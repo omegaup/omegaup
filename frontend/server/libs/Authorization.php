@@ -105,6 +105,15 @@ class Authorization {
         return Authorization::isProblemAdmin($user_id, $problem);
     }
 
+    public static function canViewCourse($user_id, Courses $course, Groups $group) {
+        if (!Authorization::isCourseAdmin($user_id, $course) &&
+            !Authorization::isGroupMember($user_id, $group)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static function isContestAdmin($user_id, Contests $contest) {
         if (is_null($contest) || !is_a($contest, 'Contests')) {
             return false;
@@ -155,5 +164,38 @@ class Authorization {
     private static function isOwner($user_id, $acl_id) {
         $acl = ACLsDAO::getByPK($acl_id);
         return $acl->owner_id == $user_id;
+    }
+
+    /**
+     * An admin is either the group owner or a member of the admin group.
+     */
+    public static function isCourseAdmin($user_id, Courses $course) {
+        if (is_null($course)) {
+            return false;
+        }
+
+        if (self::isOwner($user_id, $course->acl_id)) {
+            return true;
+        }
+
+        return GroupRolesDAO::isAdmin($user_id, $course->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $course->acl_id);
+    }
+
+    public static function isGroupMember($user_id, Groups $group) {
+        if (is_null($group)) {
+            return false;
+        }
+
+        if (Authorization::isSystemAdmin($user_id)) {
+            return true;
+        }
+
+        $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
+            'user_id' => $user_id,
+            'group_id' => $group->group_id
+        ]));
+
+        return !is_null($groupUsers) && count($groupUsers) > 0;
     }
 }

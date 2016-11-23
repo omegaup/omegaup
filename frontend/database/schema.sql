@@ -190,6 +190,25 @@ CREATE TABLE IF NOT EXISTS `Contests_Users` (
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden participar en concurso cerrado.';
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Contest_Users`
+--
+
+CREATE TABLE IF NOT EXISTS `Courses` (
+  `course_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` tinytext NOT NULL,
+  `alias` varchar(32) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL,
+  `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
+  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
+  PRIMARY KEY (`course_id`),
+  UNIQUE KEY `course_alias` (`alias`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
 --
 -- Estructura de tabla para la tabla `User_Login_Log`
 --
@@ -615,7 +634,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
   `recruitment_optin` tinyint(1) NULL DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
-  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE
+  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
@@ -699,7 +718,7 @@ CREATE TABLE IF NOT EXISTS `Groups_Users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Estructura de tabla para la tabla `Groups`
+-- Estructura de tabla para la tabla `Groups_Scoreboards`
 --
 
 CREATE TABLE IF NOT EXISTS `Groups_Scoreboards` (
@@ -766,6 +785,21 @@ CREATE TABLE IF NOT EXISTS `Run_Counts` (
 	PRIMARY KEY (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
 
+CREATE TABLE `Assignments` (
+  `assignment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `course_id` int(11) NOT NULL,
+  `problemset_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` tinytext NOT NULL,
+  `alias` varchar(32) NOT NULL,
+  `publish_time_delay` int(11),
+  `assignment_type` enum('homework', 'test') NOT NULL,
+  `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
+  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  PRIMARY KEY (`assignment_id`),
+  UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -775,6 +809,13 @@ CREATE TABLE IF NOT EXISTS `Run_Counts` (
 --
 ALTER TABLE `Announcement`
   ADD CONSTRAINT `fk_au_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Assignments`
+--
+ALTER TABLE `Assignments`
+  ADD CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Auth_Tokens`
@@ -1000,6 +1041,10 @@ ALTER TABLE `Groups_Scoreboards`
 ALTER TABLE `Groups_Scoreboards_Contests`
   ADD CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Courses`
+  ADD CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Update AC Count on grade
