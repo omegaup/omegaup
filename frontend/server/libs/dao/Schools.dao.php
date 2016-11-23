@@ -29,15 +29,20 @@ class SchoolsDAO extends SchoolsDAOBase
     public static function findByName($name) {
         global  $conn;
 
-        $sql = "select DISTINCT s.* from Schools s where s.name LIKE  CONCAT('%', ?, '%') LIMIT 10";
+        $sql = '
+            SELECT
+                s.*
+            FROM
+                Schools s
+            WHERE
+                s.name LIKE CONCAT(\'%\', ?, \'%\')
+            LIMIT 10';
         $args = array($name);
 
-        $rs = $conn->Execute($sql, $args);
-        $ar = array();
-        foreach ($rs as $foo) {
-            $bar =  new Users($foo);
-            array_push($ar, $bar);
+        $result = array();
+        foreach ($conn->Execute($sql, $args) as $row) {
+            $result[] = new Schools($row);
         }
-        return $ar;
+        return $result;
     }
 }
