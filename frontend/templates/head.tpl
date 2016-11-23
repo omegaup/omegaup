@@ -62,5 +62,5 @@
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
-		<div id="wrapper">
+		<div id="root">
 {include file='common.navbar.tpl'}
