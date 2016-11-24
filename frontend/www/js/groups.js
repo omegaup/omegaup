@@ -63,19 +63,7 @@ $(function() {
 
     // Typehead
     refreshGroupMembers();
-    $('#member-username')
-        .typeahead(
-            {
-              minLength: 2,
-              highlight: true,
-            },
-            {
-              source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
-              displayKey: 'label',
-            })
-        .on('typeahead:selected', function(item, val, text) {
-          $('#member-username').val(val.label);
-        });
+    omegaup.UI.userTypeahead('#member-username');
 
     $('#add-member-form')
         .submit(function() {

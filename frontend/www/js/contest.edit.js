@@ -189,60 +189,11 @@ $('document')
             return false;  // Prevent page refresh
           });
 
-      // Edit users
-      function userTypeahead(elm) {
-        elm.typeahead(
-               {
-                 minLength: 2,
-                 highlight: true,
-               },
-               {
-                 source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
-                 displayKey: 'label',
-               })
-            .on('typeahead:selected',
-                function(item, val, text) { elm.val(val.label); });
-      };
-
-      function groupTypeahead(elm) {
-        elm.typeahead(
-               {
-                 minLength: 2,
-                 highlight: true,
-               },
-               {
-                 source: omegaup.UI.typeaheadWrapper(omegaup.API.searchGroups),
-                 displayKey: 'label',
-               })
-            .on('typeahead:selected',
-                function(item, val, text) { elm.val(val.label); });
-      };
-
-      userTypeahead($('#username-contestant'));
-      userTypeahead($('#username-admin'));
-      groupTypeahead($('#groupalias-admin'));
-      $('#problems-dropdown')
-          .typeahead(
-              {
-                minLength: 3,
-                highlight: false,
-              },
-              {
-                source: function(query, cb) {
-                  omegaup.API.searchProblems(
-                      query, function(data) { cb(data.results); });
-                },
-                displayKey: 'alias',
-                templates: {
-                  suggestion: function(elm) {
-                    return '<strong>' + elm.title + '</strong> (' + elm.alias +
-                           ')';
-                  }
-                }
-              })
-          .on('typeahead:selected', function(item, val, text) {
-            $('#problems-dropdown').val(val.alias);
-          });
+      omegaup.UI.userTypeahead('#username-contestant');
+      omegaup.UI.userTypeahead('#username-admin');
+      omegaup.UI.standardTypeahead('#groupalias-admin',
+                                   omegaup.API.searchGroups);
+      omegaup.UI.problemTypeahead('#problems-dropdown');
 
       function refreshContestRequests() {
         $('#user-requests-table')

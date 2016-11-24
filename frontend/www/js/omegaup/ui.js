@@ -142,6 +142,53 @@ omegaup.UI = {
     return wrappedCall;
   },
 
+  standardTypeahead: function(elem, searchFn, cb) {
+    cb = cb || function(event, val) {
+      $(event.target).val(val.value);
+    };
+    $(elem)
+        .typeahead(
+            {
+              minLength: 2,
+              highlight: true,
+            },
+            {
+              source: omegaup.UI.typeaheadWrapper(searchFn),
+              displayKey: 'label',
+            })
+        .on('typeahead:selected', cb);
+  },
+
+  problemTypeahead: function(elem, labelField) {
+    labelField = labelField || 'alias';
+    $(elem)
+        .typeahead(
+            {
+              minLength: 3,
+              highlight: false,
+            },
+            {
+              source: function(query, cb) {
+                omegaup.API.searchProblems(
+                    query, function(data) { cb(data.results); });
+              },
+              displayKey: labelField,
+              templates: {
+                suggestion: function(val) {
+                  return omegaup.UI.formatString(
+                      '<strong>%(title)</strong> (%(alias))', val);
+                }
+              }
+            })
+        .on('typeahead:selected', function(event, val) {
+          $(event.target).val(val[labelField]);
+        });
+  },
+
+  userTypeahead: function(elem, cb) {
+    omegaup.UI.standardTypeahead(elem, omegaup.API.searchUsers, cb);
+  },
+
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },

@@ -1343,18 +1343,9 @@ omegaup.arena.RunView.prototype.attach = function(elm) {
         self.filter_offset(self.filter_offset() + self.row_count);
       });
 
-  $('.runsusername', elm)
-      .typeahead(
-          {
-            minLength: 2,
-            highlight: true,
-          },
-          {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
-            displayKey: 'label',
-          })
-      .on('typeahead:selected',
-          function(elm, item) { self.filter_username(item.value); });
+  omegaup.UI.userTypeahead($('.runsusername', elm), function(event, item) {
+    self.filter_username(item.value);
+  });
 
   $('.runsusername-clear', elm)
       .click(function() {

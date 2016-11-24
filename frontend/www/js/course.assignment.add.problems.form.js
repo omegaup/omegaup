@@ -18,27 +18,7 @@ $('a[data-toggle="tab"]')
         });
 
         // Plug problems type-ahead
-        $('.assignment-add-problem #problems-dropdown')
-            .typeahead(
-                {
-                  minLength: 3,
-                  highlight: false,
-                },
-                {
-                  source: function(query, cb) {
-                    omegaup.API.searchProblems(
-                        query, function(data) { cb(data.results); });
-                  },
-                  displayKey: 'alias',
-                  templates: {
-                    suggestion: function(elm) {
-                      return '<strong>' + elm.title + '</strong> (' +
-                             elm.alias + ')';
-                    }
-                  }
-                })
-            .on('typeahead:selected', function(item, val, text) {
-              $('#problems-dropdown').val(val.alias);
-            });
+        omeguap.UI.problemTypeahead(
+            '.assignment-add-problem #problems-dropdown');
       }
     });
