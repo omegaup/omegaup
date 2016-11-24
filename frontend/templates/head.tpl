@@ -2,7 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head data-locale="{#locale#}">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{if $inArena}
+		{assign var='LOAD_MATHJAX' value='true'}
+		{assign var='navbarSection' value='arena'}
+{else}
 		<meta name="google-signin-client_id" content="{$GOOGLECLIENTID}">
+{/if}
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
@@ -14,6 +19,14 @@
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/api.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/ui.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
+{if $inArena}
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.gritter.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
+{else}
+		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>
+{/if}
 
 {if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
@@ -23,7 +36,6 @@
 		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {/if}
 		<link rel="stylesheet" href="/third_party/css/reset.css" />
-		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
 
@@ -32,9 +44,6 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/js/bootstrap.min.js"}"></script>
-		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
-		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}"></script>
-		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-select.min.js"}"></script>
@@ -47,8 +56,16 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
 
-		<link rel="stylesheet" type="text/css" href="/css/common.css" />
+{if $inArena}
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
+		<link rel="stylesheet" type="text/css" href="/third_party/css/jquery.gritter.css" />
+{else}
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
+		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
+		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}"></script>
+		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
+{/if}
+		<link rel="stylesheet" type="text/css" href="/css/common.css" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
@@ -62,5 +79,14 @@
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
-		<div id="wrapper">
+{if $inArena}
+		<!-- Generated from http://ajaxload.info/ -->
+		{if !isset($bodyid) or $bodyid != 'only-problem'}
+		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		{/if}
+{/if}
+		<div id="root">
 {include file='common.navbar.tpl'}
+{if $inArena}
+{include file='status.tpl'}
+{/if}
