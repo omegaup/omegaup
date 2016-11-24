@@ -10,11 +10,11 @@ $('document')
                          username: $('#member-username').val()
                        })
                 .then(function(data) {
-                  if (data.status == 'ok') {
-                    omegaup.UI.success(omegaup.T.courseStudentAdded);
-                  } else {
+                  if (data.status != 'ok') {
                     omegaup.UI.error(data.error || 'error');
+                    return;
                   }
+                  omegaup.UI.success(omegaup.T.courseStudentAdded);
                 });
             refreshStudentList();
             return false;

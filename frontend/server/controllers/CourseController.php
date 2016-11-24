@@ -462,10 +462,12 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAddStudent(Request $r) {
+        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r);
 

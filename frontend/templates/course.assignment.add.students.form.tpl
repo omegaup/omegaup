@@ -1,5 +1,3 @@
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/course.add.students.form.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/course.add.students.js"}"></script>
 
@@ -31,11 +29,9 @@
 			</div>
 		</form>
 		<div>
-			<div
-				id="add-students-list-table"
-				data-bind="template: { name: 'add-student-current-list',
-							data: { listName: '{#courseListAdminCurrentCourses#}',
-									student: getStudentsList() }  }">
+			<div id="add-students-list-table"
+				 data-bind="template: { name: 'add-student-current-list',
+							data: { student: getStudentsList() }  }">
 			</div>
 		</div>
 	</div>

@@ -80,12 +80,10 @@ $('document')
     });
 
 var koStudentsList = {getStudentsList: ko.observableArray()};
+
 function refreshStudentList() {
   var courseAlias =
       /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
-
-  ko.bindingProvider.instance =
-      new ko.secureBindingsProvider({attribute: 'data-bind'});
 
   omegaup.API.getCourseStudentList({course_alias: courseAlias})
       .then(function(data) {
