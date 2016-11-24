@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile={version_hash src='/ux/arena.js'}}
+{include file='head.tpl' jsfile={version_hash src='/ux/arena.js' inArena=true}}
 {include file='arena.contest_list.tpl'}
 			<div class="container" id="main">
 				<div class="panel">

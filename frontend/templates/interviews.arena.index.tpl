@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile={version_hash src='/js/interviews.arena.contest.js'} inContest=false}
+{include file='head.tpl' jsfile={version_hash src='/js/interviews.arena.contest.js'} inContest=false inArena=true}
 
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
