@@ -4,8 +4,6 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/course.list.js"}"></script>
 
 <template id="course-list">

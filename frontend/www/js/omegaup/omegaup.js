@@ -76,6 +76,10 @@ omegaup.OmegaUp = {
         omegaup.OmegaUp._notify('ready');
       }
     });
+    var options = {
+      attribute: 'data-bind'  // default "data-sbind"
+    };
+    ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
   },
 
   _notify: function(eventName) {

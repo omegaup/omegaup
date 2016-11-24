@@ -2,8 +2,6 @@ $(document)
     .ready(function() {
       Date.setLocale(omegaup.T.locale);
 
-      ko.bindingProvider.instance =
-          new ko.secureBindingsProvider({attribute: 'data-bind'});
       var contestLists = [
         // List Id, Active, Recommended, List header
         [
