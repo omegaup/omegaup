@@ -44,6 +44,7 @@ omegaup.arena.ScoreboardColors = [
 omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
   var options = {
     isLockdownMode: false,
+    isInterview: false,
     isPractice: false,
     isOnlyProblem: false,
     disableClarifications: false,
@@ -139,11 +140,7 @@ omegaup.arena.Arena = function(options) {
 
   // Setup any global hooks.
   self.installLibinteractiveHooks();
-
-  var options = {
-    attribute: 'data-bind'  // default "data-sbind"
-  };
-  ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
+  self.bindGlobalHandlers();
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
@@ -278,6 +275,76 @@ omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
   }
 };
 
+omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
+  var self = this;
+  if (contest.status == 'error') {
+    if (!omegaup.OmegaUp.loggedIn) {
+      window.location = '/login/?redirect=' + escape(window.location);
+    } else if (contest.start_time) {
+      var f = (function(x, y) {
+        return function() {
+          var t = omegaup.OmegaUp.time();
+          $('#loading')
+              .html(x + ' ' +
+                    omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
+          if (t.getTime() < y.getTime()) {
+            setTimeout(f, 1000);
+          } else {
+            omegaup.API.getContest(x, contestLoaded);
+          }
+        }
+      })(self.options.contestAlias,
+         omegaup.OmegaUp.time(contest.start_time * 1000));
+      setTimeout(f, 1000);
+    } else {
+      $('#loading').html('404');
+    }
+    return;
+  }
+  if (self.options.isPractice && contest.finish_time &&
+      omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+    window.location = window.location.pathname.replace(/\/practice.*/, '/');
+    return;
+  }
+
+  $('#title .contest-title').html(omegaup.UI.escape(contest.title));
+  self.updateSummary(contest);
+  self.submissionGap = parseInt(contest.submission_gap);
+  if (!(self.submissionGap > 0)) self.submissionGap = 0;
+
+  self.initClock(contest.start_time, contest.finish_time,
+                 contest.submission_deadline);
+  self.initProblems(contest);
+
+  for (var idx in contest.problems) {
+    var problem = contest.problems[idx];
+    var problemName = problem.letter + '. ' + omegaup.UI.escape(problem.title);
+
+    var prob = $('#problem-list .template')
+                   .clone()
+                   .removeClass('template')
+                   .addClass('problem_' + problem.alias);
+    $('.name', prob)
+        .attr('href', '#problems/' + problem.alias)
+        .html(problemName);
+    $('#problem-list').append(prob);
+
+    $('#clarification select')
+        .append('<option value="' + problem.alias + '">' + problemName +
+                '</option>');
+  }
+
+  if (!self.options.isPractice && !self.options.isInterview) {
+    self.setupPolls();
+  }
+
+  // Trigger the event (useful on page load).
+  $(window).hashchange();
+
+  $('#loading').fadeOut('slow');
+  $('#root').fadeIn('slow');
+};
+
 omegaup.arena.Arena.prototype.initProblems = function(contest) {
   var self = this;
   self.currentContest = contest;
@@ -301,7 +368,8 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
 omegaup.arena.Arena.prototype.updateClock = function() {
   var self = this;
   var countdownTime = self.submissionDeadline || self.finishTime;
-  if (self.startTime === null || countdownTime === null) {
+  if (self.startTime === null || countdownTime === null ||
+      !omegaup.OmegaUp.ready) {
     return;
   }
 
@@ -776,6 +844,13 @@ omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
   }
 };
 
+omegaup.arena.Arena.prototype.updateAllowedLanguages = function(lang_array) {
+  $('#lang-select option')
+      .each(function(index, item) {
+        $(item).toggle(lang_array.indexOf($(item).val()) >= 0);
+      });
+};
+
 omegaup.arena.Arena.prototype.onHashChanged = function() {
   var self = this;
   var tabChanged = false;
@@ -860,14 +935,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 
       $('#problem tbody.added').remove();
 
-      $('#lang-select option')
-          .each(function(index, item) {
-            if (language_array.indexOf($(item).val()) >= 0) {
-              $(item).show();
-            } else {
-              $(item).hide();
-            }
-          });
+      self.updateAllowedLanguages(language_array);
 
       function updateRuns(runs) {
         if (runs) {
@@ -957,6 +1025,46 @@ omegaup.arena.Arena.prototype.hideOverlay = function() {
   $('#overlay').hide();
   window.location.hash =
       window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+};
+
+omegaup.arena.Arena.prototype.bindGlobalHandlers = function() {
+  var self = this;
+  $('#overlay, .close').click(self.onCloseSubmit.bind(self));
+};
+
+omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
+  var self = this;
+  if (e.target.id === 'overlay' || e.target.className === 'close') {
+    $('#submit #clarification').hide();
+    self.hideOverlay();
+    var code_file = $('#submit-code-file');
+    code_file.replaceWith(code_file = code_file.clone(true));
+    return false;
+  }
+};
+
+omegaup.arena.Arena.prototype.updateSummary = function(contest) {
+  var summary = $('#summary');
+  $('.title', summary).html(omegaup.UI.escape(contest.title));
+  $('.description', summary).html(omegaup.UI.escape(contest.description));
+  var duration = contest.finish_time.getTime() - contest.start_time.getTime();
+  $('.window_length', summary)
+      .html(omegaup.arena.FormatDelta((contest.window_length * 60000) ||
+                                      duration));
+  $('.contest_organizer', summary)
+      .html('<a href="/profile/' + contest.director + '/">' + contest.director +
+            '</a>');
+
+  $('.start_time', summary)
+      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+                                  contest.start_time.getTime()));
+  $('.finish_time', summary)
+      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+                                  contest.finish_time.getTime()));
+  $('.scoreboard_cutoff', summary)
+      .html(Highcharts.dateFormat(
+          '%Y-%m-%d %H:%M:%S',
+          contest.start_time.getTime() + duration * contest.scoreboard / 100));
 };
 
 omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {

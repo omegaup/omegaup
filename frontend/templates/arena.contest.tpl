@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile=$jsfile inContest=!$practice}
+{include file='head.tpl' jsfile=$jsfile inContest=!$practice inArena=true}
 
 {if $admin}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>

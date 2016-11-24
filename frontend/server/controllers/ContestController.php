@@ -875,7 +875,7 @@ class ContestController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            if (is_null($r['contest_alias'])) {
+            if (is_null($r['contest'])) {
                 throw new NotFoundException('contestNotFound');
             }
 
@@ -1633,6 +1633,10 @@ class ContestController extends Controller {
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['contest'])) {
+            throw new NotFoundException('contestNotFound');
         }
 
         // If true, will override Scoreboard Pertentage to 100%

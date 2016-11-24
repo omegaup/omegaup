@@ -6,14 +6,18 @@ if (!function_exists('try_define')) {
         }
     }
 }
+
+# ####################################
+# EXPERIMENTS
+# ####################################
+try_define('EXPERIMENT_SCHOOLS', true);
+
 # ####################################
 # DATABASE CONFIG
 # ####################################
 try_define('OMEGAUP_DB_NAME', 'omegaup-test');
 try_define('OMEGAUP_DB_USER', 'root');
-try_define('OMEGAUP_DB_PASS', 'omegaup');
-try_define('OMEGAUP_DB_HOST', '127.0.0.1');
-try_define('OMEGAUP_DB_DRIVER', 'mysql');
+try_define('OMEGAUP_DB_PASS', '');
 
 # ####################################
 # TEST CONFIG

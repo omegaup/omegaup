@@ -43,7 +43,7 @@ class EmailVerificationUITest extends OmegaupUITestCase {
         $this->clickAndWait("//input[@value='Inicia sesion']");
 
         // Sanity check that we are logged in
-        $this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
-        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->username);
+        $this->waitForElementPresent('//*[@id="root"]/div[1]/a');
+        $this->assertElementContainsText('//*[@id="root"]/div[1]/a', $contestant->username);
     }
 }

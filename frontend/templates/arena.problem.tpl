@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem'}
+{include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true}
 			{if $problem_admin}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<ul class="tabs">

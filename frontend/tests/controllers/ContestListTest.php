@@ -8,29 +8,6 @@
 
 class ContestListTest extends OmegaupTestCase {
     /**
-     * Check if given contest ($contestData) is in $response
-     *
-     * @param array $response
-     * @param array $contestData
-     * @param bool $inverse
-     */
-    private function assertTitleInList($response, $contestData, $inverse = false) {
-        // Assert our contest is there
-        $titles = array();
-        foreach ($response['results'] as $entry) {
-            $titles[] = $entry['title'];
-        }
-
-        $this->assertArrayHasKey('0', $response['results']);
-
-        if ($inverse === true) {
-            $this->assertNotContains($contestData['request']['title'], $titles);
-        } else {
-            $this->assertContains($contestData['request']['title'], $titles);
-        }
-    }
-
-    /**
      * Check request and response durations match.
      *
      * @param array $response
@@ -90,7 +67,11 @@ class ContestListTest extends OmegaupTestCase {
 
         $response = ContestController::apiList($r);
 
-        $this->assertTitleInList($response, $contestData);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
         $this->assertDurationIsCorrect($response, $contestData);
     }
 
@@ -113,7 +94,11 @@ class ContestListTest extends OmegaupTestCase {
         ));
         $response = ContestController::apiList($r);
 
-        $this->assertTitleInList($response, $contestData);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
         $this->assertDurationIsCorrect($response, $contestData);
     }
 
@@ -137,7 +122,11 @@ class ContestListTest extends OmegaupTestCase {
         $response = ContestController::apiList($r);
 
         // Assert our contest is not there
-        $this->assertTitleInList($response, $contestData, true /*assertNoContains*/);
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
     /**
@@ -154,7 +143,11 @@ class ContestListTest extends OmegaupTestCase {
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
-        $this->assertTitleInList($response, $contestData);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
         $this->assertDurationIsCorrect($response, $contestData);
     }
 
@@ -178,8 +171,52 @@ class ContestListTest extends OmegaupTestCase {
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
-        $this->assertTitleInList($response, $contestData);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
         $this->assertDurationIsCorrect($response, $contestData);
+    }
+
+    /**
+     *
+     */
+    public function testPrivateContestForContestGroupAdmin() {
+        // Create new private contest
+        $contestData = ContestsFactory::createContest(null, true /*private*/);
+
+        $admin1 = UserFactory::createUser();
+        $admin2 = UserFactory::createUser();
+
+        $login = self::login($admin1);
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // Assert our contest is there
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
+
+        // Add user to our private contest
+        $group = GroupsFactory::createGroup($contestData['director']);
+        GroupsFactory::addUserToGroup($group, $admin1);
+        GroupsFactory::addUserToGroup($group, $admin2);
+        ContestsFactory::addGroupAdmin($contestData, $group['group']);
+
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // Assert our contest is there
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
     /**

@@ -227,3 +227,4 @@ $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
 $experiments = new Experiments($_REQUEST);
+$smarty->assign('ENABLED_EXPERIMENTS', $experiments->getEnabledExperiments());

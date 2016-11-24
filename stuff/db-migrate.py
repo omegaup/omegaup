@@ -103,7 +103,7 @@ def latest(args):
   A helper command for puppet. Exits with 1 (error) if the latest script in the
   checkout has not been applied to the database.
   '''
-  if _revision(args) != _scripts(args)[-1][0]:
+  if _revision(args) < _scripts(args)[-1][0]:
     sys.exit(1)
 
 

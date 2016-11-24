@@ -14,6 +14,7 @@ import sys
 GIT_DIFF_TREE_PATTERN = re.compile(
     br'^:\d+ \d+ [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
 GIT_LS_TREE_PATTERN = re.compile(br'^\d* blob [0-9a-f]+\t(.*)$')
+GIT_NULL_HASH = '0000000000000000000000000000000000000000'
 
 class COLORS:
   HEADER = '\033[95m'
@@ -61,9 +62,6 @@ def _validate_args(args, files):
 def _files_to_consider(args, whitelist=(), blacklist=()):
   '''Returns the list of files to consider.
 
-  If the first commit is the null hash, all files present in the second commit
-  will be considered.
-
   Only files that matched against at least one of the regular expressions in
   |whitelist|, and match against no regular expressions in |blacklist| will be
   present in the result.
@@ -84,6 +82,10 @@ def _files_to_consider(args, whitelist=(), blacklist=()):
     if len(args.commits) == 1:
       cmd = ['/usr/bin/git', 'diff-index', '--diff-filter=d'] + args.commits
     else:
+      if args.commits[-1] == GIT_NULL_HASH:
+        # If the second commit is the null hash, the branch is being deleted,
+        # so no files should be considered.
+        return result
       cmd = ['/usr/bin/git', 'diff-tree', '-r',
              '--diff-filter=d'] + args.commits
     for line in subprocess.check_output(cmd, cwd=root).splitlines():

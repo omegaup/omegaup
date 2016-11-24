@@ -4,7 +4,7 @@
 {include file='status.tpl'}
 
 <div class="page-header">
-	<h1><span>{#frontPageLoading#}</span> <small></small></h1>
+	<h1><span>{#frontPageLoading#}</span><small></small></h1>
 	<h3><small></small></h3>
 </div>
 
@@ -24,12 +24,9 @@
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/third_party/jquery.ba-hashchange.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/js/third_party/knockout-4.3.0.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/js/third_party/knockout-secure-binding.min.js"}"></script>
 
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/ux/admin.js"}"></script>
 
 <script type="text/javascript" src="{version_hash src="/js/interviews.results.js"}"></script>
 {include file='footer.tpl'}

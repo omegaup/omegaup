@@ -63,11 +63,6 @@ $('document')
 
       omegaup.API.getContestActivityReport({'contest_alias': contestAlias})
           .then(function(report) {
-            var options = {
-              attribute: 'data-bind'  // default "data-sbind"
-            };
-            ko.bindingProvider.instance =
-                new ko.secureBindingsProvider(options);
             ko.applyBindings(new ActivityReport(report));
           });
     });

@@ -15,8 +15,6 @@ $('document').ready(function() {
             }
         }
     }
-    ko.bindingProvider.instance =
-        new ko.secureBindingsProvider({attribute: 'data-bind'});
     omegaup.API.getCourseList().then(function(data) {
         if (data.status != 'ok') {
             omegaup.UI.error(data.error);

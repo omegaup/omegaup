@@ -1055,6 +1055,14 @@ omegaup.API = {
         });
   },
 
+  getProblemsWithTags: function(tags) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/list/',
+      data: {tag: tags},
+      dataType: 'json',
+    }));
+  },
+
   searchProblems: function(query, callback) {
     $.post('/api/problem/list/', {query: query},
            function(data) { callback(data); }, 'json')
@@ -1938,5 +1946,5 @@ omegaup.API = {
           omegaup.UI.error(JSON.parse(j.responseText).error);
           callback();
         });
-  },
+  }
 };
