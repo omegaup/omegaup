@@ -431,7 +431,7 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
 };
 
 omegaup.arena.Arena.prototype.rankingChange = function(data) {
-  if (data.status != "ok") {
+  if (data.status != 'ok') {
     return;
   }
   var self = this;
@@ -1064,8 +1064,8 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
   var self = this;
   if (!self.options.isOnlyProblem &&
       (self.problems[self.currentProblem.alias].last_submission +
-            self.submissionGap * 1000 >
-        omegaup.OmegaUp.time().getTime())) {
+           self.submissionGap * 1000 >
+       omegaup.OmegaUp.time().getTime())) {
     alert(omegaup.UI.formatString(omegaup.T.arenaRunSubmitWaitBetweenUploads,
                                   {submissionGap: self.submissionGap}));
     return false;
@@ -1086,34 +1086,31 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     var reader = new FileReader();
 
     reader.onload = function(e) {
-      self.submitRun(
-          (self.options.isPractice || self.options.isOnlyProblem) ?
-              '' :
-              self.options.contestAlias,
-          self.currentProblem.alias,
-          langSelect.val(),
-          e.target.result);
+      self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
+                         '' :
+                         self.options.contestAlias,
+                     self.currentProblem.alias, langSelect.val(),
+                     e.target.result);
     };
 
     var extension = file.name.split(/\./);
     extension = extension[extension.length - 1];
 
-    if (langSelect.val() != 'cat' ||
-        file.type.indexOf('text/') === 0 || extension == 'cpp' ||
-        extension == 'c' || extension == 'java' ||
-        extension == 'txt' || extension == 'hs' ||
-        extension == 'kp' || extension == 'kj' || extension == 'p' ||
-        extension == 'pas' || extension == 'py' ||
-        extension == 'rb') {
-      if (file.size >= 10*1024) {
+    if (langSelect.val() != 'cat' || file.type.indexOf('text/') === 0 ||
+        extension == 'cpp' || extension == 'c' || extension == 'java' ||
+        extension == 'txt' || extension == 'hs' || extension == 'kp' ||
+        extension == 'kj' || extension == 'p' || extension == 'pas' ||
+        extension == 'py' || extension == 'rb') {
+      if (file.size >= 10 * 1024) {
         alert(omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
         return false;
       }
       reader.readAsText(file, 'UTF-8');
     } else {
       // 100kB _must_ be enough for anybody.
-      if (file.size >= 100*1024) {
-        alert(omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
+      if (file.size >= 100 * 1024) {
+        alert(
+            omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
         return false;
       }
       reader.readAsDataURL(file);
@@ -1124,53 +1121,51 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
 
   if (!code) return false;
 
-  self.submitRun(
-      (self.options.isPractice || self.options.isOnlyProblem) ?
-          '' :
-          self.options.contestAlias,
-      self.currentProblem.alias,
-      langSelect.val(), code);
+  self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
+                     '' :
+                     self.options.contestAlias,
+                 self.currentProblem.alias, langSelect.val(), code);
 
   return false;
 };
 
-omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias, lang, code) {
+omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
+                                                   lang, code) {
   var self = this;
   $('#submit input').attr('disabled', 'disabled');
-  omegaup.API.submit(
-      contestAlias, problemAlias, lang, code, function(run) {
-        if (run.status != 'ok') {
-          alert(run.error);
-          $('#submit input').removeAttr('disabled');
-          return;
-        }
+  omegaup.API.submit(contestAlias, problemAlias, lang, code, function(run) {
+    if (run.status != 'ok') {
+      alert(run.error);
+      $('#submit input').removeAttr('disabled');
+      return;
+    }
 
-        if (self.options.isLockdownMode && sessionStorage) {
-          sessionStorage.setItem('run:' + run.guid, code);
-        }
+    if (self.options.isLockdownMode && sessionStorage) {
+      sessionStorage.setItem('run:' + run.guid, code);
+    }
 
-        if (!self.options.isOnlyProblem) {
-          self.problems[self.currentProblem.alias].last_submission =
-              omegaup.OmegaUp.time().getTime();
-        }
+    if (!self.options.isOnlyProblem) {
+      self.problems[self.currentProblem.alias].last_submission =
+          omegaup.OmegaUp.time().getTime();
+    }
 
-        run.username = omegaup.OmegaUp.username;
-        run.status = 'new';
-        run.alias = self.currentProblem.alias;
-        run.contest_score = null;
-        run.time = omegaup.OmegaUp.time();
-        run.penalty = 0;
-        run.runtime = 0;
-        run.memory = 0;
-        run.language = $('#submit select[name="language"]').val();
-        self.updateRun(run);
+    run.username = omegaup.OmegaUp.username;
+    run.status = 'new';
+    run.alias = self.currentProblem.alias;
+    run.contest_score = null;
+    run.time = omegaup.OmegaUp.time();
+    run.penalty = 0;
+    run.runtime = 0;
+    run.memory = 0;
+    run.language = $('#submit select[name="language"]').val();
+    self.updateRun(run);
 
-        $('#submit input').removeAttr('disabled');
-        $('#submit textarea[name="code"]').val('');
-        var code_file = $('#submit-code-file');
-        code_file.replaceWith(code_file = code_file.clone(true));
-        self.hideOverlay();
-      });
+    $('#submit input').removeAttr('disabled');
+    $('#submit textarea[name="code"]').val('');
+    var code_file = $('#submit-code-file');
+    code_file.replaceWith(code_file = code_file.clone(true));
+    self.hideOverlay();
+  });
 };
 
 omegaup.arena.Arena.prototype.updateSummary = function(contest) {
