@@ -1,6 +1,6 @@
 {include file='head.tpl' jsfile={version_hash src='/ux/arena.js' inArena=true}}
 {include file='arena.contest_list.tpl'}
-			<div class="container" id="main">
+			<div id="content">
 				<div class="panel">
 					<div class="panel-heading panel-default">
 						<h1>{#arenaPageTitle#}</h1>

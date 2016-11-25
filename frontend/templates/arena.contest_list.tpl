@@ -46,6 +46,6 @@
 				</tr>
 			</tfoot>
 		</table>
-	</div> <!-- penl-body -->
+	</div> <!-- panel-body -->
 </div> <!-- panel -->
 </script>
