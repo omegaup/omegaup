@@ -16,11 +16,18 @@ import tempfile
 
 from git_tools import COLORS
 
+def _find_pip_tool(name):
+  '''Tries to find a pip tool in a few default locations.'''
+  for prefix in ['/usr/bin', '/usr/local/bin']:
+    toolpath = os.path.join(prefix, name)
+    if os.path.exists(toolpath):
+      return toolpath
+  return os.path.join(os.environ['HOME'], '.local/bin', name)
+
 PIP_PATH = '/usr/bin/pip'
 CLANG_FORMAT_PATH = '/usr/bin/clang-format-3.7'
-FIXJSSTYLE_PATH = os.path.join(os.environ['HOME'],
-                               '.local/bin/fixjsstyle')
-GJSLINT_PATH = os.path.join(os.environ['HOME'], '.local/bin/gjslint')
+FIXJSSTYLE_PATH = _find_pip_tool('fixjsstyle')
+GJSLINT_PATH = _find_pip_tool('gjslint')
 
 def run_linter(args, files, validate_only):
   '''Runs the Google Closure Compiler linter against |files|.'''
