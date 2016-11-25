@@ -159,8 +159,7 @@ omegaup.UI = {
         .on('typeahead:selected', cb);
   },
 
-  problemTypeahead: function(elem, labelField) {
-    labelField = labelField || 'alias';
+  problemTypeahead: function(elem) {
     $(elem)
         .typeahead(
             {
@@ -172,7 +171,7 @@ omegaup.UI = {
                 omegaup.API.searchProblems(
                     query, function(data) { cb(data.results); });
               },
-              displayKey: labelField,
+              displayKey: 'alias',
               templates: {
                 suggestion: function(val) {
                   return omegaup.UI.formatString(
@@ -181,7 +180,7 @@ omegaup.UI = {
               }
             })
         .on('typeahead:selected', function(event, val) {
-          $(event.target).val(val[labelField]);
+          $(event.target).val(val.alias);
         });
   },
 
