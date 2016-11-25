@@ -1050,7 +1050,7 @@ omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
 
 omegaup.arena.Arena.prototype.onLanguageSelect = function(e) {
   var lang = $(e.target).val();
-  var ext = $('#submit-filename-extension'); 
+  var ext = $('#submit-filename-extension');
   if (lang == 'cpp11') {
     ext.text('.cpp');
   } else if (lang && lang != 'cat') {
@@ -1066,17 +1066,20 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
       (self.problems[self.currentProblem.alias].last_submission +
             self.submissionGap * 1000 >
         omegaup.OmegaUp.time().getTime())) {
-    alert('Deben pasar ' + self.submissionGap +
-          ' segundos entre envios de un mismo problema');
+    alert(omegaup.UI.formatString(omegaup.T.arenaRunSubmitWaitBetweenUploads,
+                                  {submissionGap: self.submissionGap}));
     return false;
   }
 
-  if (!$('#submit select[name="language"]').val()) {
-    alert('Debes elegir un lenguaje');
+  var submitForm = $(e.target);
+  var langSelect = $('select[name="language"]', submitForm);
+  if (!langSelect.val()) {
+    alert(omegaup.T.arenaRunSubmitMissingLanguage);
     return false;
   }
 
-  var code = $('#submit textarea[name="code"]').val();
+  var code = $('textarea[name="code"]', submitForm).val();
+  // TODO: Remove form field ids.
   var file = $('#submit-code-file')[0];
   if (file && file.files && file.files.length > 0) {
     file = file.files[0];
@@ -1088,29 +1091,29 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
               '' :
               self.options.contestAlias,
           self.currentProblem.alias,
-          $('#submit select[name="language"]').val(),
+          langSelect.val(),
           e.target.result);
     };
 
     var extension = file.name.split(/\./);
     extension = extension[extension.length - 1];
 
-    if ($('#submit select[name="language"]').val() != 'cat' ||
+    if (langSelect.val() != 'cat' ||
         file.type.indexOf('text/') === 0 || extension == 'cpp' ||
         extension == 'c' || extension == 'java' ||
         extension == 'txt' || extension == 'hs' ||
         extension == 'kp' || extension == 'kj' || extension == 'p' ||
         extension == 'pas' || extension == 'py' ||
         extension == 'rb') {
-      if (file.size >= 10240) {
-        alert('El límite para subir archivos son 10kB');
+      if (file.size >= 10*1024) {
+        alert(omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
         return false;
       }
       reader.readAsText(file, 'UTF-8');
     } else {
       // 100kB _must_ be enough for anybody.
-      if (file.size >= 102400) {
-        alert('El límite para subir archivos son 100kB');
+      if (file.size >= 100*1024) {
+        alert(omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
         return false;
       }
       reader.readAsDataURL(file);
@@ -1126,7 +1129,7 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
           '' :
           self.options.contestAlias,
       self.currentProblem.alias,
-      $('#submit select[name="language"]').val(), code);
+      langSelect.val(), code);
 
   return false;
 };
