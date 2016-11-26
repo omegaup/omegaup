@@ -50,7 +50,7 @@ omegaup.arena.Notifications.prototype.attach = function(element) {
     self.notificationMapping = {};
   };
 
-  ko.applyBindings(self, element[0]);
+  if (element[0] && !ko.dataFor(element[0])) ko.applyBindings(self, element[0]);
 };
 
 omegaup.arena.Notifications.prototype.notify = function(data) {
