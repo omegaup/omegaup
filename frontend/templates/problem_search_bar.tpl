@@ -38,6 +38,4 @@
 			<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="problem-search-button"/>
 		</div>
 	</form>
-
-	<script src="{version_hash src="/js/search.js"}"></script>
 </div>

@@ -1,19 +1,6 @@
 $('document')
     .ready(function() {
-      $('#username')
-          .typeahead(
-              {
-                minLength: 2,
-                highlight: true,
-              },
-              {
-                source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
-                displayKey: 'label',
-              })
-          .on('typeahead:selected', function(item, val, text) {
-            $('#username').val(val.label);
-          });
-
+      omeguap.UI.userTypeahead($('#username'));
       $('#verify-user-form')
           .submit(function() {
             username = $('#username').val();
