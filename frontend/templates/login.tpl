@@ -1,6 +1,4 @@
 {include file='head.tpl' htmlTitle='{#omegaupTitleLogin#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <div id="login-page">
 	<div class="panel panel-default">

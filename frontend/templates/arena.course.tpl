@@ -1,6 +1,4 @@
 {include file='head.tpl' htmlTitle='{#courseDetails#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <script src="{version_hash src="/js/course.js"}"></script>
 

@@ -1,7 +1,5 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' navbarSection='contests' htmlTitle='{#omegaupTitleContest#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 {if $PRIVATE_CONTESTS_ALERT eq 1}
 	<div class="alert alert-info">

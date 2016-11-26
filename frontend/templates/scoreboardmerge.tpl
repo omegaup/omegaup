@@ -1,7 +1,5 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle='{#omegaupTitleScoreboardmerge#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <div class="post">
 	<div class="copy">

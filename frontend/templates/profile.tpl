@@ -1,6 +1,4 @@
 {include file='head.tpl' htmlTitle='{#omegaupTitleProfile#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 {if !isset($STATUS_ERROR)}
 

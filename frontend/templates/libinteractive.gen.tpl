@@ -1,5 +1,4 @@
 {include file='head.tpl' htmlTitle='libinteractive'}
-{include file='mainmenu.tpl'}
 
 <div class="panel panel-default">
   <div class="panel-body">

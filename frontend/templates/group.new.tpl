@@ -1,7 +1,5 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle='{#omegaupTitleGroupsNew#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 {if !isset($IS_UPDATE)}
 	{assign "IS_UPDATE" 0}

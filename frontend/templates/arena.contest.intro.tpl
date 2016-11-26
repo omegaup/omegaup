@@ -1,6 +1,4 @@
 {include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle='{#enterContest#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">

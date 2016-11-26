@@ -1,6 +1,4 @@
 {include file='head.tpl' htmlTitle='{#omegaupTitleCodersofthemonth#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <div class="wait_for_ajax panel panel-default" id="coders_list" >
 	<div class="panel-heading">

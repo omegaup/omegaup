@@ -1,7 +1,5 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle='{#omegaupTitleMyProblemsList#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 {if $PRIVATE_PROBLEMS_ALERT eq 1}
 	<div class="alert alert-info">

@@ -1,6 +1,4 @@
 {include file='head.tpl' htmlTitle='{#enterContest#}'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
 
 <div id="intro-page" class="contest">
 	<div class="panel panel-default">
