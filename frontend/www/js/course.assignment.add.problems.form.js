@@ -18,7 +18,7 @@ $('a[data-toggle="tab"]')
         });
 
         // Plug problems type-ahead
-        omeguap.UI.problemTypeahead(
+        omegaup.UI.problemTypeahead(
             $('.assignment-add-problem #problems-dropdown'));
       }
     });
