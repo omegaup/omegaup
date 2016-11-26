@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#enterCourse#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#enterCourse#}"}
 
 <div id="intro-page" class="course">
 	<div class="panel panel-default">

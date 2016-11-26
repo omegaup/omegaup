@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#omegaupTitleProfile#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleProfile#}"}
 
 {if !isset($STATUS_ERROR)}
 

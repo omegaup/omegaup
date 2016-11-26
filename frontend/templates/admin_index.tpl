@@ -1,6 +1,4 @@
-{assign var="htmlTitle" value="{#omegaupTitleAdminIndex#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleAdminIndex#}"}
 
 <div class="post" >
 	<div class="copy" >

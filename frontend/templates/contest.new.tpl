@@ -1,8 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleContestNew#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleContestNew#}"}
 
 {include file='contest.new.form.tpl'}
 

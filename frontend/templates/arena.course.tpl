@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#courseDetails#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#courseDetails#}"}
 
 <script src="{version_hash src="/js/course.js"}"></script>
 

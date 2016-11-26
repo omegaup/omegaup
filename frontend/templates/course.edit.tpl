@@ -1,8 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleCourseEdit#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleCourseEdit#}"}
 
 <div class='panel'>
 	<div class="page-header">

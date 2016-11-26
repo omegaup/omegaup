@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#interviewList#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#interviewList#}"}
 
 <div class="page-header">
 	<h1><span>{#frontPageLoading#}</span><small></small></h1>

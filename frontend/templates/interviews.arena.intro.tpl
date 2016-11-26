@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#enterContest#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#enterContest#}"}
 
 <div id="intro-page" class="contest">
 	<div class="panel panel-default">

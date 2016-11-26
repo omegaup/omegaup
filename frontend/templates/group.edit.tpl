@@ -1,8 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleGroupsEdit#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleGroupsEdit#}"}
 
 <span id="form-data" data-name="groups" data-page="edit" data-alias="{$smarty.get.group}"></span>
 <script src="{version_hash src="/js/groups.js"}"></script>

@@ -86,6 +86,7 @@
 {/if}
 		<div id="root">
 {include file='common.navbar.tpl'}
-{if $inArena}
-{include file='status.tpl'}
+{if !$inArena}
+{include file='mainmenu.tpl'}
 {/if}
+{include file='status.tpl'}

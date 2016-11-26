@@ -1,8 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleGroups#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleGroups#}"}
 
 <span id="form-data" data-name="groups" data-page="list"></span>
 <script src="{version_hash src="/js/groups.js"}"></script>

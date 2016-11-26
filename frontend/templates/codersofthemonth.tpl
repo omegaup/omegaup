@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#omegaupTitleCodersofthemonth#}"}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleCodersofthemonth#}"}
 
 <div class="wait_for_ajax panel panel-default" id="coders_list" >
 	<div class="panel-heading">

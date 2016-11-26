@@ -1,8 +1,5 @@
 {include file='redirect.tpl'}
-{assign var='htmlTitle' value='My courses'}
-{include file='head.tpl'}
-{include file='mainmenu.tpl'}
-{include file='status.tpl'}
+{include file='head.tpl' htmlTitle="My courses"}
 
 <script type="text/javascript" src="{version_hash src="/js/course.list.js"}"></script>
 

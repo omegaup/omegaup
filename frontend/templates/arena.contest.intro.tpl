@@ -1,7 +1,4 @@
-{assign var="htmlTitle" value="{#enterContest#}"}
-{include file="head.tpl" jsfile={version_hash src="/js/contestintro.js"}}
-{include file="mainmenu.tpl"}
-{include file="status.tpl"}
+{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}"}
 
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">

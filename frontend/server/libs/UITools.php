@@ -10,21 +10,7 @@ require_once(OMEGAUP_ROOT . '/www/api/ApiCaller.php');
 
 class UITools {
     public static $IsLoggedIn = false;
-    public static $isAdmin = false;
-
-    /**
-     * Set rank by problems solved
-     *
-     * @param Smarty smarty
-     * @param int $offset
-     * @param int $rowcount
-     */
-    public static function setRankByProblemsSolved(Smarty $smarty, $offset, $rowcount) {
-        $rankRequest = new Request(array('offset' => $offset, 'rowcount' => $rowcount));
-        $response = UserController::getRankByProblemsSolved2($rankRequest);
-
-        $smarty->assign('rank', $response);
-    }
+    public static $IsAdmin = false;
 
     /**
      * If user is not logged in, redirect to login page
@@ -40,7 +26,7 @@ class UITools {
      * If user is not logged in or isn't an admin, redirect to home page
      */
     public static function redirectIfNoAdmin() {
-        if (self::$isAdmin !== true) {
+        if (self::$IsAdmin !== true) {
             header('Location: /');
             die();
         }
