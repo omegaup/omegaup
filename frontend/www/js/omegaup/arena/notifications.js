@@ -77,14 +77,14 @@ omegaup.arena.Notifications.prototype.notify = function(data) {
                      0;
   if (lastModified >= data.modificationTime) return;
 
-  data.onCloseClicked = function() {
-    localStorage.setItem(data.id, new Date().getTime());
-    self.notifications.remove(data);
-  };
   for (var key in data) {
     if (!data.hasOwnProperty(key)) continue;
     data[key] = ko.observable(data[key]);
   }
+  data.onCloseClicked = function() {
+    localStorage.setItem(data.id(), new Date().getTime());
+    self.notifications.remove(data);
+  };
   self.notificationMapping[data.id()] = data;
 
   self.notifications.push(data);
