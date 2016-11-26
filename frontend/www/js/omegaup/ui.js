@@ -143,11 +143,8 @@ omegaup.UI = {
   },
 
   typeahead: function(elem, searchFn, cb) {
-    cb = cb || function(event, val) {
-      $(event.target).val(val.value);
-    };
-    $(elem)
-        .typeahead(
+    cb = cb || function(event, val) { $(event.target).val(val.value); };
+    elem.typeahead(
             {
               minLength: 2,
               highlight: true,
@@ -160,8 +157,7 @@ omegaup.UI = {
   },
 
   problemTypeahead: function(elem) {
-    $(elem)
-        .typeahead(
+    elem.typeahead(
             {
               minLength: 3,
               highlight: false,

@@ -1,6 +1,6 @@
 $('document')
     .ready(function() {
-      omeguap.UI.userTypeahead('#username');
+      omeguap.UI.userTypeahead($('#username'));
       $('#verify-user-form')
           .submit(function() {
             username = $('#username').val();

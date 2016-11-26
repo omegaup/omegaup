@@ -63,7 +63,7 @@ $(function() {
 
     // Typehead
     refreshGroupMembers();
-    omegaup.UI.userTypeahead('#member-username');
+    omegaup.UI.userTypeahead($('#member-username'));
 
     $('#add-member-form')
         .submit(function() {

@@ -21,11 +21,11 @@ $(document)
 
       // Add typeaheads
       refreshProblemAdmins();
-      omegaup.UI.userTypeahead('#username-admin');
-      omegaup.UI.typeahead(
-          '#groupalias-admin', omegaup.API.searchGroups, function(event, val) {
-            $(event.target).attr('data-alias', val.value);
-          });
+      omegaup.UI.userTypeahead($('#username-admin'));
+      omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.searchGroups,
+                           function(event, val) {
+                             $(event.target).attr('data-alias', val.value);
+                           });
 
       refreshProblemTags();
       $('#tag-name')
@@ -38,8 +38,8 @@ $(document)
                 source: omegaup.UI.typeaheadWrapper(omegaup.API.searchTags),
                 displayKey: 'name',
               })
-          .on('typeahead:selected', function(item, val, text) {
-            $('#tag-name').val(val.name);
+          .on('typeahead:selected', function(event, val) {
+            $(event.target).val(val.name);
           });
 
       $('#add-admin-form')

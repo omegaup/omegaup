@@ -8,6 +8,6 @@ $('a[data-toggle="tab"]')
             /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
         // Mount users typeahead
-        omegaup.UI.userTypeahead('#member-username');
+        omegaup.UI.userTypeahead($('#member-username'));
       }
     });

@@ -1,6 +1,6 @@
 $('document')
     .ready(function() {
-      omegaup.UI.userTypeahead('#username');
+      omegaup.UI.userTypeahead($('#username'));
       $('#change-password-form')
           .submit(function() {
             password = $('#password').val();

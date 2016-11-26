@@ -165,12 +165,12 @@ $(document)
         }
       });
 
-      omegaup.UI.problemTypeahead('#problems-dropdown');
+      omegaup.UI.problemTypeahead($('#problems-dropdown'));
 
       // Edit users
       omegaup.UI.userTypeahead($('#username-admin'));
       omegaup.UI.userTypeahead($('#usernameOrEmail'));
-      omegaup.UI.typeahead('#groupalias-admin', omegaup.API.searchGroups);
+      omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.searchGroups);
 
       $('#add-admin-form')
           .submit(function() {
