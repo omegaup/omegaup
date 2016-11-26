@@ -794,6 +794,8 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
     }
   }
 
+  var anchor = 'clarifications/clarification-' + clarification.clarification_id;
+  $('.anchor', r).attr('name', anchor);
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);
   if (self.contestAdmin) $('.author', r).html(clarification.author);
