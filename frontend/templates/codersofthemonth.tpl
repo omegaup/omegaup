@@ -1,5 +1,4 @@
-{assign var="htmlTitle" value="{#omegaupTitleCodersofthemonth#}"}
-{include file='head.tpl'}
+{include file='head.tpl' htmlTitle='{#omegaupTitleCodersofthemonth#}'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 

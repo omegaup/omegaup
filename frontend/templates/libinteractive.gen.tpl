@@ -1,5 +1,4 @@
-{assign var="htmlTitle" value="libinteractive"}
-{include file='head.tpl'}
+{include file='head.tpl' htmlTitle='libinteractive'}
 {include file='mainmenu.tpl'}
 
 <div class="panel panel-default">

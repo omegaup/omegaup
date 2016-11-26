@@ -1,5 +1,4 @@
-{assign var="htmlTitle" value="{#enterCourse#}"}
-{include file='head.tpl'}
+{include file='head.tpl' htmlTitle='{#enterCourse#}'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 

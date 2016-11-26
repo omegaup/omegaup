@@ -1,5 +1,4 @@
-{assign var="htmlTitle" value="{#passwordResetResetTitle#}"}
-{include file='head.tpl'}
+{include file='head.tpl' htmlTitle='{#passwordResetResetTitle#}'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 <div id="password-reset" class="container">

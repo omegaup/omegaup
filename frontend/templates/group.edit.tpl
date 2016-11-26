@@ -1,6 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleGroupsEdit#}"}
-{include file='head.tpl'}
+{include file='head.tpl' htmlTitle='{#omegaupTitleGroupsEdit#}'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
