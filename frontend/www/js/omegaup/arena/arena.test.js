@@ -1,5 +1,6 @@
 'use strict';
 require('../omegaup.js');
+require('./notifications.js');
 require('./arena.js');
 
 describe('omegaup.arena', function() {
