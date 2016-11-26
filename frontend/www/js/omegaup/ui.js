@@ -142,7 +142,7 @@ omegaup.UI = {
     return wrappedCall;
   },
 
-  standardTypeahead: function(elem, searchFn, cb) {
+  typeahead: function(elem, searchFn, cb) {
     cb = cb || function(event, val) {
       $(event.target).val(val.value);
     };
@@ -185,7 +185,7 @@ omegaup.UI = {
   },
 
   userTypeahead: function(elem, cb) {
-    omegaup.UI.standardTypeahead(elem, omegaup.API.searchUsers, cb);
+    omegaup.UI.typeahead(elem, omegaup.API.searchUsers, cb);
   },
 
   getProfileLink: function(username) {

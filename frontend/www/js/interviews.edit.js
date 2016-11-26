@@ -170,8 +170,7 @@ $(document)
       // Edit users
       omegaup.UI.userTypeahead($('#username-admin'));
       omegaup.UI.userTypeahead($('#usernameOrEmail'));
-      omegaup.UI.standardTypeahead('#groupalias-admin',
-                                   omegaup.API.searchGroups);
+      omegaup.UI.typeahead('#groupalias-admin', omegaup.API.searchGroups);
 
       $('#add-admin-form')
           .submit(function() {

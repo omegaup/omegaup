@@ -22,7 +22,7 @@ $(document)
       // Add typeaheads
       refreshProblemAdmins();
       omegaup.UI.userTypeahead('#username-admin');
-      omegaup.UI.standardTypeahead(
+      omegaup.UI.typeahead(
           '#groupalias-admin', omegaup.API.searchGroups, function(event, val) {
             $(event.target).attr('data-alias', val.value);
           });

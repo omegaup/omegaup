@@ -191,8 +191,7 @@ $('document')
 
       omegaup.UI.userTypeahead('#username-contestant');
       omegaup.UI.userTypeahead('#username-admin');
-      omegaup.UI.standardTypeahead('#groupalias-admin',
-                                   omegaup.API.searchGroups);
+      omegaup.UI.typeahead('#groupalias-admin', omegaup.API.searchGroups);
       omegaup.UI.problemTypeahead('#problems-dropdown');
 
       function refreshContestRequests() {
