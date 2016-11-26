@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#omegaupTitleProfile#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleProfile#}"}
 
 {if !isset($STATUS_ERROR)}
 

@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle='My courses'}
+{include file='head.tpl' htmlTitle="My courses"}
 
 <script type="text/javascript" src="{version_hash src="/js/course.list.js"}"></script>
 

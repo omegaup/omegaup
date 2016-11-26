@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#omegaupTitleAdminIndex#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleAdminIndex#}"}
 
 <div class="post" >
 	<div class="copy" >

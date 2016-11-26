@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#interviewList#}'}
+{include file='head.tpl' htmlTitle="{#interviewList#}"}
 
 <span id="form-data" data-name="interviews" data-page="new"></span>
 <script src="{version_hash src="/js/alias.generate.js"}"></script>

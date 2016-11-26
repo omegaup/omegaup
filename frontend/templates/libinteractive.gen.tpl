@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='libinteractive'}
+{include file='head.tpl' htmlTitle="libinteractive"}
 
 <div class="panel panel-default">
   <div class="panel-body">

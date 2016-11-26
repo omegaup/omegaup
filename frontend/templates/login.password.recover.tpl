@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#passwordResetRequestTitle#}'}
+{include file='head.tpl' htmlTitle="{#passwordResetRequestTitle#}"}
 <div id="password-reset" class="container">
 	<h1>{#passwordResetRequestTitle#}</h1>
 	<div class="row">

@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#courseDetails#}'}
+{include file='head.tpl' htmlTitle="{#courseDetails#}"}
 
 <script src="{version_hash src="/js/course.js"}"></script>
 

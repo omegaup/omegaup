@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle='{#omegaupTitleProblemEdit#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleProblemEdit#}"}
 
 <script src="{version_hash src="/js/problem.edit.js"}" type="text/javascript"></script>
 

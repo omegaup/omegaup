@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' jsfile={version_hash src="/js/contest.activity.js"} htmlTitle='{#contestActivityReport#}'}
+{include file='head.tpl' jsfile={version_hash src="/js/contest.activity.js"} htmlTitle="{#contestActivityReport#}"}
 
 <div class="post">
   <div class="copy">

@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle='{#omegaupTitleAdminChangePassword#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleAdminChangePassword#}"}
 
 <div class="panel panel-primary">
 	<div class="panel-heading">

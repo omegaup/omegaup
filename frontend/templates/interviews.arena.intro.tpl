@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#enterContest#}'}
+{include file='head.tpl' htmlTitle="{#enterContest#}"}
 
 <div id="intro-page" class="contest">
 	<div class="panel panel-default">

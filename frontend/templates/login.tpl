@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#omegaupTitleLogin#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleLogin#}"}
 
 <div id="login-page">
 	<div class="panel panel-default">

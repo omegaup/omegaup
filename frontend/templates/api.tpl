@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='{#omegaupTitleApi#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleApi#}"}
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
 	<table>
 	<tr>

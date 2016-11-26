@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle='Hackathon omegaUp'}
+{include file='head.tpl' htmlTitle="Hackathon omegaUp"}
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 <div class="row">

@@ -1,4 +1,4 @@
-{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle='{#enterContest#}'}
+{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}"}
 
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">

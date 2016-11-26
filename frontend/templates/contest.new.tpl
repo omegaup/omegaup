@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle='{#omegaupTitleContestNew#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleContestNew#}"}
 
 {include file='contest.new.form.tpl'}
 

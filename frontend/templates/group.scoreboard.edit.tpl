@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle='{#omegaupTitleGroupsScoreboardEdit#}'}
+{include file='head.tpl' htmlTitle="{#omegaupTitleGroupsScoreboardEdit#}"}
 
 <span id="form-data" data-name="group-scoreboards" data-page="edit" data-alias="{$smarty.get.scoreboard}" data-group-alias="{$smarty.get.group}"></span>
 <script src="{version_hash src="/js/groups.scoreboards.js"}"></script>
