@@ -37,7 +37,7 @@ class UITools {
     }
 
     /**
-     * If user is not logged in, redirect to login page
+     * If user is not logged in or isn't an admin, redirect to home page
      */
     public static function redirectIfNoAdmin() {
         if (self::$isAdmin !== true) {
