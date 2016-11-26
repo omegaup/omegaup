@@ -1,3 +1,4 @@
+body { padding-top: 51px; /* Espacio para el navbar */ }
 #header { border-bottom-width: 0; }
 #header .caret { border-top-color: white; border-bottom-color: white; }
 #header .active > a { background-color: #5F87D4; }
@@ -42,9 +43,6 @@ darle focus. */
 	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
-}
-
-#header .navbar-inner .container {
 	padding-left: 0;
 	padding-right: 0;
 }
@@ -64,7 +62,7 @@ darle focus. */
 	}
 }
 
-td.forcebreaks {
+.forcebreaks {
         text-overflow: ellipsis !important;
         word-wrap: break-word;
         overflow: hidden;
@@ -73,9 +71,41 @@ td.forcebreaks {
 
 /* Evita el desborde de la tabla top 5 coders trabajando
 en conjunto con la clase ".forcebreaks" de common.css
-de tal manera que se establece overflow: hidden con un ancho mximo
+de tal manera que se establece overflow: hidden con un ancho máximo
 de 166px de contenido para mostrar.  */
-td.forcebreaks-top-5 {
+.forcebreaks-top-5 {
         word-wrap: initial !important;
         max-width: 166px;
+}
+
+/* Clase para quitar el padding de algn contenedor o div tag */
+.no-padding {
+        padding: 0;
+}
+/* Clase para quitar el margin de algn contenedor o div tag */
+.no-margin {
+        margin: 0;
+}
+/* Estilos de uso general */
+.center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+.vertical-padding {
+        padding-top: 15px;
+        padding-bottom: 15px;
+}
+
+/*
+ * Ahora el navbar está fijo hasta arriba y eso oculta los targets de
+ * navegación. Si agregamos un elemento invisible del alto del navbar, todo
+ * cuadra de nuevo.
+ */
+:target::before {
+	content: "";
+	display: block;
+	height: 51px;
+	margin: -51px 0 0;
 }

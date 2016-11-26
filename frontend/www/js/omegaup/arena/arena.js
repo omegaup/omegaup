@@ -124,7 +124,9 @@ omegaup.arena.Arena = function(options) {
   self.currentEvents = null;
 
   // Currently opened notifications.
-  self.currentNotifications = {count: 0, timer: null};
+  self.notifications = new omegaup.arena.Notifications();
+  omegaup.OmegaUp.on(
+      'ready', function() { self.notifications.attach($('#notifications')); });
 
   // Currently opened problem.
   self.currentProblem = null;
@@ -704,68 +706,18 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   }
 };
 
-omegaup.arena.Arena.prototype.flashTitle = function(reset) {
-  if (document.title.indexOf('!') === 0) {
-    document.title = document.title.substring(2);
-  } else if (!reset) {
-    document.title = '! ' + document.title;
-  }
-};
-
-omegaup.arena.Arena.prototype.notify = function(title, message, element, id,
-                                                modificationTime) {
-  var self = this;
-
-  var lastModified = parseInt((typeof(localStorage) !== 'undefined' &&
-                               localStorage.getItem(id)) ||
-                                  '0',
-                              10) ||
-                     0;
-
-  if (self.currentNotifications.hasOwnProperty(id) ||
-      lastModified >= modificationTime) {
-    return;
-  }
-
-  if (self.currentNotifications.timer == null) {
-    self.currentNotifications.timer = setInterval(self.flashTitle, 1000);
-  }
-
-  self.currentNotifications.count++;
-
-  var gid = $.gritter.add({
-    title: title,
-    text: message,
-    sticky: true,
-    before_close: function() {
-      if (localStorage) {
-        localStorage.setItem(id, modificationTime);
-      }
-      if (element) {
-        window.focus();
-        element.scrollIntoView(true);
-      }
-
-      self.currentNotifications.count--;
-      if (self.currentNotifications.count == 0) {
-        clearInterval(self.currentNotifications.timer);
-        self.currentNotifications.timer = null;
-        self.flashTitle(true);
-      }
-    }
-  });
-
-  self.currentNotifications[id] = gid;
-
-  var audio = document.getElementById('notification_audio');
-  if (audio != null) audio.play();
-};
-
 omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
   var self = this;
   var r = null;
   if (self.clarifications[clarification.clarification_id]) {
     r = self.clarifications[clarification.clarification_id];
+
+    self.notifications.notify({
+      id: 'clarification-' + clarification.clarification_id,
+      message: clarification.message,
+      answer: clarification.answer,
+      modificationTime: clarification.time.getTime()
+    });
   } else {
     r = $('.clarifications tbody.clarification-list tr.template')
             .clone()
@@ -794,6 +746,8 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
     }
   }
 
+  var anchor = 'clarifications/clarification-' + clarification.clarification_id;
+  $('.anchor', r).attr('name', anchor);
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);
   if (self.contestAdmin) $('.author', r).html(clarification.author);
@@ -807,14 +761,16 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
   }
 
   if (self.contestAdmin != !!clarification.answer) {
-    self.notify((clarification.author ? clarification.author + ' - ' : '') +
-                    clarification.problem_alias,
-                omegaup.UI.escape(clarification.message) +
-                    (clarification.answer ?
-                         ('<hr/>' + omegaup.UI.escape(clarification.answer)) :
-                         ''),
-                r[0], 'clarification-' + clarification.clarification_id,
-                clarification.time.getTime());
+    self.notifications.notify({
+      id: 'clarification-' + clarification.clarification_id,
+      author: clarification.author,
+      contest: clarification.contest_alias,
+      problem: clarification.problem_alias,
+      message: clarification.message,
+      answer: clarification.answer,
+      anchor: '#' + anchor,
+      modificationTime: clarification.time.getTime()
+    });
   }
 
   if (!self.clarifications[clarification.clarification_id]) {

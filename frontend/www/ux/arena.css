@@ -656,3 +656,79 @@ td.forcebreaks-arena {
 .contest-list tr:nth-child(4n+2) td, .contest-list tr:nth-child(4n+4) td {
    border: none;
 }
+
+/* Notificaciones */
+.notification-button {
+  padding-top: 6px !important;
+  padding-bottom: 20px !important;
+  padding-right: 12px !important;
+  padding-left: 12px !important;
+  font-size: 22px;
+}
+
+.notification-counter {
+  position: absolute;
+  font-size: 16px;
+  padding: 2px 4px;
+  bottom: 4px;
+  right: 0px;
+}
+
+.notification-drawer::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: #F5F5F5;
+}
+
+.notification-drawer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #F5F5F5;
+}
+
+.notification-drawer::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #7F7F7F;
+}
+
+.notification-drawer {
+  width: 320px;
+  max-width: 320px;
+  max-height: 380px;
+  overflow-y: scroll;
+}
+
+.notification-drawer li {
+  padding: 3px 20px;
+  border-top: 1px solid #F1F1F1;
+}
+
+.notification-drawer li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.notification-drawer li a pre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.notification-drawer li:hover,
+.notification-drawer li:focus,
+.notification-drawer li:active {
+  cursor: pointer;
+  background-color: #678DD7;
+  text-decoration: none;
+}
+
+.notification-drawer li:hover > a,
+.notification-drawer li:focus > a,
+.notification-drawer li:active > a {
+  color: #FFF;
+}
+
+.notification-drawer li a > h4,
+.notification-drawer li a > p {
+  word-wrap: break-word;
+}

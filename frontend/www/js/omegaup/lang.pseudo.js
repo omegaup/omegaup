@@ -322,6 +322,7 @@ omegaup.T = {
 	navViewProfile: "(My pr0fi13)",
 	noCoders: "(N0 c0d3r5.)",
 	notRegisteredInContest: "(Y0u ar3 n07 r3gi573r3d f0r 7hi5 c0n7357.)",
+	notificationsMarkAllAsRead: "(Mark a11 a5 r3ad)",
 	oldPassword: "(O1d pa55w0rd)",
 	omegaupTitleAdminChangePassword: "(AdminChang3Pa55w0rd)",
 	omegaupTitleAdminIndex: "(AdminInd3x)",

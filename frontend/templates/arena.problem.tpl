@@ -71,33 +71,7 @@
 {include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true}
 			</div>
 			<div id="clarifications" class="tab">
-				<table class="clarifications">
-					<caption>
-						{#wordsClarifications#}
-						<div class="clarifpager">
-							<button class="clarifpagerprev">&lt;</button>
-							<button class="clarifpagernext">&gt;</button>
-						</div>
-					</caption>
-					<thead>
-						<tr>
-							<th class="contest">{#wordsContest#}</th>
-							<th class="author">{#wordsAuthor#}</th>
-							<th class="time">{#wordsTime#}</th>
-							<th class="message">{#wordsMessage#}</th>
-							<th class="answer">{#wordsResult#}</th>
-						</tr>
-					</thead>
-					<tbody class="clarification-list">
-						<tr class="template">
-							<td class="contest"></td>
-							<td class="author"></td>
-							<td class="time"></td>
-							<td><pre class="message"></pre></td>
-							<td class="answer"><pre></pre></td>
-						</tr>
-					</tbody>
-				</table>
+{include file='arena.clarification_list.tpl' contest=false}
 			</div>
 			{/if}
 		</div>

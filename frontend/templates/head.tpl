@@ -21,8 +21,8 @@
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 {if $inArena}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.gritter.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/notifications.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
 {else}
 		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>
@@ -58,7 +58,6 @@
 
 {if $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
-		<link rel="stylesheet" type="text/css" href="/third_party/css/jquery.gritter.css" />
 {else}
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
