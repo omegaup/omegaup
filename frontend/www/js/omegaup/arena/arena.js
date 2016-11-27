@@ -143,6 +143,15 @@ omegaup.arena.Arena = function(options) {
   // Setup any global hooks.
   self.installLibinteractiveHooks();
   self.bindGlobalHandlers();
+
+  // UI elements
+  self.ui = {
+    clarification: $('#clarification'),
+    loadingOverlay: $('#loading'),
+    miniRanking: $('#mini-ranking'),
+    problemList: $('#problem-list'),
+    rankingTable: $('#ranking-table'),
+  };
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
@@ -286,9 +295,8 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
       var f = (function(x, y) {
         return function() {
           var t = omegaup.OmegaUp.time();
-          $('#loading')
-              .html(x + ' ' +
-                    omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
+          self.ui.loadingOverlay.html(
+              x + ' ' + omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
           if (t.getTime() < y.getTime()) {
             setTimeout(f, 1000);
           } else {
@@ -299,7 +307,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
          omegaup.OmegaUp.time(contest.start_time * 1000));
       setTimeout(f, 1000);
     } else {
-      $('#loading').html('404');
+      self.ui.loadingOverlay.html('404');
     }
     return;
   }
@@ -318,22 +326,19 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
                  contest.submission_deadline);
   self.initProblems(contest);
 
+  var problemSelect = $('select', self.ui.clarification);
+  var problemTemplate = $('#problem-template').html().trim();
   for (var idx in contest.problems) {
     var problem = contest.problems[idx];
     var problemName = problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
-    var prob = $('#problem-list .template')
-                   .clone()
-                   .removeClass('template')
-                   .addClass('problem_' + problem.alias);
+    var prob = $(problemTemplate).addClass('problem_' + problem.alias);
     $('.name', prob)
         .attr('href', '#problems/' + problem.alias)
         .html(problemName);
-    $('#problem-list').append(prob);
+    self.ui.problemList.append(prob);
 
-    $('#clarification select')
-        .append('<option value="' + problem.alias + '">' + problemName +
-                '</option>');
+    $('<option>').val(problem.alias).text(problemName).appendTo(problemSelect);
   }
 
   if (!self.options.isPractice && !self.options.isInterview) {
@@ -343,7 +348,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
   // Trigger the event (useful on page load).
   $(window).hashchange();
 
-  $('#loading').fadeOut('slow');
+  self.ui.loadingOverlay.fadeOut('slow');
   $('#root').fadeIn('slow');
 };
 
@@ -363,8 +368,8 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
     $('<td class="prob_' + alias + '_points"></td>')
         .insertBefore('#ranking-table tbody.user-list-template td.points');
   }
-  $('#ranking-table thead th').attr('colspan', '');
-  $('#ranking-table tbody.user-list-template .penalty').remove();
+  $('thead th', self.ui.rankingTable).attr('colspan', '');
+  $('tbody.user-list-template .penalty', self.ui.rankingTable).remove();
 };
 
 omegaup.arena.Arena.prototype.updateClock = function() {
@@ -450,8 +455,8 @@ omegaup.arena.Arena.prototype.rankingChange = function(data) {
 
 omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
   var self = this;
-  $('#mini-ranking tbody.inserted').remove();
-  $('#ranking-table tbody.inserted').remove();
+  $('tbody.inserted', self.ui.miniRanking).remove();
+  $('tbody.inserted', self.ui.rankingTable).remove();
 
   if (self.removeRecentEventClassTimeout) {
     clearTimeout(self.removeRecentEventClassTimeout);
@@ -472,7 +477,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     var rank = ranking[i];
     newRanking[rank.username] = i;
 
-    var r = $('#ranking-table tbody.user-list-template')
+    var r = $('tbody.user-list-template', self.ui.rankingTable)
                 .clone()
                 .removeClass('user-list-template')
                 .addClass('inserted')
@@ -554,11 +559,11 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
       }
     }
 
-    $('#ranking-table').append(r);
+    self.ui.rankingTable.append(r);
 
     // update miniranking
     if (i < 10) {
-      r = $('#mini-ranking tbody.user-list-template')
+      r = $('tbody.user-list-template', self.ui.miniRanking)
               .clone()
               .removeClass('user-list-template')
               .addClass('inserted');
@@ -570,7 +575,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
       $('.points', r).html(rank.total.points);
       $('.penalty', r).html(rank.total.penalty);
 
-      $('#mini-ranking').append(r);
+      self.ui.miniRanking.append(r);
     }
   }
 
@@ -695,7 +700,7 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   });
 
   // set legend colors
-  var rows = $('#ranking-table tbody.inserted tr');
+  var rows = $('tbody.inserted tr', self.ui.rankingTable);
   for (var r = 0; r < rows.length; r++) {
     $('.legend', rows[r])
         .css({
@@ -836,10 +841,11 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
     var newRun = problem[2];
     self.currentProblem = problem = self.problems[problem[1]];
 
-    $('#problem-list .active').removeClass('active');
-    $('#problem-list .problem_' + problem.alias).addClass('active');
+    $('.active', self.ui.problemList).removeClass('active');
+    $('.problem_' + problem.alias, self.ui.problemList).addClass('active');
 
     function update(problem) {
+      // TODO: Make #problem a component
       $('#summary').hide();
       $('#problem').show();
       $('#problem > .title')
@@ -941,8 +947,8 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
   } else if (self.activeTab == 'problems') {
     $('#problem').hide();
     $('#summary').show();
-    $('#problem-list .active').removeClass('active');
-    $('#problem-list .summary').addClass('active');
+    $('.active', self.ui.problemList).removeClass('active');
+    $('.summary', self.ui.problemList).addClass('active');
   } else if (self.activeTab == 'clarifications') {
     if (window.location.hash == '#clarifications/new') {
       $('#overlay form').hide();

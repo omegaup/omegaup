@@ -46,25 +46,25 @@ omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
         self.refreshClarifications();
       });
 
-  $('#clarification')
-      .submit(function(e) {
-        $('#clarification input').attr('disabled', 'disabled');
-        omegaup.API.newClarification(
-            self.arena.options.contestAlias,
-            $('#clarification select[name="problem"]').val(),
-            $('#clarification textarea[name="message"]').val(), function(run) {
-              if (run.status != 'ok') {
-                alert(run.error);
-                $('#clarification input').removeAttr('disabled');
-                return;
-              }
-              self.arena.hideOverlay();
-              self.refreshClarifications();
-              $('#clarification input').removeAttr('disabled');
-            });
+  self.arena.ui.clarification.submit(function(e) {
+    $('input', self.arena.ui.clarification).attr('disabled', 'disabled');
+    omegaup.API.newClarification(
+        self.arena.options.contestAlias,
+        $('select[name="problem"]', self.arena.ui.clarification).val(),
+        $('textarea[name="message"]', self.arena.ui.clarification).val(),
+        function(run) {
+          if (run.status != 'ok') {
+            alert(run.error);
+            $('input', self.arena.ui.clarification).removeAttr('disabled');
+            return;
+          }
+          self.arena.hideOverlay();
+          self.refreshClarifications();
+          $('input', self.arena.ui.clarification).removeAttr('disabled');
+        });
 
-        return false;
-      });
+    return false;
+  });
 };
 
 omegaup.arena.ArenaAdmin.prototype.refreshRuns = function() {

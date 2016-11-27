@@ -52,23 +52,12 @@
 					{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 				</div>
 			</div>
-
-			<div id="clarifications" class="tab">
 {include file='arena.clarification_list.tpl' contest=true}
-			</div>
-
 		</div>
 
 		<div id="overlay">
 			{include file='arena.runsubmit.tpl'}
-			<form id="clarification" method="POST">
-				<button class="close">&times;</button>
-				{#wordsProblem#}
-				<select name="problem">
-				</select><br/>
-				<textarea name="message"></textarea><br/>
-				<input type="submit" />
-			</form>
+			{include file='arena.clarification.tpl'}
 			{include file='arena.rundetails.tpl'}
 		</div>
 	</body>

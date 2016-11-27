@@ -1,3 +1,4 @@
+			<div id="clarifications" class="tab">
 				<table class="clarifications">
 					<caption>
 						{#wordsClarifications#}
@@ -45,4 +46,4 @@
 						</tr>
 					</tbody>
 				</table>
-
+			</div>
