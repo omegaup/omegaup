@@ -147,10 +147,12 @@ omegaup.arena.Arena = function(options) {
   // UI elements
   self.ui = {
     clarification: $('#clarification'),
+    clock: $('#title .clock'),
     loadingOverlay: $('#loading'),
     miniRanking: $('#mini-ranking'),
     problemList: $('#problem-list'),
     rankingTable: $('#ranking-table'),
+    socketStatus: $('#title .socket-status'),
   };
 };
 
@@ -200,7 +202,7 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 
   try {
     self.socket = new WebSocket(uri, 'com.omegaup.events');
-    $('#title .socket-status').html('&bull;');
+    self.ui.socketStatus.html('&bull;');
     self.socket.onmessage = function(message) {
       console.log(message);
       var data = JSON.parse(message.data);
@@ -219,7 +221,7 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
       }
     };
     self.socket.onopen = function() {
-      $('#title .socket-status').html('&bull;').css('color', '#080');
+      self.ui.socketStatus.html('&bull;').css('color', '#080');
       self.socket_keepalive =
           setInterval((function(socket) {
                         return function() { socket.send('"ping"'); };
@@ -227,14 +229,14 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
                       30000);
     };
     self.socket.onclose = function(e) {
-      $('#title .socket-status').html('&cross;').css('color', '#800');
+      self.ui.socketStatus.html('&cross;').css('color', '#800');
       self.socket = null;
       clearInterval(self.socket_keepalive);
       setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
       console.error(e);
     };
     self.socket.onerror = function(e) {
-      $('#title .socket-status').html('&cross;').css('color', '#800');
+      self.ui.socketStatus.html('&cross;').css('color', '#800');
       self.socket = null;
       clearInterval(self.socket_keepalive);
       setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
@@ -276,7 +278,7 @@ omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
   self.startTime = start;
   self.finishTime = finish;
   if (self.options.isPractice) {
-    $('#title .clock').html('&infin;');
+    self.ui.clock.html('&infin;');
     return;
   }
   if (deadline) self.submissionDeadline = deadline;
@@ -408,7 +410,7 @@ omegaup.arena.Arena.prototype.updateClock = function() {
                                       (date + omegaup.OmegaUp._deltaTime));
   }
 
-  $('#title .clock').html(clock);
+  self.ui.clock.html(clock);
 };
 
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
