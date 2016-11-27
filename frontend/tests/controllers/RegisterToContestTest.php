@@ -15,9 +15,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
         // Contest will start in the future:
+        $adminLogin = self::login($contestAdmin);
         $request = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestAdmin),
+            'auth_token' => $adminLogin->auth_token,
             'start_time' => Utils::GetPhpUnixTimestamp() + 60 * 60,
         ));
         $request['finish_time'] = $request['start_time'] + 60;
@@ -26,9 +27,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         // Contestant will try to open the contes, this should fail
         $contestant = UserFactory::createUser();
 
+        $contestantLogin = self::login($contestant);
         $request2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
 
         try {
@@ -42,9 +44,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
+        $adminLogin = self::login($contestAdmin);
         $request = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestAdmin),
+            'auth_token' => $adminLogin->auth_token,
             'start_time' => Utils::GetPhpUnixTimestamp() - 1,
         ));
         $request['finish_time'] = $request['start_time'] + 60;
@@ -53,9 +56,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         $show_intro = ContestController::showContestIntro($request2);
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
+        $contestantLogin = self::login($contestant);
         $request2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
 
         // Join this contest
@@ -75,18 +79,20 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // make it "registrable"
         self::log('Update contest to make it registrable');
+        $adminLogin = self::login($contestAdmin);
         $r1 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
             'contestant_must_register' => true,
-            'auth_token' => self::login($contestAdmin),
+            'auth_token' => $adminLogin->auth_token,
         ));
         ContestController::apiUpdate($r1);
 
         // some user asks for contest
         $contestant = UserFactory::createUser();
+        $contestantLogin = self::login($contestant);
         $r2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
         try {
             $response = ContestController::apiDetails($r2);
@@ -99,9 +105,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         ContestController::apiRegisterForContest($r2);
 
         // admin lists registrations
+        $adminLogin = self::login($contestAdmin);
         $r3 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestAdmin),
+            'auth_token' => $adminLogin->auth_token,
         ));
         $result = ContestController::apiRequests($r3);
         $this->assertEquals(sizeof($result['users']), 1);
@@ -112,9 +119,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         ContestController::apiArbitrateRequest($r3);
 
         // ask for details again, this should fail again
+        $contestantLogin = self::login($contestant);
         $r2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
         try {
             $response = ContestController::apiDetails($r2);
@@ -129,9 +137,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         ContestController::apiArbitrateRequest($r3);
 
         // user can now submit to contest
+        $contestantLogin = self::login($contestant);
         $r2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
 
         // Explicitly join contest
@@ -147,25 +156,26 @@ class RegisterToContestTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
         // make it "registrable"
+        $adminLogin = self::login($contestAdmin);
         $r1 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
             'contestant_must_register' => true,
-            'auth_token' => self::login($contestAdmin),
+            'auth_token' => $adminLogin->auth_token,
         ));
         ContestController::apiUpdate($r1);
 
         // some user asks for contest
         $contestant = UserFactory::createUser();
-        $login = self::login($contestant);
+        $contestantLogin = self::login($contestant);
         $r2 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
         ));
         ContestController::apiRegisterForContest($r2);
 
         $r3 = new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestant),
+            'auth_token' => $contestantLogin->auth_token,
             'username' => $contestant->username,
             'resolution' => true,
         ));

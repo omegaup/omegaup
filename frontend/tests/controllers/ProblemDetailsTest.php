@@ -26,15 +26,13 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
 
-        // Prepare our request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
-
-        // Log in the user
-        $r['auth_token'] = self::login($contestant);
-
         // Explicitly join contest
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+        ]);
         ContestController::apiOpen($r);
 
         // Call api
@@ -92,30 +90,27 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
 
-        // Prepare our request
-        $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
-
-        // Log in the user
-        $r['auth_token'] = self::login($contestant);
-
         // Call api
-        $r['statement_type'] = $type;
-        $response = ProblemController::apiDetails($r);
+        $login = self::login($contestant);
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'statement_type' => $type,
+        ]));
 
-                // Assert data
-                $this->assertContains($expected_text, $response['problem_statement']);
+        // Assert data
+        $this->assertContains($expected_text, $response['problem_statement']);
     }
 
     /**
-     * Problem statmeent is returned in HTML.
+     * Problem statement is returned in HTML.
      */
     public function testViewProblemStatementHtml() {
         $this->internalViewProblemStatement('html', '<h1>Entrada</h1>');
     }
 
     /**
-     * Problem statmeent is returned in Markdown.
+     * Problem statement is returned in Markdown.
      */
     public function testViewProblemStatementMarkdown() {
         $this->internalViewProblemStatement('markdown', '# Entrada');
@@ -135,15 +130,12 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
 
-        // Prepare our request
-        $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
-
-        // Log in the user
-        $r['auth_token'] = self::login($contestant);
-
         // Call api
-        $response = ProblemController::apiDetails($r);
+        $login = self::login($contestant);
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+        ]));
 
         $this->assertEquals($response['alias'], $problemData['request']['alias']);
     }
@@ -160,15 +152,12 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
 
-        // Prepare our request
-        $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
-
-        // Log in the user
-        $r['auth_token'] = self::login($contestant);
-
         // Call api
-        $response = ProblemController::apiDetails($r);
+        $login = self::login($contestant);
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+        ]));
     }
 
     /**
@@ -188,10 +177,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $response = ProblemController::apiDetails(new Request(array(
-            'auth_token' => self::login($contestant),
+        $login = self::login($contestant);
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias']
-        )));
+        ]));
 
         $this->assertEquals(100.00, $response['score']);
     }
@@ -215,11 +205,12 @@ class ProblemDetailsTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
-        $response = ProblemController::apiDetails(new Request(array(
-            'auth_token' => self::login($contestant),
+        $login = self::login($contestant);
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'contest_alias' => $contestData['request']['alias']
-        )));
+        ]));
 
         $this->assertEquals(50.00, $response['score']);
     }

@@ -16,10 +16,12 @@ class UserResetPasswordTest extends OmegaupTestCase {
         // Create the admin who will change the password
         $admin = UserFactory::createAdminUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($admin);
-        $r['username'] = $user->username;
-        $r['password'] = Utils::CreateRandomString();
+        $adminLogin = self::login($admin);
+        $r = new Request(array(
+            'auth_token' => $adminLogin->auth_token,
+            'username' => $user->username,
+            'password' => Utils::CreateRandomString(),
+        ));
 
         // Call api
         UserController::apiChangePassword($r);
@@ -47,11 +49,13 @@ class UserResetPasswordTest extends OmegaupTestCase {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['username'] = $user->username;
-        $r['password'] = Utils::CreateRandomString();
-        $r['old_password'] = $user->password;
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'username' => $user->username,
+            'password' => Utils::CreateRandomString(),
+            'old_password' => $user->password,
+        ));
 
         // Call api
         UserController::apiChangePassword($r);
@@ -78,11 +82,13 @@ class UserResetPasswordTest extends OmegaupTestCase {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['username'] = $user->username;
-        $r['password'] = Utils::CreateRandomString();
-        $r['old_password'] = 'bad old password';
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'username' => $user->username,
+            'password' => Utils::CreateRandomString(),
+            'old_password' => 'bad old password',
+        ));
 
         // Call api
         UserController::apiChangePassword($r);

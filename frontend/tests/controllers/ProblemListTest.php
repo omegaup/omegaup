@@ -19,10 +19,10 @@ class ProblemList extends OmegaupTestCase {
         // Get 1 problem private, should not appear
         $privateProblemData = ProblemsFactory::createProblem(null, null, 0 /* public */);
 
-        $r = new Request();
-        $r['auth_token'] = self::login(UserFactory::createUser());
-
-        $response = ProblemController::apiList($r);
+        $login = self::login(UserFactory::createUser());
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         // Check that all public problems are there
         for ($i = 0; $i < $n; $i++) {
@@ -78,11 +78,10 @@ class ProblemList extends OmegaupTestCase {
 
         // Test one tag at a time
         for ($j = 0; $j < $n; $j++) {
-            $r = new Request();
-            $r['auth_token'] = $login;
-            $r['tag'] = "tag-$j";
-
-            $response = ProblemController::apiList($r);
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'tag' => "tag-$j",
+            ]));
             $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tag $j.
@@ -92,12 +91,12 @@ class ProblemList extends OmegaupTestCase {
         // Test multiple tags at a time
         $tags = array();
         for ($j = 0; $j < $n; $j++) {
-            $r = new Request();
-            $r['auth_token'] = self::login(UserFactory::createUser());
             $tags[] = "tag-$j";
-            $r['tag'] = $tags;
 
-            $response = ProblemController::apiList($r);
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'tag' => $tags,
+            ]));
             $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tags 0 through $j.
@@ -115,12 +114,12 @@ class ProblemList extends OmegaupTestCase {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
         }
 
-        $r = new Request();
-        $r['auth_token'] = self::login(UserFactory::createUser());
-        $r['rowcount'] = 1;
-        $r['offset'] = 1;
-
-        $response = ProblemController::apiList($r);
+        $login = self::login(UserFactory::createUser());
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+            'rowcount' => 1,
+            'offset' => 1,
+        ]));
 
         $this->assertCount(1, $response['results']);
         $this->assertEquals($problemData[1]['request']['alias'], $response['results'][0]['alias']);
@@ -138,10 +137,10 @@ class ProblemList extends OmegaupTestCase {
         $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
         $anotherProblemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $anotherAuthor);
 
-        $r = new Request();
-        $r['auth_token'] = self::login($author);
-
-        $response = ProblemController::apiList($r);
+        $login = self::login($author);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
     }
@@ -158,10 +157,10 @@ class ProblemList extends OmegaupTestCase {
 
         $admin = UserFactory::createAdminUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($admin);
-
-        $response = ProblemController::apiList($r);
+        $login = self::login($admin);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
     }
@@ -176,18 +175,21 @@ class ProblemList extends OmegaupTestCase {
 
         $addedAdmin = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($addedAdmin);
+        $adminLogin = self::login($addedAdmin);
+        $r = new Request([
+            'auth_token' => $adminLogin->auth_token,
+        ]);
 
         // Should not be contained in problem list.
         $response = ProblemController::apiList($r);
         $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
 
-        $r2 = new Request();
-        $r2['auth_token'] = self::login($author);
-        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
-        $r2['usernameOrEmail'] = $addedAdmin->username;
-        $response = ProblemController::apiAddAdmin($r2);
+        $login = self::login($author);
+        $response = ProblemController::apiAddAdmin(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'usernameOrEmail' => $addedAdmin->username,
+        ]));
 
         $this->assertEquals('ok', $response['status']);
 
@@ -206,21 +208,24 @@ class ProblemList extends OmegaupTestCase {
 
         $addedAdmin = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($addedAdmin);
+        $login = self::login($addedAdmin);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
 
         // Should not be contained in problem list.
         $response = ProblemController::apiList($r);
         $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
 
-        $group = GroupsFactory::createGroup($addedAdmin);
-        GroupsFactory::addUserToGroup($group, $author);
+        $authorLogin = self::login($author);
+        $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
+        GroupsFactory::addUserToGroup($group, $addedAdmin, $authorLogin);
 
-        $r2 = new Request();
-        $r2['auth_token'] = self::login($author);
-        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
-        $r2['group'] = $group['group']->alias;
-        $response = ProblemController::apiAddGroupAdmin($r2);
+        $response = ProblemController::apiAddGroupAdmin(new Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'group' => $group['group']->alias,
+        ]));
 
         $this->assertEquals('ok', $response['status']);
 
@@ -241,18 +246,19 @@ class ProblemList extends OmegaupTestCase {
         $group = GroupsFactory::createGroup($author);
         GroupsFactory::addUserToGroup($group, $helper);
 
-        $r2 = new Request();
-        $r2['auth_token'] = self::login($author);
-        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
-        $r2['group'] = $group['group']->alias;
-        $response = ProblemController::apiAddGroupAdmin($r2);
+        $login = self::login($author);
+        $response = ProblemController::apiAddGroupAdmin(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'group' => $group['group']->alias,
+        ]));
 
         $this->assertEquals('ok', $response['status']);
 
         // This should be visible exactly once.
-        $r = new Request();
-        $r['auth_token'] = self::login($author);
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
         $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['alias']);
     }
 
@@ -267,10 +273,10 @@ class ProblemList extends OmegaupTestCase {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
         }
 
-        $r = new Request();
-        $r['auth_token'] = self::login($author);
-
-        $response = ProblemController::apiMyList($r);
+        $login = self::login($author);
+        $response = ProblemController::apiMyList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
         $this->assertEquals(3, count($response['problems']));
         $this->assertEquals($problemData[2]['request']['alias'], $response['problems'][0]['alias']);
     }
@@ -291,11 +297,10 @@ class ProblemList extends OmegaupTestCase {
         $runDataDecimal = RunsFactory::createRunToProblem($problemDataDecimal, $contestant);
         RunsFactory::gradeRun($runDataDecimal, '.123456', 'PA');
 
-        $r = new Request(array(
-            'auth_token' => self::login($contestant)
-        ));
-
-        $response = ProblemController::apiList($r);
+        $login = self::login($contestant);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
@@ -321,9 +326,7 @@ class ProblemList extends OmegaupTestCase {
     public function testListScoresForNonLoggedIn() {
         $problemData = ProblemsFactory::createProblem();
 
-        $r = new Request();
-
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request());
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
@@ -341,33 +344,35 @@ class ProblemList extends OmegaupTestCase {
         $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */);
 
         $user = UserFactory::createUser();
+        $userLogin = self::login($user);
         $admin = UserFactory::createAdminUser();
+        $adminLogin = self::login($admin);
 
         // Expect public problem only
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['query'] = substr($problemDataPublic['request']['title'], 2, 5);
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'query' => substr($problemDataPublic['request']['title'], 2, 5),
+        ]));
         $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['alias']);
 
         // Expect 0 problems, matches are private for $user
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['query'] = substr($problemDataPrivate['request']['title'], 2, 5);
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'query' => substr($problemDataPrivate['request']['title'], 2, 5),
+        ]));
         $this->assertEquals(0, count($response['results']));
 
         // Expect 1 problem, admin can see private problem
-        $r = new Request();
-        $r['auth_token'] = self::login($admin);
-        $r['query'] = substr($problemDataPrivate['request']['title'], 2, 5);
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'query' => substr($problemDataPrivate['request']['title'], 2, 5),
+        ]));
         $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
 
         // Expect public problem only
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $response = ProblemController::apiList($r);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $userLogin->auth_token,
+        ]));
         $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['alias']);
     }
 
@@ -392,8 +397,10 @@ class ProblemList extends OmegaupTestCase {
             }
         }
 
-        $request = new Request();
-        $request['auth_token'] = self::login($contestant);
+        $login = self::login($contestant);
+        $request = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
         $response = ProblemController::apiList($request);
 
         // Test search by title

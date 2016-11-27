@@ -14,9 +14,9 @@ class UserProblemsTest extends OmegaupTestCase {
         $problemData[2] = ProblemsFactory::createProblemWithAuthor($author);
 
         // Call API
-        // Call api
+        $login = self::login($author);
         $r = new Request(array(
-            'auth_token' => self::login($author)
+            'auth_token' => $login->auth_token,
         ));
         $response = ProblemController::apiMyList($r);
 
@@ -30,9 +30,9 @@ class UserProblemsTest extends OmegaupTestCase {
         $author = UserFactory::createUser();
 
         // Call API
-        // Call api
+        $login = self::login($author);
         $r = new Request(array(
-            'auth_token' => self::login($author)
+            'auth_token' => $login->auth_token,
         ));
         $response = ProblemController::apiMyList($r);
 

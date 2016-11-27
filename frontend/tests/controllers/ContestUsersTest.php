@@ -28,12 +28,12 @@ class ContestUsersTest extends OmegaupTestCase {
         $nonRegisteredUser = UserFactory::createUser();
         ContestsFactory::openContest($contestData, $nonRegisteredUser);
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
         // Log in with the admin of the contest
-        $r['auth_token'] = self::login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]);
 
         // Call API
         $response = ContestController::apiUsers($r);
@@ -49,16 +49,18 @@ class ContestUsersTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         ContestsFactory::openContest($contestData, $user);
 
-        ContestController::apiDetails(new Request(array(
+        $userLogin = self::login($user);
+        ContestController::apiDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($user),
-        )));
+        ]));
 
         // Call API
-        $response = ContestController::apiActivityReport(new Request(array(
+        $directorLogin = self::login($contestData['director']);
+        $response = ContestController::apiActivityReport(new Request([
+            'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => self::login($contestData['director']),
-        )));
+        ]));
 
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));

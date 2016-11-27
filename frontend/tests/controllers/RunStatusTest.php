@@ -28,9 +28,11 @@ class RunStatusTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = self::login($contestant);
-        $r['run_alias'] = $runData['response']['guid'];
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'run_alias' => $runData['response']['guid'],
+        ));
 
         // Call API
         $response = RunController::apiStatus($r);

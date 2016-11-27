@@ -41,16 +41,14 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::openProblemInContest($this->contestData, $problemData, $this->contestant);
 
         // Create an empty request
-        $r = new Request();
-
-        // Log in as contestant
-        $r['auth_token'] = self::login($this->contestant);
-
-        // Build request
-        $r['contest_alias'] = $this->contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($this->contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $this->contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ));
 
         return $r;
     }
@@ -165,7 +163,8 @@ class RunCreateTest extends OmegaupTestCase {
         $contestant2 = UserFactory::createUser();
 
         // Log in this second user
-        $r['auth_token'] = self::login($contestant2);
+        $login = self::login($contestant2);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API
         RunController::apiCreate($r);
@@ -357,7 +356,8 @@ class RunCreateTest extends OmegaupTestCase {
         $this->detourGraderCalls();
 
         // Log as contest director
-        $r['auth_token'] = self::login($this->contestData['director']);
+        $login = self::login($this->contestData['director']);
+        $r['auth_token'] = $login->auth_token;
 
         // Manually set the contest	start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -380,7 +380,8 @@ class RunCreateTest extends OmegaupTestCase {
         $this->detourGraderCalls($this->exactly(2));
 
         // Log as contest director
-        $r['auth_token'] = self::login($this->contestData['director']);
+        $login = self::login($this->contestData['director']);
+        $r['auth_token'] = $login->auth_token;
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -419,16 +420,14 @@ class RunCreateTest extends OmegaupTestCase {
         $this->contestant = UserFactory::createUser();
 
         // Create an empty request
-        $r = new Request();
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($this->contestant);
-
-        // Build request
-        $r['contest_alias'] = ''; // Not inside a contest
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($this->contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => '', // Not inside a contest
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ));
 
         // Call API
         $this->detourGraderCalls($this->exactly(1));
@@ -451,15 +450,13 @@ class RunCreateTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create an empty request
-        $r = new Request();
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($contestant);
-
-        // Build request
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ));
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -488,17 +485,14 @@ class RunCreateTest extends OmegaupTestCase {
         // Then we need to open the problem
         ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
-        // Create an empty request
-        $r = new Request();
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($contestant);
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ));
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -524,17 +518,14 @@ class RunCreateTest extends OmegaupTestCase {
         // Create our contestant
         $this->contestant = UserFactory::createUser();
 
-        // Create an empty request
-        $r = new Request();
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($this->contestant);
-
-        // Build request
-        $r['contest_alias'] = ''; // Not inside a contest
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($this->contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => '', // Not inside a contest
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ));
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -558,14 +549,14 @@ class RunCreateTest extends OmegaupTestCase {
             // Create an empty request
             $r = new Request();
 
-            // Log in as contest director
-            $r['auth_token'] = self::login($this->contestant);
-
-            // Build request
-            $r['contest_alias'] = ''; // Not inside a contest
-            $r['problem_alias'] = $problemData['request']['alias'];
-            $r['language'] = 'c';
-            $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+            $login = self::login($this->contestant);
+            $r = new Request(array(
+                'auth_token' => $login->auth_token,
+                'contest_alias' => '', // Not inside a contest
+                'problem_alias' => $problemData['request']['alias'],
+                'language' => 'c',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ));
 
             // Call API
             $this->detourGraderCalls($this->exactly(1));

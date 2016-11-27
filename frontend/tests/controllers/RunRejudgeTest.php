@@ -33,9 +33,11 @@ class RunRejudgeTest extends OmegaupTestCase {
         $this->detourGraderCalls($this->once());
 
         // Build request
-        $r = new Request();
-        $r['run_alias'] = $runData['response']['guid'];
-        $r['auth_token'] = self::login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'run_alias' => $runData['response']['guid'],
+        ));
 
         // Call API
         $response = RunController::apiRejudge($r);

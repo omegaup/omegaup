@@ -79,14 +79,14 @@ class ProblemsFactory {
                 'zip_path' => $zipName);
     }
 
-    public static function createProblemWithAuthor(Users $author) {
-        return self::createProblem(null, null, 1, $author);
+    public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {
+        return self::createProblem(null, null, 1, $author, null, $login);
     }
 
     /**
      *
      */
-    public static function createProblem($zipName = null, $title = null, $public = 1, Users $author = null, $languages = null) {
+    public static function createProblem($zipName = null, $title = null, $public = 1, Users $author = null, $languages = null, ScopedLoginToken $login = null) {
         if (is_null($zipName)) {
             $zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
         }
@@ -96,8 +96,10 @@ class ProblemsFactory {
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
-        // Login user
-        $login = OmegaupTestCase::login($problemAuthor);
+        if ($login == null) {
+            // Login user
+            $login = OmegaupTestCase::login($problemAuthor);
+        }
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
