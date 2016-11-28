@@ -27,12 +27,10 @@
 						<div class="summary">
 							<a class="name" href="#problems">{#wordsSummary#}</a>
 						</div>
-						<template id="problem-template">
-						<div>
+						<div class="template">
 							<a class="name"></a>
 							<span class="solved"></span>
 						</div>
-						</template>
 					</div>
 {if !$practice}
 					<table id="mini-ranking">

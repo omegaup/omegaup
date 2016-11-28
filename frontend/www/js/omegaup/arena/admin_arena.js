@@ -46,21 +46,22 @@ omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
         self.refreshClarifications();
       });
 
-  self.arena.ui.clarification.submit(function(e) {
-    $('input', self.arena.ui.clarification).attr('disabled', 'disabled');
+  self.arena.elements.clarification.submit(function(e) {
+    $('input', self.arena.elements.clarification).attr('disabled', 'disabled');
     omegaup.API.newClarification(
         self.arena.options.contestAlias,
-        $('select[name="problem"]', self.arena.ui.clarification).val(),
-        $('textarea[name="message"]', self.arena.ui.clarification).val(),
+        $('select[name="problem"]', self.arena.elements.clarification).val(),
+        $('textarea[name="message"]', self.arena.elements.clarification).val(),
         function(run) {
           if (run.status != 'ok') {
             alert(run.error);
-            $('input', self.arena.ui.clarification).removeAttr('disabled');
+            $('input', self.arena.elements.clarification)
+                .removeAttr('disabled');
             return;
           }
           self.arena.hideOverlay();
           self.refreshClarifications();
-          $('input', self.arena.ui.clarification).removeAttr('disabled');
+          $('input', self.arena.elements.clarification).removeAttr('disabled');
         });
 
     return false;

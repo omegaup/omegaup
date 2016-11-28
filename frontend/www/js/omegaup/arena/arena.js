@@ -145,7 +145,7 @@ omegaup.arena.Arena = function(options) {
   self.bindGlobalHandlers();
 
   // UI elements
-  self.ui = {
+  self.elements = {
     clarification: $('#clarification'),
     clock: $('#title .clock'),
     loadingOverlay: $('#loading'),
@@ -202,7 +202,7 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 
   try {
     self.socket = new WebSocket(uri, 'com.omegaup.events');
-    self.ui.socketStatus.html('&bull;');
+    self.elements.socketStatus.html('&bull;');
     self.socket.onmessage = function(message) {
       console.log(message);
       var data = JSON.parse(message.data);
@@ -221,7 +221,7 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
       }
     };
     self.socket.onopen = function() {
-      self.ui.socketStatus.html('&bull;').css('color', '#080');
+      self.elements.socketStatus.html('&bull;').css('color', '#080');
       self.socket_keepalive =
           setInterval((function(socket) {
                         return function() { socket.send('"ping"'); };
@@ -229,14 +229,14 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
                       30000);
     };
     self.socket.onclose = function(e) {
-      self.ui.socketStatus.html('&cross;').css('color', '#800');
+      self.elements.socketStatus.html('&cross;').css('color', '#800');
       self.socket = null;
       clearInterval(self.socket_keepalive);
       setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
       console.error(e);
     };
     self.socket.onerror = function(e) {
-      self.ui.socketStatus.html('&cross;').css('color', '#800');
+      self.elements.socketStatus.html('&cross;').css('color', '#800');
       self.socket = null;
       clearInterval(self.socket_keepalive);
       setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
@@ -278,7 +278,7 @@ omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
   self.startTime = start;
   self.finishTime = finish;
   if (self.options.isPractice) {
-    self.ui.clock.html('&infin;');
+    self.elements.clock.html('&infin;');
     return;
   }
   if (deadline) self.submissionDeadline = deadline;
@@ -297,7 +297,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
       var f = (function(x, y) {
         return function() {
           var t = omegaup.OmegaUp.time();
-          self.ui.loadingOverlay.html(
+          self.elements.loadingOverlay.html(
               x + ' ' + omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
           if (t.getTime() < y.getTime()) {
             setTimeout(f, 1000);
@@ -309,7 +309,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
          omegaup.OmegaUp.time(contest.start_time * 1000));
       setTimeout(f, 1000);
     } else {
-      self.ui.loadingOverlay.html('404');
+      self.elements.loadingOverlay.html('404');
     }
     return;
   }
@@ -328,17 +328,19 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
                  contest.submission_deadline);
   self.initProblems(contest);
 
-  var problemSelect = $('select', self.ui.clarification);
-  var problemTemplate = $('#problem-template').html().trim();
+  var problemSelect = $('select', self.elements.clarification);
+  var problemTemplate = $('#problem-list .template');
   for (var idx in contest.problems) {
     var problem = contest.problems[idx];
     var problemName = problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
-    var prob = $(problemTemplate).addClass('problem_' + problem.alias);
+    var prob = problemTemplate.clone()
+                   .removeClass('template')
+                   .addClass('problem_' + problem.alias);
     $('.name', prob)
         .attr('href', '#problems/' + problem.alias)
         .html(problemName);
-    self.ui.problemList.append(prob);
+    self.elements.problemList.append(prob);
 
     $('<option>').val(problem.alias).text(problemName).appendTo(problemSelect);
   }
@@ -350,7 +352,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
   // Trigger the event (useful on page load).
   $(window).hashchange();
 
-  self.ui.loadingOverlay.fadeOut('slow');
+  self.elements.loadingOverlay.fadeOut('slow');
   $('#root').fadeIn('slow');
 };
 
@@ -370,8 +372,8 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
     $('<td class="prob_' + alias + '_points"></td>')
         .insertBefore('#ranking-table tbody.user-list-template td.points');
   }
-  $('thead th', self.ui.rankingTable).attr('colspan', '');
-  $('tbody.user-list-template .penalty', self.ui.rankingTable).remove();
+  $('thead th', self.elements.rankingTable).attr('colspan', '');
+  $('tbody.user-list-template .penalty', self.elements.rankingTable).remove();
 };
 
 omegaup.arena.Arena.prototype.updateClock = function() {
@@ -410,7 +412,7 @@ omegaup.arena.Arena.prototype.updateClock = function() {
                                       (date + omegaup.OmegaUp._deltaTime));
   }
 
-  self.ui.clock.html(clock);
+  self.elements.clock.html(clock);
 };
 
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
@@ -457,8 +459,8 @@ omegaup.arena.Arena.prototype.rankingChange = function(data) {
 
 omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
   var self = this;
-  $('tbody.inserted', self.ui.miniRanking).remove();
-  $('tbody.inserted', self.ui.rankingTable).remove();
+  $('tbody.inserted', self.elements.miniRanking).remove();
+  $('tbody.inserted', self.elements.rankingTable).remove();
 
   if (self.removeRecentEventClassTimeout) {
     clearTimeout(self.removeRecentEventClassTimeout);
@@ -479,7 +481,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     var rank = ranking[i];
     newRanking[rank.username] = i;
 
-    var r = $('tbody.user-list-template', self.ui.rankingTable)
+    var r = $('tbody.user-list-template', self.elements.rankingTable)
                 .clone()
                 .removeClass('user-list-template')
                 .addClass('inserted')
@@ -561,11 +563,11 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
       }
     }
 
-    self.ui.rankingTable.append(r);
+    self.elements.rankingTable.append(r);
 
     // update miniranking
     if (i < 10) {
-      r = $('tbody.user-list-template', self.ui.miniRanking)
+      r = $('tbody.user-list-template', self.elements.miniRanking)
               .clone()
               .removeClass('user-list-template')
               .addClass('inserted');
@@ -577,7 +579,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
       $('.points', r).html(rank.total.points);
       $('.penalty', r).html(rank.total.penalty);
 
-      self.ui.miniRanking.append(r);
+      self.elements.miniRanking.append(r);
     }
   }
 
@@ -702,7 +704,7 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   });
 
   // set legend colors
-  var rows = $('tbody.inserted tr', self.ui.rankingTable);
+  var rows = $('tbody.inserted tr', self.elements.rankingTable);
   for (var r = 0; r < rows.length; r++) {
     $('.legend', rows[r])
         .css({
@@ -843,8 +845,9 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
     var newRun = problem[2];
     self.currentProblem = problem = self.problems[problem[1]];
 
-    $('.active', self.ui.problemList).removeClass('active');
-    $('.problem_' + problem.alias, self.ui.problemList).addClass('active');
+    $('.active', self.elements.problemList).removeClass('active');
+    $('.problem_' + problem.alias, self.elements.problemList)
+        .addClass('active');
 
     function update(problem) {
       // TODO: Make #problem a component
@@ -949,8 +952,8 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
   } else if (self.activeTab == 'problems') {
     $('#problem').hide();
     $('#summary').show();
-    $('.active', self.ui.problemList).removeClass('active');
-    $('.summary', self.ui.problemList).addClass('active');
+    $('.active', self.elements.problemList).removeClass('active');
+    $('.summary', self.elements.problemList).addClass('active');
   } else if (self.activeTab == 'clarifications') {
     if (window.location.hash == '#clarifications/new') {
       $('#overlay form').hide();
