@@ -1,4 +1,4 @@
-$('document').ready(function() {
+omegaup.OmegaUp.on('ready', function() {
     function updateViewModel(model, data, section) {
         var current = model[section + 'CoursesCurrent'];
         var past = model[section + 'CoursesPast'];

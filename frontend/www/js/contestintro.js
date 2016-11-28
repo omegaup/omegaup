@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var contestAlias =
           /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
       var contestObject = null;

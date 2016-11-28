@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var original_locale = null;
       var original_school = null;
       var original_school_id = null;

@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var contestAlias = /\/contest\/([^\/]+)\/activity\/?.*/.exec(
           window.location.pathname)[1];
 

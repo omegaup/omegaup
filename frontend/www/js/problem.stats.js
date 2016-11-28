@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var problemAlias =
           /\/problem\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
 

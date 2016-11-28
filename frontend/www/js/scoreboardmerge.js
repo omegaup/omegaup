@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       omegaup.API.getContests().then(function(contests) {
         // Got the contests, lets populate the dropdown with them
         for (var i = 0; i < contests.results.length; i++) {

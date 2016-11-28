@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var chosenLanguage = null;
 
       if (window.location.hash) {

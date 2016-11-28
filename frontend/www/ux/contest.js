@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var arena = new omegaup.arena.Arena(
           omegaup.arena.GetOptionsFromLocation(window.location));
       var admin = null;
