@@ -203,7 +203,6 @@ omegaup.T = {
 	courseNewFormStartDateDesc: "Time and date (in local time) in which the course will start.",
 	courseNewFormUpdateCourse: "Update course",
 	courseNotFound: "Course not found",
-	courseStudentAdded: "Student added successfully.",
 	courseStudentsProgress: "Students progress",
 	courseViewProgress: "View progress",
 	createSchoolFailed: "School creation failed.",

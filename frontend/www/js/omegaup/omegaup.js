@@ -48,10 +48,6 @@ omegaup.OmegaUp = {
     'ready': [
       function() {
         omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
-      },
-      function() {
-        ko.bindingProvider.instance =
-            new ko.secureBindingsProvider({attribute: 'data-bind'});
       }
     ],
   },
@@ -80,6 +76,10 @@ omegaup.OmegaUp = {
         omegaup.OmegaUp._notify('ready');
       }
     });
+    var options = {
+      attribute: 'data-bind'  // default "data-sbind"
+    };
+    ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
   },
 
   _notify: function(eventName) {

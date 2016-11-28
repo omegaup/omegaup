@@ -312,15 +312,6 @@ omegaup.API = {
         });
   },
 
-  addStudentToCourse: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/addStudent/course_alias/' +
-               encodeURIComponent(params.course_alias) + '/usernameOrEmail/' +
-               encodeURIComponent(params.username) + '/',
-      dataType: 'json',
-    }));
-  },
-
   createContest: function(
       title, description, start_time, finish_time, window_length, alias,
       points_decay_factor, submissions_gap, feedback, penalty, public,
