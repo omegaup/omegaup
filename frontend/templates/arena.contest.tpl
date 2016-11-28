@@ -132,21 +132,11 @@
 				</table>
 				<div class="footer"></div>
 			</div>
-			<div id="clarifications" class="tab">
 {include file='arena.clarification_list.tpl' contest=true}
-			</div>
 		</div>
 		<div id="overlay">
 {include file='arena.runsubmit.tpl'}
-			<form id="clarification" method="POST">
-				<button class="close">&times;</button>
-				{#wordsProblem#}
-				<select name="problem">
-				</select><br/>
-				<label for="message">{#arenaClarificationCreateMaxLength#}</label>
-				<textarea name="message" maxlength="200"></textarea><br/>
-				<input type="submit" />
-			</form>
+{include file='arena.clarification.tpl'}
 {include file='arena.rundetails.tpl'}
 		</div>
 	</body>

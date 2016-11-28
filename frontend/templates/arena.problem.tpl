@@ -70,9 +70,7 @@
 			<div id="runs" class="tab">
 {include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true}
 			</div>
-			<div id="clarifications" class="tab">
 {include file='arena.clarification_list.tpl' contest=false}
-			</div>
 			{/if}
 		</div>
 		<div id="overlay">
