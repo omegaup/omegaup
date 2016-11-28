@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head data-locale="{#locale#}">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-{if $inArena}
+{if isset($inArena) && $inArena}
 		{assign var='LOAD_MATHJAX' value='true'}
 		{assign var='navbarSection' value='arena'}
 {else}
@@ -19,7 +19,7 @@
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/api.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/ui.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
-{if $inArena}
+{if isset($inArena) && $inArena}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/notifications.js"}"></script>
@@ -56,7 +56,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
 
-{if $inArena}
+{if isset($inArena) && $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
 {else}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
@@ -78,7 +78,7 @@
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
-{if $inArena}
+{if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
@@ -86,7 +86,7 @@
 {/if}
 		<div id="root">
 {include file='common.navbar.tpl'}
-{if !$inArena}
+{if !isset($inArena) || !$inArena}
 {include file='mainmenu.tpl'}
 {/if}
 {include file='status.tpl'}

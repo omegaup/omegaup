@@ -9,7 +9,7 @@
 						</a>
 					</div>
 					<ul class="nav navbar-nav">
-						{if !$smarty.const.OMEGAUP_LOCKDOWN && !isset($inContest)}
+						{if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
 						<li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
 						{if $LOGGED_IN eq '1'}
 							<li id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
@@ -48,7 +48,7 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						{if $LOGGED_IN eq '1'}
-{if isset($inContest)}
+{if isset($inContest) && $inContest}
 {include file='common.navbar.notifications.tpl'}
 {/if}
 							<li class="dropdown">
