@@ -1,6 +1,4 @@
-
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var formSubmit = function() {
         omegaup.API.createInterview(
             $('#alias').val(), $('#title').val(), $('#duration').val(),

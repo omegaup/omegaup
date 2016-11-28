@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       $('.new_contest_form')
           .submit(function() {
             var window_length_value =

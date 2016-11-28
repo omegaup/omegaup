@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       if (window.location.hash) {
         $('#sections')
             .find('a[href="' + window.location.hash + '"]')

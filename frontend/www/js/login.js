@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       function registerAndLogin() {
         if ($('#reg_pass').val() != $('#reg_pass2').val()) {
           omegaup.UI.error(omegaup.T.loginPasswordNotEqual);

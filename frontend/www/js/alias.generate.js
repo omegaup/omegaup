@@ -11,8 +11,7 @@ function generateAlias(title) {
   return title;
 }
 
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var formData = $('#form-data');
       var formName = formData.attr('data-name');
       var existsFn = null;

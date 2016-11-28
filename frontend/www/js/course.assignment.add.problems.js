@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       $('.assignment-add-problem')
           .submit(function() {
             var courseAlias = /\/course\/([^\/]+)\/edit\/?.*/.exec(

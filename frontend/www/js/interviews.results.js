@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var interviewAlias = /\/interview\/([^\/]+)\/result\/([^\/]+)?.*/.exec(
           window.location.pathname)[1];
       var candidateUsername = /\/interview\/([^\/]+)\/result\/([^\/]+)?.*/.exec(

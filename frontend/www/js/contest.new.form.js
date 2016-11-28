@@ -1,5 +1,4 @@
-$('document')
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       $('#start-time, #finish-time')
           .datetimepicker({
             weekStart: 1,

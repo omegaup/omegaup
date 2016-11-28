@@ -1,5 +1,4 @@
-$(document)
-    .ready(function() {
+omegaup.OmegaUp.on('ready', function() {
       var requiredFields = ['#source', '#title'];
       if (window.location.pathname.indexOf('/problem/new') !== 0) {
         requiredFields.push('#update-message');
