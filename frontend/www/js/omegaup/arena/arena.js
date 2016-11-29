@@ -652,6 +652,7 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
 };
 
 omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
+  var self = this;
   if (series.length == 0) return;
 
   Highcharts.setOptions({colors: omegaup.arena.ScoreboardColors});
@@ -661,8 +662,8 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
 
     xAxis: {
       ordinal: false,
-      min: this.startTime.getTime(),
-      max: Math.min(this.finishTime.getTime(), Date.now())
+      min: self.startTime.getTime(),
+      max: Math.min(self.finishTime.getTime(), Date.now())
     },
 
     yAxis: {
@@ -676,7 +677,7 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
           total += parseInt(problems[prob].points, 10);
         }
         return total;
-      })(this.problems)
+      })(self.problems)
     },
 
     plotOptions: {
