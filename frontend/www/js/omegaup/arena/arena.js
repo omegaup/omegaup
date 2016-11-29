@@ -1243,7 +1243,7 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
     };
   }
 
-  // TODO(lhchavez): Only use data.details once backendv1 is deprecated.
+  // TODO(lhchavez): Use only data.details once backendv1 is deprecated.
   var detailsGroups = data.groups;
   if (data.details) {
     detailsGroups = data.details.groups;
