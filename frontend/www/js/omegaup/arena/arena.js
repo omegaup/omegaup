@@ -1243,10 +1243,15 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
     };
   }
 
-  if (data.groups && data.groups.length) {
-    data.groups.sort(numericSort('group'));
-    for (var i = 0; i < data.groups.length; i++) {
-      data.groups[i].cases.sort(numericSort('name'));
+  // TODO(lhchavez): Only use data.details once backendv1 is deprecated.
+  var detailsGroups = data.groups;
+  if (data.details) {
+    detailsGroups = data.details.groups;
+  }
+  if (detailsGroups && detailsGroups.length) {
+    detailsGroups.sort(numericSort('group'));
+    for (var i = 0; i < detailsGroups.length; i++) {
+      detailsGroups[i].cases.sort(numericSort('name'));
     }
 
     var groups =
@@ -1263,8 +1268,8 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
                                     omegaup.T['rankScore'] + '</th>')
                             .append('<th width="1"></th>')));
 
-    for (var i = 0; i < data.groups.length; i++) {
-      var g = data.groups[i];
+    for (var i = 0; i < detailsGroups.length; i++) {
+      var g = detailsGroups[i];
       var cases = $('<tbody></tbody>').hide();
       groups.append(
           $('<tbody></tbody>')
