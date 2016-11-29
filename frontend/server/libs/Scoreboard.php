@@ -457,14 +457,15 @@ class Scoreboard {
         Scoreboard::sortScoreboard($result, $sortByName);
         usort($problems, array('Scoreboard', 'compareOrder'));
 
-        return array(
+        return [
+            'status' => 'ok',
             'problems' => $problems,
             'ranking' => $result,
             'start_time' => strtotime($contest->start_time),
             'finish_time' => strtotime($contest->finish_time),
             'title' => $contest->title,
             'time' => time() * 1000
-        );
+        ];
     }
 
     private static function compareUserScores($a, $b) {
