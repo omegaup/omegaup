@@ -18,11 +18,16 @@
 					</div>
 				</div>
 				<div id="summary" class="main">
-					<h1 class="title"></h1>
-					<p class="description"></p>
+					<h1 data-bind="html: title"></h1>
+					<p data-bind="html: description"></p>
 					<table>
-						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td class="window_length"></td></tr>
-						<tr><td><strong>{#arenaContestOrganizer#}</strong></td><td class="contest_organizer"></td></tr>
+						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="html: windowLength"></td></tr>
+						<tr>
+							<td><strong>{#arenaContestOrganizer#}</strong></td>
+							<td>
+								<a data-bind="html: contestOrganizer, attr: { href: '/profile/' + contestOrganizer + '/' }"></a>
+							</td>
+						</tr>
 					</table>
 				</div>
 
