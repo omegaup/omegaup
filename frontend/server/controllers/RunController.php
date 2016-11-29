@@ -551,7 +551,14 @@ class RunController extends Controller {
 
         if ($response['admin']) {
             if (file_exists("$grade_dir/details.json")) {
-                $response['groups'] = json_decode(file_get_contents("$grade_dir/details.json"), true);
+                $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
+                if (count(array_filter(array_keys($details), 'is_string')) > 0) {
+                    $response['details'] = $details;
+                } else {
+                    // TODO(lhchavez): Remove this backwards-compatibility shim
+                    // with backendv1.
+                    $response['groups'] = $details;
+                }
             }
             if (file_exists("$grade_dir/run.log")) {
                 $response['logs'] = file_get_contents("$grade_dir/run.log");
