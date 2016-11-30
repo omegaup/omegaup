@@ -1155,8 +1155,8 @@ omegaup.arena.Arena.prototype.updateSummary = function(contest) {
     ko.applyBindings(self.summaryView, summary[0]);
     self.summaryView.attached = true;
   }
-  self.summaryView.title(omegaup.UI.escape(contest.title));
-  self.summaryView.description(omegaup.UI.escape(contest.description));
+  self.summaryView.title(contest.title);
+  self.summaryView.description(contest.description);
   var duration = contest.finish_time.getTime() - contest.start_time.getTime();
   self.summaryView.windowLength(
       omegaup.arena.FormatDelta((contest.window_length * 60000) || duration));

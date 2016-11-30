@@ -18,14 +18,14 @@
 					</div>
 				</div>
 				<div id="summary" class="main">
-					<h1 data-bind="html: title"></h1>
-					<p data-bind="html: description"></p>
+					<h1 data-bind="text: title"></h1>
+					<p data-bind="text: description"></p>
 					<table>
-						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="html: windowLength"></td></tr>
+						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="text: windowLength"></td></tr>
 						<tr>
 							<td><strong>{#arenaContestOrganizer#}</strong></td>
 							<td>
-								<a data-bind="html: contestOrganizer, attr: { href: '/profile/' + contestOrganizer + '/' }"></a>
+								<a data-bind="text: contestOrganizer, attr: { href: '/profile/' + contestOrganizer + '/' }"></a>
 							</td>
 						</tr>
 					</table>
