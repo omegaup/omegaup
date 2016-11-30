@@ -53,14 +53,19 @@
 {/if}
 				</div>
 				<div id="summary" class="main">
-					<h1 class="title"></h1>
-					<p class="description"></p>
+					<h1 data-bind="text: title"></h1>
+					<p data-bind="text: description"></p>
 					<table>
-						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td class="finish_time"></td></tr>
-						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td class="scoreboard_cutoff"></td></tr>
-						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td class="window_length"></td></tr>
-						<tr><td><strong>{#arenaContestOrganizer#}</strong></td><td class="contest_organizer"></td></tr>
+						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td data-bind="text: startTime"></td></tr>
+						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td data-bind="text: finishTime"></td></tr>
+						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td data-bind="text: scoreboardCutoff"></td></tr>
+						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="text: windowLength"></td></tr>
+						<tr>
+							<td><strong>{#arenaContestOrganizer#}</strong></td>
+							<td>
+								<a data-bind="text: contestOrganizer, attr: { href: '/profile/' + contestOrganizer + '/' }"></a>
+							</td>
+						</tr>
 					</table>
 				</div>
 				<div id="problem" class="main">

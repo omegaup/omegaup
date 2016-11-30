@@ -154,6 +154,18 @@ omegaup.arena.Arena = function(options) {
     rankingTable: $('#ranking-table'),
     socketStatus: $('#title .socket-status'),
   };
+
+  // Contest summary view model
+  self.summaryView = {
+    title: ko.observable(),
+    description: ko.observable(),
+    windowLength: ko.observable(),
+    contestOrganizer: ko.observable(),
+    startTime: ko.observable(),
+    finishTime: ko.observable(),
+    scoreboardCutoff: ko.observable(),
+    attached: false,
+  };
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
@@ -1137,27 +1149,25 @@ omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
 };
 
 omegaup.arena.Arena.prototype.updateSummary = function(contest) {
-  var summary = $('#summary');
-  $('.title', summary).html(omegaup.UI.escape(contest.title));
-  $('.description', summary).html(omegaup.UI.escape(contest.description));
+  var self = this;
+  if (!self.summaryView.attached) {
+    var summary = $('#summary');
+    ko.applyBindings(self.summaryView, summary[0]);
+    self.summaryView.attached = true;
+  }
+  self.summaryView.title(contest.title);
+  self.summaryView.description(contest.description);
   var duration = contest.finish_time.getTime() - contest.start_time.getTime();
-  $('.window_length', summary)
-      .html(omegaup.arena.FormatDelta((contest.window_length * 60000) ||
-                                      duration));
-  $('.contest_organizer', summary)
-      .html('<a href="/profile/' + contest.director + '/">' + contest.director +
-            '</a>');
-
-  $('.start_time', summary)
-      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                  contest.start_time.getTime()));
-  $('.finish_time', summary)
-      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                  contest.finish_time.getTime()));
-  $('.scoreboard_cutoff', summary)
-      .html(Highcharts.dateFormat(
-          '%Y-%m-%d %H:%M:%S',
-          contest.start_time.getTime() + duration * contest.scoreboard / 100));
+  self.summaryView.windowLength(
+      omegaup.arena.FormatDelta((contest.window_length * 60000) || duration));
+  self.summaryView.contestOrganizer(contest.director);
+  self.summaryView.startTime(
+      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
+  self.summaryView.finishTime(Highcharts.dateFormat(
+      '%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
+  self.summaryView.scoreboardCutoff(Highcharts.dateFormat(
+      '%Y-%m-%d %H:%M:%S',
+      contest.start_time.getTime() + duration * contest.scoreboard / 100));
 };
 
 omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
