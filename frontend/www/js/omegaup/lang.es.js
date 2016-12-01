@@ -37,6 +37,7 @@ omegaup.T = {
 	arenaRunSubmitWaitBetweenUploads: "Eles devem passar %(submissionGap) segundos entre a entrega do mesmo problema",
 	cannotAddProb: "No puedes agregar problemas porque no eres el director del concurso.",
 	cannotRemoveProblem: "No puedes eliminar problemas porque no eres el director del concurso.",
+	cannotRemoveProblemWithSubmissions: "No puedes eliminar un problema que ya tiene envíos",
 	clarificationEmailBody: "<p>Hola!</p><p>El usuario <strong><a href=\"https://omegaup.com/profile/%(user_name)\">%(user_name)</a></strong> solicitó una clarificación para el problema <strong><a href=\"https://omegaup.com/arena/problem/%(problem_alias)\">%(problem_name)</a></strong>:</p><p><blockquote><p>%(clarification_body)</p></blockquote><p>Para responder, por favor visita esta liga: <a href=\"%(url)\">%(url)</a>.</p><p>Gracias,<br/>omegaUp</p>",
 	clarificationEmailSubject: "[omegaUp] Nueva clarificación para el problema %(problem_name)",
 	clarificationNotFound: "Clarificacion no encontrada",
