@@ -913,9 +913,10 @@ class UserController extends Controller {
             ) {
                 throw new ForbiddenAccessException();
             }
-            $keys = array (
-                'ROO-17' => 160
-            );
+            $keys = [
+                'ROOP-17' => 30,
+                'ROOS-17' => 30,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
