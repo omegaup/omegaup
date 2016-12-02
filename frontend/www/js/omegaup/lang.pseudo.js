@@ -37,6 +37,7 @@ omegaup.T = {
 	arenaRunSubmitWaitBetweenUploads: "(Y0u mu57 wai7 %(submissionGap) 53c0nd5 b37w33n 5ubmi55i0n5 f0r a pr0b13m)",
 	cannotAddProb: "(Cann07 add pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",
 	cannotRemoveProblem: "(Cann07 r3m0v3 7h3 pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",
+	cannotRemoveProblemWithSubmissions: "(Y0u cann07 r3m0v3 a pr0b13m 7ha7 a1r3ady ha5 5ubmi55i0n5)",
 	clarificationEmailBody: "(<p>H0wdy!</p><p>Th3 u53r <57r0ng><a hr3f=\h77p5://0m3gaup.c0m/pr0fi13/%(user_name)\>%(user_name)</a></57r0ng> ha5 r3qu3573d a c1arifica7i0n f0r 7h3 pr0b13m <57r0ng><a hr3f=\h77p5://0m3gaup.c0m/ar3na/pr0b13m/%(problem_alias)\>%(problem_name)</a></57r0ng>:</p><p><b10ckqu073><p>%(clarification_body)</p></b10ckqu073><p>T0 an5w3r i7, p13a53 vi5i7 7h3 f0110wing 1ink: <a hr3f=\%(url)\>%(url)</a>.</p><p>Thank5!,<br/>0m3gaUp</p>)",
 	clarificationEmailSubject: "([0m3gaUp] N3w c1arifica7i0n f0r pr0b13m %(problem_name))",
 	clarificationNotFound: "(C1arifica7i0n n07 f0und)",
