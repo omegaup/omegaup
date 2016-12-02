@@ -215,31 +215,37 @@ omegaup.arena.EventsSocket.prototype.connect = function() {
     return;
   }
 
-  self.socket.onmessage = function(message) {
-    var data = JSON.parse(message.data);
-
-    if (data.message == '/run/update/') {
-      data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
-      self.arena.updateRun(data.run);
-    } else if (data.message == '/clarification/update/') {
-      if (self.arena.options.disableClarifications) {
-        data.clarification.time =
-            omegaup.OmegaUp.time(data.clarification.time * 1000);
-        self.arena.updateClarification(data.clarification);
-      }
-    } else if (data.message == '/scoreboard/update/') {
-      self.arena.rankingChange(data.scoreboard);
-    }
-  };
-  self.socket.onopen = function() {
-    self.shouldRetry = true;
-    self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
-    self.socketKeepalive =
-        setInterval(function() { self.socket.send('"ping"'); }, 30000);
-  };
-  self.socket.onclose = function(e) { self.onclose(e); };
+  self.socket.onmessage = self.onmessage.bind(self);
+  self.socket.onopen = self.onopen.bind(self);
+  self.socket.onclose = self.onclose.bind(self);
 
   return self.deferred;
+};
+
+omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
+  var self = this;
+  var data = JSON.parse(message.data);
+
+  if (data.message == '/run/update/') {
+    data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
+    self.arena.updateRun(data.run);
+  } else if (data.message == '/clarification/update/') {
+    if (self.arena.options.disableClarifications) {
+      data.clarification.time =
+          omegaup.OmegaUp.time(data.clarification.time * 1000);
+      self.arena.updateClarification(data.clarification);
+    }
+  } else if (data.message == '/scoreboard/update/') {
+    self.arena.rankingChange(data.scoreboard);
+  }
+};
+
+omegaup.arena.EventsSocket.prototype.onopen = function() {
+  var self = this;
+  self.shouldRetry = true;
+  self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
+  self.socketKeepalive =
+      setInterval(function() { self.socket.send('"ping"'); }, 30000);
 };
 
 omegaup.arena.EventsSocket.prototype.onclose = function(e) {
