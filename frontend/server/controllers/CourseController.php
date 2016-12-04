@@ -322,7 +322,7 @@ class CourseController extends Controller {
         }
 
         $response = array();
-        $response['assignments'] = array();
+        $response['assignments'] = [];
         foreach ($assignments as $a) {
             $response['assignments'][] = array(
                 'name' => $a->name,
