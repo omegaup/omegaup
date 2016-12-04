@@ -1,4 +1,4 @@
-$(function() {
+omegaup.OmegaUp.on('ready', function() {
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
   omegaup.API.getCourseDetails(courseAlias, function(course) {
     // Assignment lists by type.
@@ -17,16 +17,18 @@ $(function() {
           new Date(1000 * course.assignments[i].start_time));
       course.assignments[i].finishTime = omegaup.UI.formatDateTime(
           new Date(1000 * course.assignments[i].finish_time));
-      course.isAdmin = course.is_admin;
-      course.addAssignmentUrl =
-          '/course/' + courseAlias + '/edit#add-assignment';
-      course.editUrl = '/course/' + courseAlias + '/edit';
-      course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';
     }
+
     // Put assignment lists back in a separate field per type.
     for (var type in assignments) {
       course[type] = assignments[type];
     }
+
+    course.isAdmin = course.is_admin;
+    course.addAssignmentUrl = '/course/' + courseAlias + '/edit#add-assignment';
+    course.editUrl = '/course/' + courseAlias + '/edit';
+    course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';
+
     ko.applyBindings(course, $('#course-info')[0]);
   });
 });

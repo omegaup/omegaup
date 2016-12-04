@@ -66,6 +66,5 @@
 </div>
 </script>
 
-<div id="course-info" data-bind="template: 'course-info-template'">
-<div>
+<div id="course-info" data-bind="template: 'course-info-template'"></div>
 {include file='footer.tpl'}
