@@ -1208,7 +1208,7 @@ class ContestController extends Controller {
         // Disallow removing problem from contest if it already has runs within the contest
         if (RunsDAO::CountTotalRunsOfProblemInContest($problem->problem_id, $contest->contest_id) > 0 &&
             !Authorization::isSystemAdmin($r['current_user_id'])) {
-            throw new ForbiddenAccessException('cannotRemoveProblem');
+            throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
         if ($contest->public == 1) {

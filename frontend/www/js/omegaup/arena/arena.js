@@ -154,6 +154,18 @@ omegaup.arena.Arena = function(options) {
     rankingTable: $('#ranking-table'),
     socketStatus: $('#title .socket-status'),
   };
+
+  // Contest summary view model
+  self.summaryView = {
+    title: ko.observable(),
+    description: ko.observable(),
+    windowLength: ko.observable(),
+    contestOrganizer: ko.observable(),
+    startTime: ko.observable(),
+    finishTime: ko.observable(),
+    scoreboardCutoff: ko.observable(),
+    attached: false,
+  };
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
@@ -181,71 +193,121 @@ omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
       });
 };
 
+omegaup.arena.EventsSocket = function(uri, arena) {
+  var self = this;
+
+  self.uri = uri;
+  self.arena = arena;
+  self.socket = null;
+  self.socketKeepalive = null;
+  self.deferred = $.Deferred();
+  self.retries = 10;
+};
+
+omegaup.arena.EventsSocket.prototype.connect = function() {
+  var self = this;
+
+  self.shouldRetry = false;
+  try {
+    self.socket = new WebSocket(self.uri, 'com.omegaup.events');
+  } catch (e) {
+    self.onclose(e);
+    return;
+  }
+
+  self.socket.onmessage = self.onmessage.bind(self);
+  self.socket.onopen = self.onopen.bind(self);
+  self.socket.onclose = self.onclose.bind(self);
+
+  return self.deferred;
+};
+
+omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
+  var self = this;
+  var data = JSON.parse(message.data);
+
+  if (data.message == '/run/update/') {
+    data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
+    self.arena.updateRun(data.run);
+  } else if (data.message == '/clarification/update/') {
+    if (self.arena.options.disableClarifications) {
+      data.clarification.time =
+          omegaup.OmegaUp.time(data.clarification.time * 1000);
+      self.arena.updateClarification(data.clarification);
+    }
+  } else if (data.message == '/scoreboard/update/') {
+    self.arena.rankingChange(data.scoreboard);
+  }
+};
+
+omegaup.arena.EventsSocket.prototype.onopen = function() {
+  var self = this;
+  self.shouldRetry = true;
+  self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
+  self.socketKeepalive =
+      setInterval(function() { self.socket.send('"ping"'); }, 30000);
+};
+
+omegaup.arena.EventsSocket.prototype.onclose = function(e) {
+  var self = this;
+  self.socket = null;
+  if (self.socketKeepalive) {
+    clearInterval(self.socketKeepalive);
+    self.socketKepalive = null;
+  }
+  if (self.shouldRetry && self.retries > 0) {
+    self.retries--;
+    self.arena.elements.socketStatus.html('↻').css('color', '#888');
+    setTimeout(self.connect.bind(self), Math.random() * 15000);
+    return;
+  }
+
+  self.arena.elements.socketStatus.html('✗').css('color', '#800');
+  self.deferred.reject(e);
+};
+
 omegaup.arena.Arena.prototype.connectSocket = function() {
   var self = this;
   if (self.options.isPractice || self.options.disableSockets ||
       self.options.contestAlias == 'admin') {
+    self.elements.socketStatus.html('✗').css('color', '#800');
     return false;
   }
 
-  var uri;
-  if (window.location.protocol === 'https:') {
-    uri = 'wss:';
-  } else {
-    uri = 'ws:';
-  }
-  uri += '//' + window.location.host + '/api/contest/events/' +
-         self.options.contestAlias + '/';
-  if (self.options.scoreboardToken) {
-    uri += '?token=' + self.options.scoreboardToken;
-  }
+  var protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
+  var uris = [];
+  // Backendv2 uri
+  uris.push(protocol + window.location.host + '/events/?filter=/contest/' +
+            self.options.contestAlias +
+            (self.options.scoreboardToken ?
+                 ('/' + self.options.scoreboardToken) :
+                 ''));
+  // Legacy uri
+  // TODO(lhchavez): Remove once we migrate to backendv2
+  uris.push(protocol + window.location.host + '/api/contest/events/' +
+            self.options.contestAlias + '/' +
+            (self.options.scoreboardToken ?
+                 ('?token=' + self.options.scoreboardToken) :
+                 ''));
 
-  try {
-    self.socket = new WebSocket(uri, 'com.omegaup.events');
-    self.elements.socketStatus.html('&bull;');
-    self.socket.onmessage = function(message) {
-      console.log(message);
-      var data = JSON.parse(message.data);
-
-      if (data.message == '/run/update/') {
-        data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
-        self.updateRun(data.run);
-      } else if (data.message == '/clarification/update/') {
-        if (self.options.disableClarifications) {
-          data.clarification.time =
-              omegaup.OmegaUp.time(data.clarification.time * 1000);
-          self.updateClarification(data.clarification);
-        }
-      } else if (data.message == '/scoreboard/update/') {
-        self.rankingChange(data.scoreboard);
+  function connect(uris, index) {
+    self.socket = new omegaup.arena.EventsSocket(uris[index], self);
+    self.socket.connect().fail(function(e) {
+      console.log(e);
+      // Try the next uri.
+      index++;
+      if (index < uris.length) {
+        connect(uris, index);
+      } else {
+        // Out of options. Falling back to polls.
+        self.socket = null;
+        setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
       }
-    };
-    self.socket.onopen = function() {
-      self.elements.socketStatus.html('&bull;').css('color', '#080');
-      self.socket_keepalive =
-          setInterval((function(socket) {
-                        return function() { socket.send('"ping"'); };
-                      })(self.socket),
-                      30000);
-    };
-    self.socket.onclose = function(e) {
-      self.elements.socketStatus.html('&cross;').css('color', '#800');
-      self.socket = null;
-      clearInterval(self.socket_keepalive);
-      setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
-      console.error(e);
-    };
-    self.socket.onerror = function(e) {
-      self.elements.socketStatus.html('&cross;').css('color', '#800');
-      self.socket = null;
-      clearInterval(self.socket_keepalive);
-      setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
-      console.error(e);
-    };
-  } catch (e) {
-    self.socket = null;
-    console.error(e);
+    });
   }
+
+  self.elements.socketStatus.html('↻').css('color', '#888');
+  connect(uris, 0, 10);
 };
 
 omegaup.arena.Arena.prototype.setupPolls = function() {
@@ -1137,27 +1199,25 @@ omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
 };
 
 omegaup.arena.Arena.prototype.updateSummary = function(contest) {
-  var summary = $('#summary');
-  $('.title', summary).html(omegaup.UI.escape(contest.title));
-  $('.description', summary).html(omegaup.UI.escape(contest.description));
+  var self = this;
+  if (!self.summaryView.attached) {
+    var summary = $('#summary');
+    ko.applyBindings(self.summaryView, summary[0]);
+    self.summaryView.attached = true;
+  }
+  self.summaryView.title(contest.title);
+  self.summaryView.description(contest.description);
   var duration = contest.finish_time.getTime() - contest.start_time.getTime();
-  $('.window_length', summary)
-      .html(omegaup.arena.FormatDelta((contest.window_length * 60000) ||
-                                      duration));
-  $('.contest_organizer', summary)
-      .html('<a href="/profile/' + contest.director + '/">' + contest.director +
-            '</a>');
-
-  $('.start_time', summary)
-      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                  contest.start_time.getTime()));
-  $('.finish_time', summary)
-      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                  contest.finish_time.getTime()));
-  $('.scoreboard_cutoff', summary)
-      .html(Highcharts.dateFormat(
-          '%Y-%m-%d %H:%M:%S',
-          contest.start_time.getTime() + duration * contest.scoreboard / 100));
+  self.summaryView.windowLength(
+      omegaup.arena.FormatDelta((contest.window_length * 60000) || duration));
+  self.summaryView.contestOrganizer(contest.director);
+  self.summaryView.startTime(
+      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
+  self.summaryView.finishTime(Highcharts.dateFormat(
+      '%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
+  self.summaryView.scoreboardCutoff(Highcharts.dateFormat(
+      '%Y-%m-%d %H:%M:%S',
+      contest.start_time.getTime() + duration * contest.scoreboard / 100));
 };
 
 omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
@@ -1243,10 +1303,15 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
     };
   }
 
-  if (data.groups && data.groups.length) {
-    data.groups.sort(numericSort('group'));
-    for (var i = 0; i < data.groups.length; i++) {
-      data.groups[i].cases.sort(numericSort('name'));
+  // TODO(lhchavez): Use only data.details once backendv1 is deprecated.
+  var detailsGroups = data.groups;
+  if (data.details) {
+    detailsGroups = data.details.groups;
+  }
+  if (detailsGroups && detailsGroups.length) {
+    detailsGroups.sort(numericSort('group'));
+    for (var i = 0; i < detailsGroups.length; i++) {
+      detailsGroups[i].cases.sort(numericSort('name'));
     }
 
     var groups =
@@ -1263,8 +1328,8 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
                                     omegaup.T['rankScore'] + '</th>')
                             .append('<th width="1"></th>')));
 
-    for (var i = 0; i < data.groups.length; i++) {
-      var g = data.groups[i];
+    for (var i = 0; i < detailsGroups.length; i++) {
+      var g = detailsGroups[i];
       var cases = $('<tbody></tbody>').hide();
       groups.append(
           $('<tbody></tbody>')
