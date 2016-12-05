@@ -23,14 +23,15 @@ class ClarificationsDAO extends ClarificationsDAOBase {
         if ($admin) {
             $sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
                    'c.message, c.answer, UNIX_TIMESTAMP(c.time) `time`, c.public ' .
-                   'FROM Clarifications c ' .
-                   'INNER JOIN Users u ON u.user_id = c.author_id ';
+                   'FROM Clarifications c ';
         } else {
-            $sql = 'SELECT c.clarification_id, p.alias problem_alias, c.message, ' .
+            $sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
+                   'c.message, ' .
                    'UNIX_TIMESTAMP(c.time) `time`, c.answer, c.public ' .
                    'FROM Clarifications c ';
         }
-        $sql .= 'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
+        $sql .= 'INNER JOIN Users u ON u.user_id = c.author_id ' .
+                'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
                 'WHERE ' .
                 'c.contest_id = ? ';
         $val = array($contest_id);

@@ -781,13 +781,18 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
 omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
   var self = this;
   var r = null;
+  var anchor = 'clarifications/clarification-' + clarification.clarification_id;
   if (self.clarifications[clarification.clarification_id]) {
     r = self.clarifications[clarification.clarification_id];
 
     self.notifications.notify({
       id: 'clarification-' + clarification.clarification_id,
+      author: clarification.author,
+      contest: clarification.contest_alias,
+      problem: clarification.problem_alias,
       message: clarification.message,
       answer: clarification.answer,
+      anchor: '#' + anchor,
       modificationTime: clarification.time.getTime()
     });
   } else {
@@ -818,7 +823,6 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
     }
   }
 
-  var anchor = 'clarifications/clarification-' + clarification.clarification_id;
   $('.anchor', r).attr('name', anchor);
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);

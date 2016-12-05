@@ -60,8 +60,11 @@ omegaup.arena.Notifications.prototype.notify = function(data) {
     // Update the pre-existing notification.
     var notification = self.notificationMapping[data.id];
     for (var key in data) {
-      if (!data.hasOwnProperty(key) || notification[key]() == data[key])
+      if (!data.hasOwnProperty(key) ||
+          typeof(notification[key]) != 'function' ||
+          notification[key]() == data[key]) {
         continue;
+      }
       notification[key](data[key]);
     }
     self.unread(true);
