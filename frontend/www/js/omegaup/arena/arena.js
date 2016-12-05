@@ -230,7 +230,7 @@ omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
     data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
     self.arena.updateRun(data.run);
   } else if (data.message == '/clarification/update/') {
-    if (self.arena.options.disableClarifications) {
+    if (!self.arena.options.disableClarifications) {
       data.clarification.time =
           omegaup.OmegaUp.time(data.clarification.time * 1000);
       self.arena.updateClarification(data.clarification);
