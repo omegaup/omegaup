@@ -27,9 +27,12 @@ class Broadcaster {
             $this->log->debug("Sending update $message");
             $grader->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
+                is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
                 $r['clarification']->public != '0',
-                $r['clarification']->author_id
+                $r['user']->username,
+                $r['clarification']->author_id,
+                false  // user_only
             );
         } catch (Exception $e) {
             $this->log->error('Failed to send to broadcaster ' . $e->getMessage());

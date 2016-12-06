@@ -120,15 +120,19 @@ class Grader {
         return $this->executeCurl($curl);
     }
 
-    public function broadcast($contest_alias, $message, $broadcast, $user_id = -1, $user_only = false) {
+    public function broadcast($contest_alias, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
         $curl = $this->initGraderCall(OMEGAUP_GRADER_BROADCAST_URL);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(array(
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([
             'contest' => $contest_alias,
+            'problem' => $problem_alias,
             'message' => $message,
-            'broadcast' => $broadcast,
+            'public' => $public,
+            'user' => $username,
+            // TODO(lhchavez): Remove the backendv1-compat fields.
+            'broadcast' => $public,
             'targetUser' => (int)$user_id,
-            'userOnly' => $user_only
-        )));
+            'userOnly' => $user_only,
+        ]));
         return $this->executeCurl($curl);
     }
 }
