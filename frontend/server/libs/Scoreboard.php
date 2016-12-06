@@ -273,11 +273,11 @@ class Scoreboard {
             $grader->broadcast(
                 $contest->alias,
                 null,
-                json_encode(array(
+                json_encode([
                     'message' => '/scoreboard/update/',
                     'scoreboard_type' => 'admin',
                     'scoreboard' => $adminScoreboard
-                )),
+                ]),
                 false,  // public
                 null,  // username
                 -1,  // user_id
@@ -286,11 +286,11 @@ class Scoreboard {
             $grader->broadcast(
                 $contest->alias,
                 null,
-                json_encode(array(
+                json_encode([
                     'message' => '/scoreboard/update/',
                     'scoreboard_type' => 'contestant',
                     'scoreboard' => $contestantScoreboard
-                )),
+                ]),
                 true,  // public
                 null,  // username
                 -1,  // user_id
