@@ -324,6 +324,7 @@ omegaup.T = {
 	noCoders: "No coders.",
 	notRegisteredInContest: "You are not registered for this contest.",
 	notificationsMarkAllAsRead: "Mark all as read",
+	notificationsNoNewNotifications: "No new notifications.",
 	oldPassword: "Old password",
 	omegaupTitleAdminChangePassword: "AdminChangePassword",
 	omegaupTitleAdminIndex: "AdminIndex",

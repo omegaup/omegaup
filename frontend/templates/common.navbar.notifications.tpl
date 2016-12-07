@@ -3,8 +3,11 @@
 									<span class="notification-icon glyphicon glyphicon-bell"></span>
 									<span class="notification-counter label label-danger" data-bind="text: notifications().length, visible: notifications().length > 0, css: { 'label-danger': unread }"></span>
 								</a>
-								<ul class="dropdown-menu" data-bind="visible: notifications().length > 0">
-									<li>
+								<ul class="dropdown-menu">
+									<li class="empty" data-bind="visible: notifications().length == 0">
+										{#notificationsNoNewNotifications#}
+									</li>
+									<li data-bind="visible: notifications().length > 0">
 										<ul class="notification-drawer">
 											<!-- ko foreach: notifications -->
 											<li>
