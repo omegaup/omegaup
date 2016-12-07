@@ -1,9 +1,6 @@
 <?php
 require_once('../../server/bootstrap.php');
 
-$smarty->assign('admin', false);
-$smarty->assign('practice', false);
-
 $show_intro = true;
 
 try {
@@ -20,6 +17,5 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
-    $smarty->assign('jsfile', '/ux/contest.js');
-    $smarty->display('../../templates/arena.contest.tpl');
+    $smarty->display('../../templates/arena.contest.contestant.tpl');
 }
