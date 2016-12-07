@@ -38,17 +38,7 @@ omegaup.OmegaUp.on('ready', function() {
         return;
       }
       $('#title .contest-title').html(omegaup.UI.escape(contest.title));
-
-      $('#summary .title').html(omegaup.UI.escape(contest.title));
-      $('#summary .description').html(omegaup.UI.escape(contest.description));
-
-      $('#summary .start_time')
-          .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                      contest.start_time.getTime()));
-      $('#summary .finish_time')
-          .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                      contest.finish_time.getTime()));
-      $('#summary .window_length').html(contest.window_length);
+      arena.updateSummary(contest);
 
       arena.submissionGap = parseInt(contest.submission_gap);
       if (!(arena.submissionGap > 0)) arena.submissionGap = 0;

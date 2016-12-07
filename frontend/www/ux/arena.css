@@ -732,3 +732,9 @@ td.forcebreaks-arena {
 .notification-drawer li a > p {
   word-wrap: break-word;
 }
+
+.dropdown-menu li.empty {
+  padding: 1em;
+  color: #888;
+  text-align: center;
+}
