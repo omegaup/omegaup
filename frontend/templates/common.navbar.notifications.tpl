@@ -7,7 +7,7 @@
 									<li class="empty" data-bind="visible: notifications().length == 0">
 										{#notificationsNoNewNotifications#}
 									</li>
-									<li>
+									<li data-bind="visible: notifications().length > 0">
 										<ul class="notification-drawer">
 											<!-- ko foreach: notifications -->
 											<li>
