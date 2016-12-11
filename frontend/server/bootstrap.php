@@ -221,10 +221,14 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 } else {
     // During testing We need smarty to load strings from *.lang files
     $lang = 'pseudo';
+    $session = ['valid' => false];
 }
 
 $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
-$experiments = new Experiments($_REQUEST);
+$experiments = new Experiments(
+    $_REQUEST,
+    array_key_exists('user', $session) ? $session['user'] : null
+);
 $smarty->assign('ENABLED_EXPERIMENTS', $experiments->getEnabledExperiments());

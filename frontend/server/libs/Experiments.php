@@ -31,7 +31,7 @@
  *   This is done to avoid users from unintentionally enabling experiments that
  *   are not quite ready. frontend/server/libs/ExperimentHashCmd.php is a
  *   command-line script that can calculate these hashes for you.
- * * TODO(lhchavez): Add support for per-user experiments.
+ * * By adding a row to the Users_Experiments table.
  * * TODO(lhchavez): Add support (and guidelines) for randomized trials.
  */
 class Experiments {
@@ -59,6 +59,7 @@ class Experiments {
     /**
      * Creates an instance of Experiments.
      * @param array $request Typically $_REQUEST, except in tests.
+     * @param User $user The currently logged in user.
      * @param array $defines Typically get_defined_constants(true)['user'],
      *                       except in tests.
      * @param array $knownExperiments Typically
@@ -67,6 +68,7 @@ class Experiments {
      */
     public function __construct(
         array $request,
+        Users $user = null,
         array $defines = null,
         array $knownExperiments = null
     ) {
@@ -77,18 +79,72 @@ class Experiments {
             $defines = get_defined_constants(true)['user'];
         }
 
+        $this->loadExperimentsFromConfig($defines, $knownExperiments);
+
+        if (!is_null($user)) {
+            $this->loadExperimentsForUser($user, $knownExperiments);
+        }
+
+        if (isset($request[self::EXPERIMENT_REQUEST_NAME]) &&
+            !empty($request[self::EXPERIMENT_REQUEST_NAME])
+        ) {
+            $this->loadExperimentsFromRequest($request, $knownExperiments);
+        }
+    }
+
+    /**
+     * Loads experiments from config (defines).
+     * @param array $defines Typically get_defined_constants(true)['user'],
+     *                       except in tests.
+     * @param array $knownExperiments Typically
+     *                                Experiments::$kKnownExperiments, except
+     *                                in tests.
+     */
+    private function loadExperimentsFromConfig(
+        array $defines,
+        array $knownExperiments
+    ) {
         foreach ($knownExperiments as $name) {
             if ($this->isEnabledByConfig($name, $defines)) {
                 $this->enabledExperiments[] = $name;
             }
         }
+    }
 
-        if (!isset($request[self::EXPERIMENT_REQUEST_NAME]) ||
-            empty($request[self::EXPERIMENT_REQUEST_NAME])
-        ) {
-            return;
+    /**
+     * Loads experiments for a particular user.
+     * @param Users $user The user.
+     * @param array $knownExperiments Typically
+     *                                Experiments::$kKnownExperiments, except
+     *                                in tests.
+     */
+    private function loadExperimentsForUser(
+        Users $user,
+        array $knownExperiments
+    ) {
+        $search = new UsersExperiments(['user_id' => $user->user_id]);
+        foreach (UsersExperimentsDAO::search($search) as $ue) {
+            if (in_array($ue->experiment, $knownExperiments) &&
+                !$this->isEnabled($ue->experiment)
+            ) {
+                $this->enabledExperiments[] = $ue->experiment;
+            }
         }
+    }
 
+    /**
+     * Loads experiments from request parameters. To avoid users enabling
+     * experiments without permission, the request must provide both the name
+     * of the experiment as well as an HMAC-hashed version.
+     * @param array $request Typically $_REQUEST, except in tests.
+     * @param array $knownExperiments Typically
+     *                                Experiments::$kKnownExperiments, except
+     *                                in tests.
+     */
+    private function loadExperimentsFromRequest(
+        array $request,
+        array $knownExperiments
+    ) {
         $tokens = explode(',', $request[self::EXPERIMENT_REQUEST_NAME]);
         foreach ($tokens as $token) {
             $kvp = explode('=', $token);

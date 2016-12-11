@@ -678,6 +678,17 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Users_Experiments`
+--
+CREATE TABLE IF NOT EXISTS `Users_Experiments` (
+  `user_id` int(11) NOT NULL,
+  `experiment` varchar(256) NOT NULL,
+  KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los experimentos habilitados para un usuario.';
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `User_Permissions`
 --
 
@@ -1027,6 +1038,12 @@ ALTER TABLE `User_Roles`
 ALTER TABLE `Users_Permissions`
   ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `Permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Users_Experiments`
+--
+ALTER TABLE `Users_Experiments`
+  ADD CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups`
   ADD CONSTRAINT `fk_g_user_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
