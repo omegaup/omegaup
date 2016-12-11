@@ -158,9 +158,12 @@ class Grader {
                     $result = $r;
                 }
             } catch (Exception $e) {
-                $this->log->error("Error sending request to $url: " . $e);
                 if ($primary) {
                     $result = $e;
+                } else {
+                    // Only log non-primary requests: primary requests will be
+                    // logged in some catch block upstream.
+                    $this->log->error("Error sending request to $url: " . $e);
                 }
             }
             $primary = false;
