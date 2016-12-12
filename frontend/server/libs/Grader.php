@@ -1,7 +1,10 @@
 <?php
 
 class Grader {
+    private $log;
+
     public function __construct() {
+        $this->log = Logger::getLogger('Grader');
     }
 
     /**
@@ -75,24 +78,20 @@ class Grader {
     }
 
     /**
-     * Call /grade endpoint with run id as paraemeter
+     * Call /grade endpoint with run id as parameter
      *
      * @param int $runId
      * @throws Exception
      */
     public function Grade($runGuids, $rejudge, $debug) {
-        $curl = $this->initGraderCall(OMEGAUP_GRADER_URL);
-
-        // Set curl Post data
-        $debug = !!$debug;
-        $rejudge = !!$rejudge;
-        curl_setopt(
-            $curl,
-            CURLOPT_POSTFIELDS,
-            json_encode(array('id' => $runGuids, 'rejudge' => $rejudge, 'debug' => $debug))
+        return $this->multiCurlRequest(
+            explode(',', OMEGAUP_GRADER_URL),
+            [
+                'id' => $runGuids,
+                'rejudge' => !!$rejudge,
+                'debug' => !!$debug,
+            ]
         );
-
-        return $this->executeCurl($curl);
     }
 
     /**
@@ -121,18 +120,57 @@ class Grader {
     }
 
     public function broadcast($contest_alias, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
-        $curl = $this->initGraderCall(OMEGAUP_GRADER_BROADCAST_URL);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([
-            'contest' => $contest_alias,
-            'problem' => $problem_alias,
-            'message' => $message,
-            'public' => $public,
-            'user' => $username,
-            // TODO(lhchavez): Remove the backendv1-compat fields.
-            'broadcast' => $public,
-            'targetUser' => (int)$user_id,
-            'userOnly' => $user_only,
-        ]));
-        return $this->executeCurl($curl);
+        return $this->multiCurlRequest(
+            explode(',', OMEGAUP_GRADER_BROADCAST_URL),
+            [
+                'contest' => $contest_alias,
+                'problem' => $problem_alias,
+                'message' => $message,
+                'public' => $public,
+                'user' => $username,
+                // TODO(lhchavez): Remove the backendv1-compat fields.
+                'broadcast' => $public,
+                'targetUser' => (int)$user_id,
+                'userOnly' => $user_only,
+            ]
+        );
+    }
+
+    /**
+     * Sends a request to multiple URLs. Only returns the data from the first
+     * element in the list.
+     */
+    private function multiCurlRequest($urls, $postFields) {
+        $result = null;
+        $primary = true;
+        foreach ($urls as $url) {
+            $curl = $this->initGraderCall($url);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postFields));
+
+            if (!$primary) {
+                // For secondary requests, set a really short timeout.
+                curl_setopt($curl, CURLOPT_TIMEOUT, 1);
+            }
+
+            try {
+                $r = $this->executeCurl($curl);
+                if ($primary) {
+                    $result = $r;
+                }
+            } catch (Exception $e) {
+                if ($primary) {
+                    $result = $e;
+                } else {
+                    // Only log non-primary requests: primary requests will be
+                    // logged in some catch block upstream.
+                    $this->log->error("Error sending request to $url: " . $e);
+                }
+            }
+            $primary = false;
+        }
+        if (is_a($result, 'Exception')) {
+            throw $result;
+        }
+        return $result;
     }
 }
