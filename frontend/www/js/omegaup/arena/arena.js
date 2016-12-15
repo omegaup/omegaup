@@ -1089,7 +1089,9 @@ omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
 };
 
 omegaup.arena.Arena.prototype.clearInputfile = function() {
-  self.elements.submitForm.file.replaceWith(self.elements.submitForm.file = self.elements.submitForm.file.clone(true));
+  self.elements.submitForm.file.replaceWith(
+      self.elements.submitForm.file =
+          self.elements.submitForm.file.clone(true));
 };
 
 omegaup.arena.Arena.prototype.onLanguageSelect = function(e) {
