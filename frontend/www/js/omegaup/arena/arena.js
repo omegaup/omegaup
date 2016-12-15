@@ -140,10 +140,6 @@ omegaup.arena.Arena = function(options) {
   self.clarifications = {};
   self.submissionGap = 0;
 
-  // Setup any global hooks.
-  self.installLibinteractiveHooks();
-  self.bindGlobalHandlers();
-
   // UI elements
   self.elements = {
     clarification: $('#clarification'),
@@ -153,7 +149,17 @@ omegaup.arena.Arena = function(options) {
     problemList: $('#problem-list'),
     rankingTable: $('#ranking-table'),
     socketStatus: $('#title .socket-status'),
+    submitForm: $('#submit'),
   };
+  $.extend(self.elements.submitForm, {
+    code: $('textarea[name="code"]', self.elements.submitForm),
+    file: $('input[type="file"]', self.elements.submitForm),
+    language: $('select[name="language"]', self.elements.submitForm),
+  });
+
+  // Setup any global hooks.
+  self.installLibinteractiveHooks();
+  self.bindGlobalHandlers();
 
   // Contest summary view model
   self.summaryView = {
@@ -474,7 +480,7 @@ omegaup.arena.Arena.prototype.updateClock = function() {
                                       (date + omegaup.OmegaUp._deltaTime));
   }
 
-  self.elements.clock.html(clock);
+  self.elements.clock.text(clock);
 };
 
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
@@ -880,9 +886,11 @@ omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
 };
 
 omegaup.arena.Arena.prototype.updateAllowedLanguages = function(lang_array) {
-  $('#lang-select option')
+  var self = this;
+  $('option', self.elements.submitForm.language)
       .each(function(index, item) {
-        $(item).toggle(lang_array.indexOf($(item).val()) >= 0);
+        item = $(item);
+        item.toggle(lang_array.indexOf(item.val()) >= 0);
       });
 };
 
@@ -1010,11 +1018,10 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 
     if (newRun) {
       $('#overlay form').hide();
-      $('#submit input').show();
-      $('#submit #lang-select').show();
-      $('#submit').show();
+      $('input', self.elements.submitForm).show();
+      self.elements.submitForm.show();
       $('#overlay').show();
-      $('#submit textarea[name="code"]').val('');
+      self.elements.submitForm.code.val('');
     }
   } else if (self.activeTab == 'problems') {
     $('#problem').hide();
@@ -1067,24 +1074,28 @@ omegaup.arena.Arena.prototype.hideOverlay = function() {
 omegaup.arena.Arena.prototype.bindGlobalHandlers = function() {
   var self = this;
   $('#overlay, .close').click(self.onCloseSubmit.bind(self));
-  $('#submit select[name="language"]').change(self.onLanguageSelect.bind(self));
-  $('#submit').submit(self.onSubmit.bind(self));
+  self.elements.submitForm.language.change(self.onLanguageSelect.bind(self));
+  self.elements.submitForm.submit(self.onSubmit.bind(self));
 };
 
 omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
   var self = this;
   if (e.target.id === 'overlay' || e.target.className === 'close') {
-    $('#submit #clarification').hide();
+    $('#clarification', self.elements.submitForm).hide();
     self.hideOverlay();
-    var code_file = $('#submit-code-file');
-    code_file.replaceWith(code_file = code_file.clone(true));
+    self.clearInputFile();
     return false;
   }
 };
 
+omegaup.arena.Arena.prototype.clearInputfile = function() {
+  self.elements.submitForm.file.replaceWith(self.elements.submitForm.file = self.elements.submitForm.file.clone(true));
+};
+
 omegaup.arena.Arena.prototype.onLanguageSelect = function(e) {
+  var self = this;
   var lang = $(e.target).val();
-  var ext = $('#submit-filename-extension');
+  var ext = $('.submit-filename-extension', self.elements.submitForm);
   if (lang == 'cpp11') {
     ext.text('.cpp');
   } else if (lang && lang != 'cat') {
@@ -1105,16 +1116,14 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     return false;
   }
 
-  var submitForm = $(e.target);
-  var langSelect = $('select[name="language"]', submitForm);
+  var submitForm = self.elements.submitForm;
+  var langSelect = self.elements.submitForm.language;
   if (!langSelect.val()) {
     alert(omegaup.T.arenaRunSubmitMissingLanguage);
     return false;
   }
 
-  var code = $('textarea[name="code"]', submitForm).val();
-  // TODO: Remove form field ids.
-  var file = $('#submit-code-file')[0];
+  var file = self.elements.submitForm.file[0];
   if (file && file.files && file.files.length > 0) {
     file = file.files[0];
     var reader = new FileReader();
@@ -1153,6 +1162,7 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     return false;
   }
 
+  var code = submitForm.code.val();
   if (!code) return false;
 
   self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
@@ -1166,11 +1176,11 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
 omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
                                                    lang, code) {
   var self = this;
-  $('#submit input').attr('disabled', 'disabled');
+  $('input', self.elements.submitForm).attr('disabled', 'disabled');
   omegaup.API.submit(contestAlias, problemAlias, lang, code, function(run) {
     if (run.status != 'ok') {
       alert(run.error);
-      $('#submit input').removeAttr('disabled');
+      $('input', self.elements.submitForm).removeAttr('disabled');
       return;
     }
 
@@ -1191,14 +1201,13 @@ omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
     run.penalty = 0;
     run.runtime = 0;
     run.memory = 0;
-    run.language = $('#submit select[name="language"]').val();
+    run.language = self.elements.submitForm.language.val();
     self.updateRun(run);
 
-    $('#submit input').removeAttr('disabled');
-    $('#submit textarea[name="code"]').val('');
-    var code_file = $('#submit-code-file');
-    code_file.replaceWith(code_file = code_file.clone(true));
+    $('input', self.elements.submitForm).removeAttr('disabled');
+    self.elements.submitForm.code.val('');
     self.hideOverlay();
+    self.clearInputfile();
   });
 };
 

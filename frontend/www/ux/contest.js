@@ -93,7 +93,6 @@ omegaup.OmegaUp.on('ready', function() {
             }
             $('#overlay form').hide();
             $('#submit input').show();
-            $('#submit #lang-select').show();
             $('#submit').show();
             $('#overlay').show();
             $('#submit textarea[name="code"]').val('');

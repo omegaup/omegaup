@@ -1,6 +1,6 @@
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
-				<div id="lang-select">
+				<div>
 					{#wordsLanguage#}
 					<select name="language">
 						<option value="" default="default"></option>
@@ -17,11 +17,8 @@
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
 				</div>
-				<div>{#arenaRunSubmitFilename#} <tt>Main<span id="submit-filename-extension"></span></tt></div>
-				<label for="submit-code-contents">{#arenaRunSubmitPaste#}</label>
-				<textarea name="code" id="submit-code-contents"></textarea><br/>
-				<label for="submit-code-file">{#arenaRunSubmitUpload#}</label>
-				<input type="file" id="submit-code-file" /><br/>
+				<div>{#arenaRunSubmitFilename#} <tt>Main<span class="submit-filename-extension"></span></tt></div>
+				<label>{#arenaRunSubmitPaste#} <textarea name="code"></textarea></label><br/>
+				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
 				<input type="submit" />
 			</form>
-
