@@ -26,7 +26,7 @@ class ProblemArenaTest extends OmegaupUITestCase {
 
         // Click in New run
         $this->click('link=Nuevo envío');
-        $this->waitForElementPresent('//*[@id="lang-select"]');
+        $this->waitForElementPresent('//*[@name="language"]');
 
         // Write some code and submit
         $this->select('name=language', 'label=C++');
