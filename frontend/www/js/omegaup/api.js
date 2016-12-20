@@ -262,6 +262,15 @@ omegaup.API = {
         });
   },
 
+  getAssignment: function(courseAlias, assignmentAlias) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/getAssignment/course/' +
+               encodeURIComponent(courseAlias) + '/assignment/' +
+               encodeURIComponent(assignmentAlias) + '/',
+      dataType: 'json',
+    }));
+  },
+
   getCourseAdminDetails: function(alias, callback) {
     $.get('/api/course/admindetails/alias/' + encodeURIComponent(alias) + '/',
           function(data) {

@@ -14,7 +14,9 @@
 {if !$practice}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
+{if !isset($showRanking) || $showRanking}
 				<li><a href="#ranking">{#wordsRanking#}</a></li>
+{/if}
 {if $admin}
 				<li><a href="#runs">{#wordsRuns#}</a></li>
 {/if}
@@ -32,7 +34,7 @@
 							<span class="solved"></span>
 						</div>
 					</div>
-{if !$practice}
+{if !$practice && (!isset($showRanking) || $showRanking)}
 					<table id="mini-ranking">
 						<thead>
 							<tr>
@@ -58,7 +60,9 @@
 					<table>
 						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td data-bind="text: startTime"></td></tr>
 						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td data-bind="text: finishTime"></td></tr>
+{if (!isset($showRanking) || $showRanking)}
 						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td data-bind="text: scoreboardCutoff"></td></tr>
+{/if}
 						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="text: windowLength"></td></tr>
 						<tr>
 							<td><strong>{#arenaContestOrganizer#}</strong></td>
@@ -114,6 +118,7 @@
 {include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
 			</div>
 {/if}
+{if (!isset($showRanking) || $showRanking)}
 			<div id="ranking" class="tab">
 				<div id="ranking-chart"></div>
 				<table id="ranking-table">
@@ -137,6 +142,7 @@
 				</table>
 				<div class="footer"></div>
 			</div>
+{/if}
 {include file='arena.clarification_list.tpl' contest=true}
 		</div>
 		<div id="overlay">

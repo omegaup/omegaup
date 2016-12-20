@@ -22,7 +22,9 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
-    $smarty->display('../../templates/arena.course.assignment.tpl');
+    $smarty->assign('jsfile', '/ux/assignment.js');
+    $smarty->assign('showRanking', false);
+    $smarty->display('../../templates/arena.contest.tpl');
 } else {
     $smarty->display('../../templates/arena.course.tpl');
 }

@@ -128,6 +128,25 @@ class CourseController extends Controller {
         }
     }
 
+    private static function validateAssignmentDetails(Request $r) {
+        Validators::isStringNonEmpty($r['course'], 'course', true /*is_required*/);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /*is_required*/);
+
+        $r['course'] = CoursesDAO::findByAlias($r['course']);
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+        $assignments = AssignmentsDAO::search(new Assignments(array(
+            'course_id' => $r['course']->course_id,
+            'alias' => $r['assignment'],
+        )));
+        if (count($assignments) != 1) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+        $r['assignment'] = $assignments[0];
+        // TODO: Access check
+    }
+
     /**
      * Gets the Group assigned to the Course. Assumes r['course'] has been set
      * @param  Request $r
@@ -550,6 +569,41 @@ class CourseController extends Controller {
         }
 
         return self::getCommonCourseDetails($r);
+    }
+
+    /**
+     */
+    public static function apiGetAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateAssignmentDetails($r);
+        $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
+        $letter = 1;
+        foreach (array_keys($problems) as $key) {
+            $problems[$key]['letter'] = strval($letter++);
+        }
+        $r['assignment']->toUnixTime();
+        $result = ['status' => 'ok',
+                   'name' => $r['assignment']->name,
+                   'description' => $r['assignment']->description,
+                   'assignment_type' => $r['assignment']->assignment_type,
+                   'start_time' => $r['assignment']->start_time,
+                   'finish_time' => $r['assignment']->finish_time,
+                   'problems' => $problems,
+                   ];
+        try {
+            $acl = ACLsDAO::getByPK($r['course']->acl_id);
+            $result['director'] = UsersDAO::getByPK($acl->owner_id)->username;
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+        return $result;
     }
 
     /**

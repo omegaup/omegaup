@@ -66,8 +66,16 @@ omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
     options.onlyProblemAlias =
         /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
   } else {
-    options.contestAlias =
-        /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+    var assignmentMatch =
+        /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
+            arenaLocation.pathname);
+    if (assignmentMatch) {
+      options.courseAlias = assignmentMatch[1];
+      options.assignmentAlias = assignmentMatch[2];
+    } else {
+      options.contestAlias =
+          /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+    }
   }
 
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
@@ -863,6 +871,9 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
 
 omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
   var self = this;
+  if (data.status != 'ok') {
+    return;
+  }
   $('.clarifications tr.inserted').remove();
   if (data.clarifications.length > 0 &&
       data.clarifications.length < self.clarificationsRowcount) {
