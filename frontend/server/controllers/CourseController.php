@@ -1,4 +1,7 @@
 <?php
+
+require_once('ContestController.php');
+
 /**
  *  CourseController
  *
@@ -583,9 +586,9 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r);
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
-        $letter = 1;
+        $letter = 0;
         foreach (array_keys($problems) as $key) {
-            $problems[$key]['letter'] = strval($letter++);
+            $problems[$key]['letter'] = ContestController::columnName($letter++);
         }
         $r['assignment']->toUnixTime();
         $result = ['status' => 'ok',

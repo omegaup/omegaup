@@ -1,16 +1,19 @@
 omegaup.OmegaUp.on('ready', function() {
-  var arena = new omegaup.arena.Arena(
-      omegaup.arena.GetOptionsFromLocation(window.location));
+  var options = omegaup.arena.GetOptionsFromLocation(window.location);
+  var assignmentMatch = /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
+      window.location.pathname);
+  if (assignmentMatch) {
+    options.courseAlias = assignmentMatch[1];
+    options.assignmentAlias = assignmentMatch[2];
+  }
+
+  var arena = new omegaup.arena.Arena(options);
   Highcharts.setOptions({global: {useUTC: false}});
-  omegaup.API.getAssignment(arena.options.courseAlias,
-                            arena.options.assignmentAlias)
-      .then(function(assignment) {
-        assignment.start_time =
-            omegaup.OmegaUp.time(assignment.start_time * 1000);
-        assignment.finish_time =
-            omegaup.OmegaUp.time(assignment.finish_time * 1000);
-        arena.contestLoaded(assignment);
-      });
+  omegaup.API.getAssignment({
+               course: arena.options.courseAlias,
+               assignment: arena.options.assignmentAlias
+             })
+      .then(arena.contestLoaded.bind(arena));
 
   $(window).hashchange(arena.onHashChanged.bind(arena));
 });

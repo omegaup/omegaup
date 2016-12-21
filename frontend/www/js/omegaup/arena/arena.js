@@ -66,15 +66,9 @@ omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
     options.onlyProblemAlias =
         /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
   } else {
-    var assignmentMatch =
-        /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
-            arenaLocation.pathname);
-    if (assignmentMatch) {
-      options.courseAlias = assignmentMatch[1];
-      options.assignmentAlias = assignmentMatch[2];
-    } else {
-      options.contestAlias =
-          /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+    var match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    if (match) {
+      options.contestAlias = match[1];
     }
   }
 
