@@ -1,5 +1,7 @@
 {include file='head.tpl' jsfile=$jsfile inContest=!$practice inArena=true}
-
+{if !isset($showRanking)}
+{assign "showRanking" !$practice}
+{/if}
 {if $admin}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<audio id="notification-audio">
@@ -14,7 +16,7 @@
 {if !$practice}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
-{if !isset($showRanking) || $showRanking}
+{if $showRanking}
 				<li><a href="#ranking">{#wordsRanking#}</a></li>
 {/if}
 {if $admin}
@@ -34,7 +36,7 @@
 							<span class="solved"></span>
 						</div>
 					</div>
-{if !$practice && (!isset($showRanking) || $showRanking)}
+{if $showRanking}
 					<table id="mini-ranking">
 						<thead>
 							<tr>
@@ -60,7 +62,7 @@
 					<table>
 						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td data-bind="text: startTime"></td></tr>
 						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td data-bind="text: finishTime"></td></tr>
-{if (!isset($showRanking) || $showRanking)}
+{if $showRanking}
 						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td data-bind="text: scoreboardCutoff"></td></tr>
 {/if}
 						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td data-bind="text: windowLength"></td></tr>
@@ -118,7 +120,7 @@
 {include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
 			</div>
 {/if}
-{if (!isset($showRanking) || $showRanking)}
+{if $showRanking}
 			<div id="ranking" class="tab">
 				<div id="ranking-chart"></div>
 				<table id="ranking-table">

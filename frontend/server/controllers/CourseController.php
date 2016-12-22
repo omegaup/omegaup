@@ -587,8 +587,8 @@ class CourseController extends Controller {
         self::validateAssignmentDetails($r);
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
-        foreach (array_keys($problems) as $key) {
-            $problems[$key]['letter'] = ContestController::columnName($letter++);
+        foreach ($problems as &$problem) {
+            $problem['letter'] = ContestController::columnName($letter++);
         }
         $r['assignment']->toUnixTime();
         $result = ['status' => 'ok',
