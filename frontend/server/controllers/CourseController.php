@@ -1,7 +1,5 @@
 <?php
 
-require_once('ContestController.php');
-
 /**
  *  CourseController
  *
@@ -590,23 +588,24 @@ class CourseController extends Controller {
         foreach ($problems as &$problem) {
             $problem['letter'] = ContestController::columnName($letter++);
         }
-        $r['assignment']->toUnixTime();
-        $result = ['status' => 'ok',
-                   'name' => $r['assignment']->name,
-                   'description' => $r['assignment']->description,
-                   'assignment_type' => $r['assignment']->assignment_type,
-                   'start_time' => $r['assignment']->start_time,
-                   'finish_time' => $r['assignment']->finish_time,
-                   'problems' => $problems,
-                   ];
+        $director = null;
         try {
             $acl = ACLsDAO::getByPK($r['course']->acl_id);
-            $result['director'] = UsersDAO::getByPK($acl->owner_id)->username;
+            $director = UsersDAO::getByPK($acl->owner_id)->username;
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-        return $result;
+        $r['assignment']->toUnixTime();
+        return ['status' => 'ok',
+                'name' => $r['assignment']->name,
+                'description' => $r['assignment']->description,
+                'assignment_type' => $r['assignment']->assignment_type,
+                'start_time' => $r['assignment']->start_time,
+                'finish_time' => $r['assignment']->finish_time,
+                'problems' => $problems,
+                'director' => $director,
+                ];
     }
 
     /**
