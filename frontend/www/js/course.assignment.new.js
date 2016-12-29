@@ -1,29 +1,52 @@
 omegaup.OmegaUp.on('ready', function() {
-      $('.new_course_assignment_form')
-          .submit(function() {
-            var courseAlias = /\/course\/([^\/]+)\/edit\/?.*/.exec(
-                window.location.pathname)[1];
+  var assignmentForm = $('.new_course_assignment_form');
+  assignmentForm
+      .submit(function() {
+        var courseAlias = /\/course\/([^\/]+)\/edit\/?.*/.exec(
+            window.location.pathname)[1];
 
-            omegaup.API.createCourseAssignment(
-                courseAlias, $('.new_course_assignment_form #title').val(),
-                $('.new_course_assignment_form #description').val(),
-                (new Date($('.new_course_assignment_form #start_time').val())
-                     .getTime()) /
-                    1000,
-                (new Date($('.new_course_assignment_form #finish_time').val())
-                     .getTime()) /
-                    1000,
-                $('.new_course_assignment_form #alias').val(),
-                $('.new_course_assignment_form #assignment_type').val(),
-                function(data) {
-                  if (data.status == 'ok') {
-                    omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
-                    $('.new_course_assignment_form')[0].reset();
-                  } else {
-                    omegaup.UI.error(data.error || 'error');
-                  }
-                });
+        omegaup.API.createCourseAssignment(
+            courseAlias, $('#title', assignmentForm).val(),
+            $('#description', assignmentForm).val(),
+            (new Date($('#start_time', assignmentForm).val())
+                  .getTime()) /
+                1000,
+            (new Date($('#finish_time', assignmentForm).val())
+                  .getTime()) /
+                1000,
+            $('#alias', assignmentForm).val(),
+            $('#assignment_type', assignmentForm).val(),
+            function(data) {
+              if (data.status == 'ok') {
+                omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
+                assignmentForm[0].reset();
+                setDefaultDates();
+              } else {
+                omegaup.UI.error(data.error || 'error');
+              }
+            });
 
-            return false;
-          });
-    });
+        return false;
+      });
+
+  $('#start_time, #finish_time', assignmentForm)
+      .datetimepicker({
+        weekStart: 1,
+        format: 'mm/dd/yyyy hh:ii',
+        startDate: Date.create(Date.now()),
+      });
+
+  function setDefaultDates() {
+    // Defaults for start_time and end_time
+    var defaultDate = Date.create(Date.now());
+    defaultDate.set({seconds: 0});
+    $('#start_time', assignmentForm)
+        .val(omegaup.UI.formatDateTime(defaultDate));
+    defaultDate.setHours(defaultDate.getHours() + 5);
+    $('#finish_time', assignmentForm)
+        .val(omegaup.UI.formatDateTime(defaultDate));
+  }
+  if ($('#start_time', assignmentForm).val() == '') {
+    setDefaultDates();
+  }
+});
