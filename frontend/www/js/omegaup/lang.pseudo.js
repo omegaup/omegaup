@@ -35,6 +35,7 @@ omegaup.T = {
 	arenaRunSubmitPaste: "(Pa573 y0ur pr0gram'5 c0d3 h3r3)",
 	arenaRunSubmitUpload: "(Or up10ad 7h3 fi13)",
 	arenaRunSubmitWaitBetweenUploads: "(Y0u mu57 wai7 %(submissionGap) 53c0nd5 b37w33n 5ubmi55i0n5 f0r a pr0b13m)",
+	assignmentNotFound: "(A55ignm3n7 n07 f0und)",
 	cannotAddProb: "(Cann07 add pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",
 	cannotRemoveProblem: "(Cann07 r3m0v3 7h3 pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",
 	cannotRemoveProblemWithSubmissions: "(Y0u cann07 r3m0v3 a pr0b13m 7ha7 a1r3ady ha5 5ubmi55i0n5)",

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CourseController
  *
@@ -126,6 +127,25 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+    }
+
+    private static function validateAssignmentDetails(Request $r) {
+        Validators::isStringNonEmpty($r['course'], 'course', true /*is_required*/);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /*is_required*/);
+
+        $r['course'] = CoursesDAO::findByAlias($r['course']);
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+        $assignments = AssignmentsDAO::search(new Assignments(array(
+            'course_id' => $r['course']->course_id,
+            'alias' => $r['assignment'],
+        )));
+        if (count($assignments) != 1) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+        $r['assignment'] = $assignments[0];
+        // TODO: Access check
     }
 
     /**
@@ -550,6 +570,42 @@ class CourseController extends Controller {
         }
 
         return self::getCommonCourseDetails($r);
+    }
+
+    /**
+     */
+    public static function apiGetAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateAssignmentDetails($r);
+        $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
+        $letter = 0;
+        foreach ($problems as &$problem) {
+            $problem['letter'] = ContestController::columnName($letter++);
+        }
+        $director = null;
+        try {
+            $acl = ACLsDAO::getByPK($r['course']->acl_id);
+            $director = UsersDAO::getByPK($acl->owner_id)->username;
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $r['assignment']->toUnixTime();
+        return ['status' => 'ok',
+                'name' => $r['assignment']->name,
+                'description' => $r['assignment']->description,
+                'assignment_type' => $r['assignment']->assignment_type,
+                'start_time' => $r['assignment']->start_time,
+                'finish_time' => $r['assignment']->finish_time,
+                'problems' => $problems,
+                'director' => $director,
+                ];
     }
 
     /**

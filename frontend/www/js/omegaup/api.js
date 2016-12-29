@@ -262,6 +262,16 @@ omegaup.API = {
         });
   },
 
+  getAssignment: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/getAssignment',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }),
+                                     omegaup.API._convertTimes);
+  },
+
   getCourseAdminDetails: function(alias, callback) {
     $.get('/api/course/admindetails/alias/' + encodeURIComponent(alias) + '/',
           function(data) {
@@ -295,8 +305,7 @@ omegaup.API = {
               omegaup.UI.error(data.error);
             }
             if (data.status == 'ok') {
-              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000);
-              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000);
+              omegaup.API._convertTimes(data);
             }
             if (callback !== undefined) {
               callback(data);
@@ -461,23 +470,29 @@ omegaup.API = {
         });
   },
 
+  _convertTimes: function(item) {
+    if (item.hasOwnProperty('start_time')) {
+      item.start_time = omegaup.OmegaUp.time(item.start_time * 1000);
+    }
+    if (item.hasOwnProperty('finish_time')) {
+      item.finish_time = omegaup.OmegaUp.time(item.finish_time * 1000);
+    }
+    return item;
+  },
+
   getContests: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/contest/list/',
-          data: params,
-          dataType: 'json',
-        }),
-        function(result) {
-          for (var idx in result.results) {
-            var contest = result.results[idx];
-            contest.start_time =
-                omegaup.OmegaUp.time(contest.start_time * 1000);
-            contest.finish_time =
-                omegaup.OmegaUp.time(contest.finish_time * 1000);
-          }
-          return result;
-        });
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/list/',
+      data: params,
+      dataType: 'json',
+    }),
+                                     function(result) {
+                                       for (var idx in result.results) {
+                                         var contest = result.results[idx];
+                                         omegaup.API._convertTimes(contest);
+                                       }
+                                       return result;
+                                     });
   },
 
   openContest: function(alias, callback) {
@@ -497,10 +512,7 @@ omegaup.API = {
               '/',
           function(contest) {
             if (contest.status == 'ok') {
-              contest.start_time =
-                  omegaup.OmegaUp.time(contest.start_time * 1000);
-              contest.finish_time =
-                  omegaup.OmegaUp.time(contest.finish_time * 1000);
+              omegaup.API._convertTimes(contest);
               contest.submission_deadline =
                   omegaup.OmegaUp.time(contest.submission_deadline * 1000);
               contest.show_penalty =
@@ -523,10 +535,7 @@ omegaup.API = {
               encodeURIComponent(alias) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              contest.start_time =
-                  omegaup.OmegaUp.time(contest.start_time * 1000);
-              contest.finish_time =
-                  omegaup.OmegaUp.time(contest.finish_time * 1000);
+              omegaup.API._convertTimes(contest);
               contest.submission_deadline =
                   omegaup.OmegaUp.time(contest.submission_deadline * 1000);
               contest.show_penalty =
@@ -549,10 +558,7 @@ omegaup.API = {
               encodeURIComponent(alias) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              contest.start_time =
-                  omegaup.OmegaUp.time(contest.start_time * 1000);
-              contest.finish_time =
-                  omegaup.OmegaUp.time(contest.finish_time * 1000);
+              omegaup.API._convertTimes(contest);
               contest.submission_deadline =
                   omegaup.OmegaUp.time(contest.submission_deadline * 1000);
               contest.show_penalty =
@@ -592,10 +598,7 @@ omegaup.API = {
               '/token/' + encodeURIComponent(token) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              contest.start_time =
-                  omegaup.OmegaUp.time(contest.start_time * 1000);
-              contest.finish_time =
-                  omegaup.OmegaUp.time(contest.finish_time * 1000);
+              omegaup.API._convertTimes(contest);
               contest.show_penalty =
                   (contest.penalty || contest.penalty_type != 'none');
             }
@@ -1132,22 +1135,18 @@ omegaup.API = {
   },
 
   getMyContests: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/contest/mylist/',
-          data: params,
-          dataType: 'json',
-        }),
-        function(result) {
-          for (var idx in result.contests) {
-            var contest = result.contests[idx];
-            contest.start_time =
-                omegaup.OmegaUp.time(contest.start_time * 1000);
-            contest.finish_time =
-                omegaup.OmegaUp.time(contest.finish_time * 1000);
-          }
-          return result;
-        });
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/mylist/',
+      data: params,
+      dataType: 'json',
+    }),
+                                     function(result) {
+                                       for (var idx in result.contests) {
+                                         var contest = result.contests[idx];
+                                         omegaup.API._convertTimes(contest);
+                                       }
+                                       return result;
+                                     });
   },
 
   getAdminProblems: function(params) {
@@ -1159,22 +1158,18 @@ omegaup.API = {
   },
 
   getAdminContests: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/contest/adminlist/',
-          data: params,
-          dataType: 'json',
-        }),
-        function(result) {
-          for (var idx in result.contests) {
-            var contest = result.contests[idx];
-            contest.start_time =
-                omegaup.OmegaUp.time(contest.start_time * 1000);
-            contest.finish_time =
-                omegaup.OmegaUp.time(contest.finish_time * 1000);
-          }
-          return result;
-        });
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/adminlist/',
+      data: params,
+      dataType: 'json',
+    }),
+                                     function(result) {
+                                       for (var idx in result.contests) {
+                                         var contest = result.contests[idx];
+                                         omegaup.API._convertTimes(contest);
+                                       }
+                                       return result;
+                                     });
   },
 
   getProblem: function(contestAlias, problemAlias, callback, statement_type,
@@ -1623,8 +1618,7 @@ omegaup.API = {
               encodeURIComponent(contestAlias) + '/token/' +
               encodeURIComponent(token) + '/',
           function(data) {
-            data.start_time = omegaup.OmegaUp.time(data.start_time * 1000);
-            data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000);
+            omegaup.API._convertTimes(data);
             callback(data);
           },
           'json')

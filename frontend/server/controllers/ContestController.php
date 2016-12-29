@@ -719,7 +719,7 @@ class ContestController extends Controller {
     /**
      * Returns a "column name" for the $idx (think Excel column names).
      */
-    private static function columnName($idx) {
+    public static function columnName($idx) {
         $name = chr(ord('A') + $idx % 26);
         while ($idx >= 26) {
             $idx /= 26;

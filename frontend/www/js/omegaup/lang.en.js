@@ -35,6 +35,7 @@ omegaup.T = {
 	arenaRunSubmitPaste: "Paste your program's code here",
 	arenaRunSubmitUpload: "Or upload the file",
 	arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
+	assignmentNotFound: "Assignment not found",
 	cannotAddProb: "Cannot add problem. You are not a contest admin.",
 	cannotRemoveProblem: "Cannot remove the problem. You are not a contest admin.",
 	cannotRemoveProblemWithSubmissions: "You cannot remove a problem that already has submissions",
