@@ -4,7 +4,7 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="assignments-dropdown">{#wordsAssignments#}</label>
-					<select name="assignments-list" id='assignments-list' class="form-control"></select>
+					<select name="assignments-list" id="assignments-list" class="form-control"></select>
 				</div>
 			</div>
 			<hr>
@@ -12,7 +12,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label for="topics-list">{#wordsTopics#}</label>
-						<select name="topics-list" id='topic-list' class="form-control">
+						<select name="topics-list" id="topic-list" class="form-control">
 							<!-- TODO: How do we do this in general? -->
 							<option value="binary-search">{#problemTopicBinarySearch#}</option>
 							<option value="graph-theory">{#problemTopicGraphTheory#}</option>
@@ -21,7 +21,7 @@
 					</div>
 					<div class="form-group">
 						<label for="level-list">{#wordsLevels#}</label>
-						<select name="level-list" id='level-list' class="form-control">
+						<select name="level-list" id="level-list" class="form-control">
 							<option value="intro">{#problemLevelIntro#}</option>
 							<option value="easy">{#problemLevelEasy#}</option>
 							<option value="medium">{#problemLevelMedium#}</option>
@@ -45,7 +45,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<button type='submit' class="btn btn-primary">{#courseAddProblemsAdd#}</button>
+						<button type="submit" class="btn btn-primary">{#courseAddProblemsAdd#}</button>
 					</div>
 				</div>
 			</div>
