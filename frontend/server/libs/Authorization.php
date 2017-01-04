@@ -198,4 +198,8 @@ class Authorization {
 
         return !is_null($groupUsers) && count($groupUsers) > 0;
     }
+
+    public static function clearSystemAdminCache() {
+        self::$is_system_admin = null;
+    }
 }

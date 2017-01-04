@@ -64,14 +64,14 @@ class ProblemList extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
             for ($j = 0; $j <= $i; $j++) {
-                ProblemsFactory::addTag($problemData[$i], "tag-$j");
+                ProblemsFactory::addTag($problemData[$i], "tag-$j", 1 /* public */);
             }
         }
 
         // Get 1 problem private, should not appear
         $privateProblemData = ProblemsFactory::createProblem(null, null, 0 /* public */);
         for ($j = 0; $j < $n; $j++) {
-            ProblemsFactory::addTag($privateProblemData, "tag-$j");
+            ProblemsFactory::addTag($privateProblemData, "tag-$j", 1 /* public */);
         }
 
         $login = self::login(UserFactory::createUser());
@@ -101,6 +101,75 @@ class ProblemList extends OmegaupTestCase {
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tags 0 through $j.
             $this->assertCount($n - $j, $response['results']);
+        }
+    }
+
+    /**
+     * Tests problem lists when searching by tag when tags are not public.
+     */
+    public function testProblemListWithPrivateTags() {
+        $admin = UserFactory::createAdminUser('admin');
+        $user_a = UserFactory::createUser('user_a');
+        $user_b = UserFactory::createUser('user_b');
+        $other_user = UserFactory::createUser('other');
+
+        $problem = ProblemsFactory::createProblem(null, null, 1 /* public */, $admin);
+        $private_problem = ProblemsFactory::createProblem(null, null, 0 /* public */, $admin);
+        $problem_a = ProblemsFactory::createProblem(null, null, 1 /* public */, $user_a);
+        $private_problem_a = ProblemsFactory::createProblem(null, null, 0 /* public */, $user_a);
+        $problem_b = ProblemsFactory::createProblem(null, null, 1 /* public */, $user_b);
+        $private_problem_b = ProblemsFactory::createProblem(null, null, 0 /* public */, $user_b);
+
+        $all_problems = [$problem, $private_problem,
+                         $problem_a, $private_problem_a, $problem_b, $private_problem_b];
+        // Tag each problem with 3 tags, 2 public and 1 private.
+        foreach ($all_problems as $problem) {
+            ProblemsFactory::addTag($problem, 'a', 1 /* public */);
+            ProblemsFactory::addTag($problem, 'b', 1 /* public */);
+            ProblemsFactory::addTag($problem, 'c', 0 /* public */);
+        }
+
+        $all_users = [$admin, $user_a, $user_b, $other_user];
+        $tag_a_results = [
+            6,      // admin user can see all 6 problems
+            4,      // User A sees 3 public problems and private_problem_a
+            4,      // User B sees 3 public problems and private_problem_b
+            3,      // Random user sees only 3 public problems
+        ];
+        // Same thing when searching for tags "a" and "b", since tags a and b are public
+        $tag_ab_results = $tag_a_results;
+        // But searching for tags "a" and "c" won't give other users' problems
+        // because tag "c" is private.
+        $tag_ac_results = [
+            6,      // admin can still see all problems
+            2,      // User a can only see their 2 problems
+            2,      // User b can only see their own 2 problems
+            0,      // Random user can't see any problem at all
+        ];
+        for ($i = 0; $i < 4; $i++) {
+            Authorization::clearSystemAdminCache();
+            $login = self::login($all_users[$i]);
+
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'tag' => 'a',
+            ]));
+            $this->assertEquals($response['status'], 'ok');
+            $this->assertCount($tag_a_results[$i], $response['results']);
+
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'tag' => ['a', 'b']
+            ]));
+            $this->assertEquals($response['status'], 'ok');
+            $this->assertCount($tag_ab_results[$i], $response['results']);
+
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'tag' => ['a', 'c']
+            ]));
+            $this->assertEquals($response['status'], 'ok');
+            $this->assertCount($tag_ac_results[$i], $response['results']);
         }
     }
 

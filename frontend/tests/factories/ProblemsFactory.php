@@ -149,12 +149,12 @@ class ProblemsFactory {
         ProblemController::apiAddGroupAdmin($r);
     }
 
-    public static function addTag($problemData, $tag) {
+    public static function addTag($problemData, $tag, $public) {
         // Prepare our request
         $r = new Request(array(
             'problem_alias' => $problemData['request']['alias'],
             'name' => $tag,
-            'public' => 1
+            'public' => $public
         ));
 
         // Log in the problem author
