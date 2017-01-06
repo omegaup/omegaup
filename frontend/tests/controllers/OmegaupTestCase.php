@@ -351,5 +351,6 @@ class ScopedLoginToken {
 
     public function __destruct() {
         OmegaUpTestCase::logout();
+        Authorization::clearSystemAdminCache();
     }
 }

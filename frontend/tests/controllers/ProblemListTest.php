@@ -147,7 +147,6 @@ class ProblemList extends OmegaupTestCase {
             0,      // Random user can't see any problem at all
         ];
         for ($i = 0; $i < 4; $i++) {
-            Authorization::clearSystemAdminCache();
             $login = self::login($all_users[$i]);
 
             $response = ProblemController::apiList(new Request([
