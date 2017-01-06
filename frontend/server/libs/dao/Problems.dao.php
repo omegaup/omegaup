@@ -19,17 +19,24 @@ require_once('base/Problems.vo.base.php');
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
-    final private static function addTagFilter($user_type, $tag, &$sql, &$args) {
-        $public_check = 'AND pt.public = 1';
+    final private static function addTagFilter($user_type, $user_id, $tag, &$sql, &$args) {
+        $add_user_id = false;
         if ($user_type === USER_ADMIN) {
             $public_check = '';
+        } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
+            $public_check = '(ptp.public OR a.owner_id = ?) AND ';
+            $add_user_id = true;
+        } else {
+            $public_check = 'ptp.public AND ';
         }
-
         if (is_string($tag)) {
-            $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
-            $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
-            $sql .= " WHERE t.name = ? $public_check AND";
+            $sql .= ' INNER JOIN Problems_Tags ptp ON ptp.problem_id = p.problem_id';
+            $sql .= ' INNER JOIN Tags t ON ptp.tag_id = t.tag_id';
+            $sql .= " WHERE t.name = ? AND $public_check";
             $args[] = $tag;
+            if ($add_user_id) {
+                $args[] = $user_id;
+            }
         } elseif (is_array($tag)) {
             // Look for problems matching ALL tags.
             $placeholders = array_fill(0, count($tag), '?');
@@ -37,21 +44,25 @@ class ProblemsDAO extends ProblemsDAOBase
             $sql .= "
                 INNER JOIN (
                     SELECT
-                        pt.problem_id
+                        pt.problem_id,
+                        BIT_AND(pt.public) as public
                     FROM
                         Problems_Tags pt
                     WHERE pt.tag_id IN (
                         SELECT t.tag_id
                         FROM Tags t
                         WHERE t.name in ($placeholders)
-                    ) $public_check
+                    )
                     GROUP BY
                         pt.problem_id
                     HAVING
                         (COUNT(pt.tag_id) = ?)
-                ) ptp ON ptp.problem_id = p.problem_id WHERE";
+                ) ptp ON ptp.problem_id = p.problem_id WHERE $public_check";
             $args = array_merge($args, $tag);
             $args[] = count($tag);
+            if ($add_user_id) {
+                $args[] = $user_id;
+            }
         } else {
             $sql .= ' WHERE';
         }
@@ -105,7 +116,7 @@ class ProblemsDAO extends ProblemsDAOBase
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id';
 
-            self::addTagFilter($user_type, $tag, $sql, $args);
+            self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             if (!is_null($query)) {
                 $sql .= " title LIKE CONCAT('%', ?, '%') ";
                 $args[] = $query;
@@ -155,7 +166,7 @@ class ProblemsDAO extends ProblemsDAOBase
             $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
 
-            self::addTagFilter($user_type, $tag, $sql, $args);
+            self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= '
                 (p.public = 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
             $args[] = $user_id;
@@ -175,7 +186,7 @@ class ProblemsDAO extends ProblemsDAOBase
                     FROM
                         Problems p';
 
-            self::addTagFilter($user_type, $tag, $sql, $args);
+            self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= ' p.public = 1 ';
 
             if (!is_null($query)) {
