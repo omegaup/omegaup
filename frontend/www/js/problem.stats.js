@@ -1,8 +1,9 @@
 omegaup.OmegaUp.on('ready', function() {
-  var problemAlias =
-      /\/problem\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
+  var problemAlias = /\/problem\/([^\/]+)\/stats\/?.*/.exec(
+    window.location.pathname
+  )[1];
 
-  Highcharts.setOptions({global: {useUTC: false}});
+  Highcharts.setOptions({ global: { useUTC: false } });
 
   var stats = null;
   var callStatsApiTimeout = 10 * 1000;
@@ -10,16 +11,22 @@ omegaup.OmegaUp.on('ready', function() {
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
   function getStats() {
-    omegaup.API.getProblemStats({problem_alias: problemAlias})
-        .then(function(s) {
-          stats = s;
-          drawCharts();
-        });
+    omegaup.API
+      .getProblemStats({ problem_alias: problemAlias })
+      .then(function(s) {
+        stats = s;
+        drawCharts();
+      });
     updateStats();
   }
 
   function updateStats() {
-    setTimeout(function() { getStats(); }, callStatsApiTimeout);
+    setTimeout(
+      function() {
+        getStats();
+      },
+      callStatsApiTimeout
+    );
   }
 
   function getCasesDistribution() {
@@ -45,8 +52,11 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     // Draw verdict counts pie chart
-    window.run_counts_chart =
-        oGraph.verdictCounts('verdict-chart', problemAlias, stats);
+    window.run_counts_chart = oGraph.verdictCounts(
+      'verdict-chart',
+      problemAlias,
+      stats
+    );
 
     var casesNames = [];
     var casesCounts = [];
@@ -57,13 +67,13 @@ omegaup.OmegaUp.on('ready', function() {
 
     // Cases distribution chart
     window.cases_distribution_chart = new Highcharts.Chart({
-      chart: {type: 'column', renderTo: 'cases-distribution-chart'},
-      title: {text: 'Soluciones correctas caso por caso'},
-      xAxis: {categories: casesNames},
-      yAxis: {min: 0, title: {text: 'Número de soluciones'}},
+      chart: { type: 'column', renderTo: 'cases-distribution-chart' },
+      title: { text: 'Soluciones correctas caso por caso' },
+      xAxis: { categories: casesNames },
+      yAxis: { min: 0, title: { text: 'Número de soluciones' } },
       tooltip: {},
-      plotOptions: {column: {pointPadding: 0.2, borderWidth: 0}},
-      series: [{name: 'Número de soluciones', data: casesCounts}]
+      plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
+      series: [{ name: 'Número de soluciones', data: casesCounts }]
     });
   }
 
@@ -72,7 +82,10 @@ omegaup.OmegaUp.on('ready', function() {
   setTimeout(updateRunCountsData, updateRunCountsChart);
 
   // Pending runs chart
-  window.pending_chart =
-      oGraph.pendingRuns(updatePendingRunsChartTimeout,
-                         function() { return stats.pending_runs.length; });
+  window.pending_chart = oGraph.pendingRuns(
+    updatePendingRunsChartTimeout,
+    function() {
+      return stats.pending_runs.length;
+    }
+  );
 });

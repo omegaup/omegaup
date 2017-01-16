@@ -1,6 +1,6 @@
-var omegaup = typeof global === 'undefined' ?
-                  (window.omegaup = window.omegaup || {}) :
-                  (global.omegaup = global.omegaup || {});
+var omegaup = typeof global === 'undefined'
+  ? window.omegaup = window.omegaup || {}
+  : global.omegaup = global.omegaup || {};
 
 omegaup.arena = omegaup.arena || {};
 
@@ -39,7 +39,9 @@ omegaup.arena.Notifications.prototype.attach = function(element) {
   var self = this;
 
   self.button = $('.notification-button', element);
-  self.button.click(function() { self.unread(false); });
+  self.button.click(function() {
+    self.unread(false);
+  });
 
   self.onMarkAllAsRead = function() {
     self.notifications.removeAll();
@@ -60,9 +62,11 @@ omegaup.arena.Notifications.prototype.notify = function(data) {
     // Update the pre-existing notification.
     var notification = self.notificationMapping[data.id];
     for (var key in data) {
-      if (!data.hasOwnProperty(key) ||
-          typeof(notification[key]) != 'function' ||
-          notification[key]() == data[key]) {
+      if (
+        !data.hasOwnProperty(key) ||
+          typeof notification[key] != 'function' ||
+          notification[key]() == data[key]
+      ) {
         continue;
       }
       notification[key](data[key]);
@@ -73,11 +77,11 @@ omegaup.arena.Notifications.prototype.notify = function(data) {
     return;
   }
 
-  var lastModified = parseInt((typeof(localStorage) !== 'undefined' &&
-                               localStorage.getItem(data.id)) ||
-                                  '0',
-                              10) ||
-                     0;
+  var lastModified = parseInt(
+    typeof localStorage !== 'undefined' && localStorage.getItem(data.id) || '0',
+    10
+  ) ||
+    0;
   if (lastModified >= data.modificationTime) return;
 
   for (var key in data) {

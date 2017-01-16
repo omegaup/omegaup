@@ -1,6 +1,5 @@
 (function jquery_helper() {
   'use strict';
-
   if (typeof window === 'undefined') {
     var jsdom = require('jsdom');
     var window = jsdom.jsdom().defaultView;
@@ -14,7 +13,7 @@
 
     // window and navigator objects are required by typeahead.jquery.js
     global.window = window;
-    var navigator = {userAgent: 'node-js', platform: 'Linux i686'};
+    var navigator = { userAgent: 'node-js', platform: 'Linux i686' };
     global.window.navigator = global.navigator = navigator;
     navigator.platform = 'Linux i686';
 

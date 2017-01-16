@@ -26,12 +26,17 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function onAliasExists() {
-    omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
-                     '" ya existe. Elige otro nombre');
+    omegaup.UI.error(
+      '"' +
+        omegaup.UI.escape($('#alias').val()) +
+        '" ya existe. Elige otro nombre'
+    );
     $('#alias').focus();
   }
 
-  function onAliasNew() { omegaup.UI.dismissNotifications(); }
+  function onAliasNew() {
+    omegaup.UI.dismissNotifications();
+  }
 
   switch (formName) {
     case 'problems':
@@ -42,9 +47,10 @@ omegaup.OmegaUp.on('ready', function() {
 
     case 'groups':
       existsFn = function(alias) {
-        omegaup.API.getGroup({group_alias: alias})
-            .then(onAliasExists)
-            .fail(onAliasNew);
+        omegaup.API
+          .getGroup({ group_alias: alias })
+          .then(onAliasExists)
+          .fail(onAliasNew);
       };
       break;
 
@@ -55,10 +61,11 @@ omegaup.OmegaUp.on('ready', function() {
       break;
   }
 
-  $('#title')
-      .blur(function() {
-        $('#alias').val(generateAlias($(this).val())).change();
-      });
+  $('#title').blur(function() {
+    $('#alias').val(generateAlias($(this).val())).change();
+  });
 
-  $('#alias').change(function() { existsFn($('#alias').val()); });
+  $('#alias').change(function() {
+    existsFn($('#alias').val());
+  });
 });

@@ -1,9 +1,10 @@
 omegaup.OmegaUp.on('ready', function() {
   var arena = new omegaup.arena.Arena(
-      omegaup.arena.GetOptionsFromLocation(window.location));
+    omegaup.arena.GetOptionsFromLocation(window.location)
+  );
   var admin = null;
 
-  Highcharts.setOptions({global: {useUTC: false}});
+  Highcharts.setOptions({ global: { useUTC: false } });
 
   function onlyProblemLoaded(problem) {
     arena.currentProblem = problem;
@@ -12,22 +13,26 @@ omegaup.OmegaUp.on('ready', function() {
       arena.myRuns.attach($('#problem .runs'));
     }
 
-    MathJax.Hub.Queue(
-        ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
+    MathJax.Hub.Queue([
+      'Typeset',
+      MathJax.Hub,
+      $('#problem .statement').get(0)
+    ]);
 
     for (var i = 0; i < problem.solvers.length; i++) {
       var solver = problem.solvers[i];
       var prob = $('.solver-list .template').clone().removeClass('template');
       $('.user', prob)
-          .attr('href', '/profile/' + solver.username)
-          .html(solver.username);
+        .attr('href', '/profile/' + solver.username)
+        .html(solver.username);
       $('.language', prob).html(solver.language);
-      $('.runtime', prob)
-          .html((parseFloat(solver.runtime) / 1000.0).toFixed(2));
-      $('.memory', prob)
-          .html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
-      $('.time', prob)
-          .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
+      $('.runtime', prob).html((parseFloat(solver.runtime) / 1000).toFixed(2));
+      $('.memory', prob).html(
+        (parseFloat(solver.memory) / (1024 * 1024)).toFixed(2)
+      );
+      $('.time', prob).html(
+        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000)
+      );
       $('.solver-list').append(prob);
     }
 
@@ -35,21 +40,27 @@ omegaup.OmegaUp.on('ready', function() {
     arena.updateAllowedLanguages(language_array);
 
     if (problem.user.logged_in) {
-      omegaup.API.getProblemRuns({problem_alias: problem.alias})
-          .then(function(data) {
-            onlyProblemUpdateRuns(data.runs, 'score', 100);
-          });
+      omegaup.API
+        .getProblemRuns({ problem_alias: problem.alias })
+        .then(function(data) {
+          onlyProblemUpdateRuns(data.runs, 'score', 100);
+        });
     }
 
     if (problem.user.admin) {
-      admin =
-          new omegaup.arena.ArenaAdmin(arena, arena.options.onlyProblemAlias);
+      admin = new omegaup.arena.ArenaAdmin(
+        arena,
+        arena.options.onlyProblemAlias
+      );
       admin.refreshRuns();
       admin.refreshClarifications();
-      setInterval(function() {
-        admin.refreshRuns();
-        admin.refreshClarifications();
-      }, 5 * 60 * 1000);
+      setInterval(
+        function() {
+          admin.refreshRuns();
+          admin.refreshClarifications();
+        },
+        5 * 60 * 1000
+      );
     }
 
     // Trigger the event (useful on page load).
@@ -112,73 +123,80 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   if (arena.options.isOnlyProblem) {
-    onlyProblemLoaded(JSON.parse(
-        document.getElementById('problem-json').firstChild.nodeValue));
+    onlyProblemLoaded(
+      JSON.parse(document.getElementById('problem-json').firstChild.nodeValue)
+    );
   } else {
     arena.connectSocket();
-    omegaup.API.getContest(arena.options.contestAlias,
-                           arena.contestLoaded.bind(arena));
+    omegaup.API.getContest(
+      arena.options.contestAlias,
+      arena.contestLoaded.bind(arena)
+    );
 
-    $('.clarifpager .clarifpagerprev')
-        .click(function() {
-          if (arena.clarificationsOffset > 0) {
-            arena.clarificationsOffset -= arena.clarificationsRowcount;
-            if (arena.clarificationsOffset < 0) {
-              arena.clarificationsOffset = 0;
-            }
+    $('.clarifpager .clarifpagerprev').click(function() {
+      if (arena.clarificationsOffset > 0) {
+        arena.clarificationsOffset -= arena.clarificationsRowcount;
+        if (arena.clarificationsOffset < 0) {
+          arena.clarificationsOffset = 0;
+        }
 
-            // Refresh with previous page
-            omegaup.API.getClarifications(
-                arena.options.contestAlias, arena.clarificationsOffset,
-                arena.clarificationsRowcount,
-                arena.clarificationsChange.bind(arena));
-          }
-        });
+        // Refresh with previous page
+        omegaup.API.getClarifications(
+          arena.options.contestAlias,
+          arena.clarificationsOffset,
+          arena.clarificationsRowcount,
+          arena.clarificationsChange.bind(arena)
+        );
+      }
+    });
 
-    $('.clarifpager .clarifpagernext')
-        .click(function() {
-          arena.clarificationsOffset += arena.clarificationsRowcount;
-          if (arena.clarificationsOffset < 0) {
-            arena.clarificationsOffset = 0;
-          }
+    $('.clarifpager .clarifpagernext').click(function() {
+      arena.clarificationsOffset += arena.clarificationsRowcount;
+      if (arena.clarificationsOffset < 0) {
+        arena.clarificationsOffset = 0;
+      }
 
-          // Refresh with previous page
-          omegaup.API.getClarifications(arena.options.contestAlias,
-                                        arena.clarificationsOffset,
-                                        arena.clarificationsRowcount,
-                                        arena.clarificationsChange.bind(arena));
-        });
+      // Refresh with previous page
+      omegaup.API.getClarifications(
+        arena.options.contestAlias,
+        arena.clarificationsOffset,
+        arena.clarificationsRowcount,
+        arena.clarificationsChange.bind(arena)
+      );
+    });
   }
 
-  $('#clarification')
-      .submit(function(e) {
-        $('#clarification input').attr('disabled', 'disabled');
-        omegaup.API.newClarification(
-            arena.options.contestAlias,
-            $('#clarification select[name="problem"]').val(),
-            $('#clarification textarea[name="message"]').val(), function(run) {
-              if (run.status != 'ok') {
-                alert(run.error);
-                $('#clarification input').removeAttr('disabled');
-                return;
-              }
-              arena.hideOverlay();
-              omegaup.API.getClarifications(
-                  arena.options.contestAlias, arena.clarificationsOffset,
-                  arena.clarificationsRowcount,
-                  arena.clarificationsChange.bind(arena));
-              $('#clarification input').removeAttr('disabled');
-            });
-
-        return false;
-      });
-
-  $(window)
-      .hashchange(function(e) {
-        if (arena.options.isOnlyProblem) {
-          onlyProblemHashChanged(e);
-        } else {
-          arena.onHashChanged();
+  $('#clarification').submit(function(e) {
+    $('#clarification input').attr('disabled', 'disabled');
+    omegaup.API.newClarification(
+      arena.options.contestAlias,
+      $('#clarification select[name="problem"]').val(),
+      $('#clarification textarea[name="message"]').val(),
+      function(run) {
+        if (run.status != 'ok') {
+          alert(run.error);
+          $('#clarification input').removeAttr('disabled');
+          return;
         }
-      });
+        arena.hideOverlay();
+        omegaup.API.getClarifications(
+          arena.options.contestAlias,
+          arena.clarificationsOffset,
+          arena.clarificationsRowcount,
+          arena.clarificationsChange.bind(arena)
+        );
+        $('#clarification input').removeAttr('disabled');
+      }
+    );
+
+    return false;
+  });
+
+  $(window).hashchange(function(e) {
+    if (arena.options.isOnlyProblem) {
+      onlyProblemHashChanged(e);
+    } else {
+      arena.onHashChanged();
+    }
+  });
 });

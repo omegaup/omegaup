@@ -1,8 +1,9 @@
 omegaup.OmegaUp.on('ready', function() {
-  var contestAlias =
-      /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
+  var contestAlias = /\/contest\/([^\/]+)\/stats\/?.*/.exec(
+    window.location.pathname
+  )[1];
 
-  Highcharts.setOptions({global: {useUTC: false}});
+  Highcharts.setOptions({ global: { useUTC: false } });
 
   var stats = null;
   var callStatsApiTimeout = 10 * 1000;
@@ -10,16 +11,22 @@ omegaup.OmegaUp.on('ready', function() {
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
   function getStats() {
-    omegaup.API.getContestStats({contest_alias: contestAlias})
-        .then(function(s) {
-          stats = s;
-          drawCharts();
-        });
+    omegaup.API
+      .getContestStats({ contest_alias: contestAlias })
+      .then(function(s) {
+        stats = s;
+        drawCharts();
+      });
     updateStats();
   }
 
   function updateStats() {
-    setTimeout(function() { getStats(); }, callStatsApiTimeout);
+    setTimeout(
+      function() {
+        getStats();
+      },
+      callStatsApiTimeout
+    );
   }
 
   function updateRunCountsData() {
@@ -38,12 +45,18 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     // Draw verdict counts pie chart
-    window.run_counts_chart =
-        oGraph.verdictCounts('verdict-chart', contestAlias, stats);
+    window.run_counts_chart = oGraph.verdictCounts(
+      'verdict-chart',
+      contestAlias,
+      stats
+    );
 
     // Draw distribution of scores chart
-    window.distribution_chart =
-        oGraph.distributionChart('distribution-chart', contestAlias, stats);
+    window.distribution_chart = oGraph.distributionChart(
+      'distribution-chart',
+      contestAlias,
+      stats
+    );
   }
 
   getStats();
@@ -51,7 +64,10 @@ omegaup.OmegaUp.on('ready', function() {
   setTimeout(updateRunCountsData, updateRunCountsChartTimeout);
 
   // Pending runs chart
-  window.pending_chart =
-      oGraph.pendingRuns(updatePendingRunsChartTimeout,
-                         function() { return stats.pending_runs.length; });
+  window.pending_chart = oGraph.pendingRuns(
+    updatePendingRunsChartTimeout,
+    function() {
+      return stats.pending_runs.length;
+    }
+  );
 });
