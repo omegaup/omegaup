@@ -89,6 +89,12 @@ Logger::configure(array(
             'appenders' => array('default'),
             'level' => OMEGAUP_LOG_LEVEL
         ),
+        'loggers' => array(
+            'csp' => array(
+                'appenders' => array('csp'),
+                'additivity' => false,
+            ),
+        ),
         'appenders' => array(
             'default' => array(
                 'class' => 'LoggerAppenderFile',
@@ -102,6 +108,19 @@ Logger::configure(array(
                     'file' => OMEGAUP_LOG_FILE,
                     'append' => true
                 )
+            ),
+            'csp' => array(
+                'class' => 'LoggerAppenderFile',
+                'layout' => array(
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => array(
+                        'conversionPattern' => '%date: %message %newline',
+                    ),
+                ),
+                'params' => array(
+                    'file' => OMEGAUP_CSP_LOG_FILE,
+                    'append' => true,
+                ),
             )
         )
     ));
