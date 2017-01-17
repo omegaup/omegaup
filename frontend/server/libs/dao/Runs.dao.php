@@ -20,23 +20,6 @@ require_once('base/Runs.vo.base.php');
  */
 class RunsDAO extends RunsDAOBase {
     /*
-	 * Gets a boolean indicating whether there are runs that are not ready.
-	 */
-
-    final public static function PendingRuns($contest_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND status != 'ready'";
-        $val = array($contest_id);
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
-
-        global $conn;
-        return $conn->GetOne($sql, $val) === 0;
-    }
-
-    /*
 	 * Gets an array of the guids of the pending runs
 	 */
 
@@ -102,10 +85,10 @@ class RunsDAO extends RunsDAOBase {
 	 * Gets an array of the guids of the pending runs
 	 */
 
-    final public static function GetPendingRunsOfContest($contest_id, $showAllRuns = false) {
+    final public static function GetPendingRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
-        $sql = "SELECT guid FROM Runs WHERE contest_id = ? AND status != 'ready'";
-        $val = array($contest_id);
+        $sql = "SELECT guid FROM Runs WHERE problemset_id = ? AND status != 'ready'";
+        $val = array($problemset_id);
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -122,20 +105,20 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function GetAllRuns($contest_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
+    final public static function GetAllRuns($problemset_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
         $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
                 'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
                 'r.submit_delay, u.username, p.alias, u.country_id, c.alias AS contest_alias ' .
                 'FROM Runs r USE INDEX(PRIMARY) ' .
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
                 'INNER JOIN Users u ON u.user_id = r.user_id ' .
-                'LEFT JOIN Contests c ON c.contest_id = r.contest_id ';
+                'LEFT JOIN Contests c ON c.problemset_id = r.problemset_id ';
         $where = array();
         $val = array();
 
-        if (!is_null($contest_id)) {
-            $where[] = 'r.contest_id = ?';
-            $val[] = $contest_id;
+        if (!is_null($problemset_id)) {
+            $where[] = 'r.problemset_id = ?';
+            $val[] = $problemset_id;
         }
 
         if (!is_null($status)) {
@@ -212,13 +195,12 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given contest
+	 * Gets the count of total runs sent to a given problemset
 	 */
-
-    final public static function CountTotalRunsOfContest($contest_id, $showAllRuns = false) {
+    final public static function CountTotalRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE contest_id = ? ';
-        $val = array($contest_id);
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? ';
+        $val = array($problemset_id);
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -263,15 +245,15 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /**
-     * Get the count of runs of a problem in a given contest
+     * Get the count of runs of a problem in a given problemset
      *
-     * @param string  $problem_id
-     * @param string  $contest_id
+     * @param int $problem_id
+     * @param int $problemset_id
      */
-    final public static function CountTotalRunsOfProblemInContest($problem_id, $contest_id) {
+    final public static function CountTotalRunsOfProblemInProblemset($problem_id, $problemset_id) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND contest_id = ? AND test = 0';
-        $val = array($problem_id, $contest_id);
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND problemset_id = ? AND test = 0';
+        $val = array($problem_id, $problemset_id);
 
         global $conn;
         return $conn->GetOne($sql, $val);
@@ -281,10 +263,10 @@ class RunsDAO extends RunsDAOBase {
 	 * Gets the count of total runs sent to a given contest by verdict
 	 */
 
-    final public static function CountTotalRunsOfContestByVerdict($contest_id, $verdict, $showAllRuns = false) {
+    final public static function CountTotalRunsOfProblemsetByVerdict($problemset_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND verdict = ? ';
-        $val = array($contest_id, $verdict);
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? AND verdict = ? ';
+        $val = array($problemset_id, $verdict);
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -331,11 +313,10 @@ class RunsDAO extends RunsDAOBase {
     /*
 	 * Gets the largest queued time of a run in ms
 	 */
-
-    final public static function GetLargestWaitTimeOfContest($contest_id, $showAllRuns = false) {
+    final public static function GetLargestWaitTimeOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
-        $sql = "SELECT * FROM Runs WHERE contest_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
-        $val = array($contest_id);
+        $sql = "SELECT * FROM Runs WHERE problemset_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
+        $val = array($problemset_id);
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -362,13 +343,13 @@ class RunsDAO extends RunsDAOBase {
                 FROM
                     Users u
                 INNER JOIN
-                    Contests_Users cu ON u.user_id = cu.user_id
+                    Problemset_Users pu ON u.user_id = pu.user_id
                 WHERE
-                    cu.contest_id = ? AND
+                    pu.problemset_id = ? AND
                     u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                     u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
             $val = array(
-                $contest->contest_id,
+                $contest->problemset_id,
                 $contest->acl_id,
                 $contest->acl_id,
                 Authorization::SYSTEM_ACL,
@@ -387,10 +368,10 @@ class RunsDAO extends RunsDAOBase {
                         Runs r
                     WHERE
                         r.verdict NOT IN (\'CE\', \'JE\') AND
-                        r.contest_id = ? AND
+                        r.problemset_id = ? AND
                         r.status = \'ready\' AND
                         r.test = 0) rc ON u.user_id = rc.user_id';
-            $val = array($contest->contest_id);
+            $val = array($contest->problemset_id);
             if (!is_null($filterUsersBy)) {
                 $sql .= ' WHERE u.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
@@ -409,18 +390,18 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function getContestRuns(Contests $contest, $onlyAC = false) {
+    final public static function getProblemsetRuns(Problemsets $problemset, $onlyAC = false) {
         $sql =    'SELECT '
                     . 'r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid '
                 . 'FROM '
                     . 'Runs r '
                 . 'INNER JOIN '
-                    . 'Contest_Problems cp '
+                    . 'Problemset_Problems pp '
                 . 'ON '
-                    . 'r.problem_id = cp.problem_id '
-                    . 'AND r.contest_id = cp.contest_id '
+                    . 'r.problem_id = pp.problem_id '
+                    . 'AND r.problemset_id = pp.problemset_id '
                 . 'WHERE '
-                    . 'cp.contest_id = ? '
+                    . 'pp.problemset_id = ? '
                     . "AND r.status = 'ready' "
                     . "AND r.test = '0' " .
                     (($onlyAC === false) ?
@@ -428,7 +409,7 @@ class RunsDAO extends RunsDAOBase {
                         "AND r.verdict IN ('AC') ")
                 . 'ORDER BY r.run_id;';
 
-        $val = array($contest->contest_id);
+        $val = array($problemset->problemset_id);
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
@@ -446,15 +427,14 @@ class RunsDAO extends RunsDAOBase {
 	 * Get last run of a user
 	 *
 	 */
-
-    final public static function GetLastRun($contest_id, $problem_id, $user_id) {
+    final public static function GetLastRun($problemset_id, $problem_id, $user_id) {
         //Build SQL statement
-        if ($contest_id == null) {
+        if (is_null($problemset_id)) {
             $sql = 'SELECT * from Runs where user_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
             $val = array($user_id, $problem_id);
         } else {
-            $sql = 'SELECT * from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = array($user_id, $contest_id, $problem_id);
+            $sql = 'SELECT * from Runs where user_id = ? and problemset_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
+            $val = array($user_id, $problemset_id, $problem_id);
         }
 
         global $conn;
@@ -474,10 +454,20 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function GetBestRun($contest_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
-        //Build SQL statement
-        $sql = "SELECT contest_score, penalty, submit_delay, guid, run_id from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) " . ($showAllRuns ? '' : ' AND test = 0 ') . ' ORDER BY contest_score DESC, penalty ASC  LIMIT 1';
-        $val = array($user_id, $contest_id, $problem_id, $finish_time);
+    final public static function GetBestRun($problemset_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
+        $sql = '
+            SELECT
+                contest_score, penalty, submit_delay, guid, run_id
+            FROM
+                Runs
+            WHERE
+                user_id = ? AND problemset_id = ? AND problem_id = ? AND
+                status = \'ready\' AND time <= FROM_UNIXTIME(?) ' .
+                 ($showAllRuns ? '' : ' AND test = 0 ') . '
+            ORDER BY
+                contest_score DESC, penalty ASC
+            LIMIT 1;';
+        $val = array($user_id, $problemset_id, $problem_id, $finish_time);
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -509,24 +499,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Get number of runs before current.
-	 */
-
-    final public static function GetWrongRuns($contest_id, $problem_id, $user_id, $run_id, $showAllRuns) {
-        //Build SQL statement
-        $sql = "SELECT COUNT(*) AS wrong_runs FROM Runs WHERE user_id = ? AND contest_id = ? AND problem_id = ? AND verdict != 'JE' AND verdict != 'CE' AND run_id < ? " . ($showAllRuns ? '' : ' AND test = 0 ');
-        $val = array($user_id, $contest_id, $problem_id, $run_id);
-
-        global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        return $rs['wrong_runs'];
-    }
-
-    /*
 	 * Get runs of a user with verdict eq AC
 	 */
-
     final public static function GetRunsByUser($user_id) {
         // SQL sentence
         $sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND verdict = 'AC'";
@@ -545,19 +519,23 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function IsRunInsideSubmissionGap($contest_id, $problem_id, $user_id) {
+    final public static function IsRunInsideSubmissionGap($problemset_id, $problem_id, $user_id) {
         // Get last run
-        $lastrun = self::GetLastRun($contest_id, $problem_id, $user_id);
+        $lastrun = self::GetLastRun($problemset_id, $problem_id, $user_id);
 
         if (is_null($lastrun)) {
             return true;
         }
 
         $submission_gap = 0;
-        if ($contest_id != null) {
+        if (!is_null($problemset_id)) {
             // Get submissions gap
-            $contest = ContestsDAO::getByPK($contest_id);
-            $submission_gap = (int) $contest->submissions_gap;
+            $contests = ContestsDAO::search(new Contests(array(
+                'problemset_id' => $problemset_id,
+            )));
+            if (count($contests) === 1) {
+                $submission_gap = (int)$contests[0]->submissions_gap;
+            }
         }
         $submission_gap = max($submission_gap, RunController::$defaultSubmissionGap);
 
@@ -615,9 +593,9 @@ class RunsDAO extends RunsDAOBase {
             array_push($val, $Runs->problem_id);
         }
 
-        if ($Runs->contest_id != null) {
-            $sql .= ' Runs.contest_id = ? AND';
-            array_push($val, $Runs->contest_id);
+        if ($Runs->problemset_id != null) {
+            $sql .= ' Runs.problemset_id = ? AND';
+            array_push($val, $Runs->problemset_id);
         }
 
         if ($Runs->guid != null) {

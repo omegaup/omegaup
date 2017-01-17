@@ -36,40 +36,6 @@ class Utils {
         return $problem_id;
     }
 
-    public static function DeleteAllContests() {
-        try {
-            $contests = ContestsDAO::getAll();
-            foreach ($contests as $c) {
-                ContestsDAO::delete($c);
-            }
-        } catch (ApiException $e) {
-            // Propagate exception
-            var_dump($e->getArrayMessage());
-            throw $e;
-        }
-    }
-
-    public static function DeleteClarificationsFromProblem($problem_id) {
-        self::ConnectToDB();
-
-        // Get clarifications
-        $clarifications = ClarificationsDAO::getAll();
-
-        // Delete those who belong to problem_id
-        foreach ($clarifications as $c) {
-            if ($c->problem_id == $problem_id) {
-                try {
-                    ClarificationsDAO::delete($c);
-                } catch (ApiException $e) {
-                    var_dump($e->getArrayMessage());
-                    throw $e;
-                }
-            }
-        }
-
-        self::cleanup();
-    }
-
     public static function GetPhpUnixTimestamp($time = null) {
         if (is_null($time)) {
             return time();
@@ -127,17 +93,11 @@ class Utils {
         // Tables to truncate
         $tables = array(
             'ACLs',
-            'Auth_Tokens',
             'Assignments',
+            'Auth_Tokens',
             'Clarifications',
             'Coder_Of_The_Month',
-            'Contest_Access_Log',
-            'Contest_Problem_Opened',
-            'Contest_Problems',
-            'Contest_User_Request',
-            'Contest_User_Request_History',
             'Contests',
-            'Contests_Users',
             'Courses',
             'Emails',
             'Group_Roles',
@@ -148,12 +108,20 @@ class Utils {
             'Interviews',
             'Problems',
             'Problems_Tags',
+            'Problemset_Access_Log',
+            'Problemset_Problem_Opened',
+            'Problemset_Problems',
+            'Problemset_User_Request',
+            'Problemset_User_Request_History',
+            'Problemset_Users',
+            'Problemsets',
             'Runs',
             'Submission_Log',
             'Tags',
             'User_Login_Log',
             'User_Roles',
             'Users',
+            'Users_Experiments',
         );
 
         try {

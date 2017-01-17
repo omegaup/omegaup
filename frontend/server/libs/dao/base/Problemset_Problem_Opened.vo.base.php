@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table Contest_Problems.
+/** Value Object file for table Problemset_Problem_Opened.
   *
   * VO does not have any behaviour.
   * @access public
   *
   */
 
-class ContestProblems extends VO
+class ProblemsetProblemOpened extends VO
 {
 	/**
-	  * Constructor de ContestProblems
+	  * Constructor de ProblemsetProblemOpened
 	  *
-	  * Para construir un objeto de tipo ContestProblems debera llamarse a el constructor
+	  * Para construir un objeto de tipo ProblemsetProblemOpened debera llamarse a el constructor
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -31,17 +31,17 @@ class ContestProblems extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-			if (isset($data['contest_id'])) {
-				$this->contest_id = $data['contest_id'];
+			if (isset($data['problemset_id'])) {
+				$this->problemset_id = $data['problemset_id'];
 			}
 			if (isset($data['problem_id'])) {
 				$this->problem_id = $data['problem_id'];
 			}
-			if (isset($data['points'])) {
-				$this->points = $data['points'];
+			if (isset($data['user_id'])) {
+				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['order'])) {
-				$this->order = $data['order'];
+			if (isset($data['open_time'])) {
+				$this->open_time = $data['open_time'];
 			}
 		}
 	}
@@ -49,17 +49,17 @@ class ContestProblems extends VO
 	/**
 	  * Obtener una representacion en String
 	  *
-	  * Este metodo permite tratar a un objeto ContestProblems en forma de cadena.
+	  * Este metodo permite tratar a un objeto ProblemsetProblemOpened en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String
 	  */
 	public function __toString( )
 	{
 		$vec = array(
-			"contest_id" => $this->contest_id,
+			"problemset_id" => $this->problemset_id,
 			"problem_id" => $this->problem_id,
-			"points" => $this->points,
-			"order" => $this->order
+			"user_id" => $this->user_id,
+			"open_time" => $this->open_time
 		);
 	return json_encode($vec);
 	}
@@ -71,7 +71,7 @@ class ContestProblems extends VO
 		if (count($fields) > 0)
 			parent::toUnixTime($fields);
 		else
-			parent::toUnixTime(array());
+			parent::toUnixTime(array("open_time"));
 	}
 
 	/**
@@ -80,7 +80,7 @@ class ContestProblems extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $contest_id;
+	public $problemset_id;
 
 	/**
 	  *  [Campo no documentado]
@@ -92,15 +92,16 @@ class ContestProblems extends VO
 
 	/**
 	  *  [Campo no documentado]
+	  * Llave Primaria
 	  * @access public
-	  * @var double
+	  * @var int(11)
 	  */
-	public $points;
+	public $user_id;
 
 	/**
-	  * Define el orden de aparición de los problemas en un concurso
+	  *  [Campo no documentado]
 	  * @access public
-	  * @var INT
+	  * @var timestamp
 	  */
-	public $order;
+	public $open_time;
 }

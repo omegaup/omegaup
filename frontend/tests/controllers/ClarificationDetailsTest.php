@@ -22,7 +22,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $this->assertEquals($clarification->answer, $response['answer']);
         $this->assertEquals($clarification->time, $response['time']);
         $this->assertEquals($clarification->problem_id, $response['problem_id']);
-        $this->assertEquals($clarification->contest_id, $response['contest_id']);
+        $this->assertEquals($clarification->problemset_id, $response['problemset_id']);
     }
 
     /**

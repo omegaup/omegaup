@@ -2,7 +2,6 @@
 
 class InterviewController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
-        // Interview specific validations. Everything else is validated in ContestController::apiCreate
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
@@ -25,26 +24,38 @@ class InterviewController extends Controller {
 
         self::validateCreateOrUpdate($r, false);
 
-        // Create the contest that will back this interview
-        $r['public'] = false;
-        $r['title'] = $r['title'];
-        $r['description'] = array_key_exists('description', $r) ? $r['description'] : $r['title'];
-        $r['start_time'] = time();
-        $r['finish_time'] = strtotime('+1 year');
-        $r['window_length'] = $r['duration'];
-        $r['scoreboard'] = 0;
-        $r['points_decay_factor'] = 0;
-        $r['partial_score'] = 0;
-        $r['submissions_gap'] = 0;
-        $r['feedback'] = 'no';
-        $r['penalty'] = 0;
-        $r['penalty_type'] = 'none';
-        $r['penalty_calc_policy'] = 'sum';
-        $r['languages'] = null;
-        $r['interview'] = true;
-        $r['contestant_must_register'] = 0;
+        $problemset = new Problemsets();
+        $acl = new ACLs(array(
+            'owner_id' => $r['current_user']->user_id,
+        ));
+        $interview = new Interviews(array(
+            'alias' => $r['alias'],
+            'title' => $r['title'],
+            'description' => array_key_exists('description', $r) ? $r['description'] : $r['title'],
+            'window_length' => $r['duration'],
+        ));
 
-        $createdContest = ContestController::apiCreate($r);
+        try {
+            InterviewsDAO::transBegin();
+
+            ACLsDAO::save($acl);
+            $interview->acl_id = $acl->acl_id;
+            ProblemsetsDAO::save($problemset);
+            $interview->problemset_id = $problemset->problemset_id;
+            InterviewsDAO::save($interview);
+
+            InterviewsDAO::transEnd();
+        } catch (Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            InterviewsDAO::transRollback();
+
+            // Alias may be duplicated, 1062 error indicates that
+            if (strpos($e->getMessage(), '1062') !== false) {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
 
         self::$log->info('Created new interview ' . $r['alias']);
 
@@ -78,13 +89,13 @@ class InterviewController extends Controller {
 
         // Does the interview exist ?
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['interview_alias']);
+            $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($r['contest'])) {
+        if (is_null($r['interview'])) {
             throw new NotFoundException('interviewNotFound');
         }
 
@@ -114,8 +125,8 @@ class InterviewController extends Controller {
             // Email to new OmegaUp users
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . '<br>'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['contest']->alias . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['contest']->alias . '</a>'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
             $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
@@ -133,8 +144,8 @@ class InterviewController extends Controller {
         } else {
             // Email to current OmegaUp user
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
-                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->alias . '/arena">'
-                           . ' https://omegaup.com/interview/' . $r['contest']->alias . '/arena</a>';
+                           . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
+                           . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }
 
         if (is_null($r['user'])) {
@@ -142,23 +153,22 @@ class InterviewController extends Controller {
         }
 
         // Only director is allowed to add people to interview
-        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if (!Authorization::isInterviewAdmin($r['current_user_id'], $r['interview'])) {
             throw new ForbiddenAccessException();
         }
 
-        // add the user to the interview (contest)
-        $contestUser = new ContestsUsers();
-        $contestUser->contest_id = $r['contest']->contest_id;
-        $contestUser->user_id = $r['user']->user_id;
-        $contestUser->access_time = '0000-00-00 00:00:00';
-        $contestUser->score = '0';
-        $contestUser->time = '0';
-
+        // add the user to the interview
         try {
-            ContestsUsersDAO::save($contestUser);
+            ProblemsetUsersDAO::save(new ProblemsetUsers(array(
+                'problemset_id' => $r['interview']->problemset_id,
+                'user_id' => $r['user']->user_id,
+                'access_time' => '0000-00-00 00:00:00',
+                'score' => '0',
+                'time' => '0',
+            )));
         } catch (Exception $e) {
             // Operation failed in the data layer
-            self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
+            self::$log->error('Failed to create new ProblemsetUser: ' . $e->getMessage());
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -180,29 +190,23 @@ class InterviewController extends Controller {
 
         $thisResult = array();
 
-        $backingContest = ContestsDAO::getByAlias($r['interview_alias']);
-        if (is_null($backingContest)) {
-            throw new NotFoundException('interviewNotFound');
-        }
-
-        // Only proceed if this is indeed an interview
-        if (!InterviewsDAO::IsContestInterview($backingContest)) {
+        $interview = InterviewsDAO::getByAlias($r['interview_alias']);
+        if (is_null($interview)) {
             throw new NotFoundException('interviewNotFound');
         }
 
         // Only admins can view interview details
-        if (!Authorization::isContestAdmin($r['current_user_id'], $backingContest)) {
+        if (!Authorization::isInterviewAdmin($r['current_user_id'], $interview)) {
             throw new ForbiddenAccessException();
         }
 
-        $thisResult['description'] = $backingContest->description;
-        $thisResult['contest_alias'] = $backingContest->alias;
-
-        $candidatesQuery = new ContestsUsers();
-        $candidatesQuery->contest_id = $backingContest->contest_id;
+        $thisResult['description'] = $interview->description;
+        $thisResult['contest_alias'] = $interview->alias;
 
         try {
-            $db_results = ContestsUsersDAO::search($candidatesQuery);
+            $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers(array(
+                'problemset_id' => $interview->problemset_id,
+            )));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -222,13 +226,13 @@ class InterviewController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            $userOpenedContest = UserController::userOpenedContest($backingContest->contest_id, $user_id);
+            $problemsetOpened = UserController::userOpenedProblemset($interview->problemset_id, $user_id);
             $users[] = array(
                         'user_id' => $user_id,
                         'username' => $user->username,
                         'access_time' => $result->access_time,
                         'email' => $email->email,
-                        'opened_interview' => $userOpenedContest,
+                        'opened_interview' => $problemsetOpened,
                         'country' => $user->country_id);
         }
 

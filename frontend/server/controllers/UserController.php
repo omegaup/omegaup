@@ -1242,11 +1242,11 @@ class UserController extends Controller {
         return $response;
     }
 
-    public static function userOpenedContest($contestId, $userId) {
-        // You already started the contest.
-        $contestOpened = ContestsUsersDAO::getByPK($userId, $contestId);
+    public static function userOpenedProblemset($problemset_id, $user_id) {
+        // You already started the problemset.
+        $problemsetOpened = ProblemsetUsersDAO::getByPK($user_id, $problemset_id);
 
-        if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
+        if (!is_null($problemsetOpened) && $problemsetOpened->access_time != '0000-00-00 00:00:00') {
             return true;
         }
 
@@ -1278,12 +1278,12 @@ class UserController extends Controller {
         $response = array();
         $user = self::resolveTargetUser($r);
 
-        $openedContest = self::userOpenedContest($contest->contest_id, $user->user_id);
+        $openedProblemset = self::userOpenedProblemset($contest->problemset_id, $user->user_id);
 
         $response['user_verified'] = $user->verified === '1';
         $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
         $response['name_or_username'] = is_null($user->name) ? $user->username : $user->name;
-        $response['opened_interview'] = $openedContest;
+        $response['opened_interview'] = $openedProblemset;
         $response['finished'] = !ContestsDAO::isInsideContest($contest, $user->user_id);
         $response['status'] = 'ok';
         return $response;

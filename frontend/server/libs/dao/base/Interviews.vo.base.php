@@ -31,8 +31,26 @@ class Interviews extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-			if (isset($data['contest_id'])) {
-				$this->contest_id = $data['contest_id'];
+			if (isset($data['interview_id'])) {
+				$this->interview_id = $data['interview_id'];
+			}
+			if (isset($data['problemset_id'])) {
+				$this->problemset_id = $data['problemset_id'];
+			}
+			if (isset($data['acl_id'])) {
+				$this->acl_id = $data['acl_id'];
+			}
+			if (isset($data['alias'])) {
+				$this->alias = $data['alias'];
+			}
+			if (isset($data['title'])) {
+				$this->title = $data['title'];
+			}
+			if (isset($data['description'])) {
+				$this->description = $data['description'];
+			}
+			if (isset($data['window_length'])) {
+				$this->window_length = $data['window_length'];
 			}
 		}
 	}
@@ -47,7 +65,13 @@ class Interviews extends VO
 	public function __toString( )
 	{
 		$vec = array(
-			"contest_id" => $this->contest_id
+			"interview_id" => $this->interview_id,
+			"problemset_id" => $this->problemset_id,
+			"acl_id" => $this->acl_id,
+			"alias" => $this->alias,
+			"title" => $this->title,
+			"description" => $this->description,
+			"window_length" => $this->window_length
 		);
 	return json_encode($vec);
 	}
@@ -65,8 +89,51 @@ class Interviews extends VO
 	/**
 	  *  [Campo no documentado]
 	  * Llave Primaria
+	  * Auto Incremento
 	  * @access public
 	  * @var int(11)
 	  */
-	public $contest_id;
+	public $interview_id;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
+	public $problemset_id;
+
+	/**
+	  * La lista de control de acceso del problema
+	  * @access public
+	  * @var int(11)
+	  */
+	public $acl_id;
+
+	/**
+	  * El alias de la entrevista
+	  * @access public
+	  * @var varchar(32)
+	  */
+	public $alias;
+
+	/**
+	  * El titulo de la entrevista.
+	  * @access public
+	  * @var varchar(256)
+	  */
+	public $title;
+
+	/**
+	  * Una breve descripcion de la entrevista.
+	  * @access public
+	  * @var tinytext
+	  */
+	public $description;
+
+	/**
+	  * Indica el tiempo que tiene el usuario para envíar soluciones.
+	  * @access public
+	  * @var int(11)
+	  */
+	public $window_length;
 }

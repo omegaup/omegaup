@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table Contest_User_Request.
+/** Value Object file for table Problemset_User_Request_History.
   *
   * VO does not have any behaviour.
   * @access public
   *
   */
 
-class ContestUserRequest extends VO
+class ProblemsetUserRequestHistory extends VO
 {
 	/**
-	  * Constructor de ContestUserRequest
+	  * Constructor de ProblemsetUserRequestHistory
 	  *
-	  * Para construir un objeto de tipo ContestUserRequest debera llamarse a el constructor
+	  * Para construir un objeto de tipo ProblemsetUserRequestHistory debera llamarse a el constructor
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -31,23 +31,23 @@ class ContestUserRequest extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
+			if (isset($data['history_id'])) {
+				$this->history_id = $data['history_id'];
+			}
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['contest_id'])) {
-				$this->contest_id = $data['contest_id'];
+			if (isset($data['problemset_id'])) {
+				$this->problemset_id = $data['problemset_id'];
 			}
-			if (isset($data['request_time'])) {
-				$this->request_time = $data['request_time'];
-			}
-			if (isset($data['last_update'])) {
-				$this->last_update = $data['last_update'];
+			if (isset($data['time'])) {
+				$this->time = $data['time'];
 			}
 			if (isset($data['accepted'])) {
 				$this->accepted = $data['accepted'];
 			}
-			if (isset($data['extra_note'])) {
-				$this->extra_note = $data['extra_note'];
+			if (isset($data['admin_id'])) {
+				$this->admin_id = $data['admin_id'];
 			}
 		}
 	}
@@ -55,19 +55,19 @@ class ContestUserRequest extends VO
 	/**
 	  * Obtener una representacion en String
 	  *
-	  * Este metodo permite tratar a un objeto ContestUserRequest en forma de cadena.
+	  * Este metodo permite tratar a un objeto ProblemsetUserRequestHistory en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String
 	  */
 	public function __toString( )
 	{
 		$vec = array(
+			"history_id" => $this->history_id,
 			"user_id" => $this->user_id,
-			"contest_id" => $this->contest_id,
-			"request_time" => $this->request_time,
-			"last_update" => $this->last_update,
+			"problemset_id" => $this->problemset_id,
+			"time" => $this->time,
 			"accepted" => $this->accepted,
-			"extra_note" => $this->extra_note
+			"admin_id" => $this->admin_id
 		);
 	return json_encode($vec);
 	}
@@ -79,12 +79,20 @@ class ContestUserRequest extends VO
 		if (count($fields) > 0)
 			parent::toUnixTime($fields);
 		else
-			parent::toUnixTime(array("request_time", "last_update"));
+			parent::toUnixTime(array("time"));
 	}
 
 	/**
 	  *  [Campo no documentado]
 	  * Llave Primaria
+	  * Auto Incremento
+	  * @access public
+	  * @var int(11)
+	  */
+	public $history_id;
+
+	/**
+	  *  [Campo no documentado]
 	  * @access public
 	  * @var int(11)
 	  */
@@ -92,37 +100,29 @@ class ContestUserRequest extends VO
 
 	/**
 	  *  [Campo no documentado]
-	  * Llave Primaria
 	  * @access public
 	  * @var int(11)
 	  */
-	public $contest_id;
+	public $problemset_id;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
 	  * @var timestamp
 	  */
-	public $request_time;
+	public $time;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var timestamp
-	  */
-	public $last_update;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var tinyint(1)
+	  * @var tinyint(4)
 	  */
 	public $accepted;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var text,
+	  * @var int(11)
 	  */
-	public $extra_note;
+	public $admin_id;
 }

@@ -65,7 +65,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
-        $this->assertEquals($contest->contest_id, $clarification->contest_id);
+        $this->assertEquals($contest->problemset_id, $clarification->problemset_id);
         $this->assertEquals($problem->problem_id, $clarification->problem_id);
     }
 

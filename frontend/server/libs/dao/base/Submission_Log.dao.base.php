@@ -128,9 +128,9 @@ abstract class SubmissionLogDAOBase extends DAO
 
 		$sql = "SELECT * from Submission_Log WHERE (";
 		$val = array();
-		if (!is_null( $Submission_Log->contest_id)) {
-			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Submission_Log->contest_id );
+		if (!is_null( $Submission_Log->problemset_id)) {
+			$sql .= " `problemset_id` = ? AND";
+			array_push( $val, $Submission_Log->problemset_id );
 		}
 		if (!is_null( $Submission_Log->run_id)) {
 			$sql .= " `run_id` = ? AND";
@@ -183,9 +183,9 @@ abstract class SubmissionLogDAOBase extends DAO
 	  **/
 	private static final function update($Submission_Log)
 	{
-		$sql = "UPDATE Submission_Log SET  `contest_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE  `run_id` = ?;";
+		$sql = "UPDATE Submission_Log SET  `problemset_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE  `run_id` = ?;";
 		$params = array(
-			$Submission_Log->contest_id,
+			$Submission_Log->problemset_id,
 			$Submission_Log->user_id,
 			$Submission_Log->ip,
 			$Submission_Log->time,
@@ -210,9 +210,9 @@ abstract class SubmissionLogDAOBase extends DAO
 	private static final function create( $Submission_Log )
 	{
 		if (is_null($Submission_Log->time)) $Submission_Log->time = gmdate('Y-m-d H:i:s');
-		$sql = "INSERT INTO Submission_Log ( `contest_id`, `run_id`, `user_id`, `ip`, `time` ) VALUES ( ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Submission_Log ( `problemset_id`, `run_id`, `user_id`, `ip`, `time` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array(
-			$Submission_Log->contest_id,
+			$Submission_Log->problemset_id,
 			$Submission_Log->run_id,
 			$Submission_Log->user_id,
 			$Submission_Log->ip,
@@ -263,12 +263,12 @@ abstract class SubmissionLogDAOBase extends DAO
 	{
 		$sql = "SELECT * from Submission_Log WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Submission_LogA->contest_id) ) ) & ( ! is_null ( ($b = $Submission_LogB->contest_id) ) ) ){
-				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
+		if( ( !is_null (($a = $Submission_LogA->problemset_id) ) ) & ( ! is_null ( ($b = $Submission_LogB->problemset_id) ) ) ){
+				$sql .= " `problemset_id` >= ? AND `problemset_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND";
+			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

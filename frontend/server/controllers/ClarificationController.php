@@ -46,8 +46,8 @@ class ClarificationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        // Is the combination contest_id and problem_id valid?
-        if (is_null(ContestProblemsDAO::getByPK($r['contest']->contest_id, $r['problem']->problem_id))) {
+        // Is the combination problemset_id and problem_id valid?
+        if (is_null(ProblemsetProblemsDAO::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
             throw new NotFoundException('problemNotFoundInContest');
         }
     }
@@ -71,7 +71,7 @@ class ClarificationController extends Controller {
         $time = time();
         $r['clarification'] = new Clarifications(array(
             'author_id' => $r['current_user_id'],
-            'contest_id' => $r['contest']->contest_id,
+            'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
             'time' => gmdate('Y-m-d H:i:s', $time),
@@ -140,7 +140,7 @@ class ClarificationController extends Controller {
         self::validateDetails($r);
 
         // Create array of relevant columns
-        $relevant_columns = array('message', 'answer', 'time', 'problem_id', 'contest_id');
+        $relevant_columns = array('message', 'answer', 'time', 'problem_id', 'problemset_id');
 
         // Add the clarificatoin the response
         $response = $r['clarification']->asFilteredArray($relevant_columns);
@@ -224,8 +224,14 @@ class ClarificationController extends Controller {
             if (is_null($r['problem'])) {
                 $r['problem'] = ProblemsDAO::GetByPK($r['clarification']->problem_id);
             }
-            if (is_null($r['contest']) && !is_null($r['clarification']->contest_id)) {
-                $r['contest'] = ContestsDAO::GetByPK($r['clarification']->contest_id);
+            if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
+                $r['problemset'] = ProblemsetsDAO::GetByPK($r['clarification']->problemset_id);
+                $contests = ContestsDAO::search(new Contests(array(
+                    'problemset_id' => $r['problemset']->problemset_id,
+                )));
+                if (count($contests) === 1) {
+                    $r['contest'] = $contests[0];
+                }
             }
             if (is_null($r['user'])) {
                 $r['user'] = UsersDAO::GetByPK($r['clarification']->author_id);

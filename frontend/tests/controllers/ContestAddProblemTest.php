@@ -20,10 +20,10 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it
-        $contest_problems = ContestProblemsDAO::getByPK($contest->contest_id, $problem->problem_id);
-        self::assertNotNull($contest_problems);
-        self::assertEquals($r['points'], $contest_problems->points);
-        self::assertEquals($r['order_in_contest'], $contest_problems->order);
+        $problemset_problems = ProblemsetProblemsDAO::getByPK($contest->problemset_id, $problem->problem_id);
+        self::assertNotNull($problemset_problems);
+        self::assertEquals($r['points'], $problemset_problems->points);
+        self::assertEquals($r['order_in_contest'], $problemset_problems->order);
     }
 
     /**

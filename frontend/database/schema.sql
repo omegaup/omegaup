@@ -70,11 +70,11 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
   `answer` text,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `problem_id` int(11) DEFAULT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.',
-  `contest_id` int(11) NOT NULL,
+  `problemset_id` int(11) NOT NULL,
   `public` tinyint(1)  NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `contest_id` (`contest_id`),
+  KEY `problemset_id` (`problemset_id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se guardan las clarificaciones.' AUTO_INCREMENT=1 ;
 
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `Problemset_Problems` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
   `points` double NOT NULL DEFAULT '1',
-  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en un concurso',
+  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
   PRIMARY KEY (`problemset_id`,`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`)
@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS `ACLs` (
 CREATE TABLE IF NOT EXISTS `Contests` (
   `contest_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso',
   `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del concurso',
+  `problemset_id` int(11) NOT NULL COMMENT 'La lista de problemas de este concurso',
   `title` varchar(256) NOT NULL COMMENT 'El titulo que aparecera en cada concurso',
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de cada concurso.',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este concurso',
@@ -176,24 +177,24 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contest_Users`
+-- Estructura de tabla para la tabla `Problemset_Users`
 --
 
-CREATE TABLE IF NOT EXISTS `Contests_Users` (
+CREATE TABLE IF NOT EXISTS `Problemset_Users` (
   `user_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL,
+  `problemset_id` int(11) NOT NULL,
   `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
-  PRIMARY KEY (`user_id`,`contest_id`),
+  PRIMARY KEY (`user_id`,`problemset_id`),
   KEY `user_id` (`user_id`),
-  KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden participar en concurso cerrado.';
+  KEY `problemset_id` (`problemset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden interactuar con una lista de problemas.';
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contest_Users`
+-- Estructura de tabla para la tabla `Courses`
 --
 
 CREATE TABLE IF NOT EXISTS `Courses` (
@@ -221,46 +222,30 @@ CREATE TABLE IF NOT EXISTS `User_Login_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
 
 --
--- Estructura de tabla para la tabla `Contest_Access_Log`
+-- Estructura de tabla para la tabla `Problemset_Access_Log`
 --
 
-CREATE TABLE IF NOT EXISTS `Contest_Access_Log` (
-	`contest_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `Problemset_Access_Log` (
+	`problemset_id` int(11) NOT NULL,
 	`user_id` int(11) NOT NULL,
 	`ip` int UNSIGNED NOT NULL,
 	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a concursos';
+	KEY `problemset_id` (`problemset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a listas de problemas';
 
 --
 -- Estructura de tabla para la tabla `Submission_Log`
 --
 
 CREATE TABLE IF NOT EXISTS `Submission_Log` (
-	`contest_id` int(11) NULL DEFAULT NULL,
+	`problemset_id` int(11) NULL DEFAULT NULL,
 	`run_id` int(11) NOT NULL,
 	`user_id` int(11) NOT NULL,
 	`ip` int UNSIGNED NOT NULL,
 	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`run_id`),
-	KEY `contest_id` (`contest_id`)
+	KEY `problemset_id` (`problemset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `Contest_Problems`
---
-
-CREATE TABLE IF NOT EXISTS `Contest_Problems` (
-  `contest_id` int(11) NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  `points` double NOT NULL DEFAULT '1',
-  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en un concurso',
-  PRIMARY KEY (`contest_id`,`problem_id`),
-  KEY `contest_id` (`contest_id`),
-  KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
 -- --------------------------------------------------------
 
@@ -278,49 +263,49 @@ CREATE TABLE IF NOT EXISTS `Problem_Viewed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de vistas de problemas';
 
 --
--- Estructura de tabla para la tabla `Contest_User_OpenedProblems`
+-- Estructura de tabla para la tabla `Problemset_Problem_Opened`
 --
 
-CREATE TABLE IF NOT EXISTS `Contest_Problem_Opened` (
-  `contest_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `Problemset_Problem_Opened` (
+  `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `open_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`contest_id`,`problem_id`,`user_id`),
-  KEY `contest_id` (`contest_id`),
+  PRIMARY KEY (`problemset_id`,`problem_id`,`user_id`),
+  KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Registro de primer acceso a problemas de un conjunto.';
 
 --
--- Estructura de tabla para la tabla `Contest_User_Request`
+-- Estructura de tabla para la tabla `Problemset_User_Request`
 --
 
-CREATE TABLE IF NOT EXISTS `Contest_User_Request` (
+CREATE TABLE IF NOT EXISTS `Problemset_User_Request` (
 	`user_id` int(11) NOT NULL,
-	`contest_id` int(11) NOT NULL,
+	`problemset_id` int(11) NOT NULL,
 	`request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`last_update` timestamp NOT NULL ,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
-	PRIMARY KEY (`user_id`,`contest_id`)
+	PRIMARY KEY (`user_id`,`problemset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
 
 	-- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contest_User_Request_History`
+-- Estructura de tabla para la tabla `Problemset_User_Request_History`
 --
 
-CREATE TABLE IF NOT EXISTS `Contest_User_Request_History` (
+CREATE TABLE IF NOT EXISTS `Problemset_User_Request_History` (
 	  `history_id` int(11) NOT NULL AUTO_INCREMENT,
 	  `user_id` int(11) NOT NULL,
-	  `contest_id` int(11) NOT NULL,
+	  `problemset_id` int(11) NOT NULL,
 	  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	  `accepted` tinyint(4) NOT NULL,
 	  `admin_id` int(11) NOT NULL,
 	  PRIMARY KEY (`history_id`),
-	  KEY `user_contest_hist` (`user_id`, `contest_id`)
+	  KEY `user_problemset_hist` (`user_id`, `problemset_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
 --
@@ -384,9 +369,17 @@ CREATE TABLE IF NOT EXISTS `Languages` (
 --
 
 CREATE TABLE IF NOT EXISTS `Interviews` (
-  `contest_id` int(11) NOT NULL,
-  PRIMARY KEY (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de id_concuros que se usan para entrevista';
+  `interview_id` int(11) NOT NULL AUTO_INCREMENT,
+  `problemset_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del problema',
+  `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
+  `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
+  `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
+  `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.',
+  PRIMARY KEY (`interview_id`),
+  KEY `problemset_id` (`problemset_id`),
+  KEY `acl_id` (`acl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Entrevistas';
 
 -- --------------------------------------------------------
 
@@ -554,7 +547,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `run_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
-  `contest_id` int(11) DEFAULT NULL,
+  `problemset_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
   `language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL,
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
@@ -571,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   PRIMARY KEY (`run_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `contest_id` (`contest_id`),
+  KEY `problemset_id` (`problemset_id`),
   UNIQUE KEY `runs_alias` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
@@ -687,19 +680,6 @@ CREATE TABLE IF NOT EXISTS `Users_Experiments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los experimentos habilitados para un usuario.';
 
 -- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `User_Permissions`
---
-
-CREATE TABLE IF NOT EXISTS `Users_Permissions` (
-  `user_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL COMMENT 'Este permiso solo aplica en el contexto de un concurso.',
-  PRIMARY KEY (`user_id`,`permission_id`),
-  KEY `user_id` (`user_id`),
-  KEY `permission_id` (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los usuarios.';
 
 --
 -- Estructura de tabla para la tabla `Groups`
@@ -838,7 +818,7 @@ ALTER TABLE `Auth_Tokens`
 -- Filtros para la tabla `Clarifications`
 --
 ALTER TABLE `Clarifications`
-  ADD CONSTRAINT `fk_cp_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cu_author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -865,21 +845,22 @@ ALTER TABLE `ACLs`
 -- Filtros para la tabla `Contests`
 --
 ALTER TABLE `Contests`
-  ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsetss` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Contests_Users`
+-- Filtros para la tabla `Problemset_Users`
 --
-ALTER TABLE `Contests_Users`
-  ADD CONSTRAINT `fk_cuc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `Problemset_Users`
+  ADD CONSTRAINT `fk_puc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_puu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Contest_Access_Log`
+-- Filtros para la tabla `Problemset_Access_Log`
 --
-ALTER TABLE `Contest_Access_Log`
-  ADD CONSTRAINT `fk_calc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_calu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `Problemset_Access_Log`
+  ADD CONSTRAINT `fk_palc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_palu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `User_Login_Log`
@@ -891,7 +872,7 @@ ALTER TABLE `User_Login_Log`
 -- Filtros para la tabla `Submission_Log`
 --
 ALTER TABLE `Submission_Log`
-  ADD CONSTRAINT `fk_slc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_slp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_slu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -903,19 +884,12 @@ ALTER TABLE `Problems_Tags`
   ADD CONSTRAINT `fk_ptt_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Contest_Problems`
+-- Filtros para la tabla `Problemset_Problem_Opened`
 --
-ALTER TABLE `Contest_Problems`
-  ADD CONSTRAINT `fk_cpc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Filtros para la tabla `Contest_Problem_Opened`
---
-ALTER TABLE `Contest_Problem_Opened`
-  ADD CONSTRAINT `fk_cpo_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `Problemset_Problem_Opened`
+  ADD CONSTRAINT `fk_ppo_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ppo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ppo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problem_Viewed`
@@ -990,7 +964,7 @@ ALTER TABLE `Roles_Permissions`
 -- Filtros para la tabla `Runs`
 --
 ALTER TABLE `Runs`
-  ADD CONSTRAINT `fk_r_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -1082,7 +1056,7 @@ END$$
 DELIMITER ;
 
 CREATE INDEX idx_contest_public ON Contests (`public`);
-CREATE INDEX idx_user_roles_contest ON User_Roles (contest_id);
+CREATE INDEX idx_user_roles_acl ON User_Roles (`acl_id`);
 CREATE INDEX idx_problems_public ON Problems (`public`);
 
 --

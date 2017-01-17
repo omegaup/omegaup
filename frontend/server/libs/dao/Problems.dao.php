@@ -299,7 +299,7 @@ class ProblemsDAO extends ProblemsDAOBase
     final public static function getPracticeDeadline($id) {
         global $conn;
 
-        $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Contest_Problems cp USING(contest_id) WHERE cp.problem_id = ?';
+        $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
         return $conn->GetOne($sql, $id);
     }
 

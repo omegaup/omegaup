@@ -39,10 +39,6 @@ class InterviewCreateTest extends OmegaupTestCase {
         ]));
 
         $interview = InterviewsDAO::getMyInterviews($contestant->user_id);
-
-        $this->assertEquals(true, $interview[0]['interview']);
-        $this->assertEquals(0, $interview[0]['public']);
-        $this->assertEquals(0, $interview[0]['contestant_must_register'], 'Interviews must have the contestant_must_register property');
     }
 
     public function testAddUsersToInterview() {

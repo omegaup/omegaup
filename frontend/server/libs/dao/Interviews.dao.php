@@ -11,34 +11,33 @@ include('base/Interviews.vo.base.php');
   */
 class InterviewsDAO extends InterviewsDAOBase
 {
-    public static function isContestInterview(Contests $contest) {
-        $sql = '
-            SELECT
-                COUNT(*)
-            FROM
-                Interviews
-            WHERE
-                contest_id = ?;';
-        $params = array($contest->contest_id);
+    final public static function getByAlias($alias)
+    {
+        $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
+        $params = array($alias);
+
         global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return null;
+        }
+
+        $interview = new Interviews($rs);
+
+        return $interview;
     }
 
     final public static function getMyInterviews($user_id)
     {
         $sql = '
             SELECT
-                c.*
+                i.*
             FROM
-                Contests AS c
-            INNER JOIN
                 Interviews AS i
-            ON
-                i.contest_id = c.contest_id
             INNER JOIN
                 ACLs AS a
             ON
-                a.acl_id = c.acl_id
+                a.acl_id = i.acl_id
             WHERE
                 a.owner_id = ?
                 OR (SELECT COUNT(*) FROM User_Roles WHERE user_id = ? AND role_id = ? AND acl_id = a.acl_id) > 0;';
@@ -51,7 +50,6 @@ class InterviewsDAO extends InterviewsDAOBase
         $result = array();
 
         foreach ($rs as $r) {
-            $r['interview'] = true;
             $result[] = $r;
         }
 

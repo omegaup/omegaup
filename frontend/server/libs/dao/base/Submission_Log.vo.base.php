@@ -31,8 +31,8 @@ class SubmissionLog extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-			if (isset($data['contest_id'])) {
-				$this->contest_id = $data['contest_id'];
+			if (isset($data['problemset_id'])) {
+				$this->problemset_id = $data['problemset_id'];
 			}
 			if (isset($data['run_id'])) {
 				$this->run_id = $data['run_id'];
@@ -59,7 +59,7 @@ class SubmissionLog extends VO
 	public function __toString( )
 	{
 		$vec = array(
-			"contest_id" => $this->contest_id,
+			"problemset_id" => $this->problemset_id,
 			"run_id" => $this->run_id,
 			"user_id" => $this->user_id,
 			"ip" => $this->ip,
@@ -83,7 +83,7 @@ class SubmissionLog extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $contest_id;
+	public $problemset_id;
 
 	/**
 	  *  [Campo no documentado]

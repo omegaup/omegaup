@@ -136,6 +136,10 @@ abstract class ContestsDAOBase extends DAO
 			$sql .= " `acl_id` = ? AND";
 			array_push( $val, $Contests->acl_id );
 		}
+		if (!is_null( $Contests->problemset_id)) {
+			$sql .= " `problemset_id` = ? AND";
+			array_push( $val, $Contests->problemset_id );
+		}
 		if (!is_null( $Contests->title)) {
 			$sql .= " `title` = ? AND";
 			array_push( $val, $Contests->title );
@@ -263,9 +267,10 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
+		$sql = "UPDATE Contests SET  `acl_id` = ?, `problemset_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
 		$params = array(
 			$Contests->acl_id,
+			$Contests->problemset_id,
 			$Contests->title,
 			$Contests->description,
 			$Contests->start_time,
@@ -321,10 +326,11 @@ abstract class ContestsDAOBase extends DAO
 		if (is_null($Contests->urgent)) $Contests->urgent = 0;
 		if (is_null($Contests->contestant_must_register)) $Contests->contestant_must_register = '0';
 		if (is_null($Contests->recommended)) $Contests->recommended =  '0';
-		$sql = "INSERT INTO Contests ( `contest_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( `contest_id`, `acl_id`, `problemset_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Contests->contest_id,
 			$Contests->acl_id,
+			$Contests->problemset_id,
 			$Contests->title,
 			$Contests->description,
 			$Contests->start_time,
@@ -411,6 +417,16 @@ abstract class ContestsDAOBase extends DAO
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `acl_id` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $ContestsA->problemset_id) ) ) & ( ! is_null ( ($b = $ContestsB->problemset_id) ) ) ){
+				$sql .= " `problemset_id` >= ? AND `problemset_id` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

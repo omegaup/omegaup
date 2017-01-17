@@ -33,7 +33,7 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	public static final function save( $Interviews )
 	{
-		if (!is_null(self::getByPK( $Interviews->contest_id)))
+		if (!is_null(self::getByPK( $Interviews->interview_id)))
 		{
 			return InterviewsDAOBase::update( $Interviews);
 		} else {
@@ -50,11 +50,11 @@ abstract class InterviewsDAOBase extends DAO
 	  *	@static
 	  * @return @link Interviews Un objeto del tipo {@link Interviews}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $contest_id )
+	public static final function getByPK(  $interview_id )
 	{
-		if(  is_null( $contest_id )  ){ return NULL; }
-		$sql = "SELECT * FROM Interviews WHERE (contest_id = ? ) LIMIT 1;";
-		$params = array(  $contest_id );
+		if(  is_null( $interview_id )  ){ return NULL; }
+		$sql = "SELECT * FROM Interviews WHERE (interview_id = ? ) LIMIT 1;";
+		$params = array(  $interview_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
@@ -128,9 +128,33 @@ abstract class InterviewsDAOBase extends DAO
 
 		$sql = "SELECT * from Interviews WHERE (";
 		$val = array();
-		if (!is_null( $Interviews->contest_id)) {
-			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Interviews->contest_id );
+		if (!is_null( $Interviews->interview_id)) {
+			$sql .= " `interview_id` = ? AND";
+			array_push( $val, $Interviews->interview_id );
+		}
+		if (!is_null( $Interviews->problemset_id)) {
+			$sql .= " `problemset_id` = ? AND";
+			array_push( $val, $Interviews->problemset_id );
+		}
+		if (!is_null( $Interviews->acl_id)) {
+			$sql .= " `acl_id` = ? AND";
+			array_push( $val, $Interviews->acl_id );
+		}
+		if (!is_null( $Interviews->alias)) {
+			$sql .= " `alias` = ? AND";
+			array_push( $val, $Interviews->alias );
+		}
+		if (!is_null( $Interviews->title)) {
+			$sql .= " `title` = ? AND";
+			array_push( $val, $Interviews->title );
+		}
+		if (!is_null( $Interviews->description)) {
+			$sql .= " `description` = ? AND";
+			array_push( $val, $Interviews->description );
+		}
+		if (!is_null( $Interviews->window_length)) {
+			$sql .= " `window_length` = ? AND";
+			array_push( $val, $Interviews->window_length );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -167,6 +191,18 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	private static final function update($Interviews)
 	{
+		$sql = "UPDATE Interviews SET  `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE  `interview_id` = ?;";
+		$params = array(
+			$Interviews->problemset_id,
+			$Interviews->acl_id,
+			$Interviews->alias,
+			$Interviews->title,
+			$Interviews->description,
+			$Interviews->window_length,
+			$Interviews->interview_id, );
+		global $conn;
+		$conn->Execute($sql, $params);
+		return $conn->Affected_Rows();
 	}
 
 	/**
@@ -183,14 +219,21 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	private static final function create( $Interviews )
 	{
-		$sql = "INSERT INTO Interviews ( `contest_id` ) VALUES ( ?);";
+		$sql = "INSERT INTO Interviews ( `interview_id`, `problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length` ) VALUES ( ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
-			$Interviews->contest_id,
+			$Interviews->interview_id,
+			$Interviews->problemset_id,
+			$Interviews->acl_id,
+			$Interviews->alias,
+			$Interviews->title,
+			$Interviews->description,
+			$Interviews->window_length,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
+		$Interviews->interview_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -232,12 +275,72 @@ abstract class InterviewsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Interviews WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $InterviewsA->contest_id) ) ) & ( ! is_null ( ($b = $InterviewsB->contest_id) ) ) ){
-				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
+		if( ( !is_null (($a = $InterviewsA->interview_id) ) ) & ( ! is_null ( ($b = $InterviewsB->interview_id) ) ) ){
+				$sql .= " `interview_id` >= ? AND `interview_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND";
+			$sql .= " `interview_id` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->problemset_id) ) ) & ( ! is_null ( ($b = $InterviewsB->problemset_id) ) ) ){
+				$sql .= " `problemset_id` >= ? AND `problemset_id` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problemset_id` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->acl_id) ) ) & ( ! is_null ( ($b = $InterviewsB->acl_id) ) ) ){
+				$sql .= " `acl_id` >= ? AND `acl_id` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `acl_id` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->alias) ) ) & ( ! is_null ( ($b = $InterviewsB->alias) ) ) ){
+				$sql .= " `alias` >= ? AND `alias` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `alias` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->title) ) ) & ( ! is_null ( ($b = $InterviewsB->title) ) ) ){
+				$sql .= " `title` >= ? AND `title` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `title` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->description) ) ) & ( ! is_null ( ($b = $InterviewsB->description) ) ) ){
+				$sql .= " `description` >= ? AND `description` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `description` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $InterviewsA->window_length) ) ) & ( ! is_null ( ($b = $InterviewsB->window_length) ) ) ){
+				$sql .= " `window_length` >= ? AND `window_length` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `window_length` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
@@ -270,9 +373,9 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	public static final function delete( $Interviews )
 	{
-		if( is_null( self::getByPK($Interviews->contest_id) ) ) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM Interviews WHERE  contest_id = ?;";
-		$params = array( $Interviews->contest_id );
+		if( is_null( self::getByPK($Interviews->interview_id) ) ) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Interviews WHERE  interview_id = ?;";
+		$params = array( $Interviews->interview_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

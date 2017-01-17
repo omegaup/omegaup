@@ -33,9 +33,17 @@ class Authorization {
             return false;
         }
 
+        $contest = null;
         try {
-            $contest = ContestsDAO::getByPK($run->contest_id);
             $problem = ProblemsDAO::getByPK($run->problem_id);
+            if (!is_null($run->problemset_id)) {
+                $contests = ContestsDAO::search(new Contests(array(
+                    'problemset_id' => $run->problemset_id,
+                )));
+                if (count($contests) === 1) {
+                    $contest = $contests[0];
+                }
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -64,8 +72,16 @@ class Authorization {
             return true;
         }
 
+        $contest = null;
         try {
-            $contest = ContestsDAO::getByPK($clarification->contest_id);
+            if (!is_null($clarification->problemset_id)) {
+                $contests = ContestsDAO::search(new Contests(array(
+                    'problemset_id' => $clarification->problemset_id,
+                )));
+                if (count($contests) === 1) {
+                    $contest = $contests[0];
+                }
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -82,9 +98,17 @@ class Authorization {
             return false;
         }
 
+        $contest = null;
         try {
-            $contest = ContestsDAO::getByPK($clarification->contest_id);
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
+            if (!is_null($clarification->problemset_id)) {
+                $contests = ContestsDAO::search(new Contests(array(
+                    'problemset_id' => $clarification->problemset_id,
+                )));
+                if (count($contests) === 1) {
+                    $contest = $contests[0];
+                }
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -125,6 +149,19 @@ class Authorization {
 
         return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
                UserRolesDAO::isAdmin($user_id, $contest->acl_id);
+    }
+
+    public static function isInterviewAdmin($user_id, Interviews $interview) {
+        if (is_null($interview) || !is_a($interview, 'Interviews')) {
+            return false;
+        }
+
+        if (self::isOwner($user_id, $interview->acl_id)) {
+            return true;
+        }
+
+        return GroupRolesDAO::isAdmin($user_id, $interview->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $interview->acl_id);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {

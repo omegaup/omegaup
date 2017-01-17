@@ -19,12 +19,12 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it does not exist
-        $contest_problems = ContestProblemsDAO::getByPK(
-            $contest->contest_id,
+        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+            $contest->problemset_id,
             $problem->problem_id
         );
 
-        self::assertNull($contest_problems);
+        self::assertNull($problemset_problems);
     }
 
     /**
@@ -38,12 +38,12 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
-        $contest_problems = ContestProblemsDAO::getByPK(
-            $contest->contest_id,
+        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+            $contest->problemset_id,
             $problem->problem_id
         );
 
-        self::assertNotNull($contest_problems);
+        self::assertNotNull($problemset_problems);
     }
 
     /**

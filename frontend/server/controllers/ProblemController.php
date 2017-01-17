@@ -868,7 +868,7 @@ class ProblemController extends Controller {
                     throw new NotFoundException('contestNotFound');
                 }
 
-                if (is_null(ContestProblemsDAO::getByPK($r['contest']->contest_id, $r['problem']->problem_id))) {
+                if (is_null(ProblemsetProblemsDAO::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
                     throw new NotFoundException('problemNotFoundInContest');
                 }
             } catch (ApiException $apiException) {
@@ -881,7 +881,7 @@ class ProblemController extends Controller {
             $contest_admin
                 = Authorization::isContestAdmin($r['current_user_id'], $r['contest']);
             if ($r['contest']->public != '1') {
-                if (is_null(ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id))
+                if (is_null(ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id))
                     && !$contest_admin
                 ) {
                     throw new ForbiddenAccessException();
@@ -1144,9 +1144,9 @@ class ProblemController extends Controller {
         if (!is_null($r['contest'])) {
             // At this point, contestant_user relationship should be established.
             try {
-                ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+                ProblemsetUsersDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_user_id'],
-                    $r['contest']->contest_id
+                    $r['contest']->problemset_id
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -1156,21 +1156,18 @@ class ProblemController extends Controller {
             }
 
             // As last step, register the problem as opened
-            if (!ContestProblemOpenedDAO::getByPK(
-                $r['contest']->contest_id,
+            if (!ProblemsetProblemOpenedDAO::getByPK(
+                $r['contest']->problemset_id,
                 $r['problem']->problem_id,
                 $r['current_user_id']
             )) {
-                //Create temp object
-                $keyContestProblemOpened = new ContestProblemOpened(array(
-                            'contest_id' => $r['contest']->contest_id,
-                            'problem_id' => $r['problem']->problem_id,
-                            'user_id' => $r['current_user_id']
-                        ));
-
                 try {
                     // Save object in the DB
-                    ContestProblemOpenedDAO::save($keyContestProblemOpened);
+                    ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened(array(
+                        'problemset_id' => $r['contest']->problemset_id,
+                        'problem_id' => $r['problem']->problem_id,
+                        'user_id' => $r['current_user_id']
+                    )));
                 } catch (Exception $e) {
                     // Operation failed in the data layer
                     throw new InvalidDatabaseOperationException($e);
@@ -1693,7 +1690,13 @@ class ProblemController extends Controller {
             if (is_null($r['contest'])) {
                 $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
             } else {
-                $bestRun = RunsDAO::GetBestRun($r['contest']->contest_id, $r['problem']->problem_id, $current_user_id, strtotime($r['contest']->finish_time), false /*showAllRuns*/);
+                $bestRun = RunsDAO::GetBestRun(
+                    $r['contest']->problemset_id,
+                    $r['problem']->problem_id,
+                    $current_user_id,
+                    strtotime($r['contest']->finish_time),
+                    false /*showAllRuns*/
+                );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;
             }
         } catch (Exception $e) {

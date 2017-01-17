@@ -152,9 +152,9 @@ abstract class ClarificationsDAOBase extends DAO
 			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Clarifications->problem_id );
 		}
-		if (!is_null( $Clarifications->contest_id)) {
-			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Clarifications->contest_id );
+		if (!is_null( $Clarifications->problemset_id)) {
+			$sql .= " `problemset_id` = ? AND";
+			array_push( $val, $Clarifications->problemset_id );
 		}
 		if (!is_null( $Clarifications->public)) {
 			$sql .= " `public` = ? AND";
@@ -195,14 +195,14 @@ abstract class ClarificationsDAOBase extends DAO
 	  **/
 	private static final function update($Clarifications)
 	{
-		$sql = "UPDATE Clarifications SET  `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `contest_id` = ?, `public` = ? WHERE  `clarification_id` = ?;";
+		$sql = "UPDATE Clarifications SET  `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE  `clarification_id` = ?;";
 		$params = array(
 			$Clarifications->author_id,
 			$Clarifications->message,
 			$Clarifications->answer,
 			$Clarifications->time,
 			$Clarifications->problem_id,
-			$Clarifications->contest_id,
+			$Clarifications->problemset_id,
 			$Clarifications->public,
 			$Clarifications->clarification_id, );
 		global $conn;
@@ -226,7 +226,7 @@ abstract class ClarificationsDAOBase extends DAO
 	{
 		if (is_null($Clarifications->time)) $Clarifications->time = gmdate('Y-m-d H:i:s');
 		if (is_null($Clarifications->public)) $Clarifications->public = '0';
-		$sql = "INSERT INTO Clarifications ( `clarification_id`, `author_id`, `message`, `answer`, `time`, `problem_id`, `contest_id`, `public` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Clarifications ( `clarification_id`, `author_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Clarifications->clarification_id,
 			$Clarifications->author_id,
@@ -234,7 +234,7 @@ abstract class ClarificationsDAOBase extends DAO
 			$Clarifications->answer,
 			$Clarifications->time,
 			$Clarifications->problem_id,
-			$Clarifications->contest_id,
+			$Clarifications->problemset_id,
 			$Clarifications->public,
 		 );
 		global $conn;
@@ -343,12 +343,12 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->contest_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->contest_id) ) ) ){
-				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->problemset_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->problemset_id) ) ) ){
+				$sql .= " `problemset_id` >= ? AND `problemset_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND";
+			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
