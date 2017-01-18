@@ -533,4 +533,23 @@ class ContestsDAO extends ContestsDAOBase
 
         return $allData;
     }
+
+    public static function getContestForProblemset($problemset_id) {
+        if (is_null($problemset_id)) {
+            return null;
+        }
+
+        try {
+            $contests = ContestsDAO::search(new Contests([
+                'problemset_id' => $problemset_id,
+            ]));
+            if (count($contests) === 1) {
+                return $contests[0];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return null;
+    }
 }

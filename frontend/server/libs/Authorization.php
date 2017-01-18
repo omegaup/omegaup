@@ -33,17 +33,9 @@ class Authorization {
             return false;
         }
 
-        $contest = null;
+        $contest = ContestsDAO::getContestForProblemset($run->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($run->problem_id);
-            if (!is_null($run->problemset_id)) {
-                $contests = ContestsDAO::search(new Contests(array(
-                    'problemset_id' => $run->problemset_id,
-                )));
-                if (count($contests) === 1) {
-                    $contest = $contests[0];
-                }
-            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -72,19 +64,7 @@ class Authorization {
             return true;
         }
 
-        $contest = null;
-        try {
-            if (!is_null($clarification->problemset_id)) {
-                $contests = ContestsDAO::search(new Contests(array(
-                    'problemset_id' => $clarification->problemset_id,
-                )));
-                if (count($contests) === 1) {
-                    $contest = $contests[0];
-                }
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
 
         if (is_null($contest)) {
             return false;
@@ -98,17 +78,9 @@ class Authorization {
             return false;
         }
 
-        $contest = null;
+        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
-            if (!is_null($clarification->problemset_id)) {
-                $contests = ContestsDAO::search(new Contests(array(
-                    'problemset_id' => $clarification->problemset_id,
-                )));
-                if (count($contests) === 1) {
-                    $contest = $contests[0];
-                }
-            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

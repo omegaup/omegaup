@@ -1282,16 +1282,15 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
         self::validateAddUser($r);
 
-        $problemset_user = new ProblemsetUsers();
-        $problemset_user->problemset_id = $r['contest']->problemset_id;
-        $problemset_user->user_id = $r['user']->user_id;
-        $problemset_user->access_time = '0000-00-00 00:00:00';
-        $problemset_user->score = '0';
-        $problemset_user->time = '0';
-
         // Save the contest to the DB
         try {
-            ProblemsetUsersDAO::save($problemset_user);
+            ProblemsetUsersDAO::save(new ProblemsetUsers([
+                'problemset_id' => $r['contest']->problemset_id,
+                'user_id' => $r['user']->user_id,
+                'access_time' => '0000-00-00 00:00:00',
+                'score' => '0',
+                'time' => '0',
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
@@ -1313,12 +1312,11 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
         self::validateAddUser($r);
 
-        $problemset_user = new ProblemsetUsers();
-        $problemset_user->problemset_id = $r['contest']->problemset_id;
-        $problemset_user->user_id = $r['user']->user_id;
-
         try {
-            ProblemsetUsersDAO::delete($problemset_user);
+            ProblemsetUsersDAO::delete(new ProblemsetUsers([
+                'problemset_id' => $r['contest']->problemset_id,
+                'user_id' => $r['user']->user_id,
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

@@ -455,18 +455,19 @@ class RunsDAO extends RunsDAOBase {
 	 */
 
     final public static function GetBestRun($problemset_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
-        $sql = '
+        $filterTest = $showAllRuns ? '' : ' AND test = 0';
+        $sql = "
             SELECT
                 contest_score, penalty, submit_delay, guid, run_id
             FROM
                 Runs
             WHERE
                 user_id = ? AND problemset_id = ? AND problem_id = ? AND
-                status = \'ready\' AND time <= FROM_UNIXTIME(?) ' .
-                 ($showAllRuns ? '' : ' AND test = 0 ') . '
+                status = 'ready' AND time <= FROM_UNIXTIME(?)
+                $filterTest
             ORDER BY
                 contest_score DESC, penalty ASC
-            LIMIT 1;';
+            LIMIT 1;";
         $val = array($user_id, $problemset_id, $problem_id, $finish_time);
 
         global $conn;
@@ -530,11 +531,9 @@ class RunsDAO extends RunsDAOBase {
         $submission_gap = 0;
         if (!is_null($problemset_id)) {
             // Get submissions gap
-            $contests = ContestsDAO::search(new Contests(array(
-                'problemset_id' => $problemset_id,
-            )));
-            if (count($contests) === 1) {
-                $submission_gap = (int)$contests[0]->submissions_gap;
+            $contest = ContestsDAO::getContestForProblemset($problemset_id);
+            if (!is_null($contest)) {
+                $submission_gap = (int)$contest->submissions_gap;
             }
         }
         $submission_gap = max($submission_gap, RunController::$defaultSubmissionGap);

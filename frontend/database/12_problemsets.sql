@@ -54,7 +54,7 @@ ALTER TABLE `Interviews`
 	ADD PRIMARY KEY (`interview_id`),
 	CHANGE COLUMN `contest_id` `problemset_id` int(11) NOT NULL,
 	ADD COLUMN `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del problema',
-  ADD COLUMN `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
+	ADD COLUMN `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
 	ADD COLUMN `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
 	ADD COLUMN `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
 	ADD COLUMN `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.';
