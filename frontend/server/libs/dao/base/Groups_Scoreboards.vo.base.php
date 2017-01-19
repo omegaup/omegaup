@@ -47,24 +47,6 @@ class GroupsScoreboards extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto GroupsScoreboards en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'group_scoreboard_id' => $this->group_scoreboard_id,
-            'group_id' => $this->group_id,
-            'create_time' => $this->create_time,
-            'alias' => $this->alias,
-            'name' => $this->name,
-            'description' => $this->description,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

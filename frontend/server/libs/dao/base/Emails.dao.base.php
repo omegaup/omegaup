@@ -122,7 +122,7 @@ abstract class EmailsDAOBase extends DAO {
       */
     final public static function search($Emails, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Emails instanceof Emails)) {
-            return self::search(new Emails($Emails));
+            $Emails = new Emails($Emails);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class EmailsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -311,7 +311,7 @@ abstract class EmailsDAOBase extends DAO {
      */
     final public static function delete(Emails $Emails) {
         if (is_null(self::getByPK($Emails->email_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Emails` WHERE email_id = ?;';
         $params = [$Emails->email_id];

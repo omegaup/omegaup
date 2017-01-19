@@ -122,7 +122,7 @@ abstract class RolesDAOBase extends DAO {
       */
     final public static function search($Roles, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Roles instanceof Roles)) {
-            return self::search(new Roles($Roles));
+            $Roles = new Roles($Roles);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class RolesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -311,7 +311,7 @@ abstract class RolesDAOBase extends DAO {
      */
     final public static function delete(Roles $Roles) {
         if (is_null(self::getByPK($Roles->role_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Roles` WHERE role_id = ?;';
         $params = [$Roles->role_id];

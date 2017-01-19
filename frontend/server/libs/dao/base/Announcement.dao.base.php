@@ -122,7 +122,7 @@ abstract class AnnouncementDAOBase extends DAO {
       */
     final public static function search($Announcement, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Announcement instanceof Announcement)) {
-            return self::search(new Announcement($Announcement));
+            $Announcement = new Announcement($Announcement);
         }
 
         $clauses = [];
@@ -146,7 +146,7 @@ abstract class AnnouncementDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -331,7 +331,7 @@ abstract class AnnouncementDAOBase extends DAO {
      */
     final public static function delete(Announcement $Announcement) {
         if (is_null(self::getByPK($Announcement->announcement_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Announcement` WHERE announcement_id = ?;';
         $params = [$Announcement->announcement_id];

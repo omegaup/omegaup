@@ -122,7 +122,7 @@ abstract class StatesDAOBase extends DAO {
       */
     final public static function search($States, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($States instanceof States)) {
-            return self::search(new States($States));
+            $States = new States($States);
         }
 
         $clauses = [];
@@ -146,7 +146,7 @@ abstract class StatesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -328,7 +328,7 @@ abstract class StatesDAOBase extends DAO {
      */
     final public static function delete(States $States) {
         if (is_null(self::getByPK($States->state_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `States` WHERE state_id = ?;';
         $params = [$States->state_id];

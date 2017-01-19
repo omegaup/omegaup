@@ -122,7 +122,7 @@ abstract class RunCountsDAOBase extends DAO {
       */
     final public static function search($Run_Counts, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Run_Counts instanceof RunCounts)) {
-            return self::search(new RunCounts($Run_Counts));
+            $Run_Counts = new RunCounts($Run_Counts);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class RunCountsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -316,7 +316,7 @@ abstract class RunCountsDAOBase extends DAO {
      */
     final public static function delete(RunCounts $Run_Counts) {
         if (is_null(self::getByPK($Run_Counts->date))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Run_Counts` WHERE date = ?;';
         $params = [$Run_Counts->date];

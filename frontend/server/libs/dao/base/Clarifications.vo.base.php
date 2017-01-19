@@ -53,26 +53,6 @@ class Clarifications extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Clarifications en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'clarification_id' => $this->clarification_id,
-            'author_id' => $this->author_id,
-            'message' => $this->message,
-            'answer' => $this->answer,
-            'time' => $this->time,
-            'problem_id' => $this->problem_id,
-            'contest_id' => $this->contest_id,
-            'public' => $this->public,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

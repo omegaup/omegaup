@@ -59,28 +59,6 @@ class Assignments extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Assignments en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'assignment_id' => $this->assignment_id,
-            'course_id' => $this->course_id,
-            'problemset_id' => $this->problemset_id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'alias' => $this->alias,
-            'publish_time_delay' => $this->publish_time_delay,
-            'assignment_type' => $this->assignment_type,
-            'start_time' => $this->start_time,
-            'finish_time' => $this->finish_time,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

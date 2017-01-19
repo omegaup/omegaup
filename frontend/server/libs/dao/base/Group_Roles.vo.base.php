@@ -38,21 +38,6 @@ class GroupRoles extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto GroupRoles en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'group_id' => $this->group_id,
-            'role_id' => $this->role_id,
-            'acl_id' => $this->acl_id,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

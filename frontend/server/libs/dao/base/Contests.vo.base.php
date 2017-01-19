@@ -104,43 +104,6 @@ class Contests extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Contests en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'contest_id' => $this->contest_id,
-            'acl_id' => $this->acl_id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'start_time' => $this->start_time,
-            'finish_time' => $this->finish_time,
-            'window_length' => $this->window_length,
-            'rerun_id' => $this->rerun_id,
-            'public' => $this->public,
-            'alias' => $this->alias,
-            'scoreboard' => $this->scoreboard,
-            'points_decay_factor' => $this->points_decay_factor,
-            'partial_score' => $this->partial_score,
-            'submissions_gap' => $this->submissions_gap,
-            'feedback' => $this->feedback,
-            'penalty' => $this->penalty,
-            'penalty_type' => $this->penalty_type,
-            'penalty_calc_policy' => $this->penalty_calc_policy,
-            'show_scoreboard_after' => $this->show_scoreboard_after,
-            'scoreboard_url' => $this->scoreboard_url,
-            'scoreboard_url_admin' => $this->scoreboard_url_admin,
-            'urgent' => $this->urgent,
-            'contestant_must_register' => $this->contestant_must_register,
-            'languages' => $this->languages,
-            'recommended' => $this->recommended,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

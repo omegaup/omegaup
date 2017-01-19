@@ -122,7 +122,7 @@ abstract class ACLsDAOBase extends DAO {
       */
     final public static function search($ACLs, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($ACLs instanceof ACLs)) {
-            return self::search(new ACLs($ACLs));
+            $ACLs = new ACLs($ACLs);
         }
 
         $clauses = [];
@@ -138,7 +138,7 @@ abstract class ACLsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -294,7 +294,7 @@ abstract class ACLsDAOBase extends DAO {
      */
     final public static function delete(ACLs $ACLs) {
         if (is_null(self::getByPK($ACLs->acl_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `ACLs` WHERE acl_id = ?;';
         $params = [$ACLs->acl_id];

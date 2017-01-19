@@ -122,7 +122,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO {
       */
     final public static function search($Groups_Scoreboards, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Groups_Scoreboards instanceof GroupsScoreboards)) {
-            return self::search(new GroupsScoreboards($Groups_Scoreboards));
+            $Groups_Scoreboards = new GroupsScoreboards($Groups_Scoreboards);
         }
 
         $clauses = [];
@@ -154,7 +154,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -365,7 +365,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO {
      */
     final public static function delete(GroupsScoreboards $Groups_Scoreboards) {
         if (is_null(self::getByPK($Groups_Scoreboards->group_scoreboard_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Groups_Scoreboards` WHERE group_scoreboard_id = ?;';
         $params = [$Groups_Scoreboards->group_scoreboard_id];

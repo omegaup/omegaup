@@ -93,7 +93,7 @@ abstract class UsersExperimentsDAOBase extends DAO {
       */
     final public static function search($Users_Experiments, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Users_Experiments instanceof UsersExperiments)) {
-            return self::search(new UsersExperiments($Users_Experiments));
+            $Users_Experiments = new UsersExperiments($Users_Experiments);
         }
 
         $clauses = [];
@@ -109,7 +109,7 @@ abstract class UsersExperimentsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {

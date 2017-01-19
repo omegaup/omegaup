@@ -122,7 +122,7 @@ abstract class AssignmentsDAOBase extends DAO {
       */
     final public static function search($Assignments, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Assignments instanceof Assignments)) {
-            return self::search(new Assignments($Assignments));
+            $Assignments = new Assignments($Assignments);
         }
 
         $clauses = [];
@@ -170,7 +170,7 @@ abstract class AssignmentsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -436,7 +436,7 @@ abstract class AssignmentsDAOBase extends DAO {
      */
     final public static function delete(Assignments $Assignments) {
         if (is_null(self::getByPK($Assignments->assignment_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Assignments` WHERE assignment_id = ?;';
         $params = [$Assignments->assignment_id];

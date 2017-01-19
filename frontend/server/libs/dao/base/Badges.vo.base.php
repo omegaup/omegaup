@@ -44,23 +44,6 @@ class Badges extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Badges en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'badge_id' => $this->badge_id,
-            'name' => $this->name,
-            'image_url' => $this->image_url,
-            'description' => $this->description,
-            'hint' => $this->hint,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

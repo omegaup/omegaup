@@ -122,7 +122,7 @@ abstract class MessagesDAOBase extends DAO {
       */
     final public static function search($Messages, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Messages instanceof Messages)) {
-            return self::search(new Messages($Messages));
+            $Messages = new Messages($Messages);
         }
 
         $clauses = [];
@@ -154,7 +154,7 @@ abstract class MessagesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -368,7 +368,7 @@ abstract class MessagesDAOBase extends DAO {
      */
     final public static function delete(Messages $Messages) {
         if (is_null(self::getByPK($Messages->message_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
         $params = [$Messages->message_id];

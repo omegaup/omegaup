@@ -80,35 +80,6 @@ class Runs extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Runs en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'run_id' => $this->run_id,
-            'user_id' => $this->user_id,
-            'problem_id' => $this->problem_id,
-            'contest_id' => $this->contest_id,
-            'guid' => $this->guid,
-            'language' => $this->language,
-            'status' => $this->status,
-            'verdict' => $this->verdict,
-            'runtime' => $this->runtime,
-            'penalty' => $this->penalty,
-            'memory' => $this->memory,
-            'score' => $this->score,
-            'contest_score' => $this->contest_score,
-            'time' => $this->time,
-            'submit_delay' => $this->submit_delay,
-            'test' => $this->test,
-            'judged_by' => $this->judged_by,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

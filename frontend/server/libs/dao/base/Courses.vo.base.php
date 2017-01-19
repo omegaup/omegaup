@@ -53,26 +53,6 @@ class Courses extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Courses en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'course_id' => $this->course_id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'alias' => $this->alias,
-            'group_id' => $this->group_id,
-            'acl_id' => $this->acl_id,
-            'start_time' => $this->start_time,
-            'finish_time' => $this->finish_time,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

@@ -122,7 +122,7 @@ abstract class SubmissionLogDAOBase extends DAO {
       */
     final public static function search($Submission_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Submission_Log instanceof SubmissionLog)) {
-            return self::search(new SubmissionLog($Submission_Log));
+            $Submission_Log = new SubmissionLog($Submission_Log);
         }
 
         $clauses = [];
@@ -150,7 +150,7 @@ abstract class SubmissionLogDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -347,7 +347,7 @@ abstract class SubmissionLogDAOBase extends DAO {
      */
     final public static function delete(SubmissionLog $Submission_Log) {
         if (is_null(self::getByPK($Submission_Log->run_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Submission_Log` WHERE run_id = ?;';
         $params = [$Submission_Log->run_id];

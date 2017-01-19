@@ -47,24 +47,6 @@ class ContestUserRequest extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto ContestUserRequest en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'user_id' => $this->user_id,
-            'contest_id' => $this->contest_id,
-            'request_time' => $this->request_time,
-            'last_update' => $this->last_update,
-            'accepted' => $this->accepted,
-            'extra_note' => $this->extra_note,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

@@ -122,7 +122,7 @@ abstract class UsersDAOBase extends DAO {
       */
     final public static function search($Users, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Users instanceof Users)) {
-            return self::search(new Users($Users));
+            $Users = new Users($Users);
         }
 
         $clauses = [];
@@ -218,7 +218,7 @@ abstract class UsersDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -649,7 +649,7 @@ abstract class UsersDAOBase extends DAO {
      */
     final public static function delete(Users $Users) {
         if (is_null(self::getByPK($Users->user_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Users` WHERE user_id = ?;';
         $params = [$Users->user_id];

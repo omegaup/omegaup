@@ -122,7 +122,7 @@ abstract class UsersBadgesDAOBase extends DAO {
       */
     final public static function search($Users_Badges, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Users_Badges instanceof UsersBadges)) {
-            return self::search(new UsersBadges($Users_Badges));
+            $Users_Badges = new UsersBadges($Users_Badges);
         }
 
         $clauses = [];
@@ -146,7 +146,7 @@ abstract class UsersBadgesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -329,7 +329,7 @@ abstract class UsersBadgesDAOBase extends DAO {
      */
     final public static function delete(UsersBadges $Users_Badges) {
         if (is_null(self::getByPK($Users_Badges->badge_id, $Users_Badges->user_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Users_Badges` WHERE badge_id = ? AND user_id = ?;';
         $params = [$Users_Badges->badge_id, $Users_Badges->user_id];

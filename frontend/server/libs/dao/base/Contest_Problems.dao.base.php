@@ -122,7 +122,7 @@ abstract class ContestProblemsDAOBase extends DAO {
       */
     final public static function search($Contest_Problems, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Contest_Problems instanceof ContestProblems)) {
-            return self::search(new ContestProblems($Contest_Problems));
+            $Contest_Problems = new ContestProblems($Contest_Problems);
         }
 
         $clauses = [];
@@ -146,7 +146,7 @@ abstract class ContestProblemsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -332,7 +332,7 @@ abstract class ContestProblemsDAOBase extends DAO {
      */
     final public static function delete(ContestProblems $Contest_Problems) {
         if (is_null(self::getByPK($Contest_Problems->contest_id, $Contest_Problems->problem_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Contest_Problems` WHERE contest_id = ? AND problem_id = ?;';
         $params = [$Contest_Problems->contest_id, $Contest_Problems->problem_id];

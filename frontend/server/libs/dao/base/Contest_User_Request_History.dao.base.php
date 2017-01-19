@@ -122,7 +122,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO {
       */
     final public static function search($Contest_User_Request_History, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Contest_User_Request_History instanceof ContestUserRequestHistory)) {
-            return self::search(new ContestUserRequestHistory($Contest_User_Request_History));
+            $Contest_User_Request_History = new ContestUserRequestHistory($Contest_User_Request_History);
         }
 
         $clauses = [];
@@ -154,7 +154,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -365,7 +365,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO {
      */
     final public static function delete(ContestUserRequestHistory $Contest_User_Request_History) {
         if (is_null(self::getByPK($Contest_User_Request_History->history_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Contest_User_Request_History` WHERE history_id = ?;';
         $params = [$Contest_User_Request_History->history_id];

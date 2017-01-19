@@ -122,7 +122,7 @@ abstract class BadgesDAOBase extends DAO {
       */
     final public static function search($Badges, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Badges instanceof Badges)) {
-            return self::search(new Badges($Badges));
+            $Badges = new Badges($Badges);
         }
 
         $clauses = [];
@@ -150,7 +150,7 @@ abstract class BadgesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -348,7 +348,7 @@ abstract class BadgesDAOBase extends DAO {
      */
     final public static function delete(Badges $Badges) {
         if (is_null(self::getByPK($Badges->badge_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Badges` WHERE badge_id = ?;';
         $params = [$Badges->badge_id];

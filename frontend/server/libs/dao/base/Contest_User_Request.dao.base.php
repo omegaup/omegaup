@@ -122,7 +122,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
       */
     final public static function search($Contest_User_Request, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Contest_User_Request instanceof ContestUserRequest)) {
-            return self::search(new ContestUserRequest($Contest_User_Request));
+            $Contest_User_Request = new ContestUserRequest($Contest_User_Request);
         }
 
         $clauses = [];
@@ -154,7 +154,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -363,7 +363,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
      */
     final public static function delete(ContestUserRequest $Contest_User_Request) {
         if (is_null(self::getByPK($Contest_User_Request->user_id, $Contest_User_Request->contest_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Contest_User_Request` WHERE user_id = ? AND contest_id = ?;';
         $params = [$Contest_User_Request->user_id, $Contest_User_Request->contest_id];

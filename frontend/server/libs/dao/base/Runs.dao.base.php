@@ -122,7 +122,7 @@ abstract class RunsDAOBase extends DAO {
       */
     final public static function search($Runs, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Runs instanceof Runs)) {
-            return self::search(new Runs($Runs));
+            $Runs = new Runs($Runs);
         }
 
         $clauses = [];
@@ -198,7 +198,7 @@ abstract class RunsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -573,7 +573,7 @@ abstract class RunsDAOBase extends DAO {
      */
     final public static function delete(Runs $Runs) {
         if (is_null(self::getByPK($Runs->run_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Runs` WHERE run_id = ?;';
         $params = [$Runs->run_id];

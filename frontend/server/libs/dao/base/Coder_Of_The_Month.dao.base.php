@@ -122,7 +122,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
       */
     final public static function search($Coder_Of_The_Month, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Coder_Of_The_Month instanceof CoderOfTheMonth)) {
-            return self::search(new CoderOfTheMonth($Coder_Of_The_Month));
+            $Coder_Of_The_Month = new CoderOfTheMonth($Coder_Of_The_Month);
         }
 
         $clauses = [];
@@ -150,7 +150,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -348,7 +348,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
      */
     final public static function delete(CoderOfTheMonth $Coder_Of_The_Month) {
         if (is_null(self::getByPK($Coder_Of_The_Month->coder_of_the_month_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Coder_Of_The_Month` WHERE coder_of_the_month_id = ?;';
         $params = [$Coder_Of_The_Month->coder_of_the_month_id];

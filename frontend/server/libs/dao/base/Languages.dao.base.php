@@ -122,7 +122,7 @@ abstract class LanguagesDAOBase extends DAO {
       */
     final public static function search($Languages, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Languages instanceof Languages)) {
-            return self::search(new Languages($Languages));
+            $Languages = new Languages($Languages);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class LanguagesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -311,7 +311,7 @@ abstract class LanguagesDAOBase extends DAO {
      */
     final public static function delete(Languages $Languages) {
         if (is_null(self::getByPK($Languages->language_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Languages` WHERE language_id = ?;';
         $params = [$Languages->language_id];

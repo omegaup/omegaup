@@ -122,7 +122,7 @@ abstract class GroupRolesDAOBase extends DAO {
       */
     final public static function search($Group_Roles, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Group_Roles instanceof GroupRoles)) {
-            return self::search(new GroupRoles($Group_Roles));
+            $Group_Roles = new GroupRoles($Group_Roles);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class GroupRolesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -301,7 +301,7 @@ abstract class GroupRolesDAOBase extends DAO {
      */
     final public static function delete(GroupRoles $Group_Roles) {
         if (is_null(self::getByPK($Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->acl_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
         $params = [$Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->acl_id];

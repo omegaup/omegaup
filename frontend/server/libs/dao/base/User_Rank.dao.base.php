@@ -122,7 +122,7 @@ abstract class UserRankDAOBase extends DAO {
       */
     final public static function search($User_Rank, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($User_Rank instanceof UserRank)) {
-            return self::search(new UserRank($User_Rank));
+            $User_Rank = new UserRank($User_Rank);
         }
 
         $clauses = [];
@@ -158,7 +158,7 @@ abstract class UserRankDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -384,7 +384,7 @@ abstract class UserRankDAOBase extends DAO {
      */
     final public static function delete(UserRank $User_Rank) {
         if (is_null(self::getByPK($User_Rank->user_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `User_Rank` WHERE user_id = ?;';
         $params = [$User_Rank->user_id];

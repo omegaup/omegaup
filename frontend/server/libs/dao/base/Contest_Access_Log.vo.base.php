@@ -41,22 +41,6 @@ class ContestAccessLog extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto ContestAccessLog en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'contest_id' => $this->contest_id,
-            'user_id' => $this->user_id,
-            'ip' => $this->ip,
-            'time' => $this->time,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

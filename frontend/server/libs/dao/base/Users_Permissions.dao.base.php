@@ -122,7 +122,7 @@ abstract class UsersPermissionsDAOBase extends DAO {
       */
     final public static function search($Users_Permissions, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Users_Permissions instanceof UsersPermissions)) {
-            return self::search(new UsersPermissions($Users_Permissions));
+            $Users_Permissions = new UsersPermissions($Users_Permissions);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class UsersPermissionsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -309,7 +309,7 @@ abstract class UsersPermissionsDAOBase extends DAO {
      */
     final public static function delete(UsersPermissions $Users_Permissions) {
         if (is_null(self::getByPK($Users_Permissions->user_id, $Users_Permissions->permission_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Users_Permissions` WHERE user_id = ? AND permission_id = ?;';
         $params = [$Users_Permissions->user_id, $Users_Permissions->permission_id];

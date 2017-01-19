@@ -122,7 +122,7 @@ abstract class CountriesDAOBase extends DAO {
       */
     final public static function search($Countries, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Countries instanceof Countries)) {
-            return self::search(new Countries($Countries));
+            $Countries = new Countries($Countries);
         }
 
         $clauses = [];
@@ -138,7 +138,7 @@ abstract class CountriesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -293,7 +293,7 @@ abstract class CountriesDAOBase extends DAO {
      */
     final public static function delete(Countries $Countries) {
         if (is_null(self::getByPK($Countries->country_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Countries` WHERE country_id = ?;';
         $params = [$Countries->country_id];

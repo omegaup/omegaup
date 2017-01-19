@@ -122,7 +122,7 @@ abstract class InterviewsDAOBase extends DAO {
       */
     final public static function search($Interviews, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Interviews instanceof Interviews)) {
-            return self::search(new Interviews($Interviews));
+            $Interviews = new Interviews($Interviews);
         }
 
         $clauses = [];
@@ -134,7 +134,7 @@ abstract class InterviewsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -269,7 +269,7 @@ abstract class InterviewsDAOBase extends DAO {
      */
     final public static function delete(Interviews $Interviews) {
         if (is_null(self::getByPK($Interviews->contest_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Interviews` WHERE contest_id = ?;';
         $params = [$Interviews->contest_id];

@@ -110,45 +110,6 @@ class Problems extends VO {
     }
 
     /**
-     * Obtener una representacion en String
-     *
-     * Este metodo permite tratar a un objeto Problems en forma de cadena.
-     * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-     * @return String
-     */
-    public function __toString() {
-        return json_encode([
-            'problem_id' => $this->problem_id,
-            'acl_id' => $this->acl_id,
-            'public' => $this->public,
-            'title' => $this->title,
-            'alias' => $this->alias,
-            'validator' => $this->validator,
-            'languages' => $this->languages,
-            'server' => $this->server,
-            'remote_id' => $this->remote_id,
-            'time_limit' => $this->time_limit,
-            'validator_time_limit' => $this->validator_time_limit,
-            'overall_wall_time_limit' => $this->overall_wall_time_limit,
-            'extra_wall_time' => $this->extra_wall_time,
-            'memory_limit' => $this->memory_limit,
-            'output_limit' => $this->output_limit,
-            'stack_limit' => $this->stack_limit,
-            'visits' => $this->visits,
-            'submissions' => $this->submissions,
-            'accepted' => $this->accepted,
-            'difficulty' => $this->difficulty,
-            'creation_date' => $this->creation_date,
-            'source' => $this->source,
-            'order' => $this->order,
-            'tolerance' => $this->tolerance,
-            'slow' => $this->slow,
-            'deprecated' => $this->deprecated,
-            'email_clarifications' => $this->email_clarifications,
-        ]);
-    }
-
-    /**
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {

@@ -122,7 +122,7 @@ abstract class GroupsUsersDAOBase extends DAO {
       */
     final public static function search($Groups_Users, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Groups_Users instanceof GroupsUsers)) {
-            return self::search(new GroupsUsers($Groups_Users));
+            $Groups_Users = new GroupsUsers($Groups_Users);
         }
 
         $clauses = [];
@@ -138,7 +138,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -285,7 +285,7 @@ abstract class GroupsUsersDAOBase extends DAO {
      */
     final public static function delete(GroupsUsers $Groups_Users) {
         if (is_null(self::getByPK($Groups_Users->group_id, $Groups_Users->user_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Groups_Users` WHERE group_id = ? AND user_id = ?;';
         $params = [$Groups_Users->group_id, $Groups_Users->user_id];

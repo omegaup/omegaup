@@ -122,7 +122,7 @@ abstract class ClarificationsDAOBase extends DAO {
       */
     final public static function search($Clarifications, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Clarifications instanceof Clarifications)) {
-            return self::search(new Clarifications($Clarifications));
+            $Clarifications = new Clarifications($Clarifications);
         }
 
         $clauses = [];
@@ -162,7 +162,7 @@ abstract class ClarificationsDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -402,7 +402,7 @@ abstract class ClarificationsDAOBase extends DAO {
      */
     final public static function delete(Clarifications $Clarifications) {
         if (is_null(self::getByPK($Clarifications->clarification_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Clarifications` WHERE clarification_id = ?;';
         $params = [$Clarifications->clarification_id];

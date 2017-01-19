@@ -122,7 +122,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
       */
     final public static function search($Problems_Languages, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Problems_Languages instanceof ProblemsLanguages)) {
-            return self::search(new ProblemsLanguages($Problems_Languages));
+            $Problems_Languages = new ProblemsLanguages($Problems_Languages);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -309,7 +309,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
      */
     final public static function delete(ProblemsLanguages $Problems_Languages) {
         if (is_null(self::getByPK($Problems_Languages->problem_id, $Problems_Languages->language_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ? AND language_id = ?;';
         $params = [$Problems_Languages->problem_id, $Problems_Languages->language_id];

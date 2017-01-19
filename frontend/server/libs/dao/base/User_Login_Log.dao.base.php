@@ -93,7 +93,7 @@ abstract class UserLoginLogDAOBase extends DAO {
       */
     final public static function search($User_Login_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($User_Login_Log instanceof UserLoginLog)) {
-            return self::search(new UserLoginLog($User_Login_Log));
+            $User_Login_Log = new UserLoginLog($User_Login_Log);
         }
 
         $clauses = [];
@@ -113,7 +113,7 @@ abstract class UserLoginLogDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {

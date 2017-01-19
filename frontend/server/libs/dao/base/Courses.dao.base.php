@@ -122,7 +122,7 @@ abstract class CoursesDAOBase extends DAO {
       */
     final public static function search($Courses, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Courses instanceof Courses)) {
-            return self::search(new Courses($Courses));
+            $Courses = new Courses($Courses);
         }
 
         $clauses = [];
@@ -162,7 +162,7 @@ abstract class CoursesDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -402,7 +402,7 @@ abstract class CoursesDAOBase extends DAO {
      */
     final public static function delete(Courses $Courses) {
         if (is_null(self::getByPK($Courses->course_id))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Courses` WHERE course_id = ?;';
         $params = [$Courses->course_id];

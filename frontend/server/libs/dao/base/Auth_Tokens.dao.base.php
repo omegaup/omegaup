@@ -122,7 +122,7 @@ abstract class AuthTokensDAOBase extends DAO {
       */
     final public static function search($Auth_Tokens, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
         if (!($Auth_Tokens instanceof AuthTokens)) {
-            return self::search(new AuthTokens($Auth_Tokens));
+            $Auth_Tokens = new AuthTokens($Auth_Tokens);
         }
 
         $clauses = [];
@@ -142,7 +142,7 @@ abstract class AuthTokensDAOBase extends DAO {
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
                 $escapedValue = mysql_real_escape_string($value);
-                $clauses[] = "`{$column}` LIKE '%{$value}%'";
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
         if (sizeof($clauses) == 0) {
@@ -313,7 +313,7 @@ abstract class AuthTokensDAOBase extends DAO {
      */
     final public static function delete(AuthTokens $Auth_Tokens) {
         if (is_null(self::getByPK($Auth_Tokens->token))) {
-            throw new Exception('Campo no encontrado.');
+            throw new Exception('Registro no encontrado.');
         }
         $sql = 'DELETE FROM `Auth_Tokens` WHERE token = ?;';
         $params = [$Auth_Tokens->token];
