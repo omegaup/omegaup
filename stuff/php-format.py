@@ -24,8 +24,7 @@ def which(program):
 def main():
   args = git_tools.parse_arguments(tool_description='PHP linter',
         file_whitelist=[br'^frontend.*\.php$'],
-        file_blacklist=[br'.*third_party.*', br'.*dao/base.*',
-                        br'frontend/server/libs/dao/Estructura.php'])
+        file_blacklist=[br'.*third_party.*'])
   if not args.files:
     return 0
 
