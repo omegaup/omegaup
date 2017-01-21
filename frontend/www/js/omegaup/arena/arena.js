@@ -1358,7 +1358,10 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
                       .append('<th class="center">' +
                               omegaup.UI.escape(g.group) + '</th>')
                       .append('<th colspan="2"></th>')
-                      .append('<th class="score">' + g.score + '</th>')
+                      .append('<th class="score">' +
+                              (g.contest_score !== undefined ? g.contest_score :
+                                                               g.score) +
+                              '</th>')
                       .append('<th class="center" width="10">' +
                               (g.max_score !== undefined ? '/' : '') + '</th>')
                       .append('<th>' +
@@ -1396,7 +1399,10 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
                 .append('<td class="center">' + c.name + '</td>')
                 .append('<td class="center">' +
                         omegaup.T['verdict' + c.verdict] + '</td>')
-                .append('<td class="score">' + c.score + '</td>')
+                .append('<td class="score">' +
+                        (c.contest_score !== undefined ? c.contest_score :
+                                                         c.score) +
+                        '</td>')
                 .append('<td class="center" width="10">' +
                         (c.max_score !== undefined ? '/' : '') + '</td>')
                 .append('<td>' +
