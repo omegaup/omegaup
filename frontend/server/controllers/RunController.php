@@ -290,7 +290,7 @@ class RunController extends Controller {
         try {
             // Create file for the run
             $filepath = RunController::getSubmissionPath($run);
-            FileHandler::CreateFile($filepath, $r['source']);
+            FileHandler::CreateFile($filepath, trim($r['source']));
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException($e);
         }
@@ -533,12 +533,6 @@ class RunController extends Controller {
 
         $response = array();
 
-        // Get the error
-        $grade_dir = RunController::getGradePath($r['run']);
-        if (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
-
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
             $response['status'] = 'ok';
@@ -549,9 +543,21 @@ class RunController extends Controller {
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
         $response['admin'] = Authorization::isProblemAdmin($r['current_user_id'], $r['problem']);
 
+        // Get the error
+        $grade_dir = RunController::getGradePath($r['run']);
+        $details = null;
+        if (($response['admin'] || $r['run']->verdict == 'CE') &&
+            file_exists("$grade_dir/details.json")) {
+            $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
+        }
+        if (!is_null($details) && isset($details['compile_error'])) {
+            $response['compile_error'] = $details['compile_error'];
+        } elseif (file_exists("$grade_dir/compile_error.log")) {
+            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
+        }
+
         if ($response['admin']) {
-            if (file_exists("$grade_dir/details.json")) {
-                $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
+            if (!is_null($details)) {
                 if (count(array_filter(array_keys($details), 'is_string')) > 0) {
                     $response['details'] = $details;
                 } else {
@@ -560,7 +566,9 @@ class RunController extends Controller {
                     $response['groups'] = $details;
                 }
             }
-            if (file_exists("$grade_dir/run.log")) {
+            if (file_exists("$grade_dir/logs.txt.gz")) {
+                $response['logs'] = file_get_contents("compress.zlib://$grade_dir/logs.txt.gz");
+            } elseif (file_exists("$grade_dir/run.log")) {
                 $response['logs'] = file_get_contents("$grade_dir/run.log");
             }
 
