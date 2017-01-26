@@ -61,7 +61,9 @@ ALTER TABLE `Interviews`
 
 ALTER TABLE `Interviews`
 	ADD KEY `problemset_id` (`problemset_id`),
-	ADD KEY `acl_id` (`acl_id`);
+	ADD KEY `acl_id` (`acl_id`),
+	ADD CONSTRAINT `fk_ip_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	ADD CONSTRAINT `fk_ia_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Problemset_Access_Log
 ALTER TABLE `Contest_Access_Log`
@@ -126,6 +128,8 @@ ALTER TABLE `Contest_User_Request`
 
 ALTER TABLE `Contest_User_Request`
 	ADD PRIMARY KEY (`user_id`, `problemset_id`),
+	ADD CONSTRAINT `fk_puru_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	ADD CONSTRAINT `fk_purp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 	RENAME TO `Problemset_User_Request`;
 
 -- Problemset_User_Request_History
@@ -137,6 +141,8 @@ ALTER TABLE `Contest_User_Request_History`
 
 ALTER TABLE `Contest_User_Request_History`
 	ADD KEY `user_problemset_hist` (`user_id`, `problemset_id`),
+	ADD CONSTRAINT `fk_purhu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	ADD CONSTRAINT `fk_purhp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 	RENAME TO `Problemset_User_Request_History`;
 
 -- Runs
