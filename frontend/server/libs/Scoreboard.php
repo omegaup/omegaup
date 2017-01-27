@@ -56,12 +56,13 @@ class Scoreboard {
                     $filterUsersBy
                 );
 
-                // Get all problems given contest
-                $raw_contest_problems =
-                    ContestProblemsDAO::getRelevantProblems($this->contest);
+                // Get all problems given problemset
+                $problemset = ProblemsetsDAO::getByPK($this->contest->problemset_id);
+                $raw_problemset_problems =
+                    ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-                $contest_runs = RunsDAO::getContestRuns(
-                    $this->contest,
+                $contest_runs = RunsDAO::getProblemsetRuns(
+                    $problemset,
                     $this->onlyAC
                 );
             } catch (Exception $e) {
@@ -71,7 +72,7 @@ class Scoreboard {
             $problem_mapping = array();
 
             $order = 0;
-            foreach ($raw_contest_problems as $problem) {
+            foreach ($raw_problemset_problems as $problem) {
                 $problem_mapping[$problem->problem_id] = array(
                     'order' => $order++,
                     'alias' => $problem->alias
@@ -129,11 +130,12 @@ class Scoreboard {
                     $this->showAllRuns
                 );
 
-                // Get all problems given contest
-                $raw_contest_problems =
-                    ContestProblemsDAO::getRelevantProblems($this->contest);
+                // Get all problems given problemset
+                $problemset = ProblemsetsDAO::getByPK($this->contest->problemset_id);
+                $raw_problemset_problems =
+                    ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-                $contest_runs = RunsDAO::getContestRuns($this->contest);
+                $contest_runs = RunsDAO::getProblemsetRuns($problemset);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -141,7 +143,7 @@ class Scoreboard {
             $problem_mapping = array();
 
             $order = 0;
-            foreach ($raw_contest_problems as $problem) {
+            foreach ($raw_problemset_problems as $problem) {
                 $problem_mapping[$problem->problem_id] = array(
                     'order' => $order++,
                     'alias' => $problem->alias
@@ -188,7 +190,8 @@ class Scoreboard {
 
     public static function refreshScoreboardCache($contest) {
         try {
-            $contest_runs = RunsDAO::getContestRuns($contest);
+            $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
+            $contest_runs = RunsDAO::getProblemsetRuns($problemset);
 
             // Get all distinct contestants participating in the contest
             $raw_contest_users = RunsDAO::getAllRelevantUsers(
@@ -197,9 +200,9 @@ class Scoreboard {
                 null
             );
 
-            // Get all problems given contest
-            $raw_contest_problems =
-                ContestProblemsDAO::getRelevantProblems($contest);
+            // Get all problems given problemset
+            $raw_problemset_problems =
+                ProblemsetProblemsDAO::getRelevantProblems($problemset);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -207,7 +210,7 @@ class Scoreboard {
         $problem_mapping = array();
 
         $order = 0;
-        foreach ($raw_contest_problems as $problem) {
+        foreach ($raw_problemset_problems as $problem) {
             $problem_mapping[$problem->problem_id] = array(
                 'order' => $order++,
                 'alias' => $problem->alias

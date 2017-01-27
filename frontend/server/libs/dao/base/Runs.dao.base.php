@@ -20,7 +20,7 @@ abstract class RunsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`contest_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by`';
+    const FIELDS = '`Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class RunsDAOBase extends DAO {
         if (is_null($run_id)) {
             return null;
         }
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`contest_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class RunsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Runs}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`contest_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` from Runs';
+        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` from Runs';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -139,9 +139,9 @@ abstract class RunsDAOBase extends DAO {
             $clauses[] = '`problem_id` = ?';
             $params[] = $Runs->problem_id;
         }
-        if (!is_null($Runs->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Runs->contest_id;
+        if (!is_null($Runs->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Runs->problemset_id;
         }
         if (!is_null($Runs->guid)) {
             $clauses[] = '`guid` = ?';
@@ -204,7 +204,7 @@ abstract class RunsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`contest_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` FROM `Runs`';
+        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` FROM `Runs`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -229,11 +229,11 @@ abstract class RunsDAOBase extends DAO {
       * @param Runs [$Runs] El objeto de tipo Runs a actualizar.
       */
     final private static function update(Runs $Runs) {
-        $sql = 'UPDATE `Runs` SET `user_id` = ?, `problem_id` = ?, `contest_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `submit_delay` = ?, `test` = ?, `judged_by` = ? WHERE `run_id` = ?;';
+        $sql = 'UPDATE `Runs` SET `user_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `submit_delay` = ?, `test` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
             $Runs->user_id,
             $Runs->problem_id,
-            $Runs->contest_id,
+            $Runs->problemset_id,
             $Runs->guid,
             $Runs->language,
             $Runs->status,
@@ -291,12 +291,12 @@ abstract class RunsDAOBase extends DAO {
         if (is_null($Runs->test)) {
             $Runs->test = '0';
         }
-        $sql = 'INSERT INTO Runs (`run_id`, `user_id`, `problem_id`, `contest_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `submit_delay`, `test`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Runs (`run_id`, `user_id`, `problem_id`, `problemset_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `submit_delay`, `test`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Runs->run_id,
             $Runs->user_id,
             $Runs->problem_id,
-            $Runs->contest_id,
+            $Runs->problemset_id,
             $Runs->guid,
             $Runs->language,
             $Runs->status,
@@ -390,14 +390,14 @@ abstract class RunsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $RunsA->contest_id;
-        $b = $RunsB->contest_id;
+        $a = $RunsA->problemset_id;
+        $b = $RunsB->problemset_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

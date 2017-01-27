@@ -172,17 +172,32 @@ class ContestsDAO extends ContestsDAOBase
         if (is_null($contest->window_length)) {
             return true;
         }
-        $contest_user = ContestsUsersDAO::getByPK($user_id, $contest->contest_id);
-        $first_access_time = $contest_user->access_time;
+        $problemset_user = ProblemsetUsersDAO::getByPK($user_id, $contest->problemset_id);
+        $first_access_time = $problemset_user->access_time;
 
         return time() <= strtotime($first_access_time) + $contest->window_length * 60;
     }
 
     public static function getContestsParticipated($user_id) {
-        $sql = 'SELECT * from Contests WHERE contest_id IN ('
-                    . 'SELECT DISTINCT contest_id FROM Runs WHERE user_id = ? AND test = 0 AND contest_id IS NOT NULL'
-               . ')'
-               . 'ORDER BY contest_id DESC';
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Contests c
+            WHERE contest_id IN (
+                SELECT DISTINCT
+                    c2.contest_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Contests c2
+                ON
+                    c2.problemset_id = r.problemset_id
+                WHERE
+                    r.user_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
+            )
+            ORDER BY
+                contest_id DESC;';
         $params = array($user_id);
 
         global $conn;
@@ -359,11 +374,11 @@ class ContestsDAO extends ContestsDAOBase
                     FROM
                         Contests
                     JOIN
-                        Contests_Users
+                        Problemset_Users
                     ON
-                        Contests.contest_id = Contests_Users.contest_id
+                        Contests.problemset_id = Problemset_Users.problemset_id
                     WHERE
-                        Contests.public = 0 AND Contests_Users.user_id = ? AND
+                        Contests.public = 0 AND Problemset_Users.user_id = ? AND
                         $recommended_check AND $end_check
                  )
                  UNION
@@ -517,5 +532,24 @@ class ContestsDAO extends ContestsDAOBase
         }
 
         return $allData;
+    }
+
+    public static function getContestForProblemset($problemset_id) {
+        if (is_null($problemset_id)) {
+            return null;
+        }
+
+        try {
+            $contests = ContestsDAO::search(new Contests([
+                'problemset_id' => $problemset_id,
+            ]));
+            if (count($contests) === 1) {
+                return $contests[0];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return null;
     }
 }

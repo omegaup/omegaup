@@ -35,8 +35,8 @@ class Runs extends VO {
         if (isset($data['problem_id'])) {
             $this->problem_id = $data['problem_id'];
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
         if (isset($data['guid'])) {
             $this->guid = $data['guid'];
@@ -118,7 +118,7 @@ class Runs extends VO {
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $problemset_id;
 
     /**
       *  [Campo no documentado]

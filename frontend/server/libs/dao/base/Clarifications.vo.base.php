@@ -44,8 +44,8 @@ class Clarifications extends VO {
         if (isset($data['problem_id'])) {
             $this->problem_id = $data['problem_id'];
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
         if (isset($data['public'])) {
             $this->public = $data['public'];
@@ -112,7 +112,7 @@ class Clarifications extends VO {
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $problemset_id;
 
     /**
       * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario.

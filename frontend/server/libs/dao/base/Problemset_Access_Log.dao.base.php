@@ -8,40 +8,40 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ContestAccessLog Data Access Object (DAO) Base.
+/** ProblemsetAccessLog Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link ContestAccessLog }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetAccessLog }.
  * @access public
  * @abstract
  *
  */
-abstract class ContestAccessLogDAOBase extends DAO {
+abstract class ProblemsetAccessLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Contest_Access_Log`.`contest_id`, `Contest_Access_Log`.`user_id`, `Contest_Access_Log`.`ip`, `Contest_Access_Log`.`time`';
+    const FIELDS = '`Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ContestAccessLog} pasado en la base de datos.
+     * Este metodo guarda el estado actual del objeto {@link ProblemsetAccessLog} pasado en la base de datos.
      * save() siempre creara una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param ContestAccessLog [$Contest_Access_Log] El objeto de tipo ContestAccessLog
+     * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(ContestAccessLog $Contest_Access_Log) {
-        return ContestAccessLogDAOBase::create($Contest_Access_Log);
+    final public static function save(ProblemsetAccessLog $Problemset_Access_Log) {
+        return ProblemsetAccessLogDAOBase::create($Problemset_Access_Log);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link ContestAccessLog}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link ProblemsetAccessLog}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -50,10 +50,10 @@ abstract class ContestAccessLogDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ContestAccessLog}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetAccessLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Contest_Access_Log`.`contest_id`, `Contest_Access_Log`.`user_id`, `Contest_Access_Log`.`ip`, `Contest_Access_Log`.`time` from Contest_Access_Log';
+        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -64,7 +64,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new ContestAccessLog($row);
+            $allData[] = new ProblemsetAccessLog($row);
         }
         return $allData;
     }
@@ -72,7 +72,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestAccessLog} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetAccessLog} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -87,32 +87,32 @@ abstract class ContestAccessLogDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param ContestAccessLog [$Contest_Access_Log] El objeto de tipo ContestAccessLog
+      * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Contest_Access_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Contest_Access_Log instanceof ContestAccessLog)) {
-            $Contest_Access_Log = new ContestAccessLog($Contest_Access_Log);
+    final public static function search($Problemset_Access_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Problemset_Access_Log instanceof ProblemsetAccessLog)) {
+            $Problemset_Access_Log = new ProblemsetAccessLog($Problemset_Access_Log);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Contest_Access_Log->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Contest_Access_Log->contest_id;
+        if (!is_null($Problemset_Access_Log->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Problemset_Access_Log->problemset_id;
         }
-        if (!is_null($Contest_Access_Log->user_id)) {
+        if (!is_null($Problemset_Access_Log->user_id)) {
             $clauses[] = '`user_id` = ?';
-            $params[] = $Contest_Access_Log->user_id;
+            $params[] = $Problemset_Access_Log->user_id;
         }
-        if (!is_null($Contest_Access_Log->ip)) {
+        if (!is_null($Problemset_Access_Log->ip)) {
             $clauses[] = '`ip` = ?';
-            $params[] = $Contest_Access_Log->ip;
+            $params[] = $Problemset_Access_Log->ip;
         }
-        if (!is_null($Contest_Access_Log->time)) {
+        if (!is_null($Problemset_Access_Log->time)) {
             $clauses[] = '`time` = ?';
-            $params[] = $Contest_Access_Log->time;
+            $params[] = $Problemset_Access_Log->time;
         }
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -123,7 +123,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Contest_Access_Log`.`contest_id`, `Contest_Access_Log`.`user_id`, `Contest_Access_Log`.`ip`, `Contest_Access_Log`.`time` FROM `Contest_Access_Log`';
+        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` FROM `Problemset_Access_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -136,7 +136,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ContestAccessLog($row);
+            $ar[] = new ProblemsetAccessLog($row);
         }
         return $ar;
     }
@@ -145,24 +145,24 @@ abstract class ContestAccessLogDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ContestAccessLog suministrado. Asegurese
+     * contenidos del objeto ProblemsetAccessLog suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto ContestAccessLog dentro de la misma transaccion.
+     * primaria generada en el objeto ProblemsetAccessLog dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param ContestAccessLog [$Contest_Access_Log] El objeto de tipo ContestAccessLog a crear.
+     * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog a crear.
      */
-    final private static function create(ContestAccessLog $Contest_Access_Log) {
-        if (is_null($Contest_Access_Log->time)) {
-            $Contest_Access_Log->time = gmdate('Y-m-d H:i:s');
+    final private static function create(ProblemsetAccessLog $Problemset_Access_Log) {
+        if (is_null($Problemset_Access_Log->time)) {
+            $Problemset_Access_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Contest_Access_Log (`contest_id`, `user_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `user_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Contest_Access_Log->contest_id,
-            $Contest_Access_Log->user_id,
-            $Contest_Access_Log->ip,
-            $Contest_Access_Log->time,
+            $Problemset_Access_Log->problemset_id,
+            $Problemset_Access_Log->user_id,
+            $Problemset_Access_Log->ip,
+            $Problemset_Access_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -177,8 +177,8 @@ abstract class ContestAccessLogDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestAccessLog} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestAccessLog}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetAccessLog} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ProblemsetAccessLog}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -200,28 +200,28 @@ abstract class ContestAccessLogDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param ContestAccessLog [$Contest_Access_Log] El objeto de tipo ContestAccessLog
-     * @param ContestAccessLog [$Contest_Access_Log] El objeto de tipo ContestAccessLog
+     * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog
+     * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(ContestAccessLog $Contest_Access_LogA, ContestAccessLog $Contest_Access_LogB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(ProblemsetAccessLog $Problemset_Access_LogA, ProblemsetAccessLog $Problemset_Access_LogB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Contest_Access_LogA->contest_id;
-        $b = $Contest_Access_LogB->contest_id;
+        $a = $Problemset_Access_LogA->problemset_id;
+        $b = $Problemset_Access_LogB->problemset_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_Access_LogA->user_id;
-        $b = $Contest_Access_LogB->user_id;
+        $a = $Problemset_Access_LogA->user_id;
+        $b = $Problemset_Access_LogB->user_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
             $params[] = min($a, $b);
@@ -231,8 +231,8 @@ abstract class ContestAccessLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_Access_LogA->ip;
-        $b = $Contest_Access_LogB->ip;
+        $a = $Problemset_Access_LogA->ip;
+        $b = $Problemset_Access_LogB->ip;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`ip` >= ? AND `ip` <= ?';
             $params[] = min($a, $b);
@@ -242,8 +242,8 @@ abstract class ContestAccessLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_Access_LogA->time;
-        $b = $Contest_Access_LogB->time;
+        $a = $Problemset_Access_LogA->time;
+        $b = $Problemset_Access_LogB->time;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`time` >= ? AND `time` <= ?';
             $params[] = min($a, $b);
@@ -253,7 +253,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Contest_Access_Log`';
+        $sql = 'SELECT * FROM `Problemset_Access_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -262,7 +262,7 @@ abstract class ContestAccessLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ContestAccessLog($row);
+            $ar[] = new ProblemsetAccessLog($row);
         }
         return $ar;
     }

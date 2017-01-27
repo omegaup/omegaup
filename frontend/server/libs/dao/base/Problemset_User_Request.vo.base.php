@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Contest_User_Request_History.
+ * Value Object file for table Problemset_User_Request.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ContestUserRequestHistory extends VO {
+class ProblemsetUserRequest extends VO {
     /**
-     * Constructor de ContestUserRequestHistory
+     * Constructor de ProblemsetUserRequest
      *
-     * Para construir un objeto de tipo ContestUserRequestHistory debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetUserRequest debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,23 +26,23 @@ class ContestUserRequestHistory extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['history_id'])) {
-            $this->history_id = $data['history_id'];
-        }
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['time'])) {
-            $this->time = $data['time'];
+        if (isset($data['request_time'])) {
+            $this->request_time = $data['request_time'];
+        }
+        if (isset($data['last_update'])) {
+            $this->last_update = $data['last_update'];
         }
         if (isset($data['accepted'])) {
             $this->accepted = $data['accepted'];
         }
-        if (isset($data['admin_id'])) {
-            $this->admin_id = $data['admin_id'];
+        if (isset($data['extra_note'])) {
+            $this->extra_note = $data['extra_note'];
         }
     }
 
@@ -53,21 +53,13 @@ class ContestUserRequestHistory extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['time']);
+            parent::toUnixTime(['request_time', 'last_update']);
         }
     }
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $history_id;
-
-    /**
-      *  [Campo no documentado]
       * @access public
       * @var int(11)
       */
@@ -75,29 +67,37 @@ class ContestUserRequestHistory extends VO {
 
     /**
       *  [Campo no documentado]
+      * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
       * @var timestamp
       */
-    public $time;
+    public $request_time;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(4)
+      * @var timestamp
+      */
+    public $last_update;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var tinyint(1)
       */
     public $accepted;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
+      * @var text,
       */
-    public $admin_id;
+    public $extra_note;
 }

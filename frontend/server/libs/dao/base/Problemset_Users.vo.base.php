@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Contest_Problems.
+ * Value Object file for table Problemset_Users.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ContestProblems extends VO {
+class ProblemsetUsers extends VO {
     /**
-     * Constructor de ContestProblems
+     * Constructor de ProblemsetUsers
      *
-     * Para construir un objeto de tipo ContestProblems debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetUsers debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,17 +26,20 @@ class ContestProblems extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['user_id'])) {
+            $this->user_id = $data['user_id'];
         }
-        if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['points'])) {
-            $this->points = $data['points'];
+        if (isset($data['access_time'])) {
+            $this->access_time = $data['access_time'];
         }
-        if (isset($data['order'])) {
-            $this->order = $data['order'];
+        if (isset($data['score'])) {
+            $this->score = $data['score'];
+        }
+        if (isset($data['time'])) {
+            $this->time = $data['time'];
         }
     }
 
@@ -57,7 +60,7 @@ class ContestProblems extends VO {
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $user_id;
 
     /**
       *  [Campo no documentado]
@@ -65,19 +68,26 @@ class ContestProblems extends VO {
       * @access public
       * @var int(11)
       */
-    public $problem_id;
+    public $problemset_id;
 
     /**
-      *  [Campo no documentado]
+      * Hora a la que entró el usuario al concurso
       * @access public
-      * @var double
+      * @var datetime
       */
-    public $points;
+    public $access_time;
 
     /**
-      * Define el orden de aparición de los problemas en un concurso
+      * Indica el puntaje que obtuvo el usuario en el concurso
       * @access public
-      * @var int
+      * @var int(11)
       */
-    public $order;
+    public $score;
+
+    /**
+      * Indica el tiempo que acumulo en usuario en el concurso
+      * @access public
+      * @var int(11)
+      */
+    public $time;
 }

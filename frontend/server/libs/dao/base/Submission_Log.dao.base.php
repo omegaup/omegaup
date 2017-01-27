@@ -20,7 +20,7 @@ abstract class SubmissionLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Submission_Log`.`contest_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time`';
+    const FIELDS = '`Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class SubmissionLogDAOBase extends DAO {
         if (is_null($run_id)) {
             return null;
         }
-        $sql = 'SELECT `Submission_Log`.`contest_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (run_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class SubmissionLogDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link SubmissionLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Submission_Log`.`contest_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
+        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -127,9 +127,9 @@ abstract class SubmissionLogDAOBase extends DAO {
 
         $clauses = [];
         $params = [];
-        if (!is_null($Submission_Log->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Submission_Log->contest_id;
+        if (!is_null($Submission_Log->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Submission_Log->problemset_id;
         }
         if (!is_null($Submission_Log->run_id)) {
             $clauses[] = '`run_id` = ?';
@@ -156,7 +156,7 @@ abstract class SubmissionLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Submission_Log`.`contest_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM `Submission_Log`';
+        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM `Submission_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -181,9 +181,9 @@ abstract class SubmissionLogDAOBase extends DAO {
       * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a actualizar.
       */
     final private static function update(SubmissionLog $Submission_Log) {
-        $sql = 'UPDATE `Submission_Log` SET `contest_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE `run_id` = ?;';
+        $sql = 'UPDATE `Submission_Log` SET `problemset_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE `run_id` = ?;';
         $params = [
-            $Submission_Log->contest_id,
+            $Submission_Log->problemset_id,
             $Submission_Log->user_id,
             $Submission_Log->ip,
             $Submission_Log->time,
@@ -210,9 +210,9 @@ abstract class SubmissionLogDAOBase extends DAO {
         if (is_null($Submission_Log->time)) {
             $Submission_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Submission_Log (`contest_id`, `run_id`, `user_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Submission_Log (`problemset_id`, `run_id`, `user_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Submission_Log->contest_id,
+            $Submission_Log->problemset_id,
             $Submission_Log->run_id,
             $Submission_Log->user_id,
             $Submission_Log->ip,
@@ -263,14 +263,14 @@ abstract class SubmissionLogDAOBase extends DAO {
         $clauses = [];
         $params = [];
 
-        $a = $Submission_LogA->contest_id;
-        $b = $Submission_LogB->contest_id;
+        $a = $Submission_LogA->problemset_id;
+        $b = $Submission_LogB->problemset_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

@@ -24,4 +24,60 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
         global $conn;
         return $conn->GetAll($sql, $val);
     }
+
+    /*
+     * Get number of problems in problemset.
+     */
+    final public static function countProblemsetProblems(Problemsets $problemset) {
+        // Build SQL statement
+        $sql = 'SELECT COUNT(pp.problem_id) ' .
+               'FROM Problemset_Problems pp ' .
+               'WHERE pp.problemset_id = ?';
+        $val = array($problemset->problemset_id);
+        global $conn;
+        return $conn->GetOne($sql, $val);
+    }
+
+    /*
+     * Get problemset problems including problemset alias, points, and order
+     */
+    final public static function getProblemsetProblems(Problemsets $problemset) {
+        // Build SQL statement
+        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order ' .
+               'FROM Problems p ' .
+               'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
+               'WHERE pp.problemset_id = ? ' .
+               'ORDER BY pp.`order` ASC;';
+        $val = array($problemset->problemset_id);
+        global $conn;
+        return $conn->GetAll($sql, $val);
+    }
+
+    /*
+     *
+     * Get relevant problems including problemset alias
+     */
+    final public static function getRelevantProblems(Problemsets $problemset)
+    {
+        // Build SQL statement
+        $sql = '
+            SELECT
+                p.problem_id, p.alias
+            FROM
+                Problemset_Problems pp
+            INNER JOIN
+                Problems p ON p.problem_id = pp.problem_id
+            WHERE
+                pp.problemset_id = ?
+            ORDER BY pp.`order` ASC;';
+        $val = array($problemset->problemset_id);
+        global $conn;
+        $rs = $conn->Execute($sql, $val);
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Problems($foo);
+            array_push($ar, $bar);
+        }
+        return $ar;
+    }
 }

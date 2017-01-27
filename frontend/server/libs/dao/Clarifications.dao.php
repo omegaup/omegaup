@@ -18,7 +18,7 @@ require_once('base/Clarifications.vo.base.php');
   *
   */
 class ClarificationsDAO extends ClarificationsDAOBase {
-    final public static function GetContestClarifications($contest_id, $admin, $user_id, $offset, $rowcount) {
+    final public static function GetProblemsetClarifications($problemset_id, $admin, $user_id, $offset, $rowcount) {
         $sql = '';
         if ($admin) {
             $sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
@@ -33,8 +33,8 @@ class ClarificationsDAO extends ClarificationsDAOBase {
         $sql .= 'INNER JOIN Users u ON u.user_id = c.author_id ' .
                 'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
                 'WHERE ' .
-                'c.contest_id = ? ';
-        $val = array($contest_id);
+                'c.problemset_id = ? ';
+        $val = array($problemset_id);
 
         if (!$admin) {
             $sql .= 'AND (c.public = 1 OR c.author_id = ?) ';
@@ -64,7 +64,7 @@ class ClarificationsDAO extends ClarificationsDAOBase {
                    'UNIX_TIMESTAMP(c.time) `time`, c.answer, c.public ' .
                    'FROM Clarifications c ';
         }
-        $sql .= 'INNER JOIN Contests con ON con.contest_id = c.contest_id ' .
+        $sql .= 'LEFT JOIN Contests con ON con.problemset_id = c.problemset_id '.
                 'WHERE ' .
                 'c.problem_id = ? ';
         $val = array($problem_id);

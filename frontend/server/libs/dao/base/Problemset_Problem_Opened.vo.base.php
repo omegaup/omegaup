@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Users_Permissions.
+ * Value Object file for table Problemset_Problem_Opened.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class UsersPermissions extends VO {
+class ProblemsetProblemOpened extends VO {
     /**
-     * Constructor de UsersPermissions
+     * Constructor de ProblemsetProblemOpened
      *
-     * Para construir un objeto de tipo UsersPermissions debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetProblemOpened debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,14 +26,17 @@ class UsersPermissions extends VO {
         if (is_null($data)) {
             return;
         }
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
+        }
+        if (isset($data['problem_id'])) {
+            $this->problem_id = $data['problem_id'];
+        }
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
-        if (isset($data['permission_id'])) {
-            $this->permission_id = $data['permission_id'];
-        }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['open_time'])) {
+            $this->open_time = $data['open_time'];
         }
     }
 
@@ -44,9 +47,25 @@ class UsersPermissions extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['open_time']);
         }
     }
+
+    /**
+      *  [Campo no documentado]
+      * Llave Primaria
+      * @access public
+      * @var int(11)
+      */
+    public $problemset_id;
+
+    /**
+      *  [Campo no documentado]
+      * Llave Primaria
+      * @access public
+      * @var int(11)
+      */
+    public $problem_id;
 
     /**
       *  [Campo no documentado]
@@ -58,16 +77,8 @@ class UsersPermissions extends VO {
 
     /**
       *  [Campo no documentado]
-      * Llave Primaria
       * @access public
-      * @var int(11)
+      * @var timestamp
       */
-    public $permission_id;
-
-    /**
-      * Este permiso solo aplica en el contexto de un concurso.
-      * @access public
-      * @var int(11)
-      */
-    public $contest_id;
+    public $open_time;
 }

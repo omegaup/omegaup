@@ -20,7 +20,7 @@ abstract class ContestsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended`';
+    const FIELDS = '`Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`problemset_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ContestsDAOBase extends DAO {
         if (is_null($contest_id)) {
             return null;
         }
-        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`problemset_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
         $params = [$contest_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ContestsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
+        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`problemset_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -134,6 +134,10 @@ abstract class ContestsDAOBase extends DAO {
         if (!is_null($Contests->acl_id)) {
             $clauses[] = '`acl_id` = ?';
             $params[] = $Contests->acl_id;
+        }
+        if (!is_null($Contests->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Contests->problemset_id;
         }
         if (!is_null($Contests->title)) {
             $clauses[] = '`title` = ?';
@@ -236,7 +240,7 @@ abstract class ContestsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` FROM `Contests`';
+        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`acl_id`, `Contests`.`problemset_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`public`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`scoreboard_url`, `Contests`.`scoreboard_url_admin`, `Contests`.`urgent`, `Contests`.`contestant_must_register`, `Contests`.`languages`, `Contests`.`recommended` FROM `Contests`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -261,9 +265,10 @@ abstract class ContestsDAOBase extends DAO {
       * @param Contests [$Contests] El objeto de tipo Contests a actualizar.
       */
     final private static function update(Contests $Contests) {
-        $sql = 'UPDATE `Contests` SET `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
+        $sql = 'UPDATE `Contests` SET `acl_id` = ?, `problemset_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
             $Contests->acl_id,
+            $Contests->problemset_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
@@ -343,10 +348,11 @@ abstract class ContestsDAOBase extends DAO {
         if (is_null($Contests->recommended)) {
             $Contests->recommended =  '0';
         }
-        $sql = 'INSERT INTO Contests (`contest_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Contests (`contest_id`, `acl_id`, `problemset_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Contests->contest_id,
             $Contests->acl_id,
+            $Contests->problemset_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
@@ -436,6 +442,17 @@ abstract class ContestsDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`acl_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $ContestsA->problemset_id;
+        $b = $ContestsB->problemset_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

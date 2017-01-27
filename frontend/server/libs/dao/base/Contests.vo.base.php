@@ -32,6 +32,9 @@ class Contests extends VO {
         if (isset($data['acl_id'])) {
             $this->acl_id = $data['acl_id'];
         }
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
+        }
         if (isset($data['title'])) {
             $this->title = $data['title'];
         }
@@ -129,6 +132,13 @@ class Contests extends VO {
       * @var int(11)
       */
     public $acl_id;
+
+    /**
+      * La lista de problemas de este concurso
+      * @access public
+      * @var int(11)
+      */
+    public $problemset_id;
 
     /**
       * El titulo que aparecera en cada concurso

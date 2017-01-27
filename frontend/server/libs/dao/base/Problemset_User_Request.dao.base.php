@@ -8,69 +8,69 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ContestUserRequest Data Access Object (DAO) Base.
+/** ProblemsetUserRequest Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link ContestUserRequest }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetUserRequest }.
  * @access public
  * @abstract
  *
  */
-abstract class ContestUserRequestDAOBase extends DAO {
+abstract class ProblemsetUserRequestDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Contest_User_Request`.`user_id`, `Contest_User_Request`.`contest_id`, `Contest_User_Request`.`request_time`, `Contest_User_Request`.`last_update`, `Contest_User_Request`.`accepted`, `Contest_User_Request`.`extra_note`';
+    const FIELDS = '`Problemset_User_Request`.`user_id`, `Problemset_User_Request`.`problemset_id`, `Problemset_User_Request`.`request_time`, `Problemset_User_Request`.`last_update`, `Problemset_User_Request`.`accepted`, `Problemset_User_Request`.`extra_note`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ContestUserRequest} pasado en la base de datos. La llave
+     * Este metodo guarda el estado actual del objeto {@link ProblemsetUserRequest} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+     * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(ContestUserRequest $Contest_User_Request) {
-        if (!is_null(self::getByPK($Contest_User_Request->user_id, $Contest_User_Request->contest_id))) {
-            return ContestUserRequestDAOBase::update($Contest_User_Request);
+    final public static function save(ProblemsetUserRequest $Problemset_User_Request) {
+        if (!is_null(self::getByPK($Problemset_User_Request->user_id, $Problemset_User_Request->problemset_id))) {
+            return ProblemsetUserRequestDAOBase::update($Problemset_User_Request);
         } else {
-            return ContestUserRequestDAOBase::create($Contest_User_Request);
+            return ProblemsetUserRequestDAOBase::create($Problemset_User_Request);
         }
     }
 
     /**
-     * Obtener {@link ContestUserRequest} por llave primaria.
+     * Obtener {@link ProblemsetUserRequest} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link ContestUserRequest} de la base de datos
+     * Este metodo cargara un objeto {@link ProblemsetUserRequest} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link ContestUserRequest Un objeto del tipo {@link ContestUserRequest}. NULL si no hay tal registro.
+     * @return @link ProblemsetUserRequest Un objeto del tipo {@link ProblemsetUserRequest}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id, $contest_id) {
-        if (is_null($user_id) || is_null($contest_id)) {
+    final public static function getByPK($user_id, $problemset_id) {
+        if (is_null($user_id) || is_null($problemset_id)) {
             return null;
         }
-        $sql = 'SELECT `Contest_User_Request`.`user_id`, `Contest_User_Request`.`contest_id`, `Contest_User_Request`.`request_time`, `Contest_User_Request`.`last_update`, `Contest_User_Request`.`accepted`, `Contest_User_Request`.`extra_note` FROM Contest_User_Request WHERE (user_id = ? AND contest_id = ?) LIMIT 1;';
-        $params = [$user_id, $contest_id];
+        $sql = 'SELECT `Problemset_User_Request`.`user_id`, `Problemset_User_Request`.`problemset_id`, `Problemset_User_Request`.`request_time`, `Problemset_User_Request`.`last_update`, `Problemset_User_Request`.`accepted`, `Problemset_User_Request`.`extra_note` FROM Problemset_User_Request WHERE (user_id = ? AND problemset_id = ?) LIMIT 1;';
+        $params = [$user_id, $problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new ContestUserRequest($rs);
+        return new ProblemsetUserRequest($rs);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link ContestUserRequest}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link ProblemsetUserRequest}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +79,10 @@ abstract class ContestUserRequestDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ContestUserRequest}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetUserRequest}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Contest_User_Request`.`user_id`, `Contest_User_Request`.`contest_id`, `Contest_User_Request`.`request_time`, `Contest_User_Request`.`last_update`, `Contest_User_Request`.`accepted`, `Contest_User_Request`.`extra_note` from Contest_User_Request';
+        $sql = 'SELECT `Problemset_User_Request`.`user_id`, `Problemset_User_Request`.`problemset_id`, `Problemset_User_Request`.`request_time`, `Problemset_User_Request`.`last_update`, `Problemset_User_Request`.`accepted`, `Problemset_User_Request`.`extra_note` from Problemset_User_Request';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -93,7 +93,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new ContestUserRequest($row);
+            $allData[] = new ProblemsetUserRequest($row);
         }
         return $allData;
     }
@@ -101,7 +101,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetUserRequest} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,40 +116,40 @@ abstract class ContestUserRequestDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+      * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Contest_User_Request, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Contest_User_Request instanceof ContestUserRequest)) {
-            $Contest_User_Request = new ContestUserRequest($Contest_User_Request);
+    final public static function search($Problemset_User_Request, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Problemset_User_Request instanceof ProblemsetUserRequest)) {
+            $Problemset_User_Request = new ProblemsetUserRequest($Problemset_User_Request);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Contest_User_Request->user_id)) {
+        if (!is_null($Problemset_User_Request->user_id)) {
             $clauses[] = '`user_id` = ?';
-            $params[] = $Contest_User_Request->user_id;
+            $params[] = $Problemset_User_Request->user_id;
         }
-        if (!is_null($Contest_User_Request->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Contest_User_Request->contest_id;
+        if (!is_null($Problemset_User_Request->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Problemset_User_Request->problemset_id;
         }
-        if (!is_null($Contest_User_Request->request_time)) {
+        if (!is_null($Problemset_User_Request->request_time)) {
             $clauses[] = '`request_time` = ?';
-            $params[] = $Contest_User_Request->request_time;
+            $params[] = $Problemset_User_Request->request_time;
         }
-        if (!is_null($Contest_User_Request->last_update)) {
+        if (!is_null($Problemset_User_Request->last_update)) {
             $clauses[] = '`last_update` = ?';
-            $params[] = $Contest_User_Request->last_update;
+            $params[] = $Problemset_User_Request->last_update;
         }
-        if (!is_null($Contest_User_Request->accepted)) {
+        if (!is_null($Problemset_User_Request->accepted)) {
             $clauses[] = '`accepted` = ?';
-            $params[] = $Contest_User_Request->accepted;
+            $params[] = $Problemset_User_Request->accepted;
         }
-        if (!is_null($Contest_User_Request->extra_note)) {
+        if (!is_null($Problemset_User_Request->extra_note)) {
             $clauses[] = '`extra_note` = ?';
-            $params[] = $Contest_User_Request->extra_note;
+            $params[] = $Problemset_User_Request->extra_note;
         }
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -160,7 +160,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Contest_User_Request`.`user_id`, `Contest_User_Request`.`contest_id`, `Contest_User_Request`.`request_time`, `Contest_User_Request`.`last_update`, `Contest_User_Request`.`accepted`, `Contest_User_Request`.`extra_note` FROM `Contest_User_Request`';
+        $sql = 'SELECT `Problemset_User_Request`.`user_id`, `Problemset_User_Request`.`problemset_id`, `Problemset_User_Request`.`request_time`, `Problemset_User_Request`.`last_update`, `Problemset_User_Request`.`accepted`, `Problemset_User_Request`.`extra_note` FROM `Problemset_User_Request`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -173,7 +173,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ContestUserRequest($row);
+            $ar[] = new ProblemsetUserRequest($row);
         }
         return $ar;
     }
@@ -182,16 +182,16 @@ abstract class ContestUserRequestDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a actualizar.
+      * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest a actualizar.
       */
-    final private static function update(ContestUserRequest $Contest_User_Request) {
-        $sql = 'UPDATE `Contest_User_Request` SET `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE `user_id` = ? AND `contest_id` = ?;';
+    final private static function update(ProblemsetUserRequest $Problemset_User_Request) {
+        $sql = 'UPDATE `Problemset_User_Request` SET `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE `user_id` = ? AND `problemset_id` = ?;';
         $params = [
-            $Contest_User_Request->request_time,
-            $Contest_User_Request->last_update,
-            $Contest_User_Request->accepted,
-            $Contest_User_Request->extra_note,
-            $Contest_User_Request->user_id,$Contest_User_Request->contest_id,
+            $Problemset_User_Request->request_time,
+            $Problemset_User_Request->last_update,
+            $Problemset_User_Request->accepted,
+            $Problemset_User_Request->extra_note,
+            $Problemset_User_Request->user_id,$Problemset_User_Request->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -202,26 +202,26 @@ abstract class ContestUserRequestDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ContestUserRequest suministrado. Asegurese
+     * contenidos del objeto ProblemsetUserRequest suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto ContestUserRequest dentro de la misma transaccion.
+     * primaria generada en el objeto ProblemsetUserRequest dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a crear.
+     * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest a crear.
      */
-    final private static function create(ContestUserRequest $Contest_User_Request) {
-        if (is_null($Contest_User_Request->request_time)) {
-            $Contest_User_Request->request_time = gmdate('Y-m-d H:i:s');
+    final private static function create(ProblemsetUserRequest $Problemset_User_Request) {
+        if (is_null($Problemset_User_Request->request_time)) {
+            $Problemset_User_Request->request_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Contest_User_Request (`user_id`, `contest_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_User_Request (`user_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Contest_User_Request->user_id,
-            $Contest_User_Request->contest_id,
-            $Contest_User_Request->request_time,
-            $Contest_User_Request->last_update,
-            $Contest_User_Request->accepted,
-            $Contest_User_Request->extra_note,
+            $Problemset_User_Request->user_id,
+            $Problemset_User_Request->problemset_id,
+            $Problemset_User_Request->request_time,
+            $Problemset_User_Request->last_update,
+            $Problemset_User_Request->accepted,
+            $Problemset_User_Request->extra_note,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -236,8 +236,8 @@ abstract class ContestUserRequestDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestUserRequest}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetUserRequest} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ProblemsetUserRequest}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -259,17 +259,17 @@ abstract class ContestUserRequestDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
-     * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+     * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest
+     * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(ContestUserRequest $Contest_User_RequestA, ContestUserRequest $Contest_User_RequestB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(ProblemsetUserRequest $Problemset_User_RequestA, ProblemsetUserRequest $Problemset_User_RequestB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Contest_User_RequestA->user_id;
-        $b = $Contest_User_RequestB->user_id;
+        $a = $Problemset_User_RequestA->user_id;
+        $b = $Problemset_User_RequestB->user_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
             $params[] = min($a, $b);
@@ -279,19 +279,19 @@ abstract class ContestUserRequestDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_User_RequestA->contest_id;
-        $b = $Contest_User_RequestB->contest_id;
+        $a = $Problemset_User_RequestA->problemset_id;
+        $b = $Problemset_User_RequestB->problemset_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_User_RequestA->request_time;
-        $b = $Contest_User_RequestB->request_time;
+        $a = $Problemset_User_RequestA->request_time;
+        $b = $Problemset_User_RequestB->request_time;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`request_time` >= ? AND `request_time` <= ?';
             $params[] = min($a, $b);
@@ -301,8 +301,8 @@ abstract class ContestUserRequestDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_User_RequestA->last_update;
-        $b = $Contest_User_RequestB->last_update;
+        $a = $Problemset_User_RequestA->last_update;
+        $b = $Problemset_User_RequestB->last_update;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`last_update` >= ? AND `last_update` <= ?';
             $params[] = min($a, $b);
@@ -312,8 +312,8 @@ abstract class ContestUserRequestDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_User_RequestA->accepted;
-        $b = $Contest_User_RequestB->accepted;
+        $a = $Problemset_User_RequestA->accepted;
+        $b = $Problemset_User_RequestB->accepted;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`accepted` >= ? AND `accepted` <= ?';
             $params[] = min($a, $b);
@@ -323,8 +323,8 @@ abstract class ContestUserRequestDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_User_RequestA->extra_note;
-        $b = $Contest_User_RequestB->extra_note;
+        $a = $Problemset_User_RequestA->extra_note;
+        $b = $Problemset_User_RequestB->extra_note;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`extra_note` >= ? AND `extra_note` <= ?';
             $params[] = min($a, $b);
@@ -334,7 +334,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Contest_User_Request`';
+        $sql = 'SELECT * FROM `Problemset_User_Request`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -343,7 +343,7 @@ abstract class ContestUserRequestDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ContestUserRequest($row);
+            $ar[] = new ProblemsetUserRequest($row);
         }
         return $ar;
     }
@@ -352,21 +352,21 @@ abstract class ContestUserRequestDAOBase extends DAO {
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto ContestUserRequest suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto ProblemsetUserRequest suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a eliminar
+     * @param ProblemsetUserRequest [$Problemset_User_Request] El objeto de tipo ProblemsetUserRequest a eliminar
      */
-    final public static function delete(ContestUserRequest $Contest_User_Request) {
-        if (is_null(self::getByPK($Contest_User_Request->user_id, $Contest_User_Request->contest_id))) {
+    final public static function delete(ProblemsetUserRequest $Problemset_User_Request) {
+        if (is_null(self::getByPK($Problemset_User_Request->user_id, $Problemset_User_Request->problemset_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Contest_User_Request` WHERE user_id = ? AND contest_id = ?;';
-        $params = [$Contest_User_Request->user_id, $Contest_User_Request->contest_id];
+        $sql = 'DELETE FROM `Problemset_User_Request` WHERE user_id = ? AND problemset_id = ?;';
+        $params = [$Problemset_User_Request->user_id, $Problemset_User_Request->problemset_id];
         global $conn;
 
         $conn->Execute($sql, $params);

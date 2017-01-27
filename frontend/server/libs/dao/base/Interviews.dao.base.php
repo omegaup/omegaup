@@ -20,7 +20,7 @@ abstract class InterviewsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Interviews`.`contest_id`';
+    const FIELDS = '`Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length`';
 
     /**
      * Guardar registros.
@@ -36,7 +36,7 @@ abstract class InterviewsDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(Interviews $Interviews) {
-        if (!is_null(self::getByPK($Interviews->contest_id))) {
+        if (!is_null(self::getByPK($Interviews->interview_id))) {
             return InterviewsDAOBase::update($Interviews);
         } else {
             return InterviewsDAOBase::create($Interviews);
@@ -52,12 +52,12 @@ abstract class InterviewsDAOBase extends DAO {
      * @static
      * @return @link Interviews Un objeto del tipo {@link Interviews}. NULL si no hay tal registro.
      */
-    final public static function getByPK($contest_id) {
-        if (is_null($contest_id)) {
+    final public static function getByPK($interview_id) {
+        if (is_null($interview_id)) {
             return null;
         }
-        $sql = 'SELECT `Interviews`.`contest_id` FROM Interviews WHERE (contest_id = ?) LIMIT 1;';
-        $params = [$contest_id];
+        $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM Interviews WHERE (interview_id = ?) LIMIT 1;';
+        $params = [$interview_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -82,7 +82,7 @@ abstract class InterviewsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Interviews}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Interviews`.`contest_id` from Interviews';
+        $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` from Interviews';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -127,9 +127,33 @@ abstract class InterviewsDAOBase extends DAO {
 
         $clauses = [];
         $params = [];
-        if (!is_null($Interviews->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Interviews->contest_id;
+        if (!is_null($Interviews->interview_id)) {
+            $clauses[] = '`interview_id` = ?';
+            $params[] = $Interviews->interview_id;
+        }
+        if (!is_null($Interviews->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Interviews->problemset_id;
+        }
+        if (!is_null($Interviews->acl_id)) {
+            $clauses[] = '`acl_id` = ?';
+            $params[] = $Interviews->acl_id;
+        }
+        if (!is_null($Interviews->alias)) {
+            $clauses[] = '`alias` = ?';
+            $params[] = $Interviews->alias;
+        }
+        if (!is_null($Interviews->title)) {
+            $clauses[] = '`title` = ?';
+            $params[] = $Interviews->title;
+        }
+        if (!is_null($Interviews->description)) {
+            $clauses[] = '`description` = ?';
+            $params[] = $Interviews->description;
+        }
+        if (!is_null($Interviews->window_length)) {
+            $clauses[] = '`window_length` = ?';
+            $params[] = $Interviews->window_length;
         }
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -140,7 +164,7 @@ abstract class InterviewsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Interviews`.`contest_id` FROM `Interviews`';
+        $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM `Interviews`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -165,6 +189,19 @@ abstract class InterviewsDAOBase extends DAO {
       * @param Interviews [$Interviews] El objeto de tipo Interviews a actualizar.
       */
     final private static function update(Interviews $Interviews) {
+        $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
+        $params = [
+            $Interviews->problemset_id,
+            $Interviews->acl_id,
+            $Interviews->alias,
+            $Interviews->title,
+            $Interviews->description,
+            $Interviews->window_length,
+            $Interviews->interview_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -180,9 +217,15 @@ abstract class InterviewsDAOBase extends DAO {
      * @param Interviews [$Interviews] El objeto de tipo Interviews a crear.
      */
     final private static function create(Interviews $Interviews) {
-        $sql = 'INSERT INTO Interviews (`contest_id`) VALUES (?);';
+        $sql = 'INSERT INTO Interviews (`interview_id`, `problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Interviews->contest_id,
+            $Interviews->interview_id,
+            $Interviews->problemset_id,
+            $Interviews->acl_id,
+            $Interviews->alias,
+            $Interviews->title,
+            $Interviews->description,
+            $Interviews->window_length,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -190,6 +233,7 @@ abstract class InterviewsDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
+        $Interviews->interview_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -229,14 +273,80 @@ abstract class InterviewsDAOBase extends DAO {
         $clauses = [];
         $params = [];
 
-        $a = $InterviewsA->contest_id;
-        $b = $InterviewsB->contest_id;
+        $a = $InterviewsA->interview_id;
+        $b = $InterviewsB->interview_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`interview_id` >= ? AND `interview_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`interview_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->problemset_id;
+        $b = $InterviewsB->problemset_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->acl_id;
+        $b = $InterviewsB->acl_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`acl_id` >= ? AND `acl_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`acl_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->alias;
+        $b = $InterviewsB->alias;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`alias` >= ? AND `alias` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`alias` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->title;
+        $b = $InterviewsB->title;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`title` >= ? AND `title` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`title` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->description;
+        $b = $InterviewsB->description;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`description` >= ? AND `description` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`description` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $InterviewsA->window_length;
+        $b = $InterviewsB->window_length;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`window_length` >= ? AND `window_length` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`window_length` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -268,11 +378,11 @@ abstract class InterviewsDAOBase extends DAO {
      * @param Interviews [$Interviews] El objeto de tipo Interviews a eliminar
      */
     final public static function delete(Interviews $Interviews) {
-        if (is_null(self::getByPK($Interviews->contest_id))) {
+        if (is_null(self::getByPK($Interviews->interview_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Interviews` WHERE contest_id = ?;';
-        $params = [$Interviews->contest_id];
+        $sql = 'DELETE FROM `Interviews` WHERE interview_id = ?;';
+        $params = [$Interviews->interview_id];
         global $conn;
 
         $conn->Execute($sql, $params);

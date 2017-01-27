@@ -119,8 +119,8 @@ class RunController extends Controller {
             }
 
             // Validate that the combination contest_id problem_id is valid
-            if (!ContestProblemsDAO::getByPK(
-                $r['contest']->contest_id,
+            if (!ProblemsetProblemsDAO::getByPK(
+                $r['contest']->problemset_id,
                 $r['problem']->problem_id
             )) {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
@@ -129,7 +129,7 @@ class RunController extends Controller {
             // Contest admins can skip following checks
             if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
                 // Before submit something, contestant had to open the problem/contest
-                if (!ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id)) {
+                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id)) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
@@ -140,16 +140,16 @@ class RunController extends Controller {
 
                 // Validate if contest is private then the user should be registered
                 if ($r['contest']->public == 0
-                        && is_null(ContestsUsersDAO::getByPK(
+                        && is_null(ProblemsetUsersDAO::getByPK(
                             $r['current_user_id'],
-                            $r['contest']->contest_id
+                            $r['contest']->problemset_id
                         ))) {
                     throw new NotAllowedToSubmitException('runNotRegistered');
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
                 if (!RunsDAO::IsRunInsideSubmissionGap(
-                    $r['contest']->contest_id,
+                    $r['contest']->problemset_id,
                     $r['problem']->problem_id,
                     $r['current_user_id']
                 )) {
@@ -192,7 +192,7 @@ class RunController extends Controller {
                 throw new ForbiddenAccessException('lockdown');
             }
             $submit_delay = 0;
-            $contest_id = null;
+            $problemset_id = null;
             $test = 0;
         } else {
             //check the kind of penalty_type for this contest
@@ -208,8 +208,8 @@ class RunController extends Controller {
                 case 'problem_open':
                     // submit delay is calculated from the
                     // time the user opened the problem
-                    $opened = ContestProblemOpenedDAO::getByPK(
-                        $r['contest']->contest_id,
+                    $opened = ProblemsetProblemOpenedDAO::getByPK(
+                        $r['contest']->problemset_id,
                         $r['problem']->problem_id,
                         $r['current_user_id']
                     );
@@ -246,7 +246,7 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $contest_id = $r['contest']->contest_id;
+            $problemset_id = $r['contest']->problemset_id;
             $test = Authorization::isContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
         }
 
@@ -254,7 +254,7 @@ class RunController extends Controller {
         $run = new Runs(array(
                     'user_id' => $r['current_user_id'],
                     'problem_id' => $r['problem']->problem_id,
-                    'contest_id' => $contest_id,
+                    'problemset_id' => $problemset_id,
                     'language' => $r['language'],
                     'source' => $r['source'],
                     'status' => 'new',
@@ -262,7 +262,7 @@ class RunController extends Controller {
                     'penalty' => $submit_delay,
                     'memory' => 0,
                     'score' => 0,
-                    'contest_score' => $contest_id != null ? 0 : null,
+                    'contest_score' => $problemset_id != null ? 0 : null,
                     'submit_delay' => $submit_delay, /* based on penalty_type */
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',
@@ -276,7 +276,7 @@ class RunController extends Controller {
             SubmissionLogDAO::save(new SubmissionLog(array(
                 'user_id' => $run->user_id,
                 'run_id' => $run->run_id,
-                'contest_id' => $run->contest_id,
+                'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
             )));
 
@@ -308,7 +308,7 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id);
+                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id);
 
                 if ($r['contest']->window_length === null) {
                     $response['submission_deadline'] = strtotime($r['contest']->finish_time);

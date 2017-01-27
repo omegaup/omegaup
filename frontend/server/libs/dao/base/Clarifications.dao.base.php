@@ -20,7 +20,7 @@ abstract class ClarificationsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`contest_id`, `Clarifications`.`public`';
+    const FIELDS = '`Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ClarificationsDAOBase extends DAO {
         if (is_null($clarification_id)) {
             return null;
         }
-        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`contest_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
         $params = [$clarification_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ClarificationsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Clarifications}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`contest_id`, `Clarifications`.`public` from Clarifications';
+        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` from Clarifications';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -151,9 +151,9 @@ abstract class ClarificationsDAOBase extends DAO {
             $clauses[] = '`problem_id` = ?';
             $params[] = $Clarifications->problem_id;
         }
-        if (!is_null($Clarifications->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Clarifications->contest_id;
+        if (!is_null($Clarifications->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Clarifications->problemset_id;
         }
         if (!is_null($Clarifications->public)) {
             $clauses[] = '`public` = ?';
@@ -168,7 +168,7 @@ abstract class ClarificationsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`contest_id`, `Clarifications`.`public` FROM `Clarifications`';
+        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM `Clarifications`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -193,14 +193,14 @@ abstract class ClarificationsDAOBase extends DAO {
       * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a actualizar.
       */
     final private static function update(Clarifications $Clarifications) {
-        $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `contest_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
+        $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
         $params = [
             $Clarifications->author_id,
             $Clarifications->message,
             $Clarifications->answer,
             $Clarifications->time,
             $Clarifications->problem_id,
-            $Clarifications->contest_id,
+            $Clarifications->problemset_id,
             $Clarifications->public,
             $Clarifications->clarification_id,
         ];
@@ -228,7 +228,7 @@ abstract class ClarificationsDAOBase extends DAO {
         if (is_null($Clarifications->public)) {
             $Clarifications->public = '0';
         }
-        $sql = 'INSERT INTO Clarifications (`clarification_id`, `author_id`, `message`, `answer`, `time`, `problem_id`, `contest_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Clarifications (`clarification_id`, `author_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Clarifications->clarification_id,
             $Clarifications->author_id,
@@ -236,7 +236,7 @@ abstract class ClarificationsDAOBase extends DAO {
             $Clarifications->answer,
             $Clarifications->time,
             $Clarifications->problem_id,
-            $Clarifications->contest_id,
+            $Clarifications->problemset_id,
             $Clarifications->public,
         ];
         global $conn;
@@ -351,14 +351,14 @@ abstract class ClarificationsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $ClarificationsA->contest_id;
-        $b = $ClarificationsB->contest_id;
+        $a = $ClarificationsA->problemset_id;
+        $b = $ClarificationsB->problemset_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
+            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
+            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

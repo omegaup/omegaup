@@ -33,8 +33,8 @@ class Authorization {
             return false;
         }
 
+        $contest = ContestsDAO::getContestForProblemset($run->problemset_id);
         try {
-            $contest = ContestsDAO::getByPK($run->contest_id);
             $problem = ProblemsDAO::getByPK($run->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -64,11 +64,7 @@ class Authorization {
             return true;
         }
 
-        try {
-            $contest = ContestsDAO::getByPK($clarification->contest_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
 
         if (is_null($contest)) {
             return false;
@@ -82,8 +78,8 @@ class Authorization {
             return false;
         }
 
+        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
         try {
-            $contest = ContestsDAO::getByPK($clarification->contest_id);
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -125,6 +121,19 @@ class Authorization {
 
         return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
                UserRolesDAO::isAdmin($user_id, $contest->acl_id);
+    }
+
+    public static function isInterviewAdmin($user_id, Interviews $interview) {
+        if (is_null($interview) || !is_a($interview, 'Interviews')) {
+            return false;
+        }
+
+        if (self::isOwner($user_id, $interview->acl_id)) {
+            return true;
+        }
+
+        return GroupRolesDAO::isAdmin($user_id, $interview->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $interview->acl_id);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
