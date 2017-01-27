@@ -1187,6 +1187,7 @@ class UserController extends Controller {
                 // Generate the coder
                 $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if ($retArray == null) {
+                    self::$log->error('Missing paramer when calling apiCoderOfTheMonth.');
                     throw new InvalidParameterException('parameterInvalid', 'date');
                 }
 
@@ -1204,6 +1205,7 @@ class UserController extends Controller {
                 $user = UsersDAO::getByPK($coderOfTheMonth->user_id);
             }
         } catch (Exception $e) {
+            self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
 
