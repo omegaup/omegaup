@@ -1,6 +1,6 @@
 -- Problemsets
-INSERT IGNORE INTO `Problemsets` (`problemset_id`)
-	SELECT `contest_id` AS `problemset_id` FROM `Contests`;
+INSERT IGNORE INTO `Problemsets` (`problemset_id`, `languages`)
+	SELECT `contest_id` AS `problemset_id`, `languages` FROM `Contests`;
 
 -- Problemset_Problems
 TRUNCATE TABLE `Problemset_Problems`;
@@ -44,26 +44,6 @@ UPDATE `Contests` SET `problemset_id` = `contest_id`;
 
 ALTER TABLE `Contests`
 	ADD CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- Interviews
-ALTER TABLE `Interviews`
-	DROP PRIMARY KEY;
-
-ALTER TABLE `Interviews`
-	ADD COLUMN `interview_id` int(11) NOT NULL AUTO_INCREMENT FIRST,
-	ADD PRIMARY KEY (`interview_id`),
-	CHANGE COLUMN `contest_id` `problemset_id` int(11) NOT NULL,
-	ADD COLUMN `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del problema',
-	ADD COLUMN `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
-	ADD COLUMN `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
-	ADD COLUMN `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
-	ADD COLUMN `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.';
-
-ALTER TABLE `Interviews`
-	ADD KEY `problemset_id` (`problemset_id`),
-	ADD KEY `acl_id` (`acl_id`),
-	ADD CONSTRAINT `fk_ip_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	ADD CONSTRAINT `fk_ia_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Problemset_Access_Log
 ALTER TABLE `Contest_Access_Log`
@@ -139,6 +119,9 @@ ALTER TABLE `Contest_User_Request_History`
 ALTER TABLE `Contest_User_Request_History`
 	CHANGE COLUMN `contest_id` `problemset_id` int(11) NOT NULL;
 
+DELETE FROM `Contest_User_Request_History`
+	WHERE `problemset_id` NOT IN (SELECT `problemset_id` FROM `Problemsets`);
+
 ALTER TABLE `Contest_User_Request_History`
 	ADD KEY `user_problemset_hist` (`user_id`, `problemset_id`),
 	ADD CONSTRAINT `fk_purhu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -168,3 +151,31 @@ ALTER TABLE `Submission_Log`
 ALTER TABLE `Submission_Log`
 	ADD KEY `problemset_id` (`problemset_id`),
 	ADD CONSTRAINT `fk_slp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Interviews
+ALTER TABLE `Interviews`
+	DROP PRIMARY KEY;
+
+ALTER TABLE `Interviews`
+	ADD COLUMN `interview_id` int(11) NOT NULL AUTO_INCREMENT FIRST,
+	ADD PRIMARY KEY (`interview_id`),
+	CHANGE COLUMN `contest_id` `problemset_id` int(11) NOT NULL,
+	ADD COLUMN `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del problema',
+	ADD COLUMN `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
+	ADD COLUMN `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
+	ADD COLUMN `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
+	ADD COLUMN `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.';
+
+UPDATE `Interviews` AS i
+	INNER JOIN `Contests` AS c ON c.problemset_id = i.problemset_id
+	SET
+		i.acl_id = c.acl_id, i.alias = c.alias, i.title = c.title,
+		i.description = c.description, i.window_length = c.window_length;
+
+DELETE FROM `Contests` WHERE problemset_id IN (SELECT problemset_id FROM Interviews);
+
+ALTER TABLE `Interviews`
+	ADD KEY `problemset_id` (`problemset_id`),
+	ADD KEY `acl_id` (`acl_id`),
+	ADD CONSTRAINT `fk_ip_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	ADD CONSTRAINT `fk_ia_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
