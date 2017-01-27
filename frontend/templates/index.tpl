@@ -16,15 +16,6 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{#frontPageBlogPosts#}</h3>
-			</div>
-			<div class="panel-body">
-				<div id="blog-posts" class="media">{#frontPageLoading#}</div>
-			</div>
-		</div>
 	</div>
 
 	<div class="col-md-4">
@@ -67,7 +58,7 @@
 			</div>
 			<div id="recommended_material" class="panel-body">
 				<a class="text-center center" href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
-				<img class="center top-margin" src="https://omegaup.com/img/libroluis.gif" width="75%"/>
+					<img class="center top-margin" src="https://omegaup.com/img/libroluis.gif" width="75%"/>
 				</a>
 			</div>
 		</div>
