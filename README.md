@@ -22,7 +22,7 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 
 El resto del código está en otros repositorios:
 
-* [backend](https://github.com/omegaup/backend): Incluye el código del grader
+* [quark](https://github.com/lhchavez/quark): Incluye el código del grader
   para la calificación de problemas y ejecutar los códigos bajo minijail, así
   como el servicio utilizado en los servidores de la nube para servir la cola
   de envíos.

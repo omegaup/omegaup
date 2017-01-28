@@ -14,12 +14,6 @@
 	path = frontend/www/third_party/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
 	shallow = true
-[submodule "backend"]
-	path = backend
-	url = https://github.com/omegaup/backend.git
-[submodule "libinteractive"]
-	path = libinteractive
-	url = https://github.com/omegaup/libinteractive.git
 [submodule "frontend/server/libs/google-api-php-client"]
 	path = frontend/server/libs/third_party/google-api-php-client
 	url = https://github.com/google/google-api-php-client
