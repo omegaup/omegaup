@@ -32,11 +32,12 @@
     <div class="page-header">
         <h1><span>{#courseList#}</span> <small></small></h1>
     </div>
-    <div class="panel-body">
+    <!-- Default to hidden to avoid FOUC -->
+    <div class="panel-body tab-container" style="display:none">
         <ul class="nav nav-tabs">
-            <li class="nav-item active"
+            <li class="nav-item"
                 data-bind="if: adminCoursesCurrent().length > 0">
-                <a class="nav-link active" href="#tab-admin-courses-current"
+                <a class="nav-link" href="#tab-admin-courses-current"
                    data-toggle="tab">{#courseListAdminCurrentCourses#}</a></li>
             <li class="nav-item"
                 data-bind="if: adminCoursesPast().length > 0">
@@ -53,7 +54,7 @@
         </ul>
 
         <div class="tab-content">
-                <div class="tab-pane active" id="tab-admin-courses-current">
+                <div class="tab-pane" id="tab-admin-courses-current">
                     <div id="admin-courses-current"
              data-bind="template: { name: 'course-list',
                                     if: adminCoursesCurrent().length > 0,
