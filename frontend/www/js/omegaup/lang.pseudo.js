@@ -206,6 +206,7 @@ omegaup.T = {
 	courseNewFormUpdateCourse: "(Upda73 c0ur53)",
 	courseNotFound: "(C0ur53 n07 f0und)",
 	courseStudentAdded: "(S7ud3n7 add3d 5ucc355fu11y.)",
+	courseStudentCountLabel: "(S7ud3n75:)",
 	courseStudentsProgress: "(S7ud3n75 pr0gr355)",
 	courseViewProgress: "(Vi3w pr0gr355)",
 	createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",
