@@ -30,5 +30,12 @@ omegaup.OmegaUp.on('ready', function() {
         updateViewModel(viewModel, data, 'admin');
         updateViewModel(viewModel, data, 'student');
         ko.applyBindings(viewModel);
+
+        // Enable the first visible tab.
+        var tabs = $('.nav-link');
+        if (tabs.length > 0) {
+            $(tabs[0]).click();
+        }
+        $('.tab-container').show();
     });
 });
