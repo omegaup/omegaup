@@ -21,7 +21,7 @@
 		</tr>
 	</tbody>
 </table>
-<div class="container" data-bind="visible: course.isAdmin">
+<div class="container" data-bind="if: course.isAdmin">
     <div class="row">
         <a class="btn btn-primary pull-right"
            data-bind="text: newLabel, attr: { href: course.addAssignmentUrl }"></a>
@@ -33,7 +33,7 @@
 <div id="intro-page" class="course">
 	<div class="panel">
 		<div class="panel-header">
-			<div class="pull-right">
+			<div class="pull-right" data-bind="if: isAdmin">
 				<a class="btn btn-primary" data-bind="attr: { href: editUrl }">{#wordsEditCourse#}</a>
 			</div>
 			<div class="">
@@ -42,8 +42,8 @@
 			</div>
 		</div>
 		<div class="panel-body table-responsive">
-			<div>
-				<span>Students: <span data-bind="text: student_count"></span>
+			<div data-bind="if: isAdmin">
+				<span>{#courseStudentCountLabel#} <span data-bind="text: student_count"></span>
 				<div class="pull-right">
 					<a class="btn btn-primary" data-bind="attr: { href: scoreboardUrl }">{#wordsScoreboard#}</a>
 					<a class="btn btn-primary" data-bind="attr: { href: addStudentsUrl }">{#wordsAddStudent#}</a>
