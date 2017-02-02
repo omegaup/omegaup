@@ -16,7 +16,11 @@ omegaup.OmegaUp.on('ready', function() {
       var courseAlias =
           /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-      omegaup.API.getCourseAdminDetails(courseAlias, function(course) {
+      omegaup.API.getCourseAdminDetails({alias: courseAlias}).then(function(course) {
+        if (course.status != 'ok') {
+          // TODO: Delete this when resolve vs. reject is fixed.
+          return;
+        }
         $('.page-header h1 span')
             .html('<a href="/course/' + courseAlias + '/">' + course.name +
                   '</a>');
@@ -87,7 +91,7 @@ function refreshStudentList() {
   omegaup.API.getCourseStudentList({course_alias: courseAlias})
       .then(function(data) {
         if (data.status != 'ok') {
-          omegaup.UI.error(data.error);
+          // TODO: Delete this when resolve vs. reject is fixed.
           return;
         }
 
