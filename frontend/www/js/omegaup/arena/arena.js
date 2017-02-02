@@ -916,7 +916,8 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
   }
 
   if (!foundHash) {
-    window.location.hash = '#' + self.activeTab;
+    // Change the URL to the deafult tab but don't break the back button.
+    window.history.replaceState({}, '', '#' + self.activeTab);
   }
 
   var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
