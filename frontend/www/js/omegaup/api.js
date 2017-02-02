@@ -18,7 +18,7 @@ omegaup.API = {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
-          dfd.resolve(errorData);
+          dfd.reject(errorData);
         });
     return dfd.promise();
   },
