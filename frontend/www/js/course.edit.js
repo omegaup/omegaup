@@ -84,7 +84,7 @@ function refreshStudentList() {
   omegaup.API.getCourseStudentList({course_alias: courseAlias})
       .then(function(data) {
         if (data.status != 'ok') {
-          omegaup.UI.error(data.error);
+          // TODO: Delete this when resolve vs. reject is fixed.
           return;
         }
 
