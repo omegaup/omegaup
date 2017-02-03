@@ -76,10 +76,8 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest({
-                contest_alias: alias,
-                public: 1
-              }).then(handleResponseCallback);
+              omegaup.API.updateContest({contest_alias: alias, public: 1})
+                  .then(handleResponseCallback);
             },
             function() { fillContestsTable(); });
       });
@@ -88,10 +86,8 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest({
-                contest_alias: alias,
-                public: 0
-              }).then(handleResponseCallback);
+              omegaup.API.updateContest({contest_alias: alias, public: 0})
+                  .then(handleResponseCallback);
             },
             function() { fillContestsTable(); });
       });

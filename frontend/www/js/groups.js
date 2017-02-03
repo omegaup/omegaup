@@ -31,14 +31,15 @@ $(function() {
     $('.new_group_form')
         .submit(function() {
           omegaup.API.createGroup({
-            alias: $('.new_group_form #alias').val(),
-            name: $('.new_group_form #title').val(),
-            description: $('.new_group_form #description').val(),
-          }).then(function(data) {
-            window.location.replace('/group/' +
-                                    $('.new_group_form #alias').val() +
-                                    '/edit/#members');
-          });
+                       alias: $('.new_group_form #alias').val(),
+                       name: $('.new_group_form #title').val(),
+                       description: $('.new_group_form #description').val(),
+                     })
+              .then(function(data) {
+                window.location.replace('/group/' +
+                                        $('.new_group_form #alias').val() +
+                                        '/edit/#members');
+              });
 
           return false;
         });

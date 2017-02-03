@@ -1,36 +1,37 @@
 omegaup.OmegaUp.on('ready', function() {
-      function registerAndLogin() {
-        if ($('#reg_pass').val() != $('#reg_pass2').val()) {
-          omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
-          return false;
-        }
+  function registerAndLogin() {
+    if ($('#reg_pass').val() != $('#reg_pass2').val()) {
+      omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
+      return false;
+    }
 
-        if ($('#reg_pass').val().length < 8) {
-          omegaup.UI.error(omegaup.T.loginPasswordTooShort);
-          return false;
-        }
+    if ($('#reg_pass').val().length < 8) {
+      omegaup.UI.error(omegaup.T.loginPasswordTooShort);
+      return false;
+    }
 
-        if (grecaptcha.getResponse().length == 0) {
-          omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
-          return false;
-        }
+    if (grecaptcha.getResponse().length == 0) {
+      omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
+      return false;
+    }
 
-        omegaup.API.createUser({
-          email: $('#reg_email').val(),
-          username: $('#reg_username').val(),
-          password: $('#reg_pass').val(),
-          recaptcha: grecaptcha.getResponse()
-        }).then(function(data) {
+    omegaup.API.createUser({
+                 email: $('#reg_email').val(),
+                 username: $('#reg_username').val(),
+                 password: $('#reg_pass').val(),
+                 recaptcha: grecaptcha.getResponse()
+               })
+        .then(function(data) {
           // registration callback
           $('#user').val($('#reg_email').val());
           $('#pass').val($('#reg_pass').val());
           $('#login_form').submit();
         });
-        return false;  // Prevent form submission
-      }
+    return false;  // Prevent form submission
+  }
 
-      $('#register-form').submit(registerAndLogin);
-    });
+  $('#register-form').submit(registerAndLogin);
+});
 
 var logmeoutOnce = window.location.href.endsWith('?logout');
 

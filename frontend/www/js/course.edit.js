@@ -1,22 +1,21 @@
 omegaup.OmegaUp.on('ready', function() {
-      if (window.location.hash) {
-        $('#sections')
-            .find('a[href="' + window.location.hash + '"]')
-            .tab('show');
-      }
+  if (window.location.hash) {
+    $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
+  }
 
-      $('#sections')
-          .on('click', 'a', function(e) {
-            e.preventDefault();
-            // add this line
-            window.location.hash = $(this).attr('href');
-            $(this).tab('show');
-          });
+  $('#sections')
+      .on('click', 'a', function(e) {
+        e.preventDefault();
+        // add this line
+        window.location.hash = $(this).attr('href');
+        $(this).tab('show');
+      });
 
-      var courseAlias =
-          /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
+  var courseAlias =
+      /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-      omegaup.API.getCourseAdminDetails({alias: courseAlias}).then(function(course) {
+  omegaup.API.getCourseAdminDetails({alias: courseAlias})
+      .then(function(course) {
         $('.page-header h1 span')
             .html('<a href="/course/' + courseAlias + '/">' + course.name +
                   '</a>');
@@ -48,30 +47,33 @@ omegaup.OmegaUp.on('ready', function() {
         }
       });
 
-      // Edit course
-      $('.new_course_form').submit(function() {
-        omegaup.API.updateCourse({
-            course_alias: courseAlias,
-            name: $('.new_course_form #title').val(),
-            description: $('.new_course_form #description').val(),
-            start_time: (new Date($('.new_course_form #start_time').val()).getTime()) /
-                1000,
-            finish_time: (new Date($('.new_course_form #finish_time').val())
-                 .setHours(23, 59, 59, 999)) /
-                1000,
-            alias: $('.new_course_form #alias').val(),
-            show_scoreboard: $('.new_course_form #show_scoreboard').val(),
-          }).then(function(data) {
-            omegaup.UI.success(
-                'Tu curso ha sido editado! <a href="/course/' +
-                $('.new_course_form #alias').val() + '">' +
-                omegaup.T.courseEditGoToCourse + '</a>');
-            $('div.post.footer').show();
-            window.scrollTo(0, 0);
-        });
+  // Edit course
+  $('.new_course_form')
+      .submit(function() {
+        omegaup.API
+            .updateCourse({
+              course_alias: courseAlias,
+              name: $('.new_course_form #title').val(),
+              description: $('.new_course_form #description').val(),
+              start_time: (new Date($('.new_course_form #start_time').val())
+                               .getTime()) /
+                              1000,
+              finish_time: (new Date($('.new_course_form #finish_time').val())
+                                .setHours(23, 59, 59, 999)) /
+                               1000,
+              alias: $('.new_course_form #alias').val(),
+              show_scoreboard: $('.new_course_form #show_scoreboard').val(),
+            })
+            .then(function(data) {
+              omegaup.UI.success('Tu curso ha sido editado! <a href="/course/' +
+                                 $('.new_course_form #alias').val() + '">' +
+                                 omegaup.T.courseEditGoToCourse + '</a>');
+              $('div.post.footer').show();
+              window.scrollTo(0, 0);
+            });
         return false;
       });
-    });
+});
 
 var koStudentsList = {getStudentsList: ko.observableArray()};
 
