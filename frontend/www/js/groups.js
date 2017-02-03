@@ -8,7 +8,7 @@ var formAlias = formData.attr('data-alias');
 $(function() {
   if (formPage === 'list') {
     function fillGroupsList() {
-      omegaup.API.getMyGroups(function(groups) {
+      omegaup.API.getMyGroups().then(function(groups) {
         var html = '';
 
         for (var i = 0; i < groups.groups.length; i++) {

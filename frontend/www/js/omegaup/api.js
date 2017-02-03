@@ -180,32 +180,13 @@ omegaup.API = {
     }));
   },
 
-  login: function(username, password, callback) {
-    $.post('/api/user/login/', {usernameOrEmail: username, password: password},
-           function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  googleLogin: function(storeToken, callback) {
-    $.post('/api/session/googlelogin/', {storeToken: storeToken},
-           function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  googleLogin: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/session/googlelogin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
   getUserStats: function(username, callback) {
@@ -222,17 +203,11 @@ omegaup.API = {
         });
   },
 
-  getMyGroups: function(callback) {
-    $.get('/api/group/mylist/', function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  getMyGroups: function() {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/group/mylist/',
+      dataType: 'json'
+    }));
   },
 
   _convertTimes: function(item) {
@@ -260,16 +235,22 @@ omegaup.API = {
                                      });
   },
 
-  openContest: function(alias, callback) {
-    $.get('/api/contest/open/contest_alias/' + encodeURIComponent(alias) + '/',
-          function(contest) { callback(contest); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  openContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/open/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
+  },
+
+  _normalizeContestFields: function(contest) {
+    omegaup.API._convertTimes(contest);
+    contest.submission_deadline =
+        omegaup.OmegaUp.time(contest.submission_deadline * 1000);
+    contest.show_penalty =
+        (contest.penalty != 0 || contest.penalty_type != 'none');
+    return contest;
   },
 
   getContest: function(alias, callback) {
@@ -277,11 +258,7 @@ omegaup.API = {
               '/',
           function(contest) {
             if (contest.status == 'ok') {
-              omegaup.API._convertTimes(contest);
-              contest.submission_deadline =
-                  omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-              contest.show_penalty =
-                  (contest.penalty != 0 || contest.penalty_type != 'none');
+              omegaup.API._normalizeContestFields(contest);
             }
             callback(contest);
           },
@@ -300,11 +277,7 @@ omegaup.API = {
               encodeURIComponent(alias) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              omegaup.API._convertTimes(contest);
-              contest.submission_deadline =
-                  omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-              contest.show_penalty =
-                  (contest.penalty != 0 || contest.penalty_type != 'none');
+              omegaup.API._normalizeContestFields(contest);
             }
             callback(contest);
           },
@@ -323,11 +296,7 @@ omegaup.API = {
               encodeURIComponent(alias) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              omegaup.API._convertTimes(contest);
-              contest.submission_deadline =
-                  omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-              contest.show_penalty =
-                  (contest.penalty != 0 || contest.penalty_type != 'none');
+              omegaup.API._normalizeContestFields(contest);
             }
             callback(contest);
           },
@@ -358,25 +327,13 @@ omegaup.API = {
         });
   },
 
-  getContestByToken: function(alias, token, callback) {
-    $.get('/api/contest/details/contest_alias/' + encodeURIComponent(alias) +
-              '/token/' + encodeURIComponent(token) + '/',
-          function(contest) {
-            if (contest.status == 'ok') {
-              omegaup.API._convertTimes(contest);
-              contest.show_penalty =
-                  (contest.penalty || contest.penalty_type != 'none');
-            }
-            callback(contest);
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getContestByToken: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/details/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }), omegaup.API._normalizeContestFields);
   },
 
   getProfile: function(username, callback) {
@@ -502,155 +459,102 @@ omegaup.API = {
         });
   },
 
-  updateBasicProfile: function(username, name, password, callback) {
-    $.post('/api/user/updatebasicinfo/',
-           {username: username, name: name, password: password},
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  updateBasicProfile: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/user/updatebasicinfo/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
+ },
+
+  updateMainEmail: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/user/updateMainEmail/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  updateMainEmail: function(email, callback) {
-    $.post('/api/user/updateMainEmail/', {email: email},
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  addProblemToContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/addProblem/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  addProblemToContest: function(contestAlias, order, problemAlias, points,
-                                callback) {
-    $.post(
-         '/api/contest/addProblem/contest_alias/' +
-             encodeURIComponent(contestAlias) + '/problem_alias/' +
-             encodeURIComponent(problemAlias) + '/',
-         {problem_alias: problemAlias, points: points, order_in_contest: order},
-         function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  removeProblemFromContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/removeProblem/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  removeProblemFromContest: function(contestAlias, problemAlias, callback) {
-    $.get('/api/contest/removeProblem/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  contestProblems: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/problems/',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  contestProblems: function(contestAlias, callback) {
-    $.get('/api/contest/problems/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  addAdminToContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/addAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  addAdminToContest: function(contestAlias, username, callback) {
-    $.post('/api/contest/addAdmin/contest_alias/' +
-               encodeURIComponent(contestAlias) + '/',
-           {usernameOrEmail: username}, function(data) { callback(data); },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  removeAdminFromContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/removeAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  removeAdminFromContest: function(contestAlias, username, callback) {
-    $.post('/api/contest/removeAdmin/contest_alias/' +
-               encodeURIComponent(contestAlias) + '/',
-           {usernameOrEmail: username}, function(data) { callback(data); },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  addAdminToProblem: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/addAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  addAdminToProblem: function(problemAlias, username, callback) {
-    $.post('/api/problem/addAdmin/problem_alias/' +
-               encodeURIComponent(problemAlias) + '/',
-           {usernameOrEmail: username}, function(data) { callback(data); },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  removeAdminFromProblem: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/removeAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  removeAdminFromProblem: function(problemAlias, username, callback) {
-    $.post('/api/problem/removeAdmin/problem_alias/' +
-               encodeURIComponent(problemAlias) + '/',
-           {usernameOrEmail: username}, function(data) { callback(data); },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  addGroupAdminToContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/addGroupAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  addGroupAdminToContest: function(contestAlias, alias, callback) {
-    $.post('/api/contest/addGroupAdmin/contest_alias/' +
-               encodeURIComponent(contestAlias) + '/',
-           {group: alias}, function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  removeGroupAdminFromContest: function(contestAlias, alias, callback) {
-    $.post('/api/contest/removeGroupAdmin/contest_alias/' +
-               encodeURIComponent(contestAlias) + '/',
-           {group: alias}, function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  removeGroupAdminFromContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/removeGroupAdmin/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
   addGroupAdminToProblem: function(problemAlias, alias, callback) {

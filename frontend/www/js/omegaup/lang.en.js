@@ -5,6 +5,7 @@ omegaup.T = {
 	RegisterForContestRules: "Rules",
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
 	adminAdded: "Admin successfully added.",
+	adminRemoved: "Admin successfully removed.",
 	aliasInUse: "alias already exists. Please choose a different alias.",
 	apiNotFound: "Requested API endpoint not found.",
 	arenaAdminManageProblem: "Manage problem",

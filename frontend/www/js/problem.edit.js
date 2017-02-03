@@ -45,17 +45,14 @@ omegaup.OmegaUp.on('ready', function() {
           .submit(function() {
             var username = $('#username-admin').val();
 
-            omegaup.API.addAdminToProblem(
-                problemAlias, username, function(response) {
-                  if (response.status === 'ok') {
-                    omegaup.UI.success(omegaup.T.adminAdded);
-                    $('div.post.footer').show();
-
-                    refreshProblemAdmins();
-                  } else {
-                    omegaup.UI.error(response.error || 'error');
-                  }
-                });
+            omegaup.API.addAdminToProblem({
+              problem_alias: problemAlias,
+              usernameOrEmail: username,
+            }).then(function(response) {
+              omegaup.UI.success(omegaup.T.adminAdded);
+              $('div.post.footer').show();
+              refreshProblemAdmins();
+            });
 
             return false;  // Prevent refresh
           });
@@ -119,21 +116,16 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(username) {
                                       return function(e) {
-                                        omegaup.API.removeAdminFromProblem(
-                                            problemAlias, username,
-                                            function(response) {
-                                              if (response.status == 'ok') {
-                                                omegaup.UI.success(
-                                                    omegaup.T.adminAdded);
-                                                $('div.post.footer').show();
-                                                var tr = e.target.parentElement
-                                                             .parentElement;
-                                                $(tr).remove();
-                                              } else {
-                                                omegaup.UI.error(
-                                                    response.error || 'error');
-                                              }
-                                            });
+                                        omegaup.API.removeAdminFromProblem({
+                                          problem_alias: problemAlias,
+                                          usernameOrEmail: username,
+                                        }).then(function(response) {
+                                          omegaup.UI.success(omegaup.T.adminAdded);
+                                          $('div.post.footer').show();
+                                          var tr = e.target.parentElement
+                                                        .parentElement;
+                                          $(tr).remove();
+                                        });
                                       };
                                     })(admin.username))));
           }

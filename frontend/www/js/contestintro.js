@@ -9,13 +9,10 @@ omegaup.OmegaUp.on('ready', function() {
             $('#start-contest-submit').prop('disabled', true);
 
             // Explicitly join the contest.
-            omegaup.API.openContest(contestAlias, function(result) {
-              if (result.status == 'error') {
-                omegaup.UI.error(result.error);
-                $('#start-contest-form').show();
-              } else {
+            omegaup.API.openContest({contest_alias: contestAlias}).then(function(result) {
                 window.location.reload();
-              }
+            }).fail(function(result) {
+                $('#start-contest-form').show();
             });
             return false;
           });
