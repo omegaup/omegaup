@@ -236,30 +236,20 @@ omegaup.API = {
 
   getCourseStudentList: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/listStudents/course_alias/' +
-               encodeURIComponent(params.course_alias) + '/',
+      url: '/api/course/listStudents/',
+      method: 'POST',
+      data: params,
       dataType: 'json',
     }));
   },
 
-  getCourseAssignments: function(course_alias, callback) {
-    $.get('/api/course/listAssignments/', {course_alias: course_alias},
-          function(data) {
-            if (data.status !== undefined && data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseAssignments: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/listAssignments/',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }));
   },
 
   getAssignment: function(params) {
@@ -272,53 +262,24 @@ omegaup.API = {
                                      omegaup.API._convertTimes);
   },
 
-  getCourseAdminDetails: function(alias, callback) {
-    $.get('/api/course/admindetails/alias/' + encodeURIComponent(alias) + '/',
-          function(data) {
-            if (data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (data.status == 'ok') {
-              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000,
-                                                     {server_sync: false});
-              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000,
-                                                      {server_sync: false});
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseAdminDetails: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/adminDetails',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }),
+                                     omegaup.API._convertTimes);
   },
 
-  getCourseDetails: function(alias, callback) {
-    $.get('/api/course/details/alias/' + encodeURIComponent(alias) + '/',
-          function(data) {
-            if (data.status !== undefined && data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (data.status == 'ok') {
-              omegaup.API._convertTimes(data);
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseDetails: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/details',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }),
+                                     omegaup.API._convertTimes);
   },
 
   addStudentToCourse: function(params) {

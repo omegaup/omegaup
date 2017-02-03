@@ -1,22 +1,25 @@
 omegaup.OmegaUp.on('ready', function() {
-      if (window.location.hash) {
-        $('#sections')
-            .find('a[href="' + window.location.hash + '"]')
-            .tab('show');
-      }
+  if (window.location.hash) {
+    $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
+  }
 
-      $('#sections')
-          .on('click', 'a', function(e) {
-            e.preventDefault();
-            // add this line
-            window.location.hash = $(this).attr('href');
-            $(this).tab('show');
-          });
+  $('#sections')
+      .on('click', 'a', function(e) {
+        e.preventDefault();
+        // add this line
+        window.location.hash = $(this).attr('href');
+        $(this).tab('show');
+      });
 
-      var courseAlias =
-          /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
+  var courseAlias =
+      /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-      omegaup.API.getCourseAdminDetails(courseAlias, function(course) {
+  omegaup.API.getCourseAdminDetails({alias: courseAlias})
+      .then(function(course) {
+        if (course.status != 'ok') {
+          // TODO: Delete this when resolve vs. reject is fixed.
+          return;
+        }
         $('.page-header h1 span')
             .html('<a href="/course/' + courseAlias + '/">' + course.name +
                   '</a>');
@@ -48,35 +51,33 @@ omegaup.OmegaUp.on('ready', function() {
         }
       });
 
-      // Edit course
-      $('.new_course_form').submit(updateCourse);
+  // Edit course
+  $('.new_course_form').submit(updateCourse);
 
-      // Update course
-      function updateCourse() {
-        omegaup.API.updateCourse(
-            courseAlias, $('.new_course_form #title').val(),
-            $('.new_course_form #description').val(),
-            (new Date($('.new_course_form #start_time').val()).getTime()) /
-                1000,
-            (new Date($('.new_course_form #finish_time').val())
-                 .setHours(23, 59, 59, 999)) /
-                1000,
-            $('.new_course_form #alias').val(),
-            $('.new_course_form #show_scoreboard').val(), function(data) {
-              if (data.status == 'ok') {
-                omegaup.UI.success(
-                    'Tu curso ha sido editado! <a href="/course/' +
-                    $('.new_course_form #alias').val() + '">' +
-                    omegaup.T.courseEditGoToCourse + '</a>');
-                $('div.post.footer').show();
-                window.scrollTo(0, 0);
-              } else {
-                omegaup.UI.error(data.error || 'error');
-              }
-            });
-        return false;
-      }
-    });
+  // Update course
+  function updateCourse() {
+    omegaup.API.updateCourse(
+        courseAlias, $('.new_course_form #title').val(),
+        $('.new_course_form #description').val(),
+        (new Date($('.new_course_form #start_time').val()).getTime()) / 1000,
+        (new Date($('.new_course_form #finish_time').val())
+             .setHours(23, 59, 59, 999)) /
+            1000,
+        $('.new_course_form #alias').val(),
+        $('.new_course_form #show_scoreboard').val(), function(data) {
+          if (data.status == 'ok') {
+            omegaup.UI.success('Tu curso ha sido editado! <a href="/course/' +
+                               $('.new_course_form #alias').val() + '">' +
+                               omegaup.T.courseEditGoToCourse + '</a>');
+            $('div.post.footer').show();
+            window.scrollTo(0, 0);
+          } else {
+            omegaup.UI.error(data.error || 'error');
+          }
+        });
+    return false;
+  }
+});
 
 var koStudentsList = {getStudentsList: ko.observableArray()};
 
@@ -87,7 +88,7 @@ function refreshStudentList() {
   omegaup.API.getCourseStudentList({course_alias: courseAlias})
       .then(function(data) {
         if (data.status != 'ok') {
-          omegaup.UI.error(data.error);
+          // TODO: Delete this when resolve vs. reject is fixed.
           return;
         }
 
