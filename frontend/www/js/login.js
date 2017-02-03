@@ -41,9 +41,8 @@ function signInCallback(authResult) {
     gapi.auth.signOut();
     logmeoutOnce = false;
   } else if (authResult['code']) {
-    omegaup.API.googleLogin({storeToken: authResult['code']}).then(function(data) {
-      window.location.reload();
-    });
+    omegaup.API.googleLogin({storeToken: authResult['code']})
+        .then(function(data) { window.location.reload(); });
   } else if (authResult['error']) {
     // Esto se hace en cada refresh a la pagina de login.
     // omegaup.UI.error('There was an error: ' + authResult['error']);

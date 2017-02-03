@@ -204,10 +204,8 @@ omegaup.API = {
   },
 
   getMyGroups: function() {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/mylist/',
-      dataType: 'json'
-    }));
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/group/mylist/', dataType: 'json'}));
   },
 
   _convertTimes: function(item) {
@@ -333,7 +331,8 @@ omegaup.API = {
       method: 'POST',
       data: params,
       dataType: 'json'
-    }), omegaup.API._normalizeContestFields);
+    }),
+                                     omegaup.API._normalizeContestFields);
   },
 
   getProfile: function(username, callback) {
@@ -466,7 +465,7 @@ omegaup.API = {
       data: params,
       dataType: 'json'
     }));
- },
+  },
 
   updateMainEmail: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
@@ -496,11 +495,8 @@ omegaup.API = {
   },
 
   contestProblems: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/problems/',
-      data: params,
-      dataType: 'json'
-    }));
+    return omegaup.API._wrapDeferred($.ajax(
+        {url: '/api/contest/problems/', data: params, dataType: 'json'}));
   },
 
   addAdminToContest: function(params) {

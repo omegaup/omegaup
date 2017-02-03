@@ -12,9 +12,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   arena.connectSocket();
   omegaup.API.getContestByToken({
-      contest_alias: arena.options.contestAlias,
-      token: arena.options.scoreboardToken,
-  }).then(function(contest) {
+               contest_alias: arena.options.contestAlias,
+               token: arena.options.scoreboardToken,
+             })
+      .then(function(contest) {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
         $('#title .contest-title').html(contest.title);
