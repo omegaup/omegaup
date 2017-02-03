@@ -95,22 +95,26 @@ omegaup.OmegaUp.on('ready', function() {
                                       $('#window-length').val() :
                                       'NULL';
 
-        omegaup.API.updateContest(
-            contestAlias, $('.new_contest_form #title').val(),
-            $('.new_contest_form #description').val(),
-            (new Date($('.new_contest_form #start-time').val()).getTime()) /
+        omegaup.API.updateContest({
+            contest_alias: contestAlias,
+            title: $('.new_contest_form #title').val(),
+            description: $('.new_contest_form #description').val(),
+            start_time: (new Date($('.new_contest_form #start-time').val()).getTime()) /
                 1000,
-            (new Date($('.new_contest_form #finish-time').val()).getTime()) /
+            finish_time: (new Date($('.new_contest_form #finish-time').val()).getTime()) /
                 1000,
-            window_length_value, $('.new_contest_form #alias').val(),
-            $('.new_contest_form #points-decay-factor').val(),
-            $('.new_contest_form #submissions-gap').val() * 60,
-            $('.new_contest_form #feedback').val(),
-            $('.new_contest_form #penalty').val(), public,
-            $('.new_contest_form #scoreboard').val(),
-            $('.new_contest_form #penalty-type').val(),
-            $('.new_contest_form #show-scoreboard-after').val(),
-            $('.new_contest_form #register').val(), function(data) {
+            window_length: window_length_value,
+            alias: $('.new_contest_form #alias').val(),
+            points_decay_factor: $('.new_contest_form #points-decay-factor').val(),
+            submissions_gap: $('.new_contest_form #submissions-gap').val() * 60,
+            feedback: $('.new_contest_form #feedback').val(),
+            penalty: $('.new_contest_form #penalty').val(),
+            public: public,
+            scoreboard: $('.new_contest_form #scoreboard').val(),
+            penalty_type: $('.new_contest_form #penalty-type').val(),
+            show_scoreboard_after: $('.new_contest_form #show-scoreboard-after').val(),
+            contestant_must_register: $('.new_contest_form #register').val(),
+        }).then(function(data) {
               if (data.status == 'ok') {
                 omegaup.UI.success(
                     'Tu concurso ha sido editado! <a href="/arena/' +

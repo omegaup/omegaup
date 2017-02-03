@@ -76,10 +76,10 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest(alias, null, null, null, null, null,
-                                        null, null, null, null, null,
-                                        1 /*public*/, null, null, null, null,
-                                        handleResponseCallback);
+              omegaup.API.updateContest({
+                contest_alias: alias,
+                public: 1
+              }).then(handleResponseCallback);
             },
             function() { fillContestsTable(); });
       });
@@ -88,10 +88,10 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest(alias, null, null, null, null, null,
-                                        null, null, null, null, null,
-                                        0 /*public*/, null, null, null, null,
-                                        handleResponseCallback);
+              omegaup.API.updateContest({
+                contest_alias: alias,
+                public: 0
+              }).then(handleResponseCallback);
             },
             function() { fillContestsTable(); });
       });

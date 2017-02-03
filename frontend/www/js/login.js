@@ -15,18 +15,17 @@ omegaup.OmegaUp.on('ready', function() {
           return false;
         }
 
-        omegaup.API.createUser($('#reg_email').val(), $('#reg_username').val(),
-                               $('#reg_pass').val(), grecaptcha.getResponse(),
-                               function(data) {
-                                 // registration callback
-                                 if (data.status != 'ok') {
-                                   omegaup.UI.error(data.error);
-                                 } else {
-                                   $('#user').val($('#reg_email').val());
-                                   $('#pass').val($('#reg_pass').val());
-                                   $('#login_form').submit();
-                                 }
-                               });
+        omegaup.API.createUser({
+          email: $('#reg_email').val(),
+          username: $('#reg_username').val(),
+          password: $('#reg_pass').val(),
+          recaptcha: grecaptcha.getResponse()
+        }).then(function(data) {
+          // registration callback
+          $('#user').val($('#reg_email').val());
+          $('#pass').val($('#reg_pass').val());
+          $('#login_form').submit();
+        });
         return false;  // Prevent form submission
       }
 

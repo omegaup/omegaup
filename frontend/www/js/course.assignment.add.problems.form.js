@@ -8,7 +8,7 @@ $('a[data-toggle="tab"]')
             /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
         // Fill assignments
-        omegaup.API.getCourseAssignments(courseAlias, function(data) {
+        omegaup.API.getCourseAssignments({course_alias: courseAlias}).then(function(data) {
           $('.assignment-add-problem #assignments-list').empty();
 
           $.each(data.assignments, function(index, item) {

@@ -18,7 +18,7 @@ omegaup.API = {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
-          dfd.resolve(errorData);
+          dfd.reject(errorData);
         });
     return dfd.promise();
   },
@@ -33,189 +33,61 @@ omegaup.API = {
         $.ajax({url: '/api/time/get/', dataType: 'json'}));
   },
 
-  createUser: function(s_Email, s_Username, s_PlainPassword, s_ReCaptchaToken,
-                       callback) {
-    $.post('/api/user/create/',
-           {
-             email: s_Email,
-             username: s_Username,
-             password: s_PlainPassword,
-             recaptcha: s_ReCaptchaToken
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             } else {
-               if (callback !== undefined) {
-                 callback(data);
-               }
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  createUser: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/user/create/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  createGroup: function(alias, name, description, callback) {
-    $.post('/api/group/create/',
-           {
-             alias: alias,
-             name: name,
-             description: description,
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             }
-             if (callback !== undefined) {
-               callback(data);
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  createGroup: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/group/create/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  createCourse: function(name, description, start_time, finish_time, alias,
-                         public, show_scoreboard, callback) {
-    $.post('/api/course/create/',
-           {
-             name: name,
-             description: description,
-             start_time: start_time,
-             finish_time: finish_time, public: public,
-             alias: alias,
-             show_scoreboard: show_scoreboard,
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             }
-             if (callback !== undefined) {
-               callback(data);
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  createCourse: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/create/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  updateCourse: function(course_alias, name, description, start_time,
-                         finish_time, alias, show_scoreboard, callback) {
-    $.post('/api/course/update/course_alias/' +
-               encodeURIComponent(course_alias) + '/',
-           {
-             course_alias: course_alias,
-             name: name,
-             description: description,
-             start_time: start_time,
-             finish_time: finish_time,
-             alias: alias,
-             show_scoreboard: show_scoreboard,
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             } else {
-               if (callback !== undefined) {
-                 callback(data);
-               }
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-  createCourseAssignment: function(course_alias, name, description, start_time,
-                                   finish_time, alias, assignment_type,
-                                   callback) {
-    $.post('/api/course/createAssignment/',
-           {
-             course_alias: course_alias,
-             name: name,
-             description: description,
-             start_time: start_time,
-             finish_time: finish_time,
-             alias: alias,
-             assignment_type: assignment_type,
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             }
-             if (callback !== undefined) {
-               callback(data);
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  updateCourse: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/update/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  addCourseAssignmentProblem: function(course_alias, assignment_alias,
-                                       problem_alias, callback) {
-    $.post('/api/course/addProblem/',
-           {
-             course_alias: course_alias,
-             assignment_alias: assignment_alias,
-             problem_alias: problem_alias
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             }
-             if (callback !== undefined) {
-               callback(data);
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  createCourseAssignment: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/createAssignment/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  getCourseList: function(callback) {
+  addCourseAssignmentProblem: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/addProblem/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
+  },
+
+  getCourseList: function() {
     return omegaup.API._wrapDeferred(
         $.ajax({
           url: '/api/course/listCourses/',
@@ -236,30 +108,19 @@ omegaup.API = {
 
   getCourseStudentList: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/listStudents/course_alias/' +
-               encodeURIComponent(params.course_alias) + '/',
+      url: '/api/course/listStudents/',
+      data: params,
       dataType: 'json',
     }));
   },
 
-  getCourseAssignments: function(course_alias, callback) {
-    $.get('/api/course/listAssignments/', {course_alias: course_alias},
-          function(data) {
-            if (data.status !== undefined && data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseAssignments: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/listAssignments/',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }));
   },
 
   getAssignment: function(params) {
@@ -272,53 +133,24 @@ omegaup.API = {
                                      omegaup.API._convertTimes);
   },
 
-  getCourseAdminDetails: function(alias, callback) {
-    $.get('/api/course/admindetails/alias/' + encodeURIComponent(alias) + '/',
-          function(data) {
-            if (data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (data.status == 'ok') {
-              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000,
-                                                     {server_sync: false});
-              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000,
-                                                      {server_sync: false});
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseAdminDetails: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/adminDetails',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }),
+                                     omegaup.API._convertTimes);
   },
 
-  getCourseDetails: function(alias, callback) {
-    $.get('/api/course/details/alias/' + encodeURIComponent(alias) + '/',
-          function(data) {
-            if (data.status !== undefined && data.status == 'error') {
-              omegaup.UI.error(data.error);
-            }
-            if (data.status == 'ok') {
-              omegaup.API._convertTimes(data);
-            }
-            if (callback !== undefined) {
-              callback(data);
-            }
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getCourseDetails: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/details',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }),
+                                     omegaup.API._convertTimes);
   },
 
   addStudentToCourse: function(params) {
@@ -330,89 +162,22 @@ omegaup.API = {
     }));
   },
 
-  createContest: function(
-      title, description, start_time, finish_time, window_length, alias,
-      points_decay_factor, submissions_gap, feedback, penalty, public,
-      scoreboard, penalty_type, show_scoreboard_after, callback) {
-    $.post('/api/contest/create/',
-           {
-             title: title,
-             description: description,
-             start_time: start_time,
-             finish_time: finish_time,
-             window_length: window_length, public: public,
-             alias: alias,
-             points_decay_factor: points_decay_factor,
-             submissions_gap: submissions_gap,
-             feedback: feedback,
-             penalty: penalty,
-             scoreboard: scoreboard,
-             penalty_type: penalty_type,
-             show_scoreboard_after: show_scoreboard_after
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             }
-             if (callback !== undefined) {
-               callback(data);
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  createContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/create/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
-  updateContest: function(
-      contest_alias, title, description, start_time, finish_time, window_length,
-      alias, points_decay_factor, submissions_gap, feedback, penalty, public,
-      scoreboard, penalty_type, show_scoreboard_after, contestant_must_register,
-      callback) {
-    $.post('/api/contest/update/contest_alias/' +
-               encodeURIComponent(contest_alias) + '/',
-           {
-             contest_alias: contest_alias,
-             title: title,
-             description: description,
-             start_time: start_time,
-             finish_time: finish_time,
-             window_length: window_length, public: public,
-             alias: alias,
-             points_decay_factor: points_decay_factor,
-             submissions_gap: submissions_gap,
-             feedback: feedback,
-             penalty: penalty,
-             scoreboard: scoreboard,
-             penalty_type: penalty_type,
-             show_scoreboard_after: show_scoreboard_after,
-             contestant_must_register: contestant_must_register
-           },
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               omegaup.UI.error(data.error);
-             } else {
-               if (callback !== undefined) {
-                 callback(data);
-               }
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  updateContest: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/update/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
   login: function(username, password, callback) {
