@@ -9,10 +9,6 @@ omegaup.OmegaUp.on('ready', function() {
                      username: $('#member-username').val()
                    })
             .then(function(data) {
-              if (data.status != 'ok') {
-                omegaup.UI.error(data.error || 'error');
-                return;
-              }
               refreshStudentList();
               omegaup.UI.success(omegaup.T.courseStudentAdded);
             });

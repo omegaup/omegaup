@@ -13,16 +13,12 @@ $('document')
           return false;
         }
 
-        omegaup.API.updateBasicProfile(
-            $('#username').val(), $('#name').val(), $('#new-password-1').val(),
-            function(response) {
-              if (response.status == 'ok') {
-                window.location = '/profile/';
-                return false;
-              } else if (response.error !== undefined) {
-                omegaup.UI.error(response.error);
-              }
-            });
+        omegaup.API.updateBasicProfile({
+                     username: $('#username').val(),
+                     name: $('#name').val(),
+                     password: $('#new-password-1').val(),
+                   })
+            .then(function(response) { window.location = '/profile/'; });
         return false;  // Prevent page refresh on submit
       };
 

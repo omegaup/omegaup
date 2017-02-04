@@ -8,7 +8,7 @@ var formAlias = formData.attr('data-alias');
 $(function() {
   if (formPage === 'list') {
     function fillGroupsList() {
-      omegaup.API.getMyGroups(function(groups) {
+      omegaup.API.getMyGroups().then(function(groups) {
         var html = '';
 
         for (var i = 0; i < groups.groups.length; i++) {
@@ -30,17 +30,15 @@ $(function() {
   } else if (formPage === 'new') {
     $('.new_group_form')
         .submit(function() {
-          omegaup.API.createGroup(
-              $('.new_group_form #alias').val(),
-              $('.new_group_form #title').val(),
-              $('.new_group_form #description').val(), function(data) {
-                if (data.status === 'ok') {
-                  window.location.replace('/group/' +
-                                          $('.new_group_form #alias').val() +
-                                          '/edit/#members');
-                } else {
-                  omegaup.UI.error(data.error || 'error');
-                }
+          omegaup.API.createGroup({
+                       alias: $('.new_group_form #alias').val(),
+                       name: $('.new_group_form #title').val(),
+                       description: $('.new_group_form #description').val(),
+                     })
+              .then(function(data) {
+                window.location.replace('/group/' +
+                                        $('.new_group_form #alias').val() +
+                                        '/edit/#members');
               });
 
           return false;

@@ -108,7 +108,6 @@ omegaup.OmegaUp = {
   syncTime: function() {
     var t0 = new Date().getTime();
     omegaup.API.time().then(function(data) {
-      if (data.status != 'ok') return;
       omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
     });
   },

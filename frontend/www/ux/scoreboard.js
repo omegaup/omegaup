@@ -11,9 +11,11 @@ omegaup.OmegaUp.on('ready', function() {
   var getRankingByTokenRefresh = 5 * 60 * 1000;  // 5 minutes
 
   arena.connectSocket();
-  omegaup.API.getContestByToken(
-      arena.options.contestAlias, arena.options.scoreboardToken,
-      function(contest) {
+  omegaup.API.getContestByToken({
+               contest_alias: arena.options.contestAlias,
+               token: arena.options.scoreboardToken,
+             })
+      .then(function(contest) {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
         $('#title .contest-title').html(contest.title);
