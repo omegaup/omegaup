@@ -336,22 +336,24 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Add admin
   function refreshContestAdmins() {
-    omegaup.API.getContestAdmins({contest_alias: contestAlias}).then(function(admins) {
-      $('#contest-admins').empty();
-      // Got the contests, lets populate the dropdown with them
-      for (var i = 0; i < admins.admins.length; i++) {
-        var admin = admins.admins[i];
-        $('#contest-admins')
-            .append(
-                $('<tr></tr>')
-                    .append(
-                        $('<td></td>')
-                            .append($('<a></a>')
-                                        .attr('href', '/profile/' +
+    omegaup.API.getContestAdmins({contest_alias: contestAlias})
+        .then(function(admins) {
+          $('#contest-admins').empty();
+          // Got the contests, lets populate the dropdown with them
+          for (var i = 0; i < admins.admins.length; i++) {
+            var admin = admins.admins[i];
+            $('#contest-admins')
+                .append(
+                    $('<tr></tr>')
+                        .append($('<td></td>')
+                                    .append($('<a></a>')
+                                                .attr('href',
+                                                      '/profile/' +
                                                           admin.username + '/')
-                                        .text(admin.username)))
-                    .append($('<td></td>').text(admin.role))
-                    .append((admin.role != 'admin') ?
+                                                .text(admin.username)))
+                        .append($('<td></td>').text(admin.role))
+                        .append(
+                            (admin.role != 'admin') ?
                                 $('<td></td>') :
                                 $('<td><button type="button" class="close">' +
                                   '&times;</button></td>')
@@ -372,44 +374,46 @@ omegaup.OmegaUp.on('ready', function() {
                                             });
                                       };
                                     })(admin.username))));
-      }
-      $('#contest-group-admins').empty();
-      for (var i = 0; i < admins.group_admins.length; i++) {
-        var group_admin = admins.group_admins[i];
-        $('#contest-group-admins')
-            .append(
-                $('<tr></tr>')
-                    .append(
-                        $('<td></td>')
-                            .append($('<a></a>')
-                                        .attr('href', '/group/' +
+          }
+          $('#contest-group-admins').empty();
+          for (var i = 0; i < admins.group_admins.length; i++) {
+            var group_admin = admins.group_admins[i];
+            $('#contest-group-admins')
+                .append(
+                    $('<tr></tr>')
+                        .append($('<td></td>')
+                                    .append($('<a></a>')
+                                                .attr('href',
+                                                      '/group/' +
                                                           group_admin.alias +
                                                           '/edit/')
-                                        .text(group_admin.name)))
-                    .append($('<td></td>').text(group_admin.role))
-                    .append(
-                        (group_admin.role != 'admin') ?
-                            $('<td></td>') :
-                            $('<td><button type="button" class="close">' +
-                              '&times;</button></td>')
-                                .click((function(alias) {
-                                  return function(e) {
-                                    omegaup.API.removeGroupAdminFromContest({
-                                                 contest_alias: contestAlias,
-                                                 group: alias,
-                                               })
-                                        .then(function(response) {
-                                          omegaup.UI.success(
-                                              omegaup.T.adminRemoved);
-                                          $('div.post.footer').show();
-                                          var tr = e.target.parentElement
-                                                       .parentElement;
-                                          $(tr).remove();
-                                        });
-                                  };
-                                })(group_admin.alias))));
-      }
-    });
+                                                .text(group_admin.name)))
+                        .append($('<td></td>').text(group_admin.role))
+                        .append(
+                            (group_admin.role != 'admin') ?
+                                $('<td></td>') :
+                                $('<td><button type="button" class="close">' +
+                                  '&times;</button></td>')
+                                    .click((function(alias) {
+                                      return function(e) {
+                                        omegaup.API.removeGroupAdminFromContest(
+                                                       {
+                                                         contest_alias:
+                                                             contestAlias,
+                                                         group: alias,
+                                                       })
+                                            .then(function(response) {
+                                              omegaup.UI.success(
+                                                  omegaup.T.adminRemoved);
+                                              $('div.post.footer').show();
+                                              var tr = e.target.parentElement
+                                                           .parentElement;
+                                              $(tr).remove();
+                                            });
+                                      };
+                                    })(group_admin.alias))));
+          }
+        });
   }
 
   $('#add-admin-form')
