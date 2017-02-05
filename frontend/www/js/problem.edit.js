@@ -90,7 +90,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function refreshProblemAdmins() {
-    omegaup.API.getProblemAdmins(problemAlias, function(admins) {
+    omegaup.API.getProblemAdmins({problem_alias: problemAlias}).then(function(admins) {
       $('#problem-admins').empty();
       // Got the contests, lets populate the dropdown with them
       for (var i = 0; i < admins.admins.length; i++) {
@@ -187,7 +187,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function refreshProblemTags() {
-    omegaup.API.getProblemTags(problemAlias, function(result) {
+    omegaup.API.getProblemTags({problem_alias: problemAlias}).then(function(result) {
       $('#problem-tags').empty();
       // Got the contests, lets populate the dropdown with them
       for (var i = 0; i < result.tags.length; i++) {

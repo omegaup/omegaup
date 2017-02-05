@@ -1065,7 +1065,7 @@ omegaup.arena.Arena.prototype.detectShowRun = function() {
   if (showRunMatch) {
     $('#overlay form').hide();
     $('#overlay').show();
-    omegaup.API.runDetails(showRunMatch[1], function(data) {
+    omegaup.API.getRunDetails({run_alias: showRunMatch[1]}).then(function(data) {
       self.displayRunDetails(showRunMatch[1], data);
     });
   }

@@ -336,7 +336,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Add admin
   function refreshContestAdmins() {
-    omegaup.API.getContestAdmins(contestAlias, function(admins) {
+    omegaup.API.getContestAdmins({contest_alias: contestAlias}).then(function(admins) {
       $('#contest-admins').empty();
       // Got the contests, lets populate the dropdown with them
       for (var i = 0; i < admins.admins.length; i++) {

@@ -864,56 +864,24 @@ omegaup.API = {
         $.ajax({url: '/api/contest/users/', data: params, dataType: 'json'}));
   },
 
-  getContestAdmins: function(contestAlias, callback) {
-    $.get('/api/contest/admins/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getContestAdmins: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/contest/admins/', data: params, dataType: 'json'}));
   },
 
-  getProblemAdmins: function(problemAlias, callback) {
-    $.get('/api/problem/admins/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getProblemAdmins: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/problem/admins/', data: params, dataType: 'json'}));
   },
 
-  getProblemTags: function(problemAlias, callback) {
-    $.get('/api/problem/tags/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getProblemTags: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/problem/tags/', data: params, dataType: 'json'}));
   },
 
   getProblemStats: function(problemAlias, callback) {
-    $.get('/api/problem/stats/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/problem/stats/', data: params, dataType: 'json'}));
   },
 
   getProblemClarifications: function(problemAlias, offset, rowcount, callback) {
@@ -938,6 +906,8 @@ omegaup.API = {
         });
   },
 
+  // TODO(pablo): The caller for this is providing page and row count.
+  //              Is it used?
   getRankByProblemsSolved: function(rowcount, callback) {
     $.get('/api/user/rankbyproblemssolved/rowcount/' +
               encodeURIComponent(rowcount) + '/',
@@ -982,10 +952,7 @@ omegaup.API = {
   getRuns: function(options, callback) {
     $.post('/api/run/list/', options,
            function(data) {
-             for (var i = 0; i < data.runs.length; i++) {
-               data.runs[i].time =
-                   omegaup.OmegaUp.time(data.runs[i].time * 1000);
-             }
+             omegaup.API._convertRuntimes(data);
              callback(data);
            },
            'json')
@@ -1034,45 +1001,14 @@ omegaup.API = {
         });
   },
 
-  runDetails: function(guid, callback) {
-    $.get('/api/run/details/run_alias/' + encodeURIComponent(guid) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  getRunDetails: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/run/details/', data: params, dataType: 'json'}));
   },
 
-  runCounts: function(callback) {
-    $.get('/api/run/counts/', function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  runSource: function(guid, callback) {
-    $.get('/api/run/source/run_alias/' + encodeURIComponent(guid) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
+  getRunCounts: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/run/counts/', data: params, dataType: 'json'}));
   },
 
   runRejudge: function(guid, debug, callback) {
