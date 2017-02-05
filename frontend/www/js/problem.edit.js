@@ -118,7 +118,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                    })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminAdded);
+                                                  omegaup.T.adminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -155,7 +155,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                })
                                         .then(function(response) {
                                           omegaup.UI.success(
-                                              omegaup.T.adminAdded);
+                                              omegaup.T.adminRemoved);
                                           $('div.post.footer').show();
                                           var tr = e.target.parentElement
                                                        .parentElement;
