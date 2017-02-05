@@ -7,24 +7,36 @@
 
 class CourseDetailsTest extends OmegaupTestCase {
     public function testGetCourseDetailsValid() {
-        // Create 1 course with 1 assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
-        // Call the details API
+        // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiDetails(new Request(array(
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => Utils::CreateRandomString(),
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework',
+        ]));
+
+        // Call the details API
+        $response = CourseController::apiDetails(new Request([
             'auth_token' => $adminLogin->auth_token,
             'alias' => $courseData['course_alias']
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
         Validators::isNumber($response['start_time'], 'start_time', true);
         Validators::isNumber($response['finish_time'], 'finish_time', true);
 
-        // 1 assignment
-        $this->assertEquals(1, count($response['assignments']));
+        // Both assignments added should be visible since the caller is an
+        // admin.
         $this->assertEquals(true, $response['is_admin']);
+        $this->assertEquals(2, count($response['assignments']));
 
         foreach ($response['assignments'] as $assignment) {
             $this->assertNotNull($assignment['name']);
@@ -39,8 +51,48 @@ class CourseDetailsTest extends OmegaupTestCase {
         }
     }
 
+    public function testGetCourseDetailsAsStudentValid() {
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+
+        // Add assignment that's already underway.
+        $adminLogin = self::login($courseData['admin']);
+        $assignmentAlias = Utils::CreateRandomString();
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework',
+        ]));
+
+        $user = CoursesFactory::addStudentToCourse($courseData);
+        $userLogin = self::login($user);
+
+        // Call the details API
+        $response = CourseController::apiDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'alias' => $courseData['course_alias']
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($courseData['course_alias'], $response['alias']);
+        Validators::isNumber($response['start_time'], 'start_time', true);
+        Validators::isNumber($response['finish_time'], 'finish_time', true);
+
+        // Only the course that has started should be visible.
+        $this->assertEquals(false, $response['is_admin']);
+        $this->assertEquals(1, count($response['assignments']));
+        $this->assertEquals(
+            $assignmentAlias,
+            $response['assignments'][0]['alias']
+        );
+    }
+
     /**
-     * Get details with user not registerd to the Course. Should fail.
+     * Get details with user not registered to the Course. Should fail.
      * @expectedException ForbiddenAccessException
      */
     public function testGetCourseDetailsNormalUser() {
@@ -66,5 +118,46 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['is_admin']);
+    }
+
+    public function testGetAssignmentAsStudent() {
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+
+        // Add assignment that's already underway.
+        $adminLogin = self::login($courseData['admin']);
+        $assignmentAlias = Utils::CreateRandomString();
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework',
+        ]));
+
+        $user = CoursesFactory::addStudentToCourse($courseData);
+        $userLogin = self::login($user);
+
+        // Call the details API for the assignment that's already started.
+        $response = CourseController::apiGetAssignment(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'course' => $courseData['course_alias'],
+            'assignment' => $assignmentAlias,
+        ]));
+        $this->assertEquals('ok', $response['status']);
+
+        // Call the detail API for the assignment that has not started.
+        try {
+            $response = CourseController::apiGetAssignment(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'course' => $courseData['course_alias'],
+            'assignment' => $courseData['assignment_alias'],
+            ]));
+            $this->fail('Exception was expected.');
+        } catch (ForbiddenAccessException $e) {
+            // OK!
+        }
     }
 }
