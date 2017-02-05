@@ -653,10 +653,8 @@ omegaup.API = {
   },
 
   getProblems: function() {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/list/',
-      dataType: 'json'
-    }));
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/problem/list/', dataType: 'json'}));
   },
 
   getProblemsWithTags: function(tags) {
@@ -842,7 +840,8 @@ omegaup.API = {
       method: 'POST',
       data: params,
       dataType: 'json'
-    }), omegaup.API._convertRuntimes);
+    }),
+                                     omegaup.API._convertRuntimes);
   },
 
   getContestRuns: function(params) {
@@ -851,23 +850,18 @@ omegaup.API = {
       method: 'POST',
       data: params,
       dataType: 'json'
-    }), omegaup.API._convertRuntimes);
+    }),
+                                     omegaup.API._convertRuntimes);
   },
 
   getContestStats: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/stats/',
-      data: params,
-      dataType: 'json'
-    }));
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/contest/stats/', data: params, dataType: 'json'}));
   },
 
   getContestUsers: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/users/',
-      data: params,
-      dataType: 'json'
-    }));
+    return omegaup.API._wrapDeferred(
+        $.ajax({url: '/api/contest/users/', data: params, dataType: 'json'}));
   },
 
   getContestAdmins: function(contestAlias, callback) {

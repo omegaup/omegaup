@@ -59,14 +59,15 @@ omegaup.OmegaUp.on('ready', function() {
   $('#add-group-admin-form')
       .submit(function() {
         omegaup.API.addGroupAdminToProblem({
-            problem_alias: problemAlias,
-            group: $('#groupalias-admin').attr('data-alias'),
-        }).then(function(response) {
-            omegaup.UI.success(omegaup.T.adminAdded);
-            $('div.post.footer').show();
+                     problem_alias: problemAlias,
+                     group: $('#groupalias-admin').attr('data-alias'),
+                   })
+            .then(function(response) {
+              omegaup.UI.success(omegaup.T.adminAdded);
+              $('div.post.footer').show();
 
-            refreshProblemAdmins();
-        });
+              refreshProblemAdmins();
+            });
 
         return false;  // Prevent refresh
       });
@@ -141,25 +142,27 @@ omegaup.OmegaUp.on('ready', function() {
                                                           '/edit/')
                                         .text(group_admin.name)))
                     .append($('<td></td>').text(group_admin.role))
-                    .append((group_admin.role != 'admin') ?
-                                $('<td></td>') :
-                                $('<td><button type="button" class="close">' +
-                                  '&times;</button></td>')
-                                    .click((function(alias) {
-                                      return function(e) {
-                                        omegaup.API.removeGroupAdminFromProblem({
-                                            problem_alias: problemAlias,
-                                            group: alias,
-                                        }).then(function(response) {
-                                            omegaup.UI.success(
-                                                omegaup.T.adminAdded);
-                                            $('div.post.footer').show();
-                                            var tr = e.target.parentElement
-                                                          .parentElement;
-                                            $(tr).remove();
+                    .append(
+                        (group_admin.role != 'admin') ?
+                            $('<td></td>') :
+                            $('<td><button type="button" class="close">' +
+                              '&times;</button></td>')
+                                .click((function(alias) {
+                                  return function(e) {
+                                    omegaup.API.removeGroupAdminFromProblem({
+                                                 problem_alias: problemAlias,
+                                                 group: alias,
+                                               })
+                                        .then(function(response) {
+                                          omegaup.UI.success(
+                                              omegaup.T.adminAdded);
+                                          $('div.post.footer').show();
+                                          var tr = e.target.parentElement
+                                                       .parentElement;
+                                          $(tr).remove();
                                         });
-                                      };
-                                    })(group_admin.alias))));
+                                  };
+                                })(group_admin.alias))));
       }
     });
   }
@@ -170,15 +173,15 @@ omegaup.OmegaUp.on('ready', function() {
         var public = $('#tag-public').val();
 
         omegaup.API.addTagToProblem({
-            problem_alias: problemAlias,
-            name: tagname,
-            public: public,
-        }).then(function(response) {
-            omegaup.UI.success('Tag successfully added!');
-            $('div.post.footer').show();
+                     problem_alias: problemAlias,
+                     name: tagname, public: public,
+                   })
+            .then(function(response) {
+              omegaup.UI.success('Tag successfully added!');
+              $('div.post.footer').show();
 
-            refreshProblemTags();
-        });
+              refreshProblemTags();
+            });
 
         return false;  // Prevent refresh
       });
@@ -198,23 +201,25 @@ omegaup.OmegaUp.on('ready', function() {
                                                   '/problem/?tag=' + tag.name)
                                             .text(tag.name)))
                     .append($('<td></td>').text(tag.public))
-                    .append($('<td><button type="button" class="close">' +
-                              '&times;</button></td>')
-                                .click((function(tagname) {
-                                  return function(e) {
-                                    omegaup.API.removeTagFromProblem({
-                                        problem_alias: problemAlias,
-                                        name: tagname,
-                                    }).then(function(response) {
-                                        omegaup.UI.success(
-                                            'Tag successfully removed!');
-                                        $('div.post.footer').show();
-                                        var tr = e.target.parentElement
-                                                      .parentElement;
-                                        $(tr).remove();
+                    .append(
+                        $('<td><button type="button" class="close">' +
+                          '&times;</button></td>')
+                            .click((function(tagname) {
+                              return function(e) {
+                                omegaup.API.removeTagFromProblem({
+                                             problem_alias: problemAlias,
+                                             name: tagname,
+                                           })
+                                    .then(function(response) {
+                                      omegaup.UI.success(
+                                          'Tag successfully removed!');
+                                      $('div.post.footer').show();
+                                      var tr =
+                                          e.target.parentElement.parentElement;
+                                      $(tr).remove();
                                     });
-                                  };
-                                })(tag.name))));
+                              };
+                            })(tag.name))));
       }
     });
   }

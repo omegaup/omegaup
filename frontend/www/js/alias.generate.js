@@ -12,51 +12,51 @@ function generateAlias(title) {
 }
 
 omegaup.OmegaUp.on('ready', function() {
-      var formData = $('#form-data');
-      var formName = formData.attr('data-name');
-      var existsFn = null;
+  var formData = $('#form-data');
+  var formName = formData.attr('data-name');
+  var existsFn = null;
 
-      function checkExists(obj) {
-        if (obj.status !== 'error') {
-          // Problem already exists
-          onAliasExists();
-        } else {
-          onAliasNew();
-        }
-      }
+  function checkExists(obj) {
+    if (obj.status !== 'error') {
+      // Problem already exists
+      onAliasExists();
+    } else {
+      onAliasNew();
+    }
+  }
 
-      function onAliasExists() {
-        omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
-                         '" ya existe. Elige otro nombre');
-        $('#alias').focus();
-      }
+  function onAliasExists() {
+    omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
+                     '" ya existe. Elige otro nombre');
+    $('#alias').focus();
+  }
 
-      function onAliasNew() { omegaup.UI.dismissNotifications(); }
+  function onAliasNew() { omegaup.UI.dismissNotifications(); }
 
-      switch (formName) {
-        case 'problems':
-          existsFn = function(alias) {
-            omegaup.API.getProblem(null, alias, checkExists);
-          };
-          break;
+  switch (formName) {
+    case 'problems':
+      existsFn = function(alias) {
+        omegaup.API.getProblem(null, alias, checkExists);
+      };
+      break;
 
-        case 'groups':
-          existsFn = function(alias) {
-            omegaup.API.getGroup({group_alias: alias}).then(checkExists);
-          };
-          break;
+    case 'groups':
+      existsFn = function(alias) {
+        omegaup.API.getGroup({group_alias: alias}).then(checkExists);
+      };
+      break;
 
-        case 'interviews':
-          existsFn = function(alias) {
-            omegaup.API.getContest(alias, checkExists);
-          };
-          break;
-      }
+    case 'interviews':
+      existsFn = function(alias) {
+        omegaup.API.getContest(alias, checkExists);
+      };
+      break;
+  }
 
-      $('#title')
-          .blur(function() {
-            $('#alias').val(generateAlias($(this).val())).change();
-          });
+  $('#title')
+      .blur(function() {
+        $('#alias').val(generateAlias($(this).val())).change();
+      });
 
-      $('#alias').change(function() { existsFn($('#alias').val()); });
-    });
+  $('#alias').change(function() { existsFn($('#alias').val()); });
+});

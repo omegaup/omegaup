@@ -68,82 +68,88 @@ $(function() {
           var username = $('#member-username').val();
 
           omegaup.API.addUserToGroup({
-            group_alias: groupAlias,
-            usernameOrEmail: username,
-          }).then(function(response) {
-            omegaup.UI.success('Member successfully added!');
-            $('div.post.footer').show();
+                       group_alias: groupAlias,
+                       usernameOrEmail: username,
+                     })
+              .then(function(response) {
+                omegaup.UI.success('Member successfully added!');
+                $('div.post.footer').show();
 
-            refreshGroupMembers();
-          });
+                refreshGroupMembers();
+              });
 
           return false;  // Prevent refresh
         });
 
     function refreshGroupMembers() {
-      omegaup.API.getGroupMembers({group_alias: groupAlias}).then(function(group) {
-        $('#group-members').empty();
+      omegaup.API.getGroupMembers({group_alias: groupAlias})
+          .then(function(group) {
+            $('#group-members').empty();
 
-        for (var i = 0; i < group.users.length; i++) {
-          var user = group.users[i];
-          $('#group-members')
-              .append(
-                  $('<tr></tr>')
-                      .append(
-                          $('<td></td>')
-                              .append(
-                                  $('<a></a>')
-                                      .attr('href',
-                                            '/profile/' + user.username + '/')
-                                      .text(omegaup.UI.escape(user.username))))
-                      .append(
-                          $('<td><button type="button" class="close">' +
-                            '&times;</button></td>')
-                              .click((function(username) {
-                                return function(e) {
-                                  omegaup.API.removeUserFromGroup({
-                                      group_alias: groupAlias,
-                                      usernameOrEmail: username,
-                                  }).then(function(response) {
-                                      omegaup.UI.success(
-                                          'Member successfully removed!');
-                                      $('div.post.footer').show();
-                                      var tr = e.target.parentElement
-                                                    .parentElement;
-                                      $(tr).remove();
-                                  });
-                                };
-                              })(user.username))));
-        }
-      });
+            for (var i = 0; i < group.users.length; i++) {
+              var user = group.users[i];
+              $('#group-members')
+                  .append(
+                      $('<tr></tr>')
+                          .append($('<td></td>')
+                                      .append($('<a></a>')
+                                                  .attr('href',
+                                                        '/profile/' +
+                                                            user.username + '/')
+                                                  .text(omegaup.UI.escape(
+                                                      user.username))))
+                          .append(
+                              $('<td><button type="button" class="close">' +
+                                '&times;</button></td>')
+                                  .click((function(username) {
+                                    return function(e) {
+                                      omegaup.API.removeUserFromGroup({
+                                                   group_alias: groupAlias,
+                                                   usernameOrEmail: username,
+                                                 })
+                                          .then(function(response) {
+                                            omegaup.UI.success(
+                                                'Member successfully removed!');
+                                            $('div.post.footer').show();
+                                            var tr = e.target.parentElement
+                                                         .parentElement;
+                                            $(tr).remove();
+                                          });
+                                    };
+                                  })(user.username))));
+            }
+          });
     }
 
     $('#add-scoreboard-form')
         .submit(function() {
           omegaup.API.addScoreboardToGroup({
-              group_alias: groupAlias,
-              alias: $('#alias').val(),
-              name: $('#title').val(),
-              description: $('#description').val(),
-          }).then(function(response) {
-              omegaup.UI.success('Scoreboard successfully added!');
-              $('div.post.footer').show();
-              refreshGroupScoreboards();
-          });
+                       group_alias: groupAlias,
+                       alias: $('#alias').val(),
+                       name: $('#title').val(),
+                       description: $('#description').val(),
+                     })
+              .then(function(response) {
+                omegaup.UI.success('Scoreboard successfully added!');
+                $('div.post.footer').show();
+                refreshGroupScoreboards();
+              });
 
           return false;  // Prevent refresh
         });
 
     function refreshGroupScoreboards() {
-      omegaup.API.getGroup({group_alias: groupAlias}).then(function(group) {
-        $('#group-scoreboards').empty();
+      omegaup.API.getGroup({group_alias: groupAlias})
+          .then(function(group) {
+            $('#group-scoreboards').empty();
 
-        for (var i = 0; i < group.scoreboards.length; i++) {
-          var scoreboard = group.scoreboards[i];
-          $('#group-scoreboards')
-              .append(
-                  $('<tr></tr>')
-                      .append($('<td></td>')
+            for (var i = 0; i < group.scoreboards.length; i++) {
+              var scoreboard = group.scoreboards[i];
+              $('#group-scoreboards')
+                  .append(
+                      $('<tr></tr>')
+                          .append(
+                              $('<td></td>')
                                   .append($('<a></a>')
                                               .attr('href',
                                                     '/group/' + groupAlias +
@@ -151,13 +157,14 @@ $(function() {
                                                         scoreboard.alias + '/')
                                               .text(omegaup.UI.escape(
                                                   scoreboard.name))))
-                      .append($(
-                          '<td>' +
-                          '<a class="glyphicon glyphicon-edit" href="/group/' +
-                          groupAlias + '/scoreboard/' + scoreboard.alias +
-                          '/edit/" title="Edit"></a></td>')));
-        }
-      });
+                          .append($(
+                              '<td>' +
+                              '<a class="glyphicon glyphicon-edit" ' +
+                              'href="/group/' + groupAlias + '/scoreboard/' +
+                              scoreboard.alias + '/edit/" ' +
+                              'title="Edit"></a></td>')));
+            }
+          });
     }
 
     refreshGroupScoreboards();

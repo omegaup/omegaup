@@ -21,15 +21,16 @@ $(function() {
     $('#scoreboard-add-contest-form')
         .submit(function() {
           omegaup.API.addContestToScoreboard({
-              group_alias: groupAlias,
-              scoreboard_alias: scoreboardAlias,
-              contest_alias: $('#contests').val(),
-              only_ac: $('#only-ac').val(),
-              weight: $('#weight').val(),
-          }).then(function(data) {
-              omegaup.UI.success('Contest successfully added!');
-              refreshScoreboardContests();
-          });
+                       group_alias: groupAlias,
+                       scoreboard_alias: scoreboardAlias,
+                       contest_alias: $('#contests').val(),
+                       only_ac: $('#only-ac').val(),
+                       weight: $('#weight').val(),
+                     })
+              .then(function(data) {
+                omegaup.UI.success('Contest successfully added!');
+                refreshScoreboardContests();
+              });
 
           return false;
         });
@@ -38,9 +39,10 @@ $(function() {
 
     function refreshScoreboardContests() {
       omegaup.API.getGroupScoreboard({
-          group_alias: groupAlias,
-          scoreboard_alias: scoreboardAlias,
-      }).then(function(gScoreboard) {
+                   group_alias: groupAlias,
+                   scoreboard_alias: scoreboardAlias,
+                 })
+          .then(function(gScoreboard) {
             $('#scoreboard-contests').empty();
 
             for (var i = 0; i < gScoreboard.contests.length; i++) {
@@ -66,18 +68,20 @@ $(function() {
                                   .click((function(contestAlias) {
                                     return function(e) {
                                       omegaup.API.removeContestFromScoreboard({
-                                          group_alias: groupAlias,
-                                          scoreboard_alias: scoreboardAlias,
-                                          contest_alias: contestAlias,
-                                      }).then(function(response) {
-                                          omegaup.UI.success(
-                                              'Contest successfully ' +
-                                              'removed!');
+                                                   group_alias: groupAlias,
+                                                   scoreboard_alias:
+                                                       scoreboardAlias,
+                                                   contest_alias: contestAlias,
+                                                 })
+                                          .then(function(response) {
+                                            omegaup.UI.success(
+                                                'Contest successfully ' +
+                                                'removed!');
 
-                                          var tr = e.target.parentElement
-                                                        .parentElement;
-                                          $(tr).remove();
-                                      });
+                                            var tr = e.target.parentElement
+                                                         .parentElement;
+                                            $(tr).remove();
+                                          });
                                     };
                                   })(contest.alias))));
             }
@@ -85,9 +89,10 @@ $(function() {
     }
   } else if (formPage === 'details') {
     omegaup.API.getGroupScoreboard({
-        group_alias: groupAlias,
-        scoreboard_alias: scoreboardAlias,
-    }).then(function(scoreboard) {
+                 group_alias: groupAlias,
+                 scoreboard_alias: scoreboardAlias,
+               })
+        .then(function(scoreboard) {
           var ranking = scoreboard['ranking'];
           $('#scoreboard-title').html(scoreboard.scoreboard.name);
 
