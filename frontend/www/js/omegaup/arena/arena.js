@@ -998,8 +998,9 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       }
 
       if (self.options.isPractice || self.options.isOnlyProblem) {
-        omegaup.API.getProblemRuns(problem.alias, {},
-                                   function(data) { updateRuns(data.runs); });
+        omegaup.API.getProblemRuns({problem_alias: problem.alias}).then(
+          function(data) { updateRuns(data.runs); }
+        );
       } else {
         updateRuns(problem.runs);
       }
@@ -1546,8 +1547,9 @@ omegaup.arena.RunView.prototype.attach = function(elm) {
           },
           {
             source: omegaup.UI.typeaheadWrapper(function(query, cb) {
-              omegaup.API.searchProblems(query,
-                                         function(data) { cb(data.results); });
+              omegaup.API.searchProblems({query: query}).then(function(data) {
+                cb(data.results);
+              });
             }),
             displayKey: 'title',
             templates: {

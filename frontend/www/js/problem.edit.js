@@ -58,19 +58,15 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-group-admin-form')
       .submit(function() {
-        var groupalias = $('#groupalias-admin').attr('data-alias');
+        omegaup.API.addGroupAdminToProblem({
+            problem_alias: problemAlias,
+            group: $('#groupalias-admin').attr('data-alias'),
+        }).then(function(response) {
+            omegaup.UI.success(omegaup.T.adminAdded);
+            $('div.post.footer').show();
 
-        omegaup.API.addGroupAdminToProblem(
-            problemAlias, groupalias, function(response) {
-              if (response.status === 'ok') {
-                omegaup.UI.success(omegaup.T.adminAdded);
-                $('div.post.footer').show();
-
-                refreshProblemAdmins();
-              } else {
-                omegaup.UI.error(response.error || 'error');
-              }
-            });
+            refreshProblemAdmins();
+        });
 
         return false;  // Prevent refresh
       });
@@ -151,21 +147,17 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.removeGroupAdminFromProblem(
-                                            problemAlias, alias,
-                                            function(response) {
-                                              if (response.status == 'ok') {
-                                                omegaup.UI.success(
-                                                    omegaup.T.adminAdded);
-                                                $('div.post.footer').show();
-                                                var tr = e.target.parentElement
-                                                             .parentElement;
-                                                $(tr).remove();
-                                              } else {
-                                                omegaup.UI.error(
-                                                    response.error || 'error');
-                                              }
-                                            });
+                                        omegaup.API.removeGroupAdminFromProblem({
+                                            problem_alias: problemAlias,
+                                            group: alias,
+                                        }).then(function(response) {
+                                            omegaup.UI.success(
+                                                omegaup.T.adminAdded);
+                                            $('div.post.footer').show();
+                                            var tr = e.target.parentElement
+                                                          .parentElement;
+                                            $(tr).remove();
+                                        });
                                       };
                                     })(group_admin.alias))));
       }
@@ -177,17 +169,16 @@ omegaup.OmegaUp.on('ready', function() {
         var tagname = $('#tag-name').val();
         var public = $('#tag-public').val();
 
-        omegaup.API.addTagToProblem(
-            problemAlias, tagname, public, function(response) {
-              if (response.status === 'ok') {
-                omegaup.UI.success('Tag successfully added!');
-                $('div.post.footer').show();
+        omegaup.API.addTagToProblem({
+            problem_alias: problemAlias,
+            name: tagname,
+            public: public,
+        }).then(function(response) {
+            omegaup.UI.success('Tag successfully added!');
+            $('div.post.footer').show();
 
-                refreshProblemTags();
-              } else {
-                omegaup.UI.error(response.error || 'error');
-              }
-            });
+            refreshProblemTags();
+        });
 
         return false;  // Prevent refresh
       });
@@ -211,21 +202,17 @@ omegaup.OmegaUp.on('ready', function() {
                               '&times;</button></td>')
                                 .click((function(tagname) {
                                   return function(e) {
-                                    omegaup.API.removeTagFromProblem(
-                                        problemAlias, tagname,
-                                        function(response) {
-                                          if (response.status == 'ok') {
-                                            omegaup.UI.success(
-                                                'Tag successfully removed!');
-                                            $('div.post.footer').show();
-                                            var tr = e.target.parentElement
-                                                         .parentElement;
-                                            $(tr).remove();
-                                          } else {
-                                            omegaup.UI.error(response.error ||
-                                                             'error');
-                                          }
-                                        });
+                                    omegaup.API.removeTagFromProblem({
+                                        problem_alias: problemAlias,
+                                        name: tagname,
+                                    }).then(function(response) {
+                                        omegaup.UI.success(
+                                            'Tag successfully removed!');
+                                        $('div.post.footer').show();
+                                        var tr = e.target.parentElement
+                                                      .parentElement;
+                                        $(tr).remove();
+                                    });
                                   };
                                 })(tag.name))));
       }

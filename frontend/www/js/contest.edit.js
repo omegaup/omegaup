@@ -58,7 +58,7 @@ omegaup.OmegaUp.on('ready', function() {
     }
   });
 
-  omegaup.API.getProblems(function(problems) {
+  omegaup.API.getProblems().then(function(problems) {
     // Got the problems, lets populate the dropdown with them
     for (var i = 0; i < problems.results.length; i++) {
       problem = problems.results[i];
@@ -278,7 +278,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function refreshContestContestants() {
-    omegaup.API.getContestUsers(contestAlias, function(users) {
+    omegaup.API.getContestUsers({contest_alias: contestAlias}).then(function(users) {
       $('#contest-users').empty();
       // Got the contests, lets populate the dropdown with them
       for (var i = 0; i < users.users.length; i++) {
@@ -299,21 +299,17 @@ omegaup.OmegaUp.on('ready', function() {
                               '&times;</button></td>')
                                 .click((function(username) {
                                   return function(e) {
-                                    omegaup.API.removeUserFromContest(
-                                        contestAlias, username,
-                                        function(response) {
-                                          if (response.status == 'ok') {
-                                            omegaup.UI.success(
-                                                'User successfully removed!');
-                                            $('div.post.footer').show();
-                                            var tr = e.target.parentElement
-                                                         .parentElement;
-                                            $(tr).remove();
-                                          } else {
-                                            omegaup.UI.error(response.error ||
-                                                             'error');
-                                          }
-                                        });
+                                    omegaup.API.removeUserFromContest({
+                                        contest_alias: contestAlias,
+                                        usernameOrEmail: username,
+                                    }).then(function(response) {
+                                        omegaup.UI.success(
+                                            'User successfully removed!');
+                                        $('div.post.footer').show();
+                                        var tr = e.target.parentElement
+                                                      .parentElement;
+                                        $(tr).remove();
+                                    });
                                   };
                                 })(user.username))));
       }
@@ -323,17 +319,14 @@ omegaup.OmegaUp.on('ready', function() {
   $('#add-contestant-form')
       .submit(function() {
         username = $('#username-contestant').val();
-        omegaup.API.addUserToContest(
-            contestAlias, username, function(response) {
-              if (response.status == 'ok') {
-                omegaup.UI.success('User successfully added!');
-                $('div.post.footer').show();
-
-                refreshContestContestants();
-              } else {
-                omegaup.UI.error(response.error || 'error');
-              }
-            });
+        omegaup.API.addUserToContest({
+            contest_alias: contestAlias,
+            usernameOrEmail: username,
+        }).then(function(response) {
+            omegaup.UI.success('User successfully added!');
+            $('div.post.footer').show();
+            refreshContestContestants();
+        });
         return false;  // Prevent refresh
       });
 

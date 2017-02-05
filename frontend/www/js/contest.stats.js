@@ -10,11 +10,11 @@ omegaup.OmegaUp.on('ready', function() {
       var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
       function getStats() {
-        omegaup.API.getContestStats(contestAlias, function(s) {
-          if (s.status == 'ok') {
-            stats = s;
-            drawCharts();
-          }
+        omegaup.API.getContestStats({
+          contest_alias: contestAlias
+        }).then(function(s) {
+          stats = s;
+          drawCharts();
         });
         updateStats();
       }

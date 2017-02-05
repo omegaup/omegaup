@@ -144,7 +144,7 @@ omegaup.OmegaUp.on('ready', function() {
         });
   }
 
-  omegaup.API.getProblems(function(problems) {
+  omegaup.API.getProblems().then(function(problems) {
     // Got the problems, lets populate the dropdown with them
     for (var i = 0; i < problems.results.length; i++) {
       problem = problems.results[i];

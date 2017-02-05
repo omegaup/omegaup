@@ -67,22 +67,21 @@ $(function() {
         .submit(function() {
           var username = $('#member-username').val();
 
-          omegaup.API.addUserToGroup(groupAlias, username, function(response) {
-            if (response.status === 'ok') {
-              omegaup.UI.success('Member successfully added!');
-              $('div.post.footer').show();
+          omegaup.API.addUserToGroup({
+            group_alias: groupAlias,
+            usernameOrEmail: username,
+          }).then(function(response) {
+            omegaup.UI.success('Member successfully added!');
+            $('div.post.footer').show();
 
-              refreshGroupMembers();
-            } else {
-              omegaup.UI.error(response.error || 'error');
-            }
+            refreshGroupMembers();
           });
 
           return false;  // Prevent refresh
         });
 
     function refreshGroupMembers() {
-      omegaup.API.getGroupMembers(groupAlias, function(group) {
+      omegaup.API.getGroupMembers({group_alias: groupAlias}).then(function(group) {
         $('#group-members').empty();
 
         for (var i = 0; i < group.users.length; i++) {
@@ -102,20 +101,17 @@ $(function() {
                             '&times;</button></td>')
                               .click((function(username) {
                                 return function(e) {
-                                  omegaup.API.removeUserFromGroup(
-                                      groupAlias, username, function(response) {
-                                        if (response.status === 'ok') {
-                                          omegaup.UI.success(
-                                              'Member successfully removed!');
-                                          $('div.post.footer').show();
-                                          var tr = e.target.parentElement
-                                                       .parentElement;
-                                          $(tr).remove();
-                                        } else {
-                                          omegaup.UI.error(response.error ||
-                                                           'error');
-                                        }
-                                      });
+                                  omegaup.API.removeUserFromGroup({
+                                      group_alias: groupAlias,
+                                      usernameOrEmail: username,
+                                  }).then(function(response) {
+                                      omegaup.UI.success(
+                                          'Member successfully removed!');
+                                      $('div.post.footer').show();
+                                      var tr = e.target.parentElement
+                                                    .parentElement;
+                                      $(tr).remove();
+                                  });
                                 };
                               })(user.username))));
         }
@@ -124,27 +120,22 @@ $(function() {
 
     $('#add-scoreboard-form')
         .submit(function() {
-          var name = $('#title').val();
-          var alias = $('#alias').val();
-          var description = $('#description').val();
-
-          omegaup.API.addScoreboardToGroup(
-              groupAlias, alias, name, description, function(response) {
-                if (response.status === 'ok') {
-                  omegaup.UI.success('Scoreboard successfully added!');
-                  $('div.post.footer').show();
-
-                  refreshGroupScoreboards();
-                } else {
-                  omegaup.UI.error(response.error || 'error');
-                }
-              });
+          omegaup.API.addScoreboardToGroup({
+              group_alias: groupAlias,
+              alias: $('#alias').val(),
+              name: $('#title').val(),
+              description: $('#description').val(),
+          }).then(function(response) {
+              omegaup.UI.success('Scoreboard successfully added!');
+              $('div.post.footer').show();
+              refreshGroupScoreboards();
+          });
 
           return false;  // Prevent refresh
         });
 
     function refreshGroupScoreboards() {
-      omegaup.API.getGroup(groupAlias, function(group) {
+      omegaup.API.getGroup({group_alias: groupAlias}).then(function(group) {
         $('#group-scoreboards').empty();
 
         for (var i = 0; i < group.scoreboards.length; i++) {

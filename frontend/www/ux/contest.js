@@ -35,9 +35,9 @@ omegaup.OmegaUp.on('ready', function() {
     arena.updateAllowedLanguages(language_array);
 
     if (problem.user.logged_in) {
-      omegaup.API.getProblemRuns(problem.alias, {}, function(data) {
-        onlyProblemUpdateRuns(data.runs, 'score', 100);
-      });
+      omegaup.API.getProblemRuns({problem_alias: problem.alias}).then(
+        function(data) { onlyProblemUpdateRuns(data.runs, 'score', 100); }
+      );
     }
 
     if (problem.user.admin) {
