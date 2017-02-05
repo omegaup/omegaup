@@ -146,7 +146,9 @@ class CourseController extends Controller {
         }
         $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
-        if ($r['assignment']->start_time > time() && !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+        if ($r['assignment']->start_time > time() &&
+            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+        ) {
             throw new ForbiddenAccessException();
         }
         // TODO: Access check
