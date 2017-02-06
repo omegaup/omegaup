@@ -98,14 +98,11 @@ function refreshStudentList() {
               course_alias: courseAlias,
               usernameOrEmail: student.username
             })
-            .then(
-              function(data) {
-                refreshStudentList();
-                omegaup.UI.success(omegaup.T.courseStudentRemoved);
-              },
-              function(data) {
-                omegaup.UI.error(data.error);
-              });
+            .then(function(data) {
+              refreshStudentList();
+              omegaup.UI.success(omegaup.T.courseStudentRemoved);
+            })
+            .fail(function(data) { omegaup.UI.error(data.error); });
           };
           student.profileURL = '/profile/' + student.username;
 

@@ -13,7 +13,7 @@
             </thead>
             <tbody data-bind="foreach: students">
                 <tr>
-                    <td><a data-bind="text: name, attr: { href: profile }" /></td>
+                    <td><a data-bind="text: name || username, attr: { href: profile }" /></td>
                     <td data-bind="text: totalHomeworks"></td>
                     <td data-bind="text: totalTests"></td>
                 </tr>

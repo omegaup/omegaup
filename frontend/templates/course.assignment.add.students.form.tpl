@@ -9,7 +9,7 @@
 		</thead>
 		<tbody data-bind="foreach: students">
 			<tr>
-				<td><a data-bind="text: name, attr: { href: profile }" /></td>
+				<td><a data-bind="text: name || username, attr: { href: profile }" /></td>
 				<td><button type="button" class="close" data-bind="click: remove">&times;</button></td>
 			</tr>
 		</tbody>
