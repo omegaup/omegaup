@@ -3,7 +3,7 @@
 
 <div class='panel'>
 	<div class="page-header">
-		<h1><span>{#frontPageLoading#}</span> <small></small></h1>
+		<h1><span><a class="course-header">{#frontPageLoading#}</a></span></h1>
 	</div>
 
 	<ul class="nav nav-tabs" id="sections">
