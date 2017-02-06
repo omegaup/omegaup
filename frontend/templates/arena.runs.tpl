@@ -120,7 +120,16 @@
 {if isset($show_problem)}
 							<td class="problem"><a data-bind="text: alias, attr: { href: problem_url }"></a></td>
 {/if}
-							<td class="status" data-bind="text: status_text, style: { backgroundColor: status_color }"></td>
+							<td class="status" data-bind="style: { backgroundColor: status_color }">
+								<span data-bind="text: status_text"></span>
+								<button data-bind="visible: status_help,
+								                   click: showVerdictHelp,
+								                   attr: { title: status_text,
+								                           data-content: status_help }"
+								        data-toggle="popover"
+								        data-trigger="focus"
+								        class="glyphicon glyphicon-question-sign"></button>
+							</td>
 {if isset($show_points)}
 							<td class="points numeric" data-bind="text: points"></td>
 							<td class="penalty numeric" data-bind="text: penalty_text"></td>

@@ -1618,6 +1618,7 @@ omegaup.arena.ObservableRun = function(arena, run) {
   self.runtime_text = ko.pureComputed(self.$runtime_text, self);
   self.memory_text = ko.pureComputed(self.$memory_text, self);
   self.status_text = ko.pureComputed(self.$status_text, self);
+  self.status_help = ko.pureComputed(self.$status_help, self);
   self.status_color = ko.pureComputed(self.$status_color, self);
   self.penalty_text = ko.pureComputed(self.$penalty_text, self);
   self.points = ko.pureComputed(self.$points, self);
@@ -1636,6 +1637,11 @@ omegaup.arena.ObservableRun.prototype.update = function(run) {
       self[p](run[p]);
     }
   }
+};
+
+omegaup.arena.ObservableRun.prototype.showVerdictHelp = function(elm, ev) {
+  var self = this;
+  $(ev.target).popover('show');
 };
 
 omegaup.arena.ObservableRun.prototype.$problem_url = function() {
@@ -1706,6 +1712,24 @@ omegaup.arena.ObservableRun.prototype.$status_text = function() {
 
   return self.status() == 'ready' ? omegaup.T['verdict' + self.verdict()] :
                                     self.status();
+};
+
+omegaup.arena.ObservableRun.prototype.$status_help = function() {
+  var self = this;
+
+  if (self.status() != 'ready' || self.verdict() == 'AC') {
+    return null;
+  }
+
+  if (self.language() == 'kj' || self.language() == 'kp') {
+    if (self.verdict() == 'RTE' || self.verdict() == 'RE') {
+      return omegaup.T.verdictHelpKarelRTE;
+    } else if (self.verdict() == 'TLE' || self.verdict() == 'TO') {
+      return omegaup.T.verdictHelpKarelTLE;
+    }
+  }
+
+  return omegaup.T['verdictHelp' + self.verdict()];
 };
 
 omegaup.arena.ObservableRun.prototype.$status_color = function() {
