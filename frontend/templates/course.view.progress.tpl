@@ -11,7 +11,7 @@
                     <th>{#wordsNumTests#}</th>
                 </tr>
             </thead>
-            <tbody data-bind="foreach: student">
+            <tbody data-bind="foreach: students">
                 <tr>
                     <td><a data-bind="text: name || username, attr: { href: profile }" /></td>
                     <td data-bind="text: totalHomeworks"></td>
@@ -32,7 +32,7 @@
 	    	id="students-list-table"
 			data-bind="template: { name: 'student-list',
 	                    data: { listName: '{#courseListAdminCurrentCourses#}',
-	                            student: getStudentsList() }  }">
+	                            students: students() }  }">
 		</div>
     </div> <!-- panel-body -->
 </div> <!-- panel -->

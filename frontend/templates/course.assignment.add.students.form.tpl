@@ -7,10 +7,10 @@
 			<th>{#wordsUser#}</th>
 			<th>{#contestEditRegisteredAdminDelete#}</th>
 		</thead>
-		<tbody data-bind="foreach: student">
+		<tbody data-bind="foreach: students">
 			<tr>
 				<td><a data-bind="text: name || username, attr: { href: profile }" /></td>
-				<td>X</td>
+				<td><button type="button" class="close" data-bind="click: remove">&times;</button></td>
 			</tr>
 		</tbody>
 	</table>
@@ -31,7 +31,7 @@
 		<div>
 			<div id="add-students-list-table"
 				 data-bind="template: { name: 'add-student-current-list',
-							data: { student: getStudentsList() }  }">
+				            data: { students: students() } }">
 			</div>
 		</div>
 	</div>
