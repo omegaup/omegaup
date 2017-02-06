@@ -65,6 +65,41 @@ class CourseStudentAddTest extends OmegaupTestCase {
     }
 
     /**
+     * Basic apiRemoveStudent test
+     */
+    public function testRemoveStudentFromCourse() {
+        $courseData = CoursesFactory::createCourse();
+        $student = UserFactory::createUser();
+
+        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias']
+        ]));
+        $this->assertEquals('ok', $response['status']);
+
+        $response = CourseController::apiRemoveStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias']
+        ]));
+        $this->assertEquals('ok', $response['status']);
+
+        // Validate student was removed.
+        $course = CoursesDAO::findByAlias($courseData['course_alias']);
+        $this->assertNotNull($course);
+
+        $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
+            'group_id' => $course->group_id,
+            'user_id' => $student->user_id
+        ]));
+
+        $this->assertNotNull($studentsInGroup);
+        $this->assertEquals(0, count($studentsInGroup));
+    }
+
+    /**
      * Students can only be added by course admins
      *
      * @expectedException ForbiddenAccessException

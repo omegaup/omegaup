@@ -209,6 +209,8 @@ omegaup.T = {
 	courseStudentAdded: "(S7ud3n7 add3d 5ucc355fu11y.)",
 	courseStudentAlreadyPresent: "(Th3 57ud3n7 had a1r3ady add3d 70 7h3 c0ur53.)",
 	courseStudentCountLabel: "(S7ud3n75:)",
+	courseStudentNotInCourse: "(Th3 57ud3n7 wa5 n07 in 7h3 c0ur53.)",
+	courseStudentRemoved: "(S7ud3n7 r3m0v3d 5ucc355fu11y.)",
 	courseStudentsProgress: "(S7ud3n75 pr0gr355)",
 	courseViewProgress: "(Vi3w pr0gr355)",
 	createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",
