@@ -14,49 +14,51 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  omegaup.API.getContestAdminDetails(contestAlias, function(contest) {
-    $('.page-header h1 span')
-        .html(omegaup.T['contestEdit'] + ' ' + contest.title);
-    $('.page-header h1 small')
-        .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
-              omegaup.T['contestDetailsGoToContest'] + '</a>');
-    $('.new_contest_form #title').val(contest.title);
-    $('.new_contest_form #alias').val(contest.alias);
-    $('.new_contest_form #description').val(contest.description);
-    $('.new_contest_form #start-time')
-        .val(omegaup.UI.formatDateTime(contest.start_time));
-    $('.new_contest_form #finish-time')
-        .val(omegaup.UI.formatDateTime(contest.finish_time));
+  omegaup.API.getContestAdminDetails({contest_alias: contestAlias})
+      .then(function(contest) {
+        $('.page-header h1 span')
+            .html(omegaup.T['contestEdit'] + ' ' + contest.title);
+        $('.page-header h1 small')
+            .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
+                  omegaup.T['contestDetailsGoToContest'] + '</a>');
+        $('.new_contest_form #title').val(contest.title);
+        $('.new_contest_form #alias').val(contest.alias);
+        $('.new_contest_form #description').val(contest.description);
+        $('.new_contest_form #start-time')
+            .val(omegaup.UI.formatDateTime(contest.start_time));
+        $('.new_contest_form #finish-time')
+            .val(omegaup.UI.formatDateTime(contest.finish_time));
 
-    if (contest.window_length === null) {
-      // Disable window length
-      $('#window-length-enabled').removeAttr('checked');
-      $('#window-length').val('');
-    } else {
-      $('#window-length-enabled').attr('checked', 'checked');
-      $('#window-length').removeAttr('disabled');
-      $('#window-length').val(contest.window_length);
-    }
+        if (contest.window_length === null) {
+          // Disable window length
+          $('#window-length-enabled').removeAttr('checked');
+          $('#window-length').val('');
+        } else {
+          $('#window-length-enabled').attr('checked', 'checked');
+          $('#window-length').removeAttr('disabled');
+          $('#window-length').val(contest.window_length);
+        }
 
-    $('.new_contest_form #points-decay-factor')
-        .val(contest.points_decay_factor);
-    $('.new_contest_form #submissions-gap').val(contest.submissions_gap / 60);
-    $('.new_contest_form #feedback').val(contest.feedback);
-    $('.new_contest_form #penalty').val(contest.penalty);
-    $('.new_contest_form #public').val(contest.public);
-    $('.new_contest_form #register').val(contest.contestant_must_register);
-    $('.new_contest_form #scoreboard').val(contest.scoreboard);
-    $('.new_contest_form #penalty-type').val(contest.penalty_type);
-    $('.new_contest_form #show-scoreboard-after')
-        .val(contest.show_scoreboard_after);
+        $('.new_contest_form #points-decay-factor')
+            .val(contest.points_decay_factor);
+        $('.new_contest_form #submissions-gap')
+            .val(contest.submissions_gap / 60);
+        $('.new_contest_form #feedback').val(contest.feedback);
+        $('.new_contest_form #penalty').val(contest.penalty);
+        $('.new_contest_form #public').val(contest.public);
+        $('.new_contest_form #register').val(contest.contestant_must_register);
+        $('.new_contest_form #scoreboard').val(contest.scoreboard);
+        $('.new_contest_form #penalty-type').val(contest.penalty_type);
+        $('.new_contest_form #show-scoreboard-after')
+            .val(contest.show_scoreboard_after);
 
-    $('.contest-publish-form #public').val(contest.public);
+        $('.contest-publish-form #public').val(contest.public);
 
-    if (contest.contestant_must_register == null ||
-        contest.contestant_must_register == '0') {
-      $('#requests').hide();
-    }
-  });
+        if (contest.contestant_must_register == null ||
+            contest.contestant_must_register == '0') {
+          $('#requests').hide();
+        }
+      });
 
   omegaup.API.getProblems().then(function(problems) {
     // Got the problems, lets populate the dropdown with them

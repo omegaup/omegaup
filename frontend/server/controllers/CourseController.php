@@ -145,6 +145,12 @@ class CourseController extends Controller {
             throw new NotFoundException('assignmentNotFound');
         }
         $r['assignment'] = $assignments[0];
+        $r['assignment']->toUnixTime();
+        if ($r['assignment']->start_time > time() &&
+            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+        ) {
+            throw new ForbiddenAccessException();
+        }
         // TODO: Access check
     }
 
@@ -502,11 +508,70 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
+        $groupUser = new GroupsUsers([
+            'group_id' => $r['course']->group_id,
+            'user_id' => $r['user']->user_id,
+        ]);
+
+        if (!is_null(GroupsUsersDAO::getByPK(
+            $groupUser->group_id,
+            $groupUser->user_id
+        ))) {
+            throw new DuplicatedEntryInDatabaseException(
+                'courseStudentAlreadyPresent'
+            );
+        }
+
         try {
-            GroupsUsersDAO::save(new GroupsUsers([
-                'group_id' => $r['course']->group_id,
-                'user_id' => $r['user']->user_id
-            ]));
+            GroupsUsersDAO::save($groupUser);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Remove Student from Course
+     *
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiRemoveStudent(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userOrMailNotFound');
+        }
+
+        $groupUser = new GroupsUsers([
+            'group_id' => $r['course']->group_id,
+            'user_id' => $r['user']->user_id,
+        ]);
+
+        if (is_null(GroupsUsersDAO::getByPK(
+            $groupUser->group_id,
+            $groupUser->user_id
+        ))) {
+            throw new NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
+        try {
+            GroupsUsersDAO::delete($groupUser);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -543,7 +608,19 @@ class CourseController extends Controller {
             if (is_null($group)) {
                 throw new NotFoundException('courseGroupNotFound');
             }
-            $result['student_count'] = GroupsUsersDAO::GetMemberCountById($group->group_id);
+            $result['student_count'] = GroupsUsersDAO::GetMemberCountById(
+                $group->group_id
+            );
+        } else {
+            // Non-admins should not be able to see assignments that have not
+            // started.
+            $time = time();
+            $result['assignments'] = array_values(array_filter(
+                $result['assignments'],
+                function ($v) use ($time) {
+                    return $v['start_time'] <= $time;
+                }
+            ));
         }
 
         return $result;
@@ -596,7 +673,6 @@ class CourseController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-        $r['assignment']->toUnixTime();
         return ['status' => 'ok',
                 'name' => $r['assignment']->name,
                 'description' => $r['assignment']->description,

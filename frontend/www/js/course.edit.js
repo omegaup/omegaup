@@ -75,7 +75,9 @@ omegaup.OmegaUp.on('ready', function() {
       });
 });
 
-var koStudentsList = {getStudentsList: ko.observableArray()};
+var koStudentsList = {
+  students: ko.observableArray(),
+};
 
 function refreshStudentList() {
   var courseAlias =
@@ -88,9 +90,20 @@ function refreshStudentList() {
           return;
         }
 
-        koStudentsList['getStudentsList'].removeAll();
+        koStudentsList.students.removeAll();
         for (var i = 0; i < data['students'].length; ++i) {
           var student = data['students'][i];
+          student.remove = function(student) {
+            omegaup.API.removeStudentFromCourse({
+              course_alias: courseAlias,
+              usernameOrEmail: student.username
+            })
+            .then(function(data) {
+              refreshStudentList();
+              omegaup.UI.success(omegaup.T.courseStudentRemoved);
+            })
+            .fail(function(data) { omegaup.UI.error(data.error); });
+          };
           student.profileURL = '/profile/' + student.username;
 
           var totalHomeworks = (data['counts']['homework'] != null) ?
@@ -102,7 +115,7 @@ function refreshStudentList() {
               student.count_homeworks_done + '/' + totalHomeworks;
           student.totalTests = student.count_tests_done + '/' + totalTests;
 
-          koStudentsList['getStudentsList'].push(student);
+          koStudentsList.students.push(student);
         }
       });
 }
