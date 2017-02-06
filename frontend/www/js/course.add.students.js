@@ -12,8 +12,7 @@ omegaup.OmegaUp.on('ready', function() {
         .then(function(data) {
           refreshStudentList();
           omegaup.UI.success(omegaup.T.courseStudentAdded);
-        }, function(data) {
-          omegaup.UI.error(data.error);
-        });
+        })
+        .fail(function(data) { omegaup.UI.error(data.error); });
       });
 });

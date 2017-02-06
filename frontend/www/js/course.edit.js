@@ -76,7 +76,7 @@ omegaup.OmegaUp.on('ready', function() {
 });
 
 var koStudentsList = {
-	students: ko.observableArray(),
+  students: ko.observableArray(),
 };
 
 function refreshStudentList() {
@@ -93,18 +93,17 @@ function refreshStudentList() {
         koStudentsList.students.removeAll();
         for (var i = 0; i < data['students'].length; ++i) {
           var student = data['students'][i];
-					student.remove = function(student) {
-						omegaup.API.removeStudentFromCourse({
-							course_alias: courseAlias,
-							usernameOrEmail: student.username
-						})
-						.then(function(data) {
-							refreshStudentList();
-							omegaup.UI.success(omegaup.T.courseStudentRemoved);
-						}, function(data) {
-							omegaup.UI.error(data.error);
-						});
-					};
+          student.remove = function(student) {
+            omegaup.API.removeStudentFromCourse({
+              course_alias: courseAlias,
+              usernameOrEmail: student.username
+            })
+            .then(function(data) {
+              refreshStudentList();
+              omegaup.UI.success(omegaup.T.courseStudentRemoved);
+            })
+            .fail(function(data) { omegaup.UI.error(data.error); });
+          };
           student.profileURL = '/profile/' + student.username;
 
           var totalHomeworks = (data['counts']['homework'] != null) ?
