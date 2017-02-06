@@ -155,9 +155,18 @@ omegaup.API = {
 
   addStudentToCourse: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/addStudent/course_alias/' +
-               encodeURIComponent(params.course_alias) + '/usernameOrEmail/' +
-               encodeURIComponent(params.username) + '/',
+      url: '/api/course/addStudent/',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }));
+  },
+
+  removeStudentFromCourse: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/removeStudent/',
+      data: params,
+      method: 'POST',
       dataType: 'json',
     }));
   },

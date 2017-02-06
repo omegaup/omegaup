@@ -209,6 +209,8 @@ omegaup.T = {
 	courseStudentAdded: "Student added successfully.",
 	courseStudentAlreadyPresent: "The student had already added to the course.",
 	courseStudentCountLabel: "Students:",
+	courseStudentNotInCourse: "The student was not in the course.",
+	courseStudentRemoved: "Student removed successfully.",
 	courseStudentsProgress: "Students progress",
 	courseViewProgress: "View progress",
 	createSchoolFailed: "School creation failed.",

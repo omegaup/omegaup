@@ -7,7 +7,7 @@ omegaup.OmegaUp.on('ready', function() {
 
         omegaup.API.addStudentToCourse({
           course_alias: courseAlias,
-          username: $('#member-username').val()
+          usernameOrEmail: $('#member-username').val()
         })
         .then(function(data) {
           refreshStudentList();
