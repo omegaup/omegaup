@@ -145,6 +145,12 @@ class CourseController extends Controller {
             throw new NotFoundException('assignmentNotFound');
         }
         $r['assignment'] = $assignments[0];
+        $r['assignment']->toUnixTime();
+        if ($r['assignment']->start_time > time() &&
+            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+        ) {
+            throw new ForbiddenAccessException();
+        }
         // TODO: Access check
     }
 
@@ -543,7 +549,19 @@ class CourseController extends Controller {
             if (is_null($group)) {
                 throw new NotFoundException('courseGroupNotFound');
             }
-            $result['student_count'] = GroupsUsersDAO::GetMemberCountById($group->group_id);
+            $result['student_count'] = GroupsUsersDAO::GetMemberCountById(
+                $group->group_id
+            );
+        } else {
+            // Non-admins should not be able to see assignments that have not
+            // started.
+            $time = time();
+            $result['assignments'] = array_values(array_filter(
+                $result['assignments'],
+                function ($v) use ($time) {
+                    return $v['start_time'] <= $time;
+                }
+            ));
         }
 
         return $result;
@@ -596,7 +614,6 @@ class CourseController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-        $r['assignment']->toUnixTime();
         return ['status' => 'ok',
                 'name' => $r['assignment']->name,
                 'description' => $r['assignment']->description,
