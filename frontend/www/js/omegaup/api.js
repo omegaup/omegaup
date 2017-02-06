@@ -155,9 +155,18 @@ omegaup.API = {
 
   addStudentToCourse: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/addStudent/course_alias/' +
-               encodeURIComponent(params.course_alias) + '/usernameOrEmail/' +
-               encodeURIComponent(params.username) + '/',
+      url: '/api/course/addStudent/',
+      method: 'POST',
+      data: params,
+      dataType: 'json',
+    }));
+  },
+
+  removeStudentFromCourse: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/removeStudent/',
+      data: params,
+      method: 'POST',
       dataType: 'json',
     }));
   },
@@ -270,22 +279,24 @@ omegaup.API = {
         });
   },
 
-  getContestAdminDetails: function(alias, callback) {
-    $.get('/api/contest/admindetails/contest_alias/' +
-              encodeURIComponent(alias) + '/',
-          function(contest) {
-            if (contest.status == 'ok') {
-              omegaup.API._normalizeContestFields(contest);
-            }
-            callback(contest);
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
+  getContestAdminDetails: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({
+          url: '/api/contest/admindetails/',
+          method: 'POST',
+          data: params,
+          dataType: 'json',
+        }),
+        function(contest) {
+          // We cannot use |_normalizeContestFields| because admins need to be
+          // able to get the unmodified times.
+          contest.start_time = new Date(contest.start_time * 1000);
+          contest.finish_time = new Date(contest.finish_time * 1000);
+          contest.submission_deadline =
+              omegaup.OmegaUp.time(contest.submission_deadline * 1000);
+          contest.show_penalty =
+              (contest.penalty != 0 || contest.penalty_type != 'none');
+          return contest;
         });
   },
 

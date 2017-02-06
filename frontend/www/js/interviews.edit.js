@@ -48,16 +48,17 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent page refresh on submit
       });
 
-  omegaup.API.getContestAdminDetails(interviewAlias, function(contest) {
-    $('.page-header h1 span')
-        .html(omegaup.T['interviewEdit'] + ' ' + contest.title);
-    $('.page-header h1 small')
-        .html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' +
-              omegaup.T['interviewGoToInterview'] + '</a>');
-    $('.new_interview_form #title').val(contest.title);
-    $('.new_interview_form #description').val(contest.description);
-    $('#window_length').val(contest.window_length);
-  });
+  omegaup.API.getContestAdminDetails({contest_alias: contestAlias})
+      .then(function(contest) {
+        $('.page-header h1 span')
+            .html(omegaup.T['interviewEdit'] + ' ' + contest.title);
+        $('.page-header h1 small')
+            .html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' +
+                  omegaup.T['interviewGoToInterview'] + '</a>');
+        $('.new_interview_form #title').val(contest.title);
+        $('.new_interview_form #description').val(contest.description);
+        $('#window_length').val(contest.window_length);
+      });
 
   function fillCandidatesTable() {
     omegaup.API.getInterview(interviewAlias, function(interview) {
