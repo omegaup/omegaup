@@ -23,12 +23,17 @@ omegaup.OmegaUp.on('ready', function() {
         $('#title', courseForm).val(course.name);
         $('#alias', courseForm).val(course.alias);
         $('#description', courseForm).val(course.description);
+        $('#show_scoreboard', courseForm).val(course.show_scoreboard);
         $('#start_time', courseForm)
             .val(omegaup.UI.formatDate(course.start_time));
         $('#finish_time', courseForm)
             .val(omegaup.UI.formatDate(course.finish_time));
 
-        $('#show_scoreboard', courseForm).val(course.show_scoreboard);
+        $('#start_time, #finish_time', courseForm)
+            .datepicker({
+              weekStart: 1,
+              format: 'mm/dd/yyyy',
+            });
       });
 
   // Edit course
