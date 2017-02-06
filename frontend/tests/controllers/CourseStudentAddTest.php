@@ -36,6 +36,35 @@ class CourseStudentAddTest extends OmegaupTestCase {
     }
 
     /**
+     * apiAddStudent test with a duplicate student.
+     */
+    public function testAddDuplicateStudentToCourse() {
+        $courseData = CoursesFactory::createCourse();
+        $student = UserFactory::createUser();
+
+        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias']
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+
+        // Add the same student. Should throw.
+        try {
+            $response = CourseController::apiAddStudent(new Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $student->username,
+                'course_alias' => $courseData['course_alias']
+            ]));
+            $this->fail('Expected DuplicatedEntryInDatabaseException');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            // OK.
+        }
+    }
+
+    /**
      * Students can only be added by course admins
      *
      * @expectedException ForbiddenAccessException

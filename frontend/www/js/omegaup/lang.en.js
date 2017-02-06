@@ -207,6 +207,7 @@ omegaup.T = {
 	courseNewFormUpdateCourse: "Update course",
 	courseNotFound: "Course not found",
 	courseStudentAdded: "Student added successfully.",
+	courseStudentAlreadyPresent: "The student had already added to the course.",
 	courseStudentCountLabel: "Students:",
 	courseStudentsProgress: "Students progress",
 	courseViewProgress: "View progress",

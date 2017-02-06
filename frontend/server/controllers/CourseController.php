@@ -508,11 +508,22 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
+        $groupUser = new GroupsUsers([
+            'group_id' => $r['course']->group_id,
+            'user_id' => $r['user']->user_id,
+        ]);
+
+        if (!is_null(GroupsUsersDAO::getByPK(
+            $groupUser->group_id,
+            $groupUser->user_id
+        ))) {
+            throw new DuplicatedEntryInDatabaseException(
+                'courseStudentAlreadyPresent'
+            );
+        }
+
         try {
-            GroupsUsersDAO::save(new GroupsUsers([
-                'group_id' => $r['course']->group_id,
-                'user_id' => $r['user']->user_id
-            ]));
+            GroupsUsersDAO::save($groupUser);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
