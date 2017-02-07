@@ -78,20 +78,20 @@ class RunController extends Controller {
             Validators::isStringNonEmpty($r['source'], 'source');
 
             // Can't set both problemset_id and contest_alias at the same time.
-            if ($r['problemset_id'] && $r['contest_alias']) {
+            if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
                 throw new InvalidParameterException(
-                    'tooManyArgs',
+                    'incompatibleArgs',
                     'problemset_id and contest_alias'
                 );
             }
 
             $problemset_id = null;
             $problemset_container = null;
-            if ($r['problemset_id']) {
+            if (!empty($r['problemset_id'])) {
                 // Got a problemset id directly.
                 $problemset_id = intval($r['problemset_id']);
                 $problemset_container = ProblemsetsDAO::getProblemsetContainer($problemset_id);
-            } elseif ($r['contest_alias']) {
+            } elseif (!empty($r['contest_alias'])) {
                 // Got a contest alias, need to fetch the problemset id.
                 // Validate contest
                 Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');

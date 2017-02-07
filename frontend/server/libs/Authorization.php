@@ -120,13 +120,11 @@ class Authorization {
     }
 
     public static function isContestAdmin($user_id, Contests $contest) {
-        return ($contest instanceof Contests) &&
-            self::isAdmin($user_id, $contest);
+        return self::isAdmin($user_id, $contest);
     }
 
     public static function isInterviewAdmin($user_id, Interviews $interview) {
-        return ($interview instanceof Interviews) &&
-            self::isAdmin($user_id, $interview);
+        return self::isAdmin($user_id, $interview);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
@@ -172,8 +170,7 @@ class Authorization {
      * An admin is either the group owner or a member of the admin group.
      */
     public static function isCourseAdmin($user_id, Courses $course) {
-        return ($course instanceof Courses) &&
-            self::isAdmin($user_id, $course);
+        return self::isAdmin($user_id, $course);
     }
 
     public static function isGroupMember($user_id, Groups $group) {
