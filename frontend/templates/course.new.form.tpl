@@ -65,7 +65,3 @@
 		</form>
 	</div>
 </div>
-
-{if $IS_UPDATE != 1}
-    <script type="text/javascript" src="{version_hash src="/js/course.new.form.js"}"></script>
-{/if}
