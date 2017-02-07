@@ -1115,7 +1115,7 @@ class ProblemController extends Controller {
             $keyrun = new Runs(array(
                 'user_id' => $r['current_user_id'],
                 'problem_id' => $r['problem']->problem_id,
-                'contest_id' => is_null($r['contest']) ? null : $r['contest']->contest_id
+                'problemset_id' => is_null($r['contest']) ? null : $r['contest']->problemset_id
             ));
 
             // Get all the available runs done by the current_user
