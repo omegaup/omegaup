@@ -482,7 +482,8 @@ class ContestController extends Controller {
                 'public',
                 'show_scoreboard_after',
                 'contestant_must_register',
-                'languages');
+                'languages',
+                'problemset_id');
 
             // Initialize response to be the contest information
             $result = $r['contest']->asFilteredArray($relevant_columns);

@@ -202,6 +202,7 @@ class InterviewController extends Controller {
 
         $thisResult['description'] = $interview->description;
         $thisResult['contest_alias'] = $interview->alias;
+        $thisResult['problemset_id'] = $interview->problemset_id;
 
         try {
             $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers(array(

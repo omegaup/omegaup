@@ -33,7 +33,6 @@ class Authorization {
             return false;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($run->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($run->problem_id);
         } catch (Exception $e) {
@@ -48,7 +47,8 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        if (!is_null($contest) && Authorization::isContestAdmin($user_id, $contest)) {
+        $container = ProblemsetsDAO::getProblemsetContainer($run->problemset_id);
+        if (!is_null($container) && Authorization::isAdmin($user_id, $container)) {
             return true;
         }
 
@@ -110,30 +110,23 @@ class Authorization {
         return true;
     }
 
-    public static function isContestAdmin($user_id, Contests $contest) {
-        if (is_null($contest) || !is_a($contest, 'Contests')) {
+    public static function isAdmin($user_id, $entity) {
+        if (is_null($entity)) {
             return false;
         }
+        return self::isOwner($user_id, $entity->acl_id) ||
+            UserRolesDAO::isAdmin($user_id, $entity->acl_id) ||
+            GroupRolesDAO::isAdmin($user_id, $entity->acl_id);
+    }
 
-        if (self::isOwner($user_id, $contest->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $contest->acl_id);
+    public static function isContestAdmin($user_id, Contests $contest) {
+        return ($contest instanceof Contests) &&
+            self::isAdmin($user_id, $contest);
     }
 
     public static function isInterviewAdmin($user_id, Interviews $interview) {
-        if (is_null($interview) || !is_a($interview, 'Interviews')) {
-            return false;
-        }
-
-        if (self::isOwner($user_id, $interview->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $interview->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $interview->acl_id);
+        return ($interview instanceof Interviews) &&
+            self::isAdmin($user_id, $interview);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
@@ -179,16 +172,8 @@ class Authorization {
      * An admin is either the group owner or a member of the admin group.
      */
     public static function isCourseAdmin($user_id, Courses $course) {
-        if (is_null($course)) {
-            return false;
-        }
-
-        if (self::isOwner($user_id, $course->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $course->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $course->acl_id);
+        return ($course instanceof Courses) &&
+            self::isAdmin($user_id, $course);
     }
 
     public static function isGroupMember($user_id, Groups $group) {
