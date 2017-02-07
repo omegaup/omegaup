@@ -65,4 +65,3 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="{version_hash src="/js/course.new.form.js"}"></script>
