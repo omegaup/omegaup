@@ -162,23 +162,14 @@ class RunController extends Controller {
 
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r['current_user_id'], $problemset_container)) {
-                // Before submit something, contestant had to open the problem/contest
+                // Before submit something, user had to open the problem/problemset.
                 if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id)) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ContestsDAO::isInsideContest($r['contest'], $r['current_user_id'])) {
+                if (!ContestsDAO::isInsideContest($problemset_container, $r['current_user_id'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
-                }
-
-                // Validate if contest is private then the user should be registered
-                if ($r['contest']->public == 0
-                        && is_null(ProblemsetUsersDAO::getByPK(
-                            $r['current_user_id'],
-                            $problemset_id
-                        ))) {
-                    throw new NotAllowedToSubmitException('runNotRegistered');
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
@@ -191,6 +182,9 @@ class RunController extends Controller {
                     throw new NotAllowedToSubmitException('runWaitGap');
                 }
             }
+
+            // Expose container for downstream API code.
+            $r['container'] = $problemset_container;
         } catch (ApiException $apiException) {
             // Propagate ApiException
             throw $apiException;
@@ -231,43 +225,47 @@ class RunController extends Controller {
             $test = 0;
         } else {
             //check the kind of penalty_type for this contest
-            $penalty_type = $r['contest']->penalty_type;
+            $start = null;
+            $problemset_id = $r['container']->problemset_id;
+            if (isset($r['container']->penalty_type)) {
+                $penalty_type = $r['container']->penalty_type;
 
-            switch ($penalty_type) {
-                case 'contest_start':
-                    // submit_delay is calculated from the start
-                    // of the contest
-                    $start = $r['contest']->start_time;
-                    break;
+                switch ($penalty_type) {
+                    case 'contest_start':
+                        // submit_delay is calculated from the start
+                        // of the contest
+                        $start = $r['container']->start_time;
+                        break;
 
-                case 'problem_open':
-                    // submit delay is calculated from the
-                    // time the user opened the problem
-                    $opened = ProblemsetProblemOpenedDAO::getByPK(
-                        $r['contest']->problemset_id,
-                        $r['problem']->problem_id,
-                        $r['current_user_id']
-                    );
+                    case 'problem_open':
+                        // submit delay is calculated from the
+                        // time the user opened the problem
+                        $opened = ProblemsetProblemOpenedDAO::getByPK(
+                            $problemset_id,
+                            $r['problem']->problem_id,
+                            $r['current_user_id']
+                        );
 
-                    if (is_null($opened)) {
-                        //holy moly, he is submitting a run
-                        //and he hasnt even opened the problem
-                        //what should be done here?
-                        throw new NotAllowedToSubmitException('runEvenOpened');
-                    }
+                        if (is_null($opened)) {
+                            //holy moly, he is submitting a run
+                            //and he hasnt even opened the problem
+                            //what should be done here?
+                            throw new NotAllowedToSubmitException('runEvenOpened');
+                        }
 
-                    $start = $opened->open_time;
-                    break;
+                        $start = $opened->open_time;
+                        break;
 
-                case 'none':
-                case 'runtime':
-                    //we dont care
-                    $start = null;
-                    break;
+                    case 'none':
+                    case 'runtime':
+                        //we dont care
+                        $start = null;
+                        break;
 
-                default:
-                    self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
-                    $start = null;
+                    default:
+                        self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
+                        $start = null;
+                }
             }
 
             if (!is_null($start)) {
@@ -281,8 +279,7 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $problemset_id = $r['contest']->problemset_id;
-            $test = Authorization::isContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
+            $test = Authorization::isAdmin($r['current_user_id'], $r['container']) ? 1 : 0;
         }
 
         // Populate new run object
@@ -343,12 +340,14 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id);
+                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id);
 
-                if ($r['contest']->window_length === null) {
-                    $response['submission_deadline'] = strtotime($r['contest']->finish_time);
-                } else {
-                    $response['submission_deadline'] = min(strtotime($r['contest']->finish_time), strtotime($contest_user->access_time) + $r['contest']->window_length * 60);
+                $response['submission_deadline'] = strtotime($r['container']->finish_time);
+                if (isset($r['container']->window_length) && $r['container']->window_length !== null) {
+                    $response['submission_deadline'] = min(
+                        $response['submission_deadline'],
+                        strtotime($contest_user->access_time) + $r['container']->window_length * 60
+                    );
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer

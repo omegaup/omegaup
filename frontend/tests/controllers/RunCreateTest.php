@@ -571,4 +571,32 @@ class RunCreateTest extends OmegaupTestCase {
             RunController::$defaultSubmissionGap = $originalGap;
         }
     }
+
+    public function testRunWithProblemsetId() {
+        $r = $this->setValidRequest();
+        $r['problemset_id'] = $this->contestData['contest']->problemset_id;
+        unset($r['contest_alias']);
+
+        // Call API
+        $response = RunController::apiCreate($r);
+
+        $this->assertRun($r, $response);
+
+        // Check problem submissions (1)
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $this->assertEquals(1, $problem->submissions);
+    }
+
+    /**
+     * Can't set both params at the same time
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testRunWithProblemsetIdAndContestAlias() {
+        $r = $this->setValidRequest();
+        $r['problemset_id'] = $this->contestData['contest']->problemset_id;
+
+        // Call API
+        $response = RunController::apiCreate($r);
+    }
 }
