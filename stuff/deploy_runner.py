@@ -69,9 +69,15 @@ class RemoteRunner:
     def sudo(self, args, **kwargs):
         return self.run(['/usr/bin/sudo'] + args, **kwargs)
 
-    def scp(self, src, dest):
+    def scp(self, src, dest, mode=None, owner=None, group=None):
         subprocess.check_call(['/usr/bin/scp', src,
                                '%s:.tmp' % self._hostname])
+        if mode != None:
+            self.sudo(['/bin/chmod', '0%o' % mode, '.tmp'])
+        if owner != None:
+            self.sudo(['/bin/chown', owner, '.tmp'])
+        if group != None:
+            self.sudo(['/bin/chgrp', group, '.tmp'])
         return self.sudo(['/bin/mv', '.tmp', dest])
 
 def main():
@@ -129,9 +135,18 @@ def main():
                 '--output', os.path.join(tmpdirname, 'key.pem'),
                 '--cert-output', os.path.join(tmpdirname, 'certificate.pem')])
             runner.scp(os.path.join(tmpdirname, 'key.pem'),
-                       '/etc/omegaup/runner/key.pem')
+                       '/etc/omegaup/runner/key.pem', mode=int('0600', 8),
+                       owner='omegaup', group='omegaup')
             runner.scp(os.path.join(tmpdirname, 'certificate.pem'),
-                       '/etc/omegaup/runner/certificate.pem')
+                       '/etc/omegaup/runner/certificate.pem',
+                       owner='omegaup', group='omegaup')
+
+    if runner.run([
+        '[', '-h',
+        '/etc/systemd/system/multi-user.target.wants/omegaup-runner.service',
+        ']']).returncode != 0:
+        runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
+
 
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
 
