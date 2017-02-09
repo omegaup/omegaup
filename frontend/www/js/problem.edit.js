@@ -51,7 +51,7 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
               refreshProblemAdmins();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -67,7 +67,7 @@ omegaup.OmegaUp.on('ready', function() {
               $('div.post.footer').show();
 
               refreshProblemAdmins();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -83,7 +83,7 @@ omegaup.OmegaUp.on('ready', function() {
       .submit(function() {
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
-          omegaup.UI.error(omegaup.T['editFieldRequired']);
+          omegaup.UI.error(omegaup.T.editFieldRequired);
           $('#markdown-message-group').addClass('has-error');
           return false;
         }
@@ -125,7 +125,7 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            }).fail(omegaup.UI.apiError);
                                       };
                                     })(admin.username))));
           }
@@ -164,11 +164,11 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            }).fail(omegaup.UI.apiError);
                                       };
                                     })(group_admin.alias))));
           }
-        });
+        }).fail(omegaup.UI.apiError);
   }
 
   $('#add-tag-form')
@@ -185,7 +185,7 @@ omegaup.OmegaUp.on('ready', function() {
               $('div.post.footer').show();
 
               refreshProblemTags();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -222,11 +222,11 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            }).fail(omegaup.UI.apiError);
                                       };
                                     })(tag.name))));
           }
-        });
+        }).fail(omegaup.UI.apiError);
   }
 
   var md_converter = Markdown.getSanitizingConverter();

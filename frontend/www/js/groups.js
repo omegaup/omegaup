@@ -23,7 +23,7 @@ $(function() {
 
         $('#groups_list').removeClass('wait_for_ajax');
         $('#groups_list > table > tbody').empty().html(html);
-      });
+      }).fail(omegaup.UI.apiError);
     }
 
     fillGroupsList();
@@ -39,7 +39,7 @@ $(function() {
                 window.location.replace('/group/' +
                                         $('.new_group_form #alias').val() +
                                         '/edit/#members');
-              });
+              }).fail(omegaup.UI.apiError);
 
           return false;
         });
@@ -76,7 +76,7 @@ $(function() {
                 $('div.post.footer').show();
 
                 refreshGroupMembers();
-              });
+              }).fail(omegaup.UI.apiError);
 
           return false;  // Prevent refresh
         });
@@ -114,11 +114,11 @@ $(function() {
                                             var tr = e.target.parentElement
                                                          .parentElement;
                                             $(tr).remove();
-                                          });
+                                          }).fail(omegaup.UI.apiError);
                                     };
                                   })(user.username))));
             }
-          });
+          }).fail(omegaup.UI.apiError);
     }
 
     $('#add-scoreboard-form')
@@ -133,7 +133,7 @@ $(function() {
                 omegaup.UI.success('Scoreboard successfully added!');
                 $('div.post.footer').show();
                 refreshGroupScoreboards();
-              });
+              }).fail(omegaup.UI.apiError);
 
           return false;  // Prevent refresh
         });
@@ -164,7 +164,7 @@ $(function() {
                               scoreboard.alias + '/edit/" ' +
                               'title="Edit"></a></td>')));
             }
-          });
+          }).fail(omegaup.UI.apiError);
     }
 
     refreshGroupScoreboards();

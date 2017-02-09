@@ -58,7 +58,7 @@ omegaup.OmegaUp.on('ready', function() {
             contest.contestant_must_register == '0') {
           $('#requests').hide();
         }
-      });
+      }).fail(omegaup.UI.apiError);
 
   omegaup.API.getProblems().then(function(problems) {
     // Got the problems, lets populate the dropdown with them
@@ -69,7 +69,7 @@ omegaup.OmegaUp.on('ready', function() {
                       .attr('value', problem.alias)
                       .text(problem.title));
     }
-  });
+  }).fail(omegaup.UI.apiError);
 
   refreshContestProblems();
   refreshContestContestants();
@@ -167,11 +167,11 @@ omegaup.OmegaUp.on('ready', function() {
                                       $('div.post.footer').show();
                                       $(e.target.parentElement.parentElement)
                                           .remove();
-                                    });
+                                    }).fail(omegaup.UI.apiError);
                               };
                             })(response.problems[i].alias))));
           }
-        });
+        }).fail(omegaup.UI.apiError);
   }
 
   $('#add-problem-form')
@@ -186,7 +186,7 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success('Problem successfully added!');
               $('div.post.footer').show();
               refreshContestProblems();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent page refresh
       });
@@ -314,11 +314,11 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            }).fail(omegaup.UI.apiError);
                                       };
                                     })(user.username))));
           }
-        });
+        }).fail(omegaup.UI.apiError);
   }
 
   $('#add-contestant-form')
@@ -332,7 +332,7 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success('User successfully added!');
               $('div.post.footer').show();
               refreshContestContestants();
-            });
+            }).fail(omegaup.UI.apiError);
         return false;  // Prevent refresh
       });
 
@@ -415,7 +415,7 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
-        });
+        }).fail(omegaup.UI.apiError);
   }
 
   $('#add-admin-form')
@@ -428,7 +428,7 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -443,7 +443,7 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
-            });
+            }).fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
