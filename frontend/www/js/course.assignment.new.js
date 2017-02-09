@@ -2,6 +2,7 @@ omegaup.OmegaUp.on('ready', function() {
   var assignmentForm = $('.new_course_assignment_form');
   var startTime = $('input[name="start_time"]', assignmentForm);
   var finishTime = $('input[name="finish_time"]', assignmentForm);
+
   assignmentForm.submit(function() {
     var courseAlias =
         /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
@@ -33,17 +34,18 @@ omegaup.OmegaUp.on('ready', function() {
       .datetimepicker({
         weekStart: 1,
         format: 'mm/dd/yyyy hh:ii',
-        startDate: Date.create(Date.now()),
       });
 
   function setDefaultDates() {
     // Defaults for start_time and end_time
+    // TODO: Use course the start date as the default date
     var defaultDate = Date.create(Date.now());
     defaultDate.set({seconds: 0});
     startTime.val(omegaup.UI.formatDateTime(defaultDate));
     defaultDate.setHours(defaultDate.getHours() + 5);
     finishTime.val(omegaup.UI.formatDateTime(defaultDate));
   }
+
   if (startTime.val() == '') {
     setDefaultDates();
   }

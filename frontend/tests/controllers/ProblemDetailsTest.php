@@ -214,4 +214,49 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals(50.00, $response['score']);
     }
+
+    /**
+     * Problem details in a contest should only show runs sent in the contest.
+     */
+    public function testViewProblemHasCorrectRuns() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a user for our scenario
+        $contestant = UserFactory::createUser();
+
+        $runDataOutOfContest = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        $runDataInContest = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+        RunsFactory::gradeRun($runDataOutOfContest);
+        RunsFactory::gradeRun($runDataInContest);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+        ]);
+        $response = ProblemController::apiDetails($r);
+
+        // Verify that the only run returned is the one that was sent in the
+        // contest.
+        $this->assertEquals(1, count($response['runs']));
+        $this->assertEquals(
+            $runDataInContest['response']['guid'],
+            $response['runs'][0]['guid']
+        );
+    }
 }
