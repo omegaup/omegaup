@@ -89,7 +89,7 @@ class Grader {
             [
                 'id' => $runGuids,
                 'rejudge' => !!$rejudge,
-                'debug' => !!$debug,
+                'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]
         );
     }

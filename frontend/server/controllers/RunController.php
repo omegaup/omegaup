@@ -708,7 +708,10 @@ class RunController extends Controller {
         self::validateAdminDetailsRequest($r);
 
         $grade_dir = RunController::getGradePath($r['run']);
-        $results_zip = "$grade_dir/results.zip";
+        $results_zip = "$grade_dir/files.zip";
+        if (!file_exists($results_zip)) {
+            $results_zip = "$grade_dir/results.zip";
+        }
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
