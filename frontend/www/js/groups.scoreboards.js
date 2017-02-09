@@ -16,20 +16,21 @@ $(function() {
                         .attr('value', contest.alias)
                         .text(contest.title));
       }
-    });
+    }).fail(omegaup.UI.apiError);
 
     $('#scoreboard-add-contest-form')
         .submit(function() {
-          omegaup.API.addContestToScoreboard(
-              groupAlias, scoreboardAlias, $('#contests').val(),
-              $('#only-ac').val(), $('#weight').val(), function(data) {
-                if (data.status === 'ok') {
-                  omegaup.UI.success('Contest successfully added!');
-                  refreshScoreboardContests();
-                } else {
-                  omegaup.UI.error(data.error || 'error');
-                }
-              });
+          omegaup.API.addContestToScoreboard({
+                       group_alias: groupAlias,
+                       scoreboard_alias: scoreboardAlias,
+                       contest_alias: $('#contests').val(),
+                       only_ac: $('#only-ac').val(),
+                       weight: $('#weight').val(),
+                     })
+              .then(function(data) {
+                omegaup.UI.success('Contest successfully added!');
+                refreshScoreboardContests();
+              }).fail(omegaup.UI.apiError);
 
           return false;
         });
@@ -37,8 +38,11 @@ $(function() {
     refreshScoreboardContests();
 
     function refreshScoreboardContests() {
-      omegaup.API.getGroupScoreboard(
-          groupAlias, scoreboardAlias, function(gScoreboard) {
+      omegaup.API.getGroupScoreboard({
+                   group_alias: groupAlias,
+                   scoreboard_alias: scoreboardAlias,
+                 })
+          .then(function(gScoreboard) {
             $('#scoreboard-contests').empty();
 
             for (var i = 0; i < gScoreboard.contests.length; i++) {
@@ -63,30 +67,32 @@ $(function() {
                                 '&times;</button></td>')
                                   .click((function(contestAlias) {
                                     return function(e) {
-                                      omegaup.API.removeContestFromScoreboard(
-                                          groupAlias, scoreboardAlias,
-                                          contestAlias, function(response) {
-                                            if (response.status === 'ok') {
-                                              omegaup.UI.success(
-                                                  'Contest successfully ' +
-                                                  'removed!');
+                                      omegaup.API.removeContestFromScoreboard({
+                                                   group_alias: groupAlias,
+                                                   scoreboard_alias:
+                                                       scoreboardAlias,
+                                                   contest_alias: contestAlias,
+                                                 })
+                                          .then(function(response) {
+                                            omegaup.UI.success(
+                                                'Contest successfully ' +
+                                                'removed!');
 
-                                              var tr = e.target.parentElement
-                                                           .parentElement;
-                                              $(tr).remove();
-                                            } else {
-                                              omegaup.UI.error(response.error ||
-                                                               'error');
-                                            }
-                                          });
+                                            var tr = e.target.parentElement
+                                                         .parentElement;
+                                            $(tr).remove();
+                                          }).fail(omegaup.UI.apiError);
                                     };
                                   })(contest.alias))));
             }
-          });
+          }).fail(omegaup.UI.apiError);
     }
   } else if (formPage === 'details') {
-    omegaup.API.getGroupScoreboard(
-        groupAlias, scoreboardAlias, function(scoreboard) {
+    omegaup.API.getGroupScoreboard({
+                 group_alias: groupAlias,
+                 scoreboard_alias: scoreboardAlias,
+               })
+        .then(function(scoreboard) {
           var ranking = scoreboard['ranking'];
           $('#scoreboard-title').html(scoreboard.scoreboard.name);
 
@@ -152,6 +158,6 @@ $(function() {
           $('#ranking').show();
           $('#root').fadeIn('slow');
           $('#loading').fadeOut('slow');
-        });
+        }).fail(omegaup.UI.apiError);
   }
 });

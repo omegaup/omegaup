@@ -45,6 +45,10 @@ omegaup.UI = {
     omegaup.UI.displayStatus(message, 'alert-warning');
   },
 
+  apiError: function(response) {
+    omegaup.UI.error(response.error || 'error');
+  },
+
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
@@ -164,8 +168,8 @@ omegaup.UI = {
             },
             {
               source: function(query, cb) {
-                omegaup.API.searchProblems(
-                    query, function(data) { cb(data.results); });
+                omegaup.API.searchProblems({query: query})
+                    .then(function(data) { cb(data.results); });
               },
               displayKey: 'alias',
               templates: {

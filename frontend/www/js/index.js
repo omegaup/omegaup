@@ -1,6 +1,6 @@
 (function() {
   function OnLoad() {
-    omegaup.API.runCounts(createChart);
+    omegaup.API.getRunCounts().then(createChart);
 
     omegaup.API.getContests({active: 'ACTIVE'})
         .then(function(data) {
