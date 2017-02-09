@@ -1095,7 +1095,8 @@ omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
   }
 };
 
-omegaup.arena.Arena.prototype.clearInputfile = function() {
+omegaup.arena.Arena.prototype.clearInputFile = function() {
+  var self = this;
   self.elements.submitForm.file.replaceWith(
       self.elements.submitForm.file =
           self.elements.submitForm.file.clone(true));
@@ -1216,7 +1217,7 @@ omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
     $('input', self.elements.submitForm).removeAttr('disabled');
     self.elements.submitForm.code.val('');
     self.hideOverlay();
-    self.clearInputfile();
+    self.clearInputFile();
   });
 };
 
