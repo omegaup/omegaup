@@ -5,8 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'SessionController.php';
-
 class UserController extends Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;

@@ -16,14 +16,13 @@ class CourseController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateCreateOrUpdateAssignment(Request $r, $is_update = false) {
-        $is_required = true;
+        $is_required = !$is_update;
 
         // Does this assignment need to be within the time constraints of
         // the course it belongs to?
 
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
-        self::validateCourseExists($r);
 
         Validators::isNumber($r['start_time'], 'start_time', $is_required);
         Validators::isNumber($r['finish_time'], 'finish_time', $is_required);
@@ -36,21 +35,29 @@ class CourseController extends Controller {
             throw new InvalidParameterException('InvalidStartTime');
         }
 
-        $parent_course = null;
-        try {
-            $parent_course = CoursesDAO::search(array('alias' => $r['course_alias']));
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($parent_course) || count($parent_course) !== 1) {
-            throw new InvalidParameterException('parameterInvalid');
-        }
-
-        $r['course'] = $parent_course[0];
-
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
         Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), $is_required);
+        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+
+        if ($is_update) {
+            try {
+                $r['assignment'] = AssignmentsDAO::getByAlias($r['alias']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        } else {
+            $parent_course = null;
+            try {
+                $parent_course = CoursesDAO::search(array('alias' => $r['course_alias']));
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if (is_null($parent_course) || count($parent_course) !== 1) {
+                throw new InvalidParameterException('parameterInvalid');
+            }
+
+            $r['course'] = $parent_course[0];
+        }
     }
 
     /**
@@ -81,7 +88,7 @@ class CourseController extends Controller {
         Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', array('0', '1'), false /*is_required*/);
 
         if ($is_update) {
-            // @TODO(alan): Prevent date changes if a contest already has runs
+            // @TODO(alan): Prevent date changes if a course already has runs
             try {
                 $r['course'] = CoursesDAO::findByAlias($r['course_alias']);
             } catch (Exception $e) {
@@ -269,6 +276,47 @@ class CourseController extends Controller {
             $assignment->course_id = $r['course']->course_id;
 
             AssignmentsDAO::save($assignment);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Update an assignment
+     *
+     * @param  Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdateAssignment($r, true);
+
+        // Update contest DAO
+        $valueProperties = array(
+            'name',
+            'description',
+            'start_time' => array('transform' => function ($value) {
+                return gmdate('Y-m-d H:i:s', $value);
+            }),
+            'finish_time' => array('transform' => function ($value) {
+                return gmdate('Y-m-d H:i:s', $value);
+            })
+        );
+
+        self::updateValueProperties($r, $r['assignment'], $valueProperties);
+
+        try {
+            AssignmentsDAO::save($r['assignment']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -685,7 +733,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Returns details of a given contest
+     * Returns details of a given course
      * @param  Request $r
      * @return array
      */
@@ -706,6 +754,35 @@ class CourseController extends Controller {
         }
 
         return self::getCommonCourseDetails($r);
+    }
+
+    /**
+     * Returns details of a given assignment
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiAssignmentDetails(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+
+        $assignment = AssignmentsDAO::getByAlias($r['alias']);
+
+        if (is_null($assignment)) {
+            throw new InvalidParameterException();
+        }
+
+        $result = array();
+        $result['start_time'] = strtotime($assignment->start_time);
+        $result['finish_time'] = strtotime($assignment->finish_time);
+        $result['name'] = $assignment->name;
+        $result['description'] = $assignment->description;
+
+        return $result;
     }
 
     /**

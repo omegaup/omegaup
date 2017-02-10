@@ -41,4 +41,19 @@ class AssignmentsDAO extends AssignmentsDAOBase
         }
         return $counts;
     }
+
+    final public static function getByAlias($alias)
+    {
+        $sql = 'SELECT * FROM Assignments WHERE (alias = ? ) LIMIT 1;';
+        $params = array($alias);
+
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+                return null;
+        }
+
+        return new Assignments($rs);
+        ;
+    }
 }
