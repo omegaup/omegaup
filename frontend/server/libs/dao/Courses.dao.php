@@ -215,23 +215,4 @@ class CoursesDAO extends CoursesDAOBase
         }
         return $courses;
     }
-
-    public static function getCourseForProblemset($problemset_id) {
-        if (is_null($problemset_id)) {
-            return null;
-        }
-
-        try {
-            $courses = self::search(new Courses([
-                'problemset_id' => $problemset_id,
-            ]));
-            if (count($courses) === 1) {
-                return $courses[0];
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
-    }
 }

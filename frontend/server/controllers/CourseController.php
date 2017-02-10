@@ -684,6 +684,7 @@ class CourseController extends Controller {
                 'finish_time' => $r['assignment']->finish_time,
                 'problems' => $problems,
                 'director' => $director,
+                'problemset_id' => $r['assignment']->problemset_id,
                 ];
     }
 

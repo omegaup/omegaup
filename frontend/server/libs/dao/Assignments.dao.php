@@ -41,4 +41,25 @@ class AssignmentsDAO extends AssignmentsDAOBase
         }
         return $counts;
     }
+
+    public static function getAssignmentForProblemset($problemset_id) {
+        if (is_null($problemset_id)) {
+            return null;
+        }
+
+        try {
+            $assignments = self::search(new Assignments([
+                'problemset_id' => $problemset_id,
+            ]));
+            if (count($assignments) === 1) {
+                $course = CoursesDAO::getByPK($assignments[0]->course_id);
+                $assignments[0]->acl_id = $course->acl_id;
+                return $assignments[0];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return null;
+    }
 }

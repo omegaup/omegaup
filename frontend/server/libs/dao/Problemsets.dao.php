@@ -23,9 +23,9 @@ class ProblemsetsDAO extends ProblemsetsDAOBase
             return $contest;
         }
 
-        $course = CoursesDAO::getCourseForProblemset($problemset_id);
-        if (!is_null($course)) {
-            return $course;
+        $assignment = AssignmentsDAO::getAssignmentForProblemset($problemset_id);
+        if (!is_null($assignment)) {
+            return $assignment;
         }
 
         $interview = InterviewsDAO::getInterviewForProblemset($problemset_id);
