@@ -48,12 +48,11 @@ class AssignmentsDAO extends AssignmentsDAOBase
         $params = array($alias);
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
                 return null;
         }
 
-        return new Assignments($rs);
-        ;
+        return new Assignments($row);
     }
 }

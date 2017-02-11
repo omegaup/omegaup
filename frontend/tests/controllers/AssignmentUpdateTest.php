@@ -11,27 +11,26 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
         $assignmentAlias = $courseData['assignment_alias'];
 
-        $r = new Request([
+        $updatedStartTime = strtotime('2017-01-02 12:34:56');
+        $updatedFinishTime = strtotime('2017-03-04 12:34:56');
+
+        $response = CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'alias' => $assignmentAlias,
-            'start_time' => strtotime('2017-01-02 12:34:56'),
-            'finish_time' => strtotime('2017-03-04 12:34:56'),
+            'start_time' => $updatedStartTime,
+            'finish_time' => $updatedFinishTime,
             'name' => 'some new name',
             'description' => 'some meaningful description'
-        ]);
-
-        $response = CourseController::apiUpdateAssignment($r);
+        ]));
 
         // Read the assignment again
-        $r = new Request([
-                    'auth_token' => $login->auth_token,
-                    'alias' => $assignmentAlias
-                ]);
+        $response = CourseController::apiAssignmentDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'alias' => $assignmentAlias
+        ]));
 
-        $response = CourseController::apiAssignmentDetails($r);
-
-        $this->assertEquals(strtotime('2017-01-02 12:34:56'), $response['start_time']);
-        $this->assertEquals(strtotime('2017-03-04 12:34:56'), $response['finish_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']);
+        $this->assertEquals($updatedFinishTime, $response['finish_time']);
 
         $this->assertEquals('some new name', $response['name']);
         $this->assertEquals('some meaningful description', $response['description']);
