@@ -143,7 +143,8 @@ class CourseDetailsTest extends OmegaupTestCase {
         // Call the details API for the assignment that's already started.
         $response = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $userLogin->auth_token,
-            'alias' => $assignmentAlias,
+            'course' => $courseData['course_alias'],
+            'assignment' => $assignmentAlias,
         ]));
         $this->assertEquals('ok', $response['status']);
 
@@ -151,7 +152,8 @@ class CourseDetailsTest extends OmegaupTestCase {
         try {
             $response = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $userLogin->auth_token,
-            'alias' => $courseData['assignment_alias'],
+            'course' => $courseData['course_alias'],
+            'assignment' => $courseData['assignment_alias'],
             ]));
             $this->fail('Exception was expected.');
         } catch (ForbiddenAccessException $e) {

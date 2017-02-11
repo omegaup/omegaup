@@ -10,12 +10,13 @@
  */
 class CourseController extends Controller {
     /**
-     * Validates request for Assignment on Course operations
+     * Validates request for creating a new Assignment
      *
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
-    private static function validateAssignmentBasics(Request $r, $is_required) {
+    private static function validateCreateAssignment(Request $r) {
+        $is_required = true;
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
@@ -32,20 +33,6 @@ class CourseController extends Controller {
 
         Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
-    }
-
-    private static function validateUpdateAssignment(Request $r) {
-        self::validateAssignmentBasics($r, false /* don't require all fields */);
-
-        try {
-            $r['assignment'] = AssignmentsDAO::getByAlias($r['alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-    }
-
-    private static function validateCreateAssignment(Request $r) {
-        self::validateAssignmentBasics($r, true /* require all fields * */);
 
         $parent_course = null;
         try {
@@ -231,6 +218,7 @@ class CourseController extends Controller {
 
         $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
+
         self::validateCreateAssignment($r);
 
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
@@ -274,7 +262,7 @@ class CourseController extends Controller {
         $experiments->ensureEnabled(Experiments::SCHOOLS);
 
         self::authenticateRequest($r);
-        self::validateUpdateAssignment($r);
+        self::validateAssignmentDetails($r, true/*is_required*/);
 
         // Update contest DAO
         $valueProperties = [
@@ -672,6 +660,30 @@ class CourseController extends Controller {
         return self::getCommonCourseDetails($r);
     }
 
+    private static function validateAssignmentDetails(Request $r, $is_required = false) {
+        Validators::isStringNonEmpty($r['course'], 'course', $is_required);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+        $r['course'] = CoursesDAO::findByAlias($r['course']);
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+        $assignments = AssignmentsDAO::search(new Assignments(array(
+            'course_id' => $r['course']->course_id,
+            'alias' => $r['assignment'],
+        )));
+        if (count($assignments) != 1) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+        $r['assignment'] = $assignments[0];
+        $r['assignment']->toUnixTime();
+        if ($r['assignment']->start_time > time() &&
+            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+        ) {
+            throw new ForbiddenAccessException();
+        }
+        // TODO: Access check
+    }
+
     /**
      * Returns details of a given assignment
      * @param  Request $r
@@ -685,22 +697,7 @@ class CourseController extends Controller {
 
         $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
-
-        $r['assignment'] = AssignmentsDAO::getByAlias($r['alias']);
-
-        if (is_null($r['assignment'])) {
-            throw new InvalidParameterException('assignmentNotFound');
-        }
-
-        $r['assignment']->toUnixTime();
-
-        $r['course'] = CoursesDAO::getByPK($r['assignment']->course_id);
-
-        if ($r['assignment']->start_time > time() &&
-            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
-        ) {
-            throw new ForbiddenAccessException();
-        }
+        self::validateAssignmentDetails($r);
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
