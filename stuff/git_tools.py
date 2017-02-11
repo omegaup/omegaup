@@ -15,7 +15,7 @@ GIT_DIFF_TREE_PATTERN = re.compile(
     br'^:\d+ (\d+) [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
 GIT_LS_TREE_PATTERN = re.compile(br'^\d* blob [0-9a-f]+\t(.*)$')
 GIT_NULL_HASH = '0000000000000000000000000000000000000000'
-GIT_DIRECTORY_ENTRY_MODE = '160000'
+GIT_DIRECTORY_ENTRY_MODE = b'160000'
 
 class COLORS:
   HEADER = '\033[95m'
