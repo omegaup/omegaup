@@ -10,20 +10,15 @@
  */
 class CourseController extends Controller {
     /**
-     * Validates request for Assignment on Course operations
+     * Validates request for creating a new Assignment
      *
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
-    private static function validateCreateOrUpdateAssignment(Request $r, $is_update = false) {
+    private static function validateCreateAssignment(Request $r) {
         $is_required = true;
-
-        // Does this assignment need to be within the time constraints of
-        // the course it belongs to?
-
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
-        self::validateCourseExists($r);
 
         Validators::isNumber($r['start_time'], 'start_time', $is_required);
         Validators::isNumber($r['finish_time'], 'finish_time', $is_required);
@@ -36,9 +31,12 @@ class CourseController extends Controller {
             throw new InvalidParameterException('InvalidStartTime');
         }
 
+        Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), $is_required);
+        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+
         $parent_course = null;
         try {
-            $parent_course = CoursesDAO::search(array('alias' => $r['course_alias']));
+            $parent_course = CoursesDAO::getByAlias($r['course_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -47,10 +45,7 @@ class CourseController extends Controller {
             throw new InvalidParameterException('parameterInvalid');
         }
 
-        $r['course'] = $parent_course[0];
-
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
-        Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), $is_required);
+        $r['course'] = $parent_course;
     }
 
     /**
@@ -81,7 +76,6 @@ class CourseController extends Controller {
         Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', array('0', '1'), false /*is_required*/);
 
         if ($is_update) {
-            // @TODO(alan): Prevent date changes if a contest already has runs
             try {
                 $r['course'] = CoursesDAO::findByAlias($r['course_alias']);
             } catch (Exception $e) {
@@ -127,31 +121,6 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
-    }
-
-    private static function validateAssignmentDetails(Request $r) {
-        Validators::isStringNonEmpty($r['course'], 'course', true /*is_required*/);
-        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /*is_required*/);
-
-        $r['course'] = CoursesDAO::findByAlias($r['course']);
-        if (is_null($r['course'])) {
-            throw new NotFoundException('courseNotFound');
-        }
-        $assignments = AssignmentsDAO::search(new Assignments(array(
-            'course_id' => $r['course']->course_id,
-            'alias' => $r['assignment'],
-        )));
-        if (count($assignments) != 1) {
-            throw new NotFoundException('assignmentNotFound');
-        }
-        $r['assignment'] = $assignments[0];
-        $r['assignment']->toUnixTime();
-        if ($r['assignment']->start_time > time() &&
-            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
-        ) {
-            throw new ForbiddenAccessException();
-        }
-        // TODO: Access check
     }
 
     /**
@@ -249,7 +218,8 @@ class CourseController extends Controller {
 
         $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
-        self::validateCreateOrUpdateAssignment($r);
+
+        self::validateCreateAssignment($r);
 
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
@@ -269,6 +239,47 @@ class CourseController extends Controller {
             $assignment->course_id = $r['course']->course_id;
 
             AssignmentsDAO::save($assignment);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Update an assignment
+     *
+     * @param  Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+
+        self::authenticateRequest($r);
+        self::validateAssignmentDetails($r, true/*is_required*/);
+
+        // Update contest DAO
+        $valueProperties = [
+            'name',
+            'description',
+            'start_time' => array('transform' => function ($value) {
+                return gmdate('Y-m-d H:i:s', $value);
+            }),
+            'finish_time' => array('transform' => function ($value) {
+                return gmdate('Y-m-d H:i:s', $value);
+            })
+        ];
+
+        self::updateValueProperties($r, $r['assignment'], $valueProperties);
+
+        try {
+            AssignmentsDAO::save($r['assignment']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -649,9 +660,36 @@ class CourseController extends Controller {
         return self::getCommonCourseDetails($r);
     }
 
+    private static function validateAssignmentDetails(Request $r, $is_required = false) {
+        Validators::isStringNonEmpty($r['course'], 'course', $is_required);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+        $r['course'] = CoursesDAO::findByAlias($r['course']);
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+        $assignments = AssignmentsDAO::search(new Assignments([
+            'course_id' => $r['course']->course_id,
+            'alias' => $r['assignment'],
+        ]));
+        if (count($assignments) != 1) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+        $r['assignment'] = $assignments[0];
+        $r['assignment']->toUnixTime();
+        if ($r['assignment']->start_time > time() &&
+            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+        ) {
+            throw new ForbiddenAccessException();
+        }
+        // TODO: Access check
+    }
+
     /**
+     * Returns details of a given assignment
+     * @param  Request $r
+     * @return array
      */
-    public static function apiGetAssignment(Request $r) {
+    public static function apiAssignmentDetails(Request $r) {
         global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
@@ -660,11 +698,13 @@ class CourseController extends Controller {
         $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r);
+
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
         foreach ($problems as &$problem) {
             $problem['letter'] = ContestController::columnName($letter++);
         }
+
         $director = null;
         try {
             $acl = ACLsDAO::getByPK($r['course']->acl_id);
@@ -673,6 +713,7 @@ class CourseController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
+
         return ['status' => 'ok',
                 'name' => $r['assignment']->name,
                 'description' => $r['assignment']->description,
@@ -685,7 +726,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Returns details of a given contest
+     * Returns details of a given course
      * @param  Request $r
      * @return array
      */
