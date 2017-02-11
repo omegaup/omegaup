@@ -12,9 +12,10 @@ import subprocess
 import sys
 
 GIT_DIFF_TREE_PATTERN = re.compile(
-    br'^:\d+ \d+ [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
+    br'^:\d+ (\d+) [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
 GIT_LS_TREE_PATTERN = re.compile(br'^\d* blob [0-9a-f]+\t(.*)$')
 GIT_NULL_HASH = '0000000000000000000000000000000000000000'
+GIT_DIRECTORY_ENTRY_MODE = '160000'
 
 class COLORS:
   HEADER = '\033[95m'
@@ -90,7 +91,12 @@ def _files_to_consider(args, whitelist=(), blacklist=()):
              '--diff-filter=d'] + args.commits
     for line in subprocess.check_output(cmd, cwd=root).splitlines():
       m = GIT_DIFF_TREE_PATTERN.match(line)
-      src, dest = m.groups()
+      filemode, src, dest = m.groups()
+      if filemode == GIT_DIRECTORY_ENTRY_MODE:
+        # Files with the 160000 mode are not actually files or directories.
+        # They just are directory entries, and they typically appear in the
+        # path where submodules are inserted into the tree.
+        continue
       if dest:
         result.add(dest)
       else:
