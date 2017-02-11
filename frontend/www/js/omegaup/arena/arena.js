@@ -244,6 +244,8 @@ omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
       self.arena.updateClarification(data.clarification);
     }
   } else if (data.message == '/scoreboard/update/') {
+    if (self.arena.contestAdmin && data.scoreboard_type != 'admin')
+      return;
     self.arena.rankingChange(data.scoreboard);
   }
 };
