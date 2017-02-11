@@ -749,8 +749,6 @@ class ContestController extends Controller {
         // Validate request
         self::validateCreateOrUpdate($r);
 
-        $problemset = new Problemsets();
-
         // Create and populate a new Contests object
         $contest = new Contests();
 
@@ -792,11 +790,14 @@ class ContestController extends Controller {
             // Begin a new transaction
             ContestsDAO::transBegin();
 
-            ProblemsetsDAO::save($problemset);
-            $contest->problemset_id = $problemset->problemset_id;
-
             ACLsDAO::save($acl);
             $contest->acl_id = $acl->acl_id;
+
+            $problemset = new Problemsets([
+                'acl_id' => $acl->acl_id
+            ]);
+            ProblemsetsDAO::save($problemset);
+            $contest->problemset_id = $problemset->problemset_id;
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);

@@ -255,17 +255,19 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemSet = new Problemsets();
-
         $assignment = new Assignments($r);
         $assignment->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $assignment->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
+        $assignment->acl_id = $r['course']->acl_id;
 
         try {
             // Create the backing problemset
-            ProblemsetsDAO::save($problemSet);
+            $problemset = new Problemsets([
+                'acl_id' => $r['course']->acl_id
+            ]);
+            ProblemsetsDAO::save($problemset);
 
-            $assignment->problemset_id = $problemSet->problemset_id;
+            $assignment->problemset_id = $problemset->problemset_id;
             $assignment->course_id = $r['course']->course_id;
 
             AssignmentsDAO::save($assignment);
