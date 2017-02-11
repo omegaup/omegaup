@@ -278,19 +278,6 @@ class Scoreboard {
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
-                    'scoreboard_type' => 'admin',
-                    'scoreboard' => $adminScoreboard
-                ]),
-                false,  // public
-                null,  // username
-                -1,  // user_id
-                false  // user_only
-            );
-            $grader->broadcast(
-                $contest->alias,
-                null,
-                json_encode([
-                    'message' => '/scoreboard/update/',
                     'scoreboard_type' => 'contestant',
                     'scoreboard' => $contestantScoreboard
                 ]),
@@ -298,6 +285,19 @@ class Scoreboard {
                 null,  // username
                 -1,  // user_id
                 true  // user_only
+            );
+            $grader->broadcast(
+                $contest->alias,
+                null,
+                json_encode([
+                    'message' => '/scoreboard/update/',
+                    'scoreboard_type' => 'admin',
+                    'scoreboard' => $adminScoreboard
+                ]),
+                false,  // public
+                null,  // username
+                -1,  // user_id
+                false  // user_only
             );
         } catch (Exception $e) {
             $log->error('Error broadcasting scoreboard: ' . $e);
