@@ -102,9 +102,11 @@ CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
 
 CREATE TABLE IF NOT EXISTS `Problemsets` (
   `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
+  `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
   `access_mode` enum('private', 'public', 'registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
-  PRIMARY KEY (`problemset_id`)
+  PRIMARY KEY (`problemset_id`),
+  KEY `acl_id` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.';
 
 -- --------------------------------------------------------
@@ -780,6 +782,7 @@ CREATE TABLE `Assignments` (
   `assignment_id` int(11) NOT NULL AUTO_INCREMENT,
   `course_id` int(11) NOT NULL,
   `problemset_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso compartida con el curso',
   `name` varchar(100) NOT NULL,
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
@@ -789,6 +792,7 @@ CREATE TABLE `Assignments` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
+  KEY `acl_id` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
 
 --
@@ -805,8 +809,9 @@ ALTER TABLE `Announcement`
 -- Filtros para la tabla `Assignments`
 --
 ALTER TABLE `Assignments`
-  ADD CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-  ADD CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Auth_Tokens`
@@ -944,6 +949,12 @@ ALTER TABLE `Messages`
 --
 ALTER TABLE `Problems`
   ADD CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Problemsets`
+--
+ALTER TABLE `Problemsets`
+  ADD CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Badges`
