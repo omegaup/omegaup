@@ -220,15 +220,14 @@ class CoursesDAO extends CoursesDAOBase
         return $courses;
     }
 
-    final public static function getByAlias($alias)
-    {
-        $sql = 'SELECT * FROM Courses WHERE (alias = ? ) LIMIT 1;';
+    final public static function getByAlias($alias) {
+        $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
         $params = array($alias);
 
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {
-                return null;
+            return null;
         }
 
         return new Courses($row);

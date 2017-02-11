@@ -667,10 +667,10 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
-        $assignments = AssignmentsDAO::search(new Assignments(array(
+        $assignments = AssignmentsDAO::search(new Assignments([
             'course_id' => $r['course']->course_id,
             'alias' => $r['assignment'],
-        )));
+        ]));
         if (count($assignments) != 1) {
             throw new NotFoundException('assignmentNotFound');
         }

@@ -143,7 +143,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 1
-        $r = new Request(array(
+        CourseController::apiCreateAssignment(new Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -152,15 +152,14 @@ class CourseCreateTest extends OmegaupTestCase {
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
-        ));
-        $assignmentResult = CourseController::apiCreateAssignment($r);
+        ]));
 
         // Create the course number 2
         $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 2
-        $r = new Request(array(
+        CourseController::apiCreateAssignment(new Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -169,7 +168,6 @@ class CourseCreateTest extends OmegaupTestCase {
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
-        ));
-        $assignmentResult = CourseController::apiCreateAssignment($r);
+        ]));
     }
 }

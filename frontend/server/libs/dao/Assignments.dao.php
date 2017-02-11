@@ -42,15 +42,14 @@ class AssignmentsDAO extends AssignmentsDAOBase
         return $counts;
     }
 
-    final public static function getByAlias($alias)
-    {
-        $sql = 'SELECT * FROM Assignments WHERE (alias = ? ) LIMIT 1;';
+    final public static function getByAlias($alias) {
+        $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
         $params = array($alias);
 
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {
-                return null;
+            return null;
         }
 
         return new Assignments($row);
