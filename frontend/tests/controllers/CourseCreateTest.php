@@ -139,7 +139,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $assignmentAlias = Utils::CreateRandomString();
 
         // Create the course number 1
-        $courseFactoryResult = self::createCourse($admin, $adminLogin);
+        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 1
@@ -156,7 +156,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $assignmentResult = CourseController::apiCreateAssignment($r);
 
         // Create the course number 2
-        $courseFactoryResult = self::createCourse($admin, $adminLogin);
+        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 2
