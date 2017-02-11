@@ -1,5 +1,5 @@
 omegaup.OmegaUp.on('ready', function() {
-  omeguap.UI.userTypeahead($('#username'));
+  omegaup.UI.userTypeahead($('#username'));
   $('#verify-user-form')
       .submit(function() {
         username = $('#username').val();
