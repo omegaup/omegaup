@@ -164,20 +164,6 @@ class ContestsDAO extends ContestsDAOBase
         return time() >= strtotime($contest->finish_time);
     }
 
-    public static function isInsideContest(Contests $contest, $user_id) {
-        if (time() > strtotime($contest->finish_time) ||
-            time() < strtotime($contest->start_time)) {
-            return false;
-        }
-        if (is_null($contest->window_length)) {
-            return true;
-        }
-        $problemset_user = ProblemsetUsersDAO::getByPK($user_id, $contest->problemset_id);
-        $first_access_time = $problemset_user->access_time;
-
-        return time() <= strtotime($first_access_time) + $contest->window_length * 60;
-    }
-
     public static function getContestsParticipated($user_id) {
         $sql = '
             SELECT

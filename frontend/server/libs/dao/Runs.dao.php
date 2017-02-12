@@ -522,7 +522,7 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function IsRunInsideSubmissionGap(
         $problemset_id,
-        $problemset_container,
+        $contest,
         $problem_id,
         $user_id
     ) {
@@ -534,14 +534,12 @@ class RunsDAO extends RunsDAOBase {
         }
 
         $submission_gap = RunController::$defaultSubmissionGap;
-        if (!is_null($problemset_container)) {
+        if (!is_null($contest)) {
             // Get submissions gap
-            if (isset($problemset_container->submissions_gap)) {
-                $submission_gap = max(
-                    $submission_gap,
-                    (int)$problemset_container->submissions_gap
-                );
-            }
+            $submission_gap = max(
+                $submission_gap,
+                (int)$contest->submissions_gap
+            );
         }
 
         return time() >= (strtotime($lastrun->time) + $submission_gap);

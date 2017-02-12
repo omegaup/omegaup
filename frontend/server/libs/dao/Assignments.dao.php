@@ -52,8 +52,6 @@ class AssignmentsDAO extends AssignmentsDAOBase
                 'problemset_id' => $problemset_id,
             ]));
             if (count($assignments) === 1) {
-                $course = CoursesDAO::getByPK($assignments[0]->course_id);
-                $assignments[0]->acl_id = $course->acl_id;
                 return $assignments[0];
             }
         } catch (Exception $e) {

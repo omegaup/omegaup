@@ -47,8 +47,8 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        $container = ProblemsetsDAO::getProblemsetContainer($run->problemset_id);
-        if (!is_null($container) && Authorization::isAdmin($user_id, $container)) {
+        $problemset = ProblemsetsDAO::getByPK($run->problemset_id);
+        if (!is_null($problemset) && Authorization::isAdmin($user_id, $problemset)) {
             return true;
         }
 
@@ -64,13 +64,13 @@ class Authorization {
             return true;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
 
-        if (is_null($contest)) {
+        if (is_null($problemset)) {
             return false;
         }
 
-        return Authorization::isContestAdmin($user_id, $contest);
+        return Authorization::isAdmin($user_id, $problemset);
     }
 
     public static function canEditClarification($user_id, Clarifications $clarification) {
@@ -78,19 +78,19 @@ class Authorization {
             return false;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($contest) || is_null($problem)) {
+        if (is_null($problemset) || is_null($problem)) {
             return false;
         }
 
         return (self::isOwner($user_id, $problem->acl_id)
-                || Authorization::isContestAdmin($user_id, $contest));
+                || Authorization::isAdmin($user_id, $problemset));
     }
 
     public static function canEditProblem($user_id, Problems $problem) {

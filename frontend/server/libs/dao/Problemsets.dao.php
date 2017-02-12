@@ -35,4 +35,23 @@ class ProblemsetsDAO extends ProblemsetsDAOBase
 
         return null;
     }
+
+    public static function insideSubmissionWindow($container, $user_id) {
+        if (time() > strtotime($container->finish_time) ||
+            time() < strtotime($container->start_time)) {
+            return false;
+        }
+
+        if (!isset($container->window_length)) {
+            return true;
+        }
+
+        $problemset_user = ProblemsetUsersDAO::getByPK(
+            $user_id,
+            $container->problemset_id
+        );
+        $first_access_time = $problemset_user->access_time;
+
+        return time() <= strtotime($first_access_time) + $container->window_length * 60;
+    }
 }
