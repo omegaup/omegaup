@@ -602,6 +602,8 @@ class ContestController extends Controller {
                 'problemset_id' => $r['contest']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),
             )));
+        } else {
+            $result['admin'] = $r['contest_admin'];
         }
 
         $result['status'] = 'ok';

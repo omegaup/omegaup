@@ -131,4 +131,43 @@ class CourseCreateTest extends OmegaupTestCase {
 
         $this->assertEquals(5, count($response['assignments']));
     }
+
+    public function testDuplicateAssignmentAliases() {
+        $admin = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($admin);
+
+        $assignmentAlias = Utils::CreateRandomString();
+
+        // Create the course number 1
+        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
+        $courseAlias = $courseFactoryResult['course_alias'];
+
+        // Create the assignment number 1
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseAlias,
+            'assignment_type' => 'homework'
+        ]));
+
+        // Create the course number 2
+        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
+        $courseAlias = $courseFactoryResult['course_alias'];
+
+        // Create the assignment number 2
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseAlias,
+            'assignment_type' => 'homework'
+        ]));
+    }
 }
