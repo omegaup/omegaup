@@ -61,6 +61,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
         }
 
         return null;
+    }
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
