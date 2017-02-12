@@ -43,10 +43,10 @@ class ClarificationsFactory {
         // Clean up stuff
         unset($_REQUEST);
 
-        return array(
+        return [
             'request' => $r,
             'response' => $response
-        );
+        ];
     }
 
     /**

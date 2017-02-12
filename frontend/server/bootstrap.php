@@ -84,46 +84,46 @@ require_once('libs/third_party/phpmailer/class.smtp.php');
  *
  * */
 $request_id = str_replace('.', '', uniqid('', true));
-Logger::configure(array(
-        'rootLogger' => array(
-            'appenders' => array('default'),
+Logger::configure([
+        'rootLogger' => [
+            'appenders' => ['default'],
             'level' => OMEGAUP_LOG_LEVEL
-        ),
-        'loggers' => array(
-            'csp' => array(
-                'appenders' => array('csp'),
+        ],
+        'loggers' => [
+            'csp' => [
+                'appenders' => ['csp'],
                 'additivity' => false,
-            ),
-        ),
-        'appenders' => array(
-            'default' => array(
+            ],
+        ],
+        'appenders' => [
+            'default' => [
                 'class' => 'LoggerAppenderFile',
-                'layout' => array(
+                'layout' => [
                     'class' => 'LoggerLayoutPattern',
-                    'params' => array(
+                    'params' => [
                         'conversionPattern' => "%date [%level]: $request_id %server{REQUEST_URI} %message (%F:%L) %newline",
-                    )
-                ),
-                'params' => array(
+                    ]
+                ],
+                'params' => [
                     'file' => OMEGAUP_LOG_FILE,
                     'append' => true
-                )
-            ),
-            'csp' => array(
+                ]
+            ],
+            'csp' => [
                 'class' => 'LoggerAppenderFile',
-                'layout' => array(
+                'layout' => [
                     'class' => 'LoggerLayoutPattern',
-                    'params' => array(
+                    'params' => [
                         'conversionPattern' => '%date: %message %newline',
-                    ),
-                ),
-                'params' => array(
+                    ],
+                ],
+                'params' => [
                     'file' => OMEGAUP_CSP_LOG_FILE,
                     'append' => true,
-                ),
-            )
-        )
-    ));
+                ],
+            ]
+        ]
+    ]);
 $log = Logger::getLogger('bootstrap');
 
 /**
@@ -175,11 +175,11 @@ try {
          * */
         header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
-        die(json_encode(array(
+        die(json_encode([
                     'status' => 'error',
                     'error' => 'Conection to the database has failed.',
                     'errorcode' => 1
-                )));
+                ]));
     }
 }
 $conn->SetCharSet('utf8');

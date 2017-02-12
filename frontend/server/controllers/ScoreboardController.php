@@ -28,8 +28,8 @@ class ScoreboardController extends Controller {
 
         Scoreboard::refreshScoreboardCache($contest);
 
-        return array(
+        return [
             'status' => 'ok'
-        );
+        ];
     }
 }

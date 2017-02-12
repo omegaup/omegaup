@@ -31,7 +31,7 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
                 Users u ON u.user_id = gu.user_id
             WHERE
                 gu.group_id = ?;';
-        $params = array($group->group_id);
+        $params = [$group->group_id];
         return $conn->GetAll($sql, $params);
     }
 
@@ -44,7 +44,7 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
                 Groups_Users gu
             WHERE
                 gu.group_id = ?;';
-        $params = array($group_id);
+        $params = [$group_id];
         return $conn->GetOne($sql, $params);
     }
 }

@@ -73,10 +73,10 @@ class ProblemsFactory {
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName;
 
-        return array (
+        return  [
                 'request' => $r,
                 'author' => $author,
-                'zip_path' => $zipName);
+                'zip_path' => $zipName];
     }
 
     public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {
@@ -111,11 +111,11 @@ class ProblemsFactory {
         // Clean up our mess
         unset($_REQUEST);
 
-        return array (
+        return  [
             'request' => $r,
             'author' => $problemAuthor,
             'problem' => ProblemsDAO::getByAlias($r['alias']),
-        );
+        ];
     }
 
     public static function addAdminUser($problemData, $user) {
@@ -136,10 +136,10 @@ class ProblemsFactory {
 
     public static function addGroupAdmin($problemData, Groups $group) {
         // Prepare our request
-        $r = new Request(array(
+        $r = new Request([
             'problem_alias' => $problemData['request']['alias'],
             'group' => $group->alias,
-        ));
+        ]);
 
         // Log in the problem author
         $login = OmegaupTestCase::login($problemData['author']);
@@ -151,11 +151,11 @@ class ProblemsFactory {
 
     public static function addTag($problemData, $tag, $public) {
         // Prepare our request
-        $r = new Request(array(
+        $r = new Request([
             'problem_alias' => $problemData['request']['alias'],
             'name' => $tag,
             'public' => $public
-        ));
+        ]);
 
         // Log in the problem author
         $login = OmegaupTestCase::login($problemData['author']);

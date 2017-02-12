@@ -2,10 +2,10 @@
     require_once('../../../server/bootstrap.php');
 
 if ($_POST) {
-    if (!in_array($_POST['language'], array('c', 'cpp', 'java'))) {
+    if (!in_array($_POST['language'], ['c', 'cpp', 'java'])) {
         $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
         $smarty->assign('error_field', 'language');
-    } elseif (!in_array($_POST['os'], array('unix', 'windows'))) {
+    } elseif (!in_array($_POST['os'], ['unix', 'windows'])) {
         $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
         $smarty->assign('error_field', 'os');
     } elseif (!preg_match('/^[a-z_][a-z0-9_]{0,31}$/i', $_POST['name'])) {
@@ -18,21 +18,21 @@ if ($_POST) {
         $dirname = FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
         try {
             file_put_contents("{$dirname}/{$_POST['name']}.idl", $_POST['idl']);
-            $args = array('/usr/bin/java', '-jar', '/opt/omegaup/bin/libinteractive.jar',
+            $args = ['/usr/bin/java', '-jar', '/opt/omegaup/bin/libinteractive.jar',
                 'generate', "{$_POST['name']}.idl", $_POST['language'], $_POST['language'],
-                '--makefile', "--{$_POST['os']}");
-            $descriptorspec = array(
-                0 => array('pipe', 'r'),
-                1 => array('pipe', 'w'),
-                2 => array('pipe', 'w')
-            );
+                '--makefile', "--{$_POST['os']}"];
+            $descriptorspec = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w']
+            ];
             $cmd = join(' ', array_map('escapeshellarg', $args));
             $proc = proc_open(
                 $cmd,
                 $descriptorspec,
                 $pipes,
                 $dirname,
-                array('LANG' => 'en_US.UTF-8')
+                ['LANG' => 'en_US.UTF-8']
             );
             if (!is_resource($proc)) {
                 $smarty->assign('error', error_get_last());

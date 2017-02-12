@@ -32,13 +32,13 @@ class UserFactory {
 
         // Populate a new Request to pass to the API
         UserController::$permissionKey = uniqid();
-        $r = new Request(array(
+        $r = new Request([
             'username' => $username,
             'name' => $username,
             'password' => $password,
             'email' => $email,
             'permission_key' => UserController::$permissionKey
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiCreate($r);
@@ -76,11 +76,11 @@ class UserFactory {
         $password = Utils::CreateRandomString();
         $email = Utils::CreateRandomString().'@mail.com';
         self::createUser($username, $password, $email, $verify);
-        return array(
+        return [
             'username' => $username,
             'password' => $password,
             'email' => $email
-        );
+        ];
     }
 
     /**
@@ -99,9 +99,9 @@ class UserFactory {
      * @return type
      */
     public static function verifyUser(Users $user) {
-        UserController::apiVerifyEmail(new Request(array(
+        UserController::apiVerifyEmail(new Request([
             'id' => $user->verification_id
-        )));
+        ]));
 
         // Get user from db again to pick up verification changes
         return UsersDAO::FindByUsername($user->username);
@@ -118,11 +118,11 @@ class UserFactory {
     public static function createAdminUser($username = null, $password = null, $email = null) {
         $user = self::createUser($username, $password, $email);
 
-        $userRoles = new UserRoles(array(
+        $userRoles = new UserRoles([
             'user_id' => $user->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ));
+        ]);
         UserRolesDAO::save($userRoles);
 
         return $user;
@@ -131,11 +131,11 @@ class UserFactory {
     public static function createInterviewerUser() {
         $user = self::createUser(null, null, null, null, true);
 
-        $ur = new UserRoles(array(
+        $ur = new UserRoles([
             'user_id' => $user->user_id,
             'role_id' => Authorization::INTERVIEWER_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ));
+        ]);
         UserRolesDAO::save($ur);
 
         return $user;

@@ -28,13 +28,13 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create some runs to be pending
         $pendingRunsCount = 10;
-        $pendingRunsData = array();
+        $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
             $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
         }
 
         $ACRunsCount = 7;
-        $ACRunsData = array();
+        $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
             $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
 
@@ -43,7 +43,7 @@ class ContestStatsTest extends OmegaupTestCase {
         }
 
         $WARunsCount = 5;
-        $WARunsData = array();
+        $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
             $WARunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
 
@@ -53,10 +53,10 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiStats($r);
@@ -89,7 +89,7 @@ class ContestStatsTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $ACRunsCount = 2;
-        $ACRunsData = array();
+        $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
             $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
 
@@ -99,10 +99,10 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiStats($r);

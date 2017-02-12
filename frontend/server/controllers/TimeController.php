@@ -15,7 +15,7 @@ class TimeController extends Controller {
      * @return array
      */
     public static function apiGet(Request $r = null) {
-        $response = array();
+        $response = [];
         $response['time'] = time();
         $response['status'] = 'ok';
 

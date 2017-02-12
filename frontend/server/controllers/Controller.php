@@ -15,7 +15,7 @@ class Controller {
      *
      * @var array
      */
-    public static $verdicts = array('AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC');
+    public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
 
     /**
      * Given the request, returns what user is performing the request by
@@ -116,7 +116,7 @@ class Controller {
             if (is_int($source)) {
                 // Simple property:
                 $source = $info;
-                $info = array($source);
+                $info = [$source];
             }
             if (is_null($request[$source])) {
                 continue;

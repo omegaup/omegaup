@@ -37,9 +37,9 @@ class SchoolsDAO extends SchoolsDAOBase
             WHERE
                 s.name LIKE CONCAT(\'%\', ?, \'%\')
             LIMIT 10';
-        $args = array($name);
+        $args = [$name];
 
-        $result = array();
+        $result = [];
         foreach ($conn->Execute($sql, $args) as $row) {
             $result[] = new Schools($row);
         }

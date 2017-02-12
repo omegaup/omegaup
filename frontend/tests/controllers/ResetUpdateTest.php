@@ -27,7 +27,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     public function testShouldRefusePasswordMismatch() {
         try {
             $user_data = UserFactory::generateUser();
-            $r = new Request(array('email' => $user_data['email']));
+            $r = new Request(['email' => $user_data['email']]);
             $response = ResetController::apiCreate($r);
             $user_data['reset_token'] = $response['token'];
             $user_data['password_confirmation'] = 'abcde';
@@ -41,7 +41,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
     public function testShouldRefuseInvalidPassword() {
         $user_data = UserFactory::generateUser();
-        $r = new Request(array('email' => $user_data['email']));
+        $r = new Request(['email' => $user_data['email']]);
         $response = ResetController::apiCreate($r);
         $user_data['reset_token'] = $response['token'];
 
@@ -68,7 +68,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
     public function testShouldRefuseExpiredReset() {
         $user_data = UserFactory::generateUser();
-        $r = new Request(array('email' => $user_data['email']));
+        $r = new Request(['email' => $user_data['email']]);
         $response = ResetController::apiCreate($r);
         $user_data['password_confirmation'] = $user_data['password'];
         $user_data['reset_token'] = $response['token'];
@@ -90,7 +90,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
     public function testShouldLogInWithNewPassword() {
         $user_data = UserFactory::generateUser();
-        $r = new Request(array('email' => $user_data['email']));
+        $r = new Request(['email' => $user_data['email']]);
         $create_response = ResetController::apiCreate($r);
         $reset_token = $create_response['token'];
         $user_data['reset_token'] = $reset_token;

@@ -15,7 +15,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
     public static function GetProblemset($assignmentAlias)
     {
         $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ?;';
-        $params = array($assignmentAlias);
+        $params = [$assignmentAlias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -35,7 +35,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
         $rs = $conn->Execute($sql, $course_id);
-        $counts = array();
+        $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = $row['count'];
         }
@@ -44,7 +44,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
-        $params = array($alias);
+        $params = [$alias];
 
         global $conn;
         $row = $conn->GetRow($sql, $params);

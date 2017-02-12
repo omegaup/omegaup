@@ -27,7 +27,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         $contestant1 = UserFactory::createUser();
 
         // Create 4 clarifications with this contestant
-        $clarificationData1 = array();
+        $clarificationData1 = [];
         $this->detourBroadcasterCalls($this->exactly(9));
         for ($i = 0; $i < 4; $i++) {
             $clarificationData1[$i] =
@@ -46,7 +46,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         $contestant2 = UserFactory::createUser();
 
         // Create 3 clarifications with this contestant
-        $clarificationData2 = array();
+        $clarificationData2 = [];
         for ($i = 0; $i < 3; $i++) {
             $clarificationData2[$i] =
                 ClarificationsFactory::createClarification(
@@ -58,10 +58,10 @@ class ListClarificationsContest extends OmegaupTestCase {
 
         // Prepare the request
         $login = self::login($contestant1);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiClarifications($r);

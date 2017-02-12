@@ -19,7 +19,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
                'ORDER BY pp.`order` ASC;';
-        $val = array($problemset_id);
+        $val = [$problemset_id];
 
         global $conn;
         return $conn->GetAll($sql, $val);
@@ -33,7 +33,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
         $sql = 'SELECT COUNT(pp.problem_id) ' .
                'FROM Problemset_Problems pp ' .
                'WHERE pp.problemset_id = ?';
-        $val = array($problemset->problemset_id);
+        $val = [$problemset->problemset_id];
         global $conn;
         return $conn->GetOne($sql, $val);
     }
@@ -48,7 +48,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
                'ORDER BY pp.`order` ASC;';
-        $val = array($problemset->problemset_id);
+        $val = [$problemset->problemset_id];
         global $conn;
         return $conn->GetAll($sql, $val);
     }
@@ -70,10 +70,10 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
             WHERE
                 pp.problemset_id = ?
             ORDER BY pp.`order` ASC;';
-        $val = array($problemset->problemset_id);
+        $val = [$problemset->problemset_id];
         global $conn;
         $rs = $conn->Execute($sql, $val);
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             $bar =  new Problems($foo);
             array_push($ar, $bar);

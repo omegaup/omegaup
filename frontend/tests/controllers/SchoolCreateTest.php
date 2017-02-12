@@ -13,10 +13,10 @@ class SchoolCreateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-        ));
+        ]);
 
         // Call api
         $response = SchoolController::apiCreate($r);
@@ -32,10 +32,10 @@ class SchoolCreateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString()
-        ));
+        ]);
 
         // Call api
         $response = SchoolController::apiCreate($r);

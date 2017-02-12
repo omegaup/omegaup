@@ -5,10 +5,10 @@ require_once('../../server/bootstrap.php');
 $show_intro = true;
 
 try {
-    $r = new Request(array(
+    $r = new Request([
         'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
         'contest_alias' => $_REQUEST['contest_alias'],
-    ));
+    ]);
 
     $show_intro = InterviewController::showIntro($r);
 } catch (Exception $e) {

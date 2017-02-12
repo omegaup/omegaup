@@ -34,7 +34,7 @@ class ProblemDeployer {
     private $idlFile = null;
     private $created = false;
     private $operation = null;
-    private $updatedLanguages = array();
+    private $updatedLanguages = [];
 
     public function __construct($alias, $operation) {
         $this->log = Logger::getLogger('ProblemDeployer');
@@ -93,12 +93,12 @@ class ProblemDeployer {
     }
 
     private function execute($cmd, $cwd) {
-        $descriptorspec = array(
-            0 => array('pipe', 'r'),
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w')
-        );
-        $proc = proc_open($cmd, $descriptorspec, $pipes, $cwd, array('LANG' => 'en_US.UTF-8'));
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w']
+        ];
+        $proc = proc_open($cmd, $descriptorspec, $pipes, $cwd, ['LANG' => 'en_US.UTF-8']);
 
         if (!is_resource($proc)) {
             $errors = error_get_last();
@@ -420,7 +420,7 @@ class ProblemDeployer {
                 throw new InvalidParameterException(
                     'problemDeployerEmptyStatement',
                     null,
-                    array('file' => $file)
+                    ['file' => $file]
                 );
             }
 
@@ -504,7 +504,7 @@ class ProblemDeployer {
     private function checkCasesWithTestplan(ZipArchive $zip, array $zipFilesArray) {
         // Get testplan contents into an array
         $testplan = $zip->getFromName('testplan');
-        $testplan_array = array();
+        $testplan_array = [];
 
         // LOL RegEx magic to get test case names from testplan
         preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, $testplan_array);
@@ -522,7 +522,7 @@ class ProblemDeployer {
                     throw new InvalidParameterException(
                         'problemDeployerTestplanCaseMissing',
                         null,
-                        array('file' => $testplan_array[1][$i])
+                        ['file' => $testplan_array[1][$i]]
                     );
                 }
             }
@@ -538,7 +538,7 @@ class ProblemDeployer {
                     throw new InvalidParameterException(
                         'problemDeployerTestplanCaseMissing',
                         null,
-                        array('file' => $testplan_array[1][$i])
+                        ['file' => $testplan_array[1][$i]]
                     );
                 }
             }
@@ -563,7 +563,7 @@ class ProblemDeployer {
                 throw new InvalidParameterException(
                     'problemDeployerMissingFromTestplan',
                     null,
-                    array('file' => $caseName)
+                    ['file' => $caseName]
                 );
             }
         }
@@ -592,9 +592,9 @@ class ProblemDeployer {
             throw new InvalidParameterException('parameterEmpty', 'problem_contents');
         }
 
-        $this->filesToUnzip = array();
-        $this->imageHashes = array();
-        $this->casesFiles = array();
+        $this->filesToUnzip = [];
+        $this->imageHashes = [];
+        $this->casesFiles = [];
 
         $this->zipPath = $_FILES['problem_contents']['tmp_name'];
 
@@ -657,13 +657,13 @@ class ProblemDeployer {
             throw new InvalidParameterException(
                 'problemDeployerExceededZipSizeLimit',
                 null,
-                array('size' => $size, 'max_size' => ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE)
+                ['size' => $size, 'max_size' => ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE]
             );
         } elseif ($size > ProblemDeployer::MAX_ZIP_FILESIZE) {
             throw new InvalidParameterException(
                 'problemDeployerExceededZipSizeLimit',
                 null,
-                array('size' => $size, 'max_size' => ProblemDeployer::MAX_ZIP_FILESIZE)
+                ['size' => $size, 'max_size' => ProblemDeployer::MAX_ZIP_FILESIZE]
             );
         }
 
@@ -776,8 +776,8 @@ class ProblemDeployer {
         $this->currentLanguage = $lang;
         $html_file_contents = Markdown(
             $this->current_markdown_file_contents,
-            array($this, 'imageMarkdownCallback'),
-            array($this, 'translationCallback')
+            [$this, 'imageMarkdownCallback'],
+            [$this, 'translationCallback']
         );
 
         // Then save the changes to the markdown file
@@ -935,7 +935,7 @@ class ProblemDeployer {
         $this->log->info('Handling cases...');
 
         // Aplying normalizr to cases
-        $output = array();
+        $output = [];
         $normalizr_cmd = BIN_PATH . "/normalizr $dirpath/cases/in/* $dirpath/cases/out/* 2>&1";
         $this->log->info('Applying normalizr: ' . $normalizr_cmd);
         $return_var = -1;

@@ -60,7 +60,7 @@ class Validators {
             throw new InvalidParameterException(
                 'parameterStringTooLong',
                 $parameterName,
-                array('max_length' => $maxLength)
+                ['max_length' => $maxLength]
             );
         }
 
@@ -81,7 +81,7 @@ class Validators {
             throw new InvalidParameterException(
                 'parameterStringTooShort',
                 $parameterName,
-                array('min_length' => $minLength)
+                ['min_length' => $minLength]
             );
         }
 
@@ -167,13 +167,13 @@ class Validators {
                 throw new InvalidParameterException(
                     'parameterNumberTooSmall',
                     $parameterName,
-                    array('lower_bound' => $lowerBound)
+                    ['lower_bound' => $lowerBound]
                 );
             } elseif ($parameter > $upperBound) {
                 throw new InvalidParameterException(
                     'parameterNumberTooLarge',
                     $parameterName,
-                    array('upper_bound' => $upperBound)
+                    ['upper_bound' => $upperBound]
                 );
             }
         }
@@ -216,7 +216,7 @@ class Validators {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
-                array('bad_elements' => $parameter, 'expected_set' => implode(', ', $enum))
+                ['bad_elements' => $parameter, 'expected_set' => implode(', ', $enum)]
             );
         }
 
@@ -236,7 +236,7 @@ class Validators {
         $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
         if ($isPresent) {
-            $bad_elements = array();
+            $bad_elements = [];
             $elements = explode(',', $parameter);
             foreach ($elements as $element) {
                 if (!in_array($element, $enum)) {
@@ -247,7 +247,7 @@ class Validators {
                 throw new InvalidParameterException(
                     'parameterNotInExpectedSet',
                     $parameterName,
-                    array('bad_elements' => implode(',', $bad_elements), 'expected_set' => implode(', ', $enum))
+                    ['bad_elements' => implode(',', $bad_elements), 'expected_set' => implode(', ', $enum)]
                 );
             }
         }

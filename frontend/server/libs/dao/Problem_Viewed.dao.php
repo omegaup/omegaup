@@ -14,7 +14,7 @@ class ProblemViewedDAO extends ProblemViewedDAOBase
     public static function MarkProblemViewed($user_id, $problem_id) {
         global $conn;
         $sql = 'INSERT IGNORE Problem_Viewed (user_id, problem_id) VALUES (?, ?);';
-        $values = array($user_id, $problem_id);
+        $values = [$user_id, $problem_id];
         $conn->Execute($sql, $values);
     }
 }

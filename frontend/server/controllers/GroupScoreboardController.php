@@ -17,9 +17,9 @@ class GroupScoreboardController extends Controller {
 
         Validators::isValidAlias($r['scoreboard_alias'], 'scoreboard_alias');
         try {
-            $r['scoreboards'] = GroupsScoreboardsDAO::search(new GroupsScoreboards(array(
+            $r['scoreboards'] = GroupsScoreboardsDAO::search(new GroupsScoreboards([
                 'alias' => $r['scoreboard_alias']
-            )));
+            ]));
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
@@ -65,16 +65,16 @@ class GroupScoreboardController extends Controller {
     public static function apiAddContest(Request $r) {
         self::validateGroupScoreboardAndContest($r);
 
-        Validators::isInEnum($r['only_ac'], 'only_ac', array(0,1));
+        Validators::isInEnum($r['only_ac'], 'only_ac', [0,1]);
         Validators::isNumber($r['weight'], 'weight');
 
         try {
-            $groupScoreboardContest = new GroupsScoreboardsContests(array(
+            $groupScoreboardContest = new GroupsScoreboardsContests([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
                 'contest_id' => $r['contest']->contest_id,
                 'only_ac' => $r['only_ac'],
                 'weight' => $r['weight']
-            ));
+            ]);
 
             GroupsScoreboardsContestsDAO::save($groupScoreboardContest);
 
@@ -83,7 +83,7 @@ class GroupScoreboardController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -95,10 +95,10 @@ class GroupScoreboardController extends Controller {
         self::validateGroupScoreboardAndContest($r);
 
         try {
-            $groupScoreboardContestKey = new GroupsScoreboardsContests(array(
+            $groupScoreboardContestKey = new GroupsScoreboardsContests([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
                 'contest_id' => $r['contest']->contest_id
-            ));
+            ]);
 
             $gscs = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);
             if (is_null($gscs) || count($gscs) === 0) {
@@ -114,7 +114,7 @@ class GroupScoreboardController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -126,19 +126,19 @@ class GroupScoreboardController extends Controller {
     public static function apiDetails(Request $r) {
         self::validateGroupScoreboard($r);
 
-        $response = array();
+        $response = [];
 
         // Fill contests
-        $response['contests'] = array();
-        $response['ranking'] = array();
+        $response['contests'] = [];
+        $response['ranking'] = [];
         try {
-            $groupScoreboardContestKey = new GroupsScoreboardsContests(array(
+            $groupScoreboardContestKey = new GroupsScoreboardsContests([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
-            ));
+            ]);
 
             $r['gscs'] = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);
             $i = 0;
-            $contest_params = array();
+            $contest_params = [];
             foreach ($r['gscs'] as $gsc) {
                 $contest = ContestsDAO::getByPK($gsc->contest_id);
                 $response['contests'][$i] = $contest->asArray();
@@ -146,10 +146,10 @@ class GroupScoreboardController extends Controller {
                 $response['contests'][$i]['weight'] = $gsc->weight;
 
                 // Fill contest params to pass to scoreboardMerge
-                $contest_params[$contest->alias] = array(
+                $contest_params[$contest->alias] = [
                     'only_ac' => ($gsc->only_ac == 0) ? false : true,
                     'weight' => $gsc->weight
-                );
+                ];
 
                 $i++;
             }
@@ -175,9 +175,9 @@ class GroupScoreboardController extends Controller {
             $r['contest_aliases'] = rtrim($r['contest_aliases'], ',');
 
             try {
-                $groupUsers = GroupsUsersDAO::search(new GroupsUsers(array(
+                $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
                     'group_id' => $r['scoreboard']->group_id
-                )));
+                ]));
 
                 $r['usernames_filter'] = '';
                 foreach ($groupUsers as $groupUser) {
@@ -206,12 +206,12 @@ class GroupScoreboardController extends Controller {
     public static function apiList(Request $r) {
         GroupController::validateGroup($r);
 
-        $response = array();
-        $response['scoreboards'] = array();
+        $response = [];
+        $response['scoreboards'] = [];
         try {
-            $key = new GroupsScoreboards(array(
+            $key = new GroupsScoreboards([
                 'group_id' => $r['group']->group_id
-            ));
+            ]);
 
             $scoreboards = GroupsScoreboardsDAO::search($key);
             foreach ($scoreboards as $scoreboard) {

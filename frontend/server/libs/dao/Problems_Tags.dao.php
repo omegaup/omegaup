@@ -29,7 +29,7 @@ class ProblemsTagsDAO extends ProblemsTagsDAOBase
 				Tags t on t.tag_id = pt.tag_id
 			WHERE
 				pt.problem_id = ?';
-        $params = array($problem->problem_id);
+        $params = [$problem->problem_id];
         if ($public_only) {
             $sql .= ' AND pt.public = 1';
         }

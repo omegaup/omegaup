@@ -27,7 +27,7 @@ class ResetCreateTest extends OmegaupTestCase {
 
     public function testShouldRefuseMultipleRequestsInShortInterval() {
         $user_data = UserFactory::generateUser();
-        $r = new Request(array('email' => $user_data['email']));
+        $r = new Request(['email' => $user_data['email']]);
         $response = ResetController::apiCreate($r);
 
         try {

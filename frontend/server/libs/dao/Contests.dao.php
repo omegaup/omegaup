@@ -57,16 +57,16 @@ class StatusBase {
             $reflection = new ReflectionClass($className);
             $constants = $reflection->getConstants();
             $values = array_values($constants);
-            self::$constCache[$className] = array(
+            self::$constCache[$className] = [
                 'constants' => $constants,
                 'min' => min($values),
                 'max' => max($values),
-            );
+            ];
         }
         return self::$constCache[$className];
     }
 
-    private static $constCache = array();
+    private static $constCache = [];
 }
 
 class ActiveStatus extends StatusBase {
@@ -74,11 +74,11 @@ class ActiveStatus extends StatusBase {
     const ACTIVE = 1;
     const PAST = 2;
 
-    public static $SQL_FOR_STATUS = array(
+    public static $SQL_FOR_STATUS = [
         'TRUE',
         'finish_time > NOW()',
         'finish_time <= NOW()',
-    );
+    ];
 }
 
 class RecommendedStatus extends StatusBase {
@@ -86,11 +86,11 @@ class RecommendedStatus extends StatusBase {
     const RECOMMENDED = 1;
     const NOT_RECOMMENDED = 2;
 
-    public static $SQL_FOR_STATUS = array(
+    public static $SQL_FOR_STATUS = [
         'TRUE',
         'recommended = 1',
         'recommended = 0',
-    );
+    ];
 }
 
 /** Contests Data Access Object (DAO).
@@ -120,7 +120,7 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getByAlias($alias)
     {
         $sql = 'SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;';
-        $params = array(  $alias );
+        $params = [  $alias ];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -144,7 +144,7 @@ class ContestsDAO extends ContestsDAOBase
             a.acl_id = c.acl_id
         WHERE
             public = 0 and a.owner_id = ?;';
-        $params = array($user->user_id);
+        $params = [$user->user_id];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -198,11 +198,11 @@ class ContestsDAO extends ContestsDAOBase
             )
             ORDER BY
                 contest_id DESC;';
-        $params = array($user_id);
+        $params = [$user_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             $bar =  new Contests($foo);
             array_push($ar, $bar);
@@ -255,7 +255,7 @@ class ContestsDAO extends ContestsDAOBase
                 c.contest_id DESC
             LIMIT ?, ?;';
 
-        $params = array(
+        $params = [
             Authorization::ADMIN_ROLE,
             $user_id,
             $user_id,
@@ -263,12 +263,12 @@ class ContestsDAO extends ContestsDAOBase
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $contests = array();
+        $contests = [];
         foreach ($rs as $row) {
             array_push($contests, new Contests($row));
         }
@@ -296,16 +296,16 @@ class ContestsDAO extends ContestsDAOBase
             ORDER BY
                 c.contest_id DESC
             LIMIT ?, ?;';
-        $params = array(
+        $params = [
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $contests = array();
+        $contests = [];
         foreach ($rs as $row) {
             array_push($contests, new Contests($row));
         }
@@ -429,7 +429,7 @@ class ContestsDAO extends ContestsDAOBase
                  LIMIT ?, ?
                 ";
 
-        $params = array(
+        $params = [
             $user_id,
             $user_id,
             $user_id,
@@ -438,12 +438,12 @@ class ContestsDAO extends ContestsDAOBase
             Authorization::ADMIN_ROLE,
             $offset,
             $renglones_por_pagina,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $allData = array();
+        $allData = [];
 
         foreach ($rs as $foo) {
             $bar = new Contests($foo);
@@ -482,10 +482,10 @@ class ContestsDAO extends ContestsDAOBase
                 ";
 
         global $conn;
-        $params = array($offset, $renglones_por_pagina);
+        $params = [$offset, $renglones_por_pagina];
         $rs = $conn->Execute($sql, $params);
 
-        $allData = array();
+        $allData = [];
 
         foreach ($rs as $foo) {
             $bar = new Contests($foo);
@@ -521,10 +521,10 @@ class ContestsDAO extends ContestsDAOBase
                 ";
 
         global $conn;
-        $params = array($offset, $renglones_por_pagina);
+        $params = [$offset, $renglones_por_pagina];
         $rs = $conn->Execute($sql, $params);
 
-        $allData = array();
+        $allData = [];
 
         foreach ($rs as $foo) {
             $bar = new Contests($foo);

@@ -4,7 +4,7 @@ class Pager {
      * Returns a concatenation of key => value parameters ready to use in a URL.
      */
     public static function buildQueryString($dict) {
-        $params = array();
+        $params = [];
         $str = '';
         foreach ($dict as $key => $val) {
             $str .= "$key=$val";
@@ -41,8 +41,8 @@ class Pager {
             $query = '&' . self::buildQueryString($params);
         }
 
-        $items = array();
-        $prev = array('label' => '«', 'url' => '', 'class' => '');
+        $items = [];
+        $prev = ['label' => '«', 'url' => '', 'class' => ''];
         if ($current > 1) {
             $prev['url'] = $url . '?page=' . ($current - 1) . $query;
         } else {
@@ -52,46 +52,46 @@ class Pager {
         array_push($items, $prev);
 
         if ($current > $adjacent + 1) {
-            $first = array(
+            $first = [
                 'label' => '1',
                 'url'   => $url . '?page=1' . $query,
                 'class' => ''
-            );
-            $period = array(
+            ];
+            $period = [
                 'label' => '...',
                 'url'   => '',
                 'class' => 'disabled'
-            );
+            ];
             array_push($items, $first);
             array_push($items, $period);
         }
 
         for ($i = max(1, $current - $adjacent); $i <= min($pages, $current + $adjacent); $i++) {
-            $item = array(
+            $item = [
                 'label' => $i,
                 'url'   => $url . '?page=' . $i . $query,
                 'class' => ($i == $current) ? 'active' : ''
 
-            );
+            ];
             array_push($items, $item);
         }
 
         if ($current + $adjacent < $pages) {
-            $period = array(
+            $period = [
                 'label' => '...',
                 'url'   => '',
                 'class' => 'disabled'
-            );
-            $last = array(
+            ];
+            $last = [
                 'label' => $pages,
                 'url'   => $url . '?page=' . $pages . $query,
                 'class' => ''
-            );
+            ];
             array_push($items, $period);
             array_push($items, $last);
         }
 
-        $next = array('label' => '»', 'url' => '', 'class' => '');
+        $next = ['label' => '»', 'url' => '', 'class' => ''];
         if ($current < $pages) {
             $next['url'] = $url . '?page=' . ($current + 1) . $query;
         } else {

@@ -36,7 +36,7 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testMissingParameters() {
         // Array of valid keys
-        $valid_keys = array(
+        $valid_keys = [
             'title',
             'description',
             'start_time',
@@ -48,7 +48,7 @@ class CreateContestTest extends OmegaupTestCase {
             'feedback',
             'scoreboard',
             'penalty_type',
-        );
+        ];
 
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
@@ -153,10 +153,10 @@ class CreateContestTest extends OmegaupTestCase {
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
         $r['public'] = 1;
-        $r['problems'] = json_encode(array(array(
+        $r['problems'] = json_encode([[
             'problem' => $problem['problem']->alias,
             'points' => 100,
-        )));
+        ]]);
 
         // Log in the user and set the auth token in the new request
         $login = self::login($contestDirector);
@@ -169,10 +169,10 @@ class CreateContestTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Assert problem was added.
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
         $response = ContestController::apiProblems($r);
         $this->assertEquals(1, count($response['problems']));
         $this->assertEquals(
@@ -194,10 +194,10 @@ class CreateContestTest extends OmegaupTestCase {
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
         $r['public'] = 1;
-        $r['problems'] = json_encode(array(array(
+        $r['problems'] = json_encode([[
             'problem' => $problem['problem']->alias,
             'points' => 100,
-        )));
+        ]]);
 
         // Log in the user and set the auth token in the new request
         $login = self::login($contestDirector);

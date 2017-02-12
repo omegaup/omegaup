@@ -35,4 +35,7 @@
 
 	 <!-- eval is evil -->
 	 <rule ref="Squiz.PHP.Eval" />
+
+	 <!-- Only the short array syntax is valid. -->
+	 <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 </ruleset>

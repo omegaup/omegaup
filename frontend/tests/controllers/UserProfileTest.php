@@ -13,9 +13,9 @@ class UserProfileTest extends OmegaupTestCase {
         $user = UserFactory::createUser('testuser1');
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = UserController::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
@@ -30,10 +30,10 @@ class UserProfileTest extends OmegaupTestCase {
         $user2 = UserFactory::createUser('testuser4');
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user2->username
-        ));
+        ]);
         $response = UserController::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
@@ -49,10 +49,10 @@ class UserProfileTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username
-        ));
+        ]);
         $response = UserController::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
@@ -65,10 +65,10 @@ class UserProfileTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username
-        ));
+        ]);
         $response = UserController::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
@@ -80,7 +80,7 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserContests() {
         $contestant = UserFactory::createUser();
 
-        $contests = array();
+        $contests = [];
         $contests[0] = ContestsFactory::createContest();
         $contests[1] = ContestsFactory::createContest();
 
@@ -96,9 +96,9 @@ class UserProfileTest extends OmegaupTestCase {
         // Get ContestStats
         $login = self::login($contestant);
         $response = UserController::apiContestStats(new Request(
-            array(
+            [
                     'auth_token' => $login->auth_token,
-                )
+                ]
         ));
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
@@ -112,7 +112,7 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserContestsPrivateContestOutsider() {
         $contestant = UserFactory::createUser();
 
-        $contests = array();
+        $contests = [];
         $contests[0] = ContestsFactory::createContest(null /*title*/, 0 /*public*/);
         $contests[1] = ContestsFactory::createContest();
 
@@ -130,10 +130,10 @@ class UserProfileTest extends OmegaupTestCase {
         $login = self::login($externalUser);
         // Get ContestStats
         $response = UserController::apiContestStats(new Request(
-            array(
+            [
                     'auth_token' => $login->auth_token,
                     'username' => $contestant->username
-                )
+                ]
         ));
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
@@ -156,7 +156,7 @@ class UserProfileTest extends OmegaupTestCase {
 
         ContestsFactory::addUser($contest, $user);
 
-        $runs = array();
+        $runs = [];
         $runs[0] = RunsFactory::createRun($problemOne, $contest, $user);
         $runs[1] = RunsFactory::createRun($problemTwo, $contest, $user);
         $runs[2] = RunsFactory::createRun($problemOne, $contest, $user);
@@ -166,9 +166,9 @@ class UserProfileTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runs[2]);
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         $response = UserController::apiProblemsSolved($r);
 
@@ -182,10 +182,10 @@ class UserProfileTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'email' => 'new@email.com'
-        ));
+        ]);
         $response = UserController::apiUpdateMainEmail($r);
 
         // Check email in db

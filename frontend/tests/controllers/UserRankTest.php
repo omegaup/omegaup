@@ -5,9 +5,9 @@ class UserRankTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $adminLogin = self::login($admin);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $adminLogin->auth_token,
-        ));
+        ]);
         UserController::apiRefreshUserRank($r);
     }
 
@@ -93,9 +93,9 @@ class UserRankTest extends OmegaupTestCase {
         $this->refreshUserRank();
 
         // Call API
-        $response = UserController::apiRankByProblemsSolved(new Request(array(
+        $response = UserController::apiRankByProblemsSolved(new Request([
             'username' => $contestant->username
-        )));
+        ]));
 
         $this->assertEquals($response['name'], $contestant->name);
         $this->assertEquals($response['problems_solved'], 1);
@@ -112,9 +112,9 @@ class UserRankTest extends OmegaupTestCase {
         $this->refreshUserRank();
 
         // Call API
-        $response = UserController::apiRankByProblemsSolved(new Request(array(
+        $response = UserController::apiRankByProblemsSolved(new Request([
             'username' => $contestant->username
-        )));
+        ]));
 
         $this->assertEquals($response['name'], $contestant->name);
         $this->assertEquals($response['problems_solved'], 0);

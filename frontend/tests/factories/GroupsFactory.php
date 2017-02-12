@@ -28,24 +28,24 @@ class GroupsFactory {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($owner);
         }
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => $name,
             'description' => $description,
             'alias' => $alias
-        ));
+        ]);
 
         $response = GroupController::apiCreate($r);
-        $groups = GroupsDAO::search(new Groups(array(
+        $groups = GroupsDAO::search(new Groups([
             'alias' => $alias
-        )));
+        ]));
 
-        return array(
+        return [
             'request' => $r,
             'response' => $response,
             'owner' => $owner,
             'group' => $groups[0]
-        );
+        ];
     }
 
     /**
@@ -58,11 +58,11 @@ class GroupsFactory {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($groupData['owner']);
         }
-        GroupController::apiAddUser(new Request(array(
+        GroupController::apiAddUser(new Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
-        )));
+        ]));
     }
 
     /**
@@ -87,24 +87,24 @@ class GroupsFactory {
         }
 
         $login = OmegaupTestCase::login($groupData['owner']);
-        $request = new Request(array(
+        $request = new Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
             'name' => $name,
             'alias' => $alias,
             'description' => $description
-        ));
+        ]);
         $response = GroupController::apiCreateScoreboard($request);
 
-        $scoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards(array(
+        $scoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards([
             'alias' => $alias
-        )));
+        ]));
 
-        return array(
+        return [
             'request' => $request,
             'response' => $response,
             'scoreboard' => $scoreboards[0]
-        );
+        ];
     }
 
     /**
@@ -116,13 +116,13 @@ class GroupsFactory {
      */
     public static function addContestToScoreboard($contestData, $scoreboardData, $groupData, $onlyAC = 0, $weight = 1) {
         $login = OmegaupTestCase::login($groupData['owner']);
-        GroupScoreboardController::apiAddContest(new Request(array(
+        GroupScoreboardController::apiAddContest(new Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],
             'only_ac' => $onlyAC,
             'weight' => $weight
-        )));
+        ]));
     }
 }
