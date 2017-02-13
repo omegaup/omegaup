@@ -6,13 +6,13 @@ omegaup.OmegaUp.on('ready', function() {
             /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
         omegaup.API.addStudentToCourse({
-          course_alias: courseAlias,
-          usernameOrEmail: $('#member-username').val()
-        })
-        .then(function(data) {
-          refreshStudentList();
-          omegaup.UI.success(omegaup.T.courseStudentAdded);
-        })
-        .fail(function(data) { omegaup.UI.error(data.error); });
+                     course_alias: courseAlias,
+                     usernameOrEmail: $('#member-username').val()
+                   })
+            .then(function(data) {
+              refreshStudentList();
+              omegaup.UI.success(omegaup.T.courseStudentAdded);
+            })
+            .fail(function(data) { omegaup.UI.error(data.error); });
       });
 });
