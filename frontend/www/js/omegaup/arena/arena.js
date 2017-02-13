@@ -1,6 +1,6 @@
-var omegaup = typeof global === 'undefined' ?
-                  (window.omegaup = window.omegaup || {}) :
-                  (global.omegaup = global.omegaup || {});
+var omegaup = typeof global === 'undefined'
+  ? window.omegaup = window.omegaup || {}
+  : global.omegaup = global.omegaup || {};
 
 omegaup.arena = omegaup.arena || {};
 
@@ -38,7 +38,7 @@ omegaup.arena.ScoreboardColors = [
   '#34D0BA',
   '#3AAACF',
   '#8144D6',
-  '#CD35D3',
+  '#CD35D3'
 ];
 
 omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
@@ -63,8 +63,9 @@ omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
 
   if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
     options.isOnlyProblem = true;
-    options.onlyProblemAlias =
-        /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+    options.onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(
+      arenaLocation.pathname
+    )[1];
   } else {
     var match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
@@ -127,8 +128,9 @@ omegaup.arena.Arena = function(options) {
 
   // Currently opened notifications.
   self.notifications = new omegaup.arena.Notifications();
-  omegaup.OmegaUp.on(
-      'ready', function() { self.notifications.attach($('#notifications')); });
+  omegaup.OmegaUp.on('ready', function() {
+    self.notifications.attach($('#notifications'));
+  });
 
   // Currently opened problem.
   self.currentProblem = null;
@@ -151,12 +153,12 @@ omegaup.arena.Arena = function(options) {
     problemList: $('#problem-list'),
     rankingTable: $('#ranking-table'),
     socketStatus: $('#title .socket-status'),
-    submitForm: $('#submit'),
+    submitForm: $('#submit')
   };
   $.extend(self.elements.submitForm, {
     code: $('textarea[name="code"]', self.elements.submitForm),
     file: $('input[type="file"]', self.elements.submitForm),
-    language: $('select[name="language"]', self.elements.submitForm),
+    language: $('select[name="language"]', self.elements.submitForm)
   });
 
   // Setup any global hooks.
@@ -172,33 +174,43 @@ omegaup.arena.Arena = function(options) {
     startTime: ko.observable(),
     finishTime: ko.observable(),
     scoreboardCutoff: ko.observable(),
-    attached: false,
+    attached: false
   };
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
   var self = this;
-  $('#libinteractive-download')
-      .submit(function(e) {
-        var form = $(e.target);
-        var alias = e.target.attributes['data-alias'].value;
-        var os = form.find('.download-os').val();
-        var lang = form.find('.download-lang').val();
-        var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
+  $('#libinteractive-download').submit(function(e) {
+    var form = $(e.target);
+    var alias = e.target.attributes['data-alias'].value;
+    var os = form.find('.download-os').val();
+    var lang = form.find('.download-lang').val();
+    var extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
-        omegaup.UI.navigateTo(window.location.protocol + '//' +
-                              window.location.host + '/templates/' + alias +
-                              '/' + alias + '_' + os + '_' + lang + extension);
+    omegaup.UI.navigateTo(
+      window.location.protocol +
+        '//' +
+        window.location.host +
+        '/templates/' +
+        alias +
+        '/' +
+        alias +
+        '_' +
+        os +
+        '_' +
+        lang +
+        extension
+    );
 
-        return false;
-      });
+    return false;
+  });
 
-  $('#libinteractive-download .download-lang')
-      .change(function(e) {
-        var form = $('#libinteractive-download');
-        form.find('.libinteractive-extension')
-            .html(form.find('.download-lang').val());
-      });
+  $('#libinteractive-download .download-lang').change(function(e) {
+    var form = $('#libinteractive-download');
+    form
+      .find('.libinteractive-extension')
+      .html(form.find('.download-lang').val());
+  });
 };
 
 omegaup.arena.EventsSocket = function(uri, arena) {
@@ -239,8 +251,9 @@ omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
     self.arena.updateRun(data.run);
   } else if (data.message == '/clarification/update/') {
     if (!self.arena.options.disableClarifications) {
-      data.clarification.time =
-          omegaup.OmegaUp.time(data.clarification.time * 1000);
+      data.clarification.time = omegaup.OmegaUp.time(
+        data.clarification.time * 1000
+      );
       self.arena.updateClarification(data.clarification);
     }
   } else if (data.message == '/scoreboard/update/') {
@@ -254,8 +267,12 @@ omegaup.arena.EventsSocket.prototype.onopen = function() {
   var self = this;
   self.shouldRetry = true;
   self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
-  self.socketKeepalive =
-      setInterval(function() { self.socket.send('"ping"'); }, 30000);
+  self.socketKeepalive = setInterval(
+    function() {
+      self.socket.send('"ping"');
+    },
+    30000
+  );
 };
 
 omegaup.arena.EventsSocket.prototype.onclose = function(e) {
@@ -278,27 +295,37 @@ omegaup.arena.EventsSocket.prototype.onclose = function(e) {
 
 omegaup.arena.Arena.prototype.connectSocket = function() {
   var self = this;
-  if (self.options.isPractice || self.options.disableSockets ||
-      self.options.contestAlias == 'admin') {
+  if (
+    self.options.isPractice ||
+      self.options.disableSockets ||
+      self.options.contestAlias == 'admin'
+  ) {
     self.elements.socketStatus.html('✗').css('color', '#800');
     return false;
   }
 
-  var protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
+  var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
   var uris = [];
   // Backendv2 uri
-  uris.push(protocol + window.location.host + '/events/?filter=/contest/' +
-            self.options.contestAlias +
-            (self.options.scoreboardToken ?
-                 ('/' + self.options.scoreboardToken) :
-                 ''));
+  uris.push(
+    protocol +
+      window.location.host +
+      '/events/?filter=/contest/' +
+      self.options.contestAlias +
+      (self.options.scoreboardToken ? '/' + self.options.scoreboardToken : '')
+  );
   // Legacy uri
   // TODO(lhchavez): Remove once we migrate to backendv2
-  uris.push(protocol + window.location.host + '/api/contest/events/' +
-            self.options.contestAlias + '/' +
-            (self.options.scoreboardToken ?
-                 ('?token=' + self.options.scoreboardToken) :
-                 ''));
+  uris.push(
+    protocol +
+      window.location.host +
+      '/api/contest/events/' +
+      self.options.contestAlias +
+      '/' +
+      (self.options.scoreboardToken
+        ? '?token=' + self.options.scoreboardToken
+        : '')
+  );
 
   function connect(uris, index) {
     self.socket = new omegaup.arena.EventsSocket(uris[index], self);
@@ -311,7 +338,12 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
       } else {
         // Out of options. Falling back to polls.
         self.socket = null;
-        setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
+        setTimeout(
+          function() {
+            self.setupPolls();
+          },
+          Math.random() * 15000
+        );
       }
     });
   }
@@ -323,24 +355,41 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 omegaup.arena.Arena.prototype.setupPolls = function() {
   var self = this;
 
-  omegaup.API.getRanking(self.options.contestAlias,
-                         self.rankingChange.bind(self));
+  omegaup.API.getRanking(
+    self.options.contestAlias,
+    self.rankingChange.bind(self)
+  );
   omegaup.API.getClarifications(
-      self.options.contestAlias, self.clarificationsOffset,
-      self.clarificationsRowcount, self.clarificationsChange.bind(self));
+    self.options.contestAlias,
+    self.clarificationsOffset,
+    self.clarificationsRowcount,
+    self.clarificationsChange.bind(self)
+  );
 
   if (!self.socket) {
-    self.clarificationInterval = setInterval(function() {
-      self.clarificationsOffset = 0;  // Return pagination to start on refresh
-      omegaup.API.getClarifications(
-          self.options.contestAlias, self.clarificationsOffset,
-          self.clarificationsRowcount, self.clarificationsChange.bind(self));
-    }, 5 * 60 * 1000);
+    self.clarificationInterval = setInterval(
+      function() {
+        self.clarificationsOffset = 0;
+        // Return pagination to start on refresh
+        omegaup.API.getClarifications(
+          self.options.contestAlias,
+          self.clarificationsOffset,
+          self.clarificationsRowcount,
+          self.clarificationsChange.bind(self)
+        );
+      },
+      5 * 60 * 1000
+    );
 
-    self.rankingInterval = setInterval(function() {
-      omegaup.API.getRanking(self.options.contestAlias,
-                             self.rankingChange.bind(self));
-    }, 5 * 60 * 1000);
+    self.rankingInterval = setInterval(
+      function() {
+        omegaup.API.getRanking(
+          self.options.contestAlias,
+          self.rankingChange.bind(self)
+        );
+      },
+      5 * 60 * 1000
+    );
   }
 };
 
@@ -370,23 +419,29 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
         return function() {
           var t = omegaup.OmegaUp.time();
           self.elements.loadingOverlay.html(
-              x + ' ' + omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
+            x + ' ' + omegaup.arena.FormatDelta(y.getTime() - t.getTime())
+          );
           if (t.getTime() < y.getTime()) {
             setTimeout(f, 1000);
           } else {
             omegaup.API.getContest(x, contestLoaded);
           }
-        }
-      })(self.options.contestAlias,
-         omegaup.OmegaUp.time(contest.start_time * 1000));
+        };
+      })(
+        self.options.contestAlias,
+        omegaup.OmegaUp.time(contest.start_time * 1000)
+      );
       setTimeout(f, 1000);
     } else {
       self.elements.loadingOverlay.html('404');
     }
     return;
   }
-  if (self.options.isPractice && contest.finish_time &&
-      omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+  if (
+    self.options.isPractice &&
+      contest.finish_time &&
+      omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()
+  ) {
     window.location = window.location.pathname.replace(/\/practice.*/, '/');
     return;
   }
@@ -396,8 +451,11 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
   self.submissionGap = parseInt(contest.submission_gap);
   if (!(self.submissionGap > 0)) self.submissionGap = 0;
 
-  self.initClock(contest.start_time, contest.finish_time,
-                 contest.submission_deadline);
+  self.initClock(
+    contest.start_time,
+    contest.finish_time,
+    contest.submission_deadline
+  );
   self.initProblems(contest);
 
   var problemSelect = $('select', self.elements.clarification);
@@ -406,12 +464,13 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
     var problem = contest.problems[idx];
     var problemName = problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
-    var prob = problemTemplate.clone()
-                   .removeClass('template')
-                   .addClass('problem_' + problem.alias);
+    var prob = problemTemplate
+      .clone()
+      .removeClass('template')
+      .addClass('problem_' + problem.alias);
     $('.name', prob)
-        .attr('href', '#problems/' + problem.alias)
-        .html(problemName);
+      .attr('href', '#problems/' + problem.alias)
+      .html(problemName);
     self.elements.problemList.append(prob);
 
     $('<option>').val(problem.alias).text(problemName).appendTo(problemSelect);
@@ -438,11 +497,18 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
     var alias = problem.alias;
     self.problems[alias] = problem;
 
-    $('<th><a href="#problems/' + alias + '" title="' + alias + '">' +
-      problems[i].letter + '</a></th>')
-        .insertBefore('#ranking-table thead th.total');
-    $('<td class="prob_' + alias + '_points"></td>')
-        .insertBefore('#ranking-table tbody.user-list-template td.points');
+    $(
+      '<th><a href="#problems/' +
+        alias +
+        '" title="' +
+        alias +
+        '">' +
+        problems[i].letter +
+        '</a></th>'
+    ).insertBefore('#ranking-table thead th.total');
+    $('<td class="prob_' + alias + '_points"></td>').insertBefore(
+      '#ranking-table tbody.user-list-template td.points'
+    );
   }
   $('thead th', self.elements.rankingTable).attr('colspan', '');
   $('tbody.user-list-template .penalty', self.elements.rankingTable).remove();
@@ -451,8 +517,9 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
 omegaup.arena.Arena.prototype.updateClock = function() {
   var self = this;
   var countdownTime = self.submissionDeadline || self.finishTime;
-  if (self.startTime === null || countdownTime === null ||
-      !omegaup.OmegaUp.ready) {
+  if (
+    self.startTime === null || countdownTime === null || !omegaup.OmegaUp.ready
+  ) {
     return;
   }
 
@@ -461,8 +528,9 @@ omegaup.arena.Arena.prototype.updateClock = function() {
 
   if (date < self.startTime.getTime()) {
     clock = '-' +
-            omegaup.arena.FormatDelta(self.startTime.getTime() -
-                                      (date + omegaup.OmegaUp._deltaTime));
+      omegaup.arena.FormatDelta(
+        self.startTime.getTime() - (date + omegaup.OmegaUp._deltaTime)
+      );
   } else if (date > countdownTime.getTime()) {
     // Contest for self user is over
     clock = '00:00:00';
@@ -471,17 +539,24 @@ omegaup.arena.Arena.prototype.updateClock = function() {
 
     // Show go-to-practice-mode messages on contest end
     if (date > self.finishTime.getTime()) {
-      omegaup.UI.warning('<a href="/arena/' + self.options.contestAlias +
-                         '/practice/">' +
-                         omegaup.T.arenaContestEndedUsePractice + '</a>');
+      omegaup.UI.warning(
+        '<a href="/arena/' +
+          self.options.contestAlias +
+          '/practice/">' +
+          omegaup.T.arenaContestEndedUsePractice +
+          '</a>'
+      );
       $('#new-run').hide();
       $('#new-run-practice-msg').show();
-      $('#new-run-practice-msg a')
-          .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
+      $('#new-run-practice-msg a').prop(
+        'href',
+        '/arena/' + self.options.contestAlias + '/practice/'
+      );
     }
   } else {
-    clock = omegaup.arena.FormatDelta(countdownTime.getTime() -
-                                      (date + omegaup.OmegaUp._deltaTime));
+    clock = omegaup.arena.FormatDelta(
+      countdownTime.getTime() - (date + omegaup.OmegaUp._deltaTime)
+    );
   }
 
   self.elements.clock.text(clock);
@@ -490,9 +565,12 @@ omegaup.arena.Arena.prototype.updateClock = function() {
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
   var self = this;
   if (self.socket != null) return;
-  setTimeout(function() {
-    omegaup.API.runStatus(guid, self.updateRun.bind(self));
-  }, 5000);
+  setTimeout(
+    function() {
+      omegaup.API.runStatus(guid, self.updateRun.bind(self));
+    },
+    5000
+  );
 };
 
 omegaup.arena.Arena.prototype.updateRun = function(run) {
@@ -503,10 +581,15 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
   if (self.socket != null) return;
 
   if (run.status == 'ready') {
-    if (!self.options.isPractice && !self.options.isOnlyProblem &&
-        self.options.contestAlias != 'admin') {
-      omegaup.API.getRanking(self.options.contestAlias,
-                             self.rankingChange.bind(self));
+    if (
+      !self.options.isPractice &&
+        !self.options.isOnlyProblem &&
+        self.options.contestAlias != 'admin'
+    ) {
+      omegaup.API.getRanking(
+        self.options.contestAlias,
+        self.rankingChange.bind(self)
+      );
     }
   } else {
     self.updateRunFallback(run.guid);
@@ -520,12 +603,16 @@ omegaup.arena.Arena.prototype.rankingChange = function(data) {
   var self = this;
   self.onRankingChanged(data);
   if (self.options.scoreboardToken) {
-    omegaup.API.getRankingEventsByToken(self.options.contestAlias,
-                                        self.options.scoreboardToken,
-                                        self.onRankingEvents.bind(self));
+    omegaup.API.getRankingEventsByToken(
+      self.options.contestAlias,
+      self.options.scoreboardToken,
+      self.onRankingEvents.bind(self)
+    );
   } else {
-    omegaup.API.getRankingEvents(self.options.contestAlias,
-                                 self.onRankingEvents.bind(self));
+    omegaup.API.getRankingEvents(
+      self.options.contestAlias,
+      self.onRankingEvents.bind(self)
+    );
   }
 };
 
@@ -554,19 +641,19 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     newRanking[rank.username] = i;
 
     var r = $('tbody.user-list-template', self.elements.rankingTable)
-                .clone()
-                .removeClass('user-list-template')
-                .addClass('inserted')
-                .addClass('rank-new');
+      .clone()
+      .removeClass('user-list-template')
+      .addClass('inserted')
+      .addClass('rank-new');
 
-    var username =
-        rank.username + ((rank.name == rank.username) ?
-                             '' :
-                             (' (' + omegaup.UI.escape(rank.name) + ')'));
+    var username = rank.username +
+      (rank.name == rank.username
+        ? ''
+        : ' (' + omegaup.UI.escape(rank.name) + ')');
 
     $('.user', r).html(username + omegaup.UI.getFlag(rank['country']));
 
-    currentRankingState[username] = {place: rank.place, accepted: {}};
+    currentRankingState[username] = { place: rank.place, accepted: {} };
 
     // Update problem scores.
     var totalRuns = 0;
@@ -579,16 +666,25 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
       if (problem.runs == 0) {
         pointsCell.html('-');
       } else if (self.currentContest.show_penalty) {
-        pointsCell.html('<div class="points">' +
-                        (problem.points ? '+' + problem.points : '0') +
-                        '</div>\n' +
-                        '<div class="penalty">' + problem.penalty + ' (' +
-                        problem.runs + ')</div>');
+        pointsCell.html(
+          '<div class="points">' +
+            (problem.points ? '+' + problem.points : '0') +
+            '</div>\n' +
+            '<div class="penalty">' +
+            problem.penalty +
+            ' (' +
+            problem.runs +
+            ')</div>'
+        );
       } else {
-        pointsCell.html('<div class="points">' +
-                        (problem.points ? '+' + problem.points : '0') +
-                        '</div>\n' +
-                        '<div class="penalty">(' + problem.runs + ')</div>');
+        pointsCell.html(
+          '<div class="points">' +
+            (problem.points ? '+' + problem.points : '0') +
+            '</div>\n' +
+            '<div class="penalty">(' +
+            problem.runs +
+            ')</div>'
+        );
       }
       pointsCell.removeClass('pending accepted wrong');
       if (problem.runs > 0) {
@@ -596,8 +692,10 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
           currentRankingState[username].accepted[problem.alias] = true;
           pointsCell.addClass('accepted');
           if (this.prevRankingState) {
-            if (!this.prevRankingState[username] ||
-                !this.prevRankingState[username].accepted[problem.alias]) {
+            if (
+              !this.prevRankingState[username] ||
+                !this.prevRankingState[username].accepted[problem.alias]
+            ) {
               pointsCell.addClass('recent-event');
             }
           }
@@ -610,27 +708,40 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 
       if (self.problems[alias]) {
         if (rank.username == omegaup.OmegaUp.username) {
-          $('#problems .problem_' + alias + ' .solved')
-              .html('(' + problem.points + ' / ' + self.problems[alias].points +
-                    ')');
+          $('#problems .problem_' + alias + ' .solved').html(
+            '(' + problem.points + ' / ' + self.problems[alias].points + ')'
+          );
         }
       }
     }
 
     if (self.currentContest.show_penalty) {
-      $('td.points', r)
-          .html('<div class="points">' + rank.total.points + '</div>' +
-                '<div class="penalty">' + rank.total.penalty + ' (' +
-                totalRuns + ')</div>');
+      $('td.points', r).html(
+        '<div class="points">' +
+          rank.total.points +
+          '</div>' +
+          '<div class="penalty">' +
+          rank.total.penalty +
+          ' (' +
+          totalRuns +
+          ')</div>'
+      );
     } else {
-      $('td.points', r)
-          .html('<div class="points">' + rank.total.points + '</div>' +
-                '<div class="penalty">(' + totalRuns + ')</div>');
+      $('td.points', r).html(
+        '<div class="points">' +
+          rank.total.points +
+          '</div>' +
+          '<div class="penalty">(' +
+          totalRuns +
+          ')</div>'
+      );
     }
     $('.position', r).html(rank.place).removeClass('recent-event');
     if (this.prevRankingState) {
-      if (!this.prevRankingState[username] ||
-          this.prevRankingState[username].place > rank.place) {
+      if (
+        !this.prevRankingState[username] ||
+          this.prevRankingState[username].place > rank.place
+      ) {
         $('.position', r).addClass('recent-event');
       }
     }
@@ -640,14 +751,19 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     // update miniranking
     if (i < 10) {
       r = $('tbody.user-list-template', self.elements.miniRanking)
-              .clone()
-              .removeClass('user-list-template')
-              .addClass('inserted');
+        .clone()
+        .removeClass('user-list-template')
+        .addClass('inserted');
 
       $('.position', r).html(rank.place);
-      $('.user', r)
-          .html('<span title="' + username + '">' + rank.username +
-                omegaup.UI.getFlag(rank['country']) + '</span>');
+      $('.user', r).html(
+        '<span title="' +
+          username +
+          '">' +
+          rank.username +
+          omegaup.UI.getFlag(rank['country']) +
+          '</span>'
+      );
       $('.points', r).html(rank.total.points);
       $('.penalty', r).html(rank.total.penalty);
 
@@ -661,9 +777,12 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 
   this.currentRanking = newRanking;
   this.prevRankingState = currentRankingState;
-  self.removeRecentEventClassTimeout = setTimeout(function() {
-    $('.recent-event').removeClass('recent-event');
-  }, 30000);
+  self.removeRecentEventClassTimeout = setTimeout(
+    function() {
+      $('.recent-event').removeClass('recent-event');
+    },
+    30000
+  );
 };
 
 omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
@@ -678,16 +797,20 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
     var curr = data.events[i];
 
     // limit chart to top n users
-    if (this.currentRanking[curr.username] >
-        omegaup.arena.ScoreboardColors.length - 1)
+    if (
+      this.currentRanking[curr.username] >
+        omegaup.arena.ScoreboardColors.length - 1
+    )
       continue;
 
     if (!dataInSeries[curr.name]) {
       dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
       usernames[curr.name] = curr.username;
     }
-    dataInSeries[curr.name].push(
-        [this.startTime.getTime() + curr.delta * 60 * 1000, curr.total.points]);
+    dataInSeries[curr.name].push([
+      this.startTime.getTime() + curr.delta * 60 * 1000,
+      curr.total.points
+    ]);
 
     // check if to add to navigator
     if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
@@ -714,7 +837,9 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
     }
   }
 
-  series.sort(function(a, b) { return a.rank - b.rank; });
+  series.sort(function(a, b) {
+    return a.rank - b.rank;
+  });
 
   navigatorData.push([
     Math.min(this.finishTime.getTime(), Date.now()),
@@ -727,17 +852,15 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   var self = this;
   if (series.length == 0) return;
 
-  Highcharts.setOptions({colors: omegaup.arena.ScoreboardColors});
+  Highcharts.setOptions({ colors: omegaup.arena.ScoreboardColors });
 
   window.chart = new Highcharts.StockChart({
-    chart: {renderTo: 'ranking-chart', height: 300, spacingTop: 20},
-
+    chart: { renderTo: 'ranking-chart', height: 300, spacingTop: 20 },
     xAxis: {
       ordinal: false,
       min: self.startTime.getTime(),
       max: Math.min(self.finishTime.getTime(), Date.now())
     },
-
     yAxis: {
       showLastLabel: true,
       showFirstLabel: false,
@@ -751,16 +874,14 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
         return total;
       })(self.problems)
     },
-
     plotOptions: {
       series: {
         animation: false,
         lineWidth: 3,
-        states: {hover: {lineWidth: 3}},
-        marker: {radius: 5, symbol: 'circle', lineWidth: 1}
+        states: { hover: { lineWidth: 3 } },
+        marker: { radius: 5, symbol: 'circle', lineWidth: 1 }
       }
     },
-
     navigator: {
       series: {
         type: 'line',
@@ -770,21 +891,20 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
         data: navigatorSeries
       }
     },
-
-    rangeSelector: {enabled: false},
-
+    rangeSelector: { enabled: false },
     series: series
   });
 
   // set legend colors
   var rows = $('tbody.inserted tr', self.elements.rankingTable);
   for (var r = 0; r < rows.length; r++) {
-    $('.legend', rows[r])
-        .css({
-          'background-color': (r < omegaup.arena.ScoreboardColors.length) ?
-                                  omegaup.arena.ScoreboardColors[r] :
-                                  'transparent'
-        });
+    $('.legend', rows[r]).css({
+      'background-color': (
+        r < omegaup.arena.ScoreboardColors.length
+          ? omegaup.arena.ScoreboardColors[r]
+          : 'transparent'
+      )
+    });
   }
 };
 
@@ -807,26 +927,34 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
     });
   } else {
     r = $('.clarifications tbody.clarification-list tr.template')
-            .clone()
-            .removeClass('template')
-            .addClass('inserted');
+      .clone()
+      .removeClass('template')
+      .addClass('inserted');
 
     if (self.contestAdmin) {
       (function(id, answerNode) {
-        var responseFormNode =
-            $('#create-response-form', answerNode).removeClass('template');
+        var responseFormNode = $(
+          '#create-response-form',
+          answerNode
+        ).removeClass('template');
         if (clarification.public == 1) {
-          $('#create-response-is-public', responseFormNode)
-              .attr('checked', 'checked');
+          $('#create-response-is-public', responseFormNode).attr(
+            'checked',
+            'checked'
+          );
         }
         responseFormNode.submit(function() {
           omegaup.API.updateClarification(
-              id, $('#create-response-text', this).val(),
-              $('#create-response-is-public', this)[0].checked, function() {
-                $('pre', answerNode)
-                    .html($('#create-response-text', answerNode).val());
-                $('#create-response-text', answerNode).val('');
-              });
+            id,
+            $('#create-response-text', this).val(),
+            $('#create-response-is-public', this)[0].checked,
+            function() {
+              $('pre', answerNode).html(
+                $('#create-response-text', answerNode).val()
+              );
+              $('#create-response-text', answerNode).val('');
+            }
+          );
           return false;
         });
       })(clarification.clarification_id, $('.answer', r));
@@ -837,9 +965,9 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);
   if (self.contestAdmin) $('.author', r).html(clarification.author);
-  $('.time', r)
-      .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                  clarification.time.getTime()));
+  $('.time', r).html(
+    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime())
+  );
   $('.message', r).html(omegaup.UI.escape(clarification.message));
   $('.answer pre', r).html(omegaup.UI.escape(clarification.answer));
   if (clarification.answer) {
@@ -871,8 +999,10 @@ omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
     return;
   }
   $('.clarifications tr.inserted').remove();
-  if (data.clarifications.length > 0 &&
-      data.clarifications.length < self.clarificationsRowcount) {
+  if (
+    data.clarifications.length > 0 &&
+      data.clarifications.length < self.clarificationsRowcount
+  ) {
     $('#clarifications-count').html('(' + data.clarifications.length + ')');
   } else if (data.clarifications.length >= self.clarificationsRowcount) {
     $('#clarifications-count').html('(' + data.clarifications.length + '+)');
@@ -886,19 +1016,20 @@ omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
     self.updateClarification(data.clarifications[i]);
   }
 
-  if (self.answeredClarifications > previouslyAnswered &&
-      self.activeTab != 'clarifications') {
+  if (
+    self.answeredClarifications > previouslyAnswered &&
+      self.activeTab != 'clarifications'
+  ) {
     $('#clarifications-count').css('font-weight', 'bold');
   }
 };
 
 omegaup.arena.Arena.prototype.updateAllowedLanguages = function(lang_array) {
   var self = this;
-  $('option', self.elements.submitForm.language)
-      .each(function(index, item) {
-        item = $(item);
-        item.toggle(lang_array.indexOf(item.val()) >= 0);
-      });
+  $('option', self.elements.submitForm.language).each(function(index, item) {
+    item = $(item);
+    item.toggle(lang_array.indexOf(item.val()) >= 0);
+  });
 };
 
 omegaup.arena.Arena.prototype.onHashChanged = function() {
@@ -929,38 +1060,44 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
     self.currentProblem = problem = self.problems[problem[1]];
 
     $('.active', self.elements.problemList).removeClass('active');
-    $('.problem_' + problem.alias, self.elements.problemList)
-        .addClass('active');
+    $('.problem_' + problem.alias, self.elements.problemList).addClass(
+      'active'
+    );
 
     function update(problem) {
       // TODO: Make #problem a component
       $('#summary').hide();
       $('#problem').show();
-      $('#problem > .title')
-          .html(problem.letter + '. ' + omegaup.UI.escape(problem.title));
+      $('#problem > .title').html(
+        problem.letter + '. ' + omegaup.UI.escape(problem.title)
+      );
       $('#problem .data .points').html(problem.points);
       $('#problem .memory_limit').html(problem.memory_limit / 1024 + 'MB');
       $('#problem .time_limit').html(problem.time_limit / 1000 + 's');
-      $('#problem .overall_wall_time_limit')
-          .html(problem.overall_wall_time_limit / 1000 + 's');
+      $('#problem .overall_wall_time_limit').html(
+        problem.overall_wall_time_limit / 1000 + 's'
+      );
       $('#problem .statement').html(problem.problem_statement);
       if (!self.myRuns.attached) {
         self.myRuns.attach($('#problem .runs'));
       }
       var karel_langs = ['kp', 'kj'];
       var language_array = problem.languages.split(',');
-      if (karel_langs.every(function(x) {
-            return language_array.indexOf(x) != -1;
-          })) {
+      if (
+        karel_langs.every(function(x) {
+          return language_array.indexOf(x) != -1;
+        })
+      ) {
         var original_href = $('#problem .karel-js-link a').attr('href');
         var hash_index = original_href.indexOf('#');
         if (hash_index != -1) {
           original_href = original_href.substring(0, hash_index);
         }
         if (problem.sample_input) {
-          $('#problem .karel-js-link a')
-              .attr('href', original_href + '#mundo:' +
-                                encodeURIComponent(problem.sample_input));
+          $('#problem .karel-js-link a').attr(
+            'href',
+            original_href + '#mundo:' + encodeURIComponent(problem.sample_input)
+          );
         } else {
           $('#problem .karel-js-link a').attr('href', original_href);
         }
@@ -976,14 +1113,16 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       }
       if (problem.problemsetter) {
         $('#problem .problemsetter a')
-            .html(omegaup.UI.escape(problem.problemsetter.name))
-            .attr('href', '/profile/' + problem.problemsetter.username + '/');
+          .html(omegaup.UI.escape(problem.problemsetter.name))
+          .attr('href', '/profile/' + problem.problemsetter.username + '/');
         $('#problem .problemsetter').show();
       } else {
         $('#problem .problemsetter').hide();
       }
-      $('#problem .runs tfoot td a')
-          .attr('href', '#problems/' + problem.alias + '/new-run');
+      $('#problem .runs tfoot td a').attr(
+        'href',
+        '#problems/' + problem.alias + '/new-run'
+      );
       self.installLibinteractiveHooks();
 
       $('#problem tbody.added').remove();
@@ -1000,28 +1139,35 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       }
 
       if (self.options.isPractice || self.options.isOnlyProblem) {
-        omegaup.API.getProblemRuns({problem_alias: problem.alias})
-            .then(function(data) { updateRuns(data.runs); });
+        omegaup.API
+          .getProblemRuns({ problem_alias: problem.alias })
+          .then(function(data) {
+            updateRuns(data.runs);
+          });
       } else {
         updateRuns(problem.runs);
       }
 
-      MathJax.Hub.Queue(
-          ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
+      MathJax.Hub.Queue([
+        'Typeset',
+        MathJax.Hub,
+        $('#problem .statement').get(0)
+      ]);
     }
 
     if (problem.problem_statement) {
       update(problem);
     } else {
-      omegaup.API.getProblem(
-          self.options.contestAlias, problem.alias, function(problem_ext) {
-            problem.source = problem_ext.source;
-            problem.problemsetter = problem_ext.problemsetter;
-            problem.problem_statement = problem_ext.problem_statement;
-            problem.sample_input = problem_ext.sample_input;
-            problem.runs = problem_ext.runs;
-            update(problem);
-          });
+      omegaup.API.getProblem(self.options.contestAlias, problem.alias, function(
+        problem_ext
+      ) {
+        problem.source = problem_ext.source;
+        problem.problemsetter = problem_ext.problemsetter;
+        problem.problem_statement = problem_ext.problem_statement;
+        problem.sample_input = problem_ext.sample_input;
+        problem.runs = problem_ext.runs;
+        update(problem);
+      });
     }
 
     if (newRun) {
@@ -1067,17 +1213,20 @@ omegaup.arena.Arena.prototype.detectShowRun = function() {
   if (showRunMatch) {
     $('#overlay form').hide();
     $('#overlay').show();
-    omegaup.API.getRunDetails({run_alias: showRunMatch[1]})
-        .then(function(data) {
-          self.displayRunDetails(showRunMatch[1], data);
-        });
+    omegaup.API
+      .getRunDetails({ run_alias: showRunMatch[1] })
+      .then(function(data) {
+        self.displayRunDetails(showRunMatch[1], data);
+      });
   }
 };
 
 omegaup.arena.Arena.prototype.hideOverlay = function() {
   $('#overlay').hide();
-  window.location.hash =
-      window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+  window.location.hash = window.location.hash.substring(
+    0,
+    window.location.hash.lastIndexOf('/')
+  );
 };
 
 omegaup.arena.Arena.prototype.bindGlobalHandlers = function() {
@@ -1100,8 +1249,8 @@ omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
 omegaup.arena.Arena.prototype.clearInputFile = function() {
   var self = this;
   self.elements.submitForm.file.replaceWith(
-      self.elements.submitForm.file =
-          self.elements.submitForm.file.clone(true));
+    self.elements.submitForm.file = self.elements.submitForm.file.clone(true)
+  );
 };
 
 omegaup.arena.Arena.prototype.onLanguageSelect = function(e) {
@@ -1119,12 +1268,17 @@ omegaup.arena.Arena.prototype.onLanguageSelect = function(e) {
 
 omegaup.arena.Arena.prototype.onSubmit = function(e) {
   var self = this;
-  if (!self.options.isOnlyProblem &&
-      (self.problems[self.currentProblem.alias].last_submission +
-           self.submissionGap * 1000 >
-       omegaup.OmegaUp.time().getTime())) {
-    alert(omegaup.UI.formatString(omegaup.T.arenaRunSubmitWaitBetweenUploads,
-                                  {submissionGap: self.submissionGap}));
+  if (
+    !self.options.isOnlyProblem &&
+      self.problems[self.currentProblem.alias].last_submission +
+        self.submissionGap * 1000 >
+        omegaup.OmegaUp.time().getTime()
+  ) {
+    alert(
+      omegaup.UI.formatString(omegaup.T.arenaRunSubmitWaitBetweenUploads, {
+        submissionGap: self.submissionGap
+      })
+    );
     return false;
   }
 
@@ -1141,23 +1295,38 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     var reader = new FileReader();
 
     reader.onload = function(e) {
-      self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
-                         '' :
-                         self.options.contestAlias,
-                     self.currentProblem.alias, langSelect.val(),
-                     e.target.result);
+      self.submitRun(
+        self.options.isPractice || self.options.isOnlyProblem
+          ? ''
+          : self.options.contestAlias,
+        self.currentProblem.alias,
+        langSelect.val(),
+        e.target.result
+      );
     };
 
     var extension = file.name.split(/\./);
     extension = extension[extension.length - 1];
 
-    if (langSelect.val() != 'cat' || file.type.indexOf('text/') === 0 ||
-        extension == 'cpp' || extension == 'c' || extension == 'java' ||
-        extension == 'txt' || extension == 'hs' || extension == 'kp' ||
-        extension == 'kj' || extension == 'p' || extension == 'pas' ||
-        extension == 'py' || extension == 'rb') {
+    if (
+      langSelect.val() != 'cat' ||
+        file.type.indexOf('text/') === 0 ||
+        extension == 'cpp' ||
+        extension == 'c' ||
+        extension == 'java' ||
+        extension == 'txt' ||
+        extension == 'hs' ||
+        extension == 'kp' ||
+        extension == 'kj' ||
+        extension == 'p' ||
+        extension == 'pas' ||
+        extension == 'py' ||
+        extension == 'rb'
+    ) {
       if (file.size >= 10 * 1024) {
-        alert(omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
+        alert(
+          omegaup.UI.formatString(arenaRunSubmitFilesize, { limit: '10kB' })
+        );
         return false;
       }
       reader.readAsText(file, 'UTF-8');
@@ -1165,7 +1334,8 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
       // 100kB _must_ be enough for anybody.
       if (file.size >= 100 * 1024) {
         alert(
-            omegaup.UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
+          omegaup.UI.formatString(arenaRunSubmitFilesize, { limit: '100kB' })
+        );
         return false;
       }
       reader.readAsDataURL(file);
@@ -1177,16 +1347,24 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
   var code = submitForm.code.val();
   if (!code) return false;
 
-  self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
-                     '' :
-                     self.options.contestAlias,
-                 self.currentProblem.alias, langSelect.val(), code);
+  self.submitRun(
+    self.options.isPractice || self.options.isOnlyProblem
+      ? ''
+      : self.options.contestAlias,
+    self.currentProblem.alias,
+    langSelect.val(),
+    code
+  );
 
   return false;
 };
 
-omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
-                                                   lang, code) {
+omegaup.arena.Arena.prototype.submitRun = function(
+  contestAlias,
+  problemAlias,
+  lang,
+  code
+) {
   var self = this;
   $('input', self.elements.submitForm).attr('disabled', 'disabled');
   omegaup.API.submit(contestAlias, problemAlias, lang, code, function(run) {
@@ -1201,8 +1379,9 @@ omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
     }
 
     if (!self.options.isOnlyProblem) {
-      self.problems[self.currentProblem.alias].last_submission =
-          omegaup.OmegaUp.time().getTime();
+      self.problems[
+        self.currentProblem.alias
+      ].last_submission = omegaup.OmegaUp.time().getTime();
     }
 
     run.username = omegaup.OmegaUp.username;
@@ -1234,15 +1413,21 @@ omegaup.arena.Arena.prototype.updateSummary = function(contest) {
   self.summaryView.description(contest.description);
   var duration = contest.finish_time.getTime() - contest.start_time.getTime();
   self.summaryView.windowLength(
-      omegaup.arena.FormatDelta((contest.window_length * 60000) || duration));
+    omegaup.arena.FormatDelta(contest.window_length * 60000 || duration)
+  );
   self.summaryView.contestOrganizer(contest.director);
   self.summaryView.startTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
-  self.summaryView.finishTime(Highcharts.dateFormat(
-      '%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
-  self.summaryView.scoreboardCutoff(Highcharts.dateFormat(
+    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime())
+  );
+  self.summaryView.finishTime(
+    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime())
+  );
+  self.summaryView.scoreboardCutoff(
+    Highcharts.dateFormat(
       '%Y-%m-%d %H:%M:%S',
-      contest.start_time.getTime() + duration * contest.scoreboard / 100));
+      contest.start_time.getTime() + duration * contest.scoreboard / 100
+    )
+  );
 };
 
 omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
@@ -1255,8 +1440,9 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
   }
 
   if (data.compile_error) {
-    $('#run-details .compile_error pre')
-        .html(omegaup.UI.escape(data.compile_error));
+    $('#run-details .compile_error pre').html(
+      omegaup.UI.escape(data.compile_error)
+    );
     $('#run-details .compile_error').show();
   } else {
     $('#run-details .compile_error').hide();
@@ -1270,14 +1456,21 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
     $('#run-details .logs pre').html('');
   }
   if (data.source.indexOf('data:') === 0) {
-    $('#run-details .source')
-        .html('<a href="' + data.source + '" download="data.zip">' +
-              omegaup.T['wordsDownload'] + '</a>');
+    $('#run-details .source').html(
+      '<a href="' +
+        data.source +
+        '" download="data.zip">' +
+        omegaup.T['wordsDownload'] +
+        '</a>'
+    );
   } else if (data.source == 'lockdownDetailsDisabled') {
-    $('#run-details .source')
-        .html(omegaup.UI.escape((typeof(sessionStorage) !== 'undefined' &&
-                                 sessionStorage.getItem('run:' + guid)) ||
-                                omegaup.T['lockdownDetailsDisabled']));
+    $('#run-details .source').html(
+      omegaup.UI.escape(
+        typeof sessionStorage !== 'undefined' &&
+          sessionStorage.getItem('run:' + guid) ||
+          omegaup.T['lockdownDetailsDisabled']
+      )
+    );
   } else {
     $('#run-details .source').html(omegaup.UI.escape(data.source));
   }
@@ -1293,18 +1486,23 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
   $('#run-details .cases div').remove();
   $('#run-details .cases table').remove();
   if (problemAdmin) {
-    $('#run-details .download a')
-        .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
-    $('#run-details .download a.details')
-        .attr('href',
-              '/api/run/download/run_alias/' + data.guid + '/complete/true/');
+    $('#run-details .download a').attr(
+      'href',
+      '/api/run/download/run_alias/' + data.guid + '/'
+    );
+    $('#run-details .download a.details').attr(
+      'href',
+      '/api/run/download/run_alias/' + data.guid + '/complete/true/'
+    );
     $('#run-details .download').show();
   } else {
     $('#run-details .download').hide();
   }
 
   function numericSort(key) {
-    function isDigit(x) { return '0' <= x && x <= '9'; }
+    function isDigit(x) {
+      return '0' <= x && x <= '9';
+    }
 
     return function(x, y) {
       var i = 0, j = 0;
@@ -1312,9 +1510,9 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
         if (isDigit(x[key][i]) && isDigit(x[key][j])) {
           var nx = 0, ny = 0;
           while (i < x[key].length && isDigit(x[key][i]))
-            nx = (nx * 10) + parseInt(x[key][i++]);
+            nx = nx * 10 + parseInt(x[key][i++]);
           while (j < y[key].length && isDigit(y[key][j]))
-            ny = (ny * 10) + parseInt(y[key][j++]);
+            ny = ny * 10 + parseInt(y[key][j++]);
           i--;
           j--;
           if (nx != ny) return nx - ny;
@@ -1324,7 +1522,7 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
           return 1;
         }
       }
-      return (x[key].length - i) - (y[key].length - j);
+      return x[key].length - i - (y[key].length - j);
     };
   }
 
@@ -1339,98 +1537,110 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
       detailsGroups[i].cases.sort(numericSort('name'));
     }
 
-    var groups =
-        $('<table></table>')
-            .append(
-                $('<thead></thead>')
-                    .append(
-                        $('<tr></tr>')
-                            .append('<th>' + omegaup.T['wordsGroup'] + '</th>')
-                            .append('<th>' + omegaup.T['wordsCase'] + '</th>')
-                            .append('<th>' + omegaup.T['wordsVerdict'] +
-                                    '</th>')
-                            .append('<th colspan="3">' +
-                                    omegaup.T['rankScore'] + '</th>')
-                            .append('<th width="1"></th>')));
+    var groups = $('<table></table>').append(
+      $('<thead></thead>').append(
+        $('<tr></tr>')
+          .append('<th>' + omegaup.T['wordsGroup'] + '</th>')
+          .append('<th>' + omegaup.T['wordsCase'] + '</th>')
+          .append('<th>' + omegaup.T['wordsVerdict'] + '</th>')
+          .append('<th colspan="3">' + omegaup.T['rankScore'] + '</th>')
+          .append('<th width="1"></th>')
+      )
+    );
 
     for (var i = 0; i < detailsGroups.length; i++) {
       var g = detailsGroups[i];
       var cases = $('<tbody></tbody>').hide();
       groups.append(
-          $('<tbody></tbody>')
-              .append(
-                  $('<tr class="group"></tr>')
-                      .append('<th class="center">' +
-                              omegaup.UI.escape(g.group) + '</th>')
-                      .append('<th colspan="2"></th>')
-                      .append('<th class="score">' +
-                              (g.contest_score !== undefined ? g.contest_score :
-                                                               g.score) +
-                              '</th>')
-                      .append('<th class="center" width="10">' +
-                              (g.max_score !== undefined ? '/' : '') + '</th>')
-                      .append('<th>' +
-                              (g.max_score !== undefined ? g.max_score : '') +
-                              '</th>')
-                      .append(
-                          $('<td></td>')
-                              .append(
-                                  $('<span class="collapse glyphicon ' +
-                                    'glyphicon-collapse-down"></span>')
-                                      .click((function(cases) {
-                                        return function(ev) {
-                                          var target = $(ev.target);
-                                          if (target.hasClass(
-                                                  'glyphicon-collapse-down')) {
-                                            target.removeClass(
-                                                'glyphicon-collapse-down');
-                                            target.addClass(
-                                                'glyphicon-collapse-up');
-                                          } else {
-                                            target.addClass(
-                                                'glyphicon-collapse-down');
-                                            target.removeClass(
-                                                'glyphicon-collapse-up');
-                                          }
-                                          cases.toggle();
-                                          return false;
-                                        };
-                                      })(cases))))));
+        $('<tbody></tbody>').append(
+          $('<tr class="group"></tr>')
+            .append(
+              '<th class="center">' + omegaup.UI.escape(g.group) + '</th>'
+            )
+            .append('<th colspan="2"></th>')
+            .append(
+              '<th class="score">' +
+                (g.contest_score !== undefined ? g.contest_score : g.score) +
+                '</th>'
+            )
+            .append(
+              '<th class="center" width="10">' +
+                (g.max_score !== undefined ? '/' : '') +
+                '</th>'
+            )
+            .append(
+              '<th>' + (g.max_score !== undefined ? g.max_score : '') + '</th>'
+            )
+            .append(
+              $('<td></td>').append(
+                $(
+                  '<span class="collapse glyphicon ' +
+                    'glyphicon-collapse-down"></span>'
+                ).click(
+                  (function(cases) {
+                    return function(ev) {
+                      var target = $(ev.target);
+                      if (target.hasClass('glyphicon-collapse-down')) {
+                        target.removeClass('glyphicon-collapse-down');
+                        target.addClass('glyphicon-collapse-up');
+                      } else {
+                        target.addClass('glyphicon-collapse-down');
+                        target.removeClass('glyphicon-collapse-up');
+                      }
+                      cases.toggle();
+                      return false;
+                    };
+                  })(cases)
+                )
+              )
+            )
+        )
+      );
       for (var j = 0; j < g.cases.length; j++) {
         var c = g.cases[j];
-        var caseRow =
-            $('<tr></tr>')
-                .append('<td></td>')
-                .append('<td class="center">' + c.name + '</td>')
-                .append('<td class="center">' +
-                        omegaup.T['verdict' + c.verdict] + '</td>')
-                .append('<td class="score">' +
-                        (c.contest_score !== undefined ? c.contest_score :
-                                                         c.score) +
-                        '</td>')
-                .append('<td class="center" width="10">' +
-                        (c.max_score !== undefined ? '/' : '') + '</td>')
-                .append('<td>' +
-                        (c.max_score !== undefined ? c.max_score : '') +
-                        '</td>');
+        var caseRow = $('<tr></tr>')
+          .append('<td></td>')
+          .append('<td class="center">' + c.name + '</td>')
+          .append(
+            '<td class="center">' + omegaup.T['verdict' + c.verdict] + '</td>'
+          )
+          .append(
+            '<td class="score">' +
+              (c.contest_score !== undefined ? c.contest_score : c.score) +
+              '</td>'
+          )
+          .append(
+            '<td class="center" width="10">' +
+              (c.max_score !== undefined ? '/' : '') +
+              '</td>'
+          )
+          .append(
+            '<td>' + (c.max_score !== undefined ? c.max_score : '') + '</td>'
+          );
         cases.append(caseRow);
         if (problemAdmin && c.meta) {
-          var metaRow =
-              $('<tr class="meta"></tr>')
-                  .append('<td colspan="6"><pre>' +
-                          JSON.stringify(c.meta, null, 2) + '</pre></td>')
-                  .hide();
+          var metaRow = $('<tr class="meta"></tr>')
+            .append(
+              '<td colspan="6"><pre>' +
+                JSON.stringify(c.meta, null, 2) +
+                '</pre></td>'
+            )
+            .hide();
           caseRow.append(
-              $('<td></td>')
-                  .append(
-                      $('<span class="collapse glyphicon glyphicon-list-alt">' +
-                        '</span>')
-                          .click((function(metaRow) {
-                            return function(ev) {
-                              metaRow.toggle();
-                              return false;
-                            };
-                          })(metaRow))));
+            $('<td></td>').append(
+              $(
+                '<span class="collapse glyphicon glyphicon-list-alt">' +
+                  '</span>'
+              ).click(
+                (function(metaRow) {
+                  return function(ev) {
+                    metaRow.toggle();
+                    return false;
+                  };
+                })(metaRow)
+              )
+            )
+          );
           cases.append(metaRow);
         }
       }
@@ -1465,52 +1675,69 @@ omegaup.arena.RunView = function(arena) {
   self.filter_problem = ko.observable();
   self.filter_username = ko.observable();
   self.filter_offset = ko.observable(0);
-  self.runs = ko.observableArray().extend({deferred: true});
-  self.filtered_runs =
-      ko.pureComputed(function() {
-          var cached_verdict = self.filter_verdict();
-          var cached_status = self.filter_status();
-          var cached_language = self.filter_language();
-          var cached_problem = self.filter_problem();
-          var cached_username = self.filter_username();
-          if (!cached_verdict && !cached_status && !cached_language &&
-              !cached_problem && !cached_username) {
-            return self.runs();
+  self.runs = ko.observableArray().extend({ deferred: true });
+  self.filtered_runs = ko
+    .pureComputed(
+      function() {
+        var cached_verdict = self.filter_verdict();
+        var cached_status = self.filter_status();
+        var cached_language = self.filter_language();
+        var cached_problem = self.filter_problem();
+        var cached_username = self.filter_username();
+        if (
+          !cached_verdict &&
+            !cached_status &&
+            !cached_language &&
+            !cached_problem &&
+            !cached_username
+        ) {
+          return self.runs();
+        }
+        return self.runs().filter(function(val) {
+          if (cached_verdict && cached_verdict != val.verdict()) {
+            return false;
           }
-          return self.runs().filter(function(val) {
-            if (cached_verdict && cached_verdict != val.verdict()) {
-              return false;
-            }
-            if (cached_status && cached_status != val.status()) {
-              return false;
-            }
-            if (cached_language && cached_language != val.language()) {
-              return false;
-            }
-            if (cached_problem && cached_problem != val.alias()) {
-              return false;
-            }
-            if (cached_username && cached_username != val.username()) {
-              return false;
-            }
-            return true;
-          });
-        }, self).extend({deferred: true});
-  self.sorted_runs =
-      ko.pureComputed(function() {
-          return self.filtered_runs().sort(function(a, b) {
-            if (a.time().getTime() == b.time().getTime()) {
-              return a.guid == b.guid ? 0 : (a.guid < b.guid ? -1 : 1);
-            }
-            // Newest runs appear on top.
-            return b.time().getTime() - a.time().getTime();
-          });
-        }, self).extend({deferred: true});
-  self.display_runs =
-      ko.pureComputed(function() {
-          var offset = self.filter_offset();
-          return self.sorted_runs().slice(offset, offset + self.row_count);
-        }, self).extend({deferred: true});
+          if (cached_status && cached_status != val.status()) {
+            return false;
+          }
+          if (cached_language && cached_language != val.language()) {
+            return false;
+          }
+          if (cached_problem && cached_problem != val.alias()) {
+            return false;
+          }
+          if (cached_username && cached_username != val.username()) {
+            return false;
+          }
+          return true;
+        });
+      },
+      self
+    )
+    .extend({ deferred: true });
+  self.sorted_runs = ko
+    .pureComputed(
+      function() {
+        return self.filtered_runs().sort(function(a, b) {
+          if (a.time().getTime() == b.time().getTime()) {
+            return a.guid == b.guid ? 0 : a.guid < b.guid ? -1 : 1;
+          }
+          // Newest runs appear on top.
+          return b.time().getTime() - a.time().getTime();
+        });
+      },
+      self
+    )
+    .extend({ deferred: true });
+  self.display_runs = ko
+    .pureComputed(
+      function() {
+        var offset = self.filter_offset();
+        return self.sorted_runs().slice(offset, offset + self.row_count);
+      },
+      self
+    )
+    .extend({ deferred: true });
   self.observableRunsIndex = {};
   self.attached = false;
 };
@@ -1518,56 +1745,49 @@ omegaup.arena.RunView = function(arena) {
 omegaup.arena.RunView.prototype.attach = function(elm) {
   var self = this;
 
-  $('.runspager .runspagerprev', elm)
-      .click(function() {
-        if (self.filter_offset() < self.row_count) {
-          self.filter_offset(0);
-        } else {
-          self.filter_offset(self.filter_offset() - self.row_count);
-        }
-      });
+  $('.runspager .runspagerprev', elm).click(function() {
+    if (self.filter_offset() < self.row_count) {
+      self.filter_offset(0);
+    } else {
+      self.filter_offset(self.filter_offset() - self.row_count);
+    }
+  });
 
-  $('.runspager .runspagernext', elm)
-      .click(function() {
-        self.filter_offset(self.filter_offset() + self.row_count);
-      });
+  $('.runspager .runspagernext', elm).click(function() {
+    self.filter_offset(self.filter_offset() + self.row_count);
+  });
 
   omegaup.UI.userTypeahead($('.runsusername', elm), function(event, item) {
     self.filter_username(item.value);
   });
 
-  $('.runsusername-clear', elm)
-      .click(function() {
-        $('.runsusername', elm).val('');
-        self.filter_username('');
-      });
+  $('.runsusername-clear', elm).click(function() {
+    $('.runsusername', elm).val('');
+    self.filter_username('');
+  });
 
   $('.runsproblem', elm)
-      .typeahead(
-          {
-            minLength: 2,
-            highlight: true,
-          },
-          {
-            source: omegaup.UI.typeaheadWrapper(function(query, cb) {
-              omegaup.API.searchProblems({query: query})
-                  .then(function(data) { cb(data.results); });
-            }),
-            displayKey: 'title',
-            templates: {
-              suggestion: function(elm) {
-                return '<strong>' + elm.title + '</strong> (' + elm.alias + ')';
-              }
-            }
-          })
-      .on('typeahead:selected',
-          function(elm, item) { self.filter_problem(item.alias); });
+    .typeahead({ minLength: 2, highlight: true }, {
+      source: omegaup.UI.typeaheadWrapper(function(query, cb) {
+        omegaup.API.searchProblems({ query: query }).then(function(data) {
+          cb(data.results);
+        });
+      }),
+      displayKey: 'title',
+      templates: {
+        suggestion: function(elm) {
+          return '<strong>' + elm.title + '</strong> (' + elm.alias + ')';
+        }
+      }
+    })
+    .on('typeahead:selected', function(elm, item) {
+      self.filter_problem(item.alias);
+    });
 
-  $('.runsproblem-clear', elm)
-      .click(function() {
-        $('.runsproblem', elm).val('');
-        self.filter_problem('');
-      });
+  $('.runsproblem-clear', elm).click(function() {
+    $('.runsproblem', elm).val('');
+    self.filter_problem('');
+  });
 
   ko.applyBindings(self, elm[0]);
   self.attached = true;
@@ -1577,8 +1797,10 @@ omegaup.arena.RunView.prototype.trackRun = function(run) {
   var self = this;
 
   if (!self.observableRunsIndex[run.guid]) {
-    self.observableRunsIndex[run.guid] =
-        new omegaup.arena.ObservableRun(self.arena, run);
+    self.observableRunsIndex[run.guid] = new omegaup.arena.ObservableRun(
+      self.arena,
+      run
+    );
     self.runs.push(self.observableRunsIndex[run.guid]);
   } else {
     self.observableRunsIndex[run.guid].update(run);
@@ -1633,8 +1855,11 @@ omegaup.arena.ObservableRun = function(arena, run) {
 omegaup.arena.ObservableRun.prototype.update = function(run) {
   var self = this;
   for (var p in run) {
-    if (!run.hasOwnProperty(p) || !self.hasOwnProperty(p) ||
-        !(self[p] instanceof Function)) {
+    if (
+      !run.hasOwnProperty(p) ||
+        !self.hasOwnProperty(p) ||
+        !(self[p] instanceof Function)
+    ) {
       continue;
     }
     if (self[p]() != run[p]) {
@@ -1655,14 +1880,15 @@ omegaup.arena.ObservableRun.prototype.$problem_url = function() {
 
 omegaup.arena.ObservableRun.prototype.$contest_alias_url = function() {
   var self = this;
-  return (self.contest_alias() === null) ? '' : '/arena/' +
-                                                    self.contest_alias() + '/';
+  return self.contest_alias() === null
+    ? ''
+    : '/arena/' + self.contest_alias() + '/';
 };
 
 omegaup.arena.ObservableRun.prototype.$user_html = function() {
   var self = this;
   return omegaup.UI.getProfileLink(self.username()) +
-         omegaup.UI.getFlag(self.country_id());
+    omegaup.UI.getFlag(self.country_id());
 };
 
 omegaup.arena.ObservableRun.prototype.$time_text = function() {
@@ -1672,14 +1898,16 @@ omegaup.arena.ObservableRun.prototype.$time_text = function() {
 
 omegaup.arena.ObservableRun.prototype.$runtime_text = function() {
   var self = this;
-  if (self.status() == 'ready' && self.verdict() != 'JE' &&
-      self.verdict() != 'CE') {
+  if (
+    self.status() == 'ready' && self.verdict() != 'JE' && self.verdict() != 'CE'
+  ) {
     var prefix = '';
     if (self.verdict() == 'TLE') {
       prefix = '>';
     }
-    return prefix + (parseFloat(self.runtime() || '0') / 1000).toFixed(2) +
-           ' s';
+    return prefix +
+      (parseFloat(self.runtime() || '0') / 1000).toFixed(2) +
+      ' s';
   } else {
     return '—';
   }
@@ -1687,14 +1915,16 @@ omegaup.arena.ObservableRun.prototype.$runtime_text = function() {
 
 omegaup.arena.ObservableRun.prototype.$memory_text = function() {
   var self = this;
-  if (self.status() == 'ready' && self.verdict() != 'JE' &&
-      self.verdict() != 'CE') {
+  if (
+    self.status() == 'ready' && self.verdict() != 'JE' && self.verdict() != 'CE'
+  ) {
     var prefix = '';
     if (self.verdict() == 'MLE') {
       prefix = '>';
     }
-    return prefix + (parseFloat(self.memory()) / (1024 * 1024)).toFixed(2) +
-           ' MB';
+    return prefix +
+      (parseFloat(self.memory()) / (1024 * 1024)).toFixed(2) +
+      ' MB';
   } else {
     return '—';
   }
@@ -1703,8 +1933,9 @@ omegaup.arena.ObservableRun.prototype.$memory_text = function() {
 omegaup.arena.ObservableRun.prototype.$penalty_text = function() {
   var self = this;
 
-  if (self.status() == 'ready' && self.verdict() != 'JE' &&
-      self.verdict() != 'CE') {
+  if (
+    self.status() == 'ready' && self.verdict() != 'JE' && self.verdict() != 'CE'
+  ) {
     return self.penalty();
   } else {
     return '—';
@@ -1714,8 +1945,9 @@ omegaup.arena.ObservableRun.prototype.$penalty_text = function() {
 omegaup.arena.ObservableRun.prototype.$status_text = function() {
   var self = this;
 
-  return self.status() == 'ready' ? omegaup.T['verdict' + self.verdict()] :
-                                    self.status();
+  return self.status() == 'ready'
+    ? omegaup.T['verdict' + self.verdict()]
+    : self.status();
 };
 
 omegaup.arena.ObservableRun.prototype.$status_help = function() {
@@ -1754,8 +1986,12 @@ omegaup.arena.ObservableRun.prototype.$status_color = function() {
 
 omegaup.arena.ObservableRun.prototype.$points = function() {
   var self = this;
-  if (self.contest_score() != null && self.status() == 'ready' &&
-      self.verdict() != 'JE' && self.verdict() != 'CE') {
+  if (
+    self.contest_score() != null &&
+      self.status() == 'ready' &&
+      self.verdict() != 'JE' &&
+      self.verdict() != 'CE'
+  ) {
     return parseFloat(self.contest_score() || '0').toFixed(2);
   } else {
     return '—';
@@ -1764,8 +2000,9 @@ omegaup.arena.ObservableRun.prototype.$points = function() {
 
 omegaup.arena.ObservableRun.prototype.$percentage = function() {
   var self = this;
-  if (self.status() == 'ready' && self.verdict() != 'JE' &&
-      self.verdict() != 'CE') {
+  if (
+    self.status() == 'ready' && self.verdict() != 'JE' && self.verdict() != 'CE'
+  ) {
     return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';
   } else {
     return '—';

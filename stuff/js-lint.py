@@ -14,7 +14,7 @@ import subprocess
 import sys
 import tempfile
 
-from git_tools import COLORS
+from git_tools import COLORS, OMEGAUP_ROOT
 
 def _find_pip_tool(name):
   '''Tries to find a pip tool in a few default locations.'''
@@ -27,10 +27,11 @@ def _find_pip_tool(name):
 PIP_PATH = '/usr/bin/pip'
 CLANG_FORMAT_PATH = '/usr/bin/clang-format-3.7'
 FIXJSSTYLE_PATH = _find_pip_tool('fixjsstyle')
-GJSLINT_PATH = _find_pip_tool('gjslint')
+PRETTIER_PATH = os.path.join(OMEGAUP_ROOT,
+                             'node_modules/prettier/bin/prettier.js')
 
 def run_linter(args, files, validate_only):
-  '''Runs the Google Closure Compiler linter against |files|.'''
+  '''Runs the Google Closure Compiler linter+prettier against |files|.'''
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
@@ -41,41 +42,43 @@ def run_linter(args, files, validate_only):
       f.flush()
       f.seek(0, 0)
 
-      if validate_only:
-        try:
-          output = subprocess.check_output([
-            GJSLINT_PATH, '--nojsdoc', '--quiet',
-            f.name])
-        except subprocess.CalledProcessError as e:
-          print('File %s%s%s:\n%s' % (COLORS.HEADER, filename, COLORS.NORMAL,
-            str(b'\n'.join(e.output.split(b'\n')[1:]),
-              encoding='utf-8')), file=sys.stderr)
-          validation_passed = False
-      else:
-        previous_outputs = set("")
-        while True:
-          output = subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name])
-          if output in previous_outputs:
-            break
-          previous_outputs.add(output)
-        subprocess.check_call([CLANG_FORMAT_PATH, '-style=Google',
-                               '-assume-filename=%s' % filename,
-                               '-i', f.name])
-        with open(f.name, 'rb') as f2:
-          new_contents = f2.read()
-        if contents != new_contents:
+      try:
+        subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name],
+                                 stderr=subprocess.STDOUT)
+        subprocess.check_output([CLANG_FORMAT_PATH, '-style=Google',
+                                 '-assume-filename=%s' % filename,
+                                 '-i', f.name],
+                                 stderr=subprocess.STDOUT)
+        subprocess.check_output([PRETTIER_PATH, '--write', '--print-width=80',
+                                 '--single-quote', '--tab-width=2',
+                                 '--bracket-spacing', f.name],
+                                 stderr=subprocess.STDOUT)
+      except subprocess.CalledProcessError as e:
+        print('File %s%s%s lint failed:\n%s' % (COLORS.FAIL,
+          filename, COLORS.NORMAL, str(b'\n'.join(e.output.split(b'\n')[1:]),
+            encoding='utf-8')), file=sys.stderr)
+        validation_passed = False
+        continue
+      with open(f.name, 'rb') as f2:
+        new_contents = f2.read()
+      if contents != new_contents:
+        validation_passed = False
+        if validate_only:
+          print('File %s%s%s lint failed' %
+                (COLORS.HEADER, filename, COLORS.NORMAL), file=sys.stderr)
+        else:
           print('Fixing %s%s%s' % (COLORS.HEADER, filename,
             COLORS.NORMAL), file=sys.stderr)
           with open(os.path.join(root, filename), 'wb') as o:
             o.write(new_contents)
-          validation_passed = False
   return validation_passed
 
 def main():
   if not git_tools.verify_toolchain({
     PIP_PATH: 'sudo apt-get install python-pip',
     CLANG_FORMAT_PATH: 'sudo apt-get install clang-format-3.7',
-    GJSLINT_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master'
+    FIXJSSTYLE_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master',
+    PRETTIER_PATH: 'yarn install',
   }):
     sys.exit(1)
   args = git_tools.parse_arguments(tool_description='lints javascript',

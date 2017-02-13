@@ -21,22 +21,22 @@ omegaup.OmegaUp.on('ready', function() {
       'PAST',
       'RECOMMENDED',
       omegaup.T.arenaRecommendedOldContests
-    ],
+    ]
   ];
 
   var requests = [];
   for (var i = 0, len = contestLists.length; i < len; i++) {
     var contestList = new omegaup.arena.ContestList(
-        contestLists[i][0],
-        {active: contestLists[i][1], recommended: contestLists[i][2]},
-        {header: contestLists[i][3]});
+      contestLists[i][0],
+      { active: contestLists[i][1], recommended: contestLists[i][2] },
+      { header: contestLists[i][3] }
+    );
     requests.push(contestList.deferred);
   }
 
   // Wait until all of the calls above finish before showing the contents.
-  $.when.apply($, requests)
-      .done(function() {
-        $('#root').show();
-        $('#loading').fadeOut('slow');
-      });
+  $.when.apply($, requests).done(function() {
+    $('#root').show();
+    $('#loading').fadeOut('slow');
+  });
 });

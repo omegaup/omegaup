@@ -14,8 +14,7 @@ omegaup.OmegaUp.on('ready', function() {
     }
   }
 
-  $('#wmd-input')
-      .keyup(function() {
-        localStorage.setItem('wmdinput', $('#wmd-input').val());
-      });
+  $('#wmd-input').keyup(function() {
+    localStorage.setItem('wmdinput', $('#wmd-input').val());
+  });
 });

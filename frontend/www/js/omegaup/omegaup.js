@@ -1,6 +1,6 @@
-var omegaup = typeof global === 'undefined' ?
-                  (window.omegaup = window.omegaup || {}) :
-                  (global.omegaup = global.omegaup || {});
+var omegaup = typeof global === 'undefined'
+  ? window.omegaup = window.omegaup || {}
+  : global.omegaup = global.omegaup || {};
 
 // This is the JavaScript version of the frontend's Experiments class.
 omegaup.Experiments = function(experimentList) {
@@ -31,40 +31,32 @@ omegaup.Experiments.prototype.isEnabled = function(name) {
 
 omegaup.OmegaUp = {
   loggedIn: false,
-
   username: null,
-
   ready: false,
-
   experiments: null,
-
   _documentReady: false,
-
   _initialized: false,
-
   _deltaTime: undefined,
-
   _listeners: {
-    'ready': [
+    ready: [
       function() {
         omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
       },
       function() {
-        ko.bindingProvider.instance =
-            new ko.secureBindingsProvider({attribute: 'data-bind'});
+        ko.bindingProvider.instance = new ko.secureBindingsProvider({
+          attribute: 'data-bind'
+        });
       }
-    ],
+    ]
   },
-
   _onDocumentReady: function() {
     omegaup.OmegaUp._documentReady = true;
-    if (typeof(omegaup.OmegaUp._deltaTime) !== 'undefined') {
+    if (typeof omegaup.OmegaUp._deltaTime !== 'undefined') {
       omegaup.OmegaUp._notify('ready');
     }
     // TODO(lhchavez): Remove this.
     omegaup.OmegaUp._initialize();
   },
-
   _initialize: function() {
     var t0 = new Date().getTime();
     omegaup.API.currentSession().then(function(data) {
@@ -81,14 +73,12 @@ omegaup.OmegaUp = {
       }
     });
   },
-
   _notify: function(eventName) {
     for (var i = 0; i < omegaup.OmegaUp._listeners[eventName].length; i++) {
       omegaup.OmegaUp._listeners[eventName][i]();
     }
     omegaup.OmegaUp._listeners[eventName] = [];
   },
-
   on: function(events, handler) {
     if (omegaup.OmegaUp._initialized) return;
     omegaup.OmegaUp._initialize();
@@ -104,29 +94,27 @@ omegaup.OmegaUp = {
       omegaup.OmegaUp._listeners[splitNames[i]].push(handler);
     }
   },
-
   syncTime: function() {
     var t0 = new Date().getTime();
     omegaup.API.time().then(function(data) {
       omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
     });
   },
-
   _realTime: function(timestamp) {
-    if (typeof(timestamp) === 'undefined') {
+    if (typeof timestamp === 'undefined') {
       return new Date().getTime();
     }
     return new Date(timestamp).getTime();
   },
-
   time: function(timestamp, options) {
-    options = options ||  {};
-    options.server_sync = (typeof(options.server_sync) === 'undefined') ?
-                              true :
-                              options.server_sync;
+    options = options || {};
+    options.server_sync = typeof options.server_sync === 'undefined'
+      ? true
+      : options.server_sync;
     return new Date(
-        omegaup.OmegaUp._realTime(timestamp) +
-        (options.server_sync ? (omegaup.OmegaUp._deltaTime || 0) : 0));
+      omegaup.OmegaUp._realTime(timestamp) +
+        (options.server_sync ? omegaup.OmegaUp._deltaTime || 0 : 0)
+    );
   }
 };
 

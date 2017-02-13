@@ -14,7 +14,7 @@ describe('omegaup.arena', function() {
     });
 
     it('can be instantiated', function() {
-      var arena = new omegaup.arena.Arena({contestAlias: 'test'});
+      var arena = new omegaup.arena.Arena({ contestAlias: 'test' });
       var admin = new omegaup.arena.ArenaAdmin(arena);
       expect(arena.contestAdmin).toEqual(true);
     });

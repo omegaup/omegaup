@@ -15,19 +15,20 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-    omegaup.API.createUser({
-                 email: $('#reg_email').val(),
-                 username: $('#reg_username').val(),
-                 password: $('#reg_pass').val(),
-                 recaptcha: grecaptcha.getResponse()
-               })
-        .then(function(data) {
-          // registration callback
-          $('#user').val($('#reg_email').val());
-          $('#pass').val($('#reg_pass').val());
-          $('#login_form').submit();
-        });
-    return false;  // Prevent form submission
+    omegaup.API
+      .createUser({
+        email: $('#reg_email').val(),
+        username: $('#reg_username').val(),
+        password: $('#reg_pass').val(),
+        recaptcha: grecaptcha.getResponse()
+      })
+      .then(function(data) {
+        // registration callback
+        $('#user').val($('#reg_email').val());
+        $('#pass').val($('#reg_pass').val());
+        $('#login_form').submit();
+      });
+    return false; // Prevent form submission
   }
 
   $('#register-form').submit(registerAndLogin);
@@ -41,21 +42,22 @@ function signInCallback(authResult) {
     gapi.auth.signOut();
     logmeoutOnce = false;
   } else if (authResult['code']) {
-    omegaup.API.googleLogin({storeToken: authResult['code']})
-        .then(function(data) { window.location.reload(); });
+    omegaup.API
+      .googleLogin({ storeToken: authResult['code'] })
+      .then(function(data) {
+        window.location.reload();
+      });
   } else if (authResult['error']) {
-    // Esto se hace en cada refresh a la pagina de login.
-    // omegaup.UI.error('There was an error: ' + authResult['error']);
   }
 }
 
 // https://developers.google.com/+/web/signin/server-side-flow
 function renderButton() {
   gapi.signin2.render('google-signin', {
-    'scope': 'email',
-    'width': 200,
-    'height': 50,
-    'longtitle': false,
-    'redirect_uri': 'postmessage',
+    scope: 'email',
+    width: 200,
+    height: 50,
+    longtitle: false,
+    redirect_uri: 'postmessage'
   });
 }

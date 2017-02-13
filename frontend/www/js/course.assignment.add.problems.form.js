@@ -1,26 +1,28 @@
-$('a[data-toggle="tab"]')
-    .on('shown.bs.tab', function(e) {
-      var target = $(e.target).attr('href');
+$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+  var target = $(e.target).attr('href');
 
-      // If add-problems tab is on focus
-      if (target === '#add-problems') {
-        var courseAlias =
-            /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
+  // If add-problems tab is on focus
+  if (target === '#add-problems') {
+    var courseAlias = /\/course\/([^\/]+)\/edit\/?.*/.exec(
+      window.location.pathname
+    )[1];
 
-        // Fill assignments
-        omegaup.API.getCourseAssignments({course_alias: courseAlias})
-            .then(function(data) {
-              $('.assignment-add-problem #assignments-list').empty();
+    // Fill assignments
+    omegaup.API
+      .getCourseAssignments({ course_alias: courseAlias })
+      .then(function(data) {
+        $('.assignment-add-problem #assignments-list').empty();
 
-              $.each(data.assignments, function(index, item) {
-                $('.assignment-add-problem #assignments-list')
-                    .append(
-                        $('<option/>', {value: item.alias, text: item.name}));
-              });
-            });
+        $.each(data.assignments, function(index, item) {
+          $('.assignment-add-problem #assignments-list').append(
+            $('<option/>', { value: item.alias, text: item.name })
+          );
+        });
+      });
 
-        // Plug problems type-ahead
-        omegaup.UI.problemTypeahead(
-            $('.assignment-add-problem #problems-dropdown'));
-      }
-    });
+    // Plug problems type-ahead
+    omegaup.UI.problemTypeahead(
+      $('.assignment-add-problem #problems-dropdown')
+    );
+  }
+});

@@ -11,5 +11,8 @@
   },
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json"
+  },
+  "dependencies": {
+    "prettier": "^0.16.0"
   }
 }
