@@ -104,29 +104,29 @@ omegaup.OmegaUp.on('ready', function() {
         if (!$('#submit textarea[name="code"]').val()) return false;
 
         $('#submit input').attr('disabled', 'disabled');
-        omegaup.API.submit(
-            arena.options.contestAlias, arena.currentProblem.alias,
-            $('#submit select[name="language"]').val(),
-            $('#submit textarea[name="code"]').val(), function(run) {
-              if (run.status != 'ok') {
-                alert(run.error);
-                $('#submit input').removeAttr('disabled');
-                return;
-              }
-              run.status = 'new';
-              run.alias = arena.currentProblem.alias;
-              run.contest_score = null;
-              run.time = omegaup.OmegaUp.time();
-              run.penalty = 0;
-              run.runtime = 0;
-              run.memory = 0;
-              run.language = $('#submit select[name="language"]').val();
-              arena.trackRun(run);
-              arena.updateRunFallback(run.guid, run);
+        omegaup.API.submit({
+            contest_alias: arena.options.contestAlias,
+            problem_alias: arena.currentProblem.alias,
+            language: $('#submit select[name="language"]').val(),
+            source: $('#submit textarea[name="code"]').val(),
+        }).then(function(run) {
+          run.status = 'new';
+          run.alias = arena.currentProblem.alias;
+          run.contest_score = null;
+          run.time = omegaup.OmegaUp.time();
+          run.penalty = 0;
+          run.runtime = 0;
+          run.memory = 0;
+          run.language = $('#submit select[name="language"]').val();
+          arena.trackRun(run);
+          arena.updateRunFallback(run.guid, run);
 
-              $('#submit input').removeAttr('disabled');
-              arena.hideOverlay();
-            });
+          $('#submit input').removeAttr('disabled');
+          arena.hideOverlay();
+        }).fail(function(run) {
+          alert(run.error);
+          $('#submit input').removeAttr('disabled');
+        });
 
         return false;
       });
