@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import json
@@ -96,7 +96,7 @@ if args.sscaling == 'best':
 		if run[0]['pid'] not in pidThreads:
 			pidThreads[run[0]['pid']] = []
 		threads = pidThreads[run[0]['pid']]
-		for i in xrange(len(threads)):
+		for i in range(len(threads)):
 			if threads[i] <= t0:
 				idx = i
 				break
@@ -108,12 +108,12 @@ if args.sscaling == 'best':
 			event['tid'] = idx
 
 # Add metadata
-data = [{"name": "process_name", "ph": "M", "pid": runners[runner], "tid": 0, "args": {"name": runner}} for runner in runners] 
+data = [{"name": "process_name", "ph": "M", "pid": runners[runner], "tid": 0, "args": {"name": runner}} for runner in runners]
 
 # Flatten
 for run in runs:
 	data += run
 
-print json.dumps(data, separators=(',', ':'))
+print(json.dumps(data, separators=(',', ':')))
 
 # vim: set noexpandtab:

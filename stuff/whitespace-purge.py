@@ -69,6 +69,8 @@ def main():
 
   if not run_validations(args, args.files, validate_only):
     if validate_only:
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+        return 1
       print('%sWhitespace validation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
             COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),

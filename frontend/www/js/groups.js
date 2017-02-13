@@ -8,22 +8,25 @@ var formAlias = formData.attr('data-alias');
 $(function() {
   if (formPage === 'list') {
     function fillGroupsList() {
-      omegaup.API.getMyGroups().then(function(groups) {
-        var html = '';
+      omegaup.API.getMyGroups()
+          .then(function(groups) {
+            var html = '';
 
-        for (var i = 0; i < groups.groups.length; i++) {
-          html += '<tr>' + "<td><b><a href='/group/" + groups.groups[i].alias +
-                  "/edit/#scoreboards'>" +
-                  omegaup.UI.escape(groups.groups[i].name) + '</a></b></td>' +
-                  '<td><a class="glyphicon glyphicon-edit" href="/group/' +
-                  groups.groups[i].alias +
-                  '/edit#edit" title="{#wordsEdit#}"></a></td>' +
-                  '</tr>';
-        }
+            for (var i = 0; i < groups.groups.length; i++) {
+              html += '<tr>' + "<td><b><a href='/group/" +
+                      groups.groups[i].alias + "/edit/#scoreboards'>" +
+                      omegaup.UI.escape(groups.groups[i].name) +
+                      '</a></b></td>' +
+                      '<td><a class="glyphicon glyphicon-edit" href="/group/' +
+                      groups.groups[i].alias +
+                      '/edit#edit" title="{#wordsEdit#}"></a></td>' +
+                      '</tr>';
+            }
 
-        $('#groups_list').removeClass('wait_for_ajax');
-        $('#groups_list > table > tbody').empty().html(html);
-      }).fail(omegaup.UI.apiError);
+            $('#groups_list').removeClass('wait_for_ajax');
+            $('#groups_list > table > tbody').empty().html(html);
+          })
+          .fail(omegaup.UI.apiError);
     }
 
     fillGroupsList();
@@ -39,7 +42,8 @@ $(function() {
                 window.location.replace('/group/' +
                                         $('.new_group_form #alias').val() +
                                         '/edit/#members');
-              }).fail(omegaup.UI.apiError);
+              })
+              .fail(omegaup.UI.apiError);
 
           return false;
         });
@@ -76,7 +80,8 @@ $(function() {
                 $('div.post.footer').show();
 
                 refreshGroupMembers();
-              }).fail(omegaup.UI.apiError);
+              })
+              .fail(omegaup.UI.apiError);
 
           return false;  // Prevent refresh
         });
@@ -114,11 +119,13 @@ $(function() {
                                             var tr = e.target.parentElement
                                                          .parentElement;
                                             $(tr).remove();
-                                          }).fail(omegaup.UI.apiError);
+                                          })
+                                          .fail(omegaup.UI.apiError);
                                     };
                                   })(user.username))));
             }
-          }).fail(omegaup.UI.apiError);
+          })
+          .fail(omegaup.UI.apiError);
     }
 
     $('#add-scoreboard-form')
@@ -133,7 +140,8 @@ $(function() {
                 omegaup.UI.success('Scoreboard successfully added!');
                 $('div.post.footer').show();
                 refreshGroupScoreboards();
-              }).fail(omegaup.UI.apiError);
+              })
+              .fail(omegaup.UI.apiError);
 
           return false;  // Prevent refresh
         });
@@ -157,14 +165,15 @@ $(function() {
                                                         scoreboard.alias + '/')
                                               .text(omegaup.UI.escape(
                                                   scoreboard.name))))
-                          .append($(
-                              '<td>' +
-                              '<a class="glyphicon glyphicon-edit" ' +
-                              'href="/group/' + groupAlias + '/scoreboard/' +
-                              scoreboard.alias + '/edit/" ' +
-                              'title="Edit"></a></td>')));
+                          .append($('<td>' +
+                                    '<a class="glyphicon glyphicon-edit" ' +
+                                    'href="/group/' + groupAlias +
+                                    '/scoreboard/' + scoreboard.alias +
+                                    '/edit/" ' +
+                                    'title="Edit"></a></td>')));
             }
-          }).fail(omegaup.UI.apiError);
+          })
+          .fail(omegaup.UI.apiError);
     }
 
     refreshGroupScoreboards();

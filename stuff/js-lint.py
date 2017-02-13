@@ -45,30 +45,38 @@ def run_linter(args, files, validate_only):
         try:
           output = subprocess.check_output([
             GJSLINT_PATH, '--nojsdoc', '--quiet',
-            f.name])
+            f.name], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-          print('File %s%s%s:\n%s' % (COLORS.HEADER, filename, COLORS.NORMAL,
-            str(b'\n'.join(e.output.split(b'\n')[1:]),
-              encoding='utf-8')), file=sys.stderr)
+          print('File %s%s%s lint failed:\n%s' %
+                (COLORS.HEADER, filename, COLORS.NORMAL,
+                 str(b'\n'.join(e.output.split(b'\n')[1:]), encoding='utf-8')),
+                file=sys.stderr)
           validation_passed = False
-      else:
-        previous_outputs = set("")
-        while True:
-          output = subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name])
-          if output in previous_outputs:
-            break
-          previous_outputs.add(output)
-        subprocess.check_call([CLANG_FORMAT_PATH, '-style=Google',
-                               '-assume-filename=%s' % filename,
-                               '-i', f.name])
-        with open(f.name, 'rb') as f2:
-          new_contents = f2.read()
-        if contents != new_contents:
+      try:
+        subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name],
+                                stderr=subprocess.STDOUT)
+        subprocess.check_output([CLANG_FORMAT_PATH, '-style=Google',
+                                 '-assume-filename=%s' % filename,
+                                 '-i', f.name], stderr=subprocess.STDOUT)
+      except subprocess.CalledProcessError as e:
+        print('File %s%s%s lint failed:\n%s' %
+              (COLORS.HEADER, filename, COLORS.NORMAL,
+               str(b'\n'.join(e.output.split(b'\n')[1:]), encoding='utf-8')),
+              file=sys.stderr)
+        validation_passed = False
+      with open(f.name, 'rb') as f2:
+        new_contents = f2.read()
+      if contents != new_contents:
+        validation_passed = False
+        if validate_only:
+          print('File %s%s%s lint failed.' %
+                (COLORS.HEADER, filename, COLORS.NORMAL),
+                file=sys.stderr)
+        else:
           print('Fixing %s%s%s' % (COLORS.HEADER, filename,
             COLORS.NORMAL), file=sys.stderr)
           with open(os.path.join(root, filename), 'wb') as o:
             o.write(new_contents)
-          validation_passed = False
   return validation_passed
 
 def main():
@@ -89,6 +97,8 @@ def main():
 
   if not run_linter(args, args.files, validate_only):
     if validate_only:
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+        return 1
       print('%sValidation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
             COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
