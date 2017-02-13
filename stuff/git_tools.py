@@ -112,7 +112,35 @@ def _files_to_consider(args, whitelist=(), blacklist=()):
   result = [filename for filename in result if all(not r.match(filename)
     for r in blacklist)]
 
-  return [str(filename, encoding='utf-8') for filename in result]
+  return sorted([str(filename, encoding='utf-8') for filename in result])
+
+def prompt(question, default=True):
+  '''Asks the user a yes/no question.'''
+  if not sys.stdin.isatty():
+    return default
+
+  while True:
+    yes = 'yes'
+    no = 'no'
+    yes_label = yes
+    no_label = no
+    if default:
+      yes_label = yes_label.upper()
+    else:
+      no_label = no_label.upper()
+
+    try:
+      response = input('%s (%s/%s): ' % (question, yes_label, no_label))
+    except EOFError:
+      return default
+
+    response = response.strip().lower()
+    if not response:
+      return default
+    if yes.startswith(response):
+      return True
+    if no.startswith(response):
+      return False
 
 def file_contents(args, root, filename):
   '''Returns the contents of |filename| At the revision specified by |args|.'''
@@ -175,14 +203,18 @@ def parse_arguments(tool_description=None, file_whitelist=(),
           file=sys.stderr)
   return args
 
-def get_fix_commandline(progname, args):
-  '''Gets the commandline the developer must run to fix violations.'''
+def _get_fix_args(progname, args):
+  '''Gets the command arguments to run to fix violations.'''
   params = [progname, 'fix']
   params.extend(args.commits)
   if args.files:
     params.append('--')
     params.extend(args.files)
-  return ' '.join(pipes.quote(p) for p in params)
+  return params
+
+def get_fix_commandline(progname, args):
+  '''Gets the commandline the developer must run to fix violations.'''
+  return ' '.join(pipes.quote(p) for p in _get_fix_args(progname, args))
 
 def verify_toolchain(binaries):
   '''Verifies that the developer has all necessary tools installed.'''
@@ -193,5 +225,40 @@ def verify_toolchain(binaries):
           (COLORS.FAIL, path, COLORS.NORMAL, install_cmd), file=sys.stderr)
       success = False
   return success
+
+def _is_single_commit_pushed(args):
+  '''Returns whether a single commit is being pushed.'''
+  if len(args.commits) != 2:
+    return False
+  return args.commits[0] == subprocess.check_output(
+      ['/usr/bin/git', 'rev-parse', '%s^' % args.commits[1]],
+      universal_newlines=True).strip()
+
+def attempt_automatic_fixes(scriptname, args):
+  '''Attempts to automatically fix any fixable errors.'''
+  if not sys.stdin.isatty():
+    # There is no one to ask.
+    return False
+  if not prompt('Want to automatically fix errors?'):
+    # User decided not to go with the fixes.
+    return False
+  # This should always "fail" because it's designed to block `git push`.
+  # We cannot use check_call() for that reason.
+  subprocess.call(_get_fix_args(scriptname, args))
+  if not subprocess.check_output(['/usr/bin/git',
+                                  'status', '--porcelain']).strip():
+    # The fix failed?
+    return False
+  if _is_single_commit_pushed(args):
+    # We can amend the previous commit!
+    subprocess.check_call(['/usr/bin/git', 'commit', '--amend', '--no-edit'])
+    print('%sPrevious commit reused, ready to upload.%s' %
+          (COLORS.OKGREEN, COLORS.NORMAL), file=sys.stderr)
+  else:
+    subprocess.check_call(['/usr/bin/git', 'commit',
+                           '-am', 'Fixed %s lints' % scriptname])
+    print('%sCommitted fixes, ready to upload.%s' %
+          (COLORS.OKGREEN, COLORS.NORMAL), file=sys.stderr)
+  return True
 
 # vim: expandtab shiftwidth=2 tabstop=2

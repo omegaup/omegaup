@@ -60,6 +60,8 @@ def main():
 
   if not validation_passed:
     if validate_only:
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+        return 1
       print('%sPHP validation errors.%s '
             'Please run `%s` to fix them.' % (git_tools.COLORS.FAIL,
               git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
