@@ -25,15 +25,15 @@ class InterviewController extends Controller {
         self::validateCreateOrUpdate($r, false);
 
         $problemset = new Problemsets();
-        $acl = new ACLs(array(
+        $acl = new ACLs([
             'owner_id' => $r['current_user']->user_id,
-        ));
-        $interview = new Interviews(array(
+        ]);
+        $interview = new Interviews([
             'alias' => $r['alias'],
             'title' => $r['title'],
             'description' => array_key_exists('description', $r) ? $r['description'] : $r['title'],
             'window_length' => $r['duration'],
-        ));
+        ]);
 
         try {
             InterviewsDAO::transBegin();
@@ -59,7 +59,7 @@ class InterviewController extends Controller {
 
         self::$log->info('Created new interview ' . $r['alias']);
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     public static function apiAddUsers(Request $r) {
@@ -80,7 +80,7 @@ class InterviewController extends Controller {
             self::addUserInternal($requestToInternal);
         }
 
-        return array ('status' => 'ok');
+        return  ['status' => 'ok'];
     }
 
     private static function addUserInternal($r) {
@@ -159,13 +159,13 @@ class InterviewController extends Controller {
 
         // add the user to the interview
         try {
-            ProblemsetUsersDAO::save(new ProblemsetUsers(array(
+            ProblemsetUsersDAO::save(new ProblemsetUsers([
                 'problemset_id' => $r['interview']->problemset_id,
                 'user_id' => $r['user']->user_id,
                 'access_time' => '0000-00-00 00:00:00',
                 'score' => '0',
                 'time' => '0',
-            )));
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             self::$log->error('Failed to create new ProblemsetUser: ' . $e->getMessage());
@@ -188,7 +188,7 @@ class InterviewController extends Controller {
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
 
-        $thisResult = array();
+        $thisResult = [];
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
@@ -204,15 +204,15 @@ class InterviewController extends Controller {
         $thisResult['contest_alias'] = $interview->alias;
 
         try {
-            $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers(array(
+            $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers([
                 'problemset_id' => $interview->problemset_id,
-            )));
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $users = array();
+        $users = [];
 
         // Add all users to an array
         foreach ($db_results as $result) {
@@ -227,13 +227,13 @@ class InterviewController extends Controller {
             }
 
             $problemsetOpened = UserController::userOpenedProblemset($interview->problemset_id, $user_id);
-            $users[] = array(
+            $users[] = [
                         'user_id' => $user_id,
                         'username' => $user->username,
                         'access_time' => $result->access_time,
                         'email' => $email->email,
                         'opened_interview' => $problemsetOpened,
-                        'country' => $user->country_id);
+                        'country' => $user->country_id];
         }
 
         $thisResult['users'] = $users;

@@ -25,13 +25,13 @@ class ProblemStatsTest extends OmegaupTestCase {
 
         // Create some runs to be pending
         $pendingRunsCount = 5;
-        $pendingRunsData = array();
+        $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
             $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
         }
 
         $ACRunsCount = 2;
-        $ACRunsData = array();
+        $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
             $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
 
@@ -40,7 +40,7 @@ class ProblemStatsTest extends OmegaupTestCase {
         }
 
         $WARunsCount = 1;
-        $WARunsData = array();
+        $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
             $WARunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
 
@@ -50,10 +50,10 @@ class ProblemStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($problemData['author']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
-        ));
+        ]);
 
         // Call API
         $response = ProblemController::apiStats($r);

@@ -15,9 +15,9 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($author);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ProblemController::apiMyList($r);
 
         $this->assertEquals(count($problemData), count($response['problems']));
@@ -31,9 +31,9 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($author);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ProblemController::apiMyList($r);
 
         $this->assertEquals(0, count($response['problems']));
@@ -45,7 +45,7 @@ class UserProblemsTest extends OmegaupTestCase {
     public function testAdminList() {
         // Our author
         $author = UserFactory::createUser();
-        $problemAdminData = array();
+        $problemAdminData = [];
 
         // Get two problems with another author, add $author to their
         // admin list
@@ -64,9 +64,9 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($author);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ProblemController::apiAdminList($r);
 
         // Problems should come ordered by problem id desc

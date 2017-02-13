@@ -28,11 +28,11 @@ class UserRolesDAO extends UserRolesDAOBase {
                 Users u ON u.user_id = ur.user_id
             WHERE
                 ur.role_id = ? AND ur.acl_id IN (?, ?);';
-        $params = array(
+        $params = [
             Authorization::ADMIN_ROLE,
             Authorization::SYSTEM_ACL,
             $acl_id,
-        );
+        ];
 
         global $conn;
         $admins = $conn->GetAll($sql, $params);
@@ -46,7 +46,7 @@ class UserRolesDAO extends UserRolesDAOBase {
                 Users u ON u.user_id = a.owner_id
             WHERE
                 a.acl_id = ?;';
-        $params = array($acl_id);
+        $params = [$acl_id];
         $owner = $conn->GetOne($sql, $params);
 
         $found = false;
@@ -63,7 +63,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         }
 
         if (!$found) {
-            array_push($admins, array('username' => $owner, 'role' => 'owner'));
+            array_push($admins, ['username' => $owner, 'role' => 'owner']);
         }
 
         return $admins;
@@ -77,12 +77,12 @@ class UserRolesDAO extends UserRolesDAOBase {
                 User_Roles ur
             WHERE
                 ur.user_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
-        $params = array(
+        $params = [
             $user_id,
             Authorization::ADMIN_ROLE,
             Authorization::SYSTEM_ACL,
             $acl_id,
-        );
+        ];
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
     }

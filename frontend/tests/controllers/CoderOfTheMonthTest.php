@@ -45,9 +45,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $auth_token = self::login($user);
 
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $auth_token
-        ));
+        ]);
 
         $response = UserController::apiCoderOfTheMonthList($r);
 

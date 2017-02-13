@@ -9,8 +9,7 @@ include('base/Courses.vo.base.php');
   * @access public
   *
   */
-class CoursesDAO extends CoursesDAOBase
-{
+class CoursesDAO extends CoursesDAOBase {
     public static function findByName($name) {
         global  $conn;
 
@@ -19,8 +18,8 @@ class CoursesDAO extends CoursesDAOBase
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = $conn->Execute($sql, array($name));
-        $finalResult = array();
+        $resultRows = $conn->Execute($sql, [$name]);
+        $finalResult = [];
 
         foreach ($resultRows as $row) {
             array_push($finalResult, new Courses($row));
@@ -34,7 +33,7 @@ class CoursesDAO extends CoursesDAOBase
 
         $sql = 'SELECT c.* FROM Courses c WHERE c.alias  = ?';
 
-        $rs = $conn->GetRow($sql, array($alias));
+        $rs = $conn->GetRow($sql, [$alias]);
         if (count($rs) == 0) {
             return null;
         }
@@ -53,9 +52,9 @@ class CoursesDAO extends CoursesDAOBase
                 . ' where c.alias = ? and a.course_id = c.course_id'
                 . ' order by start_time;';
 
-        $rs = $conn->Execute($sql, array($alias));
+        $rs = $conn->Execute($sql, [$alias]);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $row) {
             unset($row['assignment_id']);
             unset($row['course_id']);
@@ -81,7 +80,7 @@ class CoursesDAO extends CoursesDAOBase
                 ON c.group_id = gg.group_id;
                ';
         $rs = $conn->Execute($sql, $user);
-        $courses = array();
+        $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
         }
@@ -122,7 +121,7 @@ class CoursesDAO extends CoursesDAOBase
                 */
 
         $rs = $conn->Execute($sql, $courseAlias);
-        $users = array();
+        $users = [];
         foreach ($rs as $row) {
             /* @TODO: Remover count_homeworks_done, count_assignments_done y sacarlos del query anterior */
             $row['count_homeworks_done'] = 1;
@@ -162,7 +161,7 @@ class CoursesDAO extends CoursesDAOBase
                 c.course_id DESC
             LIMIT
                 ?, ?';
-        $params = array(
+        $params = [
             $user_id,
             Authorization::ADMIN_ROLE,
             $user_id,
@@ -170,12 +169,12 @@ class CoursesDAO extends CoursesDAOBase
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $courses = array();
+        $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
         }
@@ -204,16 +203,16 @@ class CoursesDAO extends CoursesDAOBase
                 c.course_id DESC
             LIMIT
                 ?, ?';
-        $params = array(
+        $params = [
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $courses = array();
+        $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
         }
@@ -222,7 +221,7 @@ class CoursesDAO extends CoursesDAOBase
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
-        $params = array($alias);
+        $params = [$alias];
 
         global $conn;
         $row = $conn->GetRow($sql, $params);

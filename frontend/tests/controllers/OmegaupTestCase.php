@@ -64,9 +64,9 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      */
     public function assertLogin(Users $user, $auth_token = null) {
         // Check auth token
-        $authTokenKey = new AuthTokens(array(
+        $authTokenKey = new AuthTokens([
                     'user_id' => $user->user_id
-                ));
+                ]);
         $auth_tokens_bd = AuthTokensDAO::search($authTokenKey);
 
         // Validar que el token se guardó en la BDD
@@ -102,10 +102,10 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         SessionController::$setCookieOnRegisterSession = false;
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password,
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -246,12 +246,12 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         // Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
         $fileUploaderMock->expects($this->any())
                 ->method('IsUploadedFile')
-                ->will($this->returnCallback(array($this, 'IsUploadedFile')));
+                ->will($this->returnCallback([$this, 'IsUploadedFile']));
 
         // Detour MoveUploadedFile function inside FileUploader to our own MoveUploadedFile
         $fileUploaderMock->expects($this->any())
                 ->method('MoveUploadedFile')
-                ->will($this->returnCallback(array($this, 'MoveUploadedFile')));
+                ->will($this->returnCallback([$this, 'MoveUploadedFile']));
 
         return $fileUploaderMock;
     }

@@ -26,9 +26,9 @@ class CourseListTest extends OmegaupTestCase {
     public function testGetCourseForAdminUser() {
         // Call the details API
         $adminLogin = self::login($this->admin_user);
-        $response = CourseController::apiListCourses(new Request(array(
+        $response = CourseController::apiListCourses(new Request([
             'auth_token' => $adminLogin->auth_token,
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
@@ -47,9 +47,9 @@ class CourseListTest extends OmegaupTestCase {
 
     public function testGetCourseListForNormalUser() {
         $otherUserLogin = self::login($this->other_user);
-        $response = CourseController::apiListCourses(new Request(array(
+        $response = CourseController::apiListCourses(new Request([
             'auth_token' => $otherUserLogin->auth_token,
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);

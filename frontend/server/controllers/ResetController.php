@@ -35,7 +35,7 @@ class ResetController extends Controller {
         UsersDAO::save($user);
 
         if (IS_TEST) {
-            return array('status' => 'ok', 'token' => $token);
+            return ['status' => 'ok', 'token' => $token];
         }
 
         global $smarty;
@@ -52,10 +52,10 @@ class ResetController extends Controller {
             UsersDAO::save($user);
         }
 
-        return array(
+        return [
             'status' => 'ok',
             'message' => $smarty->getConfigVariable('passwordResetRequestSuccess')
-        );
+        ];
     }
 
     /**
@@ -75,10 +75,10 @@ class ResetController extends Controller {
         UsersDAO::save($user);
 
         global $smarty;
-        return array(
+        return [
             'status' => 'ok',
             'message' =>  IS_TEST ? 'message' : $smarty->getConfigVariable('passwordResetResetSuccess')
-        );
+        ];
     }
 
     private static function validateCreateRequest($r) {

@@ -63,11 +63,11 @@ class ProblemController extends Controller {
 
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
         Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::isInEnum($r['public'], 'public', array('0', '1'), $is_required);
+        Validators::isInEnum($r['public'], 'public', ['0', '1'], $is_required);
         Validators::isInEnum(
             $r['validator'],
             'validator',
-            array('token', 'token-caseless', 'token-numeric', 'custom', 'literal'),
+            ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $is_required
         );
             Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
@@ -84,7 +84,7 @@ class ProblemController extends Controller {
         } elseif (isset($r['languages']) && is_array($r['languages'])) {
             $r['languages'] = implode(',', $r['languages']);
         }
-            Validators::isValidSubset($r['languages'], 'languages', array('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11'), $is_required);
+            Validators::isValidSubset($r['languages'], 'languages', ['c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11'], $is_required);
     }
 
     /**
@@ -267,7 +267,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -317,7 +317,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -384,7 +384,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok', 'name' => $tag_name);
+        return ['status' => 'ok', 'name' => $tag_name];
     }
 
     /**
@@ -433,7 +433,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -481,7 +481,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -529,7 +529,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -555,7 +555,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = array();
+        $response = [];
         $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
         $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
         $response['status'] = 'ok';
@@ -582,7 +582,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
         $response['tags'] = ProblemsTagsDAO::getProblemTags(
             $problem,
             !Authorization::isProblemAdmin($r['current_user_id'], $problem)
@@ -609,13 +609,13 @@ class ProblemController extends Controller {
         self::initializeGrader();
 
         // Call Grader
-        $runs = array();
+        $runs = [];
         try {
-            $runs = RunsDAO::search(new Runs(array(
+            $runs = RunsDAO::search(new Runs([
                                 'problem_id' => $r['problem']->problem_id
-                            )));
+                            ]));
 
-            $guids = array();
+            $guids = [];
             foreach ($runs as $run) {
                 $guids[] = $run->guid;
                 $run->status = 'new';
@@ -634,7 +634,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
 
         // All clear
         $response['status'] = 'ok';
@@ -658,29 +658,29 @@ class ProblemController extends Controller {
         Validators::isStringNonEmpty($r['message'], 'message');
 
         // Update the Problem object
-        $valueProperties = array(
+        $valueProperties = [
             'public',
             'title',
-            'validator'     => array('important' => true), // requires rejudge
-            'time_limit'    => array('important' => true), // requires rejudge
-            'validator_time_limit'    => array('important' => true), // requires rejudge
-            'overall_wall_time_limit' => array('important' => true), // requires rejudge
-            'extra_wall_time' => array('important' => true), // requires rejudge
-            'memory_limit'  => array('important' => true), // requires rejudge
-            'output_limit'  => array('important' => true), // requires rejudge
-            'stack_limit'   => array('important' => true), // requires rejudge
+            'validator'     => ['important' => true], // requires rejudge
+            'time_limit'    => ['important' => true], // requires rejudge
+            'validator_time_limit'    => ['important' => true], // requires rejudge
+            'overall_wall_time_limit' => ['important' => true], // requires rejudge
+            'extra_wall_time' => ['important' => true], // requires rejudge
+            'memory_limit'  => ['important' => true], // requires rejudge
+            'output_limit'  => ['important' => true], // requires rejudge
+            'stack_limit'   => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
             'languages',
-        );
+        ];
         $problem = $r['problem'];
         $requiresRejudge = self::updateValueProperties($r, $problem, $valueProperties);
         $r['problem'] = $problem;
 
-        $response = array(
+        $response = [
             'rejudged' => false
-        );
+        ];
         $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
 
         // Insert new problem
@@ -781,7 +781,7 @@ class ProblemController extends Controller {
         Validators::isStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        $iso639_1 = array('ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
+        $iso639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
             'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',
             'bs', 'br', 'bg', 'my', 'ca', 'ch', 'ce', 'ny', 'zh', 'cv', 'kw', 'co',
             'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo', 'et', 'ee', 'fo',
@@ -796,7 +796,7 @@ class ProblemController extends Controller {
             'gd', 'sn', 'si', 'sk', 'sl', 'so', 'st', 'es', 'su', 'sw', 'ss', 'sv',
             'ta', 'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts',
             'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
-            'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu');
+            'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
         Validators::isInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
         if (is_null($r['lang'])) {
             $r['lang'] = UserController::getPreferredLanguage($r);
@@ -854,7 +854,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (isset($r['statement_type']) && !in_array($r['statement_type'], array('html', 'markdown'))) {
+        if (isset($r['statement_type']) && !in_array($r['statement_type'], ['html', 'markdown'])) {
             throw new NotFoundException('invalidStatementType');
         }
 
@@ -979,7 +979,7 @@ class ProblemController extends Controller {
         // Get HEAD revision to avoid race conditions.
         $gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias;
         $git = new Git($gitDir);
-        $head = trim($git->get(array('rev-parse', 'HEAD')));
+        $head = trim($git->get(['rev-parse', 'HEAD']));
 
         // Set headers to auto-download file
         header('Pragma: public');
@@ -988,7 +988,7 @@ class ProblemController extends Controller {
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment;filename=' . $r['problem']->alias . '_' . $head . '.zip');
         header('Content-Transfer-Encoding: binary');
-        $git->exec(array('archive', '--format=zip', $head));
+        $git->exec(['archive', '--format=zip', $head]);
 
         die();
     }
@@ -1042,14 +1042,14 @@ class ProblemController extends Controller {
         // Validate request
         self::validateDetails($r);
 
-        $response = array();
+        $response = [];
 
         // Create array of relevant columns
-        $relevant_columns = array('title', 'alias', 'validator', 'time_limit',
+        $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
             'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
             'difficulty', 'creation_date', 'source', 'order', 'points', 'public',
-            'languages', 'slow', 'stack_limit', 'email_clarifications');
+            'languages', 'slow', 'stack_limit', 'email_clarifications'];
 
         // Read the file that contains the source
         if (!ProblemController::isLanguageSupportedForProblem($r)) {
@@ -1093,30 +1093,30 @@ class ProblemController extends Controller {
             Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
             $acl = ACLsDAO::getByPK($r['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);
-            $response['problemsetter'] = array(
+            $response['problemsetter'] = [
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
                           $problemsetter->name
-            );
+            ];
         } else {
             unset($response['source']);
         }
 
         if (!is_null($r['current_user_id'])) {
             // Create array of relevant columns for list of runs
-            $relevant_columns = array('guid', 'language', 'status', 'verdict',
+            $relevant_columns = ['guid', 'language', 'status', 'verdict',
                 'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                'submit_delay');
+                'submit_delay'];
 
             // Search the relevant runs from the DB
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
 
-            $keyrun = new Runs(array(
+            $keyrun = new Runs([
                 'user_id' => $r['current_user_id'],
                 'problem_id' => $r['problem']->problem_id,
                 'problemset_id' => is_null($r['contest']) ? null : $r['contest']->problemset_id
-            ));
+            ]);
 
             // Get all the available runs done by the current_user
             try {
@@ -1128,7 +1128,7 @@ class ProblemController extends Controller {
 
             // Add each filtered run to an array
             if (count($runs_array) >= 0) {
-                $runs_filtered_array = array();
+                $runs_filtered_array = [];
                 foreach ($runs_array as $run) {
                     $filtered = $run->asFilteredArray($relevant_columns);
                     $filtered['alias'] = $r['problem']->alias;
@@ -1163,11 +1163,11 @@ class ProblemController extends Controller {
             )) {
                 try {
                     // Save object in the DB
-                    ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened(array(
+                    ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
                         'problemset_id' => $r['contest']->problemset_id,
                         'problem_id' => $r['problem']->problem_id,
                         'user_id' => $r['current_user_id']
-                    )));
+                    ]));
                 } catch (Exception $e) {
                     // Operation failed in the data layer
                     throw new InvalidDatabaseOperationException($e);
@@ -1229,7 +1229,7 @@ class ProblemController extends Controller {
         // Validate request
         self::validateRuns($r);
 
-        $response = array();
+        $response = [];
 
         if ($r['show_all']) {
             if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
@@ -1254,7 +1254,7 @@ class ProblemController extends Controller {
                     $r['rowcount']
                 );
 
-                $result = array();
+                $result = [];
 
                 foreach ($runs as $run) {
                     $run['time'] = (int)$run['time'];
@@ -1271,24 +1271,24 @@ class ProblemController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         } else {
-            $keyrun = new Runs(array(
+            $keyrun = new Runs([
                 'user_id' => $r['current_user_id'],
                 'problem_id' => $r['problem']->problem_id
-            ));
+            ]);
 
             // Get all the available runs
             try {
                 $runs_array = RunsDAO::search($keyrun);
 
                 // Create array of relevant columns for list of runs
-                $relevant_columns = array('guid', 'language', 'status', 'verdict',
+                $relevant_columns = ['guid', 'language', 'status', 'verdict',
                     'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                    'submit_delay');
+                    'submit_delay'];
 
                 // Add each filtered run to an array
-                $response['runs'] = array();
+                $response['runs'] = [];
                 if (count($runs_array) >= 0) {
-                    $runs_filtered_array = array();
+                    $runs_filtered_array = [];
                     foreach ($runs_array as $run) {
                         $filtered = $run->asFilteredArray($relevant_columns);
                         $filtered['time'] = strtotime($filtered['time']);
@@ -1339,7 +1339,7 @@ class ProblemController extends Controller {
         }
 
         // Add response to array
-        $response = array();
+        $response = [];
         $response['clarifications'] = $clarifications;
         $response['status'] = 'ok';
 
@@ -1374,7 +1374,7 @@ class ProblemController extends Controller {
             $totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r['problem']->problem_id);
 
             // List of verdicts
-            $verdict_counts = array();
+            $verdict_counts = [];
 
             foreach (self::$verdicts as $verdict) {
                 $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r['problem']->problem_id, $verdict);
@@ -1386,8 +1386,8 @@ class ProblemController extends Controller {
             $cases_stats = $problemStatsCache->get();
             if (is_null($cases_stats)) {
                 // Initialize the array at counts = 0
-                $cases_stats = array();
-                $cases_stats['counts'] = array();
+                $cases_stats = [];
+                $cases_stats['counts'] = [];
 
                 // We need to save the last_id that we processed, so next time we do not repeat this
                 $cases_stats['last_id'] = 0;
@@ -1410,7 +1410,7 @@ class ProblemController extends Controller {
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(array('problem_id' => $r['problem']->problem_id)), $cases_stats['last_id'], 'run_id');
+            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(['problem_id' => $r['problem']->problem_id]), $cases_stats['last_id'], 'run_id');
 
             // For each run we got
             foreach ($runs as $run) {
@@ -1446,13 +1446,13 @@ class ProblemController extends Controller {
         // Save in cache what we got
         $problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
 
-        return array(
+        return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
             'verdict_counts' => $verdict_counts,
             'cases_stats' => $cases_stats['counts'],
             'status' => 'ok'
-        );
+        ];
     }
 
     /**
@@ -1495,7 +1495,7 @@ class ProblemController extends Controller {
 
         // Sort results
         $order = 'problem_id'; // Order by problem_id by default.
-        $sorting_options = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
+        $sorting_options = ['title', 'submissions', 'accepted', 'ratio', 'points', 'score'];
         // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
         if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
             $order = $r['order_by'];
@@ -1508,8 +1508,8 @@ class ProblemController extends Controller {
             $mode = 'desc';
         }
 
-        $response = array();
-        $response['results'] = array();
+        $response = [];
+        $response['results'] = [];
         $author_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
@@ -1594,17 +1594,17 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $addedProblems = array();
+        $addedProblems = [];
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
-        return array(
+        return [
             'status' => 'ok',
             'problems' => $addedProblems,
-        );
+        ];
     }
 
     /**
@@ -1632,17 +1632,17 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $addedProblems = array();
+        $addedProblems = [];
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
-        return array(
+        return [
             'status' => 'ok',
             'problems' => $addedProblems,
-        );
+        ];
     }
 
     /**

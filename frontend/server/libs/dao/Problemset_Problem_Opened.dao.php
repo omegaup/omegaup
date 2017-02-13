@@ -9,6 +9,5 @@ include('base/Problemset_Problem_Opened.vo.base.php');
   * @access public
   *
   */
-class ProblemsetProblemOpenedDAO extends ProblemsetProblemOpenedDAOBase
-{
+class ProblemsetProblemOpenedDAO extends ProblemsetProblemOpenedDAOBase {
 }

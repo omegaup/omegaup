@@ -17,6 +17,5 @@ require_once('base/Roles.vo.base.php');
   * @package docs
   *
   */
-class RolesDAO extends RolesDAOBase
-{
+class RolesDAO extends RolesDAOBase {
 }

@@ -9,8 +9,7 @@ include('base/User_Rank.vo.base.php');
   * @access public
   *
   */
-class UserRankDAO extends UserRankDAOBase
-{
+class UserRankDAO extends UserRankDAOBase {
     /**
      * Actualiza la tabla User_Rank
      *

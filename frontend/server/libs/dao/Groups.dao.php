@@ -22,7 +22,7 @@ class GroupsDAO extends GroupsDAOBase {
     public static function FindByAlias($alias) {
         global  $conn;
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ?;';
-        $params = array($alias);
+        $params = [$alias];
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
@@ -33,10 +33,10 @@ class GroupsDAO extends GroupsDAOBase {
     public static function SearchByName($name) {
         global  $conn;
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
-        $args = array($name);
+        $args = [$name];
 
         $rs = $conn->Execute($sql, $args);
-        $ar = array();
+        $ar = [];
         foreach ($rs as $row) {
             array_push($ar, new Groups($row));
         }

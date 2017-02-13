@@ -9,8 +9,7 @@ include('base/Group_Roles.vo.base.php');
   * @access public
   *
   */
-class GroupRolesDAO extends GroupRolesDAOBase
-{
+class GroupRolesDAO extends GroupRolesDAOBase {
     public static function getAdmins($acl_id) {
         $sql = '
             SELECT
@@ -21,11 +20,11 @@ class GroupRolesDAO extends GroupRolesDAOBase
                 Groups g ON g.group_id = gr.group_id
             WHERE
                 gr.role_id = ? AND gr.acl_id IN (?, ?);';
-        $params = array(
+        $params = [
             Authorization::ADMIN_ROLE,
             Authorization::SYSTEM_ACL,
             $acl_id,
-        );
+        ];
 
         global $conn;
         $admins = $conn->GetAll($sql, $params);
@@ -52,12 +51,12 @@ class GroupRolesDAO extends GroupRolesDAOBase
                 Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
                 gu.user_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
-        $params = array(
+        $params = [
             $user_id,
             Authorization::ADMIN_ROLE,
             Authorization::SYSTEM_ACL,
             $acl_id,
-        );
+        ];
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
     }

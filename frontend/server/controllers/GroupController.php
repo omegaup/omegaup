@@ -20,13 +20,13 @@ class GroupController extends Controller {
         Validators::isStringNonEmpty($r['description'], 'description', false);
 
         try {
-            $group = new Groups(array(
+            $group = new Groups([
                 'owner_id' => $r['current_user_id'],
                 'name' => $r['name'],
                 'description' =>$r['description'],
                 'alias' => $r['alias'],
                 'create_time' => gmdate('Y-m-d H:i:s', time()),
-            ));
+            ]);
 
             GroupsDAO::save($group);
 
@@ -35,7 +35,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -51,9 +51,9 @@ class GroupController extends Controller {
 
         Validators::isStringNonEmpty($r['group_alias'], 'group_alias');
         try {
-            $groups = GroupsDAO::search(new Groups(array(
+            $groups = GroupsDAO::search(new Groups([
                 'alias' => $r['group_alias']
-            )));
+            ]));
 
             if (is_null($groups) || count($groups) === 0) {
                 throw new InvalidParameterException('parameterNotFound', 'Group');
@@ -90,16 +90,16 @@ class GroupController extends Controller {
         $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $groups_user = new GroupsUsers(array(
+            $groups_user = new GroupsUsers([
                 'group_id' => $r['group']->group_id,
                 'user_id' => $r['user']->user_id
-            ));
+            ]);
             GroupsUsersDAO::save($groups_user);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -112,10 +112,10 @@ class GroupController extends Controller {
         $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $key = new GroupsUsers(array(
+            $key = new GroupsUsers([
                 'group_id' => $r['group']->group_id,
                 'user_id' => $r['user']->user_id
-            ));
+            ]);
 
             // Check user is actually in group
             $groups_user = GroupsUsersDAO::search($key);
@@ -131,7 +131,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -142,13 +142,13 @@ class GroupController extends Controller {
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
 
-        $response = array();
-        $response['groups'] = array();
+        $response = [];
+        $response['groups'] = [];
 
         try {
-            $groups = GroupsDAO::search(new Groups(array(
+            $groups = GroupsDAO::search(new Groups([
                 'owner_id' => $r['current_user_id']
-            )));
+            ]));
 
             foreach ($groups as $group) {
                 $response['groups'][] = $group->asArray();
@@ -183,9 +183,9 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        $response = array();
+        $response = [];
         foreach ($groups as $group) {
-            array_push($response, array('label' => $group->name, 'value' => $group->alias));
+            array_push($response, ['label' => $group->name, 'value' => $group->alias]);
         }
         return $response;
     }
@@ -198,18 +198,18 @@ class GroupController extends Controller {
     public static function apiDetails(Request $r) {
         self::validateGroupAndOwner($r);
 
-        $response = array();
+        $response = [];
 
         try {
             $response['group'] = $r['group']->asArray();
 
             $scoreboards = GroupsScoreboardsDAO::search(
                 new GroupsScoreboards(
-                    array('group_id' => $r['group']->group_id)
+                    ['group_id' => $r['group']->group_id]
                 )
             );
 
-            $response['scoreboards'] = array();
+            $response['scoreboards'] = [];
             foreach ($scoreboards as $scoreboard) {
                 $response['scoreboards'][] = $scoreboard->asArray();
             }
@@ -229,7 +229,7 @@ class GroupController extends Controller {
     public static function apiMembers(Request $r) {
         self::validateGroupAndOwner($r);
 
-        $response = array();
+        $response = [];
 
         try {
             $response['users'] = GroupsUsersDAO::GetMemberUsernames($r['group']);
@@ -254,13 +254,13 @@ class GroupController extends Controller {
         Validators::isStringNonEmpty($r['description'], 'description', false);
 
         try {
-            $groupScoreboard = new GroupsScoreboards(array(
+            $groupScoreboard = new GroupsScoreboards([
                 'group_id' => $r['group']->group_id,
                 'name' => $r['name'],
                 'description' =>$r['description'],
                 'alias' => $r['alias'],
                 'create_time' => gmdate('Y-m-d H:i:s', time())
-            ));
+            ]);
 
             GroupsScoreboardsDAO::save($groupScoreboard);
 
@@ -269,6 +269,6 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 }

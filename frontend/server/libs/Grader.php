@@ -34,7 +34,7 @@ class Grader {
         curl_setopt($curl, CURLOPT_CAINFO, OMEGAUP_CACERT_URL);
 
         // Set curl HTTP header
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Content-Type: application/json']);
 
         return $curl;
     }

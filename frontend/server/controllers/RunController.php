@@ -55,7 +55,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $allowedLanguages = array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs');
+        $allowedLanguages = ['kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs'];
         try {
             Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -185,7 +185,7 @@ class RunController extends Controller {
         self::validateCreateRequest($r);
 
         self::$log->info('New run being submitted!!');
-        $response = array();
+        $response = [];
 
         if (self::$practice) {
             if (OMEGAUP_LOCKDOWN) {
@@ -251,7 +251,7 @@ class RunController extends Controller {
         }
 
         // Populate new run object
-        $run = new Runs(array(
+        $run = new Runs([
                     'user_id' => $r['current_user_id'],
                     'problem_id' => $r['problem']->problem_id,
                     'problemset_id' => $problemset_id,
@@ -267,18 +267,18 @@ class RunController extends Controller {
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',
                     'test' => $test
-                ));
+                ]);
 
         try {
             // Push run into DB
             RunsDAO::save($run);
 
-            SubmissionLogDAO::save(new SubmissionLog(array(
+            SubmissionLogDAO::save(new SubmissionLog([
                 'user_id' => $run->user_id,
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
-            )));
+            ]));
 
             $r['problem']->submissions++;
             ProblemsDAO::save($r['problem']);
@@ -409,9 +409,9 @@ class RunController extends Controller {
         }
 
         // Fill response
-        $relevant_columns = array('guid', 'language', 'status', 'verdict',
+        $relevant_columns = ['guid', 'language', 'status', 'verdict',
             'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-            'submit_delay');
+            'submit_delay'];
         $filtered = $r['run']->asFilteredArray($relevant_columns);
         $filtered['time'] = strtotime($filtered['time']);
         $filtered['score'] = round((float) $filtered['score'], 4);
@@ -468,7 +468,7 @@ class RunController extends Controller {
             self::$log->error($e);
         }
 
-        $response = array();
+        $response = [];
         $response['status'] = 'ok';
 
         self::invalidateCacheOnRejudge($r['run']);
@@ -531,7 +531,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = array();
+        $response = [];
 
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
@@ -587,7 +587,7 @@ class RunController extends Controller {
      * @return array
      */
     public static function ParseMeta($meta) {
-        $ans = array();
+        $ans = [];
 
         foreach (explode("\n", trim($meta)) as $line) {
             list($key, $value) = explode(':', trim($line));
@@ -637,7 +637,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = array();
+        $response = [];
 
         if (OMEGAUP_LOCKDOWN) {
             // OMI hotfix
@@ -694,12 +694,12 @@ class RunController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCounts(Request $r) {
-        $totals = array();
+        $totals = [];
 
         Cache::getFromCacheOrSet(Cache::RUN_COUNTS, '', $r, function (Request $r) {
-            $totals = array();
-            $totals['total'] = array();
-            $totals['ac'] = array();
+            $totals = [];
+            $totals['total'] = [];
+            $totals['ac'] = [];
             try {
                 $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
 
@@ -740,8 +740,8 @@ class RunController extends Controller {
 
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
-        Validators::isInEnum($r['status'], 'status', array('new', 'waiting', 'compiling', 'running', 'ready'), false);
-        Validators::isInEnum($r['verdict'], 'verdict', array('AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'), false);
+        Validators::isInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        Validators::isInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
@@ -759,7 +759,7 @@ class RunController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs'), false);
+        Validators::isInEnum($r['language'], 'language', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs'], false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
@@ -801,7 +801,7 @@ class RunController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($runs as $run) {
             $run['time'] = (int)$run['time'];
@@ -812,7 +812,7 @@ class RunController extends Controller {
             array_push($result, $run);
         }
 
-        $response = array();
+        $response = [];
         $response['runs'] = $result;
         $response['status'] = 'ok';
 

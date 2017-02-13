@@ -66,17 +66,17 @@ class ClarificationController extends Controller {
         // Validate request
         self::validateCreate($r);
 
-        $response = array();
+        $response = [];
 
         $time = time();
-        $r['clarification'] = new Clarifications(array(
+        $r['clarification'] = new Clarifications([
             'author_id' => $r['current_user_id'],
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
             'time' => gmdate('Y-m-d H:i:s', $time),
             'public' => '0'
-        ));
+        ]);
 
         // Insert new Clarification
         try {
@@ -140,7 +140,7 @@ class ClarificationController extends Controller {
         self::validateDetails($r);
 
         // Create array of relevant columns
-        $relevant_columns = array('message', 'answer', 'time', 'problem_id', 'problemset_id');
+        $relevant_columns = ['message', 'answer', 'time', 'problem_id', 'problemset_id'];
 
         // Add the clarificatoin the response
         $response = $r['clarification']->asFilteredArray($relevant_columns);
@@ -159,7 +159,7 @@ class ClarificationController extends Controller {
     private static function validateUpdate(Request $r) {
         Validators::isNumber($r['clarification_id'], 'clarificaion_id');
         Validators::isStringNonEmpty($r['answer'], 'answer', false /* not required */);
-        Validators::isInEnum($r['public'], 'public', array('0', '1'), false /* not required */);
+        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /* not required */);
         Validators::isStringNonEmpty($r['message'], 'message', false /* not required */);
 
         // Check that clarification exists
@@ -189,11 +189,11 @@ class ClarificationController extends Controller {
         self::validateUpdate($r);
 
         // Update clarification
-        $valueProperties = array(
+        $valueProperties = [
             'message',
             'answer',
             'public',
-        );
+        ];
         $clarification = $r['clarification'];
         self::updateValueProperties($r, $clarification, $valueProperties);
         $r['clarification'] = $clarification;
@@ -213,7 +213,7 @@ class ClarificationController extends Controller {
         $r['problem'] = $r['contest'] = $r['user'] = null;
         self::clarificationUpdated($r, $time);
 
-        $response = array();
+        $response = [];
         $response['status'] = 'ok';
 
         return $response;
@@ -226,9 +226,9 @@ class ClarificationController extends Controller {
             }
             if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
                 $r['problemset'] = ProblemsetsDAO::GetByPK($r['clarification']->problemset_id);
-                $contests = ContestsDAO::search(new Contests(array(
+                $contests = ContestsDAO::search(new Contests([
                     'problemset_id' => $r['problemset']->problemset_id,
-                )));
+                ]));
                 if (count($contests) === 1) {
                     $r['contest'] = $contests[0];
                 }

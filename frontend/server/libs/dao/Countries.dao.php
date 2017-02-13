@@ -17,6 +17,5 @@ require_once('base/Countries.vo.base.php');
   * @package docs
   *
   */
-class CountriesDAO extends CountriesDAOBase
-{
+class CountriesDAO extends CountriesDAOBase {
 }

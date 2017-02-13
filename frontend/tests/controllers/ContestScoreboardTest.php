@@ -51,10 +51,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Create API
         $response = ContestController::apiScoreboard($r);
@@ -83,10 +83,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Now get the scoreboard as an contest director
         $login = self::login($contestDirector);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Create API
         $response = ContestController::apiScoreboard($r);
@@ -141,10 +141,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Create API
         $response = ContestController::apiScoreboard($r);
@@ -185,10 +185,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Create API
         $response = ContestController::apiScoreboard($r);
@@ -235,10 +235,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Create API
         $response = ContestController::apiScoreboard($r);
@@ -289,10 +289,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_aliases' => $contestData['request']['alias'] . ',' . $contestData2['request']['alias'],
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiScoreboardMerge($r);
@@ -327,9 +327,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiMyList($r);
         unset($login);
 
@@ -348,21 +348,21 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Call scoreboard api from the user
         $login = self::login($externalUser);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url,
-        ));
+        ]);
         $scoreboardResponse = ContestController::apiScoreboard($r);
 
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
         // Call scoreboard api from the user with admin token
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url,
-        ));
+        ]);
         $scoreboardResponse = ContestController::apiScoreboard($r);
 
         $this->assertEquals('100', $scoreboardResponse['ranking'][0]['total']['points']);
@@ -382,11 +382,11 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Call scoreboard api from the user
         $login = self::login($externalUser);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => 'invalid token',
-        ));
+        ]);
         $scoreboardResponse = ContestController::apiScoreboard($r);
     }
 
@@ -412,9 +412,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiMyList($r);
         unset($login);
 
@@ -432,18 +432,18 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call scoreboard api from the user
-        $scoreboardResponse = ContestController::apiScoreboard(new Request(array(
+        $scoreboardResponse = ContestController::apiScoreboard(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url
-        )));
+        ]));
 
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
         // Call scoreboard api from the user with admin token
-        $scoreboardResponse = ContestController::apiScoreboard(new Request(array(
+        $scoreboardResponse = ContestController::apiScoreboard(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url
-        )));
+        ]));
 
         $this->assertEquals('100', $scoreboardResponse['ranking'][0]['total']['points']);
     }

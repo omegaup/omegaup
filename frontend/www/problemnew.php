@@ -18,7 +18,7 @@ $smarty->assign('SOURCE', '');
 $smarty->assign('PUBLIC', '0');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
-    $r = new Request(array(
+    $r = new Request([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'title' => $_POST['title'],
                 'alias' => $_POST['alias'],
@@ -33,7 +33,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'public' => $_POST['public'],
                 'stack_limit' => $_POST['stack_limit'],
                 'email_clarifications' => $_POST['email_clarifications']
-            ));
+            ]);
     $r->method = 'ProblemController::apiCreate';
 
     $response = ApiCaller::call($r);

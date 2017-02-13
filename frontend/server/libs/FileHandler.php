@@ -64,7 +64,7 @@ class FileHandler {
         }
     }
 
-    public static function TempDir($dir, $prefix = '', $mode = 0700)  {
+    public static function TempDir($dir, $prefix = '', $mode = 0700) {
         if (substr($dir, -1) != '/') {
             $dir .= '/';
         }

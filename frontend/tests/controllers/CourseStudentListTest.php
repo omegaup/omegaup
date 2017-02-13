@@ -14,17 +14,17 @@ class CourseStudentListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse();
 
         // Add some students to course
-        $students = array();
+        $students = [];
         for ($i = 0; $i < 3; $i++) {
             $students[$i] = CoursesFactory::addStudentToCourse($courseData);
         }
 
         // Call apiStudentList by an admin
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListStudents(new Request(array(
+        $response = CourseController::apiListStudents(new Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         foreach ($students as $s) {
@@ -41,10 +41,10 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         // Call apiStudentList by another random user
         $userLogin = self::login(UserFactory::createUser());
-        $response = CourseController::apiListStudents(new Request(array(
+        $response = CourseController::apiListStudents(new Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
-        )));
+        ]));
     }
 
     /**
@@ -54,10 +54,10 @@ class CourseStudentListTest extends OmegaupTestCase {
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
         $userLogin = self::login(UserFactory::createUser());
-        $response = CourseController::apiListStudents(new Request(array(
+        $response = CourseController::apiListStudents(new Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => 'foo'
-        )));
+        ]));
     }
 
     /**
@@ -71,10 +71,10 @@ class CourseStudentListTest extends OmegaupTestCase {
         );
 
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListStudents(new Request(array(
+        $response = CourseController::apiListStudents(new Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($homeworkCount, $response['counts']['homework']);

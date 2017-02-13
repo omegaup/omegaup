@@ -10,7 +10,7 @@ $smarty->assign('LOAD_PAGEDOWN', 1);
 if (isset($_POST['request'])) {
     if ($_POST['request'] == 'submit') {
         // Update problem contents/metadata
-        $r = new Request(array(
+        $r = new Request([
                     'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                     'problem_alias' => $_POST['problem_alias'],
                     'title' => $_POST['title'],
@@ -27,7 +27,7 @@ if (isset($_POST['request'])) {
                     'languages' => $_POST['languages'],
                     'stack_limit' => $_POST['stack_limit'],
                     'email_clarifications' => $_POST['email_clarifications']
-                ));
+                ]);
         $r->method = 'ProblemController::apiUpdate';
         $response = ApiCaller::call($r);
         if ($response['status'] == 'error') {
@@ -35,13 +35,13 @@ if (isset($_POST['request'])) {
         }
     } elseif ($_POST['request'] == 'markdown') {
         // Update statement
-        $r = new Request(array(
+        $r = new Request([
                     'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                     'problem_alias' => $_POST['problem_alias'],
                     'statement' => $_POST['wmd-input-statement'],
                     'message' => $_POST['message'],
                     'lang' => $_POST['statement-language']
-                ));
+                ]);
         $r->method = 'ProblemController::apiUpdateStatement';
         $response = ApiCaller::call($r);
         if ($response['status'] == 'error') {

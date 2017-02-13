@@ -29,16 +29,16 @@ $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),
-    array('kp', 'kj')
+    ['kp', 'kj']
 )) == 2);
 if (isset($result['sample_input'])) {
     $smarty->assign('sample_input', $result['sample_input']);
 }
 
-$result['user'] = array(
+$result['user'] = [
     'logged_in' => $session['valid'],
     'admin' => Authorization::canEditProblem($session['user']->user_id, $problem)
-);
+];
 $smarty->assign('problem_admin', $result['user']['admin']);
 
 // Remove the largest element to reduce the payload.

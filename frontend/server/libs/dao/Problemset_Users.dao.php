@@ -9,8 +9,7 @@ include('base/Problemset_Users.vo.base.php');
   * @access public
   *
   */
-class ProblemsetUsersDAO extends ProblemsetUsersDAOBase
-{
+class ProblemsetUsersDAO extends ProblemsetUsersDAOBase {
     public static function CheckAndSaveFirstTimeAccess($user_id, $problemset_id, $grant_access = false) {
         $problemset_user = self::getByPK($user_id, $problemset_id);
         if (is_null($problemset_user)) {

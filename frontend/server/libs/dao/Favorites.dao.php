@@ -17,6 +17,5 @@ require_once('base/Favorites.vo.base.php');
   * @package docs
   *
   */
-class FavoritesDAO extends FavoritesDAOBase
-{
+class FavoritesDAO extends FavoritesDAOBase {
 }

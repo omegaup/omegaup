@@ -53,15 +53,15 @@ Utils::CleanupDB();
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;
 $admin = UserFactory::createUser('admintest', 'testtesttest');
-ACLsDAO::save(new ACLs(array(
+ACLsDAO::save(new ACLs([
     'acl_id' => Authorization::SYSTEM_ACL,
     'owner_id' => $admin->user_id,
-)));
-UserRolesDAO::save(new UserRoles(array(
+]));
+UserRolesDAO::save(new UserRoles([
     'user_id' => $admin->user_id,
     'role_id' => Authorization::ADMIN_ROLE,
     'acl_id' => Authorization::SYSTEM_ACL,
-)));
+]));
 UserFactory::createUser('test', 'testtesttest');
 UserController::$sendEmailOnVerify = true;
 

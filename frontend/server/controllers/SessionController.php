@@ -30,10 +30,10 @@ class SessionController extends Controller {
      * */
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
-            self::$_facebook = new Facebook(array(
+            self::$_facebook = new Facebook([
                         'appId' => OMEGAUP_FB_APPID,
                         'secret' => OMEGAUP_FB_SECRET
-                    ));
+                    ]);
         }
         return self::$_facebook;
     }
@@ -41,7 +41,7 @@ class SessionController extends Controller {
     public static function getFacebookLoginUrl() {
         $facebook = self::getFacebookInstance();
 
-        return $facebook->getLoginUrl(array('scope' => 'email'));
+        return $facebook->getLoginUrl(['scope' => 'email']);
     }
 
     private static function isAuthTokenValid($authToken) {
@@ -63,11 +63,11 @@ class SessionController extends Controller {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null(self::$current_session)) {
-            return array(
+            return [
                 'status' => 'ok',
                 'session' => self::$current_session,
                 'time' => time(),
-            );
+            ];
         }
         if (is_null($r)) {
             $r = new Request();
@@ -83,7 +83,7 @@ class SessionController extends Controller {
                 Cache::SESSION_PREFIX,
                 $authToken,
                 $r,
-                array('SessionController', 'getCurrentSession'),
+                ['SessionController', 'getCurrentSession'],
                 $session,
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
@@ -91,11 +91,11 @@ class SessionController extends Controller {
         } else {
             self::$current_session = SessionController::getCurrentSession($r);
         }
-        return array(
+        return [
             'status' => 'ok',
             'session' => self::$current_session,
             'time' => time(),
-        );
+        ];
     }
 
     private static function getAuthToken(Request $r = null) {
@@ -121,38 +121,38 @@ class SessionController extends Controller {
         $authToken = $r['auth_token'];
 
         if (is_null($authToken)) {
-            return array(
+            return [
                 'valid' => false,
                 'email' => null,
                 'user' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-            );
+            ];
         }
 
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
 
         if (is_null($currentUser)) {
             // Means user has auth token, but does not exist in DB
-            return array(
+            return [
                 'valid' => false,
                 'email' => null,
                 'user' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-            );
+            ];
         }
 
         // Get email via his id
         $email = EmailsDAO::getByPK($currentUser->main_email_id);
 
-        return array(
+        return [
             'valid' => true,
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
             'auth_token' => $authToken,
             'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
-        );
+        ];
     }
 
     /**
@@ -174,7 +174,7 @@ class SessionController extends Controller {
         $this->InvalidateCache();
 
         $currentSession = self::apiCurrentSession()['session'];
-        $vo_AuthT = new AuthTokens(array('token' => $currentSession['auth_token']));
+        $vo_AuthT = new AuthTokens(['token' => $currentSession['auth_token']]);
 
         $this->InvalidateLocalCache();
 
@@ -188,10 +188,10 @@ class SessionController extends Controller {
 
     private function RegisterSession(Users $vo_User, $b_ReturnAuthTokenAsString = false) {
         // Log the login.
-        UserLoginLogDAO::save(new UserLoginLog(array(
+        UserLoginLogDAO::save(new UserLoginLog([
             'user_id' => $vo_User->user_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
-        )));
+        ]));
 
         $this->InvalidateLocalCache();
 
@@ -275,9 +275,9 @@ class SessionController extends Controller {
         $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
         $client->setRedirectUri('postmessage');
-        $client->setScopes(array(
+        $client->setScopes([
             'https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/userinfo.profile'));
+            'https://www.googleapis.com/auth/userinfo.profile']);
 
         try {
             $client->authenticate($r['storeToken']);
@@ -308,7 +308,7 @@ class SessionController extends Controller {
             throw new InternalServerErrorException(new Exception());
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     public function LoginViaGoogle($s_Email) {
@@ -322,14 +322,14 @@ class SessionController extends Controller {
             $username = self::getUniqueUsernameFromEmail($s_Email);
             UserController::$permissionKey = uniqid();
 
-            $r = new Request(array(
+            $r = new Request([
                 'name' => $username,
                 'username' => $username,
                 'email' => $s_Email,
                 'password' => null,
                 'ignore_password' => true,
                 'permission_key' => UserController::$permissionKey
-            ));
+            ]);
 
             $res = UserController::apiCreate($r);
         } else {
@@ -353,7 +353,7 @@ class SessionController extends Controller {
         //facebook sessions on every single petition
         //made from the front-end
         if (!isset($_GET['state'])) {
-            return array('status' => 'error');
+            return ['status' => 'error'];
         }
 
         //if that is not true, may still be logged with
@@ -365,7 +365,7 @@ class SessionController extends Controller {
 
         if ($fb_user == 0) {
             self::$log->info('FB session unavailable.');
-            return array('status' => 'error');
+            return ['status' => 'error'];
         }
 
         // We may or may not have this data based on whether the user is logged in.
@@ -379,7 +379,7 @@ class SessionController extends Controller {
         } catch (FacebookApiException $e) {
             $fb_user = null;
             self::$log->error('FacebookException:' . $e);
-            return array('status' => 'error');
+            return ['status' => 'error'];
         }
 
         //ok we know the user is logged in,
@@ -391,12 +391,12 @@ class SessionController extends Controller {
         if (!isset($fb_user_profile['email'])) {
             $fb_user = null;
             self::$log->error('Facebook email empty');
-            return array(
+            return [
                 'status' => 'error',
                 'error' => $smarty->getConfigVariable(
                     'loginFacebookEmptyEmailError'
                 ),
-            );
+            ];
         }
 
         $results = UsersDAO::FindByEmail($fb_user_profile['email']);
@@ -416,7 +416,7 @@ class SessionController extends Controller {
             // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
             UserController::$permissionKey = uniqid();
 
-            $r = new Request(array(
+            $r = new Request([
                 'name' => $fb_user_profile['name'],
                 'username' => $username,
                 'email' => $fb_user_profile['email'],
@@ -424,12 +424,12 @@ class SessionController extends Controller {
                 'password' => null,
                 'permission_key' => UserController::$permissionKey,
                 'ignore_password' => true
-            ));
+            ]);
             try {
                 $res = UserController::apiCreate($r);
             } catch (ApiException $e) {
                 self::$log->error('Unable to login via Facebook ' . $e);
-                return array('status' => 'error');
+                return ['status' => 'error'];
             }
             $vo_User = UsersDAO::getByPK($res['user_id']);
         }
@@ -440,7 +440,7 @@ class SessionController extends Controller {
         //if he is still logged in, and he can call
         //the api
         $this->RegisterSession($vo_User);
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
