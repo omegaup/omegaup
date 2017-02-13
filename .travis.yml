@@ -75,7 +75,7 @@ script:
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn test)
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python stuff/i18n.py --validate
+          python3 stuff/i18n.py --validate
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
           python3 stuff/whitespace-purge.py validate --all-files
