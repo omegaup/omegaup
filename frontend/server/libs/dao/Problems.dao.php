@@ -17,8 +17,7 @@ require_once('base/Problems.vo.base.php');
   * @package docs
   *
   */
-class ProblemsDAO extends ProblemsDAOBase
-{
+class ProblemsDAO extends ProblemsDAOBase {
     final private static function addTagFilter($user_type, $user_id, $tag, &$sql, &$args) {
         $add_user_id = false;
         if ($user_type === USER_ADMIN) {
@@ -234,8 +233,7 @@ class ProblemsDAO extends ProblemsDAOBase
         return $problems;
     }
 
-    final public static function getByAlias($alias)
-    {
+    final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [  $alias ];
 
@@ -250,8 +248,7 @@ class ProblemsDAO extends ProblemsDAOBase
                 return $contest;
     }
 
-    final public static function searchByAlias($alias)
-    {
+    final public static function searchByAlias($alias) {
         global $conn;
         $quoted = $conn->Quote($alias);
 

@@ -4,8 +4,7 @@
  *  Class for exposed properies defined in the API
  */
 
-class ApiExposedProperty
-{
+class ApiExposedProperty {
     private $property_name;
     private $isRequiredAsInput;
     private $validators;
@@ -22,56 +21,46 @@ class ApiExposedProperty
         $this->value = $value;
     }
     */
-    public function ApiExposedProperty($property_name, $isRequiredAsInput, $valueOrSource, $validators = null)
-    {
+    public function ApiExposedProperty($property_name, $isRequiredAsInput, $valueOrSource, $validators = null) {
         $this->validators = $validators;
         $this->property_name = $property_name;
         $this->isRequiredAsInput = $isRequiredAsInput;
         $this->value = $valueOrSource;
     }
 
-    public function setPropertyName($name)
-    {
+    public function setPropertyName($name) {
         $this->property_name = $name;
     }
 
-    public function getPropertyName()
-    {
+    public function getPropertyName() {
         return $this->property_name;
     }
 
-    public function setIsRequiredAsInput($isRequired)
-    {
+    public function setIsRequiredAsInput($isRequired) {
         $this->isRequiredAsInput = $isRequired;
     }
 
-    public function getIsRequiredAsInput()
-    {
+    public function getIsRequiredAsInput() {
         return $this->isRequiredAsInput;
     }
 
-    public function setValidators($validatorsArray)
-    {
+    public function setValidators($validatorsArray) {
         $this->validators = $validatorsArray;
     }
 
-    public function getValidators()
-    {
+    public function getValidators() {
         return $this->validators;
     }
 
-    public function addValidator($validator)
-    {
+    public function addValidator($validator) {
         array_push($this->validators, $validator);
     }
 
-    public function setValue($value)
-    {
+    public function setValue($value) {
         $this->value = $value;
     }
 
-    public function getValue()
-    {
+    public function getValue() {
         if ($this->value === POST) {
             $this->value = isset($_POST[$this->property_name]) ? $_POST[$this->property_name] : null ;
         } elseif ($this->value === GET) {
@@ -81,14 +70,12 @@ class ApiExposedProperty
         return $this->value;
     }
 
-    public function getError()
-    {
+    public function getError() {
         return $this->errorMessage;
     }
 
     // Run all registered validators. Returns TRUE if ALL validators registered return true.
-    public function validate()
-    {
+    public function validate() {
         // If the value is required and it's null, return an error
         if ($this->isRequiredAsInput && is_null($this->getValue())) {
             $this->errorMessage = 'Required parameter '. $this->property_name .' is missing.';

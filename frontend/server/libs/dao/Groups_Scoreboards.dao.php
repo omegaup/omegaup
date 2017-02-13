@@ -18,6 +18,5 @@ require_once('base/Groups_Scoreboards.vo.base.php');
   * @package docs
   *
   */
-class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase
-{
+class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
 }

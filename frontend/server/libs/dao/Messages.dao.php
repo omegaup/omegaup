@@ -17,6 +17,5 @@ require_once('base/Messages.vo.base.php');
   * @package docs
   *
   */
-class MessagesDAO extends MessagesDAOBase
-{
+class MessagesDAO extends MessagesDAOBase {
 }

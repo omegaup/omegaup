@@ -10,10 +10,8 @@ include('base/Assignments.vo.base.php');
   * @access public
   *
   */
-class AssignmentsDAO extends AssignmentsDAOBase
-{
-    public static function GetProblemset($assignmentAlias)
-    {
+class AssignmentsDAO extends AssignmentsDAOBase {
+    public static function GetProblemset($assignmentAlias) {
         $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ?;';
         $params = [$assignmentAlias];
 

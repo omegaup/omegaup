@@ -9,6 +9,5 @@ include('base/Users_Permissions.vo.base.php');
   * @access public
   *
   */
-class UsersPermissionsDAO extends UsersPermissionsDAOBase
-{
+class UsersPermissionsDAO extends UsersPermissionsDAOBase {
 }

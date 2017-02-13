@@ -17,8 +17,7 @@ require_once('base/Problems_Tags.vo.base.php');
   * @package docs
   *
   */
-class ProblemsTagsDAO extends ProblemsTagsDAOBase
-{
+class ProblemsTagsDAO extends ProblemsTagsDAOBase {
     public static function getProblemTags(Problems $problem, $public_only) {
         $sql = '
 			SELECT

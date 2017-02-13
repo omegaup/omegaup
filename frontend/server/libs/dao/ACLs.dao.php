@@ -9,6 +9,5 @@ include('base/ACLs.vo.base.php');
   * @access public
   *
   */
-class ACLsDAO extends ACLsDAOBase
-{
+class ACLsDAO extends ACLsDAOBase {
 }

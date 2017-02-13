@@ -17,6 +17,5 @@ require_once('base/Roles_Permissions.vo.base.php');
   * @package docs
   *
   */
-class RolesPermissionsDAO extends RolesPermissionsDAOBase
-{
+class RolesPermissionsDAO extends RolesPermissionsDAOBase {
 }

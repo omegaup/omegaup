@@ -25,13 +25,13 @@ abstract class DAO {
         $conn->StartTrans();
     }
 
-    public static function transEnd(){
+    public static function transEnd() {
         self::log('Transaccion commit');
         global $conn;
         $conn->CompleteTrans();
     }
 
-    public static function transRollback(){
+    public static function transRollback() {
         self::log('Transaccion rollback');
         global $conn;
         $conn->FailTrans();
@@ -46,7 +46,7 @@ abstract class DAO {
  *
  */
 abstract class VO {
-    function asArray(){
+    function asArray() {
         return get_object_vars($this);
     }
 

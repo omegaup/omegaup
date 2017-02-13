@@ -405,8 +405,7 @@ class RunCreateTest extends OmegaupTestCase {
      * User can send runs to a public problem, regardless of it being
      * in a contest
      */
-    public function testRunToPublicProblemWhileInsideAContest()
-    {
+    public function testRunToPublicProblemWhileInsideAContest() {
         // Create public problem
         $problemData = ProblemsFactory::createProblem();
 
@@ -504,8 +503,7 @@ class RunCreateTest extends OmegaupTestCase {
      *
      * @expectedException NotAllowedToSubmitException
      */
-    public function testRunToPrivateProblemWhileInsideAPublicContest()
-    {
+    public function testRunToPrivateProblemWhileInsideAPublicContest() {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 1 /* public */);
 

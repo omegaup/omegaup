@@ -2,11 +2,16 @@
 <ruleset name="omegaUp">
 	<description>The omegaUp coding standard.</description>
 
+	<rule ref="OmegaUp.Classes.ClassDeclaration.OpenBraceSameLine"/>
+	<rule ref="OmegaUp.Classes.ClassDeclaration.NoBlankLineAfter" />
+
 	<!-- Inherit from PSR2 -->
 	<rule ref="PSR2">
 		<!-- Braces on the same line -->
 		<exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
-		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnNewLine"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+		<exclude name="PSR2.Namespaces.NamespaceDeclaration.BlankLineAfter"/>
 
 		<!-- TODO(lhchavez): Remove these. -->
 		<exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
@@ -16,7 +21,8 @@
 	</rule>
 
 	<!-- Braces on the same line -->
-	<rule name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnNewLine"/>
+	<rule ref="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
 
 	 <!-- There MUST NOT be trailing whitespace. EVER. -->
 	 <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">

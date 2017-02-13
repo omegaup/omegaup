@@ -9,8 +9,7 @@ include('base/Problemset_Problems.vo.base.php');
   * @access public
   *
   */
-class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
-{
+class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblems($problemset_id) {
         // Build SQL statement
         $sql = 'SELECT p.title, p.alias, p.time_limit, p.overall_wall_time_limit, '.
@@ -57,8 +56,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase
      *
      * Get relevant problems including problemset alias
      */
-    final public static function getRelevantProblems(Problemsets $problemset)
-    {
+    final public static function getRelevantProblems(Problemsets $problemset) {
         // Build SQL statement
         $sql = '
             SELECT

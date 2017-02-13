@@ -9,8 +9,7 @@ include('base/Group_Roles.vo.base.php');
   * @access public
   *
   */
-class GroupRolesDAO extends GroupRolesDAOBase
-{
+class GroupRolesDAO extends GroupRolesDAOBase {
     public static function getAdmins($acl_id) {
         $sql = '
             SELECT

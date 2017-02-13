@@ -18,8 +18,7 @@ require_once('base/Groups_Users.vo.base.php');
   * @package docs
   *
   */
-class GroupsUsersDAO extends GroupsUsersDAOBase
-{
+class GroupsUsersDAO extends GroupsUsersDAOBase {
     public static function GetMemberUsernames(Groups $group) {
         global  $conn;
         $sql = '

@@ -17,8 +17,7 @@ require_once('base/Schools.vo.base.php');
   * @package docs
   *
   */
-class SchoolsDAO extends SchoolsDAOBase
-{
+class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Finds schools that cotains 'name'
      *

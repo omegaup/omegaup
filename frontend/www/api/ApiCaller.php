@@ -7,7 +7,7 @@ require_once(__DIR__.'/../../server/bootstrap.php');
  * error handling (try catch) logic for logging and alerting
  *
  */
-class ApiCaller{
+class ApiCaller {
     public static $log;
 
     /**

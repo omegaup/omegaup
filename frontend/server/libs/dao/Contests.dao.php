@@ -102,8 +102,7 @@ class RecommendedStatus extends StatusBase {
   * @package docs
   *
   */
-class ContestsDAO extends ContestsDAOBase
-{
+class ContestsDAO extends ContestsDAOBase {
     private static $getContestsColumns = '
                                 Contests.contest_id,
                                 title,
@@ -117,8 +116,7 @@ class ContestsDAO extends ContestsDAOBase
                                 window_length
                                 ';
 
-    final public static function getByAlias($alias)
-    {
+    final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;';
         $params = [  $alias ];
 

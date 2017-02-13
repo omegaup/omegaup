@@ -9,8 +9,7 @@ include('base/Courses.vo.base.php');
   * @access public
   *
   */
-class CoursesDAO extends CoursesDAOBase
-{
+class CoursesDAO extends CoursesDAOBase {
     public static function findByName($name) {
         global  $conn;
 

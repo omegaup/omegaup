@@ -9,10 +9,8 @@ include('base/Interviews.vo.base.php');
   * @access public
   *
   */
-class InterviewsDAO extends InterviewsDAOBase
-{
-    final public static function getByAlias($alias)
-    {
+class InterviewsDAO extends InterviewsDAOBase {
+    final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];
 
@@ -27,8 +25,7 @@ class InterviewsDAO extends InterviewsDAOBase
         return $interview;
     }
 
-    final public static function getMyInterviews($user_id)
-    {
+    final public static function getMyInterviews($user_id) {
         $sql = '
             SELECT
                 i.*
