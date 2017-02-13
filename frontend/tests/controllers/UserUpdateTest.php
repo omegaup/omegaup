@@ -12,9 +12,9 @@ class UserUpdateTest extends OmegaupTestCase {
         // Create the user to edit
         $user = UserFactory::createUser();
 
-        $states = StatesDAO::search(array('country_id' => 'MX'));
+        $states = StatesDAO::search(['country_id' => 'MX']);
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'country_id' => 'MX',
@@ -23,7 +23,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'recruitment_optin' => 1,
-        ));
+        ]);
 
         // Call api
         $response = UserController::apiUpdate($r);
@@ -47,13 +47,13 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'recruitment_optin' => 1,
             // Invalid state_id
             'state_id' => -1,
-        ));
+        ]);
 
         UserController::apiUpdate($r);
     }
@@ -66,12 +66,12 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             // Invalid name
             'name' => 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ',
             'country_id' => 'MX',
-        ));
+        ]);
 
         UserController::apiUpdate($r);
     }
@@ -84,11 +84,11 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             // Invalid name
             'name' => '',
-        ));
+        ]);
 
         UserController::apiUpdate($r);
     }
@@ -101,12 +101,12 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             // Null recruitment_optin
             'recruitment_optin' => null,
-        ));
+        ]);
 
         UserController::apiUpdate($r);
     }
@@ -118,10 +118,10 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-        ));
+        ]);
 
         // Set recruitment_optin to true
         $r['recruitment_optin'] = 1;

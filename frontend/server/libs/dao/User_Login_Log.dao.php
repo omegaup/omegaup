@@ -9,6 +9,5 @@ include('base/User_Login_Log.vo.base.php');
   * @access public
   *
   */
-class UserLoginLogDAO extends UserLoginLogDAOBase
-{
+class UserLoginLogDAO extends UserLoginLogDAOBase {
 }

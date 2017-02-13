@@ -8,6 +8,7 @@ import argparse
 import git_tools
 import io
 import os.path
+import pipes
 import subprocess
 import sys
 
@@ -30,7 +31,7 @@ def main():
 
   root = git_tools.root_dir()
   phpcs_args = [which('phpcbf'), '--encoding=utf-8',
-      '--standard=%s' % os.path.join(root, 'stuff/omegaup-standard.xml')]
+      '--standard=%s' % os.path.join(root, 'stuff/phpcbf/Standards/OmegaUp/ruleset.xml')]
 
   validate_only = args.tool == 'validate'
   validation_passed = True
@@ -38,6 +39,9 @@ def main():
   for filename in args.files:
     contents = git_tools.file_contents(args, root, filename)
     cmd = phpcs_args + ['--stdin-path=%s' % filename]
+    if args.verbose:
+      print('Executing "%s".' % (
+            ' '.join(pipes.quote(arg) for arg in cmd)), file=sys.stderr)
     with subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=root) as p:
       replaced = p.communicate(contents)[0]
@@ -60,6 +64,8 @@ def main():
 
   if not validation_passed:
     if validate_only:
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+        return 1
       print('%sPHP validation errors.%s '
             'Please run `%s` to fix them.' % (git_tools.COLORS.FAIL,
               git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),

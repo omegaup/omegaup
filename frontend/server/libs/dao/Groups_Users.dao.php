@@ -18,8 +18,7 @@ require_once('base/Groups_Users.vo.base.php');
   * @package docs
   *
   */
-class GroupsUsersDAO extends GroupsUsersDAOBase
-{
+class GroupsUsersDAO extends GroupsUsersDAOBase {
     public static function GetMemberUsernames(Groups $group) {
         global  $conn;
         $sql = '
@@ -31,7 +30,7 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
                 Users u ON u.user_id = gu.user_id
             WHERE
                 gu.group_id = ?;';
-        $params = array($group->group_id);
+        $params = [$group->group_id];
         return $conn->GetAll($sql, $params);
     }
 
@@ -44,7 +43,7 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
                 Groups_Users gu
             WHERE
                 gu.group_id = ?;';
-        $params = array($group_id);
+        $params = [$group_id];
         return $conn->GetOne($sql, $params);
     }
 }

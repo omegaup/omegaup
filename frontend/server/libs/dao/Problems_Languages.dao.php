@@ -17,6 +17,5 @@ require_once('base/Problems_Languages.vo.base.php');
   * @package docs
   *
   */
-class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase
-{
+class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
 }

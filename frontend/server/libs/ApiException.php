@@ -25,7 +25,7 @@ abstract class ApiException extends Exception {
         parent::__construct($message, $code, $previous);
 
         $this->header = $header;
-        $this->customMessage = array();
+        $this->customMessage = [];
     }
 
     /**
@@ -52,14 +52,14 @@ abstract class ApiException extends Exception {
      * @return array
      */
     public function asArray() {
-        $arrayToReturn =  array(
+        $arrayToReturn =  [
             'status' => 'error',
             'error' => $this->getErrorMessage(),
             'errorcode' => $this->code,
             'header' => $this->header,
             'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
             'trace' => $this->getTraceAsString(),
-        );
+        ];
 
         return array_merge($arrayToReturn, $this->customMessage);
     }
@@ -70,13 +70,13 @@ abstract class ApiException extends Exception {
      * @return array
      */
     public function asResponseArray() {
-        $arrayToReturn =  array(
+        $arrayToReturn =  [
             'status' => 'error',
             'error' => $this->getErrorMessage(),
             'errorname' => $this->message,
             'errorcode' => $this->code,
             'header' => $this->header
-        );
+        ];
 
         return array_merge($arrayToReturn, $this->customMessage);
     }
@@ -109,7 +109,7 @@ class InvalidParameterException extends ApiException {
      * @param string $message
      * @param Exception $previous
      */
-    public function __construct($message, $parameter = null, $additional_parameters = array()) {
+    public function __construct($message, $parameter = null, $additional_parameters = []) {
         parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
         $this->parameter = $parameter;
         $this->additional_parameters = $additional_parameters;

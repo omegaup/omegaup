@@ -244,8 +244,7 @@ omegaup.arena.EventsSocket.prototype.onmessage = function(message) {
       self.arena.updateClarification(data.clarification);
     }
   } else if (data.message == '/scoreboard/update/') {
-    if (self.arena.contestAdmin && data.scoreboard_type != 'admin')
-      return;
+    if (self.arena.contestAdmin && data.scoreboard_type != 'admin') return;
     self.arena.rankingChange(data.scoreboard);
   }
 };
@@ -1022,16 +1021,16 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       update(problem);
     } else {
       var problemset = self.computeProblemsetArg();
-      omegaup.API.getProblem($.extend(problemset, {
-        problem_alias: problem.alias
-      })).then(function(problem_ext) {
-        problem.source = problem_ext.source;
-        problem.problemsetter = problem_ext.problemsetter;
-        problem.problem_statement = problem_ext.problem_statement;
-        problem.sample_input = problem_ext.sample_input;
-        problem.runs = problem_ext.runs;
-        update(problem);
-      });
+      omegaup.API.getProblem(
+                     $.extend(problemset, {problem_alias: problem.alias}))
+          .then(function(problem_ext) {
+            problem.source = problem_ext.source;
+            problem.problemsetter = problem_ext.problemsetter;
+            problem.problem_statement = problem_ext.problem_statement;
+            problem.sample_input = problem_ext.sample_input;
+            problem.runs = problem_ext.runs;
+            update(problem);
+          });
     }
 
     if (newRun) {
@@ -1150,9 +1149,7 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     file = file.files[0];
     var reader = new FileReader();
 
-    reader.onload = function(e) {
-      self.submitRun(e.target.result);
-    };
+    reader.onload = function(e) { self.submitRun(e.target.result); };
 
     var extension = file.name.split(/\./);
     extension = extension[extension.length - 1];
@@ -1205,39 +1202,42 @@ omegaup.arena.Arena.prototype.submitRun = function(code) {
   var lang = self.elements.submitForm.language.val();
 
   $('input', self.elements.submitForm).attr('disabled', 'disabled');
-  omegaup.API.submit($.extend(problemset, {
-    problem_alias: self.currentProblem.alias,
-    language: lang,
-    source: code
-  })).then(function(run) {
-    if (self.options.isLockdownMode && sessionStorage) {
-      sessionStorage.setItem('run:' + run.guid, code);
-    }
+  omegaup.API.submit($.extend(problemset,
+                              {
+                                problem_alias: self.currentProblem.alias,
+                                language: lang,
+                                source: code
+                              }))
+      .then(function(run) {
+        if (self.options.isLockdownMode && sessionStorage) {
+          sessionStorage.setItem('run:' + run.guid, code);
+        }
 
-    if (!self.options.isOnlyProblem) {
-      self.problems[self.currentProblem.alias].last_submission =
-          omegaup.OmegaUp.time().getTime();
-    }
+        if (!self.options.isOnlyProblem) {
+          self.problems[self.currentProblem.alias].last_submission =
+              omegaup.OmegaUp.time().getTime();
+        }
 
-    run.username = omegaup.OmegaUp.username;
-    run.status = 'new';
-    run.alias = self.currentProblem.alias;
-    run.contest_score = null;
-    run.time = omegaup.OmegaUp.time();
-    run.penalty = 0;
-    run.runtime = 0;
-    run.memory = 0;
-    run.language = lang;
-    self.updateRun(run);
+        run.username = omegaup.OmegaUp.username;
+        run.status = 'new';
+        run.alias = self.currentProblem.alias;
+        run.contest_score = null;
+        run.time = omegaup.OmegaUp.time();
+        run.penalty = 0;
+        run.runtime = 0;
+        run.memory = 0;
+        run.language = lang;
+        self.updateRun(run);
 
-    $('input', self.elements.submitForm).removeAttr('disabled');
-    self.elements.submitForm.code.val('');
-    self.hideOverlay();
-    self.clearInputFile();
-  }).fail(function(run) {
-    alert(run.error);
-    $('input', self.elements.submitForm).removeAttr('disabled');
-  });
+        $('input', self.elements.submitForm).removeAttr('disabled');
+        self.elements.submitForm.code.val('');
+        self.hideOverlay();
+        self.clearInputFile();
+      })
+      .fail(function(run) {
+        alert(run.error);
+        $('input', self.elements.submitForm).removeAttr('disabled');
+      });
 };
 
 omegaup.arena.Arena.prototype.updateSummary = function(contest) {

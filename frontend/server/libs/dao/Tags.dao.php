@@ -20,7 +20,7 @@ require_once('base/Tags.vo.base.php');
 class TagsDAO extends TagsDAOBase {
     final public static function getByName($name) {
         $sql = 'SELECT * FROM Tags WHERE (name = ? ) LIMIT 1;';
-        $params = array($name);
+        $params = [$name];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -34,10 +34,10 @@ class TagsDAO extends TagsDAOBase {
     public static function FindByName($name) {
         global $conn;
         $sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 10";
-        $args = array($name);
+        $args = [$name];
 
         $rs = $conn->Execute($sql, $args);
-        $result = array();
+        $result = [];
         foreach ($rs as $row) {
             array_push($result, new Tags($row));
         }

@@ -34,7 +34,7 @@ class ClarificationsDAO extends ClarificationsDAOBase {
                 'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
                 'WHERE ' .
                 'c.problemset_id = ? ';
-        $val = array($problemset_id);
+        $val = [$problemset_id];
 
         if (!$admin) {
             $sql .= 'AND (c.public = 1 OR c.author_id = ?) ';
@@ -67,7 +67,7 @@ class ClarificationsDAO extends ClarificationsDAOBase {
         $sql .= 'LEFT JOIN Contests con ON con.problemset_id = c.problemset_id '.
                 'WHERE ' .
                 'c.problem_id = ? ';
-        $val = array($problem_id);
+        $val = [$problem_id];
 
         if (!$admin) {
             $sql .= 'AND (c.public = 1 OR c.author_id = ?) ';

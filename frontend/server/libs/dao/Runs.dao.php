@@ -36,9 +36,9 @@ class RunsDAO extends RunsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $row) {
-            array_push($ar, array('guid' => $row['guid'], 'time' => intval($row['time'])));
+            array_push($ar, ['guid' => $row['guid'], 'time' => intval($row['time'])]);
         }
 
         return $ar;
@@ -75,7 +75,7 @@ class RunsDAO extends RunsDAOBase {
 				Users u ON u.user_id = runs.user_id
 			INNER JOIN
 				Runs r ON r.run_id = runs.run_id;';
-        $val = array($problem_id, $problem_id);
+        $val = [$problem_id, $problem_id];
 
         global $conn;
         return $conn->GetAll($sql, $val);
@@ -88,7 +88,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetPendingRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = "SELECT guid FROM Runs WHERE problemset_id = ? AND status != 'ready'";
-        $val = array($problemset_id);
+        $val = [$problemset_id];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -97,7 +97,7 @@ class RunsDAO extends RunsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             array_push($ar, $foo['guid']);
         }
@@ -113,8 +113,8 @@ class RunsDAO extends RunsDAOBase {
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
                 'INNER JOIN Users u ON u.user_id = r.user_id ' .
                 'LEFT JOIN Contests c ON c.problemset_id = r.problemset_id ';
-        $where = array();
-        $val = array();
+        $where = [];
+        $val = [];
 
         if (!is_null($problemset_id)) {
             $where[] = 'r.problemset_id = ?';
@@ -163,7 +163,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetPendingRunsOfProblem($problem_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = "SELECT guid FROM Runs WHERE problem_id = ? AND status != 'ready'";
-        $val = array($problem_id);
+        $val = [$problem_id];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -172,7 +172,7 @@ class RunsDAO extends RunsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             array_push($ar, $foo['guid']);
         }
@@ -182,7 +182,7 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Runs WHERE (guid = ? ) LIMIT 1;';
-        $params = array($alias);
+        $params = [$alias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -200,7 +200,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? ';
-        $val = array($problemset_id);
+        $val = [$problemset_id];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -217,7 +217,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfUser($user_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? ';
-        $val = array($user_id);
+        $val = [$user_id];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -234,7 +234,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfProblem($problem_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? ';
-        $val = array($problem_id);
+        $val = [$problem_id];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -253,7 +253,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfProblemInProblemset($problem_id, $problemset_id) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND problemset_id = ? AND test = 0';
-        $val = array($problem_id, $problemset_id);
+        $val = [$problem_id, $problemset_id];
 
         global $conn;
         return $conn->GetOne($sql, $val);
@@ -266,7 +266,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfProblemsetByVerdict($problemset_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? AND verdict = ? ';
-        $val = array($problemset_id, $verdict);
+        $val = [$problemset_id, $verdict];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -283,7 +283,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfProblemByVerdict($problem_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND verdict = ? ';
-        $val = array($problem_id, $verdict);
+        $val = [$problem_id, $verdict];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -300,7 +300,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function CountTotalRunsOfUserByVerdict($user_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? AND verdict = ? ';
-        $val = array($user_id, $verdict);
+        $val = [$user_id, $verdict];
 
         if (!$showAllRuns) {
             $sql .= ' AND test = 0';
@@ -316,7 +316,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetLargestWaitTimeOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = "SELECT * FROM Runs WHERE problemset_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
-        $val = array($problemset_id);
+        $val = [$problemset_id];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -326,7 +326,7 @@ class RunsDAO extends RunsDAOBase {
         }
 
         $run = new Runs($rs);
-        return array($run, time() - strtotime($run->time));
+        return [$run, time() - strtotime($run->time)];
     }
 
     /*
@@ -348,13 +348,13 @@ class RunsDAO extends RunsDAOBase {
                     pu.problemset_id = ? AND
                     u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                     u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
-            $val = array(
+            $val = [
                 $contest->problemset_id,
                 $contest->acl_id,
                 $contest->acl_id,
                 Authorization::SYSTEM_ACL,
                 Authorization::ADMIN_ROLE,
-            );
+            ];
         } else {
             $sql = '
                 SELECT
@@ -371,7 +371,7 @@ class RunsDAO extends RunsDAOBase {
                         r.problemset_id = ? AND
                         r.status = \'ready\' AND
                         r.test = 0) rc ON u.user_id = rc.user_id';
-            $val = array($contest->problemset_id);
+            $val = [$contest->problemset_id];
             if (!is_null($filterUsersBy)) {
                 $sql .= ' WHERE u.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
@@ -382,7 +382,7 @@ class RunsDAO extends RunsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $row) {
             array_push($ar, new Users($row));
         }
@@ -409,12 +409,12 @@ class RunsDAO extends RunsDAOBase {
                         "AND r.verdict IN ('AC') ")
                 . 'ORDER BY r.run_id;';
 
-        $val = array($problemset->problemset_id);
+        $val = [$problemset->problemset_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             array_push($ar, new Runs($foo));
         }
@@ -431,10 +431,10 @@ class RunsDAO extends RunsDAOBase {
         //Build SQL statement
         if (is_null($problemset_id)) {
             $sql = 'SELECT * from Runs where user_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = array($user_id, $problem_id);
+            $val = [$user_id, $problem_id];
         } else {
             $sql = 'SELECT * from Runs where user_id = ? and problemset_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = array($user_id, $problemset_id, $problem_id);
+            $val = [$user_id, $problemset_id, $problem_id];
         }
 
         global $conn;
@@ -468,7 +468,7 @@ class RunsDAO extends RunsDAOBase {
             ORDER BY
                 contest_score DESC, penalty ASC
             LIMIT 1;";
-        $val = array($user_id, $problemset_id, $problem_id, $finish_time);
+        $val = [$user_id, $problemset_id, $problem_id, $finish_time];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -487,7 +487,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetBestScore($problem_id, $user_id) {
         //Build SQL statement
         $sql = "SELECT score from Runs where user_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, penalty ASC  LIMIT 1";
-        $val = array($user_id, $problem_id);
+        $val = [$user_id, $problem_id];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -505,13 +505,13 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetRunsByUser($user_id) {
         // SQL sentence
         $sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND verdict = 'AC'";
-        $val = array($user_id);
+        $val = [$user_id];
 
         global $conn;
         //Get the rows
         $rs = $conn->Execute($sql, $val);
 
-        $ar = array();
+        $ar = [];
         //Wrap every row in a Runs object
         foreach ($rs as $iter) {
             $run = new Runs($iter);
@@ -547,7 +547,7 @@ class RunsDAO extends RunsDAOBase {
 
     public static function GetRunCountsToDate($date) {
         $sql = 'select count(*) as total from Runs where time <= ?';
-        $val = array($date);
+        $val = [$date];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -557,7 +557,7 @@ class RunsDAO extends RunsDAOBase {
 
     public static function GetAcRunCountsToDate($date) {
         $sql = "select count(*) as total from Runs where verdict = 'AC' and time <= ?";
-        $val = array($date);
+        $val = [$date];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -580,7 +580,7 @@ class RunsDAO extends RunsDAOBase {
             }
         }
         $sql .= 'WHERE (';
-        $val = array();
+        $val = [];
         if ($Runs->run_id != null) {
             $sql .= ' run_id = ? AND';
             array_push($val, $Runs->run_id);
@@ -660,7 +660,7 @@ class RunsDAO extends RunsDAOBase {
         array_push($val, $greaterThan);
 
         if (sizeof($val) == 0) {
-            return array();
+            return [];
         }
         $sql = substr($sql, 0, -3) . ' )';
         if ($orderBy !== null) {
@@ -674,7 +674,7 @@ class RunsDAO extends RunsDAOBase {
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             $bar = new Runs($foo);
             array_push($ar, $bar);

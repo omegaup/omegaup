@@ -42,9 +42,9 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         // Assert our contest is there.
@@ -89,9 +89,9 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -116,9 +116,9 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login(UserFactory::createUser());
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         // Assert our contest is not there
@@ -137,9 +137,9 @@ class ContestListTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(null, false /*private*/);
 
         $login = self::login(UserFactory::createAdminUser());
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
@@ -165,9 +165,9 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
@@ -239,19 +239,19 @@ class ContestListTest extends OmegaupTestCase {
 
         // Turn recommended ON
         $login = self::login(UserFactory::createAdminUser());
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $recommendedContestData['request']['alias'],
             'value' => 1,
-        ));
+        ]);
         ContestController::apiSetRecommended($r);
         unset($login);
 
         // Get list of contests
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiList($r);
 
         // Check that recommended contest is earlier in list han not-recommended

@@ -9,8 +9,7 @@ include('base/Problemsets.vo.base.php');
   * @access public
   *
   */
-class ProblemsetsDAO extends ProblemsetsDAOBase
-{
+class ProblemsetsDAO extends ProblemsetsDAOBase {
     public static function getProblemsetContainer($problemset_id) {
         if (is_null($problemset_id)) {
             return null;

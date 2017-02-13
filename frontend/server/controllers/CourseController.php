@@ -31,7 +31,7 @@ class CourseController extends Controller {
             throw new InvalidParameterException('InvalidStartTime');
         }
 
-        Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), $is_required);
+        Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
 
         $parent_course = null;
@@ -73,7 +73,7 @@ class CourseController extends Controller {
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', array('0', '1'), false /*is_required*/);
+        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
 
         if ($is_update) {
             try {
@@ -94,9 +94,9 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
         $courses = null;
         try {
-            $courses = CoursesDAO::search(new Courses(array(
+            $courses = CoursesDAO::search(new Courses([
                 'alias' => $r['course_alias']
-            )));
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -177,7 +177,7 @@ class CourseController extends Controller {
         GroupController::apiCreate($groupRequest);
         $group = GroupsDAO::FindByAlias($groupRequest['alias']);
 
-        $acl = new ACLs(array('owner_id' => $r['current_user_id']));
+        $acl = new ACLs(['owner_id' => $r['current_user_id']]);
         ACLsDAO::save($acl);
 
         // Create the actual course
@@ -200,7 +200,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -245,7 +245,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -270,12 +270,12 @@ class CourseController extends Controller {
         $valueProperties = [
             'name',
             'description',
-            'start_time' => array('transform' => function ($value) {
+            'start_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
-            }),
-            'finish_time' => array('transform' => function ($value) {
+            }],
+            'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
-            })
+            }]
         ];
 
         self::updateValueProperties($r, $r['assignment'], $valueProperties);
@@ -286,7 +286,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -326,7 +326,7 @@ class CourseController extends Controller {
 
         ProblemsetProblemsDAO::save($problemSetProblem);
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -351,26 +351,26 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $assignments = array();
+        $assignments = [];
         try {
-            $assignments = AssignmentsDAO::search(new Assignments(array(
+            $assignments = AssignmentsDAO::search(new Assignments([
                 'course_id' => $r['course']->course_id
-            )));
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
         $response['assignments'] = [];
         foreach ($assignments as $a) {
-            $response['assignments'][] = array(
+            $response['assignments'][] = [
                 'name' => $a->name,
                 'alias' => $a->alias,
                 'description' => $a->description,
                 'start_time' => $a->start_time,
                 'finish_time' => $a->finish_time,
                 'assignment_type' => $a->assignment_type
-            );
+            ];
         }
 
         $response['status'] = 'ok';
@@ -384,7 +384,7 @@ class CourseController extends Controller {
      */
     private static function convertCourseToArray(Courses $course) {
         $course->toUnixTime();
-        $relevant_columns = array('alias', 'name', 'finish_time');
+        $relevant_columns = ['alias', 'name', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
         $counts = AssignmentsDAO::getAssignmentCountsForCourse($course->course_id);
@@ -418,7 +418,7 @@ class CourseController extends Controller {
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
-        $admin_courses = array();
+        $admin_courses = [];
         try {
             if (Authorization::isSystemAdmin($r['current_user_id'])) {
                 $admin_courses = CoursesDAO::getAll(
@@ -439,18 +439,18 @@ class CourseController extends Controller {
         }
 
         // Courses the user is a student in.
-        $student_courses = array();
+        $student_courses = [];
         try {
             $student_courses = CoursesDAO::getCoursesForStudent($r['current_user_id']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array(
-            'admin' => array(),
-            'student' => array(),
+        $response = [
+            'admin' => [],
+            'student' => [],
             'status' => 'ok'
-        );
+        ];
         foreach ($admin_courses as $course) {
             $response['admin'][] = CourseController::convertCourseToArray($course);
         }
@@ -492,11 +492,11 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array(
+        return [
             'students' => $students,
             'counts' => $counts,
             'status' => 'ok'
-            );
+            ];
     }
 
     /**
@@ -544,7 +544,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -592,7 +592,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -601,7 +601,7 @@ class CourseController extends Controller {
      * @return array
      */
     private static function getCommonCourseDetails(Request $r) {
-        $result = array();
+        $result = [];
         $result['status'] = 'ok';
         $result['assignments'] = CoursesDAO::getAllAssignments($r['alias']);
 
@@ -778,18 +778,18 @@ class CourseController extends Controller {
         }
 
         // Update contest DAO
-        $valueProperties = array(
+        $valueProperties = [
             'alias',
             'name',
             'description',
-            'start_time' => array('transform' => function ($value) {
+            'start_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
-            }),
-            'finish_time' => array('transform' => function ($value) {
+            }],
+            'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
-            }),
+            }],
             'show_scoreboard',
-        );
+        ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
 
         // Push changes
@@ -812,7 +812,7 @@ class CourseController extends Controller {
         // TODO: Expire cache
 
         // Happy ending
-        $response = array();
+        $response = [];
         $response['status'] = 'ok';
 
         self::$log->info('Contest updated (alias): ' . $r['contest_alias']);

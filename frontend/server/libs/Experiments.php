@@ -43,9 +43,9 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
-    private static $kKnownExperiments = array(
+    private static $kKnownExperiments = [
         self::SCHOOLS,
-    );
+    ];
 
     /**
      * The prefix for config-based define()s.
@@ -54,7 +54,7 @@ class Experiments {
 
     const EXPERIMENT_REQUEST_NAME = 'experiments';
 
-    private $enabledExperiments = array();
+    private $enabledExperiments = [];
 
     /**
      * Creates an instance of Experiments.

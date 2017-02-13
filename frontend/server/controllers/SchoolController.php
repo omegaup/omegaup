@@ -29,9 +29,9 @@ class SchoolController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
         foreach ($schools as $school) {
-            $entry = array('label' => $school->name, 'value' => $school->name, 'id' => $school->school_id);
+            $entry = ['label' => $school->name, 'value' => $school->name, 'id' => $school->school_id];
             array_push($response, $entry);
         }
 
@@ -65,7 +65,7 @@ class SchoolController extends Controller {
         }
 
         // Create school object
-        $school = new Schools(array('name' => $r['name'], 'state_id' => $r['state_id']));
+        $school = new Schools(['name' => $r['name'], 'state_id' => $r['state_id']]);
 
         $school_id = 0;
         try {
@@ -81,6 +81,6 @@ class SchoolController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok', 'school_id' => $school_id);
+        return ['status' => 'ok', 'school_id' => $school_id];
     }
 }

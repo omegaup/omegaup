@@ -795,7 +795,8 @@ omegaup.API = {
       method: 'POST',
       data: params,
       dataType: 'json'
-    }), omegaup.API._convertRuntimes);
+    }),
+                                     omegaup.API._convertRuntimes);
   },
 
   getGroupMembers: function(params) {

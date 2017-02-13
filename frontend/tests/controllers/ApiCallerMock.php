@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ApiCallerMock extends ApiCaller{
+class ApiCallerMock extends ApiCaller {
     /**
      * Returns the string instad of echoing it
      *

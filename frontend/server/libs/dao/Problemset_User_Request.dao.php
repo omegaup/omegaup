@@ -9,14 +9,12 @@ include('base/Problemset_User_Request.vo.base.php');
   * @access public
   *
   */
-class ProblemsetUserRequestDAO extends ProblemsetUserRequestDAOBase
-{
-    public static function getRequestsForProblemset($problemset_id)
-    {
+class ProblemsetUserRequestDAO extends ProblemsetUserRequestDAOBase {
+    public static function getRequestsForProblemset($problemset_id) {
         global  $conn;
         $sql = 'SELECT R.*, (select H.admin_id from `Problemset_User_Request_History` H where R.user_id = H.user_id '
                 . ' order by H.history_id limit 1 ) as admin_id FROM `Problemset_User_Request` R where R.problemset_id = ? ';
-        $args = array($problemset_id);
+        $args = [$problemset_id];
 
         return $conn->GetAll($sql, $args);
     }

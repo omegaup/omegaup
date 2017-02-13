@@ -9,22 +9,22 @@ class CoursesFactory {
 
         $courseAlias = Utils::CreateRandomString();
 
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
-        ));
+        ]);
 
         $response = CourseController::apiCreate($r);
 
-        return array(
+        return [
             'request' => $r,
             'admin' => $admin,
             'course_alias' => $courseAlias,
-        );
+        ];
     }
 
     public static function createCourseWithOneAssignment(Users $admin = null, ScopedLoginToken $adminLogin = null) {
@@ -40,7 +40,7 @@ class CoursesFactory {
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
 
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -49,21 +49,21 @@ class CoursesFactory {
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
-        ));
+        ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
 
-        return array(
+        return [
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'request' => $r,
             'admin' => $admin
-        );
+        ];
     }
 
     public static function createCourseWithAssignments($nAssignments) {
-        return self::createCourseWithNAssignmentsPerType(array(
+        return self::createCourseWithNAssignmentsPerType([
             'homework' => $nAssignments
-        ));
+        ]);
     }
 
     public static function createCourseWithNAssignmentsPerType($assignmentsPerType) {
@@ -74,7 +74,7 @@ class CoursesFactory {
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
-                $r = new Request(array(
+                $r = new Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
@@ -83,16 +83,16 @@ class CoursesFactory {
                     'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType
-                ));
+                ]);
 
                 CourseController::apiCreateAssignment($r);
             }
         }
 
-        return array(
+        return [
             'admin' => $admin,
             'course_alias' => $courseAlias
-        );
+        ];
     }
 
     /**
@@ -107,11 +107,11 @@ class CoursesFactory {
         }
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
-        GroupController::apiAddUser(new Request(array(
+        GroupController::apiAddUser(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'group_alias' => $courseData['course_alias']
-        )));
+        ]));
 
         return $student;
     }

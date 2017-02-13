@@ -38,10 +38,10 @@ class UITools {
      * @param Smarty $smarty
      */
     public static function setProfile(Smarty $smarty) {
-        $profileRequest = new Request(array(
+        $profileRequest = new Request([
                     'username' => array_key_exists('username', $_REQUEST) ? $_REQUEST['username'] : null,
                     'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
-                ));
+                ]);
         $profileRequest->method = 'UserController::apiProfile';
         $response = ApiCaller::call($profileRequest);
 

@@ -9,12 +9,10 @@ include('base/Interviews.vo.base.php');
   * @access public
   *
   */
-class InterviewsDAO extends InterviewsDAOBase
-{
-    final public static function getByAlias($alias)
-    {
+class InterviewsDAO extends InterviewsDAOBase {
+    final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
-        $params = array($alias);
+        $params = [$alias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -27,8 +25,7 @@ class InterviewsDAO extends InterviewsDAOBase
         return $interview;
     }
 
-    final public static function getMyInterviews($user_id)
-    {
+    final public static function getMyInterviews($user_id) {
         $sql = '
             SELECT
                 i.*
@@ -42,12 +39,12 @@ class InterviewsDAO extends InterviewsDAOBase
                 a.owner_id = ?
                 OR (SELECT COUNT(*) FROM User_Roles WHERE user_id = ? AND role_id = ? AND acl_id = a.acl_id) > 0;';
 
-        $params = array($user_id, $user_id, Authorization::ADMIN_ROLE);
+        $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $result = array();
+        $result = [];
 
         foreach ($rs as $r) {
             $result[] = $r;

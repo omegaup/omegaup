@@ -51,14 +51,14 @@ class UserController extends Controller {
         }
 
         // Prepare DAOs
-        $user_data = array(
+        $user_data = [
             'username' => $r['username'],
             'password' => $hashedPassword,
             'solved' => 0,
             'submissions' => 0,
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
-        );
+        ];
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
         }
@@ -75,19 +75,19 @@ class UserController extends Controller {
             }
 
             $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $data = array(
+            $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $r['recaptcha'],
-                'remoteip' => $_SERVER['REMOTE_ADDR']);
+                'remoteip' => $_SERVER['REMOTE_ADDR']];
 
             // use key 'http' even if you send the request to https://...
-            $options = array(
-                    'http' => array(
+            $options = [
+                    'http' => [
                         'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
                         'method'  => 'POST',
                         'content' => http_build_query($data),
-                        ),
-                    );
+                        ],
+                    ];
             $context  = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
 
@@ -111,9 +111,9 @@ class UserController extends Controller {
 
         $user = new Users($user_data);
 
-        $email = new Emails(array(
+        $email = new Emails([
             'email' => $r['email'],
-        ));
+        ]);
 
         // Save objects into DB
         try {
@@ -146,10 +146,10 @@ class UserController extends Controller {
             self::$log->info('User ' . $user->username . ' created, trusting e-mail');
         }
 
-        return array(
+        return [
             'status' => 'ok',
             'user_id' => $user->user_id
-        );
+        ];
     }
 
     /**
@@ -174,19 +174,19 @@ class UserController extends Controller {
 
         //Subscribe
         $postdata = http_build_query(
-            array(
+            [
                 'name' => $user->username,
                 'email' => $email->email,
                 'list' => OMEGAUP_EMAIL_SENDY_LIST,
                 'boolean' => 'true' /* get a plaintext response, API: https://sendy.co/api */
-                )
+                ]
         );
-        $opts = array(
-            'http' => array(
+        $opts = [
+            'http' => [
                 'method'  => 'POST',
                 'header'  => 'Content-type: application/x-www-form-urlencoded',
-                'content' => $postdata)
-        );
+                'content' => $postdata]
+        ];
 
         $context  = stream_context_create($opts);
         $result = self::$urlHelper->fetchUrl(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, $context);
@@ -383,9 +383,9 @@ class UserController extends Controller {
 
         // If user was correctly logged in
         if ($auth_token !== false) {
-            return array(
+            return [
                 'status' => 'ok',
-                'auth_token' => $auth_token);
+                'auth_token' => $auth_token];
         } else {
             throw new InvalidCredentialsException();
         }
@@ -450,7 +450,7 @@ class UserController extends Controller {
         $user->password = $hashedPassword;
         UsersDAO::save($user);
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -485,9 +485,9 @@ class UserController extends Controller {
             Validators::isStringNonEmpty($r['id'], 'id');
 
             try {
-                $users = UsersDAO::search(new Users(array(
+                $users = UsersDAO::search(new Users([
                                     'verification_id' => $r['id']
-                                )));
+                                ]));
 
                 $user = (is_array($users) && count($users) > 0) ? $users[0] : null;
             } catch (Exception $e) {
@@ -516,7 +516,7 @@ class UserController extends Controller {
             }
         }
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -533,13 +533,13 @@ class UserController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $usersAdded = array();
+        $usersAdded = [];
 
         try {
-            $usersMissing = UsersDAO::search(new Users(array(
+            $usersMissing = UsersDAO::search(new Users([
                 'verified' => true,
                 'in_mailing_list' => false
-            )));
+            ]));
 
             foreach ($usersMissing as $user) {
                 $registered = self::registerToSendy($user);
@@ -555,10 +555,10 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array(
+        return [
             'status' => 'ok',
             'users' => $usersAdded
-        );
+        ];
     }
 
     /**
@@ -609,22 +609,22 @@ class UserController extends Controller {
 
         if (is_null($user)) {
             self::$log->info('Creating user: ' . $username);
-            $createRequest = new Request(array(
+            $createRequest = new Request([
                 'username' => $username,
                 'password' => $password,
                 'email' => $username . '@omi.com',
                 'permission_key' => $r['permission_key']
-            ));
+            ]);
 
             UserController::$sendEmailOnVerify = false;
             self::apiCreate($createRequest);
             return true;
         } elseif (is_null($r['change_password']) || $r['change_password'] !== 'false') {
             if (!$user->verified) {
-                self::apiVerifyEmail(new Request(array(
+                self::apiVerifyEmail(new Request([
                     'auth_token' => $r['auth_token'],
                     'usernameOrEmail' => $username
-                )));
+                ]));
             }
 
             // Pwd changes are by default unless explictly disabled
@@ -649,7 +649,7 @@ class UserController extends Controller {
     public static function apiGenerateOmiUsers(Request $r) {
         self::authenticateRequest($r);
 
-        $response = array();
+        $response = [];
 
         $is_system_admin = Authorization::isSystemAdmin($r['current_user_id']);
         if ($r['contest_type'] == 'OMI') {
@@ -660,7 +660,7 @@ class UserController extends Controller {
             }
 
             // Arreglo de estados de MX
-            $keys = array(
+            $keys = [
                 'OMI2017-AGU' => 4,
                 'OMI2017-BCN' => 4,
                 'OMI2017-BCS' => 4,
@@ -694,7 +694,7 @@ class UserController extends Controller {
                 'OMI2017-YUC' => 4,
                 'OMI2017-ZAC' => 4,
                 'OMI2017-INV' => 4,
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIP') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -702,9 +702,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array(
+            $keys = [
                 'OMIP2017' => 800,
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIS') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -712,9 +712,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array(
+            $keys = [
                 'OMIS2017' => 800,
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIPN') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -722,7 +722,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array(
+            $keys = [
                 'OMIP2017-AGU' => 4,
                 'OMIP2017-BCN' => 4,
                 'OMIP2017-BCS' => 4,
@@ -756,7 +756,7 @@ class UserController extends Controller {
                 'OMIP2017-YUC' => 4,
                 'OMIP2017-ZAC' => 4,
                 'OMIP2017-INV' => 4,
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMISN') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -764,7 +764,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array(
+            $keys = [
                 'OMIS2017-AGU' => 4,
                 'OMIS2017-BCN' => 4,
                 'OMIS2017-BCS' => 4,
@@ -798,7 +798,7 @@ class UserController extends Controller {
                 'OMIS2017-YUC' => 4,
                 'OMIS2017-ZAC' => 4,
                 'OMIS2017-INV' => 4,
-            );
+            ];
         } elseif ($r['contest_type'] == 'ORIG') {
             if ($r['current_user']->username != 'kuko.coder'
                 && !$is_system_admin
@@ -806,7 +806,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array (
+            $keys =  [
                 'ORIG1516-CEL' => 38,
                 'ORIG1516-DHI' => 15,
                 'ORIG1516-GTO' => 14,
@@ -817,7 +817,7 @@ class UserController extends Controller {
                 'ORIG1516-SLV' => 14,
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIAGS') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -825,9 +825,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array (
+            $keys =  [
                 'OMIAGS' => 35
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIP-AGS') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
@@ -835,9 +835,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array (
+            $keys =  [
                 'OMIP-AGS' => 30
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIS-AGS') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
@@ -845,9 +845,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array (
+            $keys =  [
                 'OMIS-AGS' => 30
-            );
+            ];
         } elseif ($r['contest_type'] == 'OSI') {
             if ($r['current_user']->username != 'cope_quintana'
                 && !$is_system_admin
@@ -855,9 +855,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
-            $keys = array (
+            $keys =  [
                 'OSI16' => 120
-            );
+            ];
         } elseif ($r['contest_type'] == 'UNAMFC') {
             if ($r['current_user']->username != 'manuelalcantara52'
                 && $r['current_user']->username != 'manuel52'
@@ -865,27 +865,27 @@ class UserController extends Controller {
             ) {
                 throw new ForbiddenAccessException();
             }
-            $keys = array (
+            $keys =  [
                 'UNAMFC16' => 65
-            );
+            ];
         } elseif ($r['contest_type'] == 'OVI') {
             if ($r['current_user']->username != 'covi.academico'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
-            $keys = array (
+            $keys =  [
                 'OVI17' => 100
-            );
+            ];
         } elseif ($r['contest_type'] == 'PROFEST') {
             if ($r['current_user']->username != 'Diego_Briaares'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
-            $keys = array (
+            $keys =  [
                 'PROFEST-2016' => 18
-            );
+            ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
             if ($r['current_user']->username != 'licgerman-yahoo'
                 && !$is_system_admin
@@ -893,18 +893,18 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             // Arreglo de concurso
-            $keys = array(
+            $keys = [
                 'CCUPITSUR-16' => 50,
-            );
+            ];
         } elseif ($r['contest_type'] == 'CONALEP') {
             if ($r['current_user']->username != 'reyes811'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
-            $keys = array (
+            $keys =  [
                 'OIC-16' => 225
-            );
+            ];
         } elseif ($r['contest_type'] == 'OMIQROO') {
             if ($r['current_user']->username != 'pablobatun'
                 && !$is_system_admin
@@ -919,10 +919,10 @@ class UserController extends Controller {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
-                array(
+                [
                     'bad_elements' => $r['contest_type'],
                     'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO',
-                )
+                ]
             );
         }
 
@@ -981,7 +981,7 @@ class UserController extends Controller {
             self::$log->debug($ex);
         }
 
-        $langs = array();
+        $langs = [];
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             // break up string into pieces (languages and q factors)
@@ -1051,9 +1051,9 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     private static function getProfileImpl(Users $user) {
-        $response = array();
-        $response['userinfo'] = array();
-        $response['problems'] = array();
+        $response = [];
+        $response['userinfo'] = [];
+        $response['problems'] = [];
 
         $response['userinfo']['username'] = $user->username;
         $response['userinfo']['name'] = $user->name;
@@ -1114,7 +1114,7 @@ class UserController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'User');
         }
 
-        $response = array();
+        $response = [];
 
         Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
@@ -1129,7 +1129,7 @@ class UserController extends Controller {
         if (is_null($r['omit_rank']) || !$r['omit_rank']) {
             $response['userinfo']['rankinfo'] = self::getRankByProblemsSolved($r);
         } else {
-            $response['userinfo']['rankinfo'] = array();
+            $response['userinfo']['rankinfo'] = [];
         }
 
         // Do not leak plain emails in case the request is for a profile other than
@@ -1176,7 +1176,7 @@ class UserController extends Controller {
         try {
             $coderOfTheMonth = null;
 
-            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(array('time' => $firstDay)));
+            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay]));
             if (count($codersOfTheMonth) > 0) {
                 $coderOfTheMonth = $codersOfTheMonth[0];
             }
@@ -1192,11 +1192,11 @@ class UserController extends Controller {
                 $user = $retArray['user'];
 
                 // Save it
-                $c = new CoderOfTheMonth(array(
+                $c = new CoderOfTheMonth([
                     'user_id' => $user->user_id,
                     'time' => $firstDay,
 
-                ));
+                ]);
                 CoderOfTheMonthDAO::save($c);
             } else {
                 // Grab the user info
@@ -1220,19 +1220,19 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiCoderOfTheMonthList(Request $r) {
-        $response = array();
-        $response['coders'] = array();
+        $response = [];
+        $response['coders'] = [];
         try {
             $coders = CoderOfTheMonthDAO::getAll(null, null, 'time', 'DESC');
 
             foreach ($coders as $c) {
                 $user = UsersDAO::getByPK($c->user_id);
                 $email = EmailsDAO::getByPK($user->main_email_id);
-                $response['coders'][] = array(
+                $response['coders'][] = [
                     'username' => $user->username,
                     'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($email->email) . '?s=32',
                     'date' => $c->time
-                );
+                ];
             }
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($e);
@@ -1275,7 +1275,7 @@ class UserController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = array();
+        $response = [];
         $user = self::resolveTargetUser($r);
 
         $openedProblemset = self::userOpenedProblemset($contest->problemset_id, $user->user_id);
@@ -1299,8 +1299,8 @@ class UserController extends Controller {
     public static function apiContestStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        $response = array();
-        $response['contests'] = array();
+        $response = [];
+        $response['contests'] = [];
 
         $user = self::resolveTargetUser($r);
 
@@ -1311,14 +1311,14 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $contests = array();
+        $contests = [];
         foreach ($contestsParticipated as $contest) {
             // Get user ranking
-            $scoreboardR = new Request(array(
+            $scoreboardR = new Request([
                 'auth_token' => $r['auth_token'],
                 'contest_alias' => $contest->alias,
                 'token' => $contest->scoreboard_url_admin
-            ));
+            ]);
             $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 
             // Grab the place of the current user in the given contest
@@ -1349,8 +1349,8 @@ class UserController extends Controller {
     public static function apiProblemsSolved(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        $response = array();
-        $response['problems'] = array();
+        $response = [];
+        $response['problems'] = [];
 
         $user = self::resolveTargetUser($r);
 
@@ -1361,7 +1361,7 @@ class UserController extends Controller {
         }
 
         if (!is_null($db_results)) {
-            $relevant_columns = array('title', 'alias', 'submissions', 'accepted');
+            $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
             foreach ($db_results as $problem) {
                 if ($problem->public == 1) {
                     array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
@@ -1397,9 +1397,9 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
         foreach ($users as $user) {
-            $entry = array('label' => $user->username, 'value' => $user->username);
+            $entry = ['label' => $user->username, 'value' => $user->username];
             array_push($response, $entry);
         }
 
@@ -1419,7 +1419,7 @@ class UserController extends Controller {
             $totalRunsCount = RunsDAO::CountTotalRunsOfUser($user->user_id);
 
             // List of verdicts
-            $verdict_counts = array();
+            $verdict_counts = [];
 
             foreach (self::$verdicts as $verdict) {
                 $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfUserByVerdict($user->user_id, $verdict);
@@ -1428,11 +1428,11 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array(
+        return [
             'verdict_counts' => $verdict_counts,
             'total_runs' => $totalRunsCount,
             'status' => 'ok'
-        );
+        ];
     }
 
     /**
@@ -1464,7 +1464,7 @@ class UserController extends Controller {
 
         UsersDAO::save($r['current_user']);
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1519,7 +1519,7 @@ class UserController extends Controller {
                 $r['school_id'] = null;
             } else {
                 try {
-                    $schoolR = new Request(array('name' => $r['school_name'], 'state_id' => $r['state_id'], 'auth_token' => $r['auth_token']));
+                    $schoolR = new Request(['name' => $r['school_name'], 'state_id' => $r['state_id'], 'auth_token' => $r['auth_token']]);
                     $response = SchoolController::apiCreate($schoolR);
                     $r['school_id'] = $response['school_id'];
                 } catch (Exception $e) {
@@ -1549,7 +1549,7 @@ class UserController extends Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            $query = LanguagesDAO::search(new Languages(array( 'name' => $r['locale'])));
+            $query = LanguagesDAO::search(new Languages([ 'name' => $r['locale']]));
             if (sizeof($query) == 1) {
                 $r['current_user']->language_id = $query[0]->language_id;
             }
@@ -1557,20 +1557,20 @@ class UserController extends Controller {
 
         Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
 
-        $valueProperties = array(
+        $valueProperties = [
             'name',
             'country_id',
             'state_id',
             'scholar_degree',
             'school_id',
-            'graduation_date' => array('transform' => function ($value) {
+            'graduation_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
-            }),
-            'birth_date' => array('transform' => function ($value) {
+            }],
+            'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
-            }),
+            }],
             'recruitment_optin',
-        );
+        ];
 
         self::updateValueProperties($r, $r['current_user'], $valueProperties);
 
@@ -1585,7 +1585,7 @@ class UserController extends Controller {
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1639,8 +1639,8 @@ class UserController extends Controller {
             $rankCacheName =  $r['offset'] . '-' . $r['rowcount'];
 
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
-                $response = array();
-                $response['rank'] = array();
+                $response = [];
+                $response['rank'] = [];
                 try {
                     $userRankEntries = UserRankDAO::getAll($r['offset'], $r['rowcount'], 'Rank', 'ASC');
                 } catch (Exception $e) {
@@ -1649,13 +1649,13 @@ class UserController extends Controller {
 
                 if (!is_null($userRankEntries)) {
                     foreach ($userRankEntries as $userRank) {
-                        array_push($response['rank'], array(
+                        array_push($response['rank'], [
                             'username' => $userRank->username,
                             'name' => $userRank->name,
                             'problems_solved' => $userRank->problems_solved_count,
                             'rank' => $userRank->rank,
                             'score' => $userRank->score,
-                            'country_id' => $userRank->country_id));
+                            'country_id' => $userRank->country_id]);
                     }
                 }
                 return $response;
@@ -1667,7 +1667,7 @@ class UserController extends Controller {
                 self::setProblemsSolvedRankCacheList($rankCacheName);
             }
         } else {
-            $response = array();
+            $response = [];
 
             try {
                 $userRank = UserRankDAO::getByPK($r['user']->user_id);
@@ -1704,7 +1704,7 @@ class UserController extends Controller {
 
         if (is_null($ranksList)) {
             // Simulating a set
-            $ranksList = array($rankCacheName => 1);
+            $ranksList = [$rankCacheName => 1];
         } else {
             $ranksList[$rankCacheName] = 1;
         }
@@ -1754,7 +1754,7 @@ class UserController extends Controller {
         // Borrar todos los ranks cacheados
         self::deleteProblemsSolvedRankCacheList();
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1804,7 +1804,7 @@ class UserController extends Controller {
         $r['user'] = $r['current_user'];
         self::sendVerificationEmail($r);
 
-        return array('status' => 'ok');
+        return ['status' => 'ok'];
     }
 
     public static function makeUsernameFromEmail($email) {
@@ -1832,13 +1832,13 @@ class UserController extends Controller {
     public static function apiValidateFilter(Request $r) {
         Validators::isStringNonEmpty($r['filter'], 'filter');
 
-        $response = array(
+        $response = [
             'status' => 'ok',
             'user' => null,
             'admin' => false,
-            'problem_admin' => array(),
-            'contest_admin' => array(),
-        );
+            'problem_admin' => [],
+            'contest_admin' => [],
+        ];
 
         $session = SessionController::apiCurrentSession($r)['session'];
         $user = $session['user'];
@@ -1874,9 +1874,9 @@ class UserController extends Controller {
                     if (count($tokens) < 3) {
                         throw new InvalidParameterException('parameterInvalid', 'filter');
                     }
-                    $r2 = new Request(array(
+                    $r2 = new Request([
                         'contest_alias' => $tokens[2],
-                    ));
+                    ]);
                     if (isset($r['auth_token'])) {
                         $r2['auth_token'] = $r['auth_token'];
                     }

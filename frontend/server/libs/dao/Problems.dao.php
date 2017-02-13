@@ -17,8 +17,7 @@ require_once('base/Problems.vo.base.php');
   * @package docs
   *
   */
-class ProblemsDAO extends ProblemsDAOBase
-{
+class ProblemsDAO extends ProblemsDAOBase {
     final private static function addTagFilter($user_type, $user_id, $tag, &$sql, &$args) {
         $add_user_id = false;
         if ($user_type === USER_ADMIN) {
@@ -91,10 +90,10 @@ class ProblemsDAO extends ProblemsDAOBase
 
         $select = '';
         $sql= '';
-        $args = array();
+        $args = [];
 
         if ($user_type === USER_ADMIN) {
-            $args = array($user_id);
+            $args = [$user_id];
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
@@ -216,8 +215,8 @@ class ProblemsDAO extends ProblemsDAOBase
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.
-        $filters = array('title', 'submissions', 'accepted', 'alias', 'public');
-        $problems = array();
+        $filters = ['title', 'submissions', 'accepted', 'alias', 'public'];
+        $problems = [];
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -234,10 +233,9 @@ class ProblemsDAO extends ProblemsDAOBase
         return $problems;
     }
 
-    final public static function getByAlias($alias)
-    {
+    final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
-        $params = array(  $alias );
+        $params = [  $alias ];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -250,8 +248,7 @@ class ProblemsDAO extends ProblemsDAOBase
                 return $contest;
     }
 
-    final public static function searchByAlias($alias)
-    {
+    final public static function searchByAlias($alias) {
         global $conn;
         $quoted = $conn->Quote($alias);
 
@@ -262,7 +259,7 @@ class ProblemsDAO extends ProblemsDAOBase
         $sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
         $rs = $conn->Execute($sql);
 
-        $result = array();
+        $result = [];
 
         foreach ($rs as $r) {
             array_push($result, new Problems($r));
@@ -287,7 +284,7 @@ class ProblemsDAO extends ProblemsDAOBase
         }
 
         $rs = $conn->Execute($sql, $problem->problem_id);
-        $result = array();
+        $result = [];
 
         foreach ($rs as $r) {
             $result[] = $r['name'];
@@ -307,10 +304,10 @@ class ProblemsDAO extends ProblemsDAOBase
         global $conn;
 
         $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.user_id = ? ORDER BY `Problems`.problem_id DESC";
-        $val = array($id);
+        $val = [$id];
         $rs = $conn->Execute($sql, $val);
 
-        $result = array();
+        $result = [];
 
         foreach ($rs as $r) {
             array_push($result, new Problems($r));
@@ -330,7 +327,7 @@ class ProblemsDAO extends ProblemsDAOBase
             a.acl_id = p.acl_id
         WHERE
             p.public = 0 and a.owner_id = ?;';
-        $params = array($user->user_id);
+        $params = [$user->user_id];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -376,12 +373,12 @@ class ProblemsDAO extends ProblemsDAOBase
                 e.user_id = u.main_email_id;
         ';
 
-        $params = array($problem->problem_id,
+        $params = [$problem->problem_id,
             PROBLEM_ADMIN_ROLE,
-            $problem->problem_id);
+            $problem->problem_id];
         $rs = $conn->Execute($sql, $params);
 
-        $result = array();
+        $result = [];
         foreach ($rs as $r) {
             $result[] = $r['email'];
         }
@@ -419,7 +416,7 @@ class ProblemsDAO extends ProblemsDAOBase
                 p.problem_id DESC
             LIMIT
                 ?, ?';
-        $params = array(
+        $params = [
             $user_id,
             Authorization::ADMIN_ROLE,
             $user_id,
@@ -427,12 +424,12 @@ class ProblemsDAO extends ProblemsDAOBase
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $problems = array();
+        $problems = [];
         foreach ($rs as $row) {
             array_push($problems, new Problems($row));
         }
@@ -461,16 +458,16 @@ class ProblemsDAO extends ProblemsDAOBase
                 p.problem_id DESC
             LIMIT
                 ?, ?';
-        $params = array(
+        $params = [
             $user_id,
             $offset,
             $pageSize,
-        );
+        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $problems = array();
+        $problems = [];
         foreach ($rs as $row) {
             array_push($problems, new Problems($row));
         }

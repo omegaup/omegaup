@@ -89,7 +89,7 @@ class ProblemList extends OmegaupTestCase {
         }
 
         // Test multiple tags at a time
-        $tags = array();
+        $tags = [];
         for ($j = 0; $j < $n; $j++) {
             $tags[] = "tag-$j";
 
@@ -472,7 +472,7 @@ class ProblemList extends OmegaupTestCase {
         $response = ProblemController::apiList($request);
 
         // Test search by title
-        $titles = array();
+        $titles = [];
         foreach ($response['results'] as $problem) {
             array_push($titles, $problem['title']);
         }
@@ -492,8 +492,8 @@ class ProblemList extends OmegaupTestCase {
         // with the additions of the three features to apiList(), that is, paging,
         // order by column and order mode: Call apiList() with and without
         // pagination, for each allowed ordering and each possible order mode.
-        $modes = array('asc', 'desc');
-        $columns = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
+        $modes = ['asc', 'desc'];
+        $columns = ['title', 'submissions', 'accepted', 'ratio', 'points', 'score'];
         $counter = 0;
         for ($paging = 0; $paging <= 1; $paging++) {
             foreach ($columns as $col) {

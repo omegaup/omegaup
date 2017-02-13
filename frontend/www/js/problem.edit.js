@@ -51,7 +51,8 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
               refreshProblemAdmins();
-            }).fail(omegaup.UI.apiError);
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -67,7 +68,8 @@ omegaup.OmegaUp.on('ready', function() {
               $('div.post.footer').show();
 
               refreshProblemAdmins();
-            }).fail(omegaup.UI.apiError);
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -125,7 +127,8 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            }).fail(omegaup.UI.apiError);
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(admin.username))));
           }
@@ -164,11 +167,13 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            }).fail(omegaup.UI.apiError);
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(group_admin.alias))));
           }
-        }).fail(omegaup.UI.apiError);
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   $('#add-tag-form')
@@ -185,7 +190,8 @@ omegaup.OmegaUp.on('ready', function() {
               $('div.post.footer').show();
 
               refreshProblemTags();
-            }).fail(omegaup.UI.apiError);
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -222,11 +228,13 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            }).fail(omegaup.UI.apiError);
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(tag.name))));
           }
-        }).fail(omegaup.UI.apiError);
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   var md_converter = Markdown.getSanitizingConverter();
@@ -247,10 +255,9 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
 
-    omegaup.API.getProblem({
-      problem_alias: problemAlias,
-      statement_type: 'markdown'
-    }).then(problemCallback);
+    omegaup.API.getProblem(
+                   {problem_alias: problemAlias, statement_type: 'markdown'})
+        .then(problemCallback);
   }
 
   function problemCallback(problem) {
@@ -303,10 +310,11 @@ omegaup.OmegaUp.on('ready', function() {
   $('#statement-language')
       .on('change', function(e) {
         omegaup.API.getProblem({
-          problem_alias: problemAlias,
-          statement_type: 'markdown',
-          show_solvers: false,
-          lang: $('#statement-language').val()
-        }).then(problemCallback);
+                     problem_alias: problemAlias,
+                     statement_type: 'markdown',
+                     show_solvers: false,
+                     lang: $('#statement-language').val()
+                   })
+            .then(problemCallback);
       });
 });

@@ -13,7 +13,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
         // Create 10 users
         $n = 10;
-        $users = array();
+        $users = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
             $users[$i] = UserFactory::createUser();

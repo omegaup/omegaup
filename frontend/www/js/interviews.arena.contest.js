@@ -7,7 +7,7 @@ omegaup.OmegaUp.on('ready', function() {
   var admin = null;
 
   omegaup.API.getContest(arena.options.contestAlias,
-                          arena.contestLoaded.bind(arena));
+                         arena.contestLoaded.bind(arena));
 
   $(window).hashchange(arena.onHashChanged.bind(arena));
 });

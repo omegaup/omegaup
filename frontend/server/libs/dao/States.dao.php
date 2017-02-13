@@ -17,6 +17,5 @@ require_once('base/States.vo.base.php');
   * @package docs
   *
   */
-class StatesDAO extends StatesDAOBase
-{
+class StatesDAO extends StatesDAOBase {
 }

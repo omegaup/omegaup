@@ -45,9 +45,7 @@ omegaup.UI = {
     omegaup.UI.displayStatus(message, 'alert-warning');
   },
 
-  apiError: function(response) {
-    omegaup.UI.error(response.error || 'error');
-  },
+  apiError: function(response) { omegaup.UI.error(response.error || 'error'); },
 
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },

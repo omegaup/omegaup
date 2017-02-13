@@ -8,15 +8,17 @@ $(function() {
   var groupAlias = formData.attr('data-group-alias');
 
   if (formPage === 'edit') {
-    omegaup.API.getContests().then(function(contests) {
-      for (var i = 0; i < contests.results.length; i++) {
-        contest = contests.results[i];
-        $('#contests')
-            .append($('<option></option>')
-                        .attr('value', contest.alias)
-                        .text(contest.title));
-      }
-    }).fail(omegaup.UI.apiError);
+    omegaup.API.getContests()
+        .then(function(contests) {
+          for (var i = 0; i < contests.results.length; i++) {
+            contest = contests.results[i];
+            $('#contests')
+                .append($('<option></option>')
+                            .attr('value', contest.alias)
+                            .text(contest.title));
+          }
+        })
+        .fail(omegaup.UI.apiError);
 
     $('#scoreboard-add-contest-form')
         .submit(function() {
@@ -30,7 +32,8 @@ $(function() {
               .then(function(data) {
                 omegaup.UI.success('Contest successfully added!');
                 refreshScoreboardContests();
-              }).fail(omegaup.UI.apiError);
+              })
+              .fail(omegaup.UI.apiError);
 
           return false;
         });
@@ -81,11 +84,13 @@ $(function() {
                                             var tr = e.target.parentElement
                                                          .parentElement;
                                             $(tr).remove();
-                                          }).fail(omegaup.UI.apiError);
+                                          })
+                                          .fail(omegaup.UI.apiError);
                                     };
                                   })(contest.alias))));
             }
-          }).fail(omegaup.UI.apiError);
+          })
+          .fail(omegaup.UI.apiError);
     }
   } else if (formPage === 'details') {
     omegaup.API.getGroupScoreboard({
@@ -158,6 +163,7 @@ $(function() {
           $('#ranking').show();
           $('#root').fadeIn('slow');
           $('#loading').fadeOut('slow');
-        }).fail(omegaup.UI.apiError);
+        })
+        .fail(omegaup.UI.apiError);
   }
 });

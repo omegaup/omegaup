@@ -15,15 +15,15 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(UserLoginLogDAO::search(array(
+        $this->assertEquals(0, count(UserLoginLogDAO::search([
             'user_id' => $user->user_id,
-        ))));
+        ])));
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -32,9 +32,9 @@ class LoginTest extends OmegaupTestCase {
         $this->assertLogin($user, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(UserLoginLogDAO::search(array(
+        $this->assertEquals(1, count(UserLoginLogDAO::search([
             'user_id' => $user->user_id,
-        ))));
+        ])));
     }
 
     /**
@@ -46,10 +46,10 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser(null, null, $email);
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $email,
             'password' => $user->password
-        ));
+        ]);
 
         $response = UserController::apiLogin($r);
 
@@ -67,10 +67,10 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $user->username,
             'password' => 'badpasswordD:'
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -83,10 +83,10 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => 'IDontExist',
             'password' => 'badpasswordD:'
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -103,10 +103,10 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser(null, null, $email);
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
                     'usernameOrEmail' => $email,
                     'password' => 'badpasswordD:'
-                ));
+                ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -149,10 +149,10 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
-        ));
+        ]);
 
         // Call the API
         $response1 = UserController::apiLogin($r);
@@ -185,10 +185,10 @@ class LoginTest extends OmegaupTestCase {
         $user->password = $plainPassword;
 
         // Inflate request with user data
-        $r = new Request(array(
+        $r = new Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
-        ));
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);

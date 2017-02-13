@@ -8,9 +8,9 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testInvalidFilter() {
-        $r = new Request(array(
+        $r = new Request([
             'filter' => 'invalid',
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -18,9 +18,9 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testUnauthorizedAccess() {
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/all-events',
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -31,10 +31,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -42,10 +42,10 @@ class UserFilterTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $login = self::login($admin);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEquals($response['admin'], true);
     }
@@ -54,10 +54,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/user/' . $user->username,
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEquals($response['status'], 'ok');
         $this->assertEquals($response['user'], $user->username);
@@ -74,10 +74,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user2 = UserFactory::createUser();
 
         $login = self::login($user1);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/user/' . $user2->username,
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -86,10 +86,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($admin);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/user/' . $user->username,
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEquals($response['admin'], true);
     }
@@ -99,10 +99,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'filter' => '/contest/' . $contest->alias,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -112,9 +112,9 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousPublicContestAccess() {
         $contest = ContestsFactory::createContest()['contest'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/contest/' . $contest->alias,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
@@ -124,19 +124,19 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousContestAccess() {
         $contest = ContestsFactory::createContest(null, 0)['contest'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/contest/' . $contest->alias,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 
     public function testAnonymousContestWithToken() {
         $contest = ContestsFactory::createContest(null, 0)['contest'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
                         $contest->scoreboard_url,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEmpty($response['contest_admin']);
     }
@@ -144,10 +144,10 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousContestWithAdminToken() {
         $contest = ContestsFactory::createContest(null, 0)['contest'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
                         $contest->scoreboard_url_admin,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertContains($contest->alias, $response['contest_admin']);
         $this->assertNull($response['user']);
@@ -158,10 +158,10 @@ class UserFilterTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/problem/' . $problem->alias,
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEquals($response['user'], $user->username);
     }
@@ -169,9 +169,9 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousPublicProblemAccess() {
         $problem = ProblemsFactory::createProblem()['problem'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/problem/' . $problem->alias,
-        ));
+        ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertNull($response['user']);
     }
@@ -182,9 +182,9 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousProblemAccess() {
         $problem = ProblemsFactory::createProblem(null, null, 0)['problem'];
 
-        $r = new Request(array(
+        $r = new Request([
             'filter' => '/problem/' . $problem->alias,
-        ));
+        ]);
         UserController::apiValidateFilter($r);
     }
 }

@@ -23,7 +23,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 
         $sql = 'select u.* from Users u, Auth_Tokens at where at.user_id = u.user_id and at.token = ?;';
 
-        $params = array($auth_token);
+        $params = [$auth_token];
 
         $rs = $conn->GetRow($sql, $params);
 
@@ -41,7 +41,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 
         $sql = 'delete from Auth_Tokens where user_id = ?;';
 
-        $params = array($user_id);
+        $params = [$user_id];
 
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();

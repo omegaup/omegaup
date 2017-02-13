@@ -10,9 +10,9 @@ class Broadcaster {
 
     public function broadcastClarification(Request $r, $time) {
         try {
-            $message = json_encode(array(
+            $message = json_encode([
                 'message' => '/clarification/update/',
-                'clarification' => array(
+                'clarification' => [
                     'clarification_id' => $r['clarification']->clarification_id,
                     'problem_alias' => $r['problem']->alias,
                     'author' => $r['user']->username,
@@ -20,8 +20,8 @@ class Broadcaster {
                     'answer' => $r['clarification']->answer,
                     'time' => $time,
                     'public' => $r['clarification']->public != '0'
-                )
-            ));
+                ]
+            ]);
 
             $grader = new Grader();
             $this->log->debug("Sending update $message");
@@ -65,7 +65,7 @@ class Broadcaster {
             }
             $mail->isHTML(true);
             global $smarty;
-            $email_params = array(
+            $email_params = [
                 'clarification_id' => $r['clarification']->clarification_id,
                 'clarification_body' => htmlspecialchars($r['clarification']->message),
                 'problem_alias' => $r['problem']->alias,
@@ -74,7 +74,7 @@ class Broadcaster {
                     ('https://omegaup.com/arena/problem/' . $r['problem']->alias . '#clarifications') :
                     ('https://omegaup.com/arena/' . $r['contest']->alias . '#clarifications'),
                 'user_name' => $r['user']->username
-            );
+            ];
             $mail->Subject = ApiUtils::FormatString(
                 $smarty->getConfigVars('clarificationEmailSubject'),
                 $email_params

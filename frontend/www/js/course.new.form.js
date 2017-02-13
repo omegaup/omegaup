@@ -11,8 +11,5 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#start_time, #finish_time', courseForm)
-      .datepicker({
-        weekStart: 1,
-        format: 'mm/dd/yyyy'
-      });
+      .datepicker({weekStart: 1, format: 'mm/dd/yyyy'});
 });

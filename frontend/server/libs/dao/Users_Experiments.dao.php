@@ -9,6 +9,5 @@ include('base/Users_Experiments.vo.base.php');
   * @access public
   *
   */
-class UsersExperimentsDAO extends UsersExperimentsDAOBase
-{
+class UsersExperimentsDAO extends UsersExperimentsDAOBase {
 }

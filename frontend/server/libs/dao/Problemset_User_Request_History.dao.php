@@ -9,6 +9,5 @@ include('base/Problemset_User_Request_History.vo.base.php');
   * @access public
   *
   */
-class ProblemsetUserRequestHistoryDAO extends ProblemsetUserRequestHistoryDAOBase
-{
+class ProblemsetUserRequestHistoryDAO extends ProblemsetUserRequestHistoryDAOBase {
 }

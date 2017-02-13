@@ -17,6 +17,5 @@ require_once('base/Emails.vo.base.php');
   * @package docs
   *
   */
-class EmailsDAO extends EmailsDAOBase
-{
+class EmailsDAO extends EmailsDAOBase {
 }

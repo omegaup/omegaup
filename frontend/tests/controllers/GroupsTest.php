@@ -26,9 +26,9 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $groups = GroupsDAO::search(new Groups(array(
+        $groups = GroupsDAO::search(new Groups([
             'name' => $name
-        )));
+        ]));
         $group = $groups[0];
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
@@ -133,7 +133,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testGroupsMyList() {
         // Create 5 groups for the same owner
         $owner = UserFactory::createUser();
-        $groups = array();
+        $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
             $groups[] = GroupsFactory::createGroup($owner);
@@ -157,7 +157,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testGroupDetails() {
         // Create a group with 5 users
         $groupData = GroupsFactory::createGroup();
-        $users = array();
+        $users = [];
         $nUsers = 5;
         for ($i = 0; $i < $nUsers; $i++) {
             $users[] = UserFactory::createUser();
@@ -293,7 +293,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testScoreboardDetails() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestsData = array();
+        $contestsData = [];
 
         // Create contestants to submit runs
         $contestantInGroup = UserFactory::createUser();
@@ -339,7 +339,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testScoreboardsList() {
         $groupData = GroupsFactory::createGroup();
         $n = 5;
-        $scoreboardsData = array();
+        $scoreboardsData = [];
         for ($i = 0; $i < $n; $i++) {
             $scoreboardsData[] = GroupsFactory::createGroupScoreboard($groupData);
         }
@@ -359,7 +359,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testScoreboardDetailsOnlyAcAndWeight() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestsData = array();
+        $contestsData = [];
 
         // Create contestants to submit runs
         $contestantInGroup = UserFactory::createUser();

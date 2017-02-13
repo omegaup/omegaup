@@ -63,7 +63,7 @@ class Utils {
         global $conn;
 
         $sql = 'SELECT FROM_UNIXTIME(?) t';
-        $params = array($time);
+        $params = [$time];
         $rs = $conn->GetRow($sql, $params);
 
         if (count($rs) === 0) {
@@ -91,7 +91,7 @@ class Utils {
         global $conn;
 
         // Tables to truncate
-        $tables = array(
+        $tables = [
             'ACLs',
             'Assignments',
             'Auth_Tokens',
@@ -122,7 +122,7 @@ class Utils {
             'User_Roles',
             'Users',
             'Users_Experiments',
-        );
+        ];
 
         try {
             // Disable foreign checks
