@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import getpass
@@ -6,8 +6,8 @@ import hashlib
 import MySQLdb
 import sys
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 parser = argparse.ArgumentParser(description='Replay a contest')
 
@@ -31,7 +31,7 @@ cur = db.cursor()
 
 # Get contest ID
 if cur.execute('SELECT contest_id FROM Contests WHERE alias = %s', args.contest) != 1:
-	print>> sys.stderr, "Failed to load contest %s" % args.contest
+	print("Failed to load contest %s" % args.contest, file=sys.stderr)
 	sys.exit(1)
 
 contest_alias = args.contest
@@ -62,10 +62,9 @@ cur.execute("""INSERT INTO Contest_Problems
 db.commit()
 
 # Allow user to open the contest to see the shiny display
-print>>sys.stderr, \
-	'http://localhost:8080/arena/%s/scoreboard/%s?ws=on' % (new_alias, scoreboard_token)
-print>>sys.stderr, 'Press Enter to continue...',
-raw_input()
+print('http://localhost:8080/arena/%s/scoreboard/%s?ws=on' % (new_alias, scoreboard_token), file=sys.stderr)
+print('Press Enter to continue...', end=' ', file=sys.stderr)
+input()
 
 # Replay all runs, one after the other
 num_rows = cur.execute('SELECT * FROM Runs WHERE contest_id = %s;', (contest_id))
@@ -91,13 +90,13 @@ for row in cur.fetchall():
 	run_id = cur.lastrowid
 	db.commit()
 	idx += 1
-	print>>sys.stderr, '%2.3f%%\r' % (100.0 * idx / num_rows),
+	print('%2.3f%%\r' % (100.0 * idx / num_rows), end=' ', file=sys.stderr)
 
 	# Force scoreboard regeneration
 	t0 = time.time()
-	response = urllib2.urlopen(
+	response = urllib.request.urlopen(
 		'http://localhost/api/scoreboard/refresh/',
-		urllib.urlencode({'token': 'secret', 'alias': new_alias, 'run': str(run_id)})
+		urllib.parse.urlencode({'token': 'secret', 'alias': new_alias, 'run': str(run_id)})
 	).read()
 	t1 = time.time()
 	assert(response == '{"status":"ok"}')
@@ -108,6 +107,6 @@ cur.close()
 db.close()
 
 # Print some stats
-print times
-print t1_all - t0_all
-print (t1_all - t0_all) / num_rows
+print(times)
+print(t1_all - t0_all)
+print((t1_all - t0_all) / num_rows)

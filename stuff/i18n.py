@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import codecs
@@ -30,7 +30,8 @@ parser.add_argument('--fill-missing-with-english', dest='fillmissing', action='s
 
 args = parser.parse_args()
 
-root_dir = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--show-toplevel']).strip()
+root_dir = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--show-toplevel'],
+					universal_newlines=True).strip()
 templates_dir = os.path.join(root_dir, TEMPLATES_PATH)
 js_templates_dir = os.path.join(root_dir, JS_TEMPLATES_PATH)
 pseudoloc_file = os.path.join(templates_dir, PSEUDOLOC + '.lang')
@@ -56,68 +57,68 @@ for lang_path in glob(os.path.join(templates_dir, '*.lang')):
 					raise Exception("Invalid value")
 				strings[key][lang] = value
 			except:
-				print >> sys.stderr, 'Invalid i18n line "%s" in %s:%d' % (
-						line.strip(), lang_path, lineno + 1)
+				print('Invalid i18n line "%s" in %s:%d' % (
+						line.strip(), lang_path, lineno + 1), file=sys.stderr)
 				sys.exit(1)
 
 errors = False
 if args.validate and not_sorted:
-	print >> sys.stderr, 'Entries in %s are not sorted.' % ', '.join(sorted(not_sorted))
+	print('Entries in %s are not sorted.' % ', '.join(sorted(not_sorted)), file=sys.stderr)
 	errors = True
 
 
 if args.fillmissing:
-	for key, values in strings.iteritems():
-		missing_languages = languages.difference(values.keys())
+	for key, values in strings.items():
+		missing_languages = languages.difference(list(values.keys()))
 		if missing_languages:
-			print >> sys.stderr, 'Fixing %s%s for %s%s' % (colors.HEADER, key, lang, colors.NORMAL)
+			print('Fixing %s%s for %s%s' % (colors.HEADER, key, lang, colors.NORMAL), file=sys.stderr)
 			english_word = values['en']
 			for lang in sorted(languages):
 				if lang not in values:
 					with codecs.open(templates_dir + "/" + lang+".lang", 'a', 'utf-8') as myfile:
-						print >> myfile, '%s = %s' % (key, english_word)
-	print >> sys.stderr, 'Done fixing your missing files, re-run this tool again as usual.'
+						print('%s = %s' % (key, english_word), file=myfile)
+	print('Done fixing your missing files, re-run this tool again as usual.', file=sys.stderr)
 	sys.exit(0)
 
-for key, values in strings.iteritems():
-	missing_languages = languages.difference(values.keys())
+for key, values in strings.items():
+	missing_languages = languages.difference(list(values.keys()))
 	if not args.validate and PSEUDOLOC in missing_languages:
 		missing_languages.remove(PSEUDOLOC)
 	if missing_languages:
-		print >> sys.stderr, '%s%s%s' % (colors.HEADER, key, colors.NORMAL)
+		print('%s%s%s' % (colors.HEADER, key, colors.NORMAL), file=sys.stderr)
 		for lang in sorted(languages):
 			if lang in values:
-				print >> sys.stderr, '\t%s%-10s%s %s' % (colors.OKGREEN, lang, colors.NORMAL, values[lang])
+				print('\t%s%-10s%s %s' % (colors.OKGREEN, lang, colors.NORMAL, values[lang]), file=sys.stderr)
 			else:
-				print >> sys.stderr, '\t%s%-10s%s missing%s' % (colors.OKGREEN, lang, colors.FAIL, colors.NORMAL)
+				print('\t%s%-10s%s missing%s' % (colors.OKGREEN, lang, colors.FAIL, colors.NORMAL), file=sys.stderr)
 		errors = True
 
 if errors:
 	if args.validate:
-		print >> sys.stderr, 'i18n validation errors. Please run %s to fix them.' % sys.argv[0]
+		print('i18n validation errors. Please run %s to fix them.' % sys.argv[0], file=sys.stderr)
 	else:
-		print >> sys.stderr, 'i18n validation errors. Please fix them manually.'
+		print('i18n validation errors. Please fix them manually.', file=sys.stderr)
 	sys.exit(1)
 
 if args.validate:
 	sys.exit(0)
 
 def pseudoloc(s):
-	healthy = u'elsot'
-	yummy = u'31507'
-	table = dict([(ord(healthy[i]), yummy[i]) for i in xrange(len(healthy))] + [(ord(u'"'), u'')])
+	healthy = 'elsot'
+	yummy = '31507'
+	table = dict([(ord(healthy[i]), yummy[i]) for i in range(len(healthy))] + [(ord('"'), '')])
 	tokens = re.split('(%\([a-zA-Z0-9_-]+\))', s)
-	for i in xrange(len(tokens)):
-	    if tokens[i].startswith('%(') and tokens[i].endswith(')'):
-		continue
-	    tokens[i] = tokens[i].translate(table)
-	return u'"(%s)"' % ''.join(tokens)
+	for i in range(len(tokens)):
+		if tokens[i].startswith('%(') and tokens[i].endswith(')'):
+			continue
+		tokens[i] = tokens[i].translate(table)
+	return '"(%s)"' % ''.join(tokens)
 
-for key, values in strings.iteritems():
+for key, values in strings.items():
 	if key == 'locale':
-	    values[PSEUDOLOC] = '"pseudo"'
+		values[PSEUDOLOC] = '"pseudo"'
 	else:
-	    values[PSEUDOLOC] = pseudoloc(values['en'])
+		values[PSEUDOLOC] = pseudoloc(values['en'])
 
 for lang in languages:
 	lang_path = os.path.join(templates_dir, lang + '.lang')

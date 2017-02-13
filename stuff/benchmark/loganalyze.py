@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 
@@ -20,7 +20,7 @@ window = 10000
 
 i0 = 0
 i1 = 0
-for t in xrange(0, t1, 1000):
+for t in range(0, t1, 1000):
 	while i0 < len(data) and data[i0][0] < t:
 		i0 += 1
 	i1 = i0
@@ -30,4 +30,4 @@ for t in xrange(0, t1, 1000):
 		s += data[i1][1]
 		threads[data[i1][2]] = True
 		i1 += 1
-	print t / 1000, (i1 - i0) / (window / 1000.0), s / max(1, i1 - i0), len(threads)
+	print(t / 1000, (i1 - i0) / (window / 1000.0), s / max(1, i1 - i0), len(threads))
