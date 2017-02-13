@@ -69,7 +69,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LIMIT 1
 		";
 
-        $val = array($startTime, $endTime);
+        $val = [$startTime, $endTime];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -81,6 +81,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $user = UsersDAO::getByPK($rs['user_id']);
         $score = $rs['score'];
 
-        return array('totalCount' => $totalCount, 'user' => $user, 'score' => $score);
+        return ['totalCount' => $totalCount, 'user' => $user, 'score' => $score];
     }
 }

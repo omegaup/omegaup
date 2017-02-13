@@ -9,6 +9,5 @@ include('base/Run_Counts.vo.base.php');
   * @access public
   *
   */
-class RunCountsDAO extends RunCountsDAOBase
-{
+class RunCountsDAO extends RunCountsDAOBase {
 }

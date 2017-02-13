@@ -16,7 +16,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     private function insertProblemsInContest($contestData, $numOfProblems = 3) {
         // Create problems
-        $problems = array();
+        $problems = [];
         for ($i = 0; $i < $numOfProblems; $i++) {
             $problems[$i] = ProblemsFactory::createProblem();
             ContestsFactory::addProblemToContest($problems[$i], $contestData);
@@ -95,17 +95,17 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(ProblemsetAccessLogDAO::search(array(
+        $this->assertEquals(0, count(ProblemsetAccessLogDAO::search([
             'problemset_id' => $contestData['contest']->problemset_id,
             'user_id' => $contestant->user_id,
-        ))));
+        ])));
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Explicitly join contest
         ContestController::apiOpen($r);
@@ -116,10 +116,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertContestDetails($contestData, $problems, $response);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(ProblemsetAccessLogDAO::search(array(
+        $this->assertEquals(1, count(ProblemsetAccessLogDAO::search([
             'problemset_id' => $contestData['contest']->problemset_id,
             'user_id' => $contestant->user_id,
-        ))));
+        ])));
     }
 
     /**
@@ -138,10 +138,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Explicitly join contest
         ContestController::apiOpen($r);
@@ -174,10 +174,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Call api
         $response = ContestController::apiDetails($r);
@@ -203,10 +203,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Call api
         $response = ContestController::apiDetails($r);
@@ -227,10 +227,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Explicitly join contest
         ContestController::apiOpen($r);
@@ -262,10 +262,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Explicitly join contest
         ContestController::apiOpen($r);
@@ -300,10 +300,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Call api
         $response = ContestController::apiDetails($r);
@@ -339,10 +339,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
-        ));
+        ]);
 
         // Call api
         $response = ContestController::apiDetails($r);
@@ -363,9 +363,9 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiMyList($r);
         unset($login);
 
@@ -384,27 +384,27 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call details using token
         $login = self::login($externalUser);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url,
-        ));
+        ]);
         $detailsResponse = ContestController::apiDetails($r);
         unset($login);
 
-        $this->assertContestDetails($contestData, array(), $detailsResponse);
+        $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // Call details using admin token
         $login = self::login($externalUser);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url,
-        ));
+        ]);
         $detailsResponse = ContestController::apiDetails($r);
         unset($login);
 
-        $this->assertContestDetails($contestData, array(), $detailsResponse);
+        $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // All requests were done using tokens, so the log must be identical.
         $contestAccessLog = ProblemsetAccessLogDAO::getAll();
@@ -420,10 +420,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestDirector = $contestData['director'];
 
         $login = self::login($contestDirector);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Call api. This should fail.
         try {
@@ -435,7 +435,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call admin api. This should succeed.
         $detailsResponse = ContestController::apiAdminDetails($r);
-        $this->assertContestDetails($contestData, array(), $detailsResponse);
+        $this->assertContestDetails($contestData, [], $detailsResponse);
     }
 
     /**
@@ -452,11 +452,11 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call details using token
         $login = self::login($externalUser);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => 'invalid token',
-        ));
+        ]);
         $detailsResponse = ContestController::apiDetails($r);
     }
 
@@ -470,9 +470,9 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiMyList($r);
 
         // Look for our contest from the list and save the scoreboard tokens
@@ -489,20 +489,20 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call details using token
-        $detailsResponse = ContestController::apiDetails(new Request(array(
+        $detailsResponse = ContestController::apiDetails(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url
-        )));
+        ]));
 
-        $this->assertContestDetails($contestData, array(), $detailsResponse);
+        $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // Call details using admin token
-        $detailsResponse = ContestController::apiDetails(new Request(array(
+        $detailsResponse = ContestController::apiDetails(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url
-        )));
+        ]));
 
-        $this->assertContestDetails($contestData, array(), $detailsResponse);
+        $this->assertContestDetails($contestData, [], $detailsResponse);
     }
 
     /**
@@ -520,7 +520,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        $contestants = array();
+        $contestants = [];
         array_push($contestants, UserFactory::createUser());
         array_push($contestants, UserFactory::createUser());
         array_push($contestants, UserFactory::createUser());
@@ -529,7 +529,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
         // Create runs
-        $runsData = array();
+        $runsData = [];
         $runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
         $runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
         $runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
@@ -547,10 +547,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Create API
         $login = self::login($contestDirector);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
         $response = ContestController::apiReport($r);
         unset($login);
 

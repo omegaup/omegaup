@@ -203,14 +203,14 @@ class CreateProblemTest extends OmegaupTestCase {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
 
         // Array of valid keys
-        $valid_keys = array(
+        $valid_keys = [
             'title',
             'validator',
             'time_limit',
             'memory_limit',
             'source',
             'languages',
-        );
+        ];
 
         foreach ($valid_keys as $key) {
             // Get the problem data
@@ -245,7 +245,7 @@ class CreateProblemTest extends OmegaupTestCase {
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-        foreach (array('abc', 'c,cpp,cows', 'java,coffee,espresso') as $languages) {
+        foreach (['abc', 'c,cpp,cows', 'java,coffee,espresso'] as $languages) {
             // Get the problem data
             $problemData = ProblemsFactory::getRequest();
             $r = $problemData['request'];

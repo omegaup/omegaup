@@ -35,10 +35,10 @@ class ProblemArenaTest extends OmegaupUITestCase {
 
         // Get run ID
         sleep(1);
-        $runs = ProblemController::apiRuns(new Request(array(
+        $runs = ProblemController::apiRuns(new Request([
             'problem_alias' => $problemData['request']['alias'],
             'auth_token' => OmegaupTestCase::login($contestant)
-        )));
+        ]));
 
         // Wait for submit history to show
         $this->waitForElementPresent('//*[@id="run_'.$runs['runs'][0]['guid'].'"]/td[2]');

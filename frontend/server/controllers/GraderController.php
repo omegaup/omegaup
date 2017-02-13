@@ -31,11 +31,11 @@ class GraderController extends Controller {
     private static function setEmbeddedRunners($value) {
         self::$log->info('Calling grader/reload-config');
         $grader = new Grader();
-        $response = $grader->reloadConfig(array(
-            'overrides' => array(
+        $response = $grader->reloadConfig([
+            'overrides' => [
                 'grader.embedded_runner.enable' => $value
-            )
-        ));
+            ]
+        ]);
 
         self::$log->info('Reload config response: ' . $response);
 
@@ -62,7 +62,7 @@ class GraderController extends Controller {
         }
 
         self::$log->info('Terminating EC2 instances');
-        $ec2_cmd_output = array();
+        $ec2_cmd_output = [];
         $return_var = 0;
         $cmd = 'ec2-terminate-instances '. $instances_string .' --region us-west-1';
 
@@ -93,7 +93,7 @@ class GraderController extends Controller {
         $response['grader'] = self::setEmbeddedRunners('false');
 
         self::$log->info('Bootstrapping more instances: ');
-        $ec2_cmd_output = array();
+        $ec2_cmd_output = [];
         $return_var = 0;
 
         $cmd = 'ec2-run-instances ami-3e123e7b -k omegaup_backend_test_key -i m1.medium -n '. $r['count']. ' --region us-west-1';
@@ -120,7 +120,7 @@ class GraderController extends Controller {
     public static function apiStatus(Request $r) {
         self::validateRequest($r);
 
-        $response = array();
+        $response = [];
 
         self::$log->debug('Getting grader /status');
         $grader = new Grader();
@@ -142,13 +142,13 @@ class GraderController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     private static function getEc2Status() {
-        $ec2_describe_output = array();
+        $ec2_describe_output = [];
         $return_var = 0;
         exec('ec2-describe-instances --region us-west-1 --simple', $ec2_describe_output, $return_var);
         if ($return_var !== 0) {
             // D:
             self::$log->error('ec2-describe-instances --region us-west-1 --simple ' . $return_var);
-            return array('error'=>'error calling ec2-describe-instances');
+            return ['error'=>'error calling ec2-describe-instances'];
         }
 
         return self::parseEc2DescribeCmdOutput($ec2_describe_output);
@@ -161,11 +161,11 @@ class GraderController extends Controller {
      * @return array
      */
     private static function parseEc2DescribeCmdOutput($ec2_describe_output) {
-        $instances = array();
+        $instances = [];
         foreach ($ec2_describe_output as $instance_data) {
             $contents_array = explode("\t", $instance_data);
 
-            $values = array();
+            $values = [];
             $values['instance'] = $contents_array[0];
             $values['status'] = $contents_array[1];
             $values['endpoint'] = $contents_array[2];

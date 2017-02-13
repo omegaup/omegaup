@@ -38,6 +38,6 @@ class AddProblemToContestUITest extends OmegaupUITestCase {
         $this->assertElementContainsText('id=status', 'Problem successfully added!');
 
         // Check db
-        AddProblemToContestTest::assertProblemAddedToContest($problemData, $contestData, array('points' => 100, 'order_in_contest' => 1));
+        AddProblemToContestTest::assertProblemAddedToContest($problemData, $contestData, ['points' => 100, 'order_in_contest' => 1]);
     }
 }

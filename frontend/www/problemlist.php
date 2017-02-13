@@ -19,7 +19,7 @@ if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
 }
 $response = ProblemController::apiList($r);
 
-$params = array('query' => $keyword, 'order_by' => $order_by, 'mode' => $mode);
+$params = ['query' => $keyword, 'order_by' => $order_by, 'mode' => $mode];
 if (!empty($_GET['tag'])) {
     $params['tag'] = $_GET['tag'];
 }

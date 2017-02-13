@@ -61,7 +61,7 @@ def run_validations(args, files, validate_only):
 def main():
   args = git_tools.parse_arguments(tool_description='purges whitespace',
         file_whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
-        file_blacklist=[br'.*third_party.*', br'.*dao/base.*'])
+        file_blacklist=[br'.*third_party.*'])
   if not args.files:
     return 0
 

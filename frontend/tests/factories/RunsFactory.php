@@ -78,11 +78,11 @@ class RunsFactory {
         // Clean up
         unset($_REQUEST);
 
-        return array(
+        return [
             'request' => $r,
             'contestant' => $contestant,
             'response' => $response
-        );
+        ];
     }
 
     /**
@@ -101,11 +101,11 @@ class RunsFactory {
         // Clean up
         unset($_REQUEST);
 
-        return array(
+        return [
             'request' => $r,
             'contestant' => $contestant,
             'response' => $response
-        );
+        ];
     }
 
     /**

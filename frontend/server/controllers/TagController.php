@@ -37,9 +37,9 @@ class TagController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response = array();
+        $response = [];
         foreach ($tags as $tag) {
-            $entry = array('name' => $tag->name);
+            $entry = ['name' => $tag->name];
             array_push($response, $entry);
         }
 

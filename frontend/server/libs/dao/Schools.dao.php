@@ -17,8 +17,7 @@ require_once('base/Schools.vo.base.php');
   * @package docs
   *
   */
-class SchoolsDAO extends SchoolsDAOBase
-{
+class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Finds schools that cotains 'name'
      *
@@ -37,9 +36,9 @@ class SchoolsDAO extends SchoolsDAOBase
             WHERE
                 s.name LIKE CONCAT(\'%\', ?, \'%\')
             LIMIT 10';
-        $args = array($name);
+        $args = [$name];
 
-        $result = array();
+        $result = [];
         foreach ($conn->Execute($sql, $args) as $row) {
             $result[] = new Schools($row);
         }

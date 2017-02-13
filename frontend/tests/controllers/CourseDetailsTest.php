@@ -100,10 +100,10 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
 
-        $response = CourseController::apiDetails(new Request(array(
+        $response = CourseController::apiDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
-        )));
+        ]));
     }
 
     public function testGetCourseDetailsCourseMember() {

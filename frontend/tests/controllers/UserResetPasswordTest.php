@@ -17,11 +17,11 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $adminLogin = self::login($admin);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $adminLogin->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),
-        ));
+        ]);
 
         // Call api
         UserController::apiChangePassword($r);
@@ -50,12 +50,12 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),
             'old_password' => $user->password,
-        ));
+        ]);
 
         // Call api
         UserController::apiChangePassword($r);
@@ -83,12 +83,12 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),
             'old_password' => 'bad old password',
-        ));
+        ]);
 
         // Call api
         UserController::apiChangePassword($r);

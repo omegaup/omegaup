@@ -81,11 +81,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Create a new request
         $r = new Request(
-            array(
+            [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => 'this problem doesnt exists'
-            )
+            ]
         );
 
         $response = ContestController::apiRemoveProblem($r);
@@ -105,11 +105,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestData['director']);
 
         $r = new Request(
-            array(
+            [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => 'this contest doesnt exists',
                 'problem_alias' => $problemData['request']['alias']
-            )
+            ]
         );
 
         $response = ContestController::apiRemoveProblem($r);
@@ -130,11 +130,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestant);
 
         $r = new Request(
-            array(
+            [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['alias']
-            )
+            ]
         );
 
         $response = ContestController::apiRemoveProblem($r);
@@ -147,11 +147,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestData['director']);
 
         $r = new Request(
-            array(
+            [
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'public' => 1 // Update public
-            )
+            ]
         );
 
         // Call API
@@ -276,11 +276,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         // Add the sysadmin role to the contest director
-        $userRoles = new UserRoles(array(
+        $userRoles = new UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ));
+        ]);
         UserRolesDAO::save($userRoles);
 
         $response = ContestsFactory::removeProblemFromContest(
@@ -306,11 +306,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $secondaryAdmin->username,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Add secondary admin
         $response = ContestController::apiAddAdmin($r);
@@ -450,11 +450,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $userRoles = new UserRoles(array(
+        $userRoles = new UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ));
+        ]);
         UserRolesDAO::save($userRoles);
 
         $response = ContestsFactory::removeProblemFromContest(

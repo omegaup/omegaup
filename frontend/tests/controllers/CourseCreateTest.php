@@ -101,7 +101,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
         // There should exist 1 assignment with this alias
         $this->assertEquals(1, count(AssignmentsDAO::search(
-            array('alias' => $r['alias'])
+            ['alias' => $r['alias']]
         )));
     }
 

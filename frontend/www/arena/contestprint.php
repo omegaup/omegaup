@@ -2,10 +2,10 @@
 require_once('../../server/bootstrap.php');
 
 try {
-    $r = new Request(array(
+    $r = new Request([
             'contest_alias' => $_REQUEST['alias'],
             'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
-        ));
+        ]);
 
     // Open the contest for the current user
     $contest = ContestController::apiOpen($r);
@@ -19,11 +19,11 @@ try {
 
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
-    $r = new Request(array(
+    $r = new Request([
         'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
         'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
-    ));
+    ]);
 
     $r->method = 'ProblemController::apiDetails';
     $response = ApiCaller::call($r);

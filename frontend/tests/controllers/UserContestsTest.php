@@ -18,9 +18,9 @@ class UserContestsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($director);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiMyList($r);
 
         // Contests should come ordered by contest id desc
@@ -35,7 +35,7 @@ class UserContestsTest extends OmegaupTestCase {
     public function testAdminList() {
         // Our director
         $director = UserFactory::createUser();
-        $contestAdminData = array();
+        $contestAdminData = [];
 
         // Create a group with two arbitrary users.
         $helperGroup = GroupsFactory::createGroup($director);
@@ -64,9 +64,9 @@ class UserContestsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($director);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ));
+        ]);
         $response = ContestController::apiAdminList($r);
 
         // Contests should come ordered by contest id desc

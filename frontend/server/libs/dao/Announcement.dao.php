@@ -17,6 +17,5 @@ require_once('base/Announcement.vo.base.php');
   * @package docs
   *
   */
-class AnnouncementDAO extends AnnouncementDAOBase
-{
+class AnnouncementDAO extends AnnouncementDAOBase {
 }

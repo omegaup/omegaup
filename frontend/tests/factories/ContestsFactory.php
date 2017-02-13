@@ -49,9 +49,9 @@ class ContestsFactory {
         $r['languages'] = $languages;
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
-        return array(
+        return [
             'request' => $r,
-            'director' => $contestDirector);
+            'director' => $contestDirector];
     }
 
     public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
@@ -74,11 +74,11 @@ class ContestsFactory {
 
         $contest = ContestsDAO::getByAlias($r['alias']);
 
-        return array(
+        return [
             'director' => $contestData['director'],
             'request' => $r,
             'contest' => $contest
-        );
+        ];
     }
 
     public static function addProblemToContest($problemData, $contestData) {
@@ -107,11 +107,11 @@ class ContestsFactory {
         $login = OmegaupTestCase::login($contestData['director']);
 
         $r = new Request(
-            array(
+            [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['alias']
-            )
+            ]
         );
 
         // Call API
@@ -190,10 +190,10 @@ class ContestsFactory {
 
     public static function addGroupAdmin($contestData, Groups $group) {
         // Prepare our request
-        $r = new Request(array(
+        $r = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'group' => $group->alias,
-        ));
+        ]);
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);

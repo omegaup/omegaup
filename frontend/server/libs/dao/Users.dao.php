@@ -16,7 +16,7 @@ class UsersDAO extends UsersDAOBase {
     public static function FindByEmail($email) {
         global  $conn;
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
-        $params = array( $email );
+        $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
         if (count($rs)==0) {
             return null;
@@ -25,9 +25,9 @@ class UsersDAO extends UsersDAOBase {
     }
 
     public static function FindByUsername($username) {
-        $vo_Query = new Users(array(
+        $vo_Query = new Users([
             'username' => $username
-        ));
+        ]);
 
         $a_Results = UsersDAO::search($vo_Query);
 
@@ -46,7 +46,7 @@ class UsersDAO extends UsersDAOBase {
                 User_Roles ur
             WHERE
                 ur.user_id = ? AND ur.role_id = 4;';
-        $params = array($user_id);
+        $params = [$user_id];
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
     }
@@ -54,10 +54,10 @@ class UsersDAO extends UsersDAOBase {
     public static function FindByUsernameOrName($usernameOrName) {
         global  $conn;
         $sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
-        $args = array($usernameOrName, $usernameOrName);
+        $args = [$usernameOrName, $usernameOrName];
 
         $rs = $conn->Execute($sql, $args);
-        $ar = array();
+        $ar = [];
         foreach ($rs as $foo) {
             $bar =  new Users($foo);
             array_push($ar, $bar);
@@ -70,10 +70,10 @@ class UsersDAO extends UsersDAOBase {
         if (is_null($user)) {
             return null;
         } else {
-            return array(
+            return [
                 'reset_digest'  => $user->reset_digest,
                 'reset_sent_at'     => $user->reset_sent_at
-            );
+            ];
         }
     }
 }

@@ -69,14 +69,14 @@ class Scoreboard {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            $problem_mapping = array();
+            $problem_mapping = [];
 
             $order = 0;
             foreach ($raw_problemset_problems as $problem) {
-                $problem_mapping[$problem->problem_id] = array(
+                $problem_mapping[$problem->problem_id] = [
                     'order' => $order++,
                     'alias' => $problem->alias
-                );
+                ];
             }
 
             $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->contest, $this->showAllRuns);
@@ -140,14 +140,14 @@ class Scoreboard {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            $problem_mapping = array();
+            $problem_mapping = [];
 
             $order = 0;
             foreach ($raw_problemset_problems as $problem) {
-                $problem_mapping[$problem->problem_id] = array(
+                $problem_mapping[$problem->problem_id] = [
                     'order' => $order++,
                     'alias' => $problem->alias
-                );
+                ];
             }
 
             $result = Scoreboard::calculateEvents(
@@ -207,14 +207,14 @@ class Scoreboard {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $problem_mapping = array();
+        $problem_mapping = [];
 
         $order = 0;
         foreach ($raw_problemset_problems as $problem) {
-            $problem_mapping[$problem->problem_id] = array(
+            $problem_mapping[$problem->problem_id] = [
                 'order' => $order++,
                 'alias' => $problem->alias
-            );
+            ];
         }
 
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
@@ -337,10 +337,10 @@ class Scoreboard {
             }
         }
 
-        return array(
+        return [
             'points' => $totalPoints,
             'penalty' => $totalPenalty
-        );
+        ];
     }
 
     private static function getScoreboardFromRuns(
@@ -356,10 +356,10 @@ class Scoreboard {
         $withRunDetails = false,
         $auth_token = null
     ) {
-        $test_only = array();
-        $no_runs = array();
-        $users_info = array();
-        $problems = array();
+        $test_only = [];
+        $no_runs = [];
+        $users_info = [];
+        $problems = [];
 
         foreach ($problem_mapping as $problem) {
             array_push($problems, $problem);
@@ -367,21 +367,21 @@ class Scoreboard {
 
         // Calculate score for each contestant x problem
         foreach ($raw_contest_users as $contestant) {
-            $user_problems = array();
+            $user_problems = [];
 
             $test_only[$contestant->user_id] = true;
             $no_runs[$contestant->user_id] = true;
             foreach ($problem_mapping as $id => $problem) {
-                array_push($user_problems, array(
+                array_push($user_problems, [
                     'points' => 0,
                     'percent' => 0,
                     'penalty' => 0,
                     'runs' => 0
-                ));
+                ]);
             }
 
             // Add the problems' information
-            $users_info[$contestant->user_id] = array(
+            $users_info[$contestant->user_id] = [
                 'problems' => $user_problems,
                 'username' => $contestant->username,
                 'name' => $contestant->name ?
@@ -389,7 +389,7 @@ class Scoreboard {
                     $contestant->username,
                 'total' => null,
                 'country' => $contestant->country_id
-            );
+            ];
         }
 
         foreach ($runs as $run) {
@@ -433,12 +433,12 @@ class Scoreboard {
                 $problem['penalty'] = $totalPenalty;
 
                 if ($withRunDetails === true) {
-                    $runDetails = array();
+                    $runDetails = [];
 
-                    $runDetailsRequest = new Request(array(
+                    $runDetailsRequest = new Request([
                         'run_alias' => $run->guid,
                         'auth_token' => $auth_token,
-                    ));
+                    ]);
                     $runDetails = RunController::apiDetails($runDetailsRequest);
                     unset($runDetails['source']);
                     $problem['run_details'] = $runDetails;
@@ -447,7 +447,7 @@ class Scoreboard {
             $problem['runs']++;
         }
 
-        $result = array();
+        $result = [];
         foreach ($raw_contest_users as $contestant) {
             $user_id = $contestant->user_id;
 
@@ -464,7 +464,7 @@ class Scoreboard {
         }
 
         Scoreboard::sortScoreboard($result, $sortByName);
-        usort($problems, array('Scoreboard', 'compareOrder'));
+        usort($problems, ['Scoreboard', 'compareOrder']);
 
         return [
             'status' => 'ok',
@@ -498,10 +498,10 @@ class Scoreboard {
     private static function sortScoreboard(&$scoreboard, $sortByName = false) {
         if ($sortByName == false) {
             // Sort users by their total column
-            usort($scoreboard, array('Scoreboard', 'compareUserScores'));
+            usort($scoreboard, ['Scoreboard', 'compareUserScores']);
         } else {
             // Sort users by their name
-            usort($scoreboard, array('Scoreboard', 'compareUserNames'));
+            usort($scoreboard, ['Scoreboard', 'compareUserNames']);
         }
 
         // Append the place for each user
@@ -540,15 +540,15 @@ class Scoreboard {
         $problem_mapping,
         $showAllRuns
     ) {
-        $contest_users = array();
+        $contest_users = [];
 
         foreach ($raw_contest_users as $user) {
             $contest_users[$user->user_id] = $user;
         }
 
-        $result = array();
+        $result = [];
 
-        $user_problems_score = array();
+        $user_problems_score = [];
 
         $contestStart = strtotime($contest->start_time);
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $showAllRuns);
@@ -574,12 +574,12 @@ class Scoreboard {
             $contest_score = $run->contest_score;
 
             if (!isset($user_problems_score[$user_id])) {
-                $user_problems_score[$user_id] = array(
-                    $problem_id => array('points' => 0, 'penalty' => 0)
-                );
+                $user_problems_score[$user_id] = [
+                    $problem_id => ['points' => 0, 'penalty' => 0]
+                ];
             } elseif (!isset($user_problems_score[$user_id][$problem_id])) {
                 $user_problems_score[$user_id][$problem_id] =
-                    array('points' => 0, 'penalty' => 0);
+                    ['points' => 0, 'penalty' => 0];
             }
 
             $problem_data = &$user_problems_score[$user_id][$problem_id];
@@ -597,21 +597,21 @@ class Scoreboard {
                 continue;
             }
 
-            $data = array(
+            $data = [
                 'name' => $user->name ? $user->name : $user->username,
                 'username' => $user->username,
                 'delta' => max(0, ($run_delay - $contestStart) / 60),
-                'problem' => array(
+                'problem' => [
                     'alias' => $problem_mapping[$problem_id]['alias'],
                     'points' => round($contest_score, 2),
                     'penalty' => 0
-                ),
-                'total' => array(
+                ],
+                'total' => [
                     'points' => 0,
                     'penalty' => 0
-                ),
+                ],
                 'country' => $user->country_id
-            );
+            ];
 
             foreach ($user_problems_score[$user_id] as $problem) {
                 $data['total']['points'] += $problem['points'];

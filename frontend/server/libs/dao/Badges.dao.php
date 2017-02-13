@@ -17,6 +17,5 @@ require_once('base/Badges.vo.base.php');
   * @package docs
   *
   */
-class BadgesDAO extends BadgesDAOBase
-{
+class BadgesDAO extends BadgesDAOBase {
 }

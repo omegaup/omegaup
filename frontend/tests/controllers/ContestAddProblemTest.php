@@ -38,13 +38,13 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['alias'],
             'points' => 100,
             'order_in_contest' => 1,
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiAddProblem($r);
@@ -68,13 +68,13 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => 'this problem doesnt exists',
             'points' => 100,
             'order_in_contest' => 1,
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiAddProblem($r);
@@ -94,13 +94,13 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Create an empty request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => 'invalid problem',
             'problem_alias' => $problemData['request']['alias'],
             'points' => 100,
             'order_in_contest' => 1,
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiAddProblem($r);
@@ -123,13 +123,13 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Build request
         $userLogin = self::login($user);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['alias'],
             'points' => 100,
             'order_in_contest' => 1,
-        ));
+        ]);
 
         // Call API
         $response = ContestController::apiAddProblem($r);
@@ -148,13 +148,13 @@ class AddProblemToContestTest extends OmegaupTestCase {
             $problemData = ProblemsFactory::createProblemWithAuthor($contestData['director'], $login);
 
             // Build request
-            $r = new Request(array(
+            $r = new Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['alias'],
                 'points' => 100,
                 'order_in_contest' => $i + 1
-            ));
+            ]);
 
             try {
                 // Call API

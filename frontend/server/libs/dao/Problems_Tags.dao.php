@@ -17,8 +17,7 @@ require_once('base/Problems_Tags.vo.base.php');
   * @package docs
   *
   */
-class ProblemsTagsDAO extends ProblemsTagsDAOBase
-{
+class ProblemsTagsDAO extends ProblemsTagsDAOBase {
     public static function getProblemTags(Problems $problem, $public_only) {
         $sql = '
 			SELECT
@@ -29,7 +28,7 @@ class ProblemsTagsDAO extends ProblemsTagsDAOBase
 				Tags t on t.tag_id = pt.tag_id
 			WHERE
 				pt.problem_id = ?';
-        $params = array($problem->problem_id);
+        $params = [$problem->problem_id];
         if ($public_only) {
             $sql .= ' AND pt.public = 1';
         }
