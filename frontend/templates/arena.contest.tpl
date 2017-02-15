@@ -122,27 +122,7 @@
 {/if}
 {if $showRanking}
 			<div id="ranking" class="tab">
-				<div id="ranking-chart"></div>
-				<table id="ranking-table">
-					<thead>
-						<tr>
-							<th></th>
-							<th></th>
-							<th>{#wordsUser#}</th>
-							<th class="total" colspan="2">{#wordsTotal#}</th>
-						</tr>
-					</thead>
-					<tbody class="user-list-template">
-						<tr>
-							<td class="position"></td>
-							<td class="legend"></td>
-							<td class="user"></td>
-							<td class="points"></td>
-							<td class="penalty"></td>
-						</tr>
-					</tbody>
-				</table>
-				<div class="footer"></div>
+				<div></div>
 			</div>
 {/if}
 {include file='arena.clarification_list.tpl' contest=true}

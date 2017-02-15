@@ -445,72 +445,17 @@ body#only-problem #problems .main {
 	color: #400;
 }
 
-#scoreboard {
-	max-width: 900px;
-	margin: 0 auto;
-}
-#ranking-table, table.clarifications {
+table.clarifications {
 	width: 100%;
 	margin: 0 auto;
 }
-#ranking-table td.position.recent-event {
-	font-weight: bold;
-	background: #dfd;
-}
-#ranking-table td.accepted.recent-event {
-	background: #8f8;
-}
 
-#ranking-table td {
-	text-align: center;
-	vertical-align: middle;
-	border: 1px solid #000;
-	padding: 0.2em;
-}
-
-#ranking-table th {
-	padding: 0.2em;
-	text-align: center;
-}
-
-#ranking-table td[class$='points'], #ranking td[class$='penalty'], #ranking td.position #ranking td.legend {
-	width: 3.5em;
-}
-
-#ranking-table td[class$='points'], #problems #mini-ranking td.points {
+#problems #mini-ranking td.points {
 	border-right-style: dotted;
 }
 
-#ranking-table td[class$='penalty'], #problems #mini-ranking td.penalty {
+#problems #mini-ranking td.penalty {
 	border-left-width: 0;
-}
-
-#ranking-table td div.points {
-	font-weight: bold;
-}
-
-#ranking-table td div.penalty {
-	font-size: 70%;
-}
-
-#ranking-table td.accepted {
-	background: #dfd;
-}
-#ranking-table td.pending {
-	background: #ddf;
-}
-#ranking-table td.wrong {
-	background: #fdd;
-}
-#ranking-table a {
-	color: #5588DD;
-}
-
-#ranking .footer {
-	padding: 1em;
-	text-align: right;
-	font-size: 70%;
-	color: grey;
 }
 
 .clarifications tbody td {
