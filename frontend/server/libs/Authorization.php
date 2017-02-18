@@ -17,6 +17,9 @@ class Authorization {
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
+    // Allowed to submit to a problemset.
+    const CONTESTANT_ROLE = 2;
+
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
             return false;
@@ -192,5 +195,13 @@ class Authorization {
 
     public static function clearSystemAdminCache() {
         self::$is_system_admin = null;
+    }
+
+    public static function canSubmitToProblemset($user_id, $problemset) {
+        if (is_null($problemset)) {
+            return false;
+        }
+        return self::isAdmin($user_id, $problemset) ||
+               GroupRolesDAO::isContestant($user_id, $problemset->acl_id);
     }
 }

@@ -240,6 +240,11 @@ class CourseController extends Controller {
             $assignment->problemset_id = $problemset->problemset_id;
             $assignment->course_id = $r['course']->course_id;
 
+            GroupRolesDAO::save(new GroupRoles([
+                'group_id' => $r['course']->group_id,
+                'role_id' => Authorization::CONTESTANT_ROLE,
+                'acl_id' => $r['course']->acl_id,
+            ]));
             AssignmentsDAO::save($assignment);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -617,7 +622,7 @@ class CourseController extends Controller {
 
         if ($result['is_admin']) {
             try {
-                $group = GroupsDAO::findByAlias($r['alias']);
+                $group = GroupsDAO::getByPK($r['course']->group_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }

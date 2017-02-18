@@ -125,7 +125,7 @@ omegaup.API = {
 
   getAssignment: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/getAssignment',
+      url: '/api/course/assignmentDetails',
       method: 'POST',
       data: params,
       dataType: 'json',
