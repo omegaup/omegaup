@@ -454,7 +454,7 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function GetBestRun($problemset_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
+    final public static function GetBestRun($problemset_id, $problem_id, $user_id, $showAllRuns) {
         $filterTest = $showAllRuns ? '' : ' AND test = 0';
         $sql = "
             SELECT
@@ -463,13 +463,12 @@ class RunsDAO extends RunsDAOBase {
                 Runs
             WHERE
                 user_id = ? AND problemset_id = ? AND problem_id = ? AND
-                status = 'ready' AND time <= FROM_UNIXTIME(?)
+                status = 'ready'
                 $filterTest
             ORDER BY
                 contest_score DESC, penalty ASC
             LIMIT 1;";
-        $val = [$user_id, $problemset_id, $problem_id, $finish_time];
-
+        $val = [$user_id, $problemset_id, $problem_id];
         global $conn;
         $rs = $conn->GetRow($sql, $val);
 

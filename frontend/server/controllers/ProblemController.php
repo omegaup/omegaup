@@ -860,18 +860,23 @@ class ProblemController extends Controller {
 
         // If we request a problem inside a contest
         if (self::validateProblemset($r)) {
-            if (!Authorization::isAdmin($r['current_user_id'], $r['container'])) {
+            if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
                 // If the contest is private, verify that our user is invited
-                if (isset($r['container']->public) && $r['container']->public != '1') {
-                    if (is_null(ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['container']->problemset_id))) {
+                if (isset($r['contest'])) {
+                    if ($r['contest']->public != '1') {
+                        if (is_null(ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['problemset']->problemset_id))) {
+                            throw new ForbiddenAccessException();
+                        }
+                    }
+                    // If the contest has not started, non-admin users should not see it
+                    if (!ContestsDAO::hasStarted($r['contest'])) {
+                        throw new ForbiddenAccessException('contestNotStarted');
+                    }
+                } else {    // Not a contest, but we still have a problemset
+                    if (!Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
                         throw new ForbiddenAccessException();
                     }
-                }
-
-                // If the contest has not started, user should not see it, unless
-                // it is admin
-                if (!ContestsDAO::hasStarted($r['container'])) {
-                    throw new ForbiddenAccessException('contestNotStarted');
+                    // TODO: Check start times.
                 }
             }
         } else {
@@ -1002,18 +1007,16 @@ class ProblemController extends Controller {
     }
 
     private static function validateProblemset(Request $r) {
-        if (empty($r['contest_alias']) && empty($r['problemset_id'])) {
-            // Nothing to see here, move along.
-            return false;
-        }
-
         $problemNotFound = null;
         if (!empty($r['contest_alias'])) {
             try {
                 // Is it a valid contest_alias?
-                $r['container'] = ContestsDAO::getByAlias($r['contest_alias']);
-
-                if (is_null($r['container'])) {
+                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+                if (is_null($r['contest'])) {
+                    throw new NotFoundException('contestNotFound');
+                }
+                $r['problemset'] = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
+                if (is_null($r['problemset'])) {
                     throw new NotFoundException('contestNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInContest';
@@ -1022,17 +1025,11 @@ class ProblemController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-        } else {    // !empty($r['problemset_id'])
+        } elseif (!empty($r['problemset_id'])) {
             try {
                 // Is it a valid problemset_id?
                 $r['problemset'] = ProblemsetsDAO::getByPK($r['problemset_id']);
                 if (is_null($r['problemset'])) {
-                    throw new NotFoundException('problemsetNotFound');
-                }
-                $r['container'] = ProblemsetsDAO::getProblemsetContainer(
-                    $r['problemset_id']
-                );
-                if (is_null($r['container'])) {
                     throw new NotFoundException('problemsetNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInProblemset';
@@ -1041,11 +1038,14 @@ class ProblemController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
+        } else {
+            // Nothing to see here, move along.
+            return false;
         }
 
         // Is the problem actually in the problemset?
         if (is_null(ProblemsetProblemsDAO::getByPK(
-            $r['container']->problemset_id,
+            $r['problemset']->problemset_id,
             $r['problem']->problem_id
         ))
         ) {
@@ -1138,7 +1138,7 @@ class ProblemController extends Controller {
             unset($response['source']);
         }
 
-        $problemset_id = isset($r['container']) ? $r['container']->problemset_id : null;
+        $problemset_id = isset($r['problemset']) ? $r['problemset']->problemset_id : null;
 
         if (!is_null($r['current_user_id'])) {
             // Create array of relevant columns for list of runs
@@ -1727,10 +1727,9 @@ class ProblemController extends Controller {
                 $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
             } else {
                 $bestRun = RunsDAO::GetBestRun(
-                    $r['container']->problemset_id,
+                    $r['problemset']->problemset_id,
                     $r['problem']->problem_id,
                     $current_user_id,
-                    strtotime($r['container']->finish_time),
                     false /*showAllRuns*/
                 );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;
