@@ -1,6 +1,7 @@
 omegaup.OmegaUp.on('ready', function() {
   $('.new_contest_form')
-      .submit(function() {
+      .submit(function(ev) {
+        ev.preventDefault();
         var window_length_value = $('#window-length-enabled').is(':checked') ?
                                       $('#window-length').val() :
                                       'NULL';
@@ -33,7 +34,8 @@ omegaup.OmegaUp.on('ready', function() {
               window.location.replace('/contest/' +
                                       $('.new_contest_form #alias').val() +
                                       '/edit/#problems');
-            });
+            })
+            .fail(omegaup.UI.apiError);
         return false;
       });
 
