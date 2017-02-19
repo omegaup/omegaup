@@ -1,6 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
-  omegaup.API.getCourseDetails({alias: courseAlias})
+  omegaup.API.Course.details({alias: courseAlias})
       .then(function(course) {
         // Assignment lists by type.
         var assignments = {};

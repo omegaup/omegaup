@@ -1,8 +1,8 @@
 omegaup.OmegaUp.on('ready', function() {
   $('.new_course_form')
       .submit(function() {
-        omegaup.API
-            .createCourse({
+        omegaup.API.Course
+            .create({
               alias: $('.new_course_form #alias').val(),
               name: $('.new_course_form #title').val(),
               description: $('.new_course_form #description').val(),

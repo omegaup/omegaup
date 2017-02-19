@@ -7,17 +7,17 @@ omegaup.OmegaUp.on('ready', function() {
     var courseAlias =
         /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-    omegaup.API.createCourseAssignment({
-                 course_alias: courseAlias,
-                 name: $('input[name="title"]', assignmentForm).val(),
-                 description:
-                     $('textarea[name="description"]', assignmentForm).val(),
-                 start_time: (new Date(startTime.val()).getTime()) / 1000,
-                 finish_time: (new Date(finishTime.val()).getTime()) / 1000,
-                 alias: $('input[name="alias"]', assignmentForm).val(),
-                 assignment_type:
-                     $('select[name="assignment_type"]', assignmentForm).val(),
-               })
+    omegaup.API.Course
+        .createAssignment({
+          course_alias: courseAlias,
+          name: $('input[name="title"]', assignmentForm).val(),
+          description: $('textarea[name="description"]', assignmentForm).val(),
+          start_time: (new Date(startTime.val()).getTime()) / 1000,
+          finish_time: (new Date(finishTime.val()).getTime()) / 1000,
+          alias: $('input[name="alias"]', assignmentForm).val(),
+          assignment_type:
+              $('select[name="assignment_type"]', assignmentForm).val(),
+        })
         .then(function(data) {
           if (data.status == 'ok') {
             omegaup.UI.success(omegaup.T['courseAssignmentAdded']);

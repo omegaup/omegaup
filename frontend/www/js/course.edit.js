@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
       /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
   var courseForm = $('.new_course_form');
-  omegaup.API.getCourseAdminDetails({alias: courseAlias})
+  omegaup.API.Course.adminDetails({alias: courseAlias})
       .then(function(course) {
         $('.course-header')
             .text(course.name)
@@ -38,19 +38,19 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Edit course
   courseForm.submit(function() {
-    omegaup.API.updateCourse({
-                 course_alias: courseAlias,
-                 name: $('#title', courseForm).val(),
-                 description: $('#description', courseForm).val(),
-                 start_time:
-                     (new Date($('#start_time', courseForm).val()).getTime()) /
-                         1000,
-                 finish_time: (new Date($('#finish_time', courseForm).val())
-                                   .setHours(23, 59, 59, 999)) /
-                                  1000,
-                 alias: $('#alias', courseForm).val(),
-                 show_scoreboard: $('#show_scoreboard', courseForm).val(),
-               })
+    omegaup.API.Course
+        .update({
+          course_alias: courseAlias,
+          name: $('#title', courseForm).val(),
+          description: $('#description', courseForm).val(),
+          start_time:
+              (new Date($('#start_time', courseForm).val()).getTime()) / 1000,
+          finish_time: (new Date($('#finish_time', courseForm).val())
+                            .setHours(23, 59, 59, 999)) /
+                           1000,
+          alias: $('#alias', courseForm).val(),
+          show_scoreboard: $('#show_scoreboard', courseForm).val(),
+        })
         .then(function(data) {
           omegaup.UI.success('Tu curso ha sido editado! <a href="/course/' +
                              $('#alias', courseForm).val() + '">' +
@@ -73,7 +73,7 @@ function refreshStudentList() {
   var courseAlias =
       /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  omegaup.API.getCourseStudentList({course_alias: courseAlias})
+  omegaup.API.Course.listStudents({course_alias: courseAlias})
       .then(function(data) {
         if (data.status != 'ok') {
           // TODO: Delete this when resolve vs. reject is fixed.
@@ -84,10 +84,10 @@ function refreshStudentList() {
         for (var i = 0; i < data['students'].length; ++i) {
           var student = data['students'][i];
           student.remove = function(student) {
-            omegaup.API.removeStudentFromCourse({
-                         course_alias: courseAlias,
-                         usernameOrEmail: student.username
-                       })
+            omegaup.API.Course.removeStudent({
+                                course_alias: courseAlias,
+                                usernameOrEmail: student.username
+                              })
                 .then(function(data) {
                   refreshStudentList();
                   omegaup.UI.success(omegaup.T.courseStudentRemoved);

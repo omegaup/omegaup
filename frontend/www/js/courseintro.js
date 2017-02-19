@@ -12,5 +12,5 @@ omegaup.OmegaUp.on('ready', function() {
     }
   }
 
-  omegaup.API.getCourseDetails({alias: courseAlias}).then(onCourseLoaded);
+  omegaup.API.Course.details({alias: courseAlias}).then(onCourseLoaded);
 });

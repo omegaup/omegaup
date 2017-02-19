@@ -166,7 +166,7 @@ omegaup.UI = {
             },
             {
               source: function(query, cb) {
-                omegaup.API.searchProblems({query: query})
+                omegaup.API.Problem.list({query: query})
                     .then(function(data) { cb(data.results); });
               },
               displayKey: 'alias',

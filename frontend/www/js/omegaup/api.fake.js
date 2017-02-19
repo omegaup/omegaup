@@ -18,7 +18,7 @@
   // which is unconditionally executed when omegaup.js finishes loading. That
   // call should be removed at some point, but until that happens, let's
   // unconditionally mock the session to be always active.
-  omegaup.API.currentSession = function() {
+  omegaup.API.Session.currentSession = function() {
     return wrapDeferred({
       status: 'ok',
       session: {

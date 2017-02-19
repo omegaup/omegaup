@@ -13,11 +13,11 @@ $('document')
           return false;
         }
 
-        omegaup.API.updateBasicProfile({
-                     username: $('#username').val(),
-                     name: $('#name').val(),
-                     password: $('#new-password-1').val(),
-                   })
+        omegaup.API.User.updateBasicInfo({
+                          username: $('#username').val(),
+                          name: $('#name').val(),
+                          password: $('#new-password-1').val(),
+                        })
             .then(function(response) { window.location = '/profile/'; });
         return false;  // Prevent page refresh on submit
       };

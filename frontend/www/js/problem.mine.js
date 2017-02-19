@@ -3,8 +3,8 @@
 
   function fillProblemsTable() {
     var deferred = $('#show-admin-problems').prop('checked') ?
-                       omegaup.API.getAdminProblems() :
-                       omegaup.API.getMyProblems();
+                       omegaup.API.Problem.adminList() :
+                       omegaup.API.Problem.myList();
     deferred.then(function(result) {
       $('#problem-list .added').remove();
       for (var i = 0; i < result.problems.length; i++) {

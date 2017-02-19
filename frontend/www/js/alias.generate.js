@@ -42,7 +42,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     case 'groups':
       existsFn = function(alias) {
-        omegaup.API.getGroup({group_alias: alias})
+        omegaup.API.Group.details({group_alias: alias})
             .then(onAliasExists)
             .fail(onAliasNew);
       };

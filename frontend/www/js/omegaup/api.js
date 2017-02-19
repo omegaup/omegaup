@@ -2,200 +2,359 @@ var omegaup = typeof global === 'undefined' ?
                   (window.omegaup = window.omegaup || {}) :
                   (global.omegaup = global.omegaup || {});
 
+omegaup.internal =
+    typeof global === 'undefined' ?
+        (window.omegaup.internal = window.omegaup.internal || {}) :
+        (global.omegaup.internal = global.omegaup.internal || {});
+
+omegaup.internal.API = {
+  _call: function(url, transform) {
+    return function(params) {
+      var dfd = $.Deferred();
+      $.ajax({
+         url: url,
+         method: params ? 'POST' : 'GET',
+         data: params,
+         dataType: 'json'
+       })
+          .done(function(data) {
+            if (transform) {
+              data = transform(data);
+            }
+            dfd.resolve(data);
+          })
+          .fail(function(jqXHR) {
+            var errorData;
+            try {
+              errorData = JSON.parse(jqXHR.responseText);
+            } catch (err) {
+              errorData = {status: 'error', error: err};
+            }
+            dfd.reject(errorData);
+          });
+      return dfd.promise();
+    };
+  },
+
+  _convertRuntimes: function(data) {
+    if (data.runs) {
+      for (var i = 0; i < data.runs.length; i++) {
+        data.runs[i].time = omegaup.OmegaUp.time(data.runs[i].time * 1000);
+      }
+    }
+    return data;
+  },
+
+  _convertTimes: function(item) {
+    if (item.hasOwnProperty('start_time')) {
+      item.start_time = omegaup.OmegaUp.time(item.start_time * 1000);
+    }
+    if (item.hasOwnProperty('finish_time')) {
+      item.finish_time = omegaup.OmegaUp.time(item.finish_time * 1000);
+    }
+    return item;
+  },
+
+  _normalizeContestFields: function(contest) {
+    omegaup.internal.API._convertTimes(contest);
+    contest.submission_deadline =
+        omegaup.OmegaUp.time(contest.submission_deadline * 1000);
+    contest.show_penalty =
+        (contest.penalty != 0 || contest.penalty_type != 'none');
+    return contest;
+  },
+};
+
 omegaup.API = {
-  _wrapDeferred: function(jqXHR, transform) {
-    var dfd = $.Deferred();
-    jqXHR.done(function(data) {
-           if (transform) {
-             data = transform(data);
-           }
-           dfd.resolve(data);
-         })
-        .fail(function(jqXHR) {
-          var errorData;
-          try {
-            errorData = JSON.parse(jqXHR.responseText);
-          } catch (err) {
-            errorData = {status: 'error', error: err};
-          }
-          dfd.reject(errorData);
-        });
-    return dfd.promise();
-  },
-
-  currentSession: function() {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/session/currentsession/', dataType: 'json'}));
-  },
-
-  time: function() {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/time/get/', dataType: 'json'}));
-  },
-
-  createUser: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/user/create/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  createGroup: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/create/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  createCourse: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/create/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  updateCourse: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/update/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  createCourseAssignment: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/createAssignment/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addCourseAssignmentProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/addProblem/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  getCourseList: function() {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/course/listCourses/',
-          dataType: 'json',
-        }),
+  Contest: {
+    activityReport: omegaup.internal.API._call(
+        '/api/contest/activityReport/',
         function(result) {
-          for (var i = 0; i < result.admin.length; ++i) {
-            result.admin[i].finish_time =
-                omegaup.OmegaUp.time(result.admin[i].finish_time * 1000);
-          }
-          for (var i = 0; i < result.student.length; ++i) {
-            result.student[i].finish_time =
-                omegaup.OmegaUp.time(result.student[i].finish_time * 1000);
+          for (var idx in result.events) {
+            if (!result.events.hasOwnProperty(idx)) continue;
+            var ev = result.events[idx];
+            ev.time = omegaup.OmegaUp.time(ev.time * 1000);
           }
           return result;
-        });
+        }),
+
+    addAdmin: omegaup.internal.API._call('/api/contest/addAdmin/'),
+
+    addGroupAdmin: omegaup.internal.API._call('/api/contest/addGroupAdmin/'),
+
+    addProblem: omegaup.internal.API._call('/api/contest/addProblem/'),
+
+    addUser: omegaup.internal.API._call('/api/contest/addUser/'),
+
+    adminDetails: omegaup.internal.API._call(
+        '/api/contest/admindetails/',
+        function(contest) {
+          // We cannot use |_normalizeContestFields| because admins need to be
+          // able to get the unmodified times.
+          contest.start_time = new Date(contest.start_time * 1000);
+          contest.finish_time = new Date(contest.finish_time * 1000);
+          contest.submission_deadline =
+              omegaup.OmegaUp.time(contest.submission_deadline * 1000);
+          contest.show_penalty =
+              (contest.penalty != 0 || contest.penalty_type != 'none');
+          return contest;
+        }),
+
+    adminList: omegaup.internal.API._call(
+        '/api/contest/adminlist/',
+        function(result) {
+          for (var idx in result.contests) {
+            var contest = result.contests[idx];
+            omegaup.internal.API._convertTimes(contest);
+          }
+          return result;
+        }),
+
+    admins: omegaup.internal.API._call('/api/contest/admins/'),
+
+    create: omegaup.internal.API._call('/api/contest/create/'),
+
+    details: omegaup.internal.API._call(
+        '/api/contest/details/', omegaup.internal.API._normalizeContestFields),
+
+    list: omegaup.internal.API._call('/api/contest/list/',
+                                     function(result) {
+                                       for (var idx in result.results) {
+                                         var contest = result.results[idx];
+                                         omegaup.internal.API._convertTimes(
+                                             contest);
+                                       }
+                                       return result;
+                                     }),
+
+    myList: omegaup.internal.API._call('/api/contest/mylist/',
+                                       function(result) {
+                                         for (var idx in result.contests) {
+                                           var contest = result.contests[idx];
+                                           omegaup.internal.API._convertTimes(
+                                               contest);
+                                         }
+                                         return result;
+                                       }),
+
+    open: omegaup.internal.API._call('/api/contest/open/'),
+
+    problems: omegaup.internal.API._call('/api/contest/problems/'),
+
+    removeAdmin: omegaup.internal.API._call('/api/contest/removeAdmin/'),
+
+    removeGroupAdminFromContest:
+        omegaup.internal.API._call('/api/contest/removeGroupAdmin/'),
+
+    removeProblem: omegaup.internal.API._call('/api/contest/removeProblem/'),
+
+    removeUser: omegaup.internal.API._call('/api/contest/removeUser/'),
+
+    runs: omegaup.internal.API._call('/api/contest/runs/',
+                                     omegaup.internal.API._convertRuntimes),
+
+    stats: omegaup.internal.API._call('/api/contest/stats/'),
+
+    update: omegaup.internal.API._call('/api/contest/update/'),
+
+    users: omegaup.internal.API._call('/api/contest/users/'),
   },
 
-  getCourseStudentList: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/listStudents/',
-      data: params,
-      dataType: 'json',
-    }));
+  Course: {
+    addProblem: omegaup.internal.API._call('/api/course/addProblem/'),
+
+    addStudent: omegaup.internal.API._call('/api/course/addStudent/'),
+
+    adminDetails: omegaup.internal.API._call(
+        '/api/course/adminDetails/', omegaup.internal.API._convertTimes),
+
+    create: omegaup.internal.API._call('/api/course/create/'),
+
+    details: omegaup.internal.API._call('/api/course/details/',
+                                        omegaup.internal.API._convertTimes),
+
+    createAssignment:
+        omegaup.internal.API._call('/api/course/createAssignment/'),
+
+    getAssignment: omegaup.internal.API._call(
+        '/api/course/getAssignment', omegaup.internal.API._convertTimes),
+
+    listAssignments: omegaup.internal.API._call('/api/course/listAssignments/'),
+
+    listCourses: omegaup.internal.API
+                     ._call('/api/course/listCourses/',
+                            function(result) {
+                              for (var i = 0; i < result.admin.length; ++i) {
+                                result.admin[i].finish_time =
+                                    omegaup.OmegaUp.time(
+                                        result.admin[i].finish_time * 1000);
+                              }
+                              for (var i = 0; i < result.student.length; ++i) {
+                                result.student[i].finish_time =
+                                    omegaup.OmegaUp.time(
+                                        result.student[i].finish_time * 1000);
+                              }
+                              return result;
+                            }),
+
+    listStudents: omegaup.internal.API._call('/api/course/listStudents/'),
+
+    removeStudent: omegaup.internal.API._call('/api/course/removeStudent/'),
+
+    update: omegaup.internal.API._call('/api/course/update/'),
   },
 
-  getCourseAssignments: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/listAssignments/',
-      method: 'POST',
-      data: params,
-      dataType: 'json',
-    }));
+  Group: {
+    /**
+     * Adds a user to the group.
+     * @param {string} group_alias - The alias of the group
+     * @param {string} usernameOrEmail - The user's identification.
+     * @return {Promise}
+     */
+    addUser: omegaup.internal.API._call('/api/group/addUser/'),
+
+    /**
+     * Creates a new group.
+     * @param {string} alias - The group's alias.
+     * @param {string} name - The group's name.
+     * @param {string} description - The group's description.
+     * @return {Promise}
+     */
+    create: omegaup.internal.API._call('/api/group/create/'),
+
+    /**
+     * Adds a scoreboard to the group.
+     * @param {string} group_alias - The alias of the group.
+     * @param {string} alias - The alias of the scoreboard.
+     * @param {string} title - The title of the scoreboard.
+     * @param {string} description - The description of the scoreboard.
+     * @return {Promise}
+     */
+    createScoreboard:
+        omegaup.internal.API._call('/api/group/createScoreboard/'),
+
+    /**
+     * Gets the group's details
+     * @param {string} group_alias - The alias of the group.
+     * @return {Promise}
+     */
+    details: omegaup.internal.API._call('/api/group/details/'),
+
+    /**
+     * Gets the groups owned by the user.
+     * @return {Promise}
+     */
+    myList: omegaup.internal.API._call('/api/group/mylist/'),
+
+    /**
+     * Removes a user from the group.
+     * @param {string} group_alias - The alias of the group
+     * @param {string} usernameOrEmail - The user's identification.
+     * @return {Promise}
+     */
+    removeUser: omegaup.internal.API._call('/api/group/removeUser/'),
+
+    /**
+     * Gets the list of members of a group.
+     * @param {string} group_alias - The alias of the group
+     * @return {Promise}
+     */
+    members: omegaup.internal.API._call('/api/group/members/'),
   },
 
-  getAssignment: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/getAssignment',
-      method: 'POST',
-      data: params,
-      dataType: 'json',
-    }),
-                                     omegaup.API._convertTimes);
+  GroupScoreboard: {
+    addContest: omegaup.internal.API._call('/api/groupScoreboard/addContest/'),
+
+    details: omegaup.internal.API._call('/api/groupScoreboard/details/'),
+
+    removeContest:
+        omegaup.internal.API._call('/api/groupScoreboard/removeContest/'),
   },
 
-  getCourseAdminDetails: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/adminDetails',
-      method: 'POST',
-      data: params,
-      dataType: 'json',
-    }),
-                                     omegaup.API._convertTimes);
+  Problem: {
+    addAdmin: omegaup.internal.API._call('/api/problem/addAdmin/'),
+
+    addGroupAdmin: omegaup.internal.API._call('/api/problem/addGroupAdmin/'),
+
+    addTag: omegaup.internal.API._call('/api/problem/addTag/'),
+
+    adminList: omegaup.internal.API._call('/api/problem/adminlist/'),
+
+    admins: omegaup.internal.API._call('/api/problem/admins/'),
+
+    list: omegaup.internal.API._call('/api/problem/list/'),
+
+    myList: omegaup.internal.API._call('/api/problem/mylist/'),
+
+    removeAdmin: omegaup.internal.API._call('/api/problem/removeAdmin/'),
+
+    removeGroupAdmin:
+        omegaup.internal.API._call('/api/problem/removeGroupAdmin/'),
+
+    removeTag: omegaup.internal.API._call('/api/problem/removeTag/'),
+
+    runs: omegaup.internal.API._call('/api/problem/runs/',
+                                     omegaup.internal.API._convertRuntimes),
+
+    stats: omegaup.internal.API._call('/api/problem/stats/'),
+
+    tags: omegaup.internal.API._call('/api/problem/tags/'),
   },
 
-  getCourseDetails: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/details',
-      method: 'POST',
-      data: params,
-      dataType: 'json',
-    }),
-                                     omegaup.API._convertTimes);
+  Run: {
+    counts: omegaup.internal.API._call('/api/run/counts/'),
+
+    details: omegaup.internal.API._call('/api/run/details/'),
   },
 
-  addStudentToCourse: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/addStudent/',
-      method: 'POST',
-      data: params,
-      dataType: 'json',
-    }));
+  Session: {
+    /**
+     * Gets the current session.
+     * @return {Promise}
+     */
+    currentSession: omegaup.internal.API._call('/api/session/currentsession/'),
+
+    /**
+     * Performs a login using Google OAuth.
+     * @param {string} storeToken - The auth code.
+     */
+    googleLogin: omegaup.internal.API._call('/api/session/googlelogin/'),
   },
 
-  removeStudentFromCourse: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/removeStudent/',
-      data: params,
-      method: 'POST',
-      dataType: 'json',
-    }));
+  Time: {
+    /**
+     * Gets the current time according to the server.
+     * @return {Promise}
+     */
+    get: omegaup.internal.API._call('/api/time/get/'),
   },
 
-  createContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/create/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
+  User: {
+    /**
+     * Creates a new user.
+     * @param {string} email - The user's email address.
+     * @param {string} username - The user's username.
+     * @param {string} password - The user's password.
+     * @param {string} recaptcha - The answer to the recaptcha challenge.
+     * @return {Promise}
+     */
+    create: omegaup.internal.API._call('/api/user/create/'),
 
-  updateContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/update/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
+    /**
+     * Updates the user's basic information.
+     * @param {string} username - The user's new username.
+     * @param {string} name - The user's new username.
+     * @param {string} password - The use's new password.
+     * @return {Promise}
+     */
+    updateBasicInfo: omegaup.internal.API._call('/api/user/updatebasicinfo/'),
 
-  googleLogin: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/session/googlelogin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
+    /**
+     * Updates the user's mail email address.
+     * @param {string} email - The user's new main email.
+     * @return {Promise}
+     */
+    updateMainEmail: omegaup.internal.API._call('/api/user/updateMainEmail/'),
   },
 
   getUserStats: function(username, callback) {
@@ -212,60 +371,12 @@ omegaup.API = {
         });
   },
 
-  getMyGroups: function() {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/group/mylist/', dataType: 'json'}));
-  },
-
-  _convertTimes: function(item) {
-    if (item.hasOwnProperty('start_time')) {
-      item.start_time = omegaup.OmegaUp.time(item.start_time * 1000);
-    }
-    if (item.hasOwnProperty('finish_time')) {
-      item.finish_time = omegaup.OmegaUp.time(item.finish_time * 1000);
-    }
-    return item;
-  },
-
-  getContests: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/list/',
-      data: params,
-      dataType: 'json',
-    }),
-                                     function(result) {
-                                       for (var idx in result.results) {
-                                         var contest = result.results[idx];
-                                         omegaup.API._convertTimes(contest);
-                                       }
-                                       return result;
-                                     });
-  },
-
-  openContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/open/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  _normalizeContestFields: function(contest) {
-    omegaup.API._convertTimes(contest);
-    contest.submission_deadline =
-        omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-    contest.show_penalty =
-        (contest.penalty != 0 || contest.penalty_type != 'none');
-    return contest;
-  },
-
   getContest: function(alias, callback) {
     $.get('/api/contest/details/contest_alias/' + encodeURIComponent(alias) +
               '/',
           function(contest) {
             if (contest.status == 'ok') {
-              omegaup.API._normalizeContestFields(contest);
+              omegaup.internal.API._normalizeContestFields(contest);
             }
             callback(contest);
           },
@@ -276,27 +387,6 @@ omegaup.API = {
           } catch (err) {
             callback({status: 'error', 'error': undefined});
           }
-        });
-  },
-
-  getContestAdminDetails: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/contest/admindetails/',
-          method: 'POST',
-          data: params,
-          dataType: 'json',
-        }),
-        function(contest) {
-          // We cannot use |_normalizeContestFields| because admins need to be
-          // able to get the unmodified times.
-          contest.start_time = new Date(contest.start_time * 1000);
-          contest.finish_time = new Date(contest.finish_time * 1000);
-          contest.submission_deadline =
-              omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-          contest.show_penalty =
-              (contest.penalty != 0 || contest.penalty_type != 'none');
-          return contest;
         });
   },
 
@@ -305,7 +395,7 @@ omegaup.API = {
               encodeURIComponent(alias) + '/',
           function(contest) {
             if (contest.status == 'ok') {
-              omegaup.API._normalizeContestFields(contest);
+              omegaup.internal.API._normalizeContestFields(contest);
             }
             callback(contest);
           },
@@ -317,33 +407,6 @@ omegaup.API = {
             callback({status: 'error', 'error': undefined});
           }
         });
-  },
-
-  getContestActivityReport: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({
-          url: '/api/contest/activityReport/',
-          data: params,
-          dataType: 'json',
-        }),
-        function(result) {
-          for (var idx in result.events) {
-            if (!result.events.hasOwnProperty(idx)) continue;
-            var ev = result.events[idx];
-            ev.time = omegaup.OmegaUp.time(ev.time * 1000);
-          }
-          return result;
-        });
-  },
-
-  getContestByToken: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/details/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }),
-                                     omegaup.API._normalizeContestFields);
   },
 
   getProfile: function(username, callback) {
@@ -469,222 +532,6 @@ omegaup.API = {
         });
   },
 
-  updateBasicProfile: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/user/updatebasicinfo/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  updateMainEmail: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/user/updateMainEmail/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addProblemToContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/addProblem/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeProblemFromContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/removeProblem/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  contestProblems: function(params) {
-    return omegaup.API._wrapDeferred($.ajax(
-        {url: '/api/contest/problems/', data: params, dataType: 'json'}));
-  },
-
-  addAdminToContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/addAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeAdminFromContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/removeAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addAdminToProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/addAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeAdminFromProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/removeAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addGroupAdminToContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/addGroupAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeGroupAdminFromContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/removeGroupAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addGroupAdminToProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/addGroupAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeGroupAdminFromProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/removeGroupAdmin/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addTagToProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/addTag/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeTagFromProblem: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/removeTag/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addUserToGroup: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/addUser/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeUserFromGroup: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/removeUser/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addScoreboardToGroup: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/createScoreboard/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addContestToScoreboard: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/groupScoreboard/addContest/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeContestFromScoreboard: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/groupScoreboard/removeContest/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  addUserToContest: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/addUser/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  removeUserFromContest: function(contestAlias, username, callback) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/removeUser/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  getProblems: function() {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/problem/list/', dataType: 'json'}));
-  },
-
-  getProblemsWithTags: function(tags) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/list/',
-      data: {tag: tags},
-      dataType: 'json',
-    }));
-  },
-
-  searchProblems: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/list/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
   searchTags: function(query, callback) {
     $.post('/api/tag/list/', {query: query}, function(data) { callback(data); },
            'json')
@@ -733,61 +580,6 @@ omegaup.API = {
         });
   },
 
-  getMyProblems: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/mylist/',
-      data: params,
-      dataType: 'json',
-    }));
-  },
-
-  getMyContests: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/mylist/',
-      data: params,
-      dataType: 'json',
-    }),
-                                     function(result) {
-                                       for (var idx in result.contests) {
-                                         var contest = result.contests[idx];
-                                         omegaup.API._convertTimes(contest);
-                                       }
-                                       return result;
-                                     });
-  },
-
-  getAdminProblems: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/adminlist/',
-      data: params,
-      dataType: 'json',
-    }));
-  },
-
-  getAdminContests: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/adminlist/',
-      data: params,
-      dataType: 'json',
-    }),
-                                     function(result) {
-                                       for (var idx in result.contests) {
-                                         var contest = result.contests[idx];
-                                         omegaup.API._convertTimes(contest);
-                                       }
-                                       return result;
-                                     });
-  },
-
-  _convertRuntimes: function(data) {
-    if (data.runs) {
-      for (var i = 0; i < data.runs.length; i++) {
-        data.runs[i].time = omegaup.OmegaUp.time(data.runs[i].time * 1000);
-      }
-    }
-    return data;
-  },
-
   getProblem: function(contestAlias, problemAlias, callback, statement_type,
                        show_solvers, language) {
     if (statement_type === undefined) {
@@ -805,7 +597,7 @@ omegaup.API = {
                    encodeURIComponent(problemAlias) + '/',
            params,
            function(problem) {
-             omegaup.API._convertRuntimes(problem);
+             omegaup.internal.API._convertRuntimes(problem);
              callback(problem);
            },
            'json')
@@ -817,84 +609,6 @@ omegaup.API = {
           }
         });
   },
-
-  getGroupMembers: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/members/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  getGroup: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/group/details/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  getGroupScoreboard: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/groupScoreboard/details/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }));
-  },
-
-  getProblemRuns: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/problem/runs/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }),
-                                     omegaup.API._convertRuntimes);
-  },
-
-  getContestRuns: function(params) {
-    return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/contest/runs/',
-      method: 'POST',
-      data: params,
-      dataType: 'json'
-    }),
-                                     omegaup.API._convertRuntimes);
-  },
-
-  getContestStats: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/contest/stats/', data: params, dataType: 'json'}));
-  },
-
-  getContestUsers: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/contest/users/', data: params, dataType: 'json'}));
-  },
-
-  getContestAdmins: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/contest/admins/', data: params, dataType: 'json'}));
-  },
-
-  getProblemAdmins: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/problem/admins/', data: params, dataType: 'json'}));
-  },
-
-  getProblemTags: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/problem/tags/', data: params, dataType: 'json'}));
-  },
-
-  getProblemStats: function(problemAlias, callback) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/problem/stats/', data: params, dataType: 'json'}));
-  },
-
   getProblemClarifications: function(problemAlias, offset, rowcount, callback) {
     $.get('/api/problem/clarifications/problem_alias/' +
               encodeURIComponent(problemAlias) + '/offset/' + offset +
@@ -963,7 +677,7 @@ omegaup.API = {
   getRuns: function(options, callback) {
     $.post('/api/run/list/', options,
            function(data) {
-             omegaup.API._convertRuntimes(data);
+             omegaup.internal.API._convertRuntimes(data);
              callback(data);
            },
            'json')
@@ -1010,16 +724,6 @@ omegaup.API = {
             }
           }
         });
-  },
-
-  getRunDetails: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/run/details/', data: params, dataType: 'json'}));
-  },
-
-  getRunCounts: function(params) {
-    return omegaup.API._wrapDeferred(
-        $.ajax({url: '/api/run/counts/', data: params, dataType: 'json'}));
   },
 
   runRejudge: function(guid, debug, callback) {
@@ -1072,7 +776,7 @@ omegaup.API = {
               encodeURIComponent(contestAlias) + '/token/' +
               encodeURIComponent(token) + '/',
           function(data) {
-            omegaup.API._convertTimes(data);
+            omegaup.internal.API._convertTimes(data);
             callback(data);
           },
           'json')

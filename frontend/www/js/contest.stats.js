@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
   function getStats() {
-    omegaup.API.getContestStats({contest_alias: contestAlias})
+    omegaup.API.Contest.stats({contest_alias: contestAlias})
         .then(function(s) {
           stats = s;
           drawCharts();

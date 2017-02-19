@@ -9,7 +9,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#start-contest-submit').prop('disabled', true);
 
         // Explicitly join the contest.
-        omegaup.API.openContest(contestAlias, function(result) {
+        omegaup.API.Contest.open(contestAlias, function(result) {
           if (result.status == 'error') {
             omegaup.UI.error(result.error);
             $('#start-contest-form').show();

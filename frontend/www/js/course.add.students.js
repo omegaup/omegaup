@@ -5,10 +5,10 @@ omegaup.OmegaUp.on('ready', function() {
         var courseAlias =
             /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-        omegaup.API.addStudentToCourse({
-                     course_alias: courseAlias,
-                     usernameOrEmail: $('#member-username').val()
-                   })
+        omegaup.API.Course.addStudent({
+                            course_alias: courseAlias,
+                            usernameOrEmail: $('#member-username').val()
+                          })
             .then(function(data) {
               refreshStudentList();
               omegaup.UI.success(omegaup.T.courseStudentAdded);

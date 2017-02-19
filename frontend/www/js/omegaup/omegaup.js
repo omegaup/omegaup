@@ -67,7 +67,7 @@ omegaup.OmegaUp = {
 
   _initialize: function() {
     var t0 = new Date().getTime();
-    omegaup.API.currentSession().then(function(data) {
+    omegaup.API.Session.currentSession().then(function(data) {
       if (data.session.valid) {
         omegaup.OmegaUp.loggedIn = true;
         omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
@@ -107,7 +107,7 @@ omegaup.OmegaUp = {
 
   syncTime: function() {
     var t0 = new Date().getTime();
-    omegaup.API.time().then(function(data) {
+    omegaup.API.Time.get().then(function(data) {
       omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
     });
   },

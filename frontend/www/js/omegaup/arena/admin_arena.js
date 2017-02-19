@@ -84,12 +84,12 @@ omegaup.arena.ArenaAdmin.prototype.refreshRuns = function() {
   if (self.arena.options.onlyProblemAlias) {
     options.show_all = true;
     options.problem_alias = self.arena.options.onlyProblemAlias;
-    omegaup.API.getProblemRuns(options).then(self.runsChanged.bind(self));
+    omegaup.API.Problem.runs(options).then(self.runsChanged.bind(self));
   } else if (self.arena.options.contestAlias === 'admin') {
     omegaup.API.getRuns(options, self.runsChanged.bind(self));
   } else {
     options.contest_alias = self.arena.options.contestAlias;
-    omegaup.API.getContestRuns(options).then(self.runsChanged.bind(self));
+    omegaup.API.Contest.runs(options).then(self.runsChanged.bind(self));
   }
 };
 

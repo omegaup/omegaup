@@ -8,7 +8,7 @@ var formAlias = formData.attr('data-alias');
 $(function() {
   if (formPage === 'list') {
     function fillGroupsList() {
-      omegaup.API.getMyGroups()
+      omegaup.API.Group.myList()
           .then(function(groups) {
             var html = '';
 
@@ -33,11 +33,12 @@ $(function() {
   } else if (formPage === 'new') {
     $('.new_group_form')
         .submit(function() {
-          omegaup.API.createGroup({
-                       alias: $('.new_group_form #alias').val(),
-                       name: $('.new_group_form #title').val(),
-                       description: $('.new_group_form #description').val(),
-                     })
+          omegaup.API.Group.create({
+                             alias: $('.new_group_form #alias').val(),
+                             name: $('.new_group_form #title').val(),
+                             description:
+                                 $('.new_group_form #description').val(),
+                           })
               .then(function(data) {
                 window.location.replace('/group/' +
                                         $('.new_group_form #alias').val() +
@@ -71,10 +72,10 @@ $(function() {
         .submit(function() {
           var username = $('#member-username').val();
 
-          omegaup.API.addUserToGroup({
-                       group_alias: groupAlias,
-                       usernameOrEmail: username,
-                     })
+          omegaup.API.Group.addUser({
+                             group_alias: groupAlias,
+                             usernameOrEmail: username,
+                           })
               .then(function(response) {
                 omegaup.UI.success('Member successfully added!');
                 $('div.post.footer').show();
@@ -87,7 +88,7 @@ $(function() {
         });
 
     function refreshGroupMembers() {
-      omegaup.API.getGroupMembers({group_alias: groupAlias})
+      omegaup.API.Group.members({group_alias: groupAlias})
           .then(function(group) {
             $('#group-members').empty();
 
@@ -108,10 +109,12 @@ $(function() {
                                 '&times;</button></td>')
                                   .click((function(username) {
                                     return function(e) {
-                                      omegaup.API.removeUserFromGroup({
-                                                   group_alias: groupAlias,
-                                                   usernameOrEmail: username,
-                                                 })
+                                      omegaup.API.Group.removeUser({
+                                                         group_alias:
+                                                             groupAlias,
+                                                         usernameOrEmail:
+                                                             username,
+                                                       })
                                           .then(function(response) {
                                             omegaup.UI.success(
                                                 'Member successfully removed!');
@@ -130,12 +133,12 @@ $(function() {
 
     $('#add-scoreboard-form')
         .submit(function() {
-          omegaup.API.addScoreboardToGroup({
-                       group_alias: groupAlias,
-                       alias: $('#alias').val(),
-                       name: $('#title').val(),
-                       description: $('#description').val(),
-                     })
+          omegaup.API.Group.createScoreboard({
+                             group_alias: groupAlias,
+                             alias: $('#alias').val(),
+                             name: $('#title').val(),
+                             description: $('#description').val(),
+                           })
               .then(function(response) {
                 omegaup.UI.success('Scoreboard successfully added!');
                 $('div.post.footer').show();
@@ -147,7 +150,7 @@ $(function() {
         });
 
     function refreshGroupScoreboards() {
-      omegaup.API.getGroup({group_alias: groupAlias})
+      omegaup.API.Group.details({group_alias: groupAlias})
           .then(function(group) {
             $('#group-scoreboards').empty();
 

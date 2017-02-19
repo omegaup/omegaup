@@ -4,7 +4,7 @@ $('document')
           .submit(function() {
             $('#wait').show();
 
-            omegaup.API.updateMainEmail({email: $('#email').val()})
+            omegaup.API.User.updateMainEmail({email: $('#email').val()})
                 .then(function(response) {
                   $('#status')
                       .html(

@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
       }
     }
   }
-  omegaup.API.getCourseList().then(function(data) {
+  omegaup.API.Course.listCourses().then(function(data) {
     if (data.status != 'ok') {
       omegaup.UI.error(data.error);
       return;

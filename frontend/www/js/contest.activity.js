@@ -54,6 +54,6 @@ omegaup.OmegaUp.on('ready', function() {
     }
   };
 
-  omegaup.API.getContestActivityReport({'contest_alias': contestAlias})
+  omegaup.API.Contest.activityReport({'contest_alias': contestAlias})
       .then(function(report) { ko.applyBindings(new ActivityReport(report)); });
 });
