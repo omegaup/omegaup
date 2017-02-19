@@ -338,12 +338,16 @@ class RunController extends Controller {
             try {
                 $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id);
 
-                $response['submission_deadline'] = strtotime($r['container']->finish_time);
-                if (isset($r['container']->window_length)) {
-                    $response['submission_deadline'] = min(
-                        $response['submission_deadline'],
-                        strtotime($contest_user->access_time) + $r['container']->window_length * 60
-                    );
+                if (isset($r['container']->finish_time)) {
+                    $response['submission_deadline'] = strtotime($r['container']->finish_time);
+                    if (isset($r['container']->window_length)) {
+                        $response['submission_deadline'] = min(
+                            strtotime($r['container']->finish_time),
+                            strtotime($contest_user->access_time) + $r['container']->window_length * 60
+                        );
+                    }
+                } elseif (isset($r['container']->window_length)) {
+                    $response['submission_deadline'] = strtotime($contest_user->access_time) + $r['container']->window_length * 60;
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer

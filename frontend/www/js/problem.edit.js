@@ -309,11 +309,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#statement-language')
       .on('change', function(e) {
+        chosenLanguage = $('#statement-language').val();
         omegaup.API.getProblem({
                      problem_alias: problemAlias,
                      statement_type: 'markdown',
                      show_solvers: false,
-                     lang: $('#statement-language').val()
+                     lang: chosenLanguage
                    })
             .then(problemCallback);
       });

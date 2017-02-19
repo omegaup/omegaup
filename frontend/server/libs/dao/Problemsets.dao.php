@@ -36,9 +36,11 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     public static function insideSubmissionWindow($container, $user_id) {
-        if (time() > strtotime($container->finish_time) ||
-            time() < strtotime($container->start_time)) {
-            return false;
+        if (isset($container->finish_time)) {
+            if (time() > strtotime($container->finish_time) ||
+                time() < strtotime($container->start_time)) {
+                return false;
+            }
         }
 
         if (!isset($container->window_length)) {
