@@ -1,7 +1,6 @@
 'use strict';
-require('../omegaup.js');
-require('./notifications.js');
-require('./arena.js');
+
+var omegaup = require('../../dist/omegaup.js');
 
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {

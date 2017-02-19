@@ -1,5 +1,6 @@
 'use strict';
-require('./omegaup.js');
+
+var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup', function() {
   describe('experiments', function() {
@@ -11,6 +12,12 @@ describe('omegaup', function() {
     it('Should handle known experiments', function() {
       var experiments = new omegaup.Experiments(['foo']);
       expect(experiments.isEnabled('foo')).toEqual(true);
+    });
+  });
+
+  describe('translations', function() {
+    it('Should be loaded correctly', function() {
+      expect(typeof omegaup.T.arenaPageTitle).not.toEqual('undefined');
     });
   });
 });

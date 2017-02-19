@@ -1,133 +1,161 @@
-var omegaup = typeof global === 'undefined' ?
-                  (window.omegaup = window.omegaup || {}) :
-                  (global.omegaup = global.omegaup || {});
+import API from './api.js';
+import UI from './ui.js';
+import * as arena from './arena/arena.js';
+
+export {API, UI, arena};
 
 // This is the JavaScript version of the frontend's Experiments class.
-omegaup.Experiments = function(experimentList) {
-  var self = this;
-  self.enabledExperiments = {};
-  if (!experimentList) return;
-  for (var i = 0; i < experimentList.length; i++)
-    self.enabledExperiments[experimentList[i]] = true;
-};
+export class Experiments {
+  constructor(experimentList) {
+    var self = this;
+    self.enabledExperiments = {};
+    if (!experimentList) return;
+    for (var i = 0; i < experimentList.length; i++)
+      self.enabledExperiments[experimentList[i]] = true;
+  }
 
-// Current frontend-available experiments:
-omegaup.Experiments.SCHOOLS = 'schools';
+  // Current frontend-available experiments:
+  static get SCHOOLS() { return 'schools'; }
 
-// The list of all enabled experiments for a particular request should have
-// been injected into the DOM by Smarty.
-omegaup.Experiments.loadGlobal = function() {
-  var experimentsNode = $('#omegaup-enabled-experiments');
-  var experimentsList = null;
-  if (experimentsNode.length == 1)
-    experimentsList = experimentsNode[0].innerText.split(',');
-  return new omegaup.Experiments(experimentsList);
-};
+  // The list of all enabled experiments for a particular request should have
+  // been injected into the DOM by Smarty.
+  static loadGlobal() {
+    var experimentsNode =
+        document.getElementById('omegaup-enabled-experiments');
+    var experimentsList = null;
+    if (experimentsNode) experimentsList = experimentsNode.innerText.split(',');
+    return new Experiments(experimentsList);
+  }
 
-omegaup.Experiments.prototype.isEnabled = function(name) {
-  var self = this;
-  return self.enabledExperiments.hasOwnProperty(name);
-};
+  isEnabled(name) {
+    var self = this;
+    return self.enabledExperiments.hasOwnProperty(name);
+  }
+}
+;
 
-omegaup.OmegaUp = {
+// Stub for translations.
+// These should be loaded later with OmegaUp.loadTranslations.
+export var T = {};
+
+export let OmegaUp = {
   loggedIn: false,
 
-  username: null,
+      username: null,
 
-  ready: false,
+      ready: false,
 
-  experiments: null,
+      experiments: null,
 
-  _documentReady: false,
+      _documentReady: false,
 
-  _initialized: false,
+      _initialized: false,
 
-  _deltaTime: undefined,
+      _deltaTime: undefined,
 
-  _listeners: {
-    'ready': [
-      function() {
-        omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
-      },
-      function() {
-        ko.bindingProvider.instance =
-            new ko.secureBindingsProvider({attribute: 'data-bind'});
+      _listeners:
+          {
+            'ready': [
+              function() { OmegaUp.experiments = Experiments.loadGlobal(); },
+              function() {
+                ko.bindingProvider.instance =
+                    new ko.secureBindingsProvider({attribute: 'data-bind'});
+              }
+            ],
+          },
+
+      _onDocumentReady:
+          function() {
+            OmegaUp._documentReady = true;
+            if (typeof(OmegaUp._deltaTime) !== 'undefined') {
+              OmegaUp._notify('ready');
+            }
+            // TODO(lhchavez): Remove this.
+            OmegaUp._initialize();
+          },
+
+      _initialize:
+          function() {
+            var t0 = new Date().getTime();
+            API.Session.currentSession().then(function(data) {
+              if (data.session.valid) {
+                OmegaUp.loggedIn = true;
+                OmegaUp._deltaTime = data.time * 1000 - t0;
+                OmegaUp.username = data.session.user.username;
+                OmegaUp.email = data.session.email;
+              }
+
+              OmegaUp.ready = true;
+              if (OmegaUp._documentReady) {
+                OmegaUp._notify('ready');
+              }
+            });
+          },
+
+      _notify:
+          function(eventName) {
+            for (var i = 0; i < OmegaUp._listeners[eventName].length; i++) {
+              OmegaUp._listeners[eventName][i]();
+            }
+            OmegaUp._listeners[eventName] = [];
+          },
+
+      loadTranslations:
+          function(t) {
+            for (var p in t) {
+              if (!t.hasOwnProperty(p)) {
+                continue;
+              }
+              T[p] = t[p];
+            }
+          },
+
+      on:
+          function(events, handler) {
+            if (OmegaUp._initialized) return;
+            OmegaUp._initialize();
+            var splitNames = events.split(' ');
+            for (var i = 0; i < splitNames.length; i++) {
+              if (!OmegaUp._listeners.hasOwnProperty(splitNames[i])) continue;
+
+              if (splitNames[i] == 'ready' && OmegaUp.ready) {
+                handler();
+                return;
+              }
+
+              OmegaUp._listeners[splitNames[i]].push(handler);
+            }
+          },
+
+      syncTime:
+          function() {
+            var t0 = new Date().getTime();
+            API.Time.get().then(function(data) {
+              OmegaUp._deltaTime = data.time * 1000 - t0;
+            });
+          },
+
+      _realTime:
+          function(timestamp) {
+            if (typeof(timestamp) === 'undefined') {
+              return new Date().getTime();
+            }
+            return new Date(timestamp).getTime();
+          },
+
+      time: function(timestamp, options) {
+        options = options ||  {};
+        options.server_sync = (typeof(options.server_sync) === 'undefined') ?
+                                  true :
+                                  options.server_sync;
+        return new Date(OmegaUp._realTime(timestamp) +
+                        (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
       }
-    ],
-  },
-
-  _onDocumentReady: function() {
-    omegaup.OmegaUp._documentReady = true;
-    if (typeof(omegaup.OmegaUp._deltaTime) !== 'undefined') {
-      omegaup.OmegaUp._notify('ready');
-    }
-    // TODO(lhchavez): Remove this.
-    omegaup.OmegaUp._initialize();
-  },
-
-  _initialize: function() {
-    var t0 = new Date().getTime();
-    omegaup.API.Session.currentSession().then(function(data) {
-      if (data.session.valid) {
-        omegaup.OmegaUp.loggedIn = true;
-        omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
-        omegaup.OmegaUp.username = data.session.user.username;
-        omegaup.OmegaUp.email = data.session.email;
-      }
-
-      omegaup.OmegaUp.ready = true;
-      if (omegaup.OmegaUp._documentReady) {
-        omegaup.OmegaUp._notify('ready');
-      }
-    });
-  },
-
-  _notify: function(eventName) {
-    for (var i = 0; i < omegaup.OmegaUp._listeners[eventName].length; i++) {
-      omegaup.OmegaUp._listeners[eventName][i]();
-    }
-    omegaup.OmegaUp._listeners[eventName] = [];
-  },
-
-  on: function(events, handler) {
-    if (omegaup.OmegaUp._initialized) return;
-    omegaup.OmegaUp._initialize();
-    var splitNames = events.split(' ');
-    for (var i = 0; i < splitNames.length; i++) {
-      if (!omegaup.OmegaUp._listeners.hasOwnProperty(splitNames[i])) continue;
-
-      if (splitNames[i] == 'ready' && omegaup.OmegaUp.ready) {
-        handler();
-        return;
-      }
-
-      omegaup.OmegaUp._listeners[splitNames[i]].push(handler);
-    }
-  },
-
-  syncTime: function() {
-    var t0 = new Date().getTime();
-    omegaup.API.Time.get().then(function(data) {
-      omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
-    });
-  },
-
-  _realTime: function(timestamp) {
-    if (typeof(timestamp) === 'undefined') {
-      return new Date().getTime();
-    }
-    return new Date(timestamp).getTime();
-  },
-
-  time: function(timestamp, options) {
-    options = options ||  {};
-    options.server_sync = (typeof(options.server_sync) === 'undefined') ?
-                              true :
-                              options.server_sync;
-    return new Date(
-        omegaup.OmegaUp._realTime(timestamp) +
-        (options.server_sync ? (omegaup.OmegaUp._deltaTime || 0) : 0));
-  }
 };
 
-$(document).ready(omegaup.OmegaUp._onDocumentReady);
+if (document.readyState === 'complete' ||
+    (document.readyState !== 'loading' && !document.documentElement.doScroll)) {
+  OmegaUp._onDocumentReady();
+} else {
+  document.addEventListener('DOMContentLoaded', OmegaUp._onDocumentReady);
+}

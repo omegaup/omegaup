@@ -75,8 +75,11 @@ frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
 frontend/www/templates/
 
-#ignore sublime sftp config
+# Ignore sublime sftp config
 sftp-config.json
 
-#ignore node modules folder
+# Ignore node modules folder
 node_modules
+
+# Ignore JavaScript build files.
+frontend/www/js/dist/

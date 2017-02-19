@@ -72,7 +72,7 @@ script:
           phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
           frontend/tests/phpunit.xml frontend/tests/controllers
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn test)
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn build && yarn test)
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
           python3 stuff/i18n.py --validate < /dev/null

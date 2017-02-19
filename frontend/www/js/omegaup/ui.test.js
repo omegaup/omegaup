@@ -1,5 +1,6 @@
 'use strict';
-require('./ui.js');
+
+var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
   describe('formatString', function() {

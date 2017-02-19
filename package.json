@@ -5,11 +5,26 @@
   "license": "BSD",
   "private": true,
   "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "cross-env": "^3.1.4",
+    "css-loader": "^0.26.1",
+    "file-loader": "^0.10.0",
     "jasmine": "^2.5.2",
     "jquery": "1.11.3",
-    "jsdom": "^9.8.3"
+    "jsdom": "^9.8.3",
+    "vue-loader": "^11.0.0",
+    "vue-template-compiler": "^2.1.10",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.3.0"
   },
   "scripts": {
-    "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
+    "dev": "cross-env NODE_ENV=development webpack --watch",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+  },
+  "dependencies": {
+    "vue": "^2.1.10"
   }
 }
