@@ -321,6 +321,9 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 
 omegaup.arena.Arena.prototype.setupPolls = function() {
   var self = this;
+  if (!self.options.contestAlias) {
+    return;
+  }
 
   omegaup.API.getRanking(self.options.contestAlias,
                          self.rankingChange.bind(self));
@@ -373,6 +376,7 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
           if (t.getTime() < y.getTime()) {
             setTimeout(f, 1000);
           } else {
+            // TODO(pablo): Implement this for more than just contests.
             omegaup.API.getContest(x, contestLoaded);
           }
         }
@@ -388,6 +392,10 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
       omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
     window.location = window.location.pathname.replace(/\/practice.*/, '/');
     return;
+  }
+
+  if (contest.hasOwnProperty('problemset_id')) {
+    self.options.problemsetId = contest.problemset_id;
   }
 
   $('#title .contest-title').html(omegaup.UI.escape(contest.title));
@@ -1012,8 +1020,10 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
     if (problem.problem_statement) {
       update(problem);
     } else {
-      omegaup.API.getProblem(
-          self.options.contestAlias, problem.alias, function(problem_ext) {
+      var problemset = self.computeProblemsetArg();
+      omegaup.API.Problem.details($.extend(problemset,
+                                           {problem_alias: problem.alias}))
+          .then(function(problem_ext) {
             problem.source = problem_ext.source;
             problem.problemsetter = problem_ext.problemsetter;
             problem.problem_statement = problem_ext.problem_statement;
@@ -1139,13 +1149,7 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
     file = file.files[0];
     var reader = new FileReader();
 
-    reader.onload = function(e) {
-      self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
-                         '' :
-                         self.options.contestAlias,
-                     self.currentProblem.alias, langSelect.val(),
-                     e.target.result);
-    };
+    reader.onload = function(e) { self.submitRun(e.target.result); };
 
     var extension = file.name.split(/\./);
     extension = extension[extension.length - 1];
@@ -1176,50 +1180,64 @@ omegaup.arena.Arena.prototype.onSubmit = function(e) {
   var code = submitForm.code.val();
   if (!code) return false;
 
-  self.submitRun((self.options.isPractice || self.options.isOnlyProblem) ?
-                     '' :
-                     self.options.contestAlias,
-                 self.currentProblem.alias, langSelect.val(), code);
+  self.submitRun(code);
 
   return false;
 };
 
-omegaup.arena.Arena.prototype.submitRun = function(contestAlias, problemAlias,
-                                                   lang, code) {
+omegaup.arena.Arena.prototype.computeProblemsetArg = function() {
   var self = this;
+  if (self.options.isPractice || self.options.isOnlyProblem) {
+    return {};
+  }
+  if (self.options.contestAlias) {
+    return {contest_alias: self.options.contestAlias};
+  }
+  return {problemset_id: self.options.problemsetId};
+};
+
+omegaup.arena.Arena.prototype.submitRun = function(code) {
+  var self = this;
+  var problemset = self.computeProblemsetArg();
+  var lang = self.elements.submitForm.language.val();
+
   $('input', self.elements.submitForm).attr('disabled', 'disabled');
-  omegaup.API.submit(contestAlias, problemAlias, lang, code, function(run) {
-    if (run.status != 'ok') {
-      alert(run.error);
-      $('input', self.elements.submitForm).removeAttr('disabled');
-      return;
-    }
+  omegaup.API.Run.create($.extend(problemset,
+                                  {
+                                    problem_alias: self.currentProblem.alias,
+                                    language: lang,
+                                    source: code
+                                  }))
+      .then(function(run) {
+        if (self.options.isLockdownMode && sessionStorage) {
+          sessionStorage.setItem('run:' + run.guid, code);
+        }
 
-    if (self.options.isLockdownMode && sessionStorage) {
-      sessionStorage.setItem('run:' + run.guid, code);
-    }
+        if (!self.options.isOnlyProblem) {
+          self.problems[self.currentProblem.alias].last_submission =
+              omegaup.OmegaUp.time().getTime();
+        }
 
-    if (!self.options.isOnlyProblem) {
-      self.problems[self.currentProblem.alias].last_submission =
-          omegaup.OmegaUp.time().getTime();
-    }
+        run.username = omegaup.OmegaUp.username;
+        run.status = 'new';
+        run.alias = self.currentProblem.alias;
+        run.contest_score = null;
+        run.time = omegaup.OmegaUp.time();
+        run.penalty = 0;
+        run.runtime = 0;
+        run.memory = 0;
+        run.language = lang;
+        self.updateRun(run);
 
-    run.username = omegaup.OmegaUp.username;
-    run.status = 'new';
-    run.alias = self.currentProblem.alias;
-    run.contest_score = null;
-    run.time = omegaup.OmegaUp.time();
-    run.penalty = 0;
-    run.runtime = 0;
-    run.memory = 0;
-    run.language = self.elements.submitForm.language.val();
-    self.updateRun(run);
-
-    $('input', self.elements.submitForm).removeAttr('disabled');
-    self.elements.submitForm.code.val('');
-    self.hideOverlay();
-    self.clearInputFile();
-  });
+        $('input', self.elements.submitForm).removeAttr('disabled');
+        self.elements.submitForm.code.val('');
+        self.hideOverlay();
+        self.clearInputFile();
+      })
+      .fail(function(run) {
+        alert(run.error);
+        $('input', self.elements.submitForm).removeAttr('disabled');
+      });
 };
 
 omegaup.arena.Arena.prototype.updateSummary = function(contest) {

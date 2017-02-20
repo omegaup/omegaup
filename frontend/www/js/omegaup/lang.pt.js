@@ -247,6 +247,7 @@ omegaup.T = {
 	groupNewFormUpdateGroup: "Salvar alterações",
 	groupNewFormWeight: "Peso do pontuação",
 	groupsCreateNew: "Novo grupo",
+	incompatibleArgs: "Argumentos não podem ser definidos simultaneamente",
 	index: "Coder do mês",
 	interviewCreateNew: "Criar uma nova entrevsita",
 	interviewCreatedSuccess: "A entrevista foi criado com sucesso",

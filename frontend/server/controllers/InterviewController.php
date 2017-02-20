@@ -24,7 +24,6 @@ class InterviewController extends Controller {
 
         self::validateCreateOrUpdate($r, false);
 
-        $problemset = new Problemsets();
         $acl = new ACLs([
             'owner_id' => $r['current_user']->user_id,
         ]);
@@ -40,6 +39,10 @@ class InterviewController extends Controller {
 
             ACLsDAO::save($acl);
             $interview->acl_id = $acl->acl_id;
+
+            $problemset = new Problemsets([
+                'acl_id' => $acl->acl_id
+            ]);
             ProblemsetsDAO::save($problemset);
             $interview->problemset_id = $problemset->problemset_id;
             InterviewsDAO::save($interview);
@@ -202,6 +205,7 @@ class InterviewController extends Controller {
 
         $thisResult['description'] = $interview->description;
         $thisResult['contest_alias'] = $interview->alias;
+        $thisResult['problemset_id'] = $interview->problemset_id;
 
         try {
             $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers([

@@ -77,12 +77,47 @@ class RunController extends Controller {
             );
             Validators::isStringNonEmpty($r['source'], 'source');
 
-            // Check for practice or public problem, there is no contest info in this scenario
-            if ($r['contest_alias'] == '') {
-                if (Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
-                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id) ||
-                      $r['problem']->public == true) {
+            // Can't set both problemset_id and contest_alias at the same time.
+            if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
+                throw new InvalidParameterException(
+                    'incompatibleArgs',
+                    'problemset_id and contest_alias'
+                );
+            }
+
+            $problemset_id = null;
+            if (!empty($r['problemset_id'])) {
+                // Got a problemset id directly.
+                $problemset_id = intval($r['problemset_id']);
+                $r['container'] = ProblemsetsDAO::getProblemsetContainer($problemset_id);
+            } elseif (!empty($r['contest_alias'])) {
+                // Got a contest alias, need to fetch the problemset id.
+                // Validate contest
+                Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+
+                if ($r['contest'] == null) {
+                    throw new InvalidParameterException('parameterNotFound', 'contest_alias');
+                }
+
+                $problemset_id = $r['contest']->problemset_id;
+                $r['container'] = $r['contest'];
+
+                // Update list of valid languages.
+                if ($r['contest']->languages !== null) {
+                    $allowedLanguages = array_intersect(
+                        $allowedLanguages,
+                        explode(',', $r['contest']->languages)
+                    );
+                }
+            } else {
+                // Check for practice or public problem, there is no contest info
+                // in this scenario.
+                if ($r['problem']->public == true ||
+                      Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
+                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
+                        null,
                         null,
                         $r['problem']->problem_id,
                         $r['current_user_id']
@@ -98,58 +133,54 @@ class RunController extends Controller {
                 }
             }
 
-            // Validate contest
-            Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-
-            if ($r['contest'] == null) {
-                throw new InvalidParameterException('parameterNotFound', 'contest_alias');
+            $r['problemset'] = ProblemsetsDAO::getByPK($problemset_id);
+            if ($r['problemset'] == null) {
+                throw new InvalidParameterException('parameterNotFound', 'problemset_id');
             }
 
-            if ($r['contest']->languages !== null) {
+            // Validate the language.
+            if ($r['problemset']->languages !== null) {
                 $allowedLanguages = array_intersect(
                     $allowedLanguages,
-                    explode(',', $r['contest']->languages)
-                );
-                Validators::isInEnum(
-                    $r['language'],
-                    'language',
-                    $allowedLanguages
+                    explode(',', $r['problemset']->languages)
                 );
             }
+            Validators::isInEnum(
+                $r['language'],
+                'language',
+                $allowedLanguages
+            );
 
-            // Validate that the combination contest_id problem_id is valid
+            // Validate that the combination problemset_id problem_id is valid
             if (!ProblemsetProblemsDAO::getByPK(
-                $r['contest']->problemset_id,
+                $problemset_id,
                 $r['problem']->problem_id
             )) {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
             }
 
+            // No one should submit after the deadline. Not even admins.
+            if (ProblemsetsDAO::isLateSubmission($r['container'])) {
+                throw new NotAllowedToSubmitException('runNotInsideContest');
+            }
+
             // Contest admins can skip following checks
-            if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
-                // Before submit something, contestant had to open the problem/contest
-                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id)) {
+            if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
+                // Before submit something, user had to open the problem/problemset.
+                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id) &&
+                    !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ContestsDAO::isInsideContest($r['contest'], $r['current_user_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_user_id'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
-                }
-
-                // Validate if contest is private then the user should be registered
-                if ($r['contest']->public == 0
-                        && is_null(ProblemsetUsersDAO::getByPK(
-                            $r['current_user_id'],
-                            $r['contest']->problemset_id
-                        ))) {
-                    throw new NotAllowedToSubmitException('runNotRegistered');
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
                 if (!RunsDAO::IsRunInsideSubmissionGap(
-                    $r['contest']->problemset_id,
+                    $problemset_id,
+                    isset($r['contest']) ? $r['contest'] : null,
                     $r['problem']->problem_id,
                     $r['current_user_id']
                 )) {
@@ -196,43 +227,47 @@ class RunController extends Controller {
             $test = 0;
         } else {
             //check the kind of penalty_type for this contest
-            $penalty_type = $r['contest']->penalty_type;
+            $start = null;
+            $problemset_id = $r['problemset']->problemset_id;
+            if (isset($r['contest'])) {
+                $penalty_type = $r['contest']->penalty_type;
 
-            switch ($penalty_type) {
-                case 'contest_start':
-                    // submit_delay is calculated from the start
-                    // of the contest
-                    $start = $r['contest']->start_time;
-                    break;
+                switch ($penalty_type) {
+                    case 'contest_start':
+                        // submit_delay is calculated from the start
+                        // of the contest
+                        $start = $r['contest']->start_time;
+                        break;
 
-                case 'problem_open':
-                    // submit delay is calculated from the
-                    // time the user opened the problem
-                    $opened = ProblemsetProblemOpenedDAO::getByPK(
-                        $r['contest']->problemset_id,
-                        $r['problem']->problem_id,
-                        $r['current_user_id']
-                    );
+                    case 'problem_open':
+                        // submit delay is calculated from the
+                        // time the user opened the problem
+                        $opened = ProblemsetProblemOpenedDAO::getByPK(
+                            $problemset_id,
+                            $r['problem']->problem_id,
+                            $r['current_user_id']
+                        );
 
-                    if (is_null($opened)) {
-                        //holy moly, he is submitting a run
-                        //and he hasnt even opened the problem
-                        //what should be done here?
-                        throw new NotAllowedToSubmitException('runEvenOpened');
-                    }
+                        if (is_null($opened)) {
+                            //holy moly, he is submitting a run
+                            //and he hasnt even opened the problem
+                            //what should be done here?
+                            throw new NotAllowedToSubmitException('runEvenOpened');
+                        }
 
-                    $start = $opened->open_time;
-                    break;
+                        $start = $opened->open_time;
+                        break;
 
-                case 'none':
-                case 'runtime':
-                    //we dont care
-                    $start = null;
-                    break;
+                    case 'none':
+                    case 'runtime':
+                        //we dont care
+                        $start = null;
+                        break;
 
-                default:
-                    self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
-                    $start = null;
+                    default:
+                        self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
+                        $start = null;
+                }
             }
 
             if (!is_null($start)) {
@@ -246,8 +281,7 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $problemset_id = $r['contest']->problemset_id;
-            $test = Authorization::isContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
+            $test = Authorization::isAdmin($r['current_user_id'], $r['problemset']) ? 1 : 0;
         }
 
         // Populate new run object
@@ -308,12 +342,18 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id);
+                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id);
 
-                if ($r['contest']->window_length === null) {
-                    $response['submission_deadline'] = strtotime($r['contest']->finish_time);
-                } else {
-                    $response['submission_deadline'] = min(strtotime($r['contest']->finish_time), strtotime($contest_user->access_time) + $r['contest']->window_length * 60);
+                if (isset($r['container']->finish_time)) {
+                    $response['submission_deadline'] = strtotime($r['container']->finish_time);
+                    if (isset($r['container']->window_length)) {
+                        $response['submission_deadline'] = min(
+                            strtotime($r['container']->finish_time),
+                            strtotime($contest_user->access_time) + $r['container']->window_length * 60
+                        );
+                    }
+                } elseif (isset($r['container']->window_length)) {
+                    $response['submission_deadline'] = strtotime($contest_user->access_time) + $r['container']->window_length * 60;
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer

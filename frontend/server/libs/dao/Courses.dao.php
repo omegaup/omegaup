@@ -58,7 +58,6 @@ class CoursesDAO extends CoursesDAOBase {
         foreach ($rs as $row) {
             unset($row['assignment_id']);
             unset($row['course_id']);
-            unset($row['problemset_id']);
             $row['start_time'] =  strtotime($row['start_time']);
             $row['finish_time'] = strtotime($row['finish_time']);
             array_push($ar, $row);
@@ -89,38 +88,35 @@ class CoursesDAO extends CoursesDAOBase {
 
     /**
      * Returns a list of students within a course
-     * @param  string $courseAlias
-     * @param  int $courseId
-     * @return Array              Students data
+     * @param  int $course_id
+     * @param  int $group_id
+     * @return Array Students data
      */
-    public static function getStudentsForCourseWithProgress($courseAlias, $courseId) {
+    public static function getStudentsForCourseWithProgress($course_id, $group_id) {
         global  $conn;
 
-        $sql = 'SELECT u.username, u.name, u.country_id
+        $sql = 'SELECT u.username, u.name, pr.assignment_id, pr.problem_id, pr.best_score
                 FROM Groups g
                 INNER JOIN Groups_Users gu
-                ON g.alias = ? AND g.group_id = gu.group_id
+                ON g.group_id = ? AND g.group_id = gu.group_id
                 INNER JOIN Users u
                 ON u.user_id = gu.user_id
-               ';
-
-                /*
-                @TODO: Jalar el progreso del estudiante con esta hermosa consulta y pasar $courseId como parametro.
-                        Runs necesita soportar Problemsets.
-                INNER JOIN (
-                    SELECT a.assignment_id, a.name, p.problem_id, p.alias, p.name, max(r.score) as best_score
-                    FROM Courses c
-                    INNER JOIN Assignments a ON c.course_id = ? AND c.course_id = a.course_id
-                    INNER JOIN Problemsets ps ON a.problemset_id = ps.problemset_id
-                    INNER JOIN Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
-                    INNER JOIN Problems p ON p.problem_id = psp.problemset_id
-                    INNER JOIN Runs r ON r.problem_id = p.problem_id AND r.contest_id (!!!)
-                    GROUP BY a.assignment_id, a.name, p.problem_id, p.alias, p.name
+                LEFT JOIN (
+                    SELECT a.assignment_id, a.name, psp.problem_id, r.user_id, max(r.score) as best_score
+                    FROM Assignments a
+                    INNER JOIN Problemsets ps
+                        ON a.problemset_id = ps.problemset_id
+                    INNER JOIN Problemset_Problems psp
+                        ON psp.problemset_id = ps.problemset_id
+                    INNER JOIN Runs r
+                        ON r.problem_id = psp.problem_id
+                        AND r.problemset_id = a.problemset_id
+                    WHERE a.course_id = ?
+                    GROUP BY a.assignment_id, a.name, psp.problem_id, r.user_id
                 ) pr
-                ON pr.user_id = u.user_id
-                */
+                ON pr.user_id = u.user_id';
 
-        $rs = $conn->Execute($sql, $courseAlias);
+        $rs = $conn->Execute($sql, [$group_id, $course_id]);
         $users = [];
         foreach ($rs as $row) {
             /* @TODO: Remover count_homeworks_done, count_assignments_done y sacarlos del query anterior */

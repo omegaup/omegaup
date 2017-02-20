@@ -62,7 +62,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
@@ -86,7 +86,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $this->assertEquals(false, $response['is_admin']);
         $this->assertEquals(1, count($response['assignments']));
         $this->assertEquals(
-            $assignmentAlias,
+            $courseData['assignment_alias'],
             $response['assignments'][0]['alias']
         );
     }
@@ -131,7 +131,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
@@ -144,7 +144,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $response = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
-            'assignment' => $assignmentAlias,
+            'assignment' => $courseData['assignment_alias'],
         ]));
         $this->assertEquals('ok', $response['status']);
 
@@ -153,7 +153,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             $response = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
-            'assignment' => $courseData['assignment_alias'],
+            'assignment' => $assignmentAlias,
             ]));
             $this->fail('Exception was expected.');
         } catch (ForbiddenAccessException $e) {

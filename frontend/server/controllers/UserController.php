@@ -1294,7 +1294,7 @@ class UserController extends Controller {
         $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
         $response['name_or_username'] = is_null($user->name) ? $user->username : $user->name;
         $response['opened_interview'] = $openedProblemset;
-        $response['finished'] = !ContestsDAO::isInsideContest($contest, $user->user_id);
+        $response['finished'] = !ProblemsetsDAO::insideSubmissionWindow($contest, $user->user_id);
         $response['status'] = 'ok';
         return $response;
     }

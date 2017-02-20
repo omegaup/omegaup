@@ -8,9 +8,12 @@ omegaup.internal =
         (global.omegaup.internal = global.omegaup.internal || {});
 
 omegaup.internal.API = {
-  _call: function(url, transform) {
+  _call: function(url, transform, defaults) {
     return function(params) {
       var dfd = $.Deferred();
+      if (defaults) {
+        params = $.extend({}, defaults, params);
+      }
       $.ajax({
          url: url,
          method: params ? 'POST' : 'GET',
@@ -177,7 +180,7 @@ omegaup.API = {
         omegaup.internal.API._call('/api/course/createAssignment/'),
 
     getAssignment: omegaup.internal.API._call(
-        '/api/course/getAssignment', omegaup.internal.API._convertTimes),
+        '/api/course/assignmentDetails', omegaup.internal.API._convertTimes),
 
     listAssignments: omegaup.internal.API._call('/api/course/listAssignments/'),
 
@@ -282,6 +285,10 @@ omegaup.API = {
 
     admins: omegaup.internal.API._call('/api/problem/admins/'),
 
+    details: omegaup.internal.API._call('/api/problem/details/',
+                                        omegaup.internal.API._convertRuntimes,
+                                        {statement_type: 'html'}),
+
     list: omegaup.internal.API._call('/api/problem/list/'),
 
     myList: omegaup.internal.API._call('/api/problem/mylist/'),
@@ -303,6 +310,8 @@ omegaup.API = {
 
   Run: {
     counts: omegaup.internal.API._call('/api/run/counts/'),
+
+    create: omegaup.internal.API._call('/api/run/create/'),
 
     details: omegaup.internal.API._call('/api/run/details/'),
   },
@@ -580,35 +589,6 @@ omegaup.API = {
         });
   },
 
-  getProblem: function(contestAlias, problemAlias, callback, statement_type,
-                       show_solvers, language) {
-    if (statement_type === undefined) {
-      statement_type = 'html';
-    }
-    var params = {statement_type: statement_type, show_solvers: !!show_solvers};
-    if (language) {
-      params.lang = language;
-    }
-    $.post(contestAlias === null ?
-               '/api/problem/details/problem_alias/' +
-                   encodeURIComponent(problemAlias) + '/' :
-               '/api/problem/details/contest_alias/' +
-                   encodeURIComponent(contestAlias) + '/problem_alias/' +
-                   encodeURIComponent(problemAlias) + '/',
-           params,
-           function(problem) {
-             omegaup.internal.API._convertRuntimes(problem);
-             callback(problem);
-           },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
   getProblemClarifications: function(problemAlias, offset, rowcount, callback) {
     $.get('/api/problem/clarifications/problem_alias/' +
               encodeURIComponent(problemAlias) + '/offset/' + offset +
@@ -681,24 +661,6 @@ omegaup.API = {
              callback(data);
            },
            'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  submit: function(contestAlias, problemAlias, language, code, callback) {
-    $.post('/api/run/create/',
-           {
-             contest_alias: contestAlias,
-             problem_alias: problemAlias,
-             language: language,
-             source: code
-           },
-           function(data) { callback(data); }, 'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));

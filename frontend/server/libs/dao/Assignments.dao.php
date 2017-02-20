@@ -40,6 +40,25 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         return $counts;
     }
 
+    public static function getAssignmentForProblemset($problemset_id) {
+        if (is_null($problemset_id)) {
+            return null;
+        }
+
+        try {
+            $assignments = self::search(new Assignments([
+                'problemset_id' => $problemset_id,
+            ]));
+            if (count($assignments) === 1) {
+                return $assignments[0];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return null;
+    }
+
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
         $params = [$alias];

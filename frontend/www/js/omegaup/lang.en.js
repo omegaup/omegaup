@@ -247,6 +247,7 @@ omegaup.T = {
 	groupNewFormUpdateGroup: "Save group",
 	groupNewFormWeight: "Score weight",
 	groupsCreateNew: "New group",
+	incompatibleArgs: "Arguments can't be set simultaneously",
 	index: "Coder of the month",
 	interviewCreateNew: "Create a new interview",
 	interviewCreatedSuccess: "Interview created",
