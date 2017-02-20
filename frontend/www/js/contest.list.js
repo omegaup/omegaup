@@ -10,8 +10,8 @@
 
   function fillContestsTable() {
     var deferred = $('#show-admin-contests').prop('checked') ?
-                       omegaup.API.getAdminContests() :
-                       omegaup.API.getMyContests();
+                       omegaup.API.Contest.adminList() :
+                       omegaup.API.Contest.myList();
     deferred.then(function(result) {
       // Got the contests, lets draw them
 
@@ -76,7 +76,7 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest({contest_alias: alias, public: 1})
+              omegaup.API.Contest.update({contest_alias: alias, public: 1})
                   .then(handleResponseCallback);
             },
             function() { fillContestsTable(); });
@@ -86,7 +86,7 @@
       .click(function() {
         omegaup.UI.bulkOperation(
             function(alias, handleResponseCallback) {
-              omegaup.API.updateContest({contest_alias: alias, public: 0})
+              omegaup.API.Contest.update({contest_alias: alias, public: 0})
                   .then(handleResponseCallback);
             },
             function() { fillContestsTable(); });

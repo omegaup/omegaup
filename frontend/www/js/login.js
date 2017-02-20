@@ -15,18 +15,19 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-    omegaup.API.createUser({
-                 email: $('#reg_email').val(),
-                 username: $('#reg_username').val(),
-                 password: $('#reg_pass').val(),
-                 recaptcha: grecaptcha.getResponse()
-               })
+    omegaup.API.User.create({
+                      email: $('#reg_email').val(),
+                      username: $('#reg_username').val(),
+                      password: $('#reg_pass').val(),
+                      recaptcha: grecaptcha.getResponse()
+                    })
         .then(function(data) {
           // registration callback
           $('#user').val($('#reg_email').val());
           $('#pass').val($('#reg_pass').val());
           $('#login_form').submit();
-        });
+        })
+        .fail(omegaup.UI.apiError);
     return false;  // Prevent form submission
   }
 
@@ -41,7 +42,7 @@ function signInCallback(authResult) {
     gapi.auth.signOut();
     logmeoutOnce = false;
   } else if (authResult['code']) {
-    omegaup.API.googleLogin({storeToken: authResult['code']})
+    omegaup.API.Session.googleLogin({storeToken: authResult['code']})
         .then(function(data) { window.location.reload(); });
   } else if (authResult['error']) {
     // Esto se hace en cada refresh a la pagina de login.

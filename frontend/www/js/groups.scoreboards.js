@@ -8,7 +8,7 @@ $(function() {
   var groupAlias = formData.attr('data-group-alias');
 
   if (formPage === 'edit') {
-    omegaup.API.getContests()
+    omegaup.API.Contest.list()
         .then(function(contests) {
           for (var i = 0; i < contests.results.length; i++) {
             contest = contests.results[i];
@@ -22,13 +22,13 @@ $(function() {
 
     $('#scoreboard-add-contest-form')
         .submit(function() {
-          omegaup.API.addContestToScoreboard({
-                       group_alias: groupAlias,
-                       scoreboard_alias: scoreboardAlias,
-                       contest_alias: $('#contests').val(),
-                       only_ac: $('#only-ac').val(),
-                       weight: $('#weight').val(),
-                     })
+          omegaup.API.GroupScoreboard.addContest({
+                                       group_alias: groupAlias,
+                                       scoreboard_alias: scoreboardAlias,
+                                       contest_alias: $('#contests').val(),
+                                       only_ac: $('#only-ac').val(),
+                                       weight: $('#weight').val(),
+                                     })
               .then(function(data) {
                 omegaup.UI.success('Contest successfully added!');
                 refreshScoreboardContests();
@@ -41,10 +41,10 @@ $(function() {
     refreshScoreboardContests();
 
     function refreshScoreboardContests() {
-      omegaup.API.getGroupScoreboard({
-                   group_alias: groupAlias,
-                   scoreboard_alias: scoreboardAlias,
-                 })
+      omegaup.API.GroupScoreboard.details({
+                                   group_alias: groupAlias,
+                                   scoreboard_alias: scoreboardAlias,
+                                 })
           .then(function(gScoreboard) {
             $('#scoreboard-contests').empty();
 
@@ -65,38 +65,38 @@ $(function() {
                                                   omegaup.T.wordsYes :
                                                   omegaup.T.wordsNo))
                           .append($('<td></td>').append(contest.weight))
-                          .append(
-                              $('<td><button type="button" class="close">' +
-                                '&times;</button></td>')
-                                  .click((function(contestAlias) {
-                                    return function(e) {
-                                      omegaup.API.removeContestFromScoreboard({
-                                                   group_alias: groupAlias,
-                                                   scoreboard_alias:
-                                                       scoreboardAlias,
-                                                   contest_alias: contestAlias,
-                                                 })
-                                          .then(function(response) {
-                                            omegaup.UI.success(
-                                                'Contest successfully ' +
-                                                'removed!');
+                          .append($('<td><button type="button" class="close">' +
+                                    '&times;</button></td>')
+                                      .click((function(contestAlias) {
+                                        return function(e) {
+                                          omegaup.API.GroupScoreboard
+                                              .removeContest({
+                                                group_alias: groupAlias,
+                                                scoreboard_alias:
+                                                    scoreboardAlias,
+                                                contest_alias: contestAlias,
+                                              })
+                                              .then(function(response) {
+                                                omegaup.UI.success(
+                                                    'Contest successfully ' +
+                                                    'removed!');
 
-                                            var tr = e.target.parentElement
-                                                         .parentElement;
-                                            $(tr).remove();
-                                          })
-                                          .fail(omegaup.UI.apiError);
-                                    };
-                                  })(contest.alias))));
+                                                var tr = e.target.parentElement
+                                                             .parentElement;
+                                                $(tr).remove();
+                                              })
+                                              .fail(omegaup.UI.apiError);
+                                        };
+                                      })(contest.alias))));
             }
           })
           .fail(omegaup.UI.apiError);
     }
   } else if (formPage === 'details') {
-    omegaup.API.getGroupScoreboard({
-                 group_alias: groupAlias,
-                 scoreboard_alias: scoreboardAlias,
-               })
+    omegaup.API.GroupScoreboard.details({
+                                 group_alias: groupAlias,
+                                 scoreboard_alias: scoreboardAlias,
+                               })
         .then(function(scoreboard) {
           var ranking = scoreboard['ranking'];
           $('#scoreboard-title').html(scoreboard.scoreboard.name);

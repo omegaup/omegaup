@@ -36,7 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
   switch (formName) {
     case 'problems':
       existsFn = function(alias) {
-        omegaup.API.getProblem({problem_alias: alias})
+        omegaup.API.Problem.details({problem_alias: alias})
             .then(onAliasExists)
             .fail(onAliasNew);
       };
@@ -44,7 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     case 'groups':
       existsFn = function(alias) {
-        omegaup.API.getGroup({group_alias: alias})
+        omegaup.API.Group.details({group_alias: alias})
             .then(onAliasExists)
             .fail(onAliasNew);
       };

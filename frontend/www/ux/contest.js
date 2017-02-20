@@ -35,7 +35,7 @@ omegaup.OmegaUp.on('ready', function() {
     arena.updateAllowedLanguages(language_array);
 
     if (problem.user.logged_in) {
-      omegaup.API.getProblemRuns({problem_alias: problem.alias})
+      omegaup.API.Problem.runs({problem_alias: problem.alias})
           .then(function(data) {
             onlyProblemUpdateRuns(data.runs, 'score', 100);
           });

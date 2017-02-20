@@ -48,7 +48,7 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent page refresh on submit
       });
 
-  omegaup.API.getContestAdminDetails({contest_alias: contestAlias})
+  omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
             .html(omegaup.T['interviewEdit'] + ' ' + contest.title);
@@ -89,12 +89,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-problem-form')
       .submit(function() {
-        omegaup.API.addProblemToContest({
-                     contest_alias: interviewAlias,
-                     order_in_contest: $('input#order').val(),
-                     problem_alias: $('input#problems-dropdown').val(),
-                     points: $('input#points').val(),
-                   })
+        omegaup.API.Contest.addProblem({
+                             contest_alias: interviewAlias,
+                             order_in_contest: $('input#order').val(),
+                             problem_alias: $('input#problems-dropdown').val(),
+                             points: $('input#points').val(),
+                           })
             .then(function(response) {
               omegaup.UI.success('Problem successfully added!');
               $('div.post.footer').show();
@@ -105,7 +105,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function refreshContestProblems() {
-    omegaup.API.contestProblems({contest_alias: interviewAlias})
+    omegaup.API.Contest.problems({contest_alias: interviewAlias})
         .then(function(response) {
           var problems = $('#contest-problems-table');
           problems.empty();
@@ -128,10 +128,11 @@ omegaup.OmegaUp.on('ready', function() {
                           '&times;</button></td>')
                             .click((function(problem) {
                               return function(e) {
-                                omegaup.API.removeProblemFromContest({
-                                             contest_alias: interviewAlias,
-                                             problem_alias: problem
-                                           })
+                                omegaup.API.Contest.removeProblem({
+                                                     contest_alias:
+                                                         interviewAlias,
+                                                     problem_alias: problem
+                                                   })
                                     .then(function(response) {
                                       omegaup.UI.success(
                                           'Problem successfully removed!');
@@ -145,7 +146,7 @@ omegaup.OmegaUp.on('ready', function() {
         });
   }
 
-  omegaup.API.getProblems().then(function(problems) {
+  omegaup.API.Problem.list().then(function(problems) {
     // Got the problems, lets populate the dropdown with them
     for (var i = 0; i < problems.results.length; i++) {
       problem = problems.results[i];
@@ -165,10 +166,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-admin-form')
       .submit(function() {
-        omegaup.API.addAdminToContest({
-                     contest_alias: interviewAlias,
-                     usernameOrEmail: $('#username-admin').val(),
-                   })
+        omegaup.API.Contest.addAdmin({
+                             contest_alias: interviewAlias,
+                             usernameOrEmail: $('#username-admin').val(),
+                           })
             .then(function(response) {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
@@ -181,7 +182,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Add admin
   function refreshContestAdmins() {
-    omegaup.API.getContestAdmins({contest_alias: interviewAlias})
+    omegaup.API.Contest.admins({contest_alias: interviewAlias})
         .then(function(admins) {
           $('#contest-admins').empty();
           // Got the contests, lets populate the dropdown with them
@@ -204,11 +205,12 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(username) {
                                       return function(e) {
-                                        omegaup.API.removeAdminFromContest({
-                                                     contest_alias:
-                                                         interviewAlias,
-                                                     usernameOrEmail: username,
-                                                   })
+                                        omegaup.API.Contest.removeAdmin({
+                                                             contest_alias:
+                                                                 interviewAlias,
+                                                             usernameOrEmail:
+                                                                 username,
+                                                           })
                                             .then(function(response) {
                                               omegaup.UI.success(
                                                   omegaup.T.adminRemoved);
@@ -241,12 +243,11 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.removeGroupAdminFromContest(
-                                                       {
-                                                         contest_alias:
-                                                             interviewAlias,
-                                                         group: alias,
-                                                       })
+                                        omegaup.API.Contest.removeGroupAdmin({
+                                                             contest_alias:
+                                                                 interviewAlias,
+                                                             group: alias,
+                                                           })
                                             .then(function(response) {
                                               omegaup.UI.success(
                                                   omegaup.T.adminRemoved);
@@ -262,10 +263,10 @@ omegaup.OmegaUp.on('ready', function() {
   }
   $('#add-group-admin-form')
       .submit(function() {
-        omegaup.API.addGroupAdminToContest({
-                     contest_alias: interviewAlias,
-                     group: $('#groupalias-admin').val(),
-                   })
+        omegaup.API.Contest.addGroupAdmin({
+                             contest_alias: interviewAlias,
+                             group: $('#groupalias-admin').val(),
+                           })
             .then(function(response) {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();

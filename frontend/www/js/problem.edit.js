@@ -43,10 +43,10 @@ omegaup.OmegaUp.on('ready', function() {
       .submit(function() {
         var username = $('#username-admin').val();
 
-        omegaup.API.addAdminToProblem({
-                     problem_alias: problemAlias,
-                     usernameOrEmail: username,
-                   })
+        omegaup.API.Problem.addAdmin({
+                             problem_alias: problemAlias,
+                             usernameOrEmail: username,
+                           })
             .then(function(response) {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
@@ -59,10 +59,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-group-admin-form')
       .submit(function() {
-        omegaup.API.addGroupAdminToProblem({
-                     problem_alias: problemAlias,
-                     group: $('#groupalias-admin').attr('data-alias'),
-                   })
+        omegaup.API.Problem.addGroupAdmin({
+                             problem_alias: problemAlias,
+                             group: $('#groupalias-admin').attr('data-alias'),
+                           })
             .then(function(response) {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
@@ -92,7 +92,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function refreshProblemAdmins() {
-    omegaup.API.getProblemAdmins({problem_alias: problemAlias})
+    omegaup.API.Problem.admins({problem_alias: problemAlias})
         .then(function(admins) {
           $('#problem-admins').empty();
           // Got the contests, lets populate the dropdown with them
@@ -115,11 +115,12 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(username) {
                                       return function(e) {
-                                        omegaup.API.removeAdminFromProblem({
-                                                     problem_alias:
-                                                         problemAlias,
-                                                     usernameOrEmail: username,
-                                                   })
+                                        omegaup.API.Problem.removeAdmin({
+                                                             problem_alias:
+                                                                 problemAlias,
+                                                             usernameOrEmail:
+                                                                 username,
+                                                           })
                                             .then(function(response) {
                                               omegaup.UI.success(
                                                   omegaup.T.adminRemoved);
@@ -154,12 +155,11 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.removeGroupAdminFromProblem(
-                                                       {
-                                                         problem_alias:
-                                                             problemAlias,
-                                                         group: alias,
-                                                       })
+                                        omegaup.API.Problem.removeGroupAdmin({
+                                                             problem_alias:
+                                                                 problemAlias,
+                                                             group: alias,
+                                                           })
                                             .then(function(response) {
                                               omegaup.UI.success(
                                                   omegaup.T.adminRemoved);
@@ -181,10 +181,10 @@ omegaup.OmegaUp.on('ready', function() {
         var tagname = $('#tag-name').val();
         var public = $('#tag-public').val();
 
-        omegaup.API.addTagToProblem({
-                     problem_alias: problemAlias,
-                     name: tagname, public: public,
-                   })
+        omegaup.API.Problem.addTag({
+                             problem_alias: problemAlias,
+                             name: tagname, public: public,
+                           })
             .then(function(response) {
               omegaup.UI.success('Tag successfully added!');
               $('div.post.footer').show();
@@ -197,7 +197,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function refreshProblemTags() {
-    omegaup.API.getProblemTags({problem_alias: problemAlias})
+    omegaup.API.Problem.tags({problem_alias: problemAlias})
         .then(function(result) {
           $('#problem-tags').empty();
           // Got the contests, lets populate the dropdown with them
@@ -216,11 +216,11 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(tagname) {
                                       return function(e) {
-                                        omegaup.API.removeTagFromProblem({
-                                                     problem_alias:
-                                                         problemAlias,
-                                                     name: tagname,
-                                                   })
+                                        omegaup.API.Problem.removeTag({
+                                                             problem_alias:
+                                                                 problemAlias,
+                                                             name: tagname,
+                                                           })
                                             .then(function(response) {
                                               omegaup.UI.success(
                                                   'Tag successfully removed!');
@@ -255,8 +255,8 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
 
-    omegaup.API.getProblem(
-                   {problem_alias: problemAlias, statement_type: 'markdown'})
+    omegaup.API.Problem
+        .details({problem_alias: problemAlias, statement_type: 'markdown'})
         .then(problemCallback);
   }
 
@@ -310,12 +310,12 @@ omegaup.OmegaUp.on('ready', function() {
   $('#statement-language')
       .on('change', function(e) {
         chosenLanguage = $('#statement-language').val();
-        omegaup.API.getProblem({
-                     problem_alias: problemAlias,
-                     statement_type: 'markdown',
-                     show_solvers: false,
-                     lang: chosenLanguage
-                   })
+        omegaup.API.Problem.details({
+                             problem_alias: problemAlias,
+                             statement_type: 'markdown',
+                             show_solvers: false,
+                             lang: chosenLanguage
+                           })
             .then(problemCallback);
       });
 });

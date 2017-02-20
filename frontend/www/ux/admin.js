@@ -104,12 +104,12 @@ omegaup.OmegaUp.on('ready', function() {
         if (!$('#submit textarea[name="code"]').val()) return false;
 
         $('#submit input').attr('disabled', 'disabled');
-        omegaup.API.submit({
-                     contest_alias: arena.options.contestAlias,
-                     problem_alias: arena.currentProblem.alias,
-                     language: $('#submit select[name="language"]').val(),
-                     source: $('#submit textarea[name="code"]').val(),
-                   })
+        omegaup.API.Run.create({
+                         contest_alias: arena.options.contestAlias,
+                         problem_alias: arena.currentProblem.alias,
+                         language: $('#submit select[name="language"]').val(),
+                         source: $('#submit textarea[name="code"]').val(),
+                       })
             .then(function(run) {
               run.status = 'new';
               run.alias = arena.currentProblem.alias;

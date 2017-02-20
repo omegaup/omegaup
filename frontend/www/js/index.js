@@ -1,8 +1,8 @@
 (function() {
   function OnLoad() {
-    omegaup.API.getRunCounts().then(createChart);
+    omegaup.API.Run.counts().then(createChart);
 
-    omegaup.API.getContests({active: 'ACTIVE'})
+    omegaup.API.Contest.list({active: 'ACTIVE'})
         .then(function(data) {
           var list = data.results;
           var now = omegaup.OmegaUp.time();

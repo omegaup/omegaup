@@ -66,7 +66,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
     }
   };
   self.deferred =
-      omegaup.API.getContests(actualApiParams)
+      omegaup.API.Contest.list(actualApiParams)
           .then(function(data) {
             // Create contest view model from contest data model.
             data.results.each(function(contest) {

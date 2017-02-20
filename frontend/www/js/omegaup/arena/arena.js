@@ -1007,7 +1007,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       }
 
       if (self.options.isPractice || self.options.isOnlyProblem) {
-        omegaup.API.getProblemRuns({problem_alias: problem.alias})
+        omegaup.API.Problem.runs({problem_alias: problem.alias})
             .then(function(data) { updateRuns(data.runs); });
       } else {
         updateRuns(problem.runs);
@@ -1021,8 +1021,8 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       update(problem);
     } else {
       var problemset = self.computeProblemsetArg();
-      omegaup.API.getProblem(
-                     $.extend(problemset, {problem_alias: problem.alias}))
+      omegaup.API.Problem.details($.extend(problemset,
+                                           {problem_alias: problem.alias}))
           .then(function(problem_ext) {
             problem.source = problem_ext.source;
             problem.problemsetter = problem_ext.problemsetter;
@@ -1076,7 +1076,7 @@ omegaup.arena.Arena.prototype.detectShowRun = function() {
   if (showRunMatch) {
     $('#overlay form').hide();
     $('#overlay').show();
-    omegaup.API.getRunDetails({run_alias: showRunMatch[1]})
+    omegaup.API.Run.details({run_alias: showRunMatch[1]})
         .then(function(data) {
           self.displayRunDetails(showRunMatch[1], data);
         });
@@ -1202,12 +1202,12 @@ omegaup.arena.Arena.prototype.submitRun = function(code) {
   var lang = self.elements.submitForm.language.val();
 
   $('input', self.elements.submitForm).attr('disabled', 'disabled');
-  omegaup.API.submit($.extend(problemset,
-                              {
-                                problem_alias: self.currentProblem.alias,
-                                language: lang,
-                                source: code
-                              }))
+  omegaup.API.Run.create($.extend(problemset,
+                                  {
+                                    problem_alias: self.currentProblem.alias,
+                                    language: lang,
+                                    source: code
+                                  }))
       .then(function(run) {
         if (self.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem('run:' + run.guid, code);
@@ -1567,7 +1567,7 @@ omegaup.arena.RunView.prototype.attach = function(elm) {
           },
           {
             source: omegaup.UI.typeaheadWrapper(function(query, cb) {
-              omegaup.API.searchProblems({query: query})
+              omegaup.API.Problem.list({query: query})
                   .then(function(data) { cb(data.results); });
             }),
             displayKey: 'title',
