@@ -11,14 +11,14 @@ class Authorization {
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
+    // Allowed to submit to a problemset.
+    const CONTESTANT_ROLE = 2;
+
     // Interviewer.
     const INTERVIEWER_ROLE = 4;
 
     // System-level ACL.
     const SYSTEM_ACL = 1;
-
-    // Allowed to submit to a problemset.
-    const CONTESTANT_ROLE = 2;
 
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
