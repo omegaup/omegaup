@@ -828,6 +828,16 @@ class UserController extends Controller {
             $keys =  [
                 'OMIAGS' => 35
             ];
+        } elseif ($r['contest_type'] == 'OMIAGS-2017') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIAGS-2017' => 30
+            ];
         } elseif ($r['contest_type'] == 'OMIP-AGS') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
@@ -921,7 +931,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
                 ]
             );
         }

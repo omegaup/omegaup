@@ -75,16 +75,16 @@ script:
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn test)
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/i18n.py --validate
+          python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/whitespace-purge.py validate --all-files
+          python3 stuff/whitespace-purge.py validate --all-files < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/js-lint.py validate --all-files
+          python3 stuff/js-lint.py validate --all-files < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/php-format.py validate --all-files
+          python3 stuff/php-format.py validate --all-files < /dev/null
 
 notifications:
   slack:
