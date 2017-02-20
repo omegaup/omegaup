@@ -125,7 +125,7 @@ omegaup.API = {
 
   getAssignment: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/getAssignment',
+      url: '/api/course/assignmentDetails',
       method: 'POST',
       data: params,
       dataType: 'json',
@@ -788,34 +788,15 @@ omegaup.API = {
     return data;
   },
 
-  getProblem: function(contestAlias, problemAlias, callback, statement_type,
-                       show_solvers, language) {
-    if (statement_type === undefined) {
-      statement_type = 'html';
-    }
-    var params = {statement_type: statement_type, show_solvers: !!show_solvers};
-    if (language) {
-      params.lang = language;
-    }
-    $.post(contestAlias === null ?
-               '/api/problem/details/problem_alias/' +
-                   encodeURIComponent(problemAlias) + '/' :
-               '/api/problem/details/contest_alias/' +
-                   encodeURIComponent(contestAlias) + '/problem_alias/' +
-                   encodeURIComponent(problemAlias) + '/',
-           params,
-           function(problem) {
-             omegaup.API._convertRuntimes(problem);
-             callback(problem);
-           },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  getProblem: function(params, callback) {
+    params.statement_type = params.statement_type || 'html';
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/details/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }),
+                                     omegaup.API._convertRuntimes);
   },
 
   getGroupMembers: function(params) {
@@ -976,22 +957,13 @@ omegaup.API = {
         });
   },
 
-  submit: function(contestAlias, problemAlias, language, code, callback) {
-    $.post('/api/run/create/',
-           {
-             contest_alias: contestAlias,
-             problem_alias: problemAlias,
-             language: language,
-             source: code
-           },
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
+  submit: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/run/create/',
+      method: 'POST',
+      data: params,
+      dataType: 'json'
+    }));
   },
 
   runStatus: function(guid, callback) {

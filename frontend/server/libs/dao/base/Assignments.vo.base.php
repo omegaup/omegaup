@@ -35,6 +35,9 @@ class Assignments extends VO {
         if (isset($data['problemset_id'])) {
             $this->problemset_id = $data['problemset_id'];
         }
+        if (isset($data['acl_id'])) {
+            $this->acl_id = $data['acl_id'];
+        }
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
@@ -91,6 +94,13 @@ class Assignments extends VO {
       * @var int(11)
       */
     public $problemset_id;
+
+    /**
+      * La lista de control de acceso compartida con el curso
+      * @access public
+      * @var int(11)
+      */
+    public $acl_id;
 
     /**
       *  [Campo no documentado]

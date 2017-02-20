@@ -225,19 +225,26 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemSet = new Problemsets();
-
         $assignment = new Assignments($r);
         $assignment->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $assignment->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
+        $assignment->acl_id = $r['course']->acl_id;
 
         try {
             // Create the backing problemset
-            ProblemsetsDAO::save($problemSet);
+            $problemset = new Problemsets([
+                'acl_id' => $r['course']->acl_id
+            ]);
+            ProblemsetsDAO::save($problemset);
 
-            $assignment->problemset_id = $problemSet->problemset_id;
+            $assignment->problemset_id = $problemset->problemset_id;
             $assignment->course_id = $r['course']->course_id;
 
+            GroupRolesDAO::save(new GroupRoles([
+                'group_id' => $r['course']->group_id,
+                'role_id' => Authorization::CONTESTANT_ROLE,
+                'acl_id' => $r['course']->acl_id,
+            ]));
             AssignmentsDAO::save($assignment);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -481,7 +488,10 @@ class CourseController extends Controller {
         $students = null;
         $counts = null;
         try {
-            $students = CoursesDAO::getStudentsForCourseWithProgress($r['course']->alias, $r['course']->course_id);
+            $students = CoursesDAO::getStudentsForCourseWithProgress(
+                $r['course']->course_id,
+                $r['course']->group_id
+            );
             $counts = AssignmentsDAO::getAssignmentCountsForCourse($r['course']->course_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -612,7 +622,7 @@ class CourseController extends Controller {
 
         if ($result['is_admin']) {
             try {
-                $group = GroupsDAO::findByAlias($r['alias']);
+                $group = GroupsDAO::getByPK($r['course']->group_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -722,6 +732,7 @@ class CourseController extends Controller {
                 'finish_time' => $r['assignment']->finish_time,
                 'problems' => $problems,
                 'director' => $director,
+                'problemset_id' => $r['assignment']->problemset_id,
                 ];
     }
 

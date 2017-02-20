@@ -44,7 +44,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
     public static function isAdmin($user_id, $acl_id) {
         $sql = '
             SELECT
-                COUNT(*)
+                COUNT(*) > 0
             FROM
                 Group_Roles gr
             INNER JOIN
@@ -58,7 +58,26 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             $acl_id,
         ];
         global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+        return $conn->GetOne($sql, $params);
+    }
+
+    public static function isContestant($user_id, $acl_id) {
+        $sql = '
+            SELECT
+                COUNT(*) > 0
+            FROM
+                Group_Roles gr
+            INNER JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
+            WHERE
+                gu.user_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
+        $params = [
+            $user_id,
+            Authorization::CONTESTANT_ROLE,
+            $acl_id,
+        ];
+        global $conn;
+        return $conn->GetOne($sql, $params);
     }
 
     public static function getContestAdmins(Contests $contest) {

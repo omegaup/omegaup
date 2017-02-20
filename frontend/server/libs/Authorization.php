@@ -11,6 +11,9 @@ class Authorization {
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
+    // Allowed to submit to a problemset.
+    const CONTESTANT_ROLE = 2;
+
     // Interviewer.
     const INTERVIEWER_ROLE = 4;
 
@@ -33,7 +36,6 @@ class Authorization {
             return false;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($run->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($run->problem_id);
         } catch (Exception $e) {
@@ -48,7 +50,8 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        if (!is_null($contest) && Authorization::isContestAdmin($user_id, $contest)) {
+        $problemset = ProblemsetsDAO::getByPK($run->problemset_id);
+        if (!is_null($problemset) && Authorization::isAdmin($user_id, $problemset)) {
             return true;
         }
 
@@ -64,13 +67,13 @@ class Authorization {
             return true;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
 
-        if (is_null($contest)) {
+        if (is_null($problemset)) {
             return false;
         }
 
-        return Authorization::isContestAdmin($user_id, $contest);
+        return Authorization::isAdmin($user_id, $problemset);
     }
 
     public static function canEditClarification($user_id, Clarifications $clarification) {
@@ -78,19 +81,19 @@ class Authorization {
             return false;
         }
 
-        $contest = ContestsDAO::getContestForProblemset($clarification->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($contest) || is_null($problem)) {
+        if (is_null($problemset) || is_null($problem)) {
             return false;
         }
 
         return (self::isOwner($user_id, $problem->acl_id)
-                || Authorization::isContestAdmin($user_id, $contest));
+                || Authorization::isAdmin($user_id, $problemset));
     }
 
     public static function canEditProblem($user_id, Problems $problem) {
@@ -110,30 +113,21 @@ class Authorization {
         return true;
     }
 
-    public static function isContestAdmin($user_id, Contests $contest) {
-        if (is_null($contest) || !is_a($contest, 'Contests')) {
+    public static function isAdmin($user_id, $entity) {
+        if (is_null($entity)) {
             return false;
         }
+        return self::isOwner($user_id, $entity->acl_id) ||
+            UserRolesDAO::isAdmin($user_id, $entity->acl_id) ||
+            GroupRolesDAO::isAdmin($user_id, $entity->acl_id);
+    }
 
-        if (self::isOwner($user_id, $contest->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $contest->acl_id);
+    public static function isContestAdmin($user_id, Contests $contest) {
+        return self::isAdmin($user_id, $contest);
     }
 
     public static function isInterviewAdmin($user_id, Interviews $interview) {
-        if (is_null($interview) || !is_a($interview, 'Interviews')) {
-            return false;
-        }
-
-        if (self::isOwner($user_id, $interview->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $interview->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $interview->acl_id);
+        return self::isAdmin($user_id, $interview);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
@@ -179,16 +173,7 @@ class Authorization {
      * An admin is either the group owner or a member of the admin group.
      */
     public static function isCourseAdmin($user_id, Courses $course) {
-        if (is_null($course)) {
-            return false;
-        }
-
-        if (self::isOwner($user_id, $course->acl_id)) {
-            return true;
-        }
-
-        return GroupRolesDAO::isAdmin($user_id, $course->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $course->acl_id);
+        return self::isAdmin($user_id, $course);
     }
 
     public static function isGroupMember($user_id, Groups $group) {
@@ -210,5 +195,13 @@ class Authorization {
 
     public static function clearSystemAdminCache() {
         self::$is_system_admin = null;
+    }
+
+    public static function canSubmitToProblemset($user_id, $problemset) {
+        if (is_null($problemset)) {
+            return false;
+        }
+        return self::isAdmin($user_id, $problemset) ||
+               GroupRolesDAO::isContestant($user_id, $problemset->acl_id);
     }
 }
