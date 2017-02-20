@@ -105,8 +105,8 @@ def main():
             file=sys.stderr)
     else:
       print('Files written to working directory. '
-          '%sPlease commit them before pushing.%s' % (COLORS.HEADER,
-          COLORS.NORMAL), file=sys.stderr)
+            '%sPlease commit them before pushing.%s' %
+            (COLORS.HEADER, COLORS.NORMAL), file=sys.stderr)
     return 1
   return 0
 

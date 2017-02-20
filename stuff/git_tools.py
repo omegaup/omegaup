@@ -249,14 +249,32 @@ def attempt_automatic_fixes(scriptname, args):
                                   'status', '--porcelain']).strip():
     # The fix failed?
     return False
+  if not prompt('Want to also commit the fixes?'):
+    # Fixes succeeded, even if they are not committed yet.
+    print('Files written to working directory. '
+          '%sPlease commit them before pushing.%s' %
+          (COLORS.HEADER, COLORS.NORMAL), file=sys.stderr)
+    return True
   if _is_single_commit_pushed(args):
     # We can amend the previous commit!
-    subprocess.check_call(['/usr/bin/git', 'commit', '--amend', '--no-edit'])
+    commit_params = ['/usr/bin/git', 'commit', '--amend', '--no-edit']
+    if args.files:
+      commit_params.append('--')
+      commit_params.extend(args.files)
+    else:
+      commit_params.append('--all')
+    subprocess.check_call(commit_params)
     print('%sPrevious commit reused, ready to upload.%s' %
           (COLORS.OKGREEN, COLORS.NORMAL), file=sys.stderr)
   else:
-    subprocess.check_call(['/usr/bin/git', 'commit',
-                           '-am', 'Fixed %s lints' % scriptname])
+    commit_params = ['/usr/bin/git', 'commit',
+                     '-m', 'Fixed %s lints' % scriptname]
+    if args.files:
+      commit_params.append('--')
+      commit_params.extend(args.files)
+    else:
+      commit_params.append('--all')
+    subprocess.check_call(commit_params)
     print('%sCommitted fixes, ready to upload.%s' %
           (COLORS.OKGREEN, COLORS.NORMAL), file=sys.stderr)
   return True
