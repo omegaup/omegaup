@@ -7,52 +7,38 @@ ALTER TABLE `Problemsets`
 -- Populate columns
 
 -- Course => Assignments
-DELIMITER $$
-CREATE PROCEDURE `Denormalize_Course_ACLs`()
-BEGIN
-  UPDATE
-    `Assignments` AS `a`
-  INNER JOIN
-    `Courses` AS `c` ON `a`.`course_id` = `c`.`course_id`
-  SET
-    `a`.`acl_id` = `c`.`acl_id`;
-END$$
-DELIMITER ;
-CALL `Denormalize_Course_ACLs`();
-DROP PROCEDURE `Denormalize_Course_ACLs`;
+UPDATE
+  `Assignments` AS `a`
+INNER JOIN
+  `Courses` AS `c` ON `a`.`course_id` = `c`.`course_id`
+SET
+  `a`.`acl_id` = `c`.`acl_id`;
 
 -- Problemset Containers => Problemsets
-DELIMITER $$
-CREATE PROCEDURE `Denormalize_Problemset_ACLs`()
-BEGIN
-  START TRANSACTION;
+START TRANSACTION;
 
-  UPDATE
-    `Problemsets` AS `ps`
-  INNER JOIN
-    `Assignments` AS `a` ON `ps`.`problemset_id` = `a`.`problemset_id`
-  SET
-    `ps`.`acl_id` = `a`.`acl_id`;
+UPDATE
+  `Problemsets` AS `ps`
+INNER JOIN
+  `Assignments` AS `a` ON `ps`.`problemset_id` = `a`.`problemset_id`
+SET
+  `ps`.`acl_id` = `a`.`acl_id`;
 
-  UPDATE
-    `Problemsets` AS `ps`
-  INNER JOIN
-    `Contests` AS `c` ON `ps`.`problemset_id` = `c`.`problemset_id`
-  SET
-    `ps`.`acl_id` = `c`.`acl_id`;
+UPDATE
+  `Problemsets` AS `ps`
+INNER JOIN
+  `Contests` AS `c` ON `ps`.`problemset_id` = `c`.`problemset_id`
+SET
+  `ps`.`acl_id` = `c`.`acl_id`;
 
-  UPDATE
-    `Problemsets` AS `ps`
-  INNER JOIN
-    `Interviews` AS `i` ON `ps`.`problemset_id` = `i`.`problemset_id`
-  SET
-    `ps`.`acl_id` = `i`.`acl_id`;
+UPDATE
+  `Problemsets` AS `ps`
+INNER JOIN
+  `Interviews` AS `i` ON `ps`.`problemset_id` = `i`.`problemset_id`
+SET
+  `ps`.`acl_id` = `i`.`acl_id`;
 
-  COMMIT;
-END$$
-DELIMITER ;
-CALL `Denormalize_Problemset_ACLs`();
-DROP PROCEDURE `Denormalize_Problemset_ACLs`;
+COMMIT;
 
 -- Set up constraints
 ALTER TABLE `Assignments`

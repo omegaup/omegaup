@@ -159,10 +159,16 @@ class RunController extends Controller {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
             }
 
+            // No one should submit after the deadline. Not even admins.
+            if (ProblemsetsDAO::isLateSubmission($r['container'])) {
+                throw new NotAllowedToSubmitException('runNotInsideContest');
+            }
+
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id)) {
+                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id) &&
+                    !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 

@@ -54,6 +54,51 @@ class RunCreateTest extends OmegaupTestCase {
     }
 
     /**
+     * @return Request
+     */
+    private function setUpAssignment() {
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Create course and add user as a student
+        $this->courseData = CoursesFactory::createCourseWithOneAssignment();
+
+        // Student user
+        $this->student = UserFactory::createUser();
+        CoursesFactory::addStudentToCourse($this->courseData, $this->student);
+
+        // Non-student user
+        $this->non_student = UserFactory::createUser();
+
+        // Get the actual DB entries for later
+        $this->course = CoursesDAO::getByAlias($this->courseData['course_alias']);
+        $this->assignment = AssignmentsDAO::search(new Assignments([
+            'course_id' => $this->course->course_id,
+            'alias' => $this->courseData['assignment_alias'],
+        ]))[0];
+
+        $adminLogin = self::login($this->courseData['admin']);
+
+        // Add the problem to the contest
+        CourseController::apiAddProblem(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $this->courseData['course_alias'],
+            'assignment_alias' => $this->assignment->alias,
+            'problem_alias' => $problemData['request']['alias'],
+        ]));
+
+        // Create an empty request
+        $r = new Request([
+            'problemset_id' => $this->assignment->problemset_id,
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]);
+
+        return $r;
+    }
+
+    /**
      * Validate a run
      *
      * @param type $r
@@ -371,6 +416,30 @@ class RunCreateTest extends OmegaupTestCase {
     }
 
     /**
+     * Admin is god, but even he is unable to submit even when contest has ended
+     *
+     * @expectedException NotAllowedToSubmitException
+     */
+    public function testRunWhenContestEndedForContestDirector() {
+        // Set the context for the first contest
+        $r = $this->setValidRequest();
+
+        // Log as contest director
+        $login = self::login($this->contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Manually set the contest	start 10 mins in the future
+        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1);
+        ContestsDAO::save($contest);
+
+        // Call API
+        $response = RunController::apiCreate($r);
+
+        $this->assertRun($r, $response);
+    }
+
+    /**
      * Contest director is god, should be able to submit whenever he wants
      * for testing purposes
      */
@@ -593,6 +662,76 @@ class RunCreateTest extends OmegaupTestCase {
     public function testRunWithProblemsetIdAndContestAlias() {
         $r = $this->setValidRequest();
         $r['problemset_id'] = $this->contestData['contest']->problemset_id;
+
+        // Call API
+        $response = RunController::apiCreate($r);
+    }
+
+    /**
+     * Run from a student.
+     */
+    public function testRunInAssignmentFromStudent() {
+        $r = $this->setUpAssignment();
+        $login = self::login($this->student);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call API
+        $response = RunController::apiCreate($r);
+    }
+
+    /**
+     * Can't submit by a user that is not enrolled in a course.
+     *
+     * @expectedException NotAllowedToSubmitException
+     */
+    public function testRunInAssignmentFromNonStudent() {
+        $r = $this->setUpAssignment();
+        $login = self::login($this->non_student);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call API
+        $response = RunController::apiCreate($r);
+    }
+
+    /**
+     * Run from a student before assignment opens.
+     *
+     * @expectedException NotAllowedToSubmitException
+     */
+    public function testRunInAssignmentFromStudentBeforeStart() {
+        $r = $this->setUpAssignment();
+        $adminLogin = self::login($this->courseData['admin']);
+        CourseController::apiUpdateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course' => $this->courseData['course_alias'],
+            'assignment' => $this->courseData['assignment_alias'],
+            'start_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10)
+        ]));
+
+        $login = self::login($this->student);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call API
+        $response = RunController::apiCreate($r);
+    }
+
+    /**
+     * Run from a student after the deadline passed.
+     *
+     * @expectedException NotAllowedToSubmitException
+     */
+    public function testRunInAssignmentFromStudentAfterDeadline() {
+        $r = $this->setUpAssignment();
+        $adminLogin = self::login($this->courseData['admin']);
+        CourseController::apiUpdateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course' => $this->courseData['course_alias'],
+            'assignment' => $this->courseData['assignment_alias'],
+            'finish_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1)
+        ]));
+
+        $login = self::login($this->student);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API
         $response = RunController::apiCreate($r);

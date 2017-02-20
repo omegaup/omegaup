@@ -35,6 +35,15 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
         return null;
     }
 
+    /**
+     *  Check if a submission is before the deadline.
+     *  No one, including admins, can submit after the deadline.
+     */
+    public static function isLateSubmission($container) {
+        return isset($container->finish_time) &&
+               (time() > strtotime($container->finish_time));
+    }
+
     public static function insideSubmissionWindow($container, $user_id) {
         if (isset($container->finish_time)) {
             if (time() > strtotime($container->finish_time) ||
