@@ -2,7 +2,7 @@ import {OmegaUp, T} from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
-import Scoreboard from '../components/Scoreboard.vue';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -250,7 +250,7 @@ export class Arena {
           lastUpdated: null,
         },
         components: {
-          'omegaup-scoreboard': Scoreboard,
+          'omegaup-scoreboard': arena_Scoreboard,
         },
       }),
       socketStatus: $('#title .socket-status'),

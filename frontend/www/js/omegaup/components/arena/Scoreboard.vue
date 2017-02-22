@@ -4,8 +4,8 @@
     <table>
       <thead>
         <tr>
-          <th></th>
-          <th></th>
+          <th><!-- legend --></th>
+          <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
             <a v-bind:href="'#problems/' + problem.alias"
@@ -41,13 +41,13 @@
 export default {
   props: {
     T: Object,
-		scoreboardColors: Array,
+    scoreboardColors: Array,
     problems: Array,
     ranking: Array,
     lastUpdated: Date,
     showPenalty: {
       type: Boolean,
-      default: true,
+      'default': true,
     },
   },
   data: function() {
@@ -57,20 +57,20 @@ export default {
   computed: {
     lastUpdatedString: function() {
       if (!this.lastUpdated) {
-        return "";
+        return '';
       }
       return this.lastUpdated.toString();
     },
   },
   methods: {
-		legendColor: function(idx) {
-			if (idx > this.scoreboardColors.length) {
-				return "";
-			}
-			return this.scoreboardColors[idx];
-		},
+    legendColor: function(idx) {
+      return (idx < this.scoreboardColors.length) ?
+          this.scoreboardColors[idx] :
+          '';
+    },
     renderUser: function(u) {
-      return u.username + (u.name && u.name != u.username ? ' (' + u.name + ')' : '');
+      return u.username +
+          (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
     },
     renderPoints: function(p) {
       return (p.points > 0 ? '+' : '') + p.points;
