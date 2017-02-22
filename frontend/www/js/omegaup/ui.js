@@ -1,8 +1,6 @@
-var omegaup = typeof global === 'undefined' ?
-                  (window.omegaup = window.omegaup || {}) :
-                  (global.omegaup = global.omegaup || {});
+import API from './api.js';
 
-omegaup.UI = {
+let UI = {
   navigateTo: function(url) { window.location = url; },
 
   escape: function(s) {
@@ -31,21 +29,15 @@ omegaup.UI = {
         .slideDown();
   },
 
-  error: function(message) {
-    omegaup.UI.displayStatus(message, 'alert-danger');
-  },
+  error: function(message) { UI.displayStatus(message, 'alert-danger'); },
 
-  info: function(message) { omegaup.UI.displayStatus(message, 'alert-info'); },
+  info: function(message) { UI.displayStatus(message, 'alert-info'); },
 
-  success: function(message) {
-    omegaup.UI.displayStatus(message, 'alert-success');
-  },
+  success: function(message) { UI.displayStatus(message, 'alert-success'); },
 
-  warning: function(message) {
-    omegaup.UI.displayStatus(message, 'alert-warning');
-  },
+  warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
 
-  apiError: function(response) { omegaup.UI.error(response.error || 'error'); },
+  apiError: function(response) { UI.error(response.error || 'error'); },
 
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
@@ -81,16 +73,16 @@ omegaup.UI = {
             onOperationFinished();
 
             if (success === false) {
-              omegaup.UI.error('Error actualizando items: ' + error);
+              UI.error('Error actualizando items: ' + error);
             } else {
-              omegaup.UI.success('Todos los items han sido actualizados');
+              UI.success('Todos los items han sido actualizados');
             }
           }
         });
   },
 
   prettyPrintJSON: function(json) {
-    return omegaup.UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
+    return UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
   },
 
   syntaxHighlight: function(json) {
@@ -152,7 +144,7 @@ omegaup.UI = {
               highlight: true,
             },
             {
-              source: omegaup.UI.typeaheadWrapper(searchFn),
+              source: UI.typeaheadWrapper(searchFn),
               displayKey: 'label',
             })
         .on('typeahead:selected', cb);
@@ -166,14 +158,14 @@ omegaup.UI = {
             },
             {
               source: function(query, cb) {
-                omegaup.API.Problem.list({query: query})
+                API.Problem.list({query: query})
                     .then(function(data) { cb(data.results); });
               },
               displayKey: 'alias',
               templates: {
                 suggestion: function(val) {
-                  return omegaup.UI.formatString(
-                      '<strong>%(title)</strong> (%(alias))', val);
+                  return UI.formatString('<strong>%(title)</strong> (%(alias))',
+                                         val);
                 }
               }
             })
@@ -183,7 +175,7 @@ omegaup.UI = {
   },
 
   userTypeahead: function(elem, cb) {
-    omegaup.UI.typeahead(elem, omegaup.API.searchUsers, cb);
+    UI.typeahead(elem, API.searchUsers, cb);
   },
 
   getProfileLink: function(username) {
@@ -223,6 +215,8 @@ omegaup.UI = {
 
   formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); }
 };
+
+export {UI as default};
 
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {

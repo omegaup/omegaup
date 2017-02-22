@@ -26,8 +26,9 @@ def _find_pip_tool(name):
 
 PIP_PATH = '/usr/bin/pip'
 CLANG_FORMAT_PATH = '/usr/bin/clang-format-3.7'
+# TODO(lhchavez): Use closure compiler instead since closure-linter does not
+# support ES6 correctly.
 FIXJSSTYLE_PATH = _find_pip_tool('fixjsstyle')
-GJSLINT_PATH = _find_pip_tool('gjslint')
 
 def run_linter(args, files, validate_only):
   '''Runs the Google Closure Compiler linter against |files|.'''
@@ -41,17 +42,6 @@ def run_linter(args, files, validate_only):
       f.flush()
       f.seek(0, 0)
 
-      if validate_only:
-        try:
-          output = subprocess.check_output([
-            GJSLINT_PATH, '--nojsdoc', '--quiet',
-            f.name], stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-          print('File %s%s%s lint failed:\n%s' %
-                (COLORS.HEADER, filename, COLORS.NORMAL,
-                 str(b'\n'.join(e.output.split(b'\n')[1:]), encoding='utf-8')),
-                file=sys.stderr)
-          validation_passed = False
       try:
         subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name],
                                 stderr=subprocess.STDOUT)
@@ -83,7 +73,7 @@ def main():
   if not git_tools.verify_toolchain({
     PIP_PATH: 'sudo apt-get install python-pip',
     CLANG_FORMAT_PATH: 'sudo apt-get install clang-format-3.7',
-    GJSLINT_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master'
+    FIXJSSTYLE_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master'
   }):
     sys.exit(1)
   args = git_tools.parse_arguments(tool_description='lints javascript',

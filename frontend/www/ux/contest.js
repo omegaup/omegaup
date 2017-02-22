@@ -153,20 +153,21 @@ omegaup.OmegaUp.on('ready', function() {
   $('#clarification')
       .submit(function(e) {
         $('#clarification input').attr('disabled', 'disabled');
-        omegaup.API.newClarification(
-            arena.options.contestAlias,
-            $('#clarification select[name="problem"]').val(),
-            $('#clarification textarea[name="message"]').val(), function(run) {
-              if (run.status != 'ok') {
-                alert(run.error);
-                $('#clarification input').removeAttr('disabled');
-                return;
-              }
+        omegaup.API.Clarification
+            .create({
+              contest_alias: arena.options.contestAlias,
+              problem_alias: $('#clarification select[name="problem"]').val(),
+              message: $('#clarification textarea[name="message"]').val()
+            })
+            .then(function(run) {
               arena.hideOverlay();
               omegaup.API.getClarifications(
                   arena.options.contestAlias, arena.clarificationsOffset,
                   arena.clarificationsRowcount,
                   arena.clarificationsChange.bind(arena));
+            })
+            .fail(function(run) { alert(run.error); })
+            .always(function() {
               $('#clarification input').removeAttr('disabled');
             });
 
