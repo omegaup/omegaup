@@ -2,7 +2,9 @@ import {OmegaUp, T} from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import UI from '../ui.js';
+import Vue from 'vue';
 
 export {ArenaAdmin};
 
@@ -229,7 +231,28 @@ export class Arena {
       loadingOverlay: $('#loading'),
       miniRanking: $('#mini-ranking'),
       problemList: $('#problem-list'),
-      rankingTable: $('#ranking-table'),
+      rankingTable: new Vue({
+        el: '#ranking div',
+        render: function(createElement) {
+          return createElement('omegaup-scoreboard', {
+            props: {
+              T: T,
+              scoreboardColors: ScoreboardColors,
+              problems: this.problems,
+              ranking: this.ranking,
+              lastUpdated: this.lastUpdated,
+            },
+          });
+        },
+        data: {
+          problems: [],
+          ranking: [],
+          lastUpdated: null,
+        },
+        components: {
+          'omegaup-scoreboard': arena_Scoreboard,
+        },
+      }),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
@@ -451,15 +474,9 @@ export class Arena {
       var problem = problems[i];
       var alias = problem.alias;
       self.problems[alias] = problem;
-
-      $('<th><a href="#problems/' + alias + '" title="' + alias + '">' +
-        problems[i].letter + '</a></th>')
-          .insertBefore('#ranking-table thead th.total');
-      $('<td class="prob_' + alias + '_points"></td>')
-          .insertBefore('#ranking-table tbody.user-list-template td.points');
     }
-    $('thead th', self.elements.rankingTable).attr('colspan', '');
-    $('tbody.user-list-template .penalty', self.elements.rankingTable).remove();
+    self.elements.rankingTable.problems = problems;
+    self.elements.rankingTable.showPenalty = contest.show_penalty;
   }
 
   updateClock() {
@@ -542,7 +559,6 @@ export class Arena {
   onRankingChanged(data) {
     var self = this;
     $('tbody.inserted', self.elements.miniRanking).remove();
-    $('tbody.inserted', self.elements.rankingTable).remove();
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -563,17 +579,9 @@ export class Arena {
       var rank = ranking[i];
       newRanking[rank.username] = i;
 
-      var r = $('tbody.user-list-template', self.elements.rankingTable)
-                  .clone()
-                  .removeClass('user-list-template')
-                  .addClass('inserted')
-                  .addClass('rank-new');
-
       var username = rank.username + ((rank.name == rank.username) ?
                                           '' :
                                           (' (' + UI.escape(rank.name) + ')'));
-
-      $('.user', r).html(username + UI.getFlag(rank['country']));
 
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
@@ -584,39 +592,6 @@ export class Arena {
         var problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
-        var pointsCell = $('.prob_' + alias + '_points', r);
-        if (problem.runs == 0) {
-          pointsCell.html('-');
-        } else if (self.currentContest.show_penalty) {
-          pointsCell.html('<div class="points">' +
-                          (problem.points ? '+' + problem.points : '0') +
-                          '</div>\n' +
-                          '<div class="penalty">' + problem.penalty + ' (' +
-                          problem.runs + ')</div>');
-        } else {
-          pointsCell.html('<div class="points">' +
-                          (problem.points ? '+' + problem.points : '0') +
-                          '</div>\n' +
-                          '<div class="penalty">(' + problem.runs + ')</div>');
-        }
-        pointsCell.removeClass('pending accepted wrong');
-        if (problem.runs > 0) {
-          if (problem.percent == 100) {
-            currentRankingState[username].accepted[problem.alias] = true;
-            pointsCell.addClass('accepted');
-            if (this.prevRankingState) {
-              if (!this.prevRankingState[username] ||
-                  !this.prevRankingState[username].accepted[problem.alias]) {
-                pointsCell.addClass('recent-event');
-              }
-            }
-          } else if (problem.pending) {
-            pointsCell.addClass('pending');
-          } else if (problem.percent == 0) {
-            pointsCell.addClass('wrong');
-          }
-        }
-
         if (self.problems[alias]) {
           if (rank.username == OmegaUp.username) {
             $('#problems .problem_' + alias + ' .solved')
@@ -626,32 +601,12 @@ export class Arena {
         }
       }
 
-      if (self.currentContest.show_penalty) {
-        $('td.points', r)
-            .html('<div class="points">' + rank.total.points + '</div>' +
-                  '<div class="penalty">' + rank.total.penalty + ' (' +
-                  totalRuns + ')</div>');
-      } else {
-        $('td.points', r)
-            .html('<div class="points">' + rank.total.points + '</div>' +
-                  '<div class="penalty">(' + totalRuns + ')</div>');
-      }
-      $('.position', r).html(rank.place).removeClass('recent-event');
-      if (this.prevRankingState) {
-        if (!this.prevRankingState[username] ||
-            this.prevRankingState[username].place > rank.place) {
-          $('.position', r).addClass('recent-event');
-        }
-      }
-
-      self.elements.rankingTable.append(r);
-
       // update miniranking
       if (i < 10) {
-        r = $('tbody.user-list-template', self.elements.miniRanking)
-                .clone()
-                .removeClass('user-list-template')
-                .addClass('inserted');
+        var r = $('tbody.user-list-template', self.elements.miniRanking)
+                    .clone()
+                    .removeClass('user-list-template')
+                    .addClass('inserted');
 
         $('.position', r).html(rank.place);
         $('.user', r)
@@ -664,8 +619,9 @@ export class Arena {
       }
     }
 
+    self.elements.rankingTable.ranking = ranking;
     if (data.time) {
-      $('#ranking .footer').html(OmegaUp.time(data.time));
+      self.elements.rankingTable.lastUpdated = OmegaUp.time(data.time);
     }
 
     this.currentRanking = newRanking;
@@ -785,17 +741,6 @@ export class Arena {
 
       series: series
     });
-
-    // set legend colors
-    var rows = $('tbody.inserted tr', self.elements.rankingTable);
-    for (var r = 0; r < rows.length; r++) {
-      $('.legend', rows[r])
-          .css({
-            'background-color': (r < ScoreboardColors.length) ?
-                                    ScoreboardColors[r] :
-                                    'transparent'
-          });
-    }
   }
 
   updateClarification(clarification) {
