@@ -24,10 +24,8 @@ $('#reset-password-form')
                          password_confirmation:
                              $('#password_confirmation').val()
                        })
-          .then(function() {
-            omegaup.UI.success(data.message);
-            $('#submit').prop('disabled', false);
-          })
-          .fail(omegaup.UI.apiError);
-      return false;
+          .then(function() { omegaup.UI.success(data.message); })
+          .fail(omegaup.UI.apiError)
+          .always(function() { $('#submit')
+                                   .prop('disabled', false); });
     });

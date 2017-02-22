@@ -165,10 +165,9 @@ omegaup.OmegaUp.on('ready', function() {
                   arena.options.contestAlias, arena.clarificationsOffset,
                   arena.clarificationsRowcount,
                   arena.clarificationsChange.bind(arena));
-              $('#clarification input').removeAttr('disabled');
             })
-            .fail(function(run) {
-              alert(run.error);
+            .fail(function(run) { alert(run.error); })
+            .always(function() {
               $('#clarification input').removeAttr('disabled');
             });
 

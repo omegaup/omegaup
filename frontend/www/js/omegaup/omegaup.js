@@ -36,7 +36,7 @@ export class Experiments {
 
 // Stub for translations.
 // These should be loaded later with OmegaUp.loadTranslations.
-export var T = {};
+export let T = {};
 
 export let OmegaUp = {
   loggedIn: false,

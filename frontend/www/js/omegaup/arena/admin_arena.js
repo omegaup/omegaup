@@ -59,11 +59,9 @@ export default class ArenaAdmin {
           .then(function(run) {
             self.arena.hideOverlay();
             self.refreshClarifications();
-            $('input', self.arena.elements.clarification)
-                .removeAttr('disabled');
           })
-          .fail(function(run) {
-            alert(run.error);
+          .fail(function(run) { alert(run.error); })
+          .always(function() {
             $('input', self.arena.elements.clarification)
                 .removeAttr('disabled');
           });
