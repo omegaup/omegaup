@@ -10,6 +10,10 @@ function smarty_compiler_version_hash($params, Smarty $smarty) {
         $src = '/js/omegaup/lang.<?php echo $_smarty_tpl->getConfigVariable("locale"); ?>.js';
         $paths = ['/js/omegaup/lang.es.js', '/js/omegaup/lang.en.js',
             '/js/omegaup/lang.pt.js', '/js/omegaup/lang.pseudo.js'];
+    } elseif ($src =='/js/omegaup/lang.#locale#.json') {
+        $src = '/js/omegaup/lang.<?php echo $_smarty_tpl->getConfigVariable("locale"); ?>.json';
+        $paths = ['/js/omegaup/lang.es.json', '/js/omegaup/lang.en.json',
+            '/js/omegaup/lang.pt.json', '/js/omegaup/lang.pseudo.json'];
     } else {
         $paths[] = $src;
     }
