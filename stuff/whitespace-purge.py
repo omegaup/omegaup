@@ -14,7 +14,7 @@ import sys
 from git_tools import COLORS
 
 VALIDATIONS = [
-  ('Windows-style EOF', re.compile(br'\r'), br'\n'),
+  ('Windows-style EOF', re.compile(br'\r\n?'), br'\n'),
   ('trailing whitespace', re.compile(br'[ \t]+\n'), br'\n'),
   ('consecutive empty lines', re.compile(br'\n\n\n+'), br'\n\n'),
   ('empty lines after an opening brace', re.compile(br'{\n\n+'), br'{\n'),
