@@ -332,7 +332,7 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
      */
     final public static function delete(ProblemsetProblems $Problemset_Problems) {
         if (is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))) {
-            throw new Exception('Registro no encontrado.');
+            throw new Exception('problemsetProblemNotFound');
         }
         $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
         $params = [$Problemset_Problems->problemset_id, $Problemset_Problems->problem_id];

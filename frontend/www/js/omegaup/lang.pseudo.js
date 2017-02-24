@@ -453,6 +453,8 @@ omegaup.OmegaUp.loadTranslations({
 	problemTopicBinarySearch: "(Binary 53arch)",
 	problemTopicGraphTheory: "(Graph 7h30ry)",
 	problemTopicSorting: "(S0r7ing)",
+	problemsetNotFound: "(Pr0b13m537 d035 n07 3xi57.)",
+	problemsetProblemNotFound: "(Th3 pr0b13m i5 n07 par7 0f 7h3 a55ignm3n7.)",
 	profile: "(Nam3)",
 	profileContests: "(C0n73575 r35u175)",
 	profileContestsTablePlace: "(P1ac3)",

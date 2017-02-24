@@ -453,6 +453,8 @@ omegaup.OmegaUp.loadTranslations({
 	problemTopicBinarySearch: "Pesquisa binária",
 	problemTopicGraphTheory: "Teoria dos grafos",
 	problemTopicSorting: "Ordenar",
+	problemsetNotFound: "Conjunto de problemas não encontrado.",
+	problemsetProblemNotFound: "Problema não faz parte da designação.",
 	profile: "Nome",
 	profileContests: "Resultados dos concursos",
 	profileContestsTablePlace: "Lugar",
