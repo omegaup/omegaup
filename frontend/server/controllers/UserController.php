@@ -1489,13 +1489,11 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         if (!is_null($r['name'])) {
-            Validators::isStringNonEmpty($r['name'], 'name', false);
+            Validators::isStringNonEmpty($r['name'], 'name', true);
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
         }
 
-        if (!is_null($r['country_id'])) {
-            Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
-
+        if (!empty($r['country_id'])) {
             try {
                 $r['country'] = CountriesDAO::getByPK($r['country_id']);
             } catch (Exception $e) {
