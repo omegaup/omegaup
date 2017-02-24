@@ -484,7 +484,6 @@ omegaup.OmegaUp.loadTranslations({
 	registrationPending: "seu pedido para participar deste concurso est\u00e1 pendente de aprova\u00e7\u00e3o do administrador concurso.",
 	requestDate: "Data de aplica\u00e7\u00e3o",
 	resendInterviewEmail: "Reenviar correo",
-<<<<<<< 44c36120f51bae34a71e247231b4928aed343a92
 	runNotEvenOpened: "Você deve abrir o problema antes de tentar apresentar uma solução.",
 	runNotFound: "Run não encontrado",
 	runNotInsideContest: "Tempo de concurso expirou ou não foi iniciado ainda.",
@@ -499,7 +498,6 @@ omegaup.OmegaUp.loadTranslations({
 	schoolsLearnProgBySolvProblems: "Aprender programação resolvendo problemas",
 	schoolsManageProgressOfStudents: "Gerencie o progresso de seus alunos",
 	schoolsStartUsingSchools: "Começar a usar escolas",
-=======
 	runNotEvenOpened: "Voc\u00ea deve abrir o problema antes de tentar apresentar uma solu\u00e7\u00e3o.",
 	runNotFound: "Run n\u00e3o encontrado",
 	runNotInsideContest: "Tempo de concurso expirou ou n\u00e3o foi iniciado ainda.",
@@ -508,7 +506,6 @@ omegaup.OmegaUp.loadTranslations({
 	runWaitGap: "Voc\u00ea tem que esperar entre submiss\u00f5es consecutivas.",
 	schoolNotFound: "Escola n\u00e3o encontrada",
 	schoolToBeAdded: "Sua escola n\u00e3o foi registrada em omegaUp. Ele ser\u00e1 adicionada quando voc\u00ea salvar suas reda\u00e7\u00f5es.",
->>>>>>> Agregando un JSON con las traducciones
 	scoreboardmerge: "Unir scoreboard",
 	selectAction: "Selecionar a\u00e7\u00e3o",
 	sendInvitesToCandidates: "Enviar correos",

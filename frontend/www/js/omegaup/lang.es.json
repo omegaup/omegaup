@@ -355,7 +355,10 @@
 	"omegaupTitleIndex": "Bienvenido",
 	"omegaupTitleLogin": "Inicio de sesion",
 	"omegaupTitleMyProblemsList": "Mis problemas",
+<<<<<<< HEAD
 	"omegaupTitleOmegaUpForSchools": "Bienvenido a omegaUp para Escuelas",
+=======
+>>>>>>> master
 	"omegaupTitleProblemEdit": "Editar problema",
 	"omegaupTitleProblemNew": "Nuevo problema",
 	"omegaupTitleProblemStats": "Estadisticas de problema",
@@ -488,12 +491,15 @@
 	"runWaitGap": "Debes esperar unos segundos entre env\u00edos consecutivos.",
 	"schoolNotFound": "Escuela no encontrada",
 	"schoolToBeAdded": "Tu escuela a\u00fan no existe en omegaUp. Ser\u00e1 agregada cuando guardes tus cambios.",
+<<<<<<< HEAD
 	"schoolsCreateCoursesThatMeetNeeds": "Cursos que satisfagan sus necesidades. Puede crear sus propios problemas.",
 	"schoolsCreateYourCourse": "Cree sus cursos",
 	"schoolsCreateYourProblems": "Crea tus problemas",
 	"schoolsLearnProgBySolvProblems": "Aprende programaci\u00f3n solucionando problemas",
 	"schoolsManageProgressOfStudents": "Administre el progreso de sus estudiantes",
 	"schoolsStartUsingSchools": "Empieza a usar las escuelas",
+=======
+>>>>>>> master
 	"scoreboardmerge": "Unir scorboard",
 	"selectAction": "Seleccionar acci\u00f3n",
 	"sendInvitesToCandidates": "Enviar correos",
