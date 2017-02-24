@@ -128,7 +128,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment with a normal user
         $forbiddenUser = UserFactory::createUser();
         $forbiddenUserLogin = self::login($forbiddenUser);
-        CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
+        CoursesFactory::addProblemsToAssignment($forbiddenUserLogin, $courseAlias, $assignmentAlias, [$problem]);
     }
 
     /**
@@ -149,7 +149,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment with a student
         $forbiddenUser = CoursesFactory::addStudentToCourse($courseData);
         $forbiddenUserLogin = self::login($forbiddenUser);
-        CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
+        CoursesFactory::addProblemsToAssignment($forbiddenUserLogin, $courseAlias, $assignmentAlias, [$problem]);
     }
 
     /**
