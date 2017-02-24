@@ -104,7 +104,7 @@ class CoursesDAO extends CoursesDAOBase {
                 LEFT JOIN (
                     SELECT bpr.alias, bpr.user_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, psp.problem_id, r.user_id, max(r.score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
@@ -114,10 +114,10 @@ class CoursesDAO extends CoursesDAOBase {
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
                         WHERE a.course_id = ?
-                        GROUP BY a.alias, psp.problem_id, r.user_id
-                        ) bpr
+                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                    ) bpr
                     GROUP BY bpr.alias, bpr.user_id
-                    ) pr
+                ) pr
                 ON pr.user_id = u.user_id';
 
         $rs = $conn->Execute($sql, [$group_id, $course_id]);
@@ -125,15 +125,12 @@ class CoursesDAO extends CoursesDAOBase {
         foreach ($rs as $row) {
             $username = $row['username'];
             if (!isset($progress[$username])) {
-                $progress[$username] = [];
-                $progress[$username]['progress'] = [];
+                $progress[$username] = ['name' => $row['name'], 'progress' => []];
             }
 
             if (!is_null($row['assignment_score'])) {
                 $progress[$username]['progress'][$row['assignment_alias']] = $row['assignment_score'];
             }
-
-            $progress[$username]['name'] = $row['name'];
         }
         return $progress;
     }
