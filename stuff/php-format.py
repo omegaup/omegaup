@@ -34,7 +34,7 @@ def main():
       '--standard=%s' % os.path.join(root, 'stuff/phpcbf/Standards/OmegaUp/ruleset.xml')]
 
   validate_only = args.tool == 'validate'
-  validation_passed = True
+  file_violations = set()
 
   for filename in args.files:
     contents = git_tools.file_contents(args, root, filename)
@@ -48,11 +48,11 @@ def main():
       if p.returncode != 0 and not replaced:
         # phpcbf returns 1 if there was no change to the file. If there was an
         # actual error, there won't be anything in stdout.
-        validation_passed = False
+        file_violations.add(filename)
         print('Execution of "%s" %sfailed with return code %d%s.' % (
               ' '.join(cmd), COLORS.FAIL, COLORS.NORMAL), file=sys.stderr)
     if contents != replaced:
-      validation_passed = False
+      file_violations.add(filename)
       if validate_only:
         print('File %s%s%s has %slint errors%s.' % (COLORS.HEADER, filename,
           COLORS.NORMAL, COLORS.FAIL, COLORS.NORMAL), file=sys.stderr)
@@ -62,13 +62,14 @@ def main():
         with open(os.path.join(root, filename), 'wb') as f:
           f.write(replaced)
 
-  if not validation_passed:
+  if file_violations:
     if validate_only:
-      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args, file_violations):
         return 1
       print('%sPHP validation errors.%s '
             'Please run `%s` to fix them.' % (git_tools.COLORS.FAIL,
-              git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
+              git_tools.COLORS.NORMAL,
+              git_tools.get_fix_commandline(sys.argv[0], args, file_violations)),
               file=sys.stderr)
     else:
       print('Files written to working directory. '
