@@ -71,6 +71,7 @@ class CoursesFactory {
         $courseAlias = $courseFactoryResult['course_alias'];
         $admin = $courseFactoryResult['admin'];
         $adminLogin = OmegaupTestCase::login($admin);
+        $assignmentAlias = [];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
@@ -79,19 +80,21 @@ class CoursesFactory {
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
                     'description' => Utils::CreateRandomString(),
-                    'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+                    'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
                     'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType
                 ]);
 
+                $assignmentAlias[] = $r['alias'];
                 CourseController::apiCreateAssignment($r);
             }
         }
 
         return [
             'admin' => $admin,
-            'course_alias' => $courseAlias
+            'course_alias' => $courseAlias,
+            'assignment_aliases' => $assignmentAlias
         ];
     }
 

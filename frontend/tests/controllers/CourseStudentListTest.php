@@ -28,7 +28,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         foreach ($students as $s) {
-            $this->assertArrayContainsInKey($response['students'], 'username', $s->username);
+            $this->assertArrayHasKey($s->username, $response['students']);
         }
     }
 
@@ -61,23 +61,116 @@ class CourseStudentListTest extends OmegaupTestCase {
     }
 
     /**
-     * API returns correct counts of assignments by type
+     *  Tests progress in apiDetails is correctly calculated for multiple
+     *  assignments and multiple students
      */
-    public function testCounts() {
-        $homeworkCount = 3;
-        $testCount = 2;
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
-            ['homework' => $homeworkCount, 'test' => $testCount]
-        );
+    public function testCourseStudentListWithProgressMultipleAssignments() {
+        $homeworkCount = 5;
+        $testCount = 5;
+        $problemsPerAssignment = 3;
+        $studentCount = 5;
+        $problemAssignmentsMap = [];
 
+        // Create course with assignments
+        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(['homework' => 5, 'test' => 5]);
+
+        // Add problems to assignments
+        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
+            $assignmentAlias = $courseData['assignment_aliases'][$i];
+            $problemAssignmentsMap[$assignmentAlias] = [];
+
+            for ($j = 0; $j < $problemsPerAssignment; $j++) {
+                $problemData = ProblemsFactory::createProblem();
+                $adminLogin = self::login($courseData['admin']);
+                CourseController::apiAddProblem(new Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignmentAlias,
+                    'problem_alias' => $problemData['request']['alias'],
+                ]));
+                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+            }
+        }
+
+        // Create & add students to course
+        $students = [];
+        for ($i = 0; $i < $studentCount; $i++) {
+            $students[] = CoursesFactory::addStudentToCourse($courseData);
+        }
+
+        // Submit runs - Simulate each student submitting runs to some problems and some others not.
+        // Also, sometimes only PAs are sent, other times ACs.
+        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $expectedScores = [];
+        for ($s = 0; $s < $studentCount; $s++) {
+            $studentUsername = $students[$s]->username;
+            $expectedScores[$studentUsername] = [];
+            $studentLogin = self::login($students[$s]);
+
+            // Loop through all problems inside assignments created
+            $p = 0;
+            foreach ($courseData['assignment_aliases'] as $assignmentAlias) {
+                $assignment = AssignmentsDAO::search(new Assignments([
+                    'course_id' => $course->course_id,
+                    'alias' => $assignmentAlias,
+                ]))[0];
+
+                $expectedScores[$studentUsername][$assignmentAlias] = 0;
+
+                foreach ($problemAssignmentsMap[$assignmentAlias] as $problemData) {
+                    $p++;
+                    if ($s % 2 == $p % 2) {
+                        // PA run
+                        $runResponsePA = RunController::apiCreate(new Request([
+                            'auth_token' => $studentLogin->auth_token,
+                            'problemset_id' => $assignment->problemset_id,
+                            'problem_alias' => $problemData['request']['alias'],
+                            'language' => 'c',
+                            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+                        ]));
+                        RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', 200, $runResponsePA['guid']);
+                        $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
+
+                        if (($s + $p) % 3 == 0) {
+                            // 100 pts run
+                            $runResponseAC = RunController::apiCreate(new Request([
+                                'auth_token' => $studentLogin->auth_token,
+                                'problemset_id' => $assignment->problemset_id,
+                                'problem_alias' => $problemData['request']['alias'],
+                                'language' => 'c',
+                                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+                            ]));
+                            RunsFactory::gradeRun(null /*runData*/, 1, 'AC', 200, $runResponseAC['guid']);
+                            $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Adding a new student with no runs. Should show in progress
+        $studentWithNoRuns = CoursesFactory::addStudentToCourse($courseData);
+
+        // Call API
         $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiListStudents(new Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
 
+        // Verify response maps to expected scores
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals($homeworkCount, $response['counts']['homework']);
-        $this->assertEquals($testCount, $response['counts']['test']);
+        foreach ($expectedScores as $username => $scores) {
+            $this->assertArrayHasKey($username, $response['students']);
+
+            foreach ($scores as $assignmentAlias => $assignmentScore) {
+                $this->assertArrayHasKey($assignmentAlias, $response['students'][$username]['progress']);
+                $this->assertEquals($assignmentScore, $response['students'][$username]['progress'][$assignmentAlias]);
+            }
+        }
+
+        // Verify the student with no runs is on the list but with 0 reported assignments
+        $this->assertArrayHasKey($studentWithNoRuns->username, $response['students']);
+        $this->assertEquals(0, count($response['students'][$studentWithNoRuns->username]['progress']));
     }
 }

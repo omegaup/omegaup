@@ -488,18 +488,16 @@ class CourseController extends Controller {
         $students = null;
         $counts = null;
         try {
-            $students = CoursesDAO::getStudentsForCourseWithProgress(
+            $students = CoursesDAO::getStudentsInCourseWithProgressPerAssignment(
                 $r['course']->course_id,
                 $r['course']->group_id
             );
-            $counts = AssignmentsDAO::getAssignmentCountsForCourse($r['course']->course_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         return [
             'students' => $students,
-            'counts' => $counts,
             'status' => 'ok'
             ];
     }
