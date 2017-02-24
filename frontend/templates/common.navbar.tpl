@@ -33,6 +33,7 @@
 							<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
 						{/if}
 						<li class="hidden-xs hidden-sm{if isset($navbarSection) && $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
+						<li class="hidden-xs hidden-sm{if isset($navbarSection) && $navbarSection == "schools"} active{/if}" id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
 						<li class="hidden-xs hidden-sm"><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 						<li class="hidden-xs hidden-sm"><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 						<li id="nav-mas" class="hidden-md hidden-lg">
