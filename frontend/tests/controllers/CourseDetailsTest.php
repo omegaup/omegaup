@@ -95,7 +95,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      * Get details with user not registered to the Course. Should fail.
      * @expectedException ForbiddenAccessException
      */
-    public function testGetCourseDetailsNormalUser() {
+    public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
