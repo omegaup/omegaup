@@ -116,10 +116,6 @@ class CoursesFactory {
         return $student;
     }
 
-    public static function addProblemToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problem) {
-        return self::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem])[0];
-    }
-
     public static function addProblemsToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problems) {
         $responses = [];
         foreach ($problems as $problem) {

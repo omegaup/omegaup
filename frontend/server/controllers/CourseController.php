@@ -379,7 +379,7 @@ class CourseController extends Controller {
         $problemsetProblem->problem_id = $problem->problem_id;
 
         if (is_null(ProblemsetProblemsDAO::getByPK($problemsetProblem->problemset_id, $problemsetProblem->problem_id))) {
-            throw new NotFoundException('problemsetProblemNotFound');
+            throw new NotFoundException('problemNotPartOfAssignment');
         }
 
         // Delete the entry from the database
