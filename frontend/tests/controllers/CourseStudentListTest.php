@@ -75,13 +75,13 @@ class CourseStudentListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(['homework' => 5, 'test' => 5]);
 
         // Add problems to assignments
+        $adminLogin = self::login($courseData['admin']);
         for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
             $assignmentAlias = $courseData['assignment_aliases'][$i];
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
                 $problemData = ProblemsFactory::createProblem();
-                $adminLogin = self::login($courseData['admin']);
                 CourseController::apiAddProblem(new Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
