@@ -37,7 +37,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaRunSubmitUpload: "Ou fazer upload de um arquivo",
 	arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
 	assignmentNotFound: "Designação não encontrado",
-	birthdayInTheFuture: "Desculpe, omegaup não suporta viajantes do tempo.",
+	birthdayInTheFuture: "Você não tem idade suficiente para usar omegaUp",
 	cannotAddProb: "Não é possível adicionar problema. Você não é o diretor do concurso.",
 	cannotRemoveProblem: "Não é possível eliminar problema. Você não é o diretor do concurso.",
 	cannotRemoveProblemWithSubmissions: "Você não pode eliminar um problema que já tenha submissões",

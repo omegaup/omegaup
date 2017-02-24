@@ -1554,7 +1554,7 @@ class UserController extends Controller {
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= time()) {
+            if ($r['birth_date'] >= strtotime('-5 year', time())) {
                 throw new InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
         }
