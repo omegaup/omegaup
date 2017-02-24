@@ -33,7 +33,7 @@ FIXJSSTYLE_PATH = _find_pip_tool('fixjsstyle')
 def run_linter(args, files, validate_only):
   '''Runs the Google Closure Compiler linter against |files|.'''
   root = git_tools.root_dir()
-  validation_passed = True
+  file_violations = set()
   for filename in files:
     contents = git_tools.file_contents(args, root, filename)
 
@@ -53,11 +53,11 @@ def run_linter(args, files, validate_only):
               (COLORS.HEADER, filename, COLORS.NORMAL,
                str(b'\n'.join(e.output.split(b'\n')[1:]), encoding='utf-8')),
               file=sys.stderr)
-        validation_passed = False
+        file_violations.add(filename)
       with open(f.name, 'rb') as f2:
         new_contents = f2.read()
       if contents != new_contents:
-        validation_passed = False
+        file_violations.add(filename)
         if validate_only:
           print('File %s%s%s lint failed.' %
                 (COLORS.HEADER, filename, COLORS.NORMAL),
@@ -67,7 +67,7 @@ def run_linter(args, files, validate_only):
             COLORS.NORMAL), file=sys.stderr)
           with open(os.path.join(root, filename), 'wb') as o:
             o.write(new_contents)
-  return validation_passed
+  return file_violations
 
 def main():
   if not git_tools.verify_toolchain({
@@ -85,13 +85,15 @@ def main():
 
   validate_only = args.tool == 'validate'
 
-  if not run_linter(args, args.files, validate_only):
+  file_violations = run_linter(args, args.files, validate_only)
+  if file_violations:
     if validate_only:
-      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args, file_violations):
         return 1
       print('%sValidation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
-            COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
+            COLORS.NORMAL,
+            git_tools.get_fix_commandline(sys.argv[0], args, file_violations)),
             file=sys.stderr)
     else:
       print('Files written to working directory. '

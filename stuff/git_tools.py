@@ -203,18 +203,20 @@ def parse_arguments(tool_description=None, file_whitelist=(),
           file=sys.stderr)
   return args
 
-def _get_fix_args(progname, args):
+def _get_fix_args(progname, args, files=None):
   '''Gets the command arguments to run to fix violations.'''
   params = [progname, 'fix']
   params.extend(args.commits)
-  if args.files:
+  if not files and arg.files:
+    files = arg.files
+  if files:
     params.append('--')
-    params.extend(args.files)
+    params.extend(sorted(files))
   return params
 
-def get_fix_commandline(progname, args):
+def get_fix_commandline(progname, args, files=None):
   '''Gets the commandline the developer must run to fix violations.'''
-  return ' '.join(pipes.quote(p) for p in _get_fix_args(progname, args))
+  return ' '.join(pipes.quote(p) for p in _get_fix_args(progname, args, files))
 
 def verify_toolchain(binaries):
   '''Verifies that the developer has all necessary tools installed.'''
@@ -234,7 +236,7 @@ def _is_single_commit_pushed(args):
       ['/usr/bin/git', 'rev-parse', '%s^' % args.commits[1]],
       universal_newlines=True).strip()
 
-def attempt_automatic_fixes(scriptname, args):
+def attempt_automatic_fixes(scriptname, args, files=None):
   '''Attempts to automatically fix any fixable errors.'''
   if not sys.stdin.isatty():
     # There is no one to ask.
@@ -244,7 +246,7 @@ def attempt_automatic_fixes(scriptname, args):
     return False
   # This should always "fail" because it's designed to block `git push`.
   # We cannot use check_call() for that reason.
-  subprocess.call(_get_fix_args(scriptname, args))
+  subprocess.call(_get_fix_args(scriptname, args, files))
   if not subprocess.check_output(['/usr/bin/git',
                                   'status', '--porcelain']).strip():
     # The fix failed?
