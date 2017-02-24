@@ -1,8 +1,7 @@
-import API from '../api.js';
-import UI from '../ui.js';
-import Vue from 'vue';
+import course_AddStudents from '../components/course/AddStudents.vue';
 import course_ViewProgress from '../components/course/ViewProgress.vue';
-import {OmegaUp, T} from '../omegaup.js';
+import {API, UI, OmegaUp, T} from '../omegaup.js';
+import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   if (window.location.hash) {
@@ -39,6 +38,48 @@ OmegaUp.on('ready', function() {
     },
     components: {
       'omegaup-course-viewprogress': course_ViewProgress,
+    },
+  });
+
+  var addStudents = new Vue({
+    el: '#add-students div',
+    render: function(createElement) {
+      return createElement('omegaup-course-addstudents', {
+        props: {
+          T: T,
+          students: this.students,
+        },
+        on: {
+          'add-student': function(username) {
+            API.Course.addStudent({
+                        course_alias: courseAlias,
+                        usernameOrEmail: username,
+                      })
+                .then(function(data) {
+                  refreshStudentList();
+                  UI.success(T.courseStudentAdded);
+                })
+                .fail(UI.apiError);
+          },
+          remove: function(student) {
+            API.Course.removeStudent({
+                        course_alias: courseAlias,
+                        usernameOrEmail: student.username
+                      })
+                .then(function(data) {
+                  refreshStudentList();
+                  UI.success(T.courseStudentRemoved);
+                })
+                .fail(UI.apiError);
+          },
+        },
+      });
+    },
+    data: {
+      students: [],
+    },
+    components: {
+      'omegaup-course-addstudents': course_AddStudents,
     },
   });
 
@@ -90,27 +131,13 @@ OmegaUp.on('ready', function() {
         });
   });
 
-  $('#add-member-form')
-      .submit(function(ev) {
-        ev.preventDefault();
-
-        API.Course.addStudent({
-                    course_alias: courseAlias,
-                    usernameOrEmail: $('#member-username').val()
-                  })
-            .then(function(data) {
-              refreshStudentList();
-              UI.success(T.courseStudentAdded);
-            })
-            .fail(UI.apiError);
-      });
-
   function refreshStudentList() {
     API.Course.listStudents({course_alias: courseAlias})
         .then(function(data) {
           viewProgress.totalHomeworks = data['counts']['homework'] || 0;
           viewProgress.totalTests = data['counts']['homework'] || 0;
           viewProgress.students = data['students'];
+          addStudents.students = data['students'];
         })
         .fail(UI.apiError);
   }

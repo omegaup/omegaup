@@ -24,7 +24,7 @@
 			{include file='course.assignment.add.problems.form.tpl'}
 		</div>
 		<div class="tab-pane" id="add-students">
-			{include file='course.assignment.add.students.form.tpl'}
+			<div></div>
 		</div>
 		<div class="tab-pane" id="view-progress">
 			<div></div>
