@@ -116,7 +116,7 @@ class CoursesDAO extends CoursesDAOBase {
                         WHERE a.course_id = ?
                         GROUP BY a.assignment_id, psp.problem_id, r.user_id
                     ) bpr
-                    GROUP BY bpr.alias, bpr.user_id
+                    GROUP BY bpr.assignment_id, bpr.user_id
                 ) pr
                 ON pr.user_id = u.user_id';
 
