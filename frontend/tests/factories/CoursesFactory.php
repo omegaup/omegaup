@@ -117,11 +117,11 @@ class CoursesFactory {
     }
 
     public static function addProblemToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problem) {
-        return self::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, array($problem))[0];
+        return self::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem])[0];
     }
 
     public static function addProblemsToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problems) {
-        $responses = array();
+        $responses = [];
         foreach ($problems as $problem) {
             // Add a problem to the assignment
             $responses[] = CourseController::apiAddProblem(new Request([

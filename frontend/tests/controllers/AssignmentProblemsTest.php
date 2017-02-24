@@ -66,10 +66,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add multiple problems to the assignment
-        $problems = array(
+        $problems = [
             ProblemsFactory::createProblem(null, null, 1, $user, null, $login),
             ProblemsFactory::createProblem(null, null, 1, $user, null, $login),
-            ProblemsFactory::createProblem(null, null, 1, $user, null, $login));
+            ProblemsFactory::createProblem(null, null, 1, $user, null, $login)];
         $responses = CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, $problems);
         $this->assertEquals('ok', $responses[0]['status']);
         $this->assertEquals('ok', $responses[1]['status']);
