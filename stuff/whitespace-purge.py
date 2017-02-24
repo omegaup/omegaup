@@ -31,7 +31,7 @@ def run_validations(args, files, validate_only):
   single string, allowing for multi-line matches.
   '''
   root = git_tools.root_dir()
-  validation_passed = True
+  file_violations = set()
   for filename in files:
     contents = git_tools.file_contents(args, root, filename)
     violations = []
@@ -45,7 +45,7 @@ def run_validations(args, files, validate_only):
         contents = replaced
 
     if violations:
-      validation_passed = False
+      file_violations.add(filename)
       violations_message = ', '.join('%s%s%s' % (COLORS.FAIL, violation,
         COLORS.NORMAL) for violation in violations)
       if validate_only:
@@ -56,24 +56,26 @@ def run_validations(args, files, validate_only):
           violations_message), file=sys.stderr)
         with open(os.path.join(root, filename), 'wb') as f:
           f.write(replaced)
-  return validation_passed
+  return file_violations
 
 def main():
   args = git_tools.parse_arguments(tool_description='purges whitespace',
-        file_whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
+        file_whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py|vue)$'],
         file_blacklist=[br'.*third_party.*'])
   if not args.files:
     return 0
 
   validate_only = args.tool == 'validate'
 
-  if not run_validations(args, args.files, validate_only):
+  file_violations = run_validations(args, args.files, validate_only)
+  if file_violations:
     if validate_only:
-      if git_tools.attempt_automatic_fixes(sys.argv[0], args):
+      if git_tools.attempt_automatic_fixes(sys.argv[0], args, file_violations):
         return 1
       print('%sWhitespace validation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
-            COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
+            COLORS.NORMAL,
+            git_tools.get_fix_commandline(sys.argv[0], args, file_violations)),
             file=sys.stderr)
     else:
       print('Files written to working directory. '
