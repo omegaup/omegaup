@@ -1488,11 +1488,13 @@ class UserController extends Controller {
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['name'], 'name', false);
-        Validators::isStringOfMaxLength($r['name'], 'name', 50);
-        Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
+        if (!is_null($r['name'])) {
+            Validators::isStringNonEmpty($r['name'], 'name', true);
+            Validators::isStringOfMaxLength($r['name'], 'name', 50);
+        }
 
         if (!is_null($r['country_id'])) {
+            Validators::isStringNonEmpty($r['country_id'], 'country_id', true);
             try {
                 $r['country'] = CountriesDAO::getByPK($r['country_id']);
             } catch (Exception $e) {
@@ -1500,13 +1502,9 @@ class UserController extends Controller {
             }
         }
 
-        if ($r['state_id'] === 'null') {
-            $r['state_id'] = null;
-        }
-
-        Validators::isNumber($r['state_id'], 'state_id', false);
-
         if (!is_null($r['state_id'])) {
+            Validators::isNumber($r['state_id'], 'state_id', false);
+
             try {
                 $r['state'] = StatesDAO::getByPK($r['state_id']);
             } catch (Exception $e) {
@@ -1555,17 +1553,25 @@ class UserController extends Controller {
                 Validators::isDate($r['birth_date'], 'birth_date', false);
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
+
+            if ($r['birth_date'] >= strtotime('-5 year', time())) {
+                throw new InvalidParameterException('birthdayInTheFuture', 'birth_date');
+            }
         }
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            $query = LanguagesDAO::search(new Languages([ 'name' => $r['locale']]));
-            if (sizeof($query) == 1) {
-                $r['current_user']->language_id = $query[0]->language_id;
+            $query = LanguagesDAO::search(new Languages(['name' => $r['locale']]));
+            if (sizeof($query) != 1) {
+                throw new InvalidParameterException('invalidLanguage', 'locale');
             }
+
+            $r['current_user']->language_id = $query[0]->language_id;
         }
 
-        Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
+        if (!is_null($r['recruitment_optin'])) {
+            Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
+        }
 
         $valueProperties = [
             'name',

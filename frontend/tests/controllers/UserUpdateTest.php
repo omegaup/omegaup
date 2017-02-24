@@ -11,9 +11,10 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testUserUpdate() {
         // Create the user to edit
         $user = UserFactory::createUser();
-
-        $states = StatesDAO::search(['country_id' => 'MX']);
         $login = self::login($user);
+
+        $locale = LanguagesDAO::search(['name' => 'pt']);
+        $states = StatesDAO::search(['country_id' => 'MX']);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -22,21 +23,56 @@ class UserUpdateTest extends OmegaupTestCase {
             'scholar_degree' => 'Maestría',
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
+            'locale' => $locale[0]->name,
             'recruitment_optin' => 1,
         ]);
 
-        // Call api
-        $response = UserController::apiUpdate($r);
+        UserController::apiUpdate($r);
 
         // Check user from db
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->name, $r['name']);
-        $this->assertEquals($user_db->country_id, $r['country_id']);
-        $this->assertEquals($user_db->state_id, $r['state_id']);
-        $this->assertEquals($user_db->scholar_degree, $r['scholar_degree']);
-        $this->assertEquals($user_db->birth_date, gmdate('Y-m-d', $r['birth_date']));
-        $this->assertEquals($user_db->graduation_date, gmdate('Y-m-d', $r['graduation_date']));
-        $this->assertEquals($user_db->recruitment_optin, $r['recruitment_optin']);
+        $this->assertEquals($r['name'], $user_db->name);
+        $this->assertEquals($r['country_id'], $user_db->country_id);
+        $this->assertEquals($r['state_id'], $user_db->state_id);
+        $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
+        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
+        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
+        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
+        $this->assertEquals($locale[0]->language_id, $user_db->language_id);
+
+        // Edit all fields again with diff values
+        $locale = LanguagesDAO::search(['name' => 'pseudo']);
+        $states = StatesDAO::search(['country_id' => 'US']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'scholar_degree' => 'Primaria',
+            'birth_date' => strtotime('2000-02-02'),
+            'graduation_date' => strtotime('2026-03-03'),
+            'locale' => $locale[0]->name,
+            'recruitment_optin' => 0,
+        ]);
+
+        UserController::apiUpdate($r);
+
+        // Check user from db
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($r['name'], $user_db->name);
+        $this->assertEquals($r['country_id'], $user_db->country_id);
+        $this->assertEquals($r['state_id'], $user_db->state_id);
+        $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
+        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
+        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
+        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
+        $this->assertEquals($locale[0]->language_id, $user_db->language_id);
+
+        // Double check language update with the appropiate API
+        $r = new Request([
+            'username' => $user->username
+        ]);
+        $this->assertEquals($locale[0]->name, UserController::getPreferredLanguage($r));
     }
 
     /**
@@ -94,27 +130,9 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * Request parameter recruitment_optin cannot be null
-     * @expectedException InvalidParameterException
-     */
-    public function testNullRecruitmentOptinUpdate() {
-        $user = UserFactory::createUser();
-
-        $login = self::login($user);
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
-            // Null recruitment_optin
-            'recruitment_optin' => null,
-        ]);
-
-        UserController::apiUpdate($r);
-    }
-
-    /**
      * Exercising valid values for the recruitment flag while updating an user
      */
-    public function testRecruitmentOptinUpdate() {
+    public function testRecruitmentOptionUpdate() {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
@@ -134,5 +152,43 @@ class UserUpdateTest extends OmegaupTestCase {
         UserController::apiUpdate($r);
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
         $this->assertEquals($user_db->recruitment_optin, $r['recruitment_optin']);
+    }
+
+    /**
+     * @expectedException InvalidParameterException
+     */
+    public function testFutureBirthday() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'birth_date' => strtotime('2088-01-01'),
+        ]);
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * https://github.com/omegaup/omegaup/issues/997
+     */
+    public function testUpdateCountryWithNoStateData() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Choose a country for which we dont have state
+        // data, like Nicaragua
+        $country_id = 'NI';
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'country_id' => $country_id,
+        ]);
+
+        UserController::apiUpdate($r);
+
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->country_id, $country_id);
     }
 }
