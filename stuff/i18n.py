@@ -56,7 +56,7 @@ for lang_path in glob(os.path.join(templates_dir, '*.lang')):
 				m = VALUE_RE.match(value)
 				if m is None:
 					raise Exception("Invalid value")
-				strings[key][lang] = m.group(1)
+				strings[key][lang] = m.group(1).replace(r'\"', '"')
 			except:
 				print('Invalid i18n line "%s" in %s:%d' % (
 						line.strip(), lang_path, lineno + 1), file=sys.stderr)
@@ -107,7 +107,7 @@ if args.validate:
 def pseudoloc(s):
 	healthy = 'elsot'
 	yummy = '31507'
-	table = dict([(ord(healthy[i]), yummy[i]) for i in range(len(healthy))] + [(ord('"'), '')])
+	table = dict([(ord(healthy[i]), yummy[i]) for i in range(len(healthy))])
 	tokens = re.split('(%\([a-zA-Z0-9_-]+\))', s)
 	for i in range(len(tokens)):
 		if tokens[i].startswith('%(') and tokens[i].endswith(')'):
@@ -125,7 +125,7 @@ for lang in languages:
 	lang_path = os.path.join(templates_dir, lang + '.lang')
 	with open(lang_path, 'w') as lang_file:
 		for key in sorted(strings.keys()):
-			lang_file.write('%s = "%s"\n' % (key, strings[key][lang]))
+			lang_file.write('%s = "%s"\n' % (key, strings[key][lang].replace('"', r'\"')))
 	json_map = {}
 	for key in sorted(strings.keys()):
 		json_map[key] = strings[key][lang]
