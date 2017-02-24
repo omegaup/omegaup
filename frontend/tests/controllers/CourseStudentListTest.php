@@ -164,8 +164,8 @@ class CourseStudentListTest extends OmegaupTestCase {
             $this->assertArrayHasKey($username, $response['students']);
 
             foreach ($scores as $assignmentAlias => $assignmentScore) {
-                $this->assertArrayHasKey($assignmentAlias, $response['students'][$username]['progress']);
-                $this->assertEquals($assignmentScore, $response['students'][$username]['progress'][$assignmentAlias]);
+                $this->assertArrayHasKey($assignmentAlias, $response['students'][$username]['progress'], "Alias $assignmentAlias not found in response");
+                $this->assertEquals($assignmentScore, $response['students'][$username]['progress'][$assignmentAlias], "Score for $username $assignmentAlias did not match expected.");
             }
         }
 
