@@ -13,6 +13,11 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'umd'
   },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'omegaup',
+    }),
+  ],
   module: {
     rules: [
       {
