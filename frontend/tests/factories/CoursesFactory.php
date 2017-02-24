@@ -118,4 +118,19 @@ class CoursesFactory {
 
         return $student;
     }
+
+    public static function addProblemsToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problems) {
+        $responses = [];
+        foreach ($problems as $problem) {
+            // Add a problem to the assignment
+            $responses[] = CourseController::apiAddProblem(new Request([
+                'auth_token' => $login->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+            ]));
+        }
+
+        return $responses;
+    }
 }

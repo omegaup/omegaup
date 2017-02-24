@@ -319,17 +319,71 @@ class CourseController extends Controller {
         $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
 
         if (is_null($problemSet)) {
-            throw new InvalidDatabaseOperationException();
+            throw new NotFoundException('problemsetNotFound');
         }
 
         // Get this problem
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         $problemSetProblem = new ProblemsetProblems();
         $problemSetProblem->problemset_id = $problemSet->problemset_id;
         $problemSetProblem->problem_id = $problem->problem_id;
 
         ProblemsetProblemsDAO::save($problemSetProblem);
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Remove a problem from an assignment
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiRemoveProblem(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        // Get this problem
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        // Construct the relationship entity between the problemset and the problem
+        $problemsetProblem = new ProblemsetProblems();
+        $problemsetProblem->problemset_id = $problemSet->problemset_id;
+        $problemsetProblem->problem_id = $problem->problem_id;
+
+        if (is_null(ProblemsetProblemsDAO::getByPK($problemsetProblem->problemset_id, $problemsetProblem->problem_id))) {
+            throw new NotFoundException('problemNotPartOfAssignment');
+        }
+
+        // Delete the entry from the database
+        ProblemsetProblemsDAO::delete($problemsetProblem);
 
         return ['status' => 'ok'];
     }
