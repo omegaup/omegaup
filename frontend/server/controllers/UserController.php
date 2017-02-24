@@ -1493,7 +1493,8 @@ class UserController extends Controller {
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
         }
 
-        if (!empty($r['country_id'])) {
+        if (!is_null($r['country_id'])) {
+            Validators::isStringNonEmpty($r['country_id'], 'country_id', true);
             try {
                 $r['country'] = CountriesDAO::getByPK($r['country_id']);
             } catch (Exception $e) {
