@@ -1,5 +1,5 @@
 <template>
-  <div class="panel">
+  <div class="omegaup-course-viewprogress panel">
     <div class="page-header">
       <h2>{{ T.courseStudentsProgress }}</h2>
     </div>
