@@ -82,9 +82,6 @@ class AssignmentProblemsTest extends OmegaupTestCase {
             'assignment' => $assignmentAlias,
         ]));
         $this->assertEquals(3, sizeof($getAssignmentResponse['problems']));
-        $this->assertEquals($problems[0]['problem']->alias, $getAssignmentResponse['problems'][0]['alias']);
-        $this->assertEquals($problems[1]['problem']->alias, $getAssignmentResponse['problems'][1]['alias']);
-        $this->assertEquals($problems[2]['problem']->alias, $getAssignmentResponse['problems'][2]['alias']);
 
         // Remove multiple problems from the assignment
         $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
