@@ -154,7 +154,6 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         CoursesFactory::addProblemToAssignment($forbiddenUserLogin, $courseAlias, $assignmentAlias, $problem);
     }
 
-
     /**
      * Attempts to remove a problem with a normal user.
      *
