@@ -1,5 +1,4 @@
 <script type="text/javascript" src="{version_hash src="/js/course.add.students.form.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/js/course.add.students.js"}"></script>
 
 <template id="add-student-current-list">
 	<table class="table table-striped table-over">

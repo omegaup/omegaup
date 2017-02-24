@@ -27,12 +27,12 @@
 			{include file='course.assignment.add.students.form.tpl'}
 		</div>
 		<div class="tab-pane" id="view-progress">
-			{include file='course.view.progress.tpl'}
+			<div></div>
 		</div>
 	</div>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/course.edit.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/dist/course_edit.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/course.assignment.new.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/course.assignment.add.problems.js"}"></script>
 {include file='footer.tpl'}

@@ -4,12 +4,13 @@ var webpack = require('webpack')
 module.exports = {
   entry: {
     omegaup: './frontend/www/js/omegaup/omegaup.js',
+    course_edit: './frontend/www/js/omegaup/course/edit.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
     publicPath: '/js/dist/',
-    filename: 'omegaup.js',
-    library: 'omegaup',
+    filename: '[name].js',
+    library: '[name]',
     libraryTarget: 'umd'
   },
   module: {
