@@ -355,10 +355,7 @@
 	"omegaupTitleIndex": "Index",
 	"omegaupTitleLogin": "Login",
 	"omegaupTitleMyProblemsList": "MyProblemsList",
-<<<<<<< HEAD
 	"omegaupTitleOmegaUpForSchools": "Welcome to omegaUp for Schools",
-=======
->>>>>>> master
 	"omegaupTitleProblemEdit": "ProblemEdit",
 	"omegaupTitleProblemNew": "ProblemNew",
 	"omegaupTitleProblemStats": "ProblemStats",
@@ -491,15 +488,12 @@
 	"runWaitGap": "You have to wait between consecutive submissions.",
 	"schoolNotFound": "School not found",
 	"schoolToBeAdded": "Your school has not been registered in omegaUp. It will be added when you save your changes.",
-<<<<<<< HEAD
 	"schoolsCreateCoursesThatMeetNeeds": "Courses that meet your needs. You can create your own problems.",
 	"schoolsCreateYourCourse": "Create your courses",
 	"schoolsCreateYourProblems": "Create your problems",
 	"schoolsLearnProgBySolvProblems": "Learn programming by solving problems",
 	"schoolsManageProgressOfStudents": "Manage the progress of your students",
 	"schoolsStartUsingSchools": "Start using Schools",
-=======
->>>>>>> master
 	"scoreboardmerge": "Merge scorboard",
 	"selectAction": "Select action",
 	"sendInvitesToCandidates": "Send emails",
