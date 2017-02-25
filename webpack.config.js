@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     omegaup: './frontend/www/js/omegaup/omegaup.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
+    schools_intro: './frontend/www/js/omegaup/schools/intro.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
