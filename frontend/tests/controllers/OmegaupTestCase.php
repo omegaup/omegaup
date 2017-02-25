@@ -200,6 +200,36 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Asserts that $array has at least one element that matches $predicate.
+     *
+     * @param array $array
+     * @param callable $predicate
+     */
+    public function assertArrayContainsWithPredicate($array, $predicate) {
+        foreach ($array as $key => $value) {
+            if ($predicate($value)) {
+                return;
+            }
+        }
+        $this->fail('No elements in array satisfied predicate');
+    }
+
+    /**
+     * Finds the first element in $array that matches $predicate.
+     *
+     * @param array $array
+     * @param callable $predicate
+     */
+    public function findByPredicate($array, $predicate) {
+        foreach ($array as $key => $value) {
+            if ($predicate($value)) {
+                return $value;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Asserts that string is not present in keyed array
      *
      * @param array $array

@@ -125,13 +125,23 @@ class CoursesDAO extends CoursesDAOBase {
         foreach ($rs as $row) {
             $username = $row['username'];
             if (!isset($progress[$username])) {
-                $progress[$username] = ['name' => $row['name'], 'progress' => []];
+                $progress[$username] = [
+                    'name' => $row['name'],
+                    'progress' => [],
+                    'username' => $username,
+                ];
             }
 
             if (!is_null($row['assignment_score'])) {
                 $progress[$username]['progress'][$row['assignment_alias']] = $row['assignment_score'];
             }
         }
+        usort($progress, function ($a, $b) {
+            return strcasecmp(
+                !empty($a['name']) ? $a['name'] : $a['username'],
+                !empty($b['name']) ? $b['name'] : $b['username']
+            );
+        });
         return $progress;
     }
 
