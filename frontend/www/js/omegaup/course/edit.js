@@ -135,7 +135,7 @@ OmegaUp.on('ready', function() {
     API.Course.listStudents({course_alias: courseAlias})
         .then(function(data) {
           viewProgress.totalHomeworks = data['counts']['homework'] || 0;
-          viewProgress.totalTests = data['counts']['homework'] || 0;
+          viewProgress.totalTests = data['counts']['test'] || 0;
           viewProgress.students = data['students'];
           addStudents.students = data['students'];
         })
