@@ -35,7 +35,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         $rs = $conn->Execute($sql, $course_id);
         $counts = [];
         foreach ($rs as $row) {
-            $counts[$row['assignment_type']] = $row['count'];
+            $counts[$row['assignment_type']] = intval($row['count']);
         }
         return $counts;
     }

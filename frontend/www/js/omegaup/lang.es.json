@@ -182,6 +182,7 @@
 	"courseEditAddAssignment": "Agregar tarea",
 	"courseEditAddProblems": "Agregar problema",
 	"courseEditAddStudents": "Agregar estudiantes",
+	"courseEditAddStudentsTooltip": "Agrega estudiantes utilizando su nombre de usuario de omegaUp",
 	"courseEditGoToCourse": "Ir al curso",
 	"courseGroupNotFound": "No se encontr\u00f3 el grupo del curso",
 	"courseList": "Lista de cursos",

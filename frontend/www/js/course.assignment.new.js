@@ -19,14 +19,11 @@ omegaup.OmegaUp.on('ready', function() {
               $('select[name="assignment_type"]', assignmentForm).val(),
         })
         .then(function(data) {
-          if (data.status == 'ok') {
-            omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
-            assignmentForm[0].reset();
-            setDefaultDates();
-          } else {
-            omegaup.UI.error(data.error || 'error');
-          }
-        });
+          omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
+          assignmentForm[0].reset();
+          setDefaultDates();
+        })
+        .fail(omegaup.UI.apiError);
     return false;
   });
 

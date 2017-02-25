@@ -185,6 +185,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddAssignment: "Add assignment",
 	courseEditAddProblems: "Add problem",
 	courseEditAddStudents: "Add students",
+	courseEditAddStudentsTooltip: "Add students using their omegaUp username",
 	courseEditGoToCourse: "Go to course",
 	courseGroupNotFound: "Course group not found",
 	courseList: "Courses list",
