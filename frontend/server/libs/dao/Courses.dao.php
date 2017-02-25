@@ -139,7 +139,8 @@ class CoursesDAO extends CoursesDAOBase {
         usort($progress, function ($a, $b) {
             return strcasecmp(
                 !empty($a['name']) ? $a['name'] : $a['username'],
-                !empty($b['name']) ? $b['name'] : $b['username']);
+                !empty($b['name']) ? $b['name'] : $b['username']
+            );
         });
         return $progress;
     }
