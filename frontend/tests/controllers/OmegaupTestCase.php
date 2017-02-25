@@ -200,6 +200,21 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Finds the first element in $array that matches $predicate.
+     *
+     * @param array $array
+     * @param callable $predicate
+     */
+    public function findByPredicate($array, $predicate) {
+        foreach ($array as $key => $value) {
+            if ($predicate($value)) {
+                return $value;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Asserts that string is not present in keyed array
      *
      * @param array $array

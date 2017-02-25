@@ -161,16 +161,26 @@ class CourseStudentListTest extends OmegaupTestCase {
         // Verify response maps to expected scores
         $this->assertEquals('ok', $response['status']);
         foreach ($expectedScores as $username => $scores) {
-            $this->assertArrayHasKey($username, $response['students']);
+            $student = $this->findByPredicate($response['students'], function ($value) use ($username) {
+                return $value['username'] == $username;
+            });
+            if ($student == null) {
+                $this->fail("Failed asserting that the response has student {$username}");
+            }
 
             foreach ($scores as $assignmentAlias => $assignmentScore) {
-                $this->assertArrayHasKey($assignmentAlias, $response['students'][$username]['progress'], "Alias $assignmentAlias not found in response");
-                $this->assertEquals($assignmentScore, $response['students'][$username]['progress'][$assignmentAlias], "Score for $username $assignmentAlias did not match expected.");
+                $this->assertArrayHasKey($assignmentAlias, $student['progress'], "Alias $assignmentAlias not found in response");
+                $this->assertEquals($assignmentScore, $student['progress'][$assignmentAlias], "Score for $username $assignmentAlias did not match expected.");
             }
         }
 
         // Verify the student with no runs is on the list but with 0 reported assignments
-        $this->assertArrayHasKey($studentWithNoRuns->username, $response['students']);
-        $this->assertEquals(0, count($response['students'][$studentWithNoRuns->username]['progress']));
+        $student = $this->findByPredicate($response['students'], function ($value) use ($studentWithNoRuns) {
+            return $value['username'] == $studentWithNoRuns->username;
+        });
+        if ($student == null) {
+            $this->fail("Failed asserting that the response has student {$studentWithNoRuns->username}");
+        }
+        $this->assertEquals(0, count($student['progress']));
     }
 }
