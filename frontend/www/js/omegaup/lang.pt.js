@@ -492,7 +492,7 @@ omegaup.OmegaUp.loadTranslations({
 	runWaitGap: "Voc\u00ea tem que esperar entre submiss\u00f5es consecutivas.",
 	schoolNotFound: "Escola n\u00e3o encontrada",
 	schoolToBeAdded: "Sua escola n\u00e3o foi registrada em omegaUp. Ele ser\u00e1 adicionada quando voc\u00ea salvar suas reda\u00e7\u00f5es.",
-	schoolsCreateCoursesThatMeetNeeds: "Cursos que atendam \u00e0s suas necessidades. Voc\u00ea pode criar seus pr\u00f3prios problemas.",
+	schoolsCreateCoursesThatMeetNeeds: "Cursos que atendem \u00e0s suas necessidades. Voc\u00ea pode criar seus pr\u00f3prios problemas.",
 	schoolsCreateYourCourse: "Crie seus cursos",
 	schoolsCreateYourProblems: "Crie seus problemas",
 	schoolsLearnProgBySolvProblems: "Aprender programa\u00e7\u00e3o resolvendo problemas",

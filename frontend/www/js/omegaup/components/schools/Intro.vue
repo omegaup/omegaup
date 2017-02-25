@@ -47,3 +47,25 @@ export default {
   },
 };
 </script>
+
+<style>
+.header-bg {
+    background-image: url(/media/teacher3.jpg);
+    background-position-x: -200px;
+    background-position-y: -270px;
+    color: white;
+    height: 250px;
+    padding: 10px;
+    text-align: center;
+}
+
+.header-bg h1 {
+    font-size: 40px ;
+    margin-top: 80px;
+    text-shadow: 1px 1px #678DD7;
+}
+body {
+    background: #fff;
+}
+</style>
+
