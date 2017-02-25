@@ -414,7 +414,7 @@ class CourseController extends Controller {
         try {
             $assignments = AssignmentsDAO::search(new Assignments([
                 'course_id' => $r['course']->course_id
-            ]));
+            ]), 'start_time');
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
