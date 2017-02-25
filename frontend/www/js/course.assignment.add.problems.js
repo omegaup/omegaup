@@ -18,26 +18,24 @@ omegaup.OmegaUp.on('ready', function() {
             problems.append(
                 $('<tr></tr>')
                     .append($('<td></td>').text(item.alias))
-                    .append($('<td><button type="button" class="close">' +
-                              '&times;</button></td>')
-                                .click((function(problemAlias) {
-                                  return function(e) {
-                                    omegaup.API.Course
-                                        .removeProblem({
-                                          course_alias: courseAlias,
-                                          problem_alias: problemAlias,
-                                          assignment_alias: assignmentAlias,
-                                        })
-                                        .then(function(response) {
-                                          // TODO: localizar
-                                          omegaup.UI.success(
-                                              'Problem successfully removed!');
-                                          // $('div.post.footer').show();
-                                          refreshProblems();
-                                        })
-                                        .fail(omegaup.UI.apiError);
-                                  };
-                                })(item.alias))));
+                    .append(
+                        $('<td><button type="button" class="close">' +
+                          '&times;</button></td>')
+                            .click((function(problemAlias) {
+                              return function(e) {
+                                omegaup.API.Course.removeProblem({
+                                                    course_alias: courseAlias,
+                                                    problem_alias: problemAlias,
+                                                    assignment_alias:
+                                                        assignmentAlias,
+                                                  })
+                                    .then(function(response) {
+                                      omegaup.UI.success('successfulOperation');
+                                      refreshProblems();
+                                    })
+                                    .fail(omegaup.UI.apiError);
+                              };
+                            })(item.alias))));
           });
         })
         .fail(omegaup.UI.apiError);
