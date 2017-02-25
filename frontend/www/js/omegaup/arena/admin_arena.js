@@ -86,12 +86,16 @@ export default class ArenaAdmin {
     if (self.arena.options.onlyProblemAlias) {
       options.show_all = true;
       options.problem_alias = self.arena.options.onlyProblemAlias;
-      API.Problem.runs(options).then(self.runsChanged.bind(self));
+      API.Problem.runs(options)
+          .then(self.runsChanged.bind(self))
+          .fail(UI.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
       API.getRuns(options, self.runsChanged.bind(self));
     } else {
       options.contest_alias = self.arena.options.contestAlias;
-      API.Contest.runs(options).then(self.runsChanged.bind(self));
+      API.Contest.runs(options)
+          .then(self.runsChanged.bind(self))
+          .fail(UI.apiError);
     }
   }
 

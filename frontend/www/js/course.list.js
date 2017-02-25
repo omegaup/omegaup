@@ -15,27 +15,29 @@ omegaup.OmegaUp.on('ready', function() {
       }
     }
   }
-  omegaup.API.Course.listCourses().then(function(data) {
-    if (data.status != 'ok') {
-      omegaup.UI.error(data.error);
-      return;
-    }
-    var viewModel = {
-      adminCoursesCurrent: ko.observableArray(),
-      adminCoursesPast: ko.observableArray(),
-      studentCoursesCurrent: ko.observableArray(),
-      studentCoursesPast: ko.observableArray(),
-    };
+  omegaup.API.Course.listCourses()
+      .then(function(data) {
+        if (data.status != 'ok') {
+          omegaup.UI.error(data.error);
+          return;
+        }
+        var viewModel = {
+          adminCoursesCurrent: ko.observableArray(),
+          adminCoursesPast: ko.observableArray(),
+          studentCoursesCurrent: ko.observableArray(),
+          studentCoursesPast: ko.observableArray(),
+        };
 
-    updateViewModel(viewModel, data, 'admin');
-    updateViewModel(viewModel, data, 'student');
-    ko.applyBindings(viewModel);
+        updateViewModel(viewModel, data, 'admin');
+        updateViewModel(viewModel, data, 'student');
+        ko.applyBindings(viewModel);
 
-    // Enable the first visible tab.
-    var tabs = $('.nav-link');
-    if (tabs.length > 0) {
-      $(tabs[0]).click();
-    }
-    $('.tab-container').show();
-  });
+        // Enable the first visible tab.
+        var tabs = $('.nav-link');
+        if (tabs.length > 0) {
+          $(tabs[0]).click();
+        }
+        $('.tab-container').show();
+      })
+      .fail(omegaup.UI.apiError);
 });

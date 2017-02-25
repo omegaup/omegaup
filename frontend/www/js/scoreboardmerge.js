@@ -1,14 +1,16 @@
 omegaup.OmegaUp.on('ready', function() {
-  omegaup.API.Contest.list().then(function(contests) {
-    // Got the contests, lets populate the dropdown with them
-    for (var i = 0; i < contests.results.length; i++) {
-      contest = contests.results[i];
-      $('select.contests')
-          .append($('<option></option>')
-                      .attr('value', contest.alias)
-                      .text(contest.title));
-    }
-  });
+  omegaup.API.Contest.list()
+      .then(function(contests) {
+        // Got the contests, lets populate the dropdown with them
+        for (var i = 0; i < contests.results.length; i++) {
+          contest = contests.results[i];
+          $('select.contests')
+              .append($('<option></option>')
+                          .attr('value', contest.alias)
+                          .text(contest.title));
+        }
+      })
+      .fail(omegaup.UI.apiError);
 
   $('#get-merged-scoreboard')
       .click(function() {

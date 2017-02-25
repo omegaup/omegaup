@@ -58,7 +58,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_interview_form #title').val(contest.title);
         $('.new_interview_form #description').val(contest.description);
         $('#window_length').val(contest.window_length);
-      });
+      })
+      .fail(omegaup.UI.apiError);
 
   function fillCandidatesTable() {
     omegaup.API.getInterview(interviewAlias, function(interview) {
@@ -99,7 +100,8 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success('Problem successfully added!');
               $('div.post.footer').show();
               refreshContestProblems();
-            });
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent page refresh
       });
@@ -139,23 +141,27 @@ omegaup.OmegaUp.on('ready', function() {
                                       $('div.post.footer').show();
                                       $(e.target.parentElement.parentElement)
                                           .remove();
-                                    });
+                                    })
+                                    .fail(omegaup.UI.apiError);
                               };
                             })(response.problems[i].alias))));
           }
-        });
+        })
+        .fail(omegaup.UI.apiError);
   }
 
-  omegaup.API.Problem.list().then(function(problems) {
-    // Got the problems, lets populate the dropdown with them
-    for (var i = 0; i < problems.results.length; i++) {
-      problem = problems.results[i];
-      $('select#problems')
-          .append($('<option></option>')
-                      .attr('value', problem.alias)
-                      .text(problem.title));
-    }
-  });
+  omegaup.API.Problem.list()
+      .then(function(problems) {
+        // Got the problems, lets populate the dropdown with them
+        for (var i = 0; i < problems.results.length; i++) {
+          problem = problems.results[i];
+          $('select#problems')
+              .append($('<option></option>')
+                          .attr('value', problem.alias)
+                          .text(problem.title));
+        }
+      })
+      .fail(omegaup.UI.apiError);
 
   omegaup.UI.problemTypeahead($('#problems-dropdown'));
 
@@ -175,7 +181,8 @@ omegaup.OmegaUp.on('ready', function() {
               $('div.post.footer').show();
 
               refreshContestAdmins();
-            });
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -218,7 +225,8 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(admin.username))));
           }
@@ -255,11 +263,13 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(group_admin.alias))));
           }
-        });
+        })
+        .fail(omegaup.UI.apiError);
   }
   $('#add-group-admin-form')
       .submit(function() {
@@ -271,7 +281,8 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.UI.success(omegaup.T.adminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
-            });
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
       });

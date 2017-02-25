@@ -14,6 +14,7 @@ $('document')
                   $('#status').addClass('alert-success');
                   $('#status').slideDown();
                 })
+                .fail(omegaup.UI.apiError)
                 .always(function() { $('#wait')
                                          .hide(); });
 

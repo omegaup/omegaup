@@ -22,7 +22,8 @@
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
     "dev": "cross-env NODE_ENV=development webpack --watch",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "refactor": "cross-env ./stuff/refactor.js"
   },
   "dependencies": {
     "vue": "^2.1.10"

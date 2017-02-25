@@ -38,7 +38,8 @@ omegaup.OmegaUp.on('ready', function() {
       omegaup.API.Problem.runs({problem_alias: problem.alias})
           .then(function(data) {
             onlyProblemUpdateRuns(data.runs, 'score', 100);
-          });
+          })
+          .fail(omegaup.UI.apiError);
     }
 
     if (problem.user.admin) {
