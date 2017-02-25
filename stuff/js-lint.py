@@ -43,6 +43,9 @@ def run_linter(args, files, validate_only):
       f.seek(0, 0)
 
       try:
+        subprocess.check_output(['yarn', 'run', 'refactor', '--', f.name,
+                                 '--assume-filename=%s' % filename],
+                                stderr=subprocess.STDOUT)
         subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name],
                                 stderr=subprocess.STDOUT)
         subprocess.check_output([CLANG_FORMAT_PATH, '-style=Google',
