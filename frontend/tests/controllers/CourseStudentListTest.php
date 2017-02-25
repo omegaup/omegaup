@@ -28,7 +28,9 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         foreach ($students as $s) {
-            $this->assertArrayHasKey($s->username, $response['students']);
+            $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {
+                return $value['username'] == $s->username;
+            });
         }
     }
 
