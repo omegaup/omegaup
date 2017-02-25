@@ -16,11 +16,11 @@ omegaup.OmegaUp.on('ready', function() {
               show_scoreboard: $('.new_course_form #show_scoreboard').val(),
             })
             .then(function(data) {
-              if (data.status == 'ok')
-                window.location.replace('/course/' +
-                                        $('.new_course_form #alias').val() +
-                                        '/edit/#problems');
-            });
+              window.location.replace('/course/' +
+                                      $('.new_course_form #alias').val() +
+                                      '/edit/#problems');
+            })
+            .fail(omegaup.UI.apiError);
 
         return false;
       });
