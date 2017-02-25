@@ -32,5 +32,6 @@ omegaup.OmegaUp.on('ready', function() {
         course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';
 
         ko.applyBindings(course, $('#course-info')[0]);
-      });
+      })
+      .fail(omegaup.UI.apiError);
 });

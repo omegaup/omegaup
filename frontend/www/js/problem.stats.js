@@ -14,7 +14,8 @@ omegaup.OmegaUp.on('ready', function() {
         .then(function(s) {
           stats = s;
           drawCharts();
-        });
+        })
+        .fail(omegaup.UI.apiError);
     updateStats();
   }
 

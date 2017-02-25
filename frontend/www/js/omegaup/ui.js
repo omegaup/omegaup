@@ -159,7 +159,8 @@ let UI = {
             {
               source: function(query, cb) {
                 API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); });
+                    .then(function(data) { cb(data.results); })
+                    .fail(UI.apiError);
               },
               displayKey: 'alias',
               templates: {

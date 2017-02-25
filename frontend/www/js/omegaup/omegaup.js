@@ -77,19 +77,21 @@ export let OmegaUp = {
       _initialize:
           function() {
             var t0 = new Date().getTime();
-            API.Session.currentSession().then(function(data) {
-              if (data.session.valid) {
-                OmegaUp.loggedIn = true;
-                OmegaUp._deltaTime = data.time * 1000 - t0;
-                OmegaUp.username = data.session.user.username;
-                OmegaUp.email = data.session.email;
-              }
+            API.Session.currentSession()
+                .then(function(data) {
+                  if (data.session.valid) {
+                    OmegaUp.loggedIn = true;
+                    OmegaUp._deltaTime = data.time * 1000 - t0;
+                    OmegaUp.username = data.session.user.username;
+                    OmegaUp.email = data.session.email;
+                  }
 
-              OmegaUp.ready = true;
-              if (OmegaUp._documentReady) {
-                OmegaUp._notify('ready');
-              }
-            });
+                  OmegaUp.ready = true;
+                  if (OmegaUp._documentReady) {
+                    OmegaUp._notify('ready');
+                  }
+                })
+                .fail(UI.apiError);
           },
 
       _notify:
@@ -130,9 +132,11 @@ export let OmegaUp = {
       syncTime:
           function() {
             var t0 = new Date().getTime();
-            API.Time.get().then(function(data) {
-              OmegaUp._deltaTime = data.time * 1000 - t0;
-            });
+            API.Time.get()
+                .then(function(data) {
+                  OmegaUp._deltaTime = data.time * 1000 - t0;
+                })
+                .fail(UI.apiError);
           },
 
       _realTime:

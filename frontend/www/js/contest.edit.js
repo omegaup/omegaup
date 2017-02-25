@@ -131,7 +131,8 @@ omegaup.OmegaUp.on('ready', function() {
           } else {
             omegaup.UI.error(data.error || 'error');
           }
-        });
+        })
+        .fail(omegaup.UI.apiError);
     return false;
   }
 
@@ -385,7 +386,8 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(admin.username))));
           }
@@ -422,7 +424,8 @@ omegaup.OmegaUp.on('ready', function() {
                                               var tr = e.target.parentElement
                                                            .parentElement;
                                               $(tr).remove();
-                                            });
+                                            })
+                                            .fail(omegaup.UI.apiError);
                                       };
                                     })(group_admin.alias))));
           }

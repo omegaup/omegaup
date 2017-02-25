@@ -34,5 +34,6 @@ omegaup.OmegaUp.on('ready', function() {
         $('#ranking').show();
         $('#root').fadeIn('slow');
         $('#loading').fadeOut('slow');
-      });
+      })
+      .fail(omegaup.UI.apiError);
 });

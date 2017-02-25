@@ -1,6 +1,6 @@
 (function() {
   function OnLoad() {
-    omegaup.API.Run.counts().then(createChart);
+    omegaup.API.Run.counts().then(createChart).fail(omegaup.UI.apiError);
 
     omegaup.API.Contest.list({active: 'ACTIVE'})
         .then(function(data) {
@@ -13,7 +13,8 @@
                         '" class="list-group-item">' +
                         omegaup.UI.escape(list[i].title) + '</a>');
           }
-        });
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   function createChart(series) {
