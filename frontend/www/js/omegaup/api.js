@@ -186,6 +186,8 @@ export default {
 
     listStudents: _call('/api/course/listStudents/'),
 
+    removeProblem: _call('/api/course/removeProblem/'),
+
     removeStudent: _call('/api/course/removeStudent/'),
 
     update: _call('/api/course/update/'),

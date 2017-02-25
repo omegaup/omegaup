@@ -51,7 +51,11 @@
 			</div>
 		</form>
 	</div> <!-- panel-body -->
+	<table class="table table-striped">
+		<thead>
+			<th>{#contestAddproblemProblemName#}</th>
+			<th>{#contestAddproblemProblemRemove#}</th>
+		</thead>
+		<tbody id="assignment-problems"></tbody>
+	</table>
 </div> <!-- panel -->
-
-<script type="text/javascript" src="{version_hash src="/js/course.assignment.add.problems.form.js"}"></script>
-
