@@ -23,18 +23,12 @@ OmegaUp.on('ready', function() {
     el: '#view-progress div',
     render: function(createElement) {
       return createElement('omegaup-course-viewprogress', {
-        props: {
-          T: T,
-          students: this.students,
-          totalHomeworks: this.totalHomeworks,
-          totalTests: this.totalTests,
-        },
+        props: {T: T, students: this.students, assignments: this.assignments},
       });
     },
     data: {
       students: [],
-      totalHomeworks: 0,
-      totalTests: 0,
+      assignments: [],
     },
     components: {
       'omegaup-course-viewprogress': course_ViewProgress,
@@ -134,15 +128,18 @@ OmegaUp.on('ready', function() {
   function refreshStudentList() {
     API.Course.listStudents({course_alias: courseAlias})
         .then(function(data) {
-          if (data.counts) {
-            viewProgress.totalHomeworks = data.counts.homework || 0;
-            viewProgress.totalTests = data.counts.test || 0;
-          }
           viewProgress.students = data.students;
           addStudents.students = data.students;
         })
         .fail(UI.apiError);
   }
 
+  function refreshAssignmentsList() {
+    API.Course.listAssignments({course_alias: courseAlias})
+        .then(function(data) { viewProgress.assignments = data.assignments; })
+        .fail(UI.apiError);
+  }
+
   refreshStudentList();
+  refreshAssignmentsList();
 });

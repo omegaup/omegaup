@@ -10,14 +10,12 @@
             <thead>
               <tr>
                 <th>{{ T.wordsName }}</th>
-                <th>{{ T.wordsNumHomeworks }}</th>
-                <th>{{ T.wordsNumTests }}</th>
+                <th v-for="assignment in assignments">{{ assignment.name }}</th>
               </tr>
             </thead>
             <tr v-for="student in students">
               <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
-              <td>{{ student.count_homeworks_done }} / {{ totalHomeworks }}</td>
-              <td>{{ student.count_tests_done }} / {{ totalTests }}</td>
+              <td v-for="assignment in assignments"> {{ (assignment.alias in student.progress) ? student.progress[assignment.alias] : 0 }}</td>
             </tr>
           </table>
         </div>
@@ -31,8 +29,7 @@ export default {
   props: {
     T: Object,
     students: Array,
-    totalHomeworks: Number,
-    totalTests: Number,
+    assignments: Array,
   },
   data: function() {
     return {
