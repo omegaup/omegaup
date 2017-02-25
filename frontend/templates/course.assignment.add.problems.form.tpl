@@ -53,7 +53,6 @@
 	</div> <!-- panel-body -->
 	<table class="table table-striped">
 		<thead>
-			<th>{#contestAddproblemContestOrder#}</th>
 			<th>{#contestAddproblemProblemName#}</th>
 			<th>{#contestAddproblemProblemRemove#}</th>
 		</thead>

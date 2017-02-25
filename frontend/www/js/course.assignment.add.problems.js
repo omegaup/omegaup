@@ -17,7 +17,6 @@ omegaup.OmegaUp.on('ready', function() {
           $.each(response.problems, function(index, item) {
             problems.append(
                 $('<tr></tr>')
-                    .append($('<td></td>').text(item.order))
                     .append($('<td></td>').text(item.alias))
                     .append($('<td><button type="button" class="close">' +
                               '&times;</button></td>')
