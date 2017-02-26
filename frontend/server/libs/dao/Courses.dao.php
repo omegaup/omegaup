@@ -171,6 +171,8 @@ class CoursesDAO extends CoursesDAOBase {
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
                 (gr.role_id = ? AND gu.user_id = ?)
+            GROUP BY
+                c.course_id
             ORDER BY
                 c.course_id DESC
             LIMIT
