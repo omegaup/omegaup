@@ -514,8 +514,11 @@ export class Arena {
   updateRunFallback(guid) {
     var self = this;
     if (self.socket != null) return;
-    setTimeout(function() { API.runStatus(guid, self.updateRun.bind(self)); },
-               5000);
+    setTimeout(function() {
+      API.Run.status({run_alias: guid})
+          .then(self.updateRun.bind(self))
+          .fail(UI.ignoreError);
+    }, 5000);
   }
 
   updateRun(run) {
@@ -1775,22 +1778,22 @@ class ObservableRun {
 
   rejudge() {
     var self = this;
-    API.runRejudge(self.guid, false, function(data) {
-      if (data.status == 'ok') {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      }
-    });
+    API.run.rejudge({run_alias: self.guid, debug: false})
+        .then(function(data) {
+          self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
   }
 
   debug_rejudge() {
     var self = this;
-    API.runRejudge(self.guid, true, function(data) {
-      if (data.status == 'ok') {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      }
-    });
+    API.run.rejudge({run_alias: self.guid, debug: true})
+        .then(function(data) {
+          self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
   }
 }
 ;

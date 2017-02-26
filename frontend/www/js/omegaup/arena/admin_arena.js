@@ -90,7 +90,9 @@ export default class ArenaAdmin {
           .then(self.runsChanged.bind(self))
           .fail(UI.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
-      API.getRuns(options, self.runsChanged.bind(self));
+      API.Run.list(options)
+          .then(self.runsChanged.bind(self))
+          .fail(UI.ignoreError);
     } else {
       options.contest_alias = self.arena.options.contestAlias;
       API.Contest.runs(options)
@@ -117,8 +119,6 @@ export default class ArenaAdmin {
 
   runsChanged(data) {
     var self = this;
-
-    if (data.status != 'ok') return;
 
     for (var i = 0; i < data.runs.length; i++) {
       self.arena.trackRun(data.runs[i]);

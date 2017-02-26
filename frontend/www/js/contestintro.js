@@ -168,5 +168,4 @@ omegaup.OmegaUp.on('ready', function() {
         }
         $('#intro-page').removeClass('hidden');
       });
-
 });

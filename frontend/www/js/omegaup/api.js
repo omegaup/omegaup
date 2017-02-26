@@ -342,6 +342,16 @@ export default {
     create: _call('/api/run/create/'),
 
     details: _call('/api/run/details/'),
+
+    list: _call('/api/run/list/', _convertRuntimes),
+
+    rejudge: _call('/api/run/rejudge/'),
+
+    status: _call('/api/run/status/',
+                  function(data) {
+                    data.time = omegaup.OmegaUp.time(data.time * 1000);
+                    return data;
+                  }),
   },
 
   Session: {
@@ -464,55 +474,6 @@ export default {
             callback(JSON.parse(j.responseText));
           } catch (err) {
             callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  getRuns: function(options, callback) {
-    $.post('/api/run/list/', options,
-           function(data) {
-             _convertRuntimes(data);
-             callback(data);
-           },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  runStatus: function(guid, callback) {
-    $.get('/api/run/status/run_alias/' + encodeURIComponent(guid) + '/',
-          function(data) {
-            data.time = omegaup.OmegaUp.time(data.time * 1000);
-            callback(data);
-          },
-          'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  runRejudge: function(guid, debug, callback) {
-    $.get('/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/' +
-              (debug ? 'debug/true/' : ''),
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
           }
         });
   },

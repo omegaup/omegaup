@@ -25,7 +25,8 @@ omegaup.OmegaUp.on('ready', function() {
       })
       .fail(omegaup.UI.apiError);
 
-  omegaup.API.getRuns(
-      {username: candidateUsername, contest_alias: interviewAlias},
-      function(runs) { console.log(runs) });
+  omegaup.API.Run
+      .list({username: candidateUsername, contest_alias: interviewAlias})
+      .then(function(runs) { console.log(runs) })
+      .fail(omegaup.UI.ignoreError);
 });

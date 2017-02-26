@@ -381,7 +381,6 @@ omegaup.OmegaUp.on('ready', function() {
             .fail(omegaup.UI.apiError);
       });
 
-
   $('form#change-password-form')
       .submit(function(ev) {
         ev.preventDefault();
