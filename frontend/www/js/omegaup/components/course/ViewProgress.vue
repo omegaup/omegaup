@@ -15,7 +15,7 @@
             </thead>
             <tr v-for="student in students">
               <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
-              <td class="score" v-for="assignment in assignments"> {{ (parseFloat(student.progress[assignment.alias]) || 0).toPrecision(2) }}</td>
+              <td class="score" v-for="assignment in assignments">{{ (parseFloat(student.progress[assignment.alias]) || 0).toPrecision(2) }}</td>
             </tr>
           </table>
         </div>
