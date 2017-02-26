@@ -350,7 +350,7 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     if ($('#name').val().length > 50) {
-      omegaup.UI.error(omegaup.T['userEditNameTooLong']);
+      omegaup.UI.error(omegaup.T.userEditNameTooLong);
       return false;
     }
 
@@ -364,7 +364,7 @@ omegaup.OmegaUp.on('ready', function() {
             if (locale_changed) {
               window.location.reload();
             } else {
-              omegaup.UI.success(omegaup.T['userEditSuccess']);
+              omegaup.UI.success(omegaup.T.userEditSuccess);
             }
           } else {
             omegaup.UI.error(response.error);
@@ -381,7 +381,7 @@ omegaup.OmegaUp.on('ready', function() {
         var newPassword = $('#new-password-1').val();
         var newPassword2 = $('#new-password-2').val();
         if (newPassword != newPassword2) {
-          omegaup.UI.error(omegaup.T['loginPasswordNotEqual']);
+          omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
           return false;
         }
 
@@ -389,7 +389,7 @@ omegaup.OmegaUp.on('ready', function() {
 
         omegaup.API.changePassword(oldPassword, newPassword, function(data) {
           if (data.status == 'ok') {
-            omegaup.UI.success(omegaup.T['passwordResetResetSuccess']);
+            omegaup.UI.success(omegaup.T.passwordResetResetSuccess);
           } else {
             omegaup.UI.error(data.error);
           }

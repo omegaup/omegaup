@@ -36,7 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
         omegaup.API.addUsersToInterview(
             interviewAlias, InvitedUsers.join(), function(response) {
               if (response.status == 'ok') {
-                omegaup.UI.success(omegaup.T['userEditSuccess']);
+                omegaup.UI.success(omegaup.T.userEditSuccess);
                 InvitedUsers = Array();
                 fillCandidatesTable();
                 $('#invitepeople > table > tbody').html('');
@@ -51,10 +51,10 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
-            .html(omegaup.T['interviewEdit'] + ' ' + contest.title);
+            .html(omegaup.T.interviewEdit + ' ' + contest.title);
         $('.page-header h1 small')
             .html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' +
-                  omegaup.T['interviewGoToInterview'] + '</a>');
+                  omegaup.T.interviewGoToInterview + '</a>');
         $('.new_interview_form #title').val(contest.title);
         $('.new_interview_form #description').val(contest.description);
         $('#window_length').val(contest.window_length);
@@ -71,15 +71,15 @@ omegaup.OmegaUp.on('ready', function() {
                 '<td>' + interview.users[i].email + '</td>' +
                 '<td>' + (interview.users[i].opened_interview ?
                               interview.users[i].access_time :
-                              omegaup.T['interviewNotStarted']) +
+                              omegaup.T.interviewNotStarted) +
                 '</td>' +
                 '<td>' + "<a href='result/" +
                 omegaup.UI.escape(interview.users[i].username) + "' >" +
-                "<button  class='btn btn-xs'>" + omegaup.T['wordsDetails'] +
+                "<button  class='btn btn-xs'>" + omegaup.T.wordsDetails +
                 '</button>' +
                 '</a>' +
                 '&nbsp;' + "<button  class='btn btn-xs'>" +
-                omegaup.T['resendInterviewEmail'] + '</button>' +
+                omegaup.T.resendInterviewEmail + '</button>' +
                 '</td>' +
                 '</tr>';
       }

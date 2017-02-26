@@ -4,7 +4,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#alias').val(), $('#title').val(), $('#duration').val(),
         function(response) {
           if (response.status == 'ok') {
-            omegaup.UI.success(omegaup.T['interviewCreatedSuccess']);
+            omegaup.UI.success(omegaup.T.interviewCreatedSuccess);
             fillInterviewsTable();
           } else {
             omegaup.UI.error(response.error);

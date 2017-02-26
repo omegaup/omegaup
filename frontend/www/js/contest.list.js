@@ -30,8 +30,8 @@
                 startDate.format('long', 'es') + '</a></td>' +
                 '<td><a href="' + makeWorldClockLink(endDate) + '">' +
                 endDate.format('long', 'es') + '</a></td>' +
-                '<td>' + ((contest.public == '1') ? omegaup.T['wordsYes'] :
-                                                    omegaup.T['wordsNo']) +
+                '<td>' + ((contest.public == '1') ? omegaup.T.wordsYes :
+                                                    omegaup.T.wordsNo) +
                 '</td>' +
                 '<td>' +
                 ((contest.scoreboard_url == null) ?
@@ -39,7 +39,7 @@
                      '<a class="glyphicon glyphicon-link" href="/arena/' +
                          contest.alias + '/scoreboard/' +
                          contest.scoreboard_url + '" title="' +
-                         omegaup.T['contestScoreboardLink'] +
+                         omegaup.T.contestScoreboardLink +
                          '"> Public</a></td>') +
                 '<td>' +
                 ((contest.scoreboard_url_admin == null) ?
@@ -47,23 +47,23 @@
                      '<a class="glyphicon glyphicon-link" href="/arena/' +
                          contest.alias + '/scoreboard/' +
                          contest.scoreboard_url_admin + '" title="' +
-                         omegaup.T['contestScoreboardAdminLink'] +
+                         omegaup.T.contestScoreboardAdminLink +
                          '"> Admin</a></td>') +
                 '<td><a class="glyphicon glyphicon-edit" href="/contest/' +
-                contest.alias + '/edit/" title="' + omegaup.T['wordsEdit'] +
+                contest.alias + '/edit/" title="' + omegaup.T.wordsEdit +
                 '"></a></td>' +
                 '<td><a class="glyphicon glyphicon-dashboard" href="/arena/' +
                 contest.alias + '/admin/" title="' +
-                omegaup.T['contestListSubmissions'] + '"></a></td>' +
+                omegaup.T.contestListSubmissions + '"></a></td>' +
                 '<td><a class="glyphicon glyphicon-stats" href="/contest/' +
                 contest.alias + '/stats/" title="' +
-                omegaup.T['profileStatistics'] + '"></a></td>' +
+                omegaup.T.profileStatistics + '"></a></td>' +
                 '<td><a class="glyphicon glyphicon-time" href="/contest/' +
                 contest.alias + '/activity/" title="' +
-                omegaup.T['contestActivityReport'] + '"></a></td>' +
+                omegaup.T.contestActivityReport + '"></a></td>' +
                 '<td><a class="glyphicon glyphicon-print" href="/arena/' +
                 contest.alias + '/print/" title="' +
-                omegaup.T['contestPrintableVersion'] + '"></a></td>' +
+                omegaup.T.contestPrintableVersion + '"></a></td>' +
                 '</tr>';
           }
 

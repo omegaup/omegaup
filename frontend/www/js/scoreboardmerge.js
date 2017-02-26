@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
             contests.push(alias);
           }
 
-          html += '<td colspan="2"><b>' + omegaup.T['wordsTotal'] + '</b></td>';
+          html += '<td colspan="2"><b>' + omegaup.T.wordsTotal + '</b></td>';
           html += '</tr>';
 
           ranking = scoreboard['ranking'];

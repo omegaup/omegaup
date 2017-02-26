@@ -17,10 +17,10 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
-            .html(omegaup.T['contestEdit'] + ' ' + contest.title);
+            .html(omegaup.T.contestEdit + ' ' + contest.title);
         $('.page-header h1 small')
             .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
-                  omegaup.T['contestDetailsGoToContest'] + '</a>');
+                  omegaup.T.contestDetailsGoToContest + '</a>');
         $('.new_contest_form #title').val(contest.title);
         $('.new_contest_form #alias').val(contest.alias);
         $('.new_contest_form #description').val(contest.description);
@@ -125,7 +125,7 @@ omegaup.OmegaUp.on('ready', function() {
           if (data.status == 'ok') {
             omegaup.UI.success('Tu concurso ha sido editado! <a href="/arena/' +
                                $('.new_contest_form #alias').val() + '">' +
-                               omegaup.T['contestEditGoToContest'] + '</a>');
+                               omegaup.T.contestEditGoToContest + '</a>');
             $('div.post.footer').show();
             window.scrollTo(0, 0);
           } else {
@@ -219,7 +219,7 @@ omegaup.OmegaUp.on('ready', function() {
                         function(response) {
                           if (response.status == 'ok') {
                             omegaup.UI.success(
-                                omegaup.T['successfulOperation']);
+                                omegaup.T.successfulOperation);
                             $('#user-requests-table').bootstrapTable('refresh');
                           } else {
                             omegaup.UI.error(response.error || 'error');
@@ -237,7 +237,7 @@ omegaup.OmegaUp.on('ready', function() {
                         function(response) {
                           if (response.status == 'ok') {
                             omegaup.UI.success(
-                                omegaup.T['successfulOperation']);
+                                omegaup.T.successfulOperation);
                             $('#user-requests-table').bootstrapTable('refresh');
                           } else {
                             omegaup.UI.error(response.error || 'error');
