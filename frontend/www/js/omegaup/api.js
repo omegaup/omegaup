@@ -296,12 +296,24 @@ export default {
 
     admins: _call('/api/problem/admins/'),
 
+    clarifications: _call('/api/problem/clarifications/',
+                          function(data) {
+                            for (var idx in data.clarifications) {
+                              var clarification = data.clarifications[idx];
+                              clarification.time = omegaup.OmegaUp.time(
+                                  clarification.time * 1000);
+                            }
+                            return data;
+                          }),
+
     details: _call('/api/problem/details/', _convertRuntimes,
                    {statement_type: 'html'}),
 
     list: _call('/api/problem/list/'),
 
     myList: _call('/api/problem/mylist/'),
+
+    rejudge: _call('/api/problem/rejudge/'),
 
     removeAdmin: _call('/api/problem/removeAdmin/'),
 
@@ -314,6 +326,8 @@ export default {
     stats: _call('/api/problem/stats/'),
 
     tags: _call('/api/problem/tags/'),
+
+    update: _call('/api/problem/update/'),
   },
 
   Reset: {
@@ -418,23 +432,6 @@ export default {
     verifyEmail: _call('/api/user/verifyemail/'),
   },
 
-  updateProblem: function(alias, isPublic, callback) {
-    $.post('/api/problem/update/',
-           {
-             problem_alias: alias,
-             'public': isPublic,
-             message: isPublic ? 'private -> public' : 'public -> private'
-           },
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
   searchTags: function(query, callback) {
     $.post('/api/tag/list/', {query: query}, function(data) { callback(data); },
            'json')
@@ -462,28 +459,6 @@ export default {
   searchGroups: function(query, callback) {
     $.post('/api/group/list/', {query: query},
            function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  getProblemClarifications: function(problemAlias, offset, rowcount, callback) {
-    $.get('/api/problem/clarifications/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/offset/' + offset +
-              '/rowcount/' + rowcount + '/',
-          function(data) {
-            for (var idx in data.clarifications) {
-              var clarification = data.clarifications[idx];
-              clarification.time =
-                  omegaup.OmegaUp.time(clarification.time * 1000);
-            }
-            callback(data);
-          },
-          'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
@@ -530,21 +505,6 @@ export default {
   runRejudge: function(guid, debug, callback) {
     $.get('/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/' +
               (debug ? 'debug/true/' : ''),
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  rejudgeProblem: function(problemAlias, callback) {
-    $.get('/api/problem/rejudge/problem_alias/' +
-              encodeURIComponent(problemAlias) + '/',
           function(data) { callback(data); }, 'json')
         .fail(function(data) {
           if (callback !== undefined) {

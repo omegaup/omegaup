@@ -49,16 +49,15 @@ let UI = {
     var success = true;
     var error = null;
 
-    handleResponseCallback = function(data) {
-      if (data.status !== 'ok') {
-        success = false;
-        error = data.error;
-      }
+    var resolve = function(data) {};
+    var reject = function(data) {
+      success = false;
+      error = data.error;
     };
     $('input[type=checkbox]')
         .each(function() {
           if (this.checked) {
-            operation(this.id, handleResponseCallback);
+            operation(this.id, resolve, reject);
           }
         });
 

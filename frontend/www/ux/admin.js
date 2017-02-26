@@ -145,8 +145,10 @@ omegaup.OmegaUp.on('ready', function() {
       .click(function() {
         if (confirm('Deseas rejuecear el problema ' +
                     arena.currentProblem.alias + '?')) {
-          omegaup.API.rejudgeProblem(arena.currentProblem.alias,
-                                     function(x) { admin.refreshRuns(); });
+          omegaup.API.Problem.rejudge(
+                                 {problem_alias: arena.currentProblem.alias})
+              .then(function() { admin.refreshRuns(); })
+              .fail(omegaup.UI.ignoreError);
         }
         return false;
       });

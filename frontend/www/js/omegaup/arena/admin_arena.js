@@ -103,10 +103,13 @@ export default class ArenaAdmin {
     var self = this;
 
     if (self.arena.options.onlyProblemAlias) {
-      API.getProblemClarifications(
-          self.arena.options.onlyProblemAlias, self.arena.clarificationsOffset,
-          self.arena.clarificationsRowcount,
-          self.arena.clarificationsChange.bind(self.arena));
+      API.Problem.clarifications({
+                   problem_alias: self.arena.options.onlyProblemAlias,
+                   offset: self.arena.clarificationsOffset,
+                   rowcount: self.arena.clarificationsRowcount,
+                 })
+          .then(self.arena.clarificationsChange.bind(self.arena))
+          .fail(UI.apiError);
     } else {
       self.arena.refreshClarifications();
     }
