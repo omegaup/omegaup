@@ -3,10 +3,12 @@
   var length = parseInt(problemsSolved.attr('data-length'));
   var page = parseInt(problemsSolved.attr('data-page'));
   var is_index = (problemsSolved.attr('is-index') === '1' ? true : false);
-  omegaup.API.getRankByProblemsSolved(page, length, function(result) {
-    var html = '';
-    for (a = 0; a < result.rank.length; a++) {
-      html += '<tr>' +
+  omegaup.API.User.rankByProblemsSolved({offset: page, rowcount: length})
+      .then(function(result) {
+        var html = '';
+        for (a = 0; a < result.rank.length; a++) {
+          html +=
+              '<tr>' +
               '<td>' + result.rank[a].rank + '</td>' +
               '<td class=\"flagColumn\">' +
               omegaup.UI.getFlag(result.rank[a]['country_id']) + '</td>' +
@@ -20,7 +22,8 @@
               (is_index ? '' : ("<td class='numericColumn'>" +
                                 result.rank[a].problems_solved + '</td>')) +
               '</tr>';
-    }
-    $('#rank-by-problems-solved>tbody').append(html);
-  });
+        }
+        $('#rank-by-problems-solved>tbody').append(html);
+      })
+      .fail(omegaup.UI.apiError);
 })();

@@ -76,25 +76,19 @@
 
   $('#show-admin-contests').click(fillContestsTable);
 
-  $('#bulk-make-public')
-      .click(function() {
-        omegaup.UI.bulkOperation(
-            function(alias, handleResponseCallback) {
-              omegaup.API.Contest.update({contest_alias: alias, public: 1})
-                  .then(handleResponseCallback)
-                  .fail(omegaup.UI.apiError);
-            },
-            function() { fillContestsTable(); });
-      });
+  function makePublic(isPublic) {
+    return function() {
+      omegaup.UI.bulkOperation(
+          function(alias, resolve, reject) {
+            omegaup.API.Contest
+                .update({contest_alias: alias, 'public': isPublic ? 1 : 0})
+                .then(resolve)
+                .fail(reject);
+          },
+          function() { fillContestsTable(); });
+    };
+  }
 
-  $('#bulk-make-private')
-      .click(function() {
-        omegaup.UI.bulkOperation(
-            function(alias, handleResponseCallback) {
-              omegaup.API.Contest.update({contest_alias: alias, public: 0})
-                  .then(handleResponseCallback)
-                  .fail(omegaup.UI.apiError);
-            },
-            function() { fillContestsTable(); });
-      });
+  $('#bulk-make-public').click(makePublic(true));
+  $('#bulk-make-private').click(makePublic(false));
 })();

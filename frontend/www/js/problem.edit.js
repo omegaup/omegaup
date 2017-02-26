@@ -19,7 +19,7 @@ omegaup.OmegaUp.on('ready', function() {
   // Add typeaheads
   refreshProblemAdmins();
   omegaup.UI.userTypeahead($('#username-admin'));
-  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.searchGroups,
+  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list,
                        function(event, val) {
                          $(event.target).attr('data-alias', val.value);
                        });
@@ -32,7 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
             highlight: true,
           },
           {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.searchTags),
+            source: omegaup.UI.typeaheadWrapper(omegaup.API.Tags.list),
             displayKey: 'name',
           })
       .on('typeahead:selected', function(event, val) {

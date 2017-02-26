@@ -3,7 +3,8 @@ omegaup.OmegaUp.on('ready', function() {
   var contestObject = null;
 
   $('#start-contest-form')
-      .submit(function() {
+      .submit(function(ev) {
+        ev.preventDefault();
         $('#request-access-form').hide();
         $('#start-contest-submit').prop('disabled', true);
 
@@ -12,23 +13,22 @@ omegaup.OmegaUp.on('ready', function() {
             .then(function(result) { window.location.reload(); })
             .fail(function(result) { $('#start-contest-form')
                                          .show(); });
-        return false;
       });
 
   $('#request-access-form')
-      .submit(function() {
+      .submit(function(ev) {
+        ev.preventDefault();
         $('#request-access-form').hide();
         $('#request-access-submit').prop('disabled', true);
-        omegaup.API.registerForContest(contestAlias, function(result) {
-          if (result.status == 'error') {
-            omegaup.UI.error(result.error);
-            $('#request-access-form').show();
-            $('#start-contest-submit').prop('disabled', false);
-          } else {
-            $('#registration_pending').removeClass('hidden');
-          }
-        });
-        return false;
+        omegaup.API.Contest.registerForContest({contest_alias: contestAlias})
+            .then(function(result) {
+              $('#registration_pending').removeClass('hidden');
+            })
+            .fail(function(result) {
+              omegaup.UI.error(result.error);
+              $('#request-access-form').show();
+              $('#start-contest-submit').prop('disabled', false);
+            });
       });
 
   function formatDelta(delta) {
@@ -80,93 +80,92 @@ omegaup.OmegaUp.on('ready', function() {
     }
   }
 
-  function contestLoaded(contest) {
-    if (contest.status != 'ok') {
-      $('#contest-details').hide();
-      $('#contest-details')
-          .parent()
-          .removeClass('col-md-6')
-          .addClass('col-md-2');
-    } else {
-      $('.contest #title').html(omegaup.UI.escape(contest.title));
-      $('.contest #description').html(omegaup.UI.escape(contest.description));
+  omegaup.API.Contest.publicDetails({contest_alias: contestAlias})
+      .then(function(contest) {
+        $('.contest #title').html(omegaup.UI.escape(contest.title));
+        $('.contest #description').html(omegaup.UI.escape(contest.description));
 
-      $('.contest #time-until-start')
-          .html(omegaup.UI.escape(contest.start_time));
-      $('.contest #start-time').text(contest.start_time.long());
-      $('.contest #finish-time').text(contest.finish_time.long());
-      if (contest.show_scoreboard_after == 1) {
-        $('.contest #show-scoreboard-after')
-            .text(omegaup.T.contestNewFormScoreboardAtContestEnd);
-      } else {
-        $('.contest #show-scoreboard-after').hide();
-      }
-      if (contest.window_length != null) {
-        $('.contest #window-length-enabled')
+        $('.contest #time-until-start')
+            .html(omegaup.UI.escape(contest.start_time));
+        $('.contest #start-time').text(contest.start_time.long());
+        $('.contest #finish-time').text(contest.finish_time.long());
+        if (contest.show_scoreboard_after == 1) {
+          $('.contest #show-scoreboard-after')
+              .text(omegaup.T.contestNewFormScoreboardAtContestEnd);
+        } else {
+          $('.contest #show-scoreboard-after').hide();
+        }
+        if (contest.window_length != null) {
+          $('.contest #window-length-enabled')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestIntroDifferentStarts,
+                  {window_length: contest.window_length}));
+        } else {
+          $('.contest #window-length-enabled').hide();
+        }
+        $('.contest #scoreboard')
             .text(omegaup.UI.formatString(
-                omegaup.T.contestIntroDifferentStarts,
-                {window_length: contest.window_length}));
-      } else {
-        $('.contest #window-length-enabled').hide();
-      }
-      $('.contest #scoreboard')
-          .text(omegaup.UI.formatString(
-              omegaup.T.contestIntroScoreboardTimePercent,
-              {window_length: contest.scoreboard}));
-      $('.contest #submissions-gap')
-          .text(omegaup.UI.formatString(
-              omegaup.T.contestIntroSubmissionsSeparationDesc,
-              {window_length: contest.submissions_gap / 60}));
-      var penaltyTypes = {
-        none: omegaup.T.contestNewFormNoPenalty,
-        problem_open: omegaup.T.contestNewFormByProblem,
-        contest_start: omegaup.T.contestNewFormByContests,
-        runtime: omegaup.T.contestNewFormByRuntime
-      };
-      $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
-      if (contest.penalty != 0) {
-        $('.contest #penalty')
-            .text(omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc,
-                                          {window_length: contest.penalty}));
-      } else {
-        $('.contest #penalty').hide();
-      }
-      var feedbackTypes = {
-        yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
-        no: '',
-        partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc
-      };
-      $('.contest #feedback').text(feedbackTypes[contest.feedback]);
-      if (contest.points_decay_factor != 0) {
-        $('.contest #points-decay-factor')
+                omegaup.T.contestIntroScoreboardTimePercent,
+                {window_length: contest.scoreboard}));
+        $('.contest #submissions-gap')
             .text(omegaup.UI.formatString(
-                omegaup.T.contestNewFormDecrementFactor,
-                {window_length: contest.points_decay_factor}));
-      } else {
-        $('.contest #points-decay-factor').hide();
-      }
-    }
-
-    // Feel free to re-write this if you have the time.
-    if (contest.contestant_must_register) {
-      if (contest.user_registration_requested) {
-        if (contest.user_registration_answered) {
-          if (contest.user_registration_accepted) {
-            readyToStart(contest);
+                omegaup.T.contestIntroSubmissionsSeparationDesc,
+                {window_length: contest.submissions_gap / 60}));
+        var penaltyTypes = {
+          none: omegaup.T.contestNewFormNoPenalty,
+          problem_open: omegaup.T.contestNewFormByProblem,
+          contest_start: omegaup.T.contestNewFormByContests,
+          runtime: omegaup.T.contestNewFormByRuntime
+        };
+        $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
+        if (contest.penalty != 0) {
+          $('.contest #penalty')
+              .text(omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc,
+                                            {window_length: contest.penalty}));
+        } else {
+          $('.contest #penalty').hide();
+        }
+        var feedbackTypes = {
+          yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
+          no: '',
+          partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc
+        };
+        $('.contest #feedback').text(feedbackTypes[contest.feedback]);
+        if (contest.points_decay_factor != 0) {
+          $('.contest #points-decay-factor')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestNewFormDecrementFactor,
+                  {window_length: contest.points_decay_factor}));
+        } else {
+          $('.contest #points-decay-factor').hide();
+        }
+      })
+      .fail(function(contest) {
+        $('#contest-details').hide();
+        $('#contest-details')
+            .parent()
+            .removeClass('col-md-6')
+            .addClass('col-md-2');
+      })
+      .always(function(contest) {
+        // Feel free to re-write this if you have the time.
+        if (contest.contestant_must_register) {
+          if (contest.user_registration_requested) {
+            if (contest.user_registration_answered) {
+              if (contest.user_registration_accepted) {
+                readyToStart(contest);
+              } else {
+                $('#registration_denied').removeClass('hidden');
+              }
+            } else {
+              $('#registration_pending').removeClass('hidden');
+            }
           } else {
-            $('#registration_denied').removeClass('hidden');
+            $('#must_register').removeClass('hidden');
           }
         } else {
-          $('#registration_pending').removeClass('hidden');
+          readyToStart(contest);
         }
-      } else {
-        $('#must_register').removeClass('hidden');
-      }
-    } else {
-      readyToStart(contest);
-    }
-    $('#intro-page').removeClass('hidden');
-  }
-
-  omegaup.API.getContestPublicDetails(contestAlias, contestLoaded);
+        $('#intro-page').removeClass('hidden');
+      });
 });

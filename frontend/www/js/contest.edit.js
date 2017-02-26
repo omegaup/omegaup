@@ -201,7 +201,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.UI.userTypeahead($('#username-contestant'));
   omegaup.UI.userTypeahead($('#username-admin'));
-  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.searchGroups);
+  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
   omegaup.UI.problemTypeahead($('#problems-dropdown'));
 
   function refreshContestRequests() {
@@ -214,17 +214,17 @@ omegaup.OmegaUp.on('ready', function() {
                 .click((function() {
                   return function() {
                     var username = $(this).val();
-                    omegaup.API.arbitrateContestUserRequest(
-                        contestAlias, username, true /* accepted */, '',
-                        function(response) {
-                          if (response.status == 'ok') {
-                            omegaup.UI.success(
-                                omegaup.T['successfulOperation']);
-                            $('#user-requests-table').bootstrapTable('refresh');
-                          } else {
-                            omegaup.UI.error(response.error || 'error');
-                          }
-                        });
+                    omegaup.API.Contest.arbitrateRequest({
+                                         contest_alias: contestAlias,
+                                         username: username,
+                                         resolution: true /* accepted */,
+                                         note: '',
+                                       })
+                        .then(function(response) {
+                          omegaup.UI.success(omegaup.T['successfulOperation']);
+                          $('#user-requests-table').bootstrapTable('refresh');
+                        })
+                        .fail(omegaup.UI.apiError);
                   };
                 })());
 
@@ -232,17 +232,17 @@ omegaup.OmegaUp.on('ready', function() {
                 .click((function() {
                   return function() {
                     var username = $(this).val();
-                    omegaup.API.arbitrateContestUserRequest(
-                        contestAlias, username, false /* rejected */, '',
-                        function(response) {
-                          if (response.status == 'ok') {
-                            omegaup.UI.success(
-                                omegaup.T['successfulOperation']);
-                            $('#user-requests-table').bootstrapTable('refresh');
-                          } else {
-                            omegaup.UI.error(response.error || 'error');
-                          }
-                        });
+                    omegaup.API.Contest.arbitrateRequest({
+                                         contest_alias: contestAlias,
+                                         username: username,
+                                         resolution: false /* rejected */,
+                                         note: '',
+                                       })
+                        .then(function(response) {
+                          omegaup.UI.success(omegaup.T['successfulOperation']);
+                          $('#user-requests-table').bootstrapTable('refresh');
+                        })
+                        .fail(omegaup.UI.apiError);
                   };
                 })());
           },

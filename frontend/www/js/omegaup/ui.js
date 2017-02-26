@@ -39,6 +39,8 @@ let UI = {
 
   apiError: function(response) { UI.error(response.error || 'error'); },
 
+  ignoreError: function(response) {},
+
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
@@ -47,16 +49,15 @@ let UI = {
     var success = true;
     var error = null;
 
-    handleResponseCallback = function(data) {
-      if (data.status !== 'ok') {
-        success = false;
-        error = data.error;
-      }
+    var resolve = function(data) {};
+    var reject = function(data) {
+      success = false;
+      error = data.error;
     };
     $('input[type=checkbox]')
         .each(function() {
           if (this.checked) {
-            operation(this.id, handleResponseCallback);
+            operation(this.id, resolve, reject);
           }
         });
 
@@ -115,22 +116,23 @@ let UI = {
         lastRequest = [query, callback];
       } else {
         pending = true;
-        f(query, function(data) {
-          if (lastRequest != null) {
-            // Typeahead will ignore any stale callbacks. Given that we
-            // will start a new request ASAP, let's do a best-effort
-            // callback to the current request with the old data.
-            lastRequest[1](data);
-          } else {
-            callback(data);
-          }
-          pending = false;
-          if (lastRequest != null) {
-            var request = lastRequest;
-            lastRequest = null;
-            wrappedCall(request[0], request[1]);
-          }
-        });
+        f({query: query})
+            .then(function(data) {
+              if (lastRequest != null) {
+                // Typeahead will ignore any stale callbacks. Given that we
+                // will start a new request ASAP, let's do a best-effort
+                // callback to the current request with the old data.
+                lastRequest[1](data);
+                pending = false;
+                var request = lastRequest;
+                lastRequest = null;
+                wrappedCall(request[0], request[1]);
+              } else {
+                callback(data);
+              }
+            })
+            .fail(UI.ignoreError)
+            .always(function() { pending = false; });
       }
     }
     return wrappedCall;
@@ -157,11 +159,7 @@ let UI = {
               highlight: false,
             },
             {
-              source: function(query, cb) {
-                API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); })
-                    .fail(UI.apiError);
-              },
+              source: UI.typeaheadWrapper(API.Problem.list),
               displayKey: 'alias',
               templates: {
                 suggestion: function(val) {
@@ -175,9 +173,7 @@ let UI = {
         });
   },
 
-  userTypeahead: function(elem, cb) {
-    UI.typeahead(elem, API.searchUsers, cb);
-  },
+  userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
 
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';

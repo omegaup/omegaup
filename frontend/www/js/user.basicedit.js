@@ -1,9 +1,11 @@
 $('document')
     .ready(function() {
-      omegaup.API.getProfile(null, function(data) {
-        $('#username').val(data.userinfo.username);
-        $('#name').val(data.userinfo.name);
-      });
+      omegaup.API.User.profile()
+          .then(function(data) {
+            $('#username').val(data.userinfo.username);
+            $('#name').val(data.userinfo.name);
+          })
+          .fail(omegaup.UI.apiError);
 
       var formSubmit = function() {
         var newPassword = $('#new-password-1').val();

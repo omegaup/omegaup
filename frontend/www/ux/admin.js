@@ -22,69 +22,77 @@ omegaup.OmegaUp.on('ready', function() {
     $('#root').fadeIn('slow');
   } else {
     arena.connectSocket();
-    omegaup.API.getContest(arena.options.contestAlias, function(contest) {
-      if (contest.status == 'error' || !contest.admin) {
-        if (!omegaup.OmegaUp.loggedIn) {
-          window.location = '/login/?redirect=' + escape(window.location);
-        } else {
-          $('#loading').html('404');
-        }
-        return;
-      } else if (arena.options.isPractice && contest.finish_time &&
-                 omegaup.OmegaUp.time().getTime() <
-                     contest.finish_time.getTime()) {
-        window.location =
-            window.location.pathname.replace(/\/practice\/.*/, '/');
-        return;
-      }
-      $('#title .contest-title').html(omegaup.UI.escape(contest.title));
-      arena.updateSummary(contest);
+    omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
+        .then(function(contest) {
+          if (!contest.admin) {
+            if (!omegaup.OmegaUp.loggedIn) {
+              window.location = '/login/?redirect=' + escape(window.location);
+            } else {
+              $('#loading').html('404');
+            }
+            return;
+          } else if (arena.options.isPractice && contest.finish_time &&
+                     omegaup.OmegaUp.time().getTime() <
+                         contest.finish_time.getTime()) {
+            window.location =
+                window.location.pathname.replace(/\/practice\/.*/, '/');
+            return;
+          }
+          $('#title .contest-title').html(omegaup.UI.escape(contest.title));
+          arena.updateSummary(contest);
 
-      arena.submissionGap = parseInt(contest.submission_gap);
-      if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
+          arena.submissionGap = parseInt(contest.submission_gap);
+          if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
-      arena.initClock(contest.start_time, contest.finish_time);
-      arena.initProblems(contest);
+          arena.initClock(contest.start_time, contest.finish_time);
+          arena.initProblems(contest);
 
-      for (var idx in contest.problems) {
-        var problem = contest.problems[idx];
-        var problemName =
-            problem.letter + '. ' + omegaup.UI.escape(problem.title);
+          for (var idx in contest.problems) {
+            var problem = contest.problems[idx];
+            var problemName =
+                problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
-        arena.problems[problem.alias] = problem;
+            arena.problems[problem.alias] = problem;
 
-        var prob = $('#problem-list .template')
-                       .clone()
-                       .removeClass('template')
-                       .addClass('problem_' + problem.alias);
-        $('.name', prob)
-            .attr('href', '#problems/' + problem.alias)
-            .html(problemName);
-        $('#problem-list').append(prob);
+            var prob = $('#problem-list .template')
+                           .clone()
+                           .removeClass('template')
+                           .addClass('problem_' + problem.alias);
+            $('.name', prob)
+                .attr('href', '#problems/' + problem.alias)
+                .html(problemName);
+            $('#problem-list').append(prob);
 
-        $('#clarification select')
-            .append('<option value="' + problem.alias + '">' + problemName +
-                    '</option>');
-        $('select.runsproblem')
-            .append('<option value="' + problem.alias + '">' + problemName +
-                    '</option>');
-      }
+            $('#clarification select')
+                .append('<option value="' + problem.alias + '">' + problemName +
+                        '</option>');
+            $('select.runsproblem')
+                .append('<option value="' + problem.alias + '">' + problemName +
+                        '</option>');
+          }
 
-      arena.setupPolls();
-      admin.refreshRuns();
-      if (!arena.socket) {
-        setInterval(function() {
-          runsOffset = 0;  // Return pagination to start on refresh
+          arena.setupPolls();
           admin.refreshRuns();
-        }, 5 * 60 * 1000);
-      }
+          if (!arena.socket) {
+            setInterval(function() {
+              runsOffset = 0;  // Return pagination to start on refresh
+              admin.refreshRuns();
+            }, 5 * 60 * 1000);
+          }
 
-      // Trigger the event (useful on page load).
-      $(window).hashchange();
+          // Trigger the event (useful on page load).
+          $(window).hashchange();
 
-      $('#loading').fadeOut('slow');
-      $('#root').fadeIn('slow');
-    });
+          $('#loading').fadeOut('slow');
+          $('#root').fadeIn('slow');
+        })
+        .fail(function() {
+          if (!omegaup.OmegaUp.loggedIn) {
+            window.location = '/login/?redirect=' + escape(window.location);
+          } else {
+            $('#loading').html('404');
+          }
+        });
   }
 
   $('#submit select[name="language"]')
@@ -137,8 +145,10 @@ omegaup.OmegaUp.on('ready', function() {
       .click(function() {
         if (confirm('Deseas rejuecear el problema ' +
                     arena.currentProblem.alias + '?')) {
-          omegaup.API.rejudgeProblem(arena.currentProblem.alias,
-                                     function(x) { admin.refreshRuns(); });
+          omegaup.API.Problem.rejudge(
+                                 {problem_alias: arena.currentProblem.alias})
+              .then(function() { admin.refreshRuns(); })
+              .fail(omegaup.UI.ignoreError);
         }
         return false;
       });
