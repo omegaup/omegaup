@@ -8,7 +8,9 @@ $('#forgot-password-form')
             omegaup.UI.success(data.message);
             $('#submit').prop('disabled', false);
           })
-          .fail(omegaup.UI.apiError);
+          .fail(omegaup.UI.apiError)
+          .always(function() { $('#submit')
+                                   .prop('disabled', false); });
       return false;
     });
 
