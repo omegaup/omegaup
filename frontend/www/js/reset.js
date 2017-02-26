@@ -4,10 +4,7 @@ $('#forgot-password-form')
       $('#submit').prop('disabled', true);
       omegaup.UI.dismissNotifications();
       omegaup.API.Reset.create({email: $('#email').val()})
-          .then(function() {
-            omegaup.UI.success(data.message);
-            $('#submit').prop('disabled', false);
-          })
+          .then(function() { omegaup.UI.success(data.message); })
           .fail(omegaup.UI.apiError)
           .always(function() { $('#submit')
                                    .prop('disabled', false); });
