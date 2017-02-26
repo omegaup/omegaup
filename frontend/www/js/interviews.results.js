@@ -4,8 +4,9 @@ omegaup.OmegaUp.on('ready', function() {
   var candidateUsername = /\/interview\/([^\/]+)\/result\/([^\/]+)?.*/.exec(
       window.location.pathname)[2];
 
-  omegaup.API.getInterviewStatsForUser(
-      interviewAlias, candidateUsername, function(userStats) {
+  omegaup.API.User.interviewStats(
+                      {interview: interviewAlias, username: candidateUsername})
+      .then(function(userStats) {
         $('.page-header h1 span')
             .html(omegaup.T['interviewResultsFor'] + ' ' +
                   userStats.name_or_username);
@@ -21,7 +22,8 @@ omegaup.OmegaUp.on('ready', function() {
         } else {
           $('.page-header h1 small').html(omegaup.T['interviewNotStarted']);
         }
-      });
+      })
+      .fail(omegaup.UI.apiError);
 
   omegaup.API.getRuns(
       {username: candidateUsername, contest_alias: interviewAlias},

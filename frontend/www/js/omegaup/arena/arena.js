@@ -776,12 +776,13 @@ export class Arena {
                 .attr('checked', 'checked');
           }
           responseFormNode.submit(function() {
-            API.updateClarification({
-                 clarification_id: id,
-                 answer: $('#create-response-text', this).val(),
-                 'public':
-                     $('#create-response-is-public', this)[0].checked ? 1 : 0
-               })
+            API.Clarification
+                .update({
+                  clarification_id: id,
+                  answer: $('#create-response-text', this).val(),
+                  'public':
+                      $('#create-response-is-public', this)[0].checked ? 1 : 0
+                })
                 .then(function() {
                   $('pre', answerNode)
                       .html($('#create-response-text', answerNode).val());
