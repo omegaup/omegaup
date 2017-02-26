@@ -15,7 +15,7 @@
             </thead>
             <tr v-for="student in students">
               <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
-              <td class="score" v-for="assignment in assignments"> {{ (assignment.alias in student.progress) ? student.progress[assignment.alias] : 0 }}</td>
+              <td class="score" v-for="assignment in assignments"> {{ (parseFloat(student.progress[assignment.alias]) || 0).toPrecision(2) }}</td>
             </tr>
           </table>
         </div>
@@ -40,11 +40,12 @@ export default {
 
 <style>
 .omegaup-course-viewprogress td, .omegaup-course-viewprogress th {
+  /* max-width 0 makes cell width proportional and allows content to overflow */
   max-width: 0;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 .omegaup-course-viewprogress .score {
-  text-align: center;
+  text-align: right;
 }
 </style>
