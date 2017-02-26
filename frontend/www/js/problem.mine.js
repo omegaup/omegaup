@@ -43,23 +43,23 @@
 
   $('#show-admin-problems').click(fillProblemsTable);
 
-  $('#bulk-make-public')
-      .click(function() {
-        omegaup.UI.bulkOperation(
-            function(alias, handleResponseCallback) {
-              omegaup.API.updateProblem(alias, 1 /*public*/,
-                                        handleResponseCallback);
-            },
-            function() { fillProblemsTable(); });
-      });
+  function makePublic(isPublic) {
+    return function() {
+      omegaup.UI.bulkOperation(
+          function(alias, resolve, reject) {
+            omegaup.API.Problem.update({
+                                 problem_alias: alias,
+                                 'public': isPublic ? 1 : 0,
+                                 message: isPublic ? 'private -> public' :
+                                                     'public -> private',
+                               })
+                .then(resolve)
+                .fail(reject);
+          },
+          function() { fillProblemsTable(); });
+    };
+  }
 
-  $('#bulk-make-private')
-      .click(function() {
-        omegaup.UI.bulkOperation(
-            function(alias, handleError) {
-              omegaup.API.updateProblem(alias, 0 /*public*/,
-                                        handleResponseCallback);
-            },
-            function() { fillProblemsTable(); });
-      });
+  $('#bulk-make-public').click(makePublic(true));
+  $('#bulk-make-private').click(makePublic(false));
 })();

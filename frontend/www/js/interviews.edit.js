@@ -15,7 +15,8 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('form#add_user_to_interview')
-      .submit(function() {
+      .submit(function(ev) {
+        ev.preventDefault();
         var userOrEmail = $('#usernameOrEmail').val();
         var html = '<tr>' +
                    '<td>' + omegaup.UI.escape(userOrEmail) + '</td>' +
@@ -25,27 +26,27 @@ omegaup.OmegaUp.on('ready', function() {
         $('#invitepeople > table > tbody').append(html);
         $('#send_invites').show();
         $('#usernameOrEmail').val('');
-
-        return false;  // Prevent page refresh on submit
       });
 
   var InvitedUsers = Array();
 
   $('form#send_invites')
-      .submit(function() {
-        omegaup.API.addUsersToInterview(
-            interviewAlias, InvitedUsers.join(), function(response) {
-              if (response.status == 'ok') {
-                omegaup.UI.success(omegaup.T.userEditSuccess);
-                InvitedUsers = Array();
-                fillCandidatesTable();
-                $('#invitepeople > table > tbody').html('');
-              } else {
-                omegaup.UI.error(response.error);
-                fillCandidatesTable();
-              }
+      .submit(function(ev) {
+        ev.preventDefault();
+        omegaup.API.Interview.addUsers({
+                               interview_alias: interviewAlias,
+                               usernameOrEmailsCSV: InvitedUsers.join()
+                             })
+            .then(function(response) {
+              omegaup.UI.success(omegaup.T.userEditSuccess);
+              InvitedUsers = Array();
+              fillCandidatesTable();
+              $('#invitepeople > table > tbody').html('');
+            })
+            .fail(function(response) {
+              omegaup.UI.error(response.error);
+              fillCandidatesTable();
             });
-        return false;  // Prevent page refresh on submit
       });
 
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
@@ -62,30 +63,32 @@ omegaup.OmegaUp.on('ready', function() {
       .fail(omegaup.UI.apiError);
 
   function fillCandidatesTable() {
-    omegaup.API.getInterview(interviewAlias, function(interview) {
-      var html = '';
-      for (var i = 0; i < interview.users.length; i++) {
-        html += '<tr>' +
-                '<td>' + omegaup.UI.escape(interview.users[i].username) +
-                '</td>' +
-                '<td>' + interview.users[i].email + '</td>' +
-                '<td>' + (interview.users[i].opened_interview ?
-                              interview.users[i].access_time :
-                              omegaup.T.interviewNotStarted) +
-                '</td>' +
-                '<td>' + "<a href='result/" +
-                omegaup.UI.escape(interview.users[i].username) + "' >" +
-                "<button  class='btn btn-xs'>" + omegaup.T.wordsDetails +
-                '</button>' +
-                '</a>' +
-                '&nbsp;' + "<button  class='btn btn-xs'>" +
-                omegaup.T.resendInterviewEmail + '</button>' +
-                '</td>' +
-                '</tr>';
-      }
+    omegaup.API.Interview.details({interview_alias: interviewAlias})
+        .then(function(interview) {
+          var html = '';
+          for (var i = 0; i < interview.users.length; i++) {
+            html += '<tr>' +
+                    '<td>' + omegaup.UI.escape(interview.users[i].username) +
+                    '</td>' +
+                    '<td>' + interview.users[i].email + '</td>' +
+                    '<td>' + (interview.users[i].opened_interview ?
+                                  interview.users[i].access_time :
+                                  omegaup.T.interviewNotStarted) +
+                    '</td>' +
+                    '<td>' + "<a href='result/" +
+                    omegaup.UI.escape(interview.users[i].username) + "' >" +
+                    "<button  class='btn btn-xs'>" + omegaup.T.wordsDetails +
+                    '</button>' +
+                    '</a>' +
+                    '&nbsp;' + "<button  class='btn btn-xs'>" +
+                    omegaup.T.resendInterviewEmail + '</button>' +
+                    '</td>' +
+                    '</tr>';
+          }
 
-      $('#candidate_list > table > tbody').empty().html(html);
-    });
+          $('#candidate_list > table > tbody').empty().html(html);
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   $('#add-problem-form')
@@ -168,7 +171,7 @@ omegaup.OmegaUp.on('ready', function() {
   // Edit users
   omegaup.UI.userTypeahead($('#username-admin'));
   omegaup.UI.userTypeahead($('#usernameOrEmail'));
-  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.searchGroups);
+  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
 
   $('#add-admin-form')
       .submit(function() {

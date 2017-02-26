@@ -90,7 +90,9 @@ export default class ArenaAdmin {
           .then(self.runsChanged.bind(self))
           .fail(UI.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
-      API.getRuns(options, self.runsChanged.bind(self));
+      API.Run.list(options)
+          .then(self.runsChanged.bind(self))
+          .fail(UI.ignoreError);
     } else {
       options.contest_alias = self.arena.options.contestAlias;
       API.Contest.runs(options)
@@ -103,22 +105,20 @@ export default class ArenaAdmin {
     var self = this;
 
     if (self.arena.options.onlyProblemAlias) {
-      API.getProblemClarifications(
-          self.arena.options.onlyProblemAlias, self.arena.clarificationsOffset,
-          self.arena.clarificationsRowcount,
-          self.arena.clarificationsChange.bind(self.arena));
+      API.Problem.clarifications({
+                   problem_alias: self.arena.options.onlyProblemAlias,
+                   offset: self.arena.clarificationsOffset,
+                   rowcount: self.arena.clarificationsRowcount,
+                 })
+          .then(self.arena.clarificationsChange.bind(self.arena))
+          .fail(UI.apiError);
     } else {
-      API.getClarifications(self.arena.options.contestAlias,
-                            self.arena.clarificationsOffset,
-                            self.arena.clarificationsRowcount,
-                            self.arena.clarificationsChange.bind(self.arena));
+      self.arena.refreshClarifications();
     }
   }
 
   runsChanged(data) {
     var self = this;
-
-    if (data.status != 'ok') return;
 
     for (var i = 0; i < data.runs.length; i++) {
       self.arena.trackRun(data.runs[i]);

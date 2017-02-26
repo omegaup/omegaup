@@ -117,8 +117,9 @@ omegaup.OmegaUp.on('ready', function() {
         document.getElementById('problem-json').firstChild.nodeValue));
   } else {
     arena.connectSocket();
-    omegaup.API.getContest(arena.options.contestAlias,
-                           arena.contestLoaded.bind(arena));
+    omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
+        .then(arena.contestLoaded.bind(arena))
+        .fail(omegaup.UI.ignoreError);
 
     $('.clarifpager .clarifpagerprev')
         .click(function() {
@@ -129,10 +130,7 @@ omegaup.OmegaUp.on('ready', function() {
             }
 
             // Refresh with previous page
-            omegaup.API.getClarifications(
-                arena.options.contestAlias, arena.clarificationsOffset,
-                arena.clarificationsRowcount,
-                arena.clarificationsChange.bind(arena));
+            arena.refreshClarifications();
           }
         });
 
@@ -144,10 +142,7 @@ omegaup.OmegaUp.on('ready', function() {
           }
 
           // Refresh with previous page
-          omegaup.API.getClarifications(arena.options.contestAlias,
-                                        arena.clarificationsOffset,
-                                        arena.clarificationsRowcount,
-                                        arena.clarificationsChange.bind(arena));
+          arena.refreshClarifications();
         });
   }
 
@@ -162,10 +157,7 @@ omegaup.OmegaUp.on('ready', function() {
             })
             .then(function(run) {
               arena.hideOverlay();
-              omegaup.API.getClarifications(
-                  arena.options.contestAlias, arena.clarificationsOffset,
-                  arena.clarificationsRowcount,
-                  arena.clarificationsChange.bind(arena));
+              arena.refreshClarifications();
             })
             .fail(function(run) { alert(run.error); })
             .always(function() {

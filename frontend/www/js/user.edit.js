@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
             highlight: true,
           },
           {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.searchSchools),
+            source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
             displayKey: 'label',
             templates: {
               empty: omegaup.T.schoolToBeAdded,
@@ -311,91 +311,93 @@ omegaup.OmegaUp.on('ready', function() {
         }
       });
 
-  omegaup.API.getProfile(null, function(data) {
-    $('#username').html(data.userinfo.username);
-    $('#name').val(data.userinfo.name);
-    $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
-    $('#graduation_date')
-        .val(omegaup.UI.formatDate(data.userinfo.graduation_date));
-    $('#country_id').val(data.userinfo.country_id);
-    $('#locale').val(data.userinfo.locale);
+  omegaup.API.User.profile()
+      .then(function(data) {
+        $('#username').html(data.userinfo.username);
+        $('#name').val(data.userinfo.name);
+        $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
+        $('#graduation_date')
+            .val(omegaup.UI.formatDate(data.userinfo.graduation_date));
+        $('#country_id').val(data.userinfo.country_id);
+        $('#locale').val(data.userinfo.locale);
 
-    // Update state dropdown status
-    $('#country_id').trigger('change');
+        // Update state dropdown status
+        $('#country_id').trigger('change');
 
-    $('#state_id').val(data.userinfo.state_id);
-    $('#scholar_degree').val(data.userinfo.scholar_degree);
-    $('#school_id').val(data.userinfo.school_id);
-    $('#school').val(data.userinfo.school);
-    $('#recruitment_optin')
-        .prop('checked', data.userinfo.recruitment_optin == 1);
+        $('#state_id').val(data.userinfo.state_id);
+        $('#scholar_degree').val(data.userinfo.scholar_degree);
+        $('#school_id').val(data.userinfo.school_id);
+        $('#school').val(data.userinfo.school);
+        $('#recruitment_optin')
+            .prop('checked', data.userinfo.recruitment_optin == 1);
 
-    original_locale = data.userinfo.locale;
-    original_school = data.userinfo.school;
-    original_school_id = data.userinfo.school_id;
-  });
+        original_locale = data.userinfo.locale;
+        original_school = data.userinfo.school;
+        original_school_id = data.userinfo.school_id;
+      })
+      .fail(omegaup.UI.apiError);
 
-  var formSubmit = function() {
-    var birth_date = new Date($('#birth_date').val());
-    birth_date.setHours(23);
+  $('form#user_profile_form')
+      .submit(function(ev) {
+        ev.preventDefault();
+        var birth_date = new Date($('#birth_date').val());
+        birth_date.setHours(23);
 
-    var graduation_date = new Date($('#graduation_date').val());
-    graduation_date.setHours(23);
+        var graduation_date = new Date($('#graduation_date').val());
+        graduation_date.setHours(23);
 
-    var locale_changed = original_locale != $('#locale').val();
+        var locale_changed = original_locale != $('#locale').val();
 
-    if ($('#school_id').val() == original_school_id &&
-        $('#school').val() != original_school) {
-      $('#school_id').val('');
-    }
+        if ($('#school_id').val() == original_school_id &&
+            $('#school').val() != original_school) {
+          $('#school_id').val('');
+        }
 
-    if ($('#name').val().length > 50) {
-      omegaup.UI.error(omegaup.T.userEditNameTooLong);
-      return false;
-    }
+        if ($('#name').val().length > 50) {
+          omegaup.UI.error(omegaup.T.userEditNameTooLong);
+          return;
+        }
 
-    omegaup.API.updateProfile(
-        $('#name').val(), birth_date.getTime() / 1000, $('#country_id').val(),
-        $('#state_id').val(), $('#scholar_degree').val(),
-        graduation_date.getTime() / 1000, $('#school_id').val(),
-        $('#school').val(), $('#locale').val(),
-        $('#recruitment_optin').prop('checked') ? 1 : 0, function(response) {
-          if (response.status == 'ok') {
-            if (locale_changed) {
-              window.location.reload();
-            } else {
-              omegaup.UI.success(omegaup.T.userEditSuccess);
-            }
-          } else {
-            omegaup.UI.error(response.error);
-          }
-        });
-
-    return false;  // Prevent page refresh on submit
-  };
-
-  $('form#user_profile_form').submit(formSubmit);
+        omegaup.API.User.update({
+                          name: $('#name').val(),
+                          birth_date: birth_date.getTime() / 1000,
+                          country_id: $('#country_id').val(),
+                          state_id: $('#state_id').val(),
+                          scholar_degree: $('#scholar_degree').val(),
+                          graduation_date: graduation_date.getTime() / 1000,
+                          school_id: $('#school_id').val(),
+                          school_name: $('#school').val(),
+                          locale: $('#locale').val(),
+                          recruitment_optin:
+                              $('#recruitment_optin').prop('checked') ? 1 : 0
+                        })
+            .then(function(response) {
+              if (locale_changed) {
+                window.location.reload();
+              } else {
+                omegaup.UI.success(omegaup.T.userEditSuccess);
+              }
+            })
+            .fail(omegaup.UI.apiError);
+      });
 
   $('form#change-password-form')
-      .submit(function() {
+      .submit(function(ev) {
+        ev.preventDefault();
         var newPassword = $('#new-password-1').val();
         var newPassword2 = $('#new-password-2').val();
         if (newPassword != newPassword2) {
           omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
-          return false;
+          return;
         }
 
-        var oldPassword = $('#old-password').val();
-
-        omegaup.API.changePassword(oldPassword, newPassword, function(data) {
-          if (data.status == 'ok') {
-            omegaup.UI.success(omegaup.T.passwordResetResetSuccess);
-          } else {
-            omegaup.UI.error(data.error);
-          }
-        });
-
-        // Prevent page refresh on submit
-        return false;
+        omegaup.API.User.changePassword({
+                          old_password: $('#old-password').val(),
+                          password: newPassword
+                        })
+            .then(function() {
+              omegaup.UI.success(omegaup.T.passwordResetResetSuccess);
+            })
+            .fail(omegaup.UI.apiError);
       });
 });

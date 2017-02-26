@@ -354,23 +354,17 @@ export class Arena {
       return;
     }
 
-    API.getRanking(self.options.contestAlias, self.rankingChange.bind(self));
-    API.getClarifications(self.options.contestAlias, self.clarificationsOffset,
-                          self.clarificationsRowcount,
-                          self.clarificationsChange.bind(self));
+    self.refreshRanking();
+    self.refreshClarifications();
 
     if (!self.socket) {
       self.clarificationInterval = setInterval(function() {
         self.clarificationsOffset = 0;  // Return pagination to start on refresh
-        API.getClarifications(
-            self.options.contestAlias, self.clarificationsOffset,
-            self.clarificationsRowcount, self.clarificationsChange.bind(self));
+        self.refreshClarifications();
       }, 5 * 60 * 1000);
 
-      self.rankingInterval = setInterval(function() {
-        API.getRanking(self.options.contestAlias,
-                       self.rankingChange.bind(self));
-      }, 5 * 60 * 1000);
+      self.rankingInterval =
+          setInterval(self.refreshRanking.bind(self), 5 * 60 * 1000);
     }
   }
 
@@ -405,7 +399,9 @@ export class Arena {
               setTimeout(f, 1000);
             } else {
               // TODO(pablo): Implement this for more than just contests.
-              API.getContest(x, contestLoaded);
+              API.Contest.details({contest_alias: x})
+                  .then(contestLoaded.bind(self))
+                  .fail(UI.ignoreError);
             }
           }
         })(self.options.contestAlias, OmegaUp.time(contest.start_time * 1000));
@@ -518,8 +514,11 @@ export class Arena {
   updateRunFallback(guid) {
     var self = this;
     if (self.socket != null) return;
-    setTimeout(function() { API.runStatus(guid, self.updateRun.bind(self)); },
-               5000);
+    setTimeout(function() {
+      API.Run.status({run_alias: guid})
+          .then(self.updateRun.bind(self))
+          .fail(UI.ignoreError);
+    }, 5000);
   }
 
   updateRun(run) {
@@ -532,28 +531,31 @@ export class Arena {
     if (run.status == 'ready') {
       if (!self.options.isPractice && !self.options.isOnlyProblem &&
           self.options.contestAlias != 'admin') {
-        API.getRanking(self.options.contestAlias,
-                       self.rankingChange.bind(self));
+        self.refreshRanking();
       }
     } else {
       self.updateRunFallback(run.guid);
     }
   }
 
+  refreshRanking() {
+    var self = this;
+
+    API.Contest.scoreboard({contest_alias: self.options.contestAlias})
+        .then(self.rankingChange.bind(self))
+        .fail(UI.ignoreError);
+  }
+
   rankingChange(data) {
-    if (data.status != 'ok') {
-      return;
-    }
     var self = this;
     self.onRankingChanged(data);
-    if (self.options.scoreboardToken) {
-      API.getRankingEventsByToken(self.options.contestAlias,
-                                  self.options.scoreboardToken,
-                                  self.onRankingEvents.bind(self));
-    } else {
-      API.getRankingEvents(self.options.contestAlias,
-                           self.onRankingEvents.bind(self));
-    }
+
+    API.Contest.scoreboardEvents({
+                 contest_alias: self.options.contestAlias,
+                 token: self.options.scoreboardToken,
+               })
+        .then(self.onRankingEvents.bind(self))
+        .fail(UI.ignoreError);
   }
 
   onRankingChanged(data) {
@@ -743,6 +745,17 @@ export class Arena {
     });
   }
 
+  refreshClarifications() {
+    var self = this;
+    API.Contest.clarifications({
+                 contest_alias: self.options.contestAlias,
+                 offset: self.clarificationsOffset,
+                 rowcount: self.clarificationsRowcount,
+               })
+        .then(self.clarificationsChange.bind(self))
+        .fail(UI.ignoreError);
+  }
+
   updateClarification(clarification) {
     var self = this;
     var r = null;
@@ -776,12 +789,13 @@ export class Arena {
                 .attr('checked', 'checked');
           }
           responseFormNode.submit(function() {
-            API.updateClarification({
-                 clarification_id: id,
-                 answer: $('#create-response-text', this).val(),
-                 'public':
-                     $('#create-response-is-public', this)[0].checked ? 1 : 0
-               })
+            API.Clarification
+                .update({
+                  clarification_id: id,
+                  answer: $('#create-response-text', this).val(),
+                  'public':
+                      $('#create-response-is-public', this)[0].checked ? 1 : 0
+                })
                 .then(function() {
                   $('pre', answerNode)
                       .html($('#create-response-text', answerNode).val());
@@ -1763,22 +1777,22 @@ class ObservableRun {
 
   rejudge() {
     var self = this;
-    API.runRejudge(self.guid, false, function(data) {
-      if (data.status == 'ok') {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      }
-    });
+    API.Run.rejudge({run_alias: self.guid, debug: false})
+        .then(function(data) {
+          self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
   }
 
   debug_rejudge() {
     var self = this;
-    API.runRejudge(self.guid, true, function(data) {
-      if (data.status == 'ok') {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      }
-    });
+    API.Run.rejudge({run_alias: self.guid, debug: true})
+        .then(function(data) {
+          self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
   }
 }
 ;

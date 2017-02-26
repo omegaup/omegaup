@@ -20,14 +20,20 @@ omegaup.OmegaUp.on('ready', function() {
         arena.initClock(contest.start_time, contest.finish_time);
         $('#title .contest-title').html(contest.title);
 
-        omegaup.API.getRankingByToken(arena.options.contestAlias,
-                                      arena.options.scoreboardToken,
-                                      arena.rankingChange.bind(arena));
+        omegaup.API.Contest.scoreboard({
+                             contest_alias: arena.options.contestAlias,
+                             token: arena.options.scoreboardToken
+                           })
+            .then(arena.rankingChange.bind(arena))
+            .fail(omegaup.UI.ignoreError);
         if (omegaup.OmegaUp.time() < contest.finish_time && !arena.socket) {
           setInterval(function() {
-            omegaup.API.getRankingByToken(arena.options.contestAlias,
-                                          arena.options.scoreboardToken,
-                                          arena.rankingChange.bind(arena));
+            omegaup.API.Contest.scoreboard({
+                                 contest_alias: arena.options.contestAlias,
+                                 token: arena.options.scoreboardToken
+                               })
+                .then(arena.rankingChange.bind(arena))
+                .fail(omegaup.UI.ignoreError);
           }, getRankingByTokenRefresh);
         }
 
