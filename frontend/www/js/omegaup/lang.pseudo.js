@@ -602,6 +602,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsAuthor: "(Au7h0r)",
 	wordsBestSolvers: "(B357 acc3p73d 501v3r5)",
 	wordsBy: "(by)",
+	wordsCancel: "(Canc31)",
 	wordsCandidates: "(Candida735)",
 	wordsCase: "(Ca53)",
 	wordsCases: "(Ca535)",

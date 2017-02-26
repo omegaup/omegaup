@@ -1,4 +1,5 @@
 import course_AddStudents from '../components/course/AddStudents.vue';
+import course_Details from '../components/course/Details.vue';
 import course_ViewProgress from '../components/course/ViewProgress.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
@@ -18,6 +19,46 @@ OmegaUp.on('ready', function() {
 
   var courseAlias =
       /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
+
+  var details = new Vue({
+    el: '#edit div',
+    render: function(createElement) {
+      return createElement('omegaup-course-details', {
+        props: {T: T, update: true, course: this.course},
+        on: {
+          submit: function(ev) {
+            API.Course.update({
+                        course_alias: courseAlias,
+                        name: ev.name,
+                        description: ev.description,
+                        start_time: ev.startTime.getTime() / 1000,
+                        finish_time:
+                            new Date(ev.finishTime).setHours(23, 59, 59, 999) /
+                                1000,
+                        alias: ev.alias,
+                        show_scoreboard: ev.showScoreboard,
+                      })
+                .then(function(data) {
+                  UI.success('Tu curso ha sido editado! <a href="/course/' +
+                             ev.alias + '">' + T.courseEditGoToCourse + '</a>');
+                  $('.course-header')
+                      .text(ev.alias)
+                      .attr('href', '/course/' + ev.alias + '/');
+                  $('div.post.footer').show();
+                  window.scrollTo(0, 0);
+                })
+                .fail(UI.apiError);
+          },
+        },
+      });
+    },
+    data: {
+      course: {},
+    },
+    components: {
+      'omegaup-course-details': course_Details,
+    },
+  });
 
   var viewProgress = new Vue({
     el: '#view-progress div',
@@ -77,55 +118,14 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  var courseForm = $('.new_course_form');
   API.Course.adminDetails({alias: courseAlias})
       .then(function(course) {
         $('.course-header')
             .text(course.name)
             .attr('href', '/course/' + courseAlias + '/');
-        $('#title', courseForm).val(course.name);
-        $('#alias', courseForm).val(course.alias);
-        $('#description', courseForm).val(course.description);
-        $('#show_scoreboard', courseForm).val(course.show_scoreboard);
-        $('#start_time', courseForm).val(UI.formatDate(course.start_time));
-        $('#finish_time', courseForm).val(UI.formatDate(course.finish_time));
-
-        $('#start_time, #finish_time', courseForm)
-            .datepicker({
-              weekStart: 1,
-              format: 'mm/dd/yyyy',
-            });
+        details.course = course;
       })
       .fail(UI.apiError);
-
-  // Edit course
-  courseForm.submit(function(ev) {
-    ev.preventDefault();
-    API.Course.update({
-                course_alias: courseAlias,
-                name: $('#title', courseForm).val(),
-                description: $('#description', courseForm).val(),
-                start_time:
-                    (new Date($('#start_time', courseForm).val()).getTime()) /
-                        1000,
-                finish_time: (new Date($('#finish_time', courseForm).val())
-                                  .setHours(23, 59, 59, 999)) /
-                                 1000,
-                alias: $('#alias', courseForm).val(),
-                show_scoreboard: $('#show_scoreboard', courseForm).val(),
-              })
-        .then(function(data) {
-          UI.success('Tu curso ha sido editado! <a href="/course/' +
-                     $('#alias', courseForm).val() + '">' +
-                     T.courseEditGoToCourse + '</a>');
-          $('.course-header')
-              .text($('#title', courseForm).val())
-              .attr('href', '/course/' + courseAlias + '/');
-          $('div.post.footer').show();
-          window.scrollTo(0, 0);
-        })
-        .fail(UI.apiError);
-  });
 
   function refreshStudentList() {
     API.Course.listStudents({course_alias: courseAlias})

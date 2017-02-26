@@ -15,7 +15,7 @@
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="edit">
-			{include file='course.new.form.tpl'}
+			<div></div>
 		</div>
 		<div class="tab-pane" id="add-assignment">
 			{include file='course.assignment.new.form.tpl'}

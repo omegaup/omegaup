@@ -602,6 +602,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsAuthor: "Autor",
 	wordsBestSolvers: "Melhores submiss\u00f5es aceitadas",
 	wordsBy: "by",
+	wordsCancel: "Cancelar",
 	wordsCandidates: "Candidatos",
 	wordsCase: "Caso",
 	wordsCases: "Casos",
