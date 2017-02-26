@@ -1778,7 +1778,7 @@ class ObservableRun {
 
   rejudge() {
     var self = this;
-    API.run.rejudge({run_alias: self.guid, debug: false})
+    API.Run.rejudge({run_alias: self.guid, debug: false})
         .then(function(data) {
           self.status('rejudging');
           self.arena.updateRunFallback(self.guid);
@@ -1788,7 +1788,7 @@ class ObservableRun {
 
   debug_rejudge() {
     var self = this;
-    API.run.rejudge({run_alias: self.guid, debug: true})
+    API.Run.rejudge({run_alias: self.guid, debug: true})
         .then(function(data) {
           self.status('rejudging');
           self.arena.updateRunFallback(self.guid);
