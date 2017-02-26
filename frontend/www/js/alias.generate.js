@@ -16,15 +16,6 @@ omegaup.OmegaUp.on('ready', function() {
   var formName = formData.attr('data-name');
   var existsFn = null;
 
-  function checkExists(obj) {
-    if (obj.status !== 'error') {
-      // Problem already exists
-      onAliasExists();
-    } else {
-      onAliasNew();
-    }
-  }
-
   function onAliasExists() {
     omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
                      '" ya existe. Elige otro nombre');
@@ -52,7 +43,9 @@ omegaup.OmegaUp.on('ready', function() {
 
     case 'interviews':
       existsFn = function(alias) {
-        omegaup.API.getInterview(alias, checkExists);
+        omegaup.API.Interview.details({interview_alias: alias})
+            .then(onAliasExists)
+            .fail(onAliasNew);
       };
       break;
   }

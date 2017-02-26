@@ -287,6 +287,16 @@ export default {
     removeContest: _call('/api/groupScoreboard/removeContest/'),
   },
 
+  Interview: {
+    addUsers: _call('/api/interview/addUsers/'),
+
+    create: _call('/api/interview/create/'),
+
+    details: _call('/api/interview/details/'),
+
+    list: _call('/api/interview/list/'),
+  },
+
   Problem: {
     addAdmin: _call('/api/problem/addAdmin/'),
 
@@ -439,71 +449,5 @@ export default {
     updateMainEmail: _call('/api/user/updateMainEmail/'),
 
     verifyEmail: _call('/api/user/verifyemail/'),
-  },
-
-  addUsersToInterview: function(interviewAlias, usernameOrEmailsCSV, callback) {
-    $.post('/api/interview/addUsers/interview_alias/' +
-               encodeURIComponent(interviewAlias) + '/',
-           {usernameOrEmailsCSV: usernameOrEmailsCSV},
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  getInterview: function(alias, callback) {
-    $.get('/api/interview/details/interview_alias/' +
-              encodeURIComponent(alias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getInterviews: function(callback) {
-    $.get('/api/interview/list/', function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  createInterview: function(s_Alias, s_Title, s_Duration, callback) {
-    $.post('/api/interview/create/',
-           {alias: s_Alias, title: s_Title, duration: s_Duration},
-           function(data) {
-             if (data.status !== undefined && data.status == 'error') {
-               UI.error(data.error);
-             } else {
-               if (callback !== undefined) {
-                 callback(data);
-               }
-             }
-           },
-           'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
   },
 }

@@ -6,8 +6,9 @@ omegaup.OmegaUp.on('ready', function() {
   });
   var admin = null;
 
-  omegaup.API.getInterview(arena.options.contestAlias,
-                           arena.contestLoaded.bind(arena));
+  omegaup.API.Interview.details({interview_alias: arena.options.contestAlias})
+      .then(arena.contestLoaded.bind(arena))
+      .fail(omegaup.UI.apiError);
 
   $(window).hashchange(arena.onHashChanged.bind(arena));
 });
