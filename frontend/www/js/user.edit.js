@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
             highlight: true,
           },
           {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.searchSchools),
+            source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
             displayKey: 'label',
             templates: {
               empty: omegaup.T.schoolToBeAdded,

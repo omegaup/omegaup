@@ -255,6 +255,8 @@ export default {
      */
     details: _call('/api/group/details/'),
 
+    list: _call('/api/group/list/'),
+
     /**
      * Gets the groups owned by the user.
      * @return {Promise}
@@ -354,6 +356,10 @@ export default {
                   }),
   },
 
+  School: {
+    list: _call('/api/school/list/'),
+  },
+
   Session: {
     /**
      * Gets the current session.
@@ -376,6 +382,10 @@ export default {
     get: _call('/api/time/get/'),
   },
 
+  Tag: {
+    list: _call('/api/tag/list/'),
+  },
+
   User: {
     changePassword: _call('/api/user/changepassword/'),
 
@@ -393,18 +403,7 @@ export default {
 
     interviewStats: _call('/api/user/interviewstats/'),
 
-    // TODO(lhchavez): Migrate once UI.typeahead only accepts promises.
-    list: function(query, callback) {
-      $.post('/api/user/list/', {query: query},
-             function(data) { callback(data); }, 'json')
-          .fail(function(j, status, errorThrown) {
-            try {
-              callback(JSON.parse(j.responseText));
-            } catch (err) {
-              callback({status: 'error', 'error': undefined});
-            }
-          });
-    },
+    list: _call('/api/user/list/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 
@@ -440,42 +439,6 @@ export default {
     updateMainEmail: _call('/api/user/updateMainEmail/'),
 
     verifyEmail: _call('/api/user/verifyemail/'),
-  },
-
-  searchTags: function(query, callback) {
-    $.post('/api/tag/list/', {query: query}, function(data) { callback(data); },
-           'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  searchSchools: function(query, callback) {
-    $.post('/api/school/list/', {query: query},
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  searchGroups: function(query, callback) {
-    $.post('/api/group/list/', {query: query},
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
   },
 
   addUsersToInterview: function(interviewAlias, usernameOrEmailsCSV, callback) {
