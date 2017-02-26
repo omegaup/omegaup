@@ -164,7 +164,7 @@ class CourseController extends Controller {
         self::validateCreateOrUpdate($r);
 
         if (!is_null(CoursesDAO::findByAlias($r['alias']))) {
-            throw new DuplicatedEntryInDatabaseException('alias');
+            throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
         // Create the associated group

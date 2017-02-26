@@ -257,7 +257,8 @@ omegaup.OmegaUp.on('ready', function() {
 
     omegaup.API.Problem
         .details({problem_alias: problemAlias, statement_type: 'markdown'})
-        .then(problemCallback);
+        .then(problemCallback)
+        .fail(omegaup.UI.apiError);
   }
 
   function problemCallback(problem) {
@@ -316,6 +317,7 @@ omegaup.OmegaUp.on('ready', function() {
                              show_solvers: false,
                              lang: chosenLanguage
                            })
-            .then(problemCallback);
+            .then(problemCallback)
+            .fail(omegaup.UI.apiError);
       });
 });

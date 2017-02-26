@@ -13,7 +13,8 @@ omegaup.OmegaUp.on('ready', function() {
                       course: arena.options.courseAlias,
                       assignment: arena.options.assignmentAlias
                     })
-      .then(arena.contestLoaded.bind(arena));
+      .then(arena.contestLoaded.bind(arena))
+      .fail(omegaup.UI.apiError);
 
   $(window).hashchange(arena.onHashChanged.bind(arena));
 });

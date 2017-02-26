@@ -4,11 +4,10 @@ $('#forgot-password-form')
       $('#submit').prop('disabled', true);
       omegaup.UI.dismissNotifications();
       omegaup.API.Reset.create({email: $('#email').val()})
-          .then(function() {
-            omegaup.UI.success(data.message);
-            $('#submit').prop('disabled', false);
-          })
-          .fail(omegaup.UI.apiError);
+          .then(function(data) { omegaup.UI.success(data.message); })
+          .fail(omegaup.UI.apiError)
+          .always(function() { $('#submit')
+                                   .prop('disabled', false); });
       return false;
     });
 
@@ -24,7 +23,7 @@ $('#reset-password-form')
                          password_confirmation:
                              $('#password_confirmation').val()
                        })
-          .then(function() { omegaup.UI.success(data.message); })
+          .then(function(data) { omegaup.UI.success(data.message); })
           .fail(omegaup.UI.apiError)
           .always(function() { $('#submit')
                                    .prop('disabled', false); });

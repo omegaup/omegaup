@@ -95,7 +95,8 @@ OmegaUp.on('ready', function() {
               weekStart: 1,
               format: 'mm/dd/yyyy',
             });
-      });
+      })
+      .fail(UI.apiError);
 
   // Edit course
   courseForm.submit(function(ev) {
@@ -122,7 +123,8 @@ OmegaUp.on('ready', function() {
               .attr('href', '/course/' + courseAlias + '/');
           $('div.post.footer').show();
           window.scrollTo(0, 0);
-        });
+        })
+        .fail(UI.apiError);
   });
 
   function refreshStudentList() {

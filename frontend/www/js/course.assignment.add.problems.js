@@ -54,7 +54,8 @@ omegaup.OmegaUp.on('ready', function() {
             .then(function(data) {
               refreshProblems();
               omegaup.UI.success(omegaup.T.courseAssignmentProblemAdded);
-            });
+            })
+            .fail(omegaup.UI.apiError);
         return false;
       });
 
@@ -72,7 +73,8 @@ omegaup.OmegaUp.on('ready', function() {
             list.append(
                 $('<option>').text(problems[i].title).val(problems[i].alias));
           }
-        });
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   $('#topic-list, #level-list').change(updateProblemList);
@@ -107,7 +109,8 @@ $(function() {
                 });
 
                 $('.assignment-add-problem #assignments-list').change();
-              });
+              })
+              .fail(omegaup.UI.apiError);
 
           // Plug problems type-ahead
           omegaup.UI.problemTypeahead(

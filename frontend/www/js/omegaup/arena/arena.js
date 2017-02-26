@@ -966,7 +966,8 @@ export class Arena {
 
         if (self.options.isPractice || self.options.isOnlyProblem) {
           API.Problem.runs({problem_alias: problem.alias})
-              .then(function(data) { updateRuns(data.runs); });
+              .then(function(data) { updateRuns(data.runs); })
+              .fail(UI.apiError);
         } else {
           updateRuns(problem.runs);
         }
@@ -988,7 +989,8 @@ export class Arena {
               problem.sample_input = problem_ext.sample_input;
               problem.runs = problem_ext.runs;
               update(problem);
-            });
+            })
+            .fail(UI.apiError);
       }
 
       if (newRun) {
@@ -1037,7 +1039,8 @@ export class Arena {
       API.Run.details({run_alias: showRunMatch[1]})
           .then(function(data) {
             self.displayRunDetails(showRunMatch[1], data);
-          });
+          })
+          .fail(UI.apiError);
     }
   }
 
@@ -1529,7 +1532,8 @@ class RunView {
             {
               source: UI.typeaheadWrapper(function(query, cb) {
                 API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); });
+                    .then(function(data) { cb(data.results); })
+                    .fail(UI.apiError);
               }),
               displayKey: 'title',
               templates: {
