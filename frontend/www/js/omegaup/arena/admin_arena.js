@@ -108,10 +108,7 @@ export default class ArenaAdmin {
           self.arena.clarificationsRowcount,
           self.arena.clarificationsChange.bind(self.arena));
     } else {
-      API.getClarifications(self.arena.options.contestAlias,
-                            self.arena.clarificationsOffset,
-                            self.arena.clarificationsRowcount,
-                            self.arena.clarificationsChange.bind(self.arena));
+      self.arena.refreshClarifications();
     }
   }
 

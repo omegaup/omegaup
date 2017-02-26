@@ -111,6 +111,18 @@ export default {
 
     admins: _call('/api/contest/admins/'),
 
+    arbitrateRequest: _call('/api/contest/arbitraterequest/'),
+
+    clarifications: _call('/api/contest/clarifications/',
+                          function(data) {
+                            for (var idx in data.clarifications) {
+                              var clarification = data.clarifications[idx];
+                              clarification.time = omegaup.OmegaUp.time(
+                                  clarification.time * 1000);
+                            }
+                            return data;
+                          }),
+
     create: _call('/api/contest/create/'),
 
     details: _call('/api/contest/details/', _normalizeContestFields),
@@ -137,6 +149,11 @@ export default {
 
     problems: _call('/api/contest/problems/'),
 
+    publicDetails:
+        _call('/api/contest/publicdetails/', _normalizeContestFields),
+
+    registerForContest: _call('/api/contest/registerforcontest/'),
+
     removeAdmin: _call('/api/contest/removeAdmin/'),
 
     removeGroupAdminFromContest: _call('/api/contest/removeGroupAdmin/'),
@@ -146,6 +163,12 @@ export default {
     removeUser: _call('/api/contest/removeUser/'),
 
     runs: _call('/api/contest/runs/', _convertRuntimes),
+
+    scoreboard: _call('/api/contest/scoreboard/'),
+
+    scoreboardEvents: _call('/api/contest/scoreboardevents/'),
+
+    scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
 
     stats: _call('/api/contest/stats/'),
 
@@ -395,78 +418,6 @@ export default {
     verifyEmail: _call('/api/user/verifyemail/'),
   },
 
-  getContest: function(alias, callback) {
-    $.get('/api/contest/details/contest_alias/' + encodeURIComponent(alias) +
-              '/',
-          function(contest) {
-            if (contest.status == 'ok') {
-              _normalizeContestFields(contest);
-            }
-            callback(contest);
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  getContestPublicDetails: function(alias, callback) {
-    $.get('/api/contest/publicdetails/contest_alias/' +
-              encodeURIComponent(alias) + '/',
-          function(contest) {
-            if (contest.status == 'ok') {
-              _normalizeContestFields(contest);
-            }
-            callback(contest);
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  arbitrateContestUserRequest: function(contest_alias, username, resolution,
-                                        notes, callback) {
-    $.post('/api/contest/arbitraterequest/',
-           {
-             contest_alias: contest_alias,
-             username: username,
-             resolution: resolution,
-             note: notes
-           },
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
-  registerForContest: function(contest_alias, callback) {
-    $.post('/api/contest/registerforcontest/',
-           {
-             contest_alias: contest_alias,
-           },
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
-          }
-        });
-  },
-
   updateProblem: function(alias, isPublic, callback) {
     $.post('/api/problem/update/',
            {
@@ -602,135 +553,6 @@ export default {
             } catch (err) {
               callback({status: 'error', error: err});
             }
-          }
-        });
-  },
-
-  getRanking: function(contestAlias, callback) {
-    $.get('/api/contest/scoreboard/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getRankingByToken: function(contestAlias, token, callback) {
-    $.get('/api/contest/scoreboard/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/token/' +
-              encodeURIComponent(token) + '/',
-          function(data) {
-            _convertTimes(data);
-            callback(data);
-          },
-          'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getRankingEventsByToken: function(contestAlias, token, callback) {
-    $.get('/api/contest/scoreboardevents/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/token/' +
-              encodeURIComponent(token) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getRankingEvents: function(contestAlias, callback) {
-    $.get('/api/contest/scoreboardevents/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getScoreboardMerge: function(contestAliases, callback) {
-    $.get('/api/contest/scoreboardmerge/contest_aliases/' +
-              contestAliases.map(encodeURIComponent).join(',') + '/',
-          function(data) { callback(data); }, 'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  getClarifications: function(contestAlias, offset, count, callback) {
-    $.get('/api/contest/clarifications/contest_alias/' +
-              encodeURIComponent(contestAlias) + '/offset/' +
-              encodeURIComponent(offset) + '/rowcount/' +
-              encodeURIComponent(count) + '/',
-          function(data) {
-            for (var idx in data.clarifications) {
-              var clarification = data.clarifications[idx];
-              clarification.time =
-                  omegaup.OmegaUp.time(clarification.time * 1000);
-            }
-            callback(data);
-          },
-          'json')
-        .fail(function(data) {
-          if (callback !== undefined) {
-            try {
-              callback(JSON.parse(data.responseText));
-            } catch (err) {
-              callback({status: 'error', error: err});
-            }
-          }
-        });
-  },
-
-  UserEdit: function(username, name, email, birthDate, school, password,
-                     oldPassword, callback) {
-    var toSend = {};
-
-    if (username !== null) toSend.username = username;
-    if (name !== null) toSend.name = name;
-    if (email !== null) toSend.email = email;
-    if (birthDate !== null) toSend.birthDate = birthDate;
-    if (school !== null) toSend.school = school;
-    if (password !== null) toSend.password = password;
-    if (oldPassword !== null) toSend.oldPassword = oldPassword;
-
-    $.post('/api/controllername/user/edit/', toSend,
-           function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
           }
         });
   },

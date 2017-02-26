@@ -52,7 +52,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     case 'interviews':
       existsFn = function(alias) {
-        omegaup.API.getContest(alias, checkExists);
+        omegaup.API.getInterview(alias, checkExists);
       };
       break;
   }

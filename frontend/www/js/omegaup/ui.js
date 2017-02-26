@@ -39,6 +39,8 @@ let UI = {
 
   apiError: function(response) { UI.error(response.error || 'error'); },
 
+  ignoreError: function(response) {},
+
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
