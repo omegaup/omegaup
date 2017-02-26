@@ -218,8 +218,7 @@ omegaup.OmegaUp.on('ready', function() {
                         contestAlias, username, true /* accepted */, '',
                         function(response) {
                           if (response.status == 'ok') {
-                            omegaup.UI.success(
-                                omegaup.T.successfulOperation);
+                            omegaup.UI.success(omegaup.T.successfulOperation);
                             $('#user-requests-table').bootstrapTable('refresh');
                           } else {
                             omegaup.UI.error(response.error || 'error');
@@ -236,8 +235,7 @@ omegaup.OmegaUp.on('ready', function() {
                         contestAlias, username, false /* rejected */, '',
                         function(response) {
                           if (response.status == 'ok') {
-                            omegaup.UI.success(
-                                omegaup.T.successfulOperation);
+                            omegaup.UI.success(omegaup.T.successfulOperation);
                             $('#user-requests-table').bootstrapTable('refresh');
                           } else {
                             omegaup.UI.error(response.error || 'error');
