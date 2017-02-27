@@ -37,7 +37,9 @@ let UI = {
 
   warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
 
-  apiError: function(response) { UI.error(response.error || 'error'); },
+  apiError: function(response) {
+    UI.error((response.error || 'error').toString());
+  },
 
   ignoreError: function(response) {},
 
