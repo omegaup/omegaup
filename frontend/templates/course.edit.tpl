@@ -9,7 +9,7 @@
 	<ul class="nav nav-tabs" id="sections">
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
-		<li><a href="#add-problems" data-toggle="tab">{#courseEditAddProblems#}</a></li>
+		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
 		<li><a href="#add-students" data-toggle="tab">{#courseEditAddStudents#}</a></li>
 		<li><a href="#view-progress" data-toggle="tab">{#courseViewProgress#}</a></li>
 	</ul>
@@ -21,8 +21,9 @@
 			<div class="list"></div>
 			<div class="form"></div>
 		</div>
-		<div class="tab-pane" id="add-problems">
-			{include file='course.assignment.add.problems.form.tpl'}
+		<div class="tab-pane" id="problems">
+			<div class="list"></div>
+			<div class="form"></div>
 		</div>
 		<div class="tab-pane" id="add-students">
 			<div></div>
@@ -34,5 +35,4 @@
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/dist/course_edit.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/js/course.assignment.add.problems.js"}"></script>
 {include file='footer.tpl'}

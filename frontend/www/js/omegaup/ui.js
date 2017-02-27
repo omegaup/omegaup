@@ -37,7 +37,9 @@ let UI = {
 
   warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
 
-  apiError: function(response) { UI.error(response.error || 'error'); },
+  apiError: function(response) {
+    UI.error((response.error || 'error').toString());
+  },
 
   ignoreError: function(response) {},
 
@@ -128,7 +130,11 @@ let UI = {
                 lastRequest = null;
                 wrappedCall(request[0], request[1]);
               } else {
-                callback(data);
+                if (data.results) {
+                  callback(data.results);
+                } else {
+                  callback(data);
+                }
               }
             })
             .fail(UI.ignoreError)

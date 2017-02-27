@@ -2,6 +2,7 @@ import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Details from '../components/course/Details.vue';
+import course_ProblemList from '../components/course/ProblemList.vue';
 import course_ViewProgress from '../components/course/ViewProgress.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
@@ -177,6 +178,70 @@ OmegaUp.on('ready', function() {
     },
   });
 
+  var problemList = new Vue({
+    el: '#problems div',
+    render: function(createElement) {
+      return createElement('omegaup-course-problemlist', {
+        props: {
+          T: T,
+          assignments: this.assignments,
+          assignmentProblems: this.assignmentProblems,
+          taggedProblems: this.taggedProblems
+        },
+        on: {
+          'add-problem': function(assignment, problemAlias) {
+            console.log(problemList);
+            omegaup.API.Course.addProblem({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                                problem_alias: problemAlias,
+                              })
+                .then(function(data) {
+                  refreshProblemList(assignment);
+                  problemList.$children[0].showForm = false;
+                  omegaup.UI.success(T.courseAssignmentProblemAdded);
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          assignment: function(assignment) { refreshProblemList(assignment); },
+          remove: function(assignment, problem) {
+            if (!window.confirm(
+                    UI.formatString(T.courseAssignmentProblemConfirmRemove, {
+                      problem: problem.title,
+                    }))) {
+              return;
+            }
+            omegaup.API.Course.removeProblem({
+                                course_alias: courseAlias,
+                                problem_alias: problem.alias,
+                                assignment_alias: assignment.alias,
+                              })
+                .then(function(response) {
+                  omegaup.UI.success(T.courseAssignmentProblemRemoved);
+                  refreshProblemList(assignment);
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          tags: function(tags) {
+            omegaup.API.Problem.list({tag: tags})
+                .then(function(data) {
+                  problemList.taggedProblems = data.results;
+                })
+                .fail(omegaup.UI.apiError);
+          },
+        },
+      });
+    },
+    data: {
+      assignments: [],
+      assignmentProblems: [],
+      taggedProblems: [],
+    },
+    components: {
+      'omegaup-course-problemlist': course_ProblemList,
+    },
+  });
+
   var viewProgress = new Vue({
     el: '#view-progress div',
     render: function(createElement) {
@@ -256,10 +321,20 @@ OmegaUp.on('ready', function() {
   function refreshAssignmentsList() {
     API.Course.listAssignments({course_alias: courseAlias})
         .then(function(data) {
-          viewProgress.assignments = data.assignments;
+          problemList.assignments = data.assignments;
           assignmentList.assignments = data.assignments;
+          viewProgress.assignments = data.assignments;
         })
         .fail(UI.apiError);
+  }
+
+  function refreshProblemList(assignment) {
+    omegaup.API.Course.getAssignment(
+                          {assignment: assignment.alias, course: courseAlias})
+        .then(function(response) {
+          problemList.assignmentProblems = response.problems;
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   refreshStudentList();

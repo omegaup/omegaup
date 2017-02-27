@@ -4,7 +4,7 @@
       <h3>{{ T.wordsAssignments }}</h3>
     </div>
     <div class="panel-body" v-if="assignments.length == 0">
-      {{ T.courseAssignmentEmpty }}
+      <div class="empty-category">{{ T.courseAssignmentEmpty }}</div>
     </div>
     <table class="table table-striped" v-else>
       <thead>
@@ -65,9 +65,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.omegaup-course-assignmentlist .button-column {
-  width: 1em;
-}
-</style>
