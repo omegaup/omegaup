@@ -128,7 +128,11 @@ let UI = {
                 lastRequest = null;
                 wrappedCall(request[0], request[1]);
               } else {
-                callback(data);
+                if (data.results) {
+                  callback(data.results);
+                } else {
+                  callback(data);
+                }
               }
             })
             .fail(UI.ignoreError)
