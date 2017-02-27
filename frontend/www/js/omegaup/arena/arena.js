@@ -550,10 +550,13 @@ export class Arena {
     var self = this;
     self.onRankingChanged(data);
 
-    API.Contest.scoreboardEvents({
-                 contest_alias: self.options.contestAlias,
-                 token: self.options.scoreboardToken,
-               })
+    var params = {
+      contest_alias: self.options.contestAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Contest.scoreboardEvents(params)
         .then(self.onRankingEvents.bind(self))
         .fail(UI.ignoreError);
   }

@@ -139,6 +139,7 @@ omegaup.OmegaUp.on('ready', function() {
         } else {
           $('.contest #points-decay-factor').hide();
         }
+        return contest;
       })
       .fail(function(contest) {
         $('#contest-details').hide();
@@ -146,6 +147,7 @@ omegaup.OmegaUp.on('ready', function() {
             .parent()
             .removeClass('col-md-6')
             .addClass('col-md-2');
+        return contest;
       })
       .always(function(contest) {
         // Feel free to re-write this if you have the time.

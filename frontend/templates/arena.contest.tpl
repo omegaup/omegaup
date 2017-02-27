@@ -3,7 +3,6 @@
 {assign "showRanking" !$practice}
 {/if}
 {if $admin}
-			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<audio id="notification-audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>

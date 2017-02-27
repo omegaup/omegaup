@@ -22,7 +22,6 @@
 
 <script type="text/javascript" src="{version_hash src="/js/third_party/jquery.ba-hashchange.js"}"></script>
 
-<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
 
 <script type="text/javascript" src="{version_hash src="/js/interviews.results.js"}"></script>

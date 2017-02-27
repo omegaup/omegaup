@@ -1,4 +1,5 @@
 import API from '../api.js';
+import UI from '../ui.js';
 
 export default class ArenaAdmin {
   constructor(arena) {
