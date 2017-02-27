@@ -85,5 +85,5 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
             });
             ko.applyBindings(self, self.domElement);
           })
-          .fail(UI.apiError);
+          .fail(omegaup.UI.apiError);
 };
