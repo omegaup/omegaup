@@ -38,14 +38,14 @@
             </label>
           </div>
           <div class="form-group col-md-4">
-            <label>
+            <span class="faux-label">
               {{ T.courseNewFormShowScoreboard }}
               <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseNewFormShowScoreboardDesc" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <div class="form-control container">
-                <label class="radio-inline"><input type="radio" value="1" v-model="showScoreboard">{{ T.wordsYes }}</label>
-                <label class="radio-inline"><input type="radio" value="0" v-model="showScoreboard">{{ T.wordsNo }}</label>
-              </div>
-            </label>
+            </span>
+            <div class="form-control container">
+              <label class="radio-inline"><input type="radio" value="1" v-model="showScoreboard">{{ T.wordsYes }}</label>
+              <label class="radio-inline"><input type="radio" value="0" v-model="showScoreboard">{{ T.wordsNo }}</label>
+            </div>
           </div>
         </div>
 
@@ -122,5 +122,8 @@ export default {
 <style>
 .omegaup-course-details .form-group>label {
   width: 100%;
+}
+.omegaup-course-details .faux-label {
+  font-weight: bold;
 }
 </style>

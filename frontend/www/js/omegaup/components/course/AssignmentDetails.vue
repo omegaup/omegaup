@@ -11,7 +11,7 @@
           </div>
 
           <div class="form-group col-md-4">
-            <label for="alias">
+            <label>
               {{ T.courseNewFormShortTitle_alias_ }}
               <span data-toggle="tooltip" data-placement="top"
                   v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"

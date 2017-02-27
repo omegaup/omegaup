@@ -29,7 +29,7 @@ OmegaUp.on('ready', function() {
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + ev.alias +
-                                          '/edit/#problems');
+                                          '/edit/#assignments');
                 })
                 .fail(UI.apiError);
           },

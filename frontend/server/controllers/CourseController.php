@@ -422,12 +422,13 @@ class CourseController extends Controller {
         $response = [];
         $response['assignments'] = [];
         foreach ($assignments as $a) {
+            $a->toUnixTime();
             $response['assignments'][] = [
                 'name' => $a->name,
                 'alias' => $a->alias,
                 'description' => $a->description,
-                'start_time' => strtotime($a->start_time),
-                'finish_time' => strtotime($a->finish_time),
+                'start_time' => $a->start_time,
+                'finish_time' => $a->finish_time,
                 'assignment_type' => $a->assignment_type
             ];
         }
