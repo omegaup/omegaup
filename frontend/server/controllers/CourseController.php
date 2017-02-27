@@ -422,6 +422,7 @@ class CourseController extends Controller {
         $response = [];
         $response['assignments'] = [];
         foreach ($assignments as $a) {
+            $a->toUnixTime();
             $response['assignments'][] = [
                 'name' => $a->name,
                 'alias' => $a->alias,
@@ -434,6 +435,37 @@ class CourseController extends Controller {
 
         $response['status'] = 'ok';
         return $response;
+    }
+
+    /**
+     * Remove an assignment from a course
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiRemoveAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        throw new UnimplementedException();
     }
 
     /**

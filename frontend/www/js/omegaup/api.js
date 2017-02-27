@@ -192,7 +192,18 @@ export default {
 
     getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
 
-    listAssignments: _call('/api/course/listAssignments/'),
+    listAssignments: _call(
+        '/api/course/listAssignments/',
+        function(result) {
+          // We cannot use omegaup.OmegaUp.time() because admins need to
+          // be able to get the unmodified times.
+          for (var i = 0; i < result.assignments.length; ++i) {
+            var assignment = result.assignments[i];
+            assignment.start_time = new Date(assignment.start_time * 1000);
+            assignment.finish_time = new Date(assignment.finish_time * 1000);
+          }
+          return result;
+        }),
 
     listCourses: _call('/api/course/listCourses/',
                        function(result) {
@@ -209,11 +220,15 @@ export default {
 
     listStudents: _call('/api/course/listStudents/'),
 
+    removeAssignment: _call('/api/course/removeAssignment/'),
+
     removeProblem: _call('/api/course/removeProblem/'),
 
     removeStudent: _call('/api/course/removeStudent/'),
 
     update: _call('/api/course/update/'),
+
+    updateAssignment: _call('/api/course/updateAssignment/'),
   },
 
   Grader: {

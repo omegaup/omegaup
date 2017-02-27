@@ -5,7 +5,7 @@
         <div class="form-group">
           <label for="member-username">{{ T.wordsStudent }}</label>
           <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseEditAddStudentsTooltip"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-          <input id="student-username" v-model="studentUsername" type="text" size="20" class="form-control" autocomplete="off" />
+          <input v-model="studentUsername" type="text" size="20" class="form-control" autocomplete="off" />
         </div>
         <div class="form-group">
           <button class="btn btn-primary" type="submit">{{ T.wordsAddStudent }}</button>
@@ -44,7 +44,7 @@ export default {
     };
   },
   mounted: function() {
-    UI.userTypeahead($('#student-username'));
+    UI.userTypeahead($('input', $(this.$el)));
   },
   methods: {
     onAddStudent: function() {

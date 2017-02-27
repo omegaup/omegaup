@@ -624,6 +624,17 @@ iframe.embedded-doc {
     transform-origin:0 0;
 }
 
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: #aaa;
+}
+
+.button-column {
+  width: 1em;
+}
+
 /* Hacks */
 /* Este estilo evita el desbordamiento de las pestañas toggle tabs (tabs.js)
 de bootstrap. Sólo afecta a los .nav-tabs, ya que el "padding" horizontal
