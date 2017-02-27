@@ -5,7 +5,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   var defaultDate = Date.create(Date.now());
   defaultDate.set({seconds: 0});
-  var defaultStartDate = Date.create(defaultDate);
+  var defaultStartTime = Date.create(defaultDate);
   defaultDate.setDate(defaultDate.getDate() + 30);
   var defaultFinishTime = Date.create(defaultDate);
 
@@ -38,7 +38,7 @@ OmegaUp.on('ready', function() {
     },
     data: {
       course: {
-        start_time: defaultStartDate,
+        start_time: defaultStartTime,
         finish_time: defaultFinishTime,
       },
     },

@@ -1,3 +1,4 @@
+import course_Assignments from '../components/course/Assignments.vue';
 import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ViewProgress from '../components/course/ViewProgress.vue';
@@ -19,6 +20,48 @@ OmegaUp.on('ready', function() {
 
   var courseAlias =
       /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
+
+  var defaultDate = Date.create(Date.now());
+  defaultDate.set({seconds: 0});
+  var defaultStartTime = Date.create(defaultDate);
+  defaultDate.setHours(defaultDate.getHours() + 5);
+  var defaultFinishTime = Date.create(defaultDate);
+
+  var assignments = new Vue({
+    el: '#assignments div',
+    render: function(createElement) {
+      return createElement('omegaup-course-assignments', {
+        props: {T: T, update: false, assignment: this.assignment},
+        on: {
+          submit: function(ev) {
+            omegaup.API.Course
+              .createAssignment({
+                course_alias: courseAlias,
+                name: ev.name,
+                description: ev.description,
+                start_time: ev.startTime.getTime() / 1000,
+                finish_time: ev.finishTime.getTime() / 1000,
+                alias: ev.alias,
+                assignment_type: ev.assignmentType,
+              })
+            .then(function(data) {
+              omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+            })
+            .fail(omegaup.UI.apiError);
+          },
+        },
+      });
+    },
+    data: {
+      assignment: {
+        start_time: defaultStartTime,
+        finish_time: defaultFinishTime,
+      },
+    },
+    components: {
+      'omegaup-course-assignments': course_Assignments,
+    },
+  });
 
   var details = new Vue({
     el: '#edit div',
