@@ -354,7 +354,7 @@ omegaup.OmegaUp.on('ready', function() {
         }
 
         if ($('#name').val().length > 50) {
-          omegaup.UI.error(omegaup.T['userEditNameTooLong']);
+          omegaup.UI.error(omegaup.T.userEditNameTooLong);
           return;
         }
 
@@ -375,7 +375,7 @@ omegaup.OmegaUp.on('ready', function() {
               if (locale_changed) {
                 window.location.reload();
               } else {
-                omegaup.UI.success(omegaup.T['userEditSuccess']);
+                omegaup.UI.success(omegaup.T.userEditSuccess);
               }
             })
             .fail(omegaup.UI.apiError);

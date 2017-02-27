@@ -8,7 +8,7 @@ omegaup.OmegaUp.on('ready', function() {
                       {interview: interviewAlias, username: candidateUsername})
       .then(function(userStats) {
         $('.page-header h1 span')
-            .html(omegaup.T['interviewResultsFor'] + ' ' +
+            .html(omegaup.T.interviewResultsFor + ' ' +
                   userStats.name_or_username);
 
         var subtitleHtml = 'Interview url : ' + userStats.interview_url;
@@ -16,11 +16,11 @@ omegaup.OmegaUp.on('ready', function() {
         $('.page-header h3 small').html(subtitleHtml);
 
         if (userStats.finished) {
-          $('.page-header h1 small').html(omegaup.T['interviewFinished']);
+          $('.page-header h1 small').html(omegaup.T.interviewFinished);
         } else if (userStats.opened_interview) {
-          $('.page-header h1 small').html(omegaup.T['interviewInProgress']);
+          $('.page-header h1 small').html(omegaup.T.interviewInProgress);
         } else {
-          $('.page-header h1 small').html(omegaup.T['interviewNotStarted']);
+          $('.page-header h1 small').html(omegaup.T.interviewNotStarted);
         }
       })
       .fail(omegaup.UI.apiError);

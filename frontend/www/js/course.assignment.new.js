@@ -19,7 +19,7 @@ omegaup.OmegaUp.on('ready', function() {
               $('select[name="assignment_type"]', assignmentForm).val(),
         })
         .then(function(data) {
-          omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
+          omegaup.UI.success(omegaup.T.courseAssignmentAdded);
           assignmentForm[0].reset();
           setDefaultDates();
         })

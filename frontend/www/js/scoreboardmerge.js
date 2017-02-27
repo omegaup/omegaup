@@ -32,7 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
               }
 
               html +=
-                  '<td colspan="2"><b>' + omegaup.T['wordsTotal'] + '</b></td>';
+                  '<td colspan="2"><b>' + omegaup.T.wordsTotal + '</b></td>';
               html += '</tr>';
 
               ranking = scoreboard['ranking'];
