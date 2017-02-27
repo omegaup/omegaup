@@ -1,5 +1,5 @@
 <template>
-  <div class="omegaup-course-assignments panel">
+  <div v-show="show" class="omegaup-course-assignmentdetails panel">
     <div class="panel-body">
       <form class="form" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -69,7 +69,7 @@
             <template v-if="update">{{ T.courseAssignmentNewFormUpdate }}</template>
             <template v-else>{{ T.courseAssignmentNewFormSchedule }}</template>
           </button>
-          <button v-on:click.prevent="reset" type="reset" class="btn btn-secondary">
+          <button v-on:click.prevent="onCancel" type="reset" class="btn btn-secondary">
             {{ T.wordsCancel }}
           </button>
         </div>
@@ -86,6 +86,10 @@ export default {
     T: Object,
     update: Boolean,
     assignment: Object,
+    show: {
+      type: Boolean,
+      'default': false,
+    },
   },
   data: function() {
     return {
@@ -114,6 +118,10 @@ export default {
     onSubmit: function() {
       this.$emit('submit', this);
     },
+    onCancel: function() {
+      this.reset();
+      this.$emit('cancel');
+    },
   },
   components: {
     'omegaup-datetimepicker': DateTimePicker,
@@ -122,7 +130,7 @@ export default {
 </script>
 
 <style>
-.omegaup-course-assignments .form-group>label {
+.omegaup-course-assignmentdetails .form-group>label {
   width: 100%;
 }
 </style>

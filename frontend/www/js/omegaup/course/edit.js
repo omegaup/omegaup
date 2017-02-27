@@ -1,4 +1,5 @@
-import course_Assignments from '../components/course/Assignments.vue';
+import course_AssignmentList from '../components/course/AssignmentList.vue';
+import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ViewProgress from '../components/course/ViewProgress.vue';
@@ -27,39 +28,112 @@ OmegaUp.on('ready', function() {
   defaultDate.setHours(defaultDate.getHours() + 5);
   var defaultFinishTime = Date.create(defaultDate);
 
-  var assignments = new Vue({
-    el: '#assignments div',
+  var assignmentList = new Vue({
+    el: '#assignments div.list',
     render: function(createElement) {
-      return createElement('omegaup-course-assignments', {
-        props: {T: T, update: false, assignment: this.assignment},
+      return createElement('omegaup-course-assignmentlist', {
+        props: {T: T, assignments: this.assignments, courseAlias: courseAlias},
         on: {
-          submit: function(ev) {
-            omegaup.API.Course
-              .createAssignment({
-                course_alias: courseAlias,
-                name: ev.name,
-                description: ev.description,
-                start_time: ev.startTime.getTime() / 1000,
-                finish_time: ev.finishTime.getTime() / 1000,
-                alias: ev.alias,
-                assignment_type: ev.assignmentType,
-              })
-            .then(function(data) {
-              omegaup.UI.success(omegaup.T.courseAssignmentAdded);
-            })
-            .fail(omegaup.UI.apiError);
+          edit: function(assignment) {
+            assignmentDetails.show = true;
+            assignmentDetails.update = true;
+            assignmentDetails.assignment = assignment;
+          },
+          'delete': function(assignment) {
+            if (!window.confirm(
+                    UI.formatString(T.courseAssignmentConfirmDelete, {
+                      assignment: assignment.name,
+                    }))) {
+              return;
+            }
+            omegaup.API.Course.removeAssignment({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.courseAssignmentDeleted);
+                  refreshAssignmentsList();
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'new': function() {
+            assignmentDetails.show = true;
+            assignmentDetails.update = false;
+            assignmentDetails.assignment = {
+              start_time: defaultStartTime,
+              finish_time: defaultFinishTime,
+            };
           },
         },
       });
     },
     data: {
+      assignments: [],
+    },
+    components: {
+      'omegaup-course-assignmentlist': course_AssignmentList,
+    },
+  });
+
+  var assignmentDetails = new Vue({
+    el: '#assignments div.form',
+    render: function(createElement) {
+      return createElement('omegaup-course-assignmentdetails', {
+        props: {
+          T: T,
+          show: this.show,
+          update: this.update,
+          assignment: this.assignment
+        },
+        on: {
+          submit: function(ev) {
+            if (ev.update) {
+              omegaup.API.Course.updateAssignment({
+                                  course: courseAlias,
+                                  name: ev.name,
+                                  description: ev.description,
+                                  start_time: ev.startTime.getTime() / 1000,
+                                  finish_time: ev.finishTime.getTime() / 1000,
+                                  assignment: ev.alias,
+                                  assignment_type: ev.assignmentType,
+                                })
+                  .then(function(data) {
+                    omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+                    refreshAssignmentsList();
+                  })
+                  .fail(omegaup.UI.apiError);
+            } else {
+              omegaup.API.Course.createAssignment({
+                                  course_alias: courseAlias,
+                                  name: ev.name,
+                                  description: ev.description,
+                                  start_time: ev.startTime.getTime() / 1000,
+                                  finish_time: ev.finishTime.getTime() / 1000,
+                                  alias: ev.alias,
+                                  assignment_type: ev.assignmentType,
+                                })
+                  .then(function(data) {
+                    omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+                    refreshAssignmentsList();
+                  })
+                  .fail(omegaup.UI.apiError);
+            }
+            assignmentDetails.show = false;
+          },
+          cancel: function() { assignmentDetails.show = false; },
+        },
+      });
+    },
+    data: {
+      show: false,
+      update: false,
       assignment: {
         start_time: defaultStartTime,
         finish_time: defaultFinishTime,
       },
     },
     components: {
-      'omegaup-course-assignments': course_Assignments,
+      'omegaup-course-assignmentdetails': course_AssignmentDetails,
     },
   });
 
@@ -181,7 +255,10 @@ OmegaUp.on('ready', function() {
 
   function refreshAssignmentsList() {
     API.Course.listAssignments({course_alias: courseAlias})
-        .then(function(data) { viewProgress.assignments = data.assignments; })
+        .then(function(data) {
+          viewProgress.assignments = data.assignments;
+          assignmentList.assignments = data.assignments;
+        })
         .fail(UI.apiError);
   }
 

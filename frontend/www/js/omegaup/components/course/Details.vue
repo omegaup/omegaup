@@ -63,7 +63,7 @@
             <template v-if="update">{{ T.courseNewFormUpdateCourse }}</template>
             <template v-else>{{ T.courseNewFormScheduleCourse }}</template>
           </button>
-          <button v-on:click.prevent="reset" type="reset" class="btn btn-secondary">
+          <button v-on:click.prevent="onCancel" type="reset" class="btn btn-secondary">
             {{ T.wordsCancel }}
           </button>
         </div>
@@ -107,6 +107,10 @@ export default {
     },
     onSubmit: function() {
       this.$emit('submit', this);
+    },
+    onCancel: function() {
+      this.reset();
+      this.$emit('cancel');
     },
   },
   components: {

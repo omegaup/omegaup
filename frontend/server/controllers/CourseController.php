@@ -426,14 +426,45 @@ class CourseController extends Controller {
                 'name' => $a->name,
                 'alias' => $a->alias,
                 'description' => $a->description,
-                'start_time' => $a->start_time,
-                'finish_time' => $a->finish_time,
+                'start_time' => strtotime($a->start_time),
+                'finish_time' => strtotime($a->finish_time),
                 'assignment_type' => $a->assignment_type
             ];
         }
 
         $response['status'] = 'ok';
         return $response;
+    }
+
+    /**
+     * Remove an assignment from a course
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiRemoveAssignment(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        throw new UnimplementedException();
     }
 
     /**

@@ -333,3 +333,9 @@ class LoginDisabledException extends ApiException {
         parent::__construct('loginDisabled', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
+
+class UnimplementedException extends ApiException {
+    public function __construct(ApiException $previous = null) {
+        parent::__construct('wordsUnimplemented', 'HTTP/1.1 405 Method Not Allowed', 405, $previous);
+    }
+}
