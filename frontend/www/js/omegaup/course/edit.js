@@ -190,7 +190,6 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'add-problem': function(assignment, problemAlias) {
-            console.log(problemList);
             omegaup.API.Course.addProblem({
                                 course_alias: courseAlias,
                                 assignment_alias: assignment.alias,
