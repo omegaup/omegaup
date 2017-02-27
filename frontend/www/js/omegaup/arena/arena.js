@@ -1264,12 +1264,12 @@ export class Arena {
     if (data.source.indexOf('data:') === 0) {
       $('#run-details .source')
           .html('<a href="' + data.source + '" download="data.zip">' +
-                T['wordsDownload'] + '</a>');
+                T.wordsDownload + '</a>');
     } else if (data.source == 'lockdownDetailsDisabled') {
       $('#run-details .source')
           .html(UI.escape((typeof(sessionStorage) !== 'undefined' &&
                            sessionStorage.getItem('run:' + guid)) ||
-                          T['lockdownDetailsDisabled']));
+                          T.lockdownDetailsDisabled));
     } else {
       $('#run-details .source').html(UI.escape(data.source));
     }
@@ -1333,15 +1333,14 @@ export class Arena {
 
       var groups =
           $('<table></table>')
-              .append(
-                  $('<thead></thead>')
-                      .append($('<tr></tr>')
-                                  .append('<th>' + T['wordsGroup'] + '</th>')
-                                  .append('<th>' + T['wordsCase'] + '</th>')
-                                  .append('<th>' + T['wordsVerdict'] + '</th>')
-                                  .append('<th colspan="3">' + T['rankScore'] +
-                                          '</th>')
-                                  .append('<th width="1"></th>')));
+              .append($('<thead></thead>')
+                          .append($('<tr></tr>')
+                                      .append('<th>' + T.wordsGroup + '</th>')
+                                      .append('<th>' + T.wordsCase + '</th>')
+                                      .append('<th>' + T.wordsVerdict + '</th>')
+                                      .append('<th colspan="3">' + T.rankScore +
+                                              '</th>')
+                                      .append('<th width="1"></th>')));
 
       for (var i = 0; i < detailsGroups.length; i++) {
         var g = detailsGroups[i];

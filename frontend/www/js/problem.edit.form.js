@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
         requiredFields.each(function(inputId) {
           var input = $(inputId);
           if (input.val() == '') {
-            omegaup.UI.error(omegaup.T['editFieldRequired']);
+            omegaup.UI.error(omegaup.T.editFieldRequired);
             input.parent().addClass('has-error');
             errors = true;
           }

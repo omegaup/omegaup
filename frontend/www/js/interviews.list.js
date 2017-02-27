@@ -8,7 +8,7 @@ omegaup.OmegaUp.on('ready', function() {
                                duration: $('#duration').val()
                              })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T['interviewCreatedSuccess']);
+              omegaup.UI.success(omegaup.T.interviewCreatedSuccess);
               fillInterviewsTable();
             })
             .fail(omegaup.UI.apiError);
