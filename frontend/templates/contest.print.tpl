@@ -4,7 +4,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>omegaUp &mdash; {$contestName}</title>
 <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
-<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 <link rel="stylesheet" href="/css/reset.css" />
 <link rel="stylesheet" href="/css/common.css" />
