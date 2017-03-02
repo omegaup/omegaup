@@ -14,9 +14,11 @@ fi
 FILTER_ARG=""
 if [ -n "$1" ]; then
 	FILTER_ARG="--filter $1"
+else
+	# Only do pre-push check when no test filter was specified
+	$OMEGAUP_ROOT/stuff/git-hooks/pre-push $REF
 fi
 
-$OMEGAUP_ROOT/stuff/git-hooks/pre-push $REF
 hhvm /usr/bin/phpunit \
 	--bootstrap $OMEGAUP_ROOT/frontend/tests/bootstrap.php \
 	--configuration $OMEGAUP_ROOT/frontend/tests/phpunit.xml \

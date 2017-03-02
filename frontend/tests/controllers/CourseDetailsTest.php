@@ -123,7 +123,7 @@ class CourseDetailsTest extends OmegaupTestCase {
     public function testGetAssignmentAsStudent() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
-        // Add assignment that's already underway.
+        // Add assignment that hasn't started yet.
         $adminLogin = self::login($courseData['admin']);
         $assignmentAlias = Utils::CreateRandomString();
         CourseController::apiCreateAssignment(new Request([
@@ -137,8 +137,22 @@ class CourseDetailsTest extends OmegaupTestCase {
             'assignment_type' => 'homework',
         ]));
 
-        $user = CoursesFactory::addStudentToCourse($courseData);
+        $user = UserFactory::createUser();
         $userLogin = self::login($user);
+
+        // Try to get details before being added to the course;
+        try {
+            $response = CourseController::apiAssignmentDetails(new Request([
+                'auth_token' => $userLogin->auth_token,
+                'course' => $courseData['course_alias'],
+                'assignment' => $courseData['assignment_alias'],
+            ]));
+            $this->fail('Exception was expected.');
+        } catch (ForbiddenAccessException $e) {
+            // OK!
+        }
+
+        CoursesFactory::addStudentToCourse($courseData, $user);
 
         // Call the details API for the assignment that's already started.
         $response = CourseController::apiAssignmentDetails(new Request([
@@ -151,9 +165,9 @@ class CourseDetailsTest extends OmegaupTestCase {
         // Call the detail API for the assignment that has not started.
         try {
             $response = CourseController::apiAssignmentDetails(new Request([
-            'auth_token' => $userLogin->auth_token,
-            'course' => $courseData['course_alias'],
-            'assignment' => $assignmentAlias,
+                'auth_token' => $userLogin->auth_token,
+                'course' => $courseData['course_alias'],
+                'assignment' => $assignmentAlias,
             ]));
             $this->fail('Exception was expected.');
         } catch (ForbiddenAccessException $e) {

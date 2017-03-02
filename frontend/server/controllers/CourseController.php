@@ -180,6 +180,12 @@ class CourseController extends Controller {
         $acl = new ACLs(['owner_id' => $r['current_user_id']]);
         ACLsDAO::save($acl);
 
+        GroupRolesDAO::save(new GroupRoles([
+            'group_id' => $group->group_id,
+            'acl_id' => $acl->acl_id,
+            'role_id' => Authorization::CONTESTANT_ROLE,
+        ]));
+
         // Create the actual course
         $course = new Courses($r);
         $course->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
@@ -240,11 +246,6 @@ class CourseController extends Controller {
             $assignment->problemset_id = $problemset->problemset_id;
             $assignment->course_id = $r['course']->course_id;
 
-            GroupRolesDAO::save(new GroupRoles([
-                'group_id' => $r['course']->group_id,
-                'role_id' => Authorization::CONTESTANT_ROLE,
-                'acl_id' => $r['course']->acl_id,
-            ]));
             AssignmentsDAO::save($assignment);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -770,12 +771,17 @@ class CourseController extends Controller {
         }
         $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
-        if ($r['assignment']->start_time > time() &&
-            !Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+
+        // Admins are almighty, no need to check anything else.
+        if (Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            return;
+        }
+
+        if ($r['assignment']->start_time > time() ||
+            !GroupRolesDAO::isContestant($r['current_user_id'], $r['assignment']->acl_id)
         ) {
             throw new ForbiddenAccessException();
         }
-        // TODO: Access check
     }
 
     /**

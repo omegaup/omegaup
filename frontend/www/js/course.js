@@ -5,7 +5,6 @@ omegaup.OmegaUp.on('ready', function() {
         // Assignment lists by type.
         var assignments = {};
         for (var i = 0; i < course.assignments.length; ++i) {
-          // TODO(pablo): Agregar $progress$ al viewModel.
           var type = course.assignments[i].assignment_type;
           if (!assignments.hasOwnProperty(type)) {
             assignments[type] = [];
