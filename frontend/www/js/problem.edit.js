@@ -32,7 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
             highlight: true,
           },
           {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.Tags.list),
+            source: omegaup.UI.typeaheadWrapper(omegaup.API.Tag.list),
             displayKey: 'name',
           })
       .on('typeahead:selected', function(event, val) {
