@@ -67,7 +67,7 @@ class CourseController extends Controller {
         $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['course']->start_time);
         $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['course']->finish_time);
         if ($start_time > $finish_time) {
-            throw new InvalidParameterException('contestNewInvalidStartTime');
+            throw new InvalidParameterException('InvalidStartTime');
         }
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
@@ -272,6 +272,12 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r, true/*is_required*/);
 
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : $r['assignment']->start_time;
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : $r['assignment']->finish_time;
+        if ($start_time > $finish_time) {
+            throw new InvalidParameterException('InvalidStartTime');
+        }
+
         // Update contest DAO
         $valueProperties = [
             'name',
@@ -281,7 +287,8 @@ class CourseController extends Controller {
             }],
             'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
-            }]
+            }],
+            'assignment_type',
         ];
 
         self::updateValueProperties($r, $r['assignment'], $valueProperties);

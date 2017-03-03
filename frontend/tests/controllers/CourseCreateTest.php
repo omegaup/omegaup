@@ -170,4 +170,25 @@ class CourseCreateTest extends OmegaupTestCase {
             'assignment_type' => 'homework'
         ]));
     }
+
+    /**
+     * Try to create an assignment with incorrect times.
+     * @expectedException InvalidParameterException
+     */
+    public function testCreateAssignmentWithIncorrectTimes() {
+        $admin = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($admin);
+        $courseData = CoursesFactory::createCourse($admin, $adminLogin);
+
+        CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => Utils::CreateRandomString(),
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework'
+        ]));
+    }
 }

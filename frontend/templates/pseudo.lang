@@ -1,3 +1,4 @@
+InvalidStartTime = "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)"
 RegisterForContestRules = "(Ru135)"
 aboutToStart = "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)"
 adminAdded = "(Admin 5ucc355fu11y add3d.)"
@@ -145,7 +146,6 @@ contestNewFormTitlePlaceholderConacupStyle = "(**CONACUP S7y13 app1i3d. S37 y0ur
 contestNewFormTitlePlaceholderIoiStyle = "(**IOI S7y13 app1i3d. S37 y0ur 7i713 h3r3**)"
 contestNewFormTitlePlaceholderOmiStyle = "(**OMI S7y13 app1i3d. S37 y0ur 7i713 h3r3**)"
 contestNewFormUpdateContest = "(Upda73 c0n7357)"
-contestNewInvalidStartTime = "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)"
 contestNewPublicInfoNotice = "(T0 mak3 a pub1ic c0n7357, add a pr0b13m fir57 and 7h3n mark i7 a5 pub1ic in Edi7 C0n7357.)"
 contestNotExist = "(Th3 pr0vid3d c0n7357 d035 n07 3xi57.)"
 contestNotFound = "(C0n7357 n07 f0und.)"

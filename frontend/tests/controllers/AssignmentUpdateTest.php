@@ -58,4 +58,22 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'name' => 'some new name'
         ]));
     }
+
+    /**
+     * Can't update the start time to be after the finish time.
+     * @expectedException InvalidParameterException
+     */
+    public function testAssignmentUpdateWithIncorrectTimes() {
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
+        $response = CourseController::apiUpdateAssignment(new Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $courseData['assignment_alias'],
+            'course' => $courseData['course_alias'],
+            'start_time' => strtotime('2017-03-04 12:34:56'),
+            'finish_time' => strtotime('2017-01-02 12:34:56'),
+        ]));
+    }
 }

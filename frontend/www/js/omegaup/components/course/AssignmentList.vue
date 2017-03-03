@@ -15,7 +15,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="assignment in assignments">
+        <tr v-for="assignment in homeworks">
+          <td><a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a></td>
+          <td class="button-column"><a v-bind:title="T.courseAssignmentEdit" v-on:click="onEdit(assignment)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
+          <td class="button-column"><a v-bind:title="T.courseAssignmentDelete" v-on:click="onDelete(assignment)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+        </tr>
+        <tr v-for="assignment in tests">
           <td><a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a></td>
           <td class="button-column"><a v-bind:title="T.courseAssignmentEdit" v-on:click="onEdit(assignment)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
           <td class="button-column"><a v-bind:title="T.courseAssignmentDelete" v-on:click="onDelete(assignment)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
@@ -48,6 +53,18 @@ export default {
   data: function() {
     return {
     };
+  },
+  computed: {
+    homeworks: function() {
+      return this.assignments.filter((assignment) => {
+        return assignment.assignment_type == 'homework';
+      });
+    },
+    tests: function() {
+      return this.assignments.filter((assignment) => {
+        return assignment.assignment_type == 'test';
+      });
+    }
   },
   methods: {
     assignmentUrl: function(assignment) {

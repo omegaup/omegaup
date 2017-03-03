@@ -2,6 +2,7 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
+	InvalidStartTime: "The start time must be before the end time.",
 	RegisterForContestRules: "Rules",
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
 	adminAdded: "Admin successfully added.",
@@ -149,7 +150,6 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormTitlePlaceholderIoiStyle: "**IOI Style applied. Set your title here**",
 	contestNewFormTitlePlaceholderOmiStyle: "**OMI Style applied. Set your title here**",
 	contestNewFormUpdateContest: "Update contest",
-	contestNewInvalidStartTime: "The start time must be before the end time.",
 	contestNewPublicInfoNotice: "To make a public contest, add a problem first and then mark it as public in Edit Contest.",
 	contestNotExist: "The provided contest does not exist.",
 	contestNotFound: "Contest not found.",

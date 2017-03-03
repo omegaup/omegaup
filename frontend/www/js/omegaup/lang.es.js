@@ -2,6 +2,7 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
+	InvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
 	RegisterForContestRules: "Reglas",
 	aboutToStart: "Estas a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciara.",
 	adminAdded: "Administrador agregado correctamente",
@@ -149,7 +150,6 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormTitlePlaceholderIoiStyle: "**Estilo Preselectivo aplicado. Pon tu t\u00edtulo aqu\u00ed**",
 	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI aplicado. Tu t\u00edtulo aqu\u00ed**",
 	contestNewFormUpdateContest: "Actualizar concurso",
-	contestNewInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
 	contestNewPublicInfoNotice: "Para hacer un concurso p\u00fablico, agr\u00e9gale un problema y m\u00e1rcalo como p\u00fablico en Editar Concurso",
 	contestNotExist: "Concurso no existe",
 	contestNotFound: "Concurso no encontrado",

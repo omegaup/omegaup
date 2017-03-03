@@ -1,3 +1,4 @@
+InvalidStartTime = "O tempo de início deve ser antes do tempo do fim"
 RegisterForContestRules = "Regras"
 aboutToStart = "Você está prestes a iniciar a competição. Depois de clicar em, seu tempo começou."
 adminAdded = "administrador adicionado com sucesso"
@@ -145,7 +146,6 @@ contestNewFormTitlePlaceholderConacupStyle = "**Estilo CONACUP usado. Colocar o 
 contestNewFormTitlePlaceholderIoiStyle = "**Estilo IOI usado. Colocar o seu título aqui**"
 contestNewFormTitlePlaceholderOmiStyle = "**Estilo OMI usado. Colocar o seu título aqui**"
 contestNewFormUpdateContest = "Atualizar concurso"
-contestNewInvalidStartTime = "O tempo de início deve ser antes do tempo do fim"
 contestNewPublicInfoNotice = "Para fazer um concurso público, adicione um problema em primeiro lugar e, em seguida, marcá-la como pública em Editar Concurso."
 contestNotExist = "Concurso não existe"
 contestNotFound = "Concurso não encontrado"

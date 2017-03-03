@@ -2,6 +2,7 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
+	InvalidStartTime: "O tempo de in\u00edcio deve ser antes do tempo do fim",
 	RegisterForContestRules: "Regras",
 	aboutToStart: "Voc\u00ea est\u00e1 prestes a iniciar a competi\u00e7\u00e3o. Depois de clicar em, seu tempo come\u00e7ou.",
 	adminAdded: "administrador adicionado com sucesso",
@@ -149,7 +150,6 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormTitlePlaceholderIoiStyle: "**Estilo IOI usado. Colocar o seu t\u00edtulo aqui**",
 	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI usado. Colocar o seu t\u00edtulo aqui**",
 	contestNewFormUpdateContest: "Atualizar concurso",
-	contestNewInvalidStartTime: "O tempo de in\u00edcio deve ser antes do tempo do fim",
 	contestNewPublicInfoNotice: "Para fazer um concurso p\u00fablico, adicione um problema em primeiro lugar e, em seguida, marc\u00e1-la como p\u00fablica em Editar Concurso.",
 	contestNotExist: "Concurso n\u00e3o existe",
 	contestNotFound: "Concurso n\u00e3o encontrado",
