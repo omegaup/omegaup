@@ -28,7 +28,7 @@ class CourseController extends Controller {
         $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['course']->start_time);
         $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['course']->finish_time);
         if ($start_time > $finish_time) {
-            throw new InvalidParameterException('InvalidStartTime');
+            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
@@ -67,7 +67,7 @@ class CourseController extends Controller {
         $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['course']->start_time);
         $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['course']->finish_time);
         if ($start_time > $finish_time) {
-            throw new InvalidParameterException('InvalidStartTime');
+            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);

@@ -2,7 +2,6 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
-	InvalidStartTime: "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)",
 	RegisterForContestRules: "(Ru135)",
 	aboutToStart: "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)",
 	adminAdded: "(Admin 5ucc355fu11y add3d.)",
@@ -198,6 +197,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddStudentsTooltip: "(Add 57ud3n75 u5ing 7h3ir 0m3gaUp u53rnam3)",
 	courseEditGoToCourse: "(G0 70 c0ur53)",
 	courseGroupNotFound: "(C0ur53 gr0up n07 f0und)",
+	courseInvalidStartTime: "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)",
 	courseList: "(C0ur535 1i57)",
 	courseListAdminCurrentCourses: "(Curr3n7 c0ur535 (I 73ach))",
 	courseListAdminPastCourses: "(Pa57 c0ur535 (I 7augh7))",

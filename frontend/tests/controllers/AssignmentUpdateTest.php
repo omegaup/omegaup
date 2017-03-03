@@ -63,7 +63,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Can't update the start time to be after the finish time.
      * @expectedException InvalidParameterException
      */
-    public function testAssignmentUpdateWithIncorrectTimes() {
+    public function testAssignmentUpdateWithInvertedTimes() {
         $user = UserFactory::createUser();
         $login = self::login($user);
 

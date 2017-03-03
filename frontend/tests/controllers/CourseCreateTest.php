@@ -172,10 +172,10 @@ class CourseCreateTest extends OmegaupTestCase {
     }
 
     /**
-     * Try to create an assignment with incorrect times.
+     * Try to create an assignment with inverted times.
      * @expectedException InvalidParameterException
      */
-    public function testCreateAssignmentWithIncorrectTimes() {
+    public function testCreateAssignmentWithInvertedTimes() {
         $admin = UserFactory::createUser();
         $adminLogin = OmegaupTestCase::login($admin);
         $courseData = CoursesFactory::createCourse($admin, $adminLogin);

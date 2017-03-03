@@ -2,7 +2,6 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
-	InvalidStartTime: "The start time must be before the end time.",
 	RegisterForContestRules: "Rules",
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
 	adminAdded: "Admin successfully added.",
@@ -198,6 +197,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddStudentsTooltip: "Add students using their omegaUp username",
 	courseEditGoToCourse: "Go to course",
 	courseGroupNotFound: "Course group not found",
+	courseInvalidStartTime: "The start time must be before the end time.",
 	courseList: "Courses list",
 	courseListAdminCurrentCourses: "Current courses (I teach)",
 	courseListAdminPastCourses: "Past courses (I taught)",
