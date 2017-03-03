@@ -6,6 +6,7 @@ if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
 }
 
 $show_intro = false;
+$show_assignment = false;
 
 try {
     /*
@@ -23,6 +24,8 @@ if ($show_intro) {
     $smarty->display('../../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $smarty->assign('jsfile', '/ux/assignment.js');
+    $smarty->assign('admin', false);
+    $smarty->assign('practice', false);
     $smarty->assign('showRanking', false);
     $smarty->display('../../templates/arena.contest.tpl');
 } else {
