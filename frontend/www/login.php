@@ -25,7 +25,18 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     $triedToLogin = true;
 }
 
-if (isset($_GET['state'])) {
+if (isset($_GET['linkedin'])) {
+    if (isset($_GET['code']) && isset($_GET['state'])) {
+        $response = $c_Session->LoginViaLinkedIn();
+    } else {
+        if (isset($_GET['error'])) {
+            $response['error'] = $_GET['error'];
+        } else {
+            $response['error'] = 'Malformed login callback';
+        }
+    }
+    $triedToLogin = true;
+} elseif (isset($_GET['state'])) {
     $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }

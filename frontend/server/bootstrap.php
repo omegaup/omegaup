@@ -201,6 +201,8 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     UITools::$IsLoggedIn = false;
     $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
 
+    $smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
+
     if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
         $smarty->assign('OMEGAUP_GA_TRACK', 1);
         $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
