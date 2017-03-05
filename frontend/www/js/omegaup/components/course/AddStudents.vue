@@ -7,8 +7,9 @@
           <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseEditAddStudentsTooltip"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
           <input v-model="studentUsername" type="text" size="20" class="form-control" autocomplete="off" />
         </div>
-        <div class="form-group">
+        <div class="form-group pull-right">
           <button class="btn btn-primary" type="submit">{{ T.wordsAddStudent }}</button>
+          <button v-on:click.prevent="onCancel" class="btn btn-secondary" type="reset">{{ T.wordsCancel }}</button>
         </div>
       </form>
       <div>
@@ -50,6 +51,9 @@ export default {
     onAddStudent: function() {
       this.$emit('add-student', this.studentUsername);
       this.studentUsername = '';
+    },
+    onCancel: function() {
+      this.$emit('cancel');
     },
     onRemove: function(student) {
       this.$emit('remove', student);

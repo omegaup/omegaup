@@ -280,6 +280,9 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          },
           remove: function(student) {
             API.Course.removeStudent({
                         course_alias: courseAlias,
