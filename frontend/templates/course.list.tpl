@@ -30,6 +30,9 @@
 
 <div class="panel">
     <div class="page-header">
+        <div class="pull-right">
+          <a class="btn btn-primary" href="/course/new/">{#courseNew#}</a>
+        </div>
         <h1><span>{#courseList#}</span> <small></small></h1>
     </div>
     <!-- Default to hidden to avoid FOUC -->

@@ -13,10 +13,12 @@
                 <th v-for="assignment in assignments">{{ assignment.name }}</th>
               </tr>
             </thead>
-            <tr v-for="student in students">
-              <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
-              <td class="score" v-for="assignment in assignments">{{ (parseFloat(student.progress[assignment.alias]) || 0).toPrecision(2) }}</td>
-            </tr>
+            <tbody>
+              <tr v-for="student in students">
+                <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
+                <td class="score" v-for="assignment in assignments">{{ (parseFloat(student.progress[assignment.alias]) || 0).toPrecision(2) }}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>

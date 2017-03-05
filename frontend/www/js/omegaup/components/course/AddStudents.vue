@@ -17,8 +17,8 @@
               <th>{{ T.wordsUser }}</th>
               <th>{{ T.contestEditRegisteredAdminDelete }}</th>
             </thead>
-            <tbody v-for="student in students">
-              <tr>
+            <tbody>
+              <tr v-for="student in students">
                 <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
                 <td><button type="button" class="close" v-on:click="onRemove(student)">&times;</button></td>
               </tr>
@@ -49,6 +49,7 @@ export default {
   methods: {
     onAddStudent: function() {
       this.$emit('add-student', this.studentUsername);
+      this.studentUsername = '';
     },
     onRemove: function(student) {
       this.$emit('remove', student);
