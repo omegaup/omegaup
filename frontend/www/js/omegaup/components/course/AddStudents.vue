@@ -16,7 +16,7 @@
           <table class="table table-striped table-over">
             <thead>
               <th>{{ T.wordsUser }}</th>
-              <th>{{ T.contestEditRegisteredAdminDelete }}</th>
+              <th class="align-right">{{ T.contestEditRegisteredAdminDelete }}</th>
             </thead>
             <tbody>
               <tr v-for="student in students">
@@ -61,3 +61,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.omegaup-course-addstudent th.align-right {
+  text-align: right;
+}
+</style>
