@@ -9,7 +9,6 @@
 		<th>{#wordsAssignment#}</th>
 		<th class="time">{#wordsStartTime#}</th>
 		<th class="time">{#wordsEndTime#}</th>
-        <th>{#wordsProgress#}</th>
 	</tr></thead>
 	<tbody data-bind="foreach: assignment">
 		<tr>
@@ -17,7 +16,6 @@
                               attr: { href: assignmentUrl }" /></td>
 			<td data-bind="text: startTime" />
 			<td data-bind="text: finishTime" />
-            <td data-bind="text: progress" />
 		</tr>
 	</tbody>
 </table>

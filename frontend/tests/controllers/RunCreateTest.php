@@ -727,6 +727,7 @@ class RunCreateTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course' => $this->courseData['course_alias'],
             'assignment' => $this->courseData['assignment_alias'],
+            'start_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 10),
             'finish_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1)
         ]));
 

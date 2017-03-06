@@ -38,6 +38,7 @@ OmegaUp.on('ready', function() {
             assignmentDetails.show = true;
             assignmentDetails.update = true;
             assignmentDetails.assignment = assignment;
+            assignmentDetails.$el.scrollIntoView();
           },
           'delete': function(assignment) {
             if (!window.confirm(
@@ -98,10 +99,13 @@ OmegaUp.on('ready', function() {
                                   assignment_type: ev.assignmentType,
                                 })
                   .then(function(data) {
-                    omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+                    omegaup.UI.success(omegaup.T.courseAssignmentUpdated);
                     refreshAssignmentsList();
                   })
-                  .fail(omegaup.UI.apiError);
+                  .fail(function(error) {
+                    omegaup.UI.apiError(error);
+                    assignmentDetails.show = true;
+                  });
             } else {
               omegaup.API.Course.createAssignment({
                                   course_alias: courseAlias,
@@ -116,7 +120,10 @@ OmegaUp.on('ready', function() {
                     omegaup.UI.success(omegaup.T.courseAssignmentAdded);
                     refreshAssignmentsList();
                   })
-                  .fail(omegaup.UI.apiError);
+                  .fail(function(error) {
+                    omegaup.UI.apiError(error);
+                    assignmentDetails.show = true;
+                  });
             }
             assignmentDetails.show = false;
           },
