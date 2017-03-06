@@ -1,5 +1,5 @@
 <?php
-require_once('../../server/bootstrap.php');
+require_once('../server/bootstrap.php');
 if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
     header('HTTP/1.1 404 Not Found');
     die();
@@ -21,13 +21,13 @@ try {
 }
 
 if ($show_intro) {
-    $smarty->display('../../templates/arena.course.intro.tpl');
+    $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $smarty->assign('jsfile', '/ux/assignment.js');
     $smarty->assign('admin', false);
     $smarty->assign('practice', false);
     $smarty->assign('showRanking', false);
-    $smarty->display('../../templates/arena.contest.tpl');
+    $smarty->display('../templates/arena.contest.tpl');
 } else {
-    $smarty->display('../../templates/arena.course.tpl');
+    $smarty->display('../templates/course.details.tpl');
 }

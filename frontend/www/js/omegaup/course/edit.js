@@ -3,7 +3,6 @@ import course_AssignmentDetails from '../components/course/AssignmentDetails.vue
 import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
-import course_ViewProgress from '../components/course/ViewProgress.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
@@ -244,22 +243,6 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  var viewProgress = new Vue({
-    el: '#view-progress div',
-    render: function(createElement) {
-      return createElement('omegaup-course-viewprogress', {
-        props: {T: T, students: this.students, assignments: this.assignments},
-      });
-    },
-    data: {
-      students: [],
-      assignments: [],
-    },
-    components: {
-      'omegaup-course-viewprogress': course_ViewProgress,
-    },
-  });
-
   var addStudents = new Vue({
     el: '#students div',
     render: function(createElement) {
@@ -317,10 +300,7 @@ OmegaUp.on('ready', function() {
 
   function refreshStudentList() {
     API.Course.listStudents({course_alias: courseAlias})
-        .then(function(data) {
-          viewProgress.students = data.students;
-          addStudents.students = data.students;
-        })
+        .then(function(data) { addStudents.students = data.students; })
         .fail(UI.apiError);
   }
 
@@ -329,7 +309,6 @@ OmegaUp.on('ready', function() {
         .then(function(data) {
           problemList.assignments = data.assignments;
           assignmentList.assignments = data.assignments;
-          viewProgress.assignments = data.assignments;
         })
         .fail(UI.apiError);
   }

@@ -10,8 +10,7 @@
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
 		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
-		<li><a href="#students" data-toggle="tab">{#courseEditAddStudents#}</a></li>
-		<li><a href="#view-progress" data-toggle="tab">{#courseViewProgress#}</a></li>
+		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="edit">
@@ -26,9 +25,6 @@
 			<div class="form"></div>
 		</div>
 		<div class="tab-pane" id="students">
-			<div></div>
-		</div>
-		<div class="tab-pane" id="view-progress">
 			<div></div>
 		</div>
 	</div>
