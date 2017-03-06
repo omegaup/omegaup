@@ -483,7 +483,7 @@ class CourseController extends Controller {
      */
     private static function convertCourseToArray(Courses $course) {
         $course->toUnixTime();
-        $relevant_columns = ['alias', 'name', 'finish_time'];
+        $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
         $counts = AssignmentsDAO::getAssignmentCountsForCourse($course->course_id);
