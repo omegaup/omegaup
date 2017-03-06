@@ -27,6 +27,9 @@ let UI = {
         .removeClass('alert-success alert-info alert-warning alert-danger')
         .addClass(type)
         .slideDown();
+    if (type == 'alert-success') {
+      setTimeout(UI.dismissNotifications, 5000);
+    }
   },
 
   error: function(message) { UI.displayStatus(message, 'alert-danger'); },

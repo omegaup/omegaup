@@ -10,6 +10,7 @@
             <thead>
                 <tr>
                     <th>{#wordsName#}</th>
+                    <th>{#wordsStartTime#}</th>
                     <th>{#wordsEndTime#}</th>
                     <th>{#wordsNumHomeworks#}</th>
                     <th>{#wordsNumTests#}</th>
@@ -18,6 +19,7 @@
             <tbody data-bind="foreach: course">
                 <tr>
                     <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
+                    <td data-bind="text: startDate"></td>
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>
                     <td data-bind="text: numTests"></td>
@@ -30,6 +32,9 @@
 
 <div class="panel">
     <div class="page-header">
+        <div class="pull-right">
+          <a class="btn btn-primary" href="/course/new/">{#courseNew#}</a>
+        </div>
         <h1><span>{#courseList#}</span> <small></small></h1>
     </div>
     <!-- Default to hidden to avoid FOUC -->

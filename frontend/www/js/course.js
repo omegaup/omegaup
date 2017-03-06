@@ -26,9 +26,9 @@ omegaup.OmegaUp.on('ready', function() {
 
         course.isAdmin = course.is_admin;
         course.addAssignmentUrl =
-            '/course/' + courseAlias + '/edit#add-assignment';
-        course.editUrl = '/course/' + courseAlias + '/edit';
-        course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';
+            '/course/' + courseAlias + '/edit/#assignments';
+        course.editUrl = '/course/' + courseAlias + '/edit/';
+        course.addStudentsUrl = '/course/' + courseAlias + '/edit/#students';
 
         ko.applyBindings(course, $('#course-info')[0]);
       })

@@ -5,6 +5,7 @@ omegaup.OmegaUp.on('ready', function() {
     for (var i = 0; i < data[section].length; ++i) {
       var course = data[section][i];
       course.courseURL = '/course/' + course.alias;
+      course.startDate = omegaup.UI.formatDate(course.start_time);
       course.endDate = omegaup.UI.formatDate(course.finish_time);
       course.numHomeworks = course.counts.homework;
       course.numTests = course.counts.test;

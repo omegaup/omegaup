@@ -167,6 +167,9 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          },
         },
       });
     },
@@ -258,7 +261,7 @@ OmegaUp.on('ready', function() {
   });
 
   var addStudents = new Vue({
-    el: '#add-students div',
+    el: '#students div',
     render: function(createElement) {
       return createElement('omegaup-course-addstudents', {
         props: {
@@ -274,8 +277,12 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   refreshStudentList();
                   UI.success(T.courseStudentAdded);
+                  addStudents.$children[0].reset();
                 })
                 .fail(UI.apiError);
+          },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
           },
           remove: function(student) {
             API.Course.removeStudent({
