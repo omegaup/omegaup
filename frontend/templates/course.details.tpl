@@ -43,7 +43,7 @@
 			<div data-bind="if: isAdmin">
 				<span>{#courseStudentCountLabel#} <span data-bind="text: student_count"></span>
 				<div class="pull-right">
-					<a class="btn btn-primary" data-bind="attr: { href: scoreboardUrl }">{#wordsScoreboard#}</a>
+					<a class="btn btn-primary" data-bind="attr: { href: scoreboardUrl }">{#courseStudentsProgress#}</a>
 					<a class="btn btn-primary" data-bind="attr: { href: addStudentsUrl }">{#wordsAddStudent#}</a>
 				</div>
 			</div>

@@ -28,6 +28,7 @@ omegaup.OmegaUp.on('ready', function() {
         course.addAssignmentUrl =
             '/course/' + courseAlias + '/edit/#assignments';
         course.editUrl = '/course/' + courseAlias + '/edit/';
+        course.scoreboardUrl = '/course/' + courseAlias + '/students/';
         course.addStudentsUrl = '/course/' + courseAlias + '/edit/#students';
 
         ko.applyBindings(course, $('#course-info')[0]);
