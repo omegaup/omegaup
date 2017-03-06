@@ -277,6 +277,7 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   refreshStudentList();
                   UI.success(T.courseStudentAdded);
+                  addStudents.$children[0].reset();
                 })
                 .fail(UI.apiError);
           },

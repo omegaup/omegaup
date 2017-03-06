@@ -50,13 +50,15 @@ export default {
   methods: {
     onAddStudent: function() {
       this.$emit('add-student', this.studentUsername);
-      this.studentUsername = '';
     },
     onCancel: function() {
       this.$emit('cancel');
     },
     onRemove: function(student) {
       this.$emit('remove', student);
+    },
+    reset: function() {
+      this.studentUsername = '';
     },
   },
 };
