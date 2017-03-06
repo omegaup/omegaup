@@ -39,6 +39,7 @@ OmegaUp.on('ready', function() {
             assignmentDetails.show = true;
             assignmentDetails.update = true;
             assignmentDetails.assignment = assignment;
+            assignmentDetails.$el.scrollIntoView();
           },
           'delete': function(assignment) {
             if (!window.confirm(

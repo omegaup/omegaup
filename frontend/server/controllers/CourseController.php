@@ -275,7 +275,7 @@ class CourseController extends Controller {
         $start_time = !is_null($r['start_time']) ? $r['start_time'] : $r['assignment']->start_time;
         $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : $r['assignment']->finish_time;
         if ($start_time > $finish_time) {
-            throw new InvalidParameterException('InvalidStartTime');
+            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         // Update contest DAO
