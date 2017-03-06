@@ -9,7 +9,7 @@
     <div class="panel-body" v-else>
       <table class="table table-striped">
         <thead>
-          <tr><td v-text="T.wordsHomeworks" colspan="3"></td></tr>
+          <tr><th v-text="T.wordsHomeworks" colspan="3"></th></tr>
         </thead>
         <tbody>
           <tr v-for="assignment in homeworks">
@@ -22,7 +22,7 @@
       <hr>
       <table class="table table-striped">
         <thead>
-          <tr><td v-text="T.wordsTests" colspan="3"></td></tr>
+          <tr><th v-text="T.wordsTests" colspan="3"></th></tr>
         </thead>
         <tbody>
           <tr v-for="assignment in tests">
