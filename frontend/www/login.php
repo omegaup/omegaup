@@ -28,12 +28,6 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 if (isset($_GET['linkedin'])) {
     if (isset($_GET['code']) && isset($_GET['state'])) {
         $response = $c_Session->LoginViaLinkedIn();
-    } else {
-        if (isset($_GET['error'])) {
-            $response['error'] = $_GET['error'];
-        } else {
-            $response['error'] = 'Malformed login callback';
-        }
     }
     $triedToLogin = true;
 } elseif (isset($_GET['state'])) {
@@ -57,7 +51,7 @@ if ($c_Session->CurrentSessionAvailable()) {
         $smarty->assign('ERROR_MESSAGE', $response['error']);
     } else {
         $smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
-        $smarty->assign('ERROR_MESSAGE', $smarty->getconfigvars('loginFederatedFailed')) ;
+        $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('loginFederatedFailed')) ;
     }
 }
 
