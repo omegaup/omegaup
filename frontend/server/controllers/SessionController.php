@@ -143,7 +143,7 @@ class SessionController extends Controller {
             ];
         }
 
-        // Get email via his id
+        // Get email via their id
         $email = EmailsDAO::getByPK($currentUser->main_email_id);
 
         return [
@@ -312,30 +312,7 @@ class SessionController extends Controller {
     }
 
     public function LoginViaGoogle($s_Email) {
-        // We trust this user's identity
-        $vo_User = UsersDAO::FindByEmail($s_Email);
-
-        if (is_null($vo_User)) {
-            // This email does not exist in omegaup
-            self::$log->info("LoginViaGoogle: Creating new user for $s_Email");
-
-            $username = self::getUniqueUsernameFromEmail($s_Email);
-            UserController::$permissionKey = uniqid();
-
-            $r = new Request([
-                'name' => $username,
-                'username' => $username,
-                'email' => $s_Email,
-                'password' => null,
-                'ignore_password' => true,
-                'permission_key' => UserController::$permissionKey
-            ]);
-
-            $res = UserController::apiCreate($r);
-        } else {
-            //user has been here before, lets just register the session
-            $this->RegisterSession($vo_User);
-        }
+        return $this->ThirdPartyLogin('Google', $s_Email);
     }
 
     /**
@@ -383,9 +360,9 @@ class SessionController extends Controller {
         }
 
         //ok we know the user is logged in,
-        //lets look for his information on the database
+        //lets look for their information in the database
         //if there is none, it means that its the first
-        //time the user has been here, lets register his info
+        //time the user has been here, lets register their info
         self::$log->info('User is logged in via facebook !!');
 
         if (!isset($fb_user_profile['email'])) {
@@ -399,48 +376,11 @@ class SessionController extends Controller {
             ];
         }
 
-        $results = UsersDAO::FindByEmail($fb_user_profile['email']);
-
-        if (!is_null($results)) {
-            //user has been here before with facebook!
-            $vo_User = $results;
-            self::$log->info('user has been here before with facebook!');
-        } else {
-            // The user has never been here before, let's register him
-
-            // I have a problem with this:
-            $username = self::getUniqueUsernameFromEmail($fb_user_profile['email']);
-            // Even if the user gave us his/her email, we should not
-            // just go ahead and assume its ok to share with the world
-            // maybe we could do:
-            // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
-            UserController::$permissionKey = uniqid();
-
-            $r = new Request([
-                'name' => $fb_user_profile['name'],
-                'username' => $username,
-                'email' => $fb_user_profile['email'],
-                'facebook_user_id' => $fb_user_profile['id'],
-                'password' => null,
-                'permission_key' => UserController::$permissionKey,
-                'ignore_password' => true
-            ]);
-            try {
-                $res = UserController::apiCreate($r);
-            } catch (ApiException $e) {
-                self::$log->error('Unable to login via Facebook ' . $e);
-                return ['status' => 'error'];
-            }
-            $vo_User = UsersDAO::getByPK($res['user_id']);
-        }
-
-        //since we got here, this user does not have
-        //any auth token, lets give him one
-        //so we dont have to call facebook to see
-        //if he is still logged in, and he can call
-        //the api
-        $this->RegisterSession($vo_User);
-        return ['status' => 'ok'];
+        return $this->ThirdPartyLogin(
+            'Facebook',
+            $fb_user_profile['email'],
+            $fb_user_profile['name']
+        );
     }
 
     /**
@@ -491,5 +431,78 @@ class SessionController extends Controller {
             return false;
             //@TODO actuar en base a la exception
         }
+    }
+
+    public static function getLinkedInInstance() {
+        return new LinkedIn(
+            OMEGAUP_LINKEDIN_CLIENTID,
+            OMEGAUP_LINKEDIN_SECRET,
+            OMEGAUP_URL.'/login?linkedin',
+            isset($_GET['redirect']) ? $_GET['redirect'] : null
+        );
+    }
+    public static function getLinkedInLoginUrl() {
+        return self::getLinkedInInstance()->getLoginUrl();
+    }
+
+    public function LoginViaLinkedIn() {
+        if (empty($_GET['code']) || empty($_GET['state'])) {
+            return ['status' => 'error'];
+        }
+
+        $li = self::getLinkedInInstance();
+        $auth_token = $li->getAuthToken($_GET['code'], $_GET['state']);
+        $profile = $li->getProfileInfo($auth_token);
+        $li->maybeResetRedirect($_GET['state']);
+
+        return $this->ThirdPartyLogin(
+            'LinkedIn',
+            $profile['emailAddress'],
+            $profile['firstName'] . ' ' . $profile['lastName']
+        );
+    }
+
+    private function ThirdPartyLogin($provider, $email, $name = null) {
+        // We trust this user's identity
+        self::$log->info("User is logged in via $provider");
+        $results = UsersDAO::FindByEmail($email);
+
+        if (!is_null($results)) {
+            self::$log->info("User has been here before with $provider");
+            $vo_User = $results;
+        } else {
+            // The user has never been here before, let's register them
+            self::$log->info("LoginVia$provider: Creating new user for $email");
+
+            // I have a problem with this:
+            $username = self::getUniqueUsernameFromEmail($email);
+            // Even if the user gave us their email, we should not
+            // just go ahead and assume its ok to share with the world
+            // maybe we could do:
+            // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
+            UserController::$permissionKey = uniqid();
+
+            $r = new Request([
+                'name' => (!is_null($name) ? $name : $username),
+                'username' => $username,
+                'email' => $email,
+                'password' => null,
+                'permission_key' => UserController::$permissionKey,
+                'ignore_password' => true
+                // TODO(lhchavez): Do we actually need this? It's stored but never used.
+                //'facebook_user_id' => $fb_user_profile['id'],
+            ]);
+
+            try {
+                $res = UserController::apiCreate($r);
+            } catch (ApiException $e) {
+                self::$log->error("Unable to login via $provider: $e");
+                return ['status' => 'error'];
+            }
+            $vo_User = UsersDAO::getByPK($res['user_id']);
+        }
+
+        $this->RegisterSession($vo_User);
+        return ['status' => 'ok'];
     }
 }

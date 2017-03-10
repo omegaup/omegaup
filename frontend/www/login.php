@@ -25,7 +25,12 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     $triedToLogin = true;
 }
 
-if (isset($_GET['state'])) {
+if (isset($_GET['linkedin'])) {
+    if (isset($_GET['code']) && isset($_GET['state'])) {
+        $response = $c_Session->LoginViaLinkedIn();
+    }
+    $triedToLogin = true;
+} elseif (isset($_GET['state'])) {
     $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }
@@ -46,8 +51,11 @@ if ($c_Session->CurrentSessionAvailable()) {
         $smarty->assign('ERROR_MESSAGE', $response['error']);
     } else {
         $smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
-        $smarty->assign('ERROR_MESSAGE', $smarty->getconfigvars('loginFederatedFailed')) ;
+        $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('loginFederatedFailed')) ;
     }
 }
 
+// Only generate Login URLs if we actually need them.
+$smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
+$smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
 $smarty->display('../templates/login.tpl');

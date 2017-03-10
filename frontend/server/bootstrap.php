@@ -61,6 +61,7 @@ require_once('libs/Cache.php');
 require_once('libs/Experiments.php');
 require_once('libs/Git.php');
 require_once('libs/Grader.php');
+require_once('libs/LinkedIn.php');
 require_once('libs/Pager.php');
 require_once('libs/ProblemDeployer.php');
 require_once('libs/Request.php');
@@ -199,7 +200,6 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
     $smarty->assign('LOGGED_IN', '0');
     UITools::$IsLoggedIn = false;
-    $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
 
     if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
         $smarty->assign('OMEGAUP_GA_TRACK', 1);

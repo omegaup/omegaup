@@ -28,6 +28,11 @@
 					class="facebook openid_large_btn"></a>
 				<a style="float:right"></a>
 
+				<a href="{$LINKEDIN_URL}"
+					 title="{#loginWithLinkedIn#}"
+					 class="openid_large_btn">
+					<img src="/media/third_party/LinkedIn-Sign-in-Small---Default.png" />
+				</a>
 			</div>
 
 			<div class="col-md-4">
