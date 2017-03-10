@@ -61,4 +61,7 @@ if ($c_Session->CurrentSessionAvailable()) {
     }
 }
 
+// Only generate Login URLs if we actually need them.
+$smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
+$smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
 $smarty->display('../templates/login.tpl');

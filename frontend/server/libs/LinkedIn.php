@@ -50,28 +50,40 @@ class CurlSession {
  * Helper class to handle LinkedIn REST-based authentication.
  */
 class LinkedIn {
-    public function __construct($client_id, $secret, $redirect_url) {
+    public function __construct($client_id, $secret, $redirect_url, $post_login_redirect) {
         $this->client_id = $client_id;
         $this->secret = $secret;
         $this->redirect_url = $redirect_url;
-        // TODO(pabloaguilar): Set up CSRF properly
-        $this->csrf_token = SecurityTools::randomString(8);
+        $this->state = [
+            'ct' => SecurityTools::randomString(8) // CSRF Token
+        ];
+        if (!is_null($post_login_redirect)) {
+            $this->state['rd'] = $post_login_redirect;
+        }
     }
 
-    public function getLoginUrl($post_login_redirect) {
+    public function getLoginUrl() {
         $query_string = http_build_query([
         'response_type' => 'code',
         'client_id' => $this->client_id,
         'redirect_uri' => $this->redirect_url,
-        'state' => json_encode([
-            'csrf' => $this->csrf_token,
-            'redirect' => $post_login_redirect,
-        ])
+        'state' => json_encode($this->state)
         ]);
+        $_SESSION['li-state'] = $this->state['ct'];
         return "https://www.linkedin.com/oauth/v2/authorization?$query_string";
     }
 
-    public function getAuthToken($code) {
+    public function getAuthToken($code, $state) {
+        $state_array = json_decode($state, true);
+        if (!isset($_SESSION['li-state']) ||
+            !isset($state_array['ct']) ||
+            $_SESSION['li-state'] != $state_array['ct']) {
+            throw new Exception('Invalid CSRF token');
+        }
+
+        // If we make it here, the CSRF token has been consumed
+        unset($_SESSION['li-state']);
+
         $curl = new CurlSession('https://www.linkedin.com/oauth/v2/accessToken');
         $auth_array = $curl->get([
         'grant_type' => 'authorization_code',
@@ -97,5 +109,13 @@ class LinkedIn {
             throw new Exception('e-mail not provided');
         }
         return $profile;
+    }
+
+    public function maybeResetRedirect($state) {
+        $state_array = json_decode($state, true);
+        if (isset($state_array['rd'])) {
+            // Reset the original redirect.
+            $_GET['redirect'] = $state_array['rd'];
+        }
     }
 }

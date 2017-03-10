@@ -1,7 +1,5 @@
 <?php
 
-require_once('libs/LinkedIn.php');
-
 /**
  * Description:
  *     Session controller handles sessions.
@@ -439,11 +437,12 @@ class SessionController extends Controller {
         return new LinkedIn(
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL.'/login?linkedin'
+            OMEGAUP_URL.'/login?linkedin',
+            isset($_GET['redirect']) ? $_GET['redirect'] : null
         );
     }
     public static function getLinkedInLoginUrl() {
-        return self::getLinkedInInstance()->getLoginUrl($_GET['redirect']);
+        return self::getLinkedInInstance()->getLoginUrl();
     }
 
     public function LoginViaLinkedIn() {
@@ -452,8 +451,9 @@ class SessionController extends Controller {
         }
 
         $li = self::getLinkedInInstance();
-        $auth_token = $li->getAuthToken($_GET['code']);
+        $auth_token = $li->getAuthToken($_GET['code'], $_GET['state']);
         $profile = $li->getProfileInfo($auth_token);
+        $li->maybeResetRedirect($_GET['state']);
 
         return $this->ThirdPartyLogin(
             'LinkedIn',
