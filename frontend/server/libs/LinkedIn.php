@@ -64,10 +64,10 @@ class LinkedIn {
 
     public function getLoginUrl() {
         $query_string = http_build_query([
-        'response_type' => 'code',
-        'client_id' => $this->client_id,
-        'redirect_uri' => $this->redirect_url,
-        'state' => json_encode($this->state)
+            'response_type' => 'code',
+            'client_id' => $this->client_id,
+            'redirect_uri' => $this->redirect_url,
+            'state' => json_encode($this->state)
         ]);
         $_SESSION['li-state'] = $this->state['ct'];
         return "https://www.linkedin.com/oauth/v2/authorization?$query_string";
@@ -86,11 +86,11 @@ class LinkedIn {
 
         $curl = new CurlSession('https://www.linkedin.com/oauth/v2/accessToken');
         $auth_array = $curl->get([
-        'grant_type' => 'authorization_code',
-        'client_id' => $this->client_id,
-        'redirect_uri' => $this->redirect_url,
-        'client_secret' =>  $this->secret,
-        'code' => $_GET['code'],
+            'grant_type' => 'authorization_code',
+            'client_id' => $this->client_id,
+            'redirect_uri' => $this->redirect_url,
+            'client_secret' =>  $this->secret,
+            'code' => $_GET['code'],
         ]);
         if (empty($auth_array['access_token'])) {
             throw new Exception('Failed to get auth token');
