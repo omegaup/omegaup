@@ -262,7 +262,7 @@ OmegaUp.on('ready', function() {
           'add-student': function(username) {
             API.Course.addStudent({
                         course_alias: courseAlias,
-                        usernameOrEmail: username,
+                        usernameOrEmail: $('#student-username').val(),
                       })
                 .then(function(data) {
                   refreshStudentList();
