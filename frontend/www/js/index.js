@@ -1,5 +1,18 @@
 (function() {
   function OnLoad() {
+    if (typeof omegaup === 'undefined' || typeof omegaup.API === 'undefined' ||
+        typeof omegaup.OmegaUp === 'undefined' ||
+        typeof omegaup.UI === 'undefined') {
+      // This should only be visible in development Virtual Machines.
+      $('#status .message')
+          .html('Please run: ' +
+                '<tt>cd /opt/omegaup && yarn install && yarn run dev</tt>');
+      $('#status')
+          .removeClass('alert-success alert-info alert-warning alert-danger')
+          .addClass('alert-danger')
+          .slideDown();
+    }
+
     omegaup.API.Run.counts().then(createChart).fail(omegaup.UI.apiError);
 
     omegaup.API.Contest.list({active: 'ACTIVE'})
