@@ -12,21 +12,21 @@
           <button v-on:click.prevent="onCancel" class="btn btn-secondary" type="reset">{{ T.wordsCancel }}</button>
         </div>
       </form>
-      <div>
-          <table class="table table-striped table-over">
-            <thead>
-              <th>{{ T.wordsUser }}</th>
-              <th class="align-right">{{ T.contestEditRegisteredAdminDelete }}</th>
-            </thead>
-            <tbody>
-              <tr v-for="student in students">
-                <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
-                <td><button type="button" class="close" v-on:click="onRemove(student)">&times;</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div v-if="students.length == 0">
+        <div class="empty-category">{{ T.courseStudentsEmpty }}</div>
       </div>
+      <table class="table table-striped table-over" v-else>
+        <thead>
+          <th>{{ T.wordsUser }}</th>
+          <th class="align-right">{{ T.contestEditRegisteredAdminDelete }}</th>
+        </thead>
+        <tbody>
+          <tr v-for="student in students">
+            <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
+            <td><button type="button" class="close" v-on:click="onRemove(student)">&times;</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
