@@ -257,6 +257,7 @@ OmegaUp.on('ready', function() {
         props: {
           T: T,
           students: this.students,
+          courseAlias: courseAlias,
         },
         on: {
           'add-student': function(username) {

@@ -12,7 +12,7 @@ include('base/Problemset_Problems.vo.base.php');
 class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblems($problemset_id) {
         // Build SQL statement
-        $sql = 'SELECT p.title, p.alias, p.time_limit, p.overall_wall_time_limit, '.
+        $sql = 'SELECT p.problem_id, p.title, p.alias, p.time_limit, p.overall_wall_time_limit, '.
                'p.memory_limit, p.languages, pp.points, pp.order ' .
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .

@@ -224,6 +224,17 @@ export default {
 
     removeStudent: _call('/api/course/removeStudent/'),
 
+    studentProgress: _call('/api/course/studentProgress/',
+                           function(result) {
+                             for (var problem of result.problems) {
+                               for (var run of problem.runs) {
+                                 run.time =
+                                     omegaup.OmegaUp.time(run.time * 1000);
+                               }
+                             }
+                             return result;
+                           }),
+
     update: _call('/api/course/update/'),
 
     updateAssignment: _call('/api/course/updateAssignment/'),

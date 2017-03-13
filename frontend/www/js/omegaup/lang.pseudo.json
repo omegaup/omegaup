@@ -185,6 +185,7 @@
 	"courseAssignmentProblemConfirmRemove": "(D0 y0u r3a11y wan7 70 r3m0v3 %(problem)?)",
 	"courseAssignmentProblemRemove": "(R3m0v3 pr0b13m fr0m a55ignm3n7)",
 	"courseAssignmentProblemRemoved": "(Pr0b13m r3m0v3d 5ucc355fu11y.)",
+	"courseAssignmentProblemRunsEmpty": "(N0 run5)",
 	"courseAssignmentProblemsEmpty": "(N0 pr0b13m5)",
 	"courseAssignmentUpdated": "(A55ignm3n7 upda73d 5ucc355fu11y!)",
 	"courseDetails": "(C0ur53 d37ai15)",

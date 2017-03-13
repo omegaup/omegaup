@@ -13,7 +13,7 @@
         </thead>
         <tbody>
           <tr v-for="student in students">
-            <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
+            <td><a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username }}</a></td>
             <td class="score" v-for="assignment in assignments">{{ score(student, assignment) }}</td>
           </tr>
         </tbody>
@@ -59,6 +59,9 @@ export default {
     score: function(student, assignment) {
       let score = student.progress[assignment.alias] || '0';
       return parseFloat(score).toPrecision(2);
+    },
+    studentProgressUrl: function(student) {
+      return '/course/' + this.course.alias + '/student/' + student.username + '/';
     },
   },
   computed: {
