@@ -1,16 +1,13 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#omegaupTitleCourseEdit#}"}
 
-<div class='panel panel-primary'>
-
+<div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title course-header">{#frontPageLoading#}</h3>
 	</div>
-
 	<div class="page-header">
 		<h1><span><a class="course-header"></a></span></h1>
 	</div>
-
 	<ul class="nav nav-tabs" id="sections">
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
