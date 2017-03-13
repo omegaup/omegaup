@@ -224,6 +224,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseStudentCountLabel: "Estudiantes:",
 	courseStudentNotInCourse: "El estudiante no estaba en el curso.",
 	courseStudentRemoved: "Estudiante quitado del curso exitosamente.",
+	courseStudentsEmpty: "No hay estudiantes",
 	courseStudentsProgress: "Progreso de los estudiantes",
 	courseStudentsProgressExportToSpreadsheet: "Exportar progreso de los estudiantes a hoja de c\u00e1lculo",
 	courseViewProgress: "Ver progreso",
