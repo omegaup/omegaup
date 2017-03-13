@@ -188,6 +188,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseAssignmentProblemConfirmRemove: "Do you really want to remove %(problem)?",
 	courseAssignmentProblemRemove: "Remove problem from assignment",
 	courseAssignmentProblemRemoved: "Problem removed successfully.",
+	courseAssignmentProblemRunsEmpty: "No runs",
 	courseAssignmentProblemsEmpty: "No problems",
 	courseAssignmentUpdated: "Assignment updated successfully!",
 	courseDetails: "Course details",

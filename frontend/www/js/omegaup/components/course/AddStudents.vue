@@ -22,7 +22,7 @@
         </thead>
         <tbody>
           <tr v-for="student in students">
-            <td><a v-bind:href="'/profile/' + student.username + '/'">{{ student.name || student.username }}</a></td>
+            <td><a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username }}</a></td>
             <td><button type="button" class="close" v-on:click="onRemove(student)">&times;</button></td>
           </tr>
         </tbody>
@@ -37,6 +37,7 @@ import UI from '../../ui.js';
 export default {
   props: {
     T: Object,
+    courseAlias: String,
     students: Array,
   },
   data: function() {
@@ -59,6 +60,9 @@ export default {
     },
     reset: function() {
       this.studentUsername = '';
+    },
+    studentProgressUrl: function(student) {
+      return '/course/' + this.courseAlias + '/student/' + student.username + '/';
     },
   },
 };

@@ -592,8 +592,85 @@ class CourseController extends Controller {
 
         return [
             'students' => $students,
-            'status' => 'ok'
-            ];
+            'status' => 'ok',
+        ];
+    }
+
+    public static function apiStudentProgress(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userOrMailNotFound');
+        }
+
+        $groupUser = new GroupsUsers([
+            'group_id' => $r['course']->group_id,
+            'user_id' => $r['user']->user_id,
+        ]);
+
+        if (is_null(GroupsUsersDAO::getByPK(
+            $groupUser->group_id,
+            $groupUser->user_id
+        ))) {
+            throw new NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
+        $assignments = AssignmentsDAO::search(new Assignments([
+            'course_id' => $r['course']->course_id,
+            'alias' => $r['assignment'],
+        ]));
+        if (count($assignments) != 1) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+        $r['assignment'] = $assignments[0];
+        $r['assignment']->toUnixTime();
+
+        $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
+        $letter = 0;
+        $relevant_run_columns = ['guid', 'language', 'status', 'verdict',
+            'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
+            'submit_delay'];
+        foreach ($problems as &$problem) {
+            $keyrun = new Runs([
+                'user_id' => $r['user']->user_id,
+                'problem_id' => $problem['problem_id'],
+                'problemset_id' => $r['assignment']->problemset_id,
+            ]);
+            $runs_array = RunsDAO::search($keyrun);
+            $runs_filtered_array = [];
+            foreach ($runs_array as $run) {
+                $run->toUnixTime();
+                $filtered_run = $run->asFilteredArray($relevant_run_columns);
+                try {
+                    $filtered_run['source'] = file_get_contents(RunController::getSubmissionPath($run));
+                } catch (Exception $e) {
+                    self::$log->error('Error fetching source for {$run->guid}: ' . $e);
+                }
+                $runs_filtered_array[] = $filtered_run;
+            }
+            $problem['runs'] = $runs_filtered_array;
+            unset($problem['problem_id']);
+            $problem['letter'] = ContestController::columnName($letter++);
+        }
+
+        return [
+            'status' => 'ok',
+            'problems' => $problems,
+        ];
     }
 
     /**
@@ -810,6 +887,7 @@ class CourseController extends Controller {
         $letter = 0;
         foreach ($problems as &$problem) {
             $problem['letter'] = ContestController::columnName($letter++);
+            unset($problem['problem_id']);
         }
 
         $director = null;
@@ -821,16 +899,17 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok',
-                'name' => $r['assignment']->name,
-                'description' => $r['assignment']->description,
-                'assignment_type' => $r['assignment']->assignment_type,
-                'start_time' => $r['assignment']->start_time,
-                'finish_time' => $r['assignment']->finish_time,
-                'problems' => $problems,
-                'director' => $director,
-                'problemset_id' => $r['assignment']->problemset_id,
-                ];
+        return [
+            'status' => 'ok',
+            'name' => $r['assignment']->name,
+            'description' => $r['assignment']->description,
+            'assignment_type' => $r['assignment']->assignment_type,
+            'start_time' => $r['assignment']->start_time,
+            'finish_time' => $r['assignment']->finish_time,
+            'problems' => $problems,
+            'director' => $director,
+            'problemset_id' => $r['assignment']->problemset_id,
+        ];
     }
 
     /**

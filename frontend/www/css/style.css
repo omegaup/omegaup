@@ -251,7 +251,7 @@ table.merged-scoreboard td div.name {
 	font-size: smaller;
 	color: #888;
 }
-td.numeric {
+th.numeric, td.numeric {
 	text-align: right;
 }
 
