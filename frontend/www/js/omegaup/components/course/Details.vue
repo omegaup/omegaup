@@ -1,5 +1,5 @@
 <template>
-  <div class="omegaup-course-details panel">
+  <div class="omegaup-course-details panel-primary panel">
     <div v-if="!update" class="panel-heading">
       <h3 class="panel-title">{{ T.courseNew }}</h3>
     </div>
