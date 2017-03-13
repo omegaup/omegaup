@@ -30,13 +30,18 @@
 </div>
 </template>
 
-<div class="panel">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{#courseList#}</h3>
+    </div>
+
     <div class="page-header">
         <div class="pull-right">
           <a class="btn btn-primary" href="/course/new/">{#courseNew#}</a>
         </div>
         <h1><span>{#courseList#}</span> <small></small></h1>
     </div>
+
     <!-- Default to hidden to avoid FOUC -->
     <div class="panel-body tab-container" style="display:none">
         <ul class="nav nav-tabs">
