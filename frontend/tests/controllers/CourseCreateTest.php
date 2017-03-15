@@ -87,22 +87,41 @@ class CourseCreateTest extends OmegaupTestCase {
 
         // Create a test course
         $login = self::login($user);
-        $r = new Request([
+        $assignment_alias = Utils::CreateRandomString();
+        $course = CourseController::apiCreateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-            'alias' => Utils::CreateRandomString(),
+            'alias' => $assignment_alias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
-        ]);
-        $course = CourseController::apiCreateAssignment($r);
+        ]));
 
         // There should exist 1 assignment with this alias
-        $this->assertEquals(1, count(AssignmentsDAO::search(
-            ['alias' => $r['alias']]
-        )));
+        $assignments = AssignmentsDAO::search([
+            'alias' => $assignment_alias,
+        ]);
+        $this->assertEquals(1, count($assignments));
+        $assignment = $assignments[0];
+
+        // Add a problem to the assignment.
+        $problemData = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $points = 1337;
+        CourseController::apiAddProblem(new Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAlias,
+            'assignment_alias' => $assignment->alias,
+            'problem_alias' => $problemData['problem']->alias,
+            'points' => $points,
+        ]));
+
+        $problems = ProblemsetProblemsDAO::search([
+            'problemset_id' => $assignment->problemset_id,
+        ]);
+        $this->assertEquals(1, count($problems));
+        $this->assertEquals($points, $problems[0]->points);
     }
 
     /**
