@@ -14,21 +14,32 @@
         <tbody>
           <tr v-for="student in students">
             <td><a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username }}</a></td>
-            <td class="score" v-for="assignment in assignments">{{ score(student, assignment) }}</td>
+            <td class="score" v-for="assignment in assignments">{{ score(student, assignment).toPrecision(2) }}</td>
           </tr>
         </tbody>
       </table>
     </div> <!-- panel-body -->
     <div class="panel-footer">
-      <a v-bind:href="csvDataUrl" v-bind:download="csvFilename">{{ T.courseStudentsProgressExportToSpreadsheet }}</a>
+      {{ T.courseStudentsProgressExportToSpreadsheet }}:
+      <a v-bind:href="csvDataUrl" v-bind:download="csvFilename">.csv</a>
+      <a v-bind:href="odsDataUrl" v-bind:download="odsFilename">.ods</a>
     </div>
   </div> <!-- panel -->
 </template>
 
 <script>
+import AsyncComputed from 'vue-async-computed';
+import JSZip from 'jszip';
+import Vue from 'vue';
+
+Vue.use(AsyncComputed);
+
 function escapeCsv(cell) {
   if (typeof(cell) === 'undefined' || typeof(cell) === 'null') {
     return '';
+  }
+  if (typeof(cell) === 'number') {
+    cell = cell.toPrecision(2);
   }
   if (typeof(cell) !== 'string') {
     cell = JSON.stringify(cell);
@@ -40,8 +51,36 @@ function escapeCsv(cell) {
   return '"' + cell.replace('"', '""') + '"';
 }
 
+function escapeXml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;');
+}
+
 function toCsv(table) {
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
+}
+
+function toOds(courseName, table) {
+  let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
+  result += '<table:table-column table:number-columns-repeated="' + table[0].length + '"/>\n';
+  for (let row of table) {
+    result += '<table:table-row>\n';
+    for (let cell of row) {
+      if (typeof cell === 'number') {
+        result += '<table:table-cell office:value-type="float" office:value="' + cell + '"><text:p>' + cell.toPrecision(2) + '</text:p></table:table-cell>';
+      } else {
+        result += '<table:table-cell office:value-type="string"><text:p>' + escapeXml(cell) + '</text:p></table:table-cell>';
+      }
+    }
+    result += '</table:table-row>\n';
+  }
+  result += '</table:table>';
+  console.log(result);
+  return result;
 }
 
 export default {
@@ -58,7 +97,7 @@ export default {
   methods: {
     score: function(student, assignment) {
       let score = student.progress[assignment.alias] || '0';
-      return parseFloat(score).toPrecision(2);
+      return parseFloat(score);
     },
     studentProgressUrl: function(student) {
       return '/course/' + this.course.alias + '/student/' + student.username + '/';
@@ -68,10 +107,7 @@ export default {
     courseUrl: function() {
       return '/course/' + this.course.alias + '/';
     },
-    csvFilename: function() {
-      return this.course.alias + '.csv';
-    },
-    csvDataUrl: function() {
+    progressTable: function() {
       let table = [];
       let header = [this.T.profileUsername, this.T.wordsName];
       for (let assignment of this.assignments) {
@@ -85,8 +121,72 @@ export default {
         }
         table.push(row);
       }
+      return table;
+    },
+    csvFilename: function() {
+      return this.course.alias + '.csv';
+    },
+    csvDataUrl: function() {
+      let table = this.progressTable;
       let blob = new Blob([toCsv(table)], { type: 'text/csv;charset=utf-8;' });
       return window.URL.createObjectURL(blob);
+    },
+    odsFilename: function() {
+      return this.course.alias + '.ods';
+    },
+  },
+  asyncComputed: {
+    async odsDataUrl() {
+      let zip = new JSZip();
+      zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
+        compression: 'STORE',
+      });
+      let metaInf = zip.folder('META-INF');
+      let table = this.progressTable;
+      metaInf.file('manifest.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest
+    xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+    manifest:version="1.2">
+ <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>
+ <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
+</manifest:manifest>`);
+      zip.file('styles.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-styles
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    office:version="1.2">
+</office:document-styles>`);
+      zip.file('settings.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-settings
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    office:version="1.2">
+</office:document-settings>`);
+      zip.file('meta.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-meta
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+    office:version="1.2">
+  <office:meta>
+    <meta:generator>omegaUp</meta:generator>
+  </office:meta>
+</office:document-meta>`);
+      zip.file('content.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    office:version="1.2">
+  <office:body>
+    <office:spreadsheet>` + toOds(this.course.name, table) + `</office:spreadsheet>
+  </office:body>
+</office:document-content>`);
+      return window.URL.createObjectURL(await zip.generateAsync({
+        type: 'blob',
+        mimeType: 'application/ods',
+        compression: 'DEFLATE',
+      }));
     },
   },
 };
