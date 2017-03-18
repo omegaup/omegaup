@@ -35,7 +35,7 @@ before_install:
           frontend/server/libs/third_party/phpmailer \
           frontend/server/libs/third_party/log4php \
           frontend/server/libs/third_party/adodb \
-          frontend/server/libs/third_party/facebook-php-sdk \
+          frontend/server/libs/third_party/facebook-php-graph-sdk \
           frontend/server/libs/third_party/google-api-php-client
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user six
