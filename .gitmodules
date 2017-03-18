@@ -25,10 +25,6 @@
 	path = frontend/server/libs/third_party/smarty
 	url = https://github.com/smarty-php/smarty.git
 	shallow = true
-[submodule "frontend/server/libs/facebook-php-sdk"]
-	path = frontend/server/libs/third_party/facebook-php-sdk
-	url = https://github.com/facebookarchive/facebook-php-sdk.git
-	shallow = true
 [submodule "frontend/server/libs/phpmailer"]
 	path = frontend/server/libs/third_party/phpmailer
 	url = https://github.com/PHPMailer/PHPMailer.git
