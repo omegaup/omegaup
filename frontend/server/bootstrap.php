@@ -152,7 +152,7 @@ require_once('controllers/ResetController.php');
 require_once('libs/third_party/adodb/adodb.inc.php');
 require_once('libs/third_party/adodb/adodb-exceptions.inc.php');
 
-require_once('libs/third_party/facebook-php-sdk/src/facebook.php');
+require_once('libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php');
 require_once('libs/third_party/google-api-php-client/src/Google/autoload.php');
 
 global $conn;

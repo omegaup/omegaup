@@ -30,7 +30,7 @@ if (isset($_GET['linkedin'])) {
         $response = $c_Session->LoginViaLinkedIn();
     }
     $triedToLogin = true;
-} elseif (isset($_GET['state'])) {
+} elseif (isset($_GET['fb'])) {
     $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }
@@ -51,7 +51,7 @@ if ($c_Session->CurrentSessionAvailable()) {
         $smarty->assign('ERROR_MESSAGE', $response['error']);
     } else {
         $smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
-        $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('loginFederatedFailed')) ;
+        $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('loginFederatedFailed'));
     }
 }
 
