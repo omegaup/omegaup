@@ -36,3 +36,7 @@
 [submodule "q2a"]
 	path = frontend/www/preguntas
 	url = https://github.com/omegaup/question2answer.git
+[submodule "frontend/server/libs/third_party/facebook-php-graph-sdk"]
+	path = frontend/server/libs/third_party/facebook-php-graph-sdk
+	url = https://github.com/facebook/php-graph-sdk.git
+	shallow = true
