@@ -163,6 +163,10 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);
 
+        if ($r['alias'] == 'new') {
+            throw new DuplicatedEntryInDatabaseException('aliasInUse');
+        }
+
         if (!is_null(CoursesDAO::findByAlias($r['alias']))) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
@@ -337,11 +341,16 @@ class CourseController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        $problemSetProblem = new ProblemsetProblems();
-        $problemSetProblem->problemset_id = $problemSet->problemset_id;
-        $problemSetProblem->problem_id = $problem->problem_id;
+        $points = 100;
+        if (is_numeric($r['points'])) {
+            $points = (int)$r['points'];
+        }
 
-        ProblemsetProblemsDAO::save($problemSetProblem);
+        ProblemsetProblemsDAO::save(new ProblemsetProblems([
+            'problemset_id' => $problemSet->problemset_id,
+            'problem_id' => $problem->problem_id,
+            'points' => $points,
+        ]));
 
         return ['status' => 'ok'];
     }
