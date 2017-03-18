@@ -49,7 +49,9 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.common.js'
+      'vue$': 'vue/dist/vue.common.js',
+			'vue-async-computed': 'vue-async-computed/dist/index.js',
+			jszip: 'jszip/dist/jszip.js',
     }
   },
   devServer: {
