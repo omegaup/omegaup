@@ -79,7 +79,6 @@ function toOds(courseName, table) {
     result += '</table:table-row>\n';
   }
   result += '</table:table>';
-  console.log(result);
   return result;
 }
 
