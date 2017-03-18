@@ -30,10 +30,11 @@ class SessionController extends Controller {
      * */
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
-            self::$_facebook = new Facebook([
-                        'appId' => OMEGAUP_FB_APPID,
-                        'secret' => OMEGAUP_FB_SECRET
-                    ]);
+            self::$_facebook = new Facebook\Facebook([
+                'app_id' => OMEGAUP_FB_APPID,
+                'app_secret' => OMEGAUP_FB_SECRET,
+                'default_graph_version' => 'v2.5',
+            ]);
         }
         return self::$_facebook;
     }
@@ -41,7 +42,8 @@ class SessionController extends Controller {
     public static function getFacebookLoginUrl() {
         $facebook = self::getFacebookInstance();
 
-        return $facebook->getLoginUrl(['scope' => 'email']);
+        $helper = $facebook->getRedirectLoginHelper();
+        return $helper->getLoginUrl(OMEGAUP_URL.'/login?fb', ['email']);
     }
 
     private static function isAuthTokenValid($authToken) {
@@ -323,50 +325,37 @@ class SessionController extends Controller {
      *               i18n string may also appear on the response.
      */
     public function LoginViaFacebook() {
-        //ok, the user does not have any auth token
-        //if he wants to test facebook login
-        //Facebook must send me the state=something
-        //query, so i dont have to be testing
-        //facebook sessions on every single petition
-        //made from the front-end
-        if (!isset($_GET['state'])) {
-            return ['status' => 'error'];
-        }
-
-        //if that is not true, may still be logged with
-        //facebook, lets test that
+        // Mostly taken from
+        // https://developers.facebook.com/docs/php/howto/example_facebook_login
         $facebook = self::getFacebookInstance();
 
-        // Get User ID
-        $fb_user = $facebook->getUser();
-
-        if ($fb_user == 0) {
-            self::$log->info('FB session unavailable.');
-            return ['status' => 'error'];
+        $helper = $facebook->getRedirectLoginHelper();
+        try {
+            $access_token = $helper->getAccessToken();
+        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+            return ['status' => 'error', 'error' => $e->getMessage()];
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            return ['status' => 'error', 'error' => $e->getMessage()];
         }
 
-        // We may or may not have this data based on whether the user is logged in.
-        // If we have a $fb_user id here, it means we know the user is logged into
-        // Facebook, but we don't know if the access token is valid. An access
-        // token is invalid if the user logged out of Facebook.
+        if (!isset($access_token)) {
+            $response = ['status' => 'error'];
+            if ($helper->getError()) {
+                $response['error'] = $helper->getError() . ' ' . $helper->getErrorDescription();
+            }
+        }
 
         try {
-            // Proceed knowing you have a logged in user who's authenticated.
-            $fb_user_profile = $facebook->api('/me');
-        } catch (FacebookApiException $e) {
-            $fb_user = null;
-            self::$log->error('FacebookException:' . $e);
-            return ['status' => 'error'];
+            $fb_response = $facebook->get('/me?fields=name,email', $access_token);
+        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+            return ['status' => 'error', 'error' => $e->getMessage()];
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            return ['status' => 'error', 'error' => $e->getMessage()];
         }
 
-        //ok we know the user is logged in,
-        //lets look for their information in the database
-        //if there is none, it means that its the first
-        //time the user has been here, lets register their info
+        $fb_user_profile = $fb_response->getGraphUser();
         self::$log->info('User is logged in via facebook !!');
-
         if (!isset($fb_user_profile['email'])) {
-            $fb_user = null;
             self::$log->error('Facebook email empty');
             return [
                 'status' => 'error',
