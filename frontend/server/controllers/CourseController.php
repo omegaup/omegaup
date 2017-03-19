@@ -102,7 +102,7 @@ class CourseController extends Controller {
         }
 
         if (is_null($courses) || !is_array($courses) || count($courses) !== 1) {
-            throw new InvalidParameterException('invalidParamater', 'course_alias');
+            throw new InvalidParameterException('invalidParameter', 'course_alias');
         }
 
         $r['course'] = $courses[0];
