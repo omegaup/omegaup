@@ -141,7 +141,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(ip2long('127.0.0.1'), $logs[0]->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals((time() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);
+            $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);
         }
 
         $this->assertEquals('JE', $run->verdict);
@@ -385,7 +385,7 @@ class RunCreateTest extends OmegaupTestCase {
          // Alter first access time of our contestant such that he started
         // 21 minutes ago, this is, window length has expired by 1 minute
         $problemset_user = ProblemsetUsersDAO::getByPK($this->contestant->user_id, $contest->problemset_id);
-        $problemset_user->access_time = date('Y-m-d H:i:s', time() - 21 * 60); //Window length is in minutes
+        $problemset_user->access_time = date('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp() - 21 * 60); //Window length is in minutes
         ProblemsetUsersDAO::save($problemset_user);
 
         // Call API
@@ -705,7 +705,7 @@ class RunCreateTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course' => $this->courseData['course_alias'],
             'assignment' => $this->courseData['assignment_alias'],
-            'start_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10)
+            'start_time' => Utils::GetPhpUnixTimestamp() + 10,
         ]));
 
         $login = self::login($this->student);
@@ -727,8 +727,8 @@ class RunCreateTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course' => $this->courseData['course_alias'],
             'assignment' => $this->courseData['assignment_alias'],
-            'start_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 10),
-            'finish_time' => (int)Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1)
+            'start_time' => Utils::GetPhpUnixTimestamp() - 10,
+            'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
         ]));
 
         $login = self::login($this->student);

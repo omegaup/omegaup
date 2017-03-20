@@ -532,6 +532,7 @@ omegaup.OmegaUp.loadTranslations({
 	status: "Update your email here.",
 	submittingUnOpenedProblem: "User is submitting a run and they have not even opened the problem.",
 	successfulOperation: "Success",
+	titleInUse: "Title already exists. Please choose a different title.",
 	unableToVerifyCaptcha: "We failed to verify the captcha. Please reload the page and try again.",
 	unverifiedUser: "Unverified user.",
 	userEditBachelors: "Bachelor's",
