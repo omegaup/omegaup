@@ -32,7 +32,11 @@ class GroupController extends Controller {
 
             self::$log->info('Group ' . $r['alias'] . ' created.');
         } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+            if (strpos($e->getMessage(), '1062') !== false) {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                throw new InvalidDatabaseOperationException($e);
+            }
         }
 
         return ['status' => 'ok'];

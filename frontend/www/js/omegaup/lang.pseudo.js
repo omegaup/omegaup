@@ -532,6 +532,7 @@ omegaup.OmegaUp.loadTranslations({
 	status: "(Upda73 y0ur 3mai1 h3r3.)",
 	submittingUnOpenedProblem: "(U53r i5 5ubmi77ing a run and 7h3y hav3 n07 3v3n 0p3n3d 7h3 pr0b13m.)",
 	successfulOperation: "(Succ355)",
+	titleInUse: "(Ti713 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 7i713.)",
 	unableToVerifyCaptcha: "(W3 fai13d 70 v3rify 7h3 cap7cha. P13a53 r310ad 7h3 pag3 and 7ry again.)",
 	unverifiedUser: "(Unv3rifi3d u53r.)",
 	userEditBachelors: "(Bach310r'5)",

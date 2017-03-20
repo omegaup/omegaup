@@ -23,7 +23,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Validate student was added
-        $course = CoursesDAO::findByAlias($courseData['course_alias']);
+        $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
         $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
@@ -87,7 +87,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Validate student was removed.
-        $course = CoursesDAO::findByAlias($courseData['course_alias']);
+        $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
         $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([

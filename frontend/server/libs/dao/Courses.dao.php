@@ -28,29 +28,29 @@ class CoursesDAO extends CoursesDAOBase {
         return $finalResult;
     }
 
-    public static function findByAlias($alias) {
-        global  $conn;
-
-        $sql = 'SELECT c.* FROM Courses c WHERE c.alias  = ?';
-
-        $rs = $conn->GetRow($sql, [$alias]);
-        if (count($rs) == 0) {
-            return null;
-        }
-
-        return new Courses($rs);
-    }
-
     /**
-      * Given a course alias, get all of its assignments
-      *
+      * Given a course alias, get all of its assignments. Hides any assignments
+      * that have not started, if not an admin.
       **/
-    public static function getAllAssignments($alias) {
+    public static function getAllAssignments($alias, $isAdmin) {
         global  $conn;
 
-        $sql = 'select a.* from Courses c, Assignments a '
-                . ' where c.alias = ? and a.course_id = c.course_id'
-                . ' order by start_time;';
+        // Non-admins should not be able to see assignments that have not
+        // started.
+        $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
+        $sql = "
+            SELECT
+                a.*
+            FROM
+                Courses c
+            INNER JOIN
+                Assignments a
+            ON
+                a.course_id = c.course_id
+            WHERE
+                c.alias = ? $timeCondition
+            ORDER BY
+                start_time;";
 
         $rs = $conn->Execute($sql, [$alias]);
 

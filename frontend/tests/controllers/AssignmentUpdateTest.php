@@ -76,4 +76,36 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'finish_time' => strtotime('2017-01-02 12:34:56'),
         ]));
     }
+
+    /**
+     * Students should not be able to update the assignment.
+     */
+    public function testAssignmentUpdateByStudent() {
+        $admin = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($admin);
+        $courseData = CoursesFactory::createCourseWithOneAssignment(
+            $admin,
+            $adminLogin
+        );
+
+        $student = UserFactory::createUser();
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $login = OmegaupTestCase::login($student);
+        try {
+            CourseController::apiUpdateAssignment(new Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $courseData['assignment_alias'],
+                'course' => $courseData['course_alias'],
+                'description' => 'pwnd',
+            ]));
+            $this->fail('Expected ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            // OK.
+        }
+    }
 }
