@@ -357,6 +357,7 @@ class SessionController extends Controller {
         self::$log->info('User is logged in via facebook !!');
         if (!isset($fb_user_profile['email'])) {
             self::$log->error('Facebook email empty');
+            global $smarty;
             return [
                 'status' => 'error',
                 'error' => $smarty->getConfigVariable(
