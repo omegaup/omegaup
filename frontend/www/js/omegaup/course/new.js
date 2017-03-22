@@ -33,6 +33,7 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
+          cancel: function(ev) { window.location = '/course/'; },
         },
       });
     },
