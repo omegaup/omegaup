@@ -86,7 +86,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Validates course exists. Expects $r[$course_alias], returns
+     * Validates course exists. Expects $r[$column_name], returns
      * course found on $r['course']. Throws if not found.
      *
      * @throws InvalidParameterException
