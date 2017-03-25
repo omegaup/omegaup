@@ -6,6 +6,10 @@
  * @author joemmanuel
  */
 class RunController extends Controller {
+    public static $kSupportedLanguages = [
+        'kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas',
+        'cat', 'hs', 'lua'
+    ];
     public static $defaultSubmissionGap = 60; /*seconds*/
     public static $grader = null;
     private static $practice = false;
@@ -55,7 +59,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $allowedLanguages = ['kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs'];
+        $allowedLanguages = RunController::$kSupportedLanguages;
         try {
             Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -799,7 +803,12 @@ class RunController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs'], false);
+        Validators::isInEnum(
+            $r['language'],
+            'language',
+            RunController::$kSupportedLanguages,
+            false
+        );
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {

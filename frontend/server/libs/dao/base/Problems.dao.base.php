@@ -324,7 +324,7 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->validator = 'token-numeric';
         }
         if (is_null($Problems->languages)) {
-            $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11';
+            $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
         }
         if (is_null($Problems->time_limit)) {
             $Problems->time_limit = '3000';

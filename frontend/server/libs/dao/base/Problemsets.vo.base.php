@@ -77,7 +77,7 @@ class Problemsets extends VO {
     /**
       * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
       * @access public
-      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
+      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $languages;
 }

@@ -45,6 +45,7 @@
 									<option value="pas">Pascal</option>
 									<option value="py">Python</option>
 									<option value="rb">Ruby</option>
+									<option value="lua">Lua</option>
 									<option value="kp">Karel (Pascal)</option>
 									<option value="kj">Karel (Java)</option>
 									<option value="cat">{#wordsJustOutput#}</option>
