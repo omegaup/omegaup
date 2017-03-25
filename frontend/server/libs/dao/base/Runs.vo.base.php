@@ -130,7 +130,7 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
+      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $language;
 

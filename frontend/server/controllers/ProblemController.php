@@ -70,12 +70,12 @@ class ProblemController extends Controller {
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $is_required
         );
-            Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
-            Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
-            Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
-            Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
-            Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
-            Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
+        Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
+        Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -84,7 +84,12 @@ class ProblemController extends Controller {
         } elseif (isset($r['languages']) && is_array($r['languages'])) {
             $r['languages'] = implode(',', $r['languages']);
         }
-            Validators::isValidSubset($r['languages'], 'languages', ['c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11'], $is_required);
+        Validators::isValidSubset(
+            $r['languages'],
+            'languages',
+            RunController::$kSupportedLanguages,
+            $is_required
+        );
     }
 
     /**

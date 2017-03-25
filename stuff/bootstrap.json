@@ -17,7 +17,7 @@
 					"memory_limit": 32768,
 					"output_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
 					"stack_limit": 33554432,
 					"email_clarifications": true
 				},
@@ -39,7 +39,7 @@
 					"memory_limit": 32768,
 					"output_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
 					"stack_limit": 33554432,
 					"email_clarifications": true
 				},

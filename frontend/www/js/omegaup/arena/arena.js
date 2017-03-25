@@ -1136,7 +1136,7 @@ export class Arena {
           extension == 'cpp' || extension == 'c' || extension == 'java' ||
           extension == 'txt' || extension == 'hs' || extension == 'kp' ||
           extension == 'kj' || extension == 'p' || extension == 'pas' ||
-          extension == 'py' || extension == 'rb') {
+          extension == 'py' || extension == 'rb' || extension == 'lua') {
         if (file.size >= 10 * 1024) {
           alert(UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
