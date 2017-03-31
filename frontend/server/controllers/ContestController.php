@@ -1667,7 +1667,19 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            $r['contest'],
+            new ScoreboardParams(
+                $r['contest']->alias,
+                $r['contest']->title,
+                $r['contest']->problemset_id,
+                $r['contest']->start_time,
+                $r['contest']->finish_time,
+                $r['contest']->acl_id,
+                null /*group_id*/,
+                $r['contest']->penalty,
+                $r['contest']->penalty_calc_policy,
+                $r['contest']->show_scoreboard_after,
+                $r['contest']->scoreboard
+            ),
             $showAllRuns
         );
 
@@ -1730,7 +1742,19 @@ class ContestController extends Controller {
             }
 
             $s = new Scoreboard(
-                $contest,
+                new ScoreboardParams(
+                    $contest->alias,
+                    $contest->title,
+                    $contest->problemset_id,
+                    $contest->start_time,
+                    $contest->finish_time,
+                    $contest->acl_id,
+                    null /*group_id*/,
+                    $contest->penalty,
+                    $contest->penalty_calc_policy,
+                    $contest->show_scoreboard_after,
+                    $contest->scoreboard
+                ),
                 false, /*showAllRuns*/
                 null, /*auth_token*/
                 $r['contest_params'][$contest->alias]['only_ac']
@@ -2425,7 +2449,19 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $scoreboard = new Scoreboard(
-            $r['contest'],
+            new ScoreboardParams(
+                $r['contest']->alias,
+                $r['contest']->title,
+                $r['contest']->problemset_id,
+                $r['contest']->start_time,
+                $r['contest']->finish_time,
+                $r['contest']->acl_id,
+                null /*group_id*/,
+                $r['contest']->penalty,
+                $r['contest']->penalty_calc_policy,
+                $r['contest']->show_scoreboard_after,
+                $r['contest']->scoreboard
+            ),
             true, //Show only relevant runs
             $r['auth_token']
         );
