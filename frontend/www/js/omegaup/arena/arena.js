@@ -786,7 +786,7 @@ export class Arena {
         (function(id, answerNode) {
           var responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
-          var cannedResponse = 
+          var cannedResponse =
               $("#create-response-canned", answerNode);
           cannedResponse.change(function () {
             if(cannedResponse.val() === "other"){
@@ -803,7 +803,6 @@ export class Arena {
           responseFormNode.submit(function() {
             var responseText = null;
             if( $("#create-response-canned", answerNode).val() === "other"){
-
               responseText = $('#create-response-text', this).val();
             }else{
               responseText = $("#create-response-canned>option:selected", this).html();
