@@ -6,7 +6,6 @@
  */
 
 class CourseAssignmentScoreboardTest extends OmegaupTestCase {
-
 	/**
 	 * Get score of a given assignment happy path
 	 */
@@ -39,7 +38,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
 
         // Generate runs
         $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse($courseData, $students, [$courseData['assignment_alias']], $problemAssignmentsMap);
-		
+
 		// Call API
 		$adminLogin = self::login($courseData['admin']);
 		$response = CourseController::apiScoreboard(new Request([
