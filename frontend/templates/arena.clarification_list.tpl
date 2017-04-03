@@ -38,7 +38,7 @@
 							<td class="answer">
 								<pre></pre>
 								<form id="create-response-form" class="form-inline template">
-									<select id = "create-response-canned">
+									<select id="create-response-canned">
 										<option value="yes">{#wordsYes#}</option>
 										<option value="no">{#wordsNo#}</option>
 										<option value="nocomment">{#wordsNoComment#}</option>
