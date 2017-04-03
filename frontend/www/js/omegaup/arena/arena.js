@@ -786,13 +786,11 @@ export class Arena {
         (function(id, answerNode) {
           var responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
-          var cannedResponse =
-              $("#create-response-canned", answerNode);
-          cannedResponse.change(function () {
-            if(cannedResponse.val() === "other"){
+          var cannedResponse = $('#create-response-canned', answerNode);
+          cannedResponse.change(function() {
+            if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
-            }
-            else{
+            } else {
               $('#create-response-text', answerNode).hide();
             }
           });
@@ -802,10 +800,11 @@ export class Arena {
           }
           responseFormNode.submit(function() {
             var responseText = null;
-            if( $("#create-response-canned", answerNode).val() === "other"){
+            if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
-            }else{
-              responseText = $("#create-response-canned>option:selected", this).html();
+            } else {
+              responseText =
+                  $('#create-response-canned>option:selected', this).html();
             }
             API.Clarification
                 .update({
@@ -815,13 +814,11 @@ export class Arena {
                       $('#create-response-is-public', this)[0].checked ? 1 : 0
                 })
                 .then(function() {
-                  $('pre', answerNode)
-                      .html(responseText);
+                  $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
                 })
                 .fail(function() {
-                  $('pre', answerNode)
-                      .html(responseText);
+                  $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
                 });
             return false;
