@@ -49,7 +49,7 @@
 						{/if}
 					</ul>
 
-					<ul class="nav navbar-nav navbar-right">
+					<ul class="nav navbar-nav navbar-right" id="ShortUser">
 						{if $LOGGED_IN eq '1'}
 {if isset($inContest) && $inContest}
 {include file='common.navbar.notifications.tpl'}
