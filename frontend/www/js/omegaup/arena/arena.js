@@ -353,7 +353,6 @@ export class Arena {
     if (!self.options.contestAlias) {
       return;
     }
-
     self.refreshRanking();
     self.refreshClarifications();
 
@@ -787,26 +786,39 @@ export class Arena {
         (function(id, answerNode) {
           var responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
+          var cannedResponse = $('#create-response-canned', answerNode);
+          cannedResponse.change(function() {
+            if (cannedResponse.val() === 'other') {
+              $('#create-response-text', answerNode).show();
+            } else {
+              $('#create-response-text', answerNode).hide();
+            }
+          });
           if (clarification.public == 1) {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
           }
           responseFormNode.submit(function() {
+            var responseText = null;
+            if ($('#create-response-canned', answerNode).val() === 'other') {
+              responseText = $('#create-response-text', this).val();
+            } else {
+              responseText =
+                  $('#create-response-canned>option:selected', this).html();
+            }
             API.Clarification
                 .update({
                   clarification_id: id,
-                  answer: $('#create-response-text', this).val(),
+                  answer: responseText,
                   'public':
                       $('#create-response-is-public', this)[0].checked ? 1 : 0
                 })
                 .then(function() {
-                  $('pre', answerNode)
-                      .html($('#create-response-text', answerNode).val());
+                  $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
                 })
                 .fail(function() {
-                  $('pre', answerNode)
-                      .html($('#create-response-text', answerNode).val());
+                  $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
                 });
             return false;

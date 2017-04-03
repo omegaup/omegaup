@@ -38,7 +38,14 @@
 							<td class="answer">
 								<pre></pre>
 								<form id="create-response-form" class="form-inline template">
-									<textarea id="create-response-text" class="form-control" placeholder="{#wordsAnswer#}"></textarea>
+									<select id="create-response-canned">
+										<option value="yes">{#wordsYes#}</option>
+										<option value="no">{#wordsNo#}</option>
+										<option value="nocomment">{#wordsNoComment#}</option>
+										<option value="readAgain">{#wordsReadAgain#}</option>
+										<option value="other">{#wordsOther#}</option>
+									</select>
+									<textarea id="create-response-text" class="form-control" placeholder="{#wordsAnswer#}" style="display:none;" ></textarea>
 									<label><input type="checkbox" id="create-response-is-public"/> {#wordsPublic#}</label>
 									<input type="submit" />
 								</form>
