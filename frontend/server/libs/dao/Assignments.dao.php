@@ -11,9 +11,9 @@ include('base/Assignments.vo.base.php');
   *
   */
 class AssignmentsDAO extends AssignmentsDAOBase {
-    public static function GetProblemset($assignmentAlias) {
-        $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ?;';
-        $params = [$assignmentAlias];
+    public static function GetProblemset($courseId, $assignmentAlias) {
+        $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ? and a.course_id = ?;';
+        $params = [$assignmentAlias, $courseId];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
