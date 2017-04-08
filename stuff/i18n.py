@@ -53,7 +53,7 @@ def generate_json(lang):
 	json_map = {}
 	for key in sorted(strings.keys()):
 		json_map[key] = strings[key][lang]
-	return json.dumps(json_map, lang_file, sort_keys=True, indent='\t')
+	return json.dumps(json_map, sort_keys=True, indent='\t')
 
 for lang_path in glob(os.path.join(templates_dir, '*.lang')):
 	lang_filename = os.path.basename(lang_path)
@@ -118,8 +118,12 @@ if args.validate:
 				errors = True
 		json_lang_path = os.path.join(js_templates_dir, 'lang.%s.json' % lang)
 		with open(json_lang_path, 'r') as lang_file:
-			if lang_file.read() != generate_json(lang):
+			obtained = lang_file.read().strip()
+			expected = generate_json(lang).strip()
+			if obtained != expected:
 				print('Entries in %s do not match the .lang file.' % json_lang_path, file=sys.stderr)
+				print(base64.b64encode(gzip.compress(expected.encode('utf-8'))), file=sys.stderr)
+				print(base64.b64encode(gzip.compress(obtained.encode('utf-8'))), file=sys.stderr)
 				errors = True
 
 if errors:
