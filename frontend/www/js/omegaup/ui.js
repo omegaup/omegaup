@@ -158,10 +158,12 @@ let UI = {
               source: UI.typeaheadWrapper(searchFn),
               displayKey: 'label',
             })
-        .on('typeahead:selected', cb);
+        .on('typeahead:selected', cb)
+        .on('typeahead:autocompleted', cb);
   },
 
-  problemTypeahead: function(elem) {
+  problemTypeahead: function(elem, cb) {
+    cb = cb || function(event, val) { $(event.target).val(val.alias); };
     elem.typeahead(
             {
               minLength: 3,
@@ -177,9 +179,8 @@ let UI = {
                 }
               }
             })
-        .on('typeahead:selected', function(event, val) {
-          $(event.target).val(val.alias);
-        });
+        .on('typeahead:selected', cb)
+        .on('typeahead:autocompleted', cb);
   },
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },

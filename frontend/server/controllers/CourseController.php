@@ -336,7 +336,10 @@ class CourseController extends Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
         if (is_null($problemSet)) {
             throw new NotFoundException('problemsetNotFound');
         }
@@ -383,7 +386,10 @@ class CourseController extends Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
         if (is_null($problemSet)) {
             throw new NotFoundException('problemsetNotFound');
         }
@@ -499,7 +505,10 @@ class CourseController extends Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
         if (is_null($problemSet)) {
             throw new NotFoundException('problemsetNotFound');
         }
