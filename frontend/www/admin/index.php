@@ -1,5 +1,3 @@
 <?php
-
-    require_once('../../server/bootstrap.php');
-
-    $smarty->display('../templates/admin_index.tpl');
+header('HTTP/1.1 404 Not found');
+die();

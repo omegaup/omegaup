@@ -10,4 +10,17 @@ include('base/Users_Experiments.vo.base.php');
   *
   */
 class UsersExperimentsDAO extends UsersExperimentsDAOBase {
+    public static function delete($user_id, $experiment) {
+        $sql = '
+            DELETE FROM
+                Users_Experiments
+            WHERE
+                user_id = ? AND experiment = ?;';
+        $params = [
+            $user_id,
+            $experiment,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+    }
 }

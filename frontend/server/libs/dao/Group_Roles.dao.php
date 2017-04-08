@@ -91,4 +91,29 @@ class GroupRolesDAO extends GroupRolesDAOBase {
     public static function isSystemAdmin($user_id) {
         return self::isAdmin($user_id, Authorization::SYSTEM_ACL);
     }
+
+    public static function getSystemRoles($user_id) {
+        $sql = '
+            SELECT
+                r.name
+            FROM
+                Group_Roles gr
+            INNER JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
+            INNER JOIN
+                Roles r ON r.role_id = gr.role_id
+            WHERE
+                gu.user_id = ? AND gr.acl_id = ?;';
+        $params = [
+            $user_id,
+            Authorization::SYSTEM_ACL,
+        ];
+        global $conn;
+
+        $roles = [];
+        foreach ($conn->GetAll($sql, $params) as $role) {
+            $roles[] = $role['name'];
+        }
+        return $roles;
+    }
 }
