@@ -121,6 +121,8 @@ if args.validate:
 			obtained = lang_file.read().strip()
 			expected = generate_json(lang).strip()
 			if obtained != expected:
+				import base64
+				import gzip
 				print('Entries in %s do not match the .lang file.' % json_lang_path, file=sys.stderr)
 				print(base64.b64encode(gzip.compress(expected.encode('utf-8'))), file=sys.stderr)
 				print(base64.b64encode(gzip.compress(obtained.encode('utf-8'))), file=sys.stderr)
