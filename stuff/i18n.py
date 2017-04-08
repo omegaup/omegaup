@@ -53,7 +53,7 @@ def generate_json(lang):
 	json_map = {}
 	for key in sorted(strings.keys()):
 		json_map[key] = strings[key][lang]
-	return json.dumps(json_map, lang_file, sort_keys=True, indent='\t')
+	return json_map
 
 for lang_path in glob(os.path.join(templates_dir, '*.lang')):
 	lang_filename = os.path.basename(lang_path)
@@ -118,7 +118,7 @@ if args.validate:
 				errors = True
 		json_lang_path = os.path.join(js_templates_dir, 'lang.%s.json' % lang)
 		with open(json_lang_path, 'r') as lang_file:
-			if lang_file.read() != generate_json(lang):
+			if generate_json(lang) != json.load(lang_file):
 				print('Entries in %s do not match the .lang file.' % json_lang_path, file=sys.stderr)
 				errors = True
 
@@ -159,6 +159,6 @@ for lang in languages:
 		lang_file.write(generate_javascript(lang))
 	json_lang_path = os.path.join(js_templates_dir, 'lang.%s.json' % lang)
 	with open(json_lang_path, 'w') as lang_file:
-		lang_file.write(generate_json(lang))
+		json.dump(generate_json(lang), lang_file, sort_keys=True, indent='\t')
 
 # vim: noexpandtab
