@@ -965,7 +965,7 @@ class ContestController extends Controller {
                 if (is_null($p)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
                 }
-                if ($p->public == '0' && !Authorization::canEditProblem($r['current_user_id'], $p)) {
+                if ($p->public == '0' && !Authorization::isProblemAdmin($r['current_user_id'], $p)) {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
                 array_push($problems, [
@@ -1126,7 +1126,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if ($problem->public == '0' && !Authorization::canEditProblem($r['current_user_id'], $problem)) {
+        if ($problem->public == '0' && !Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
