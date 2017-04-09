@@ -2,19 +2,23 @@ body { padding-top: 51px; /* Espacio para el navbar */ }
 #header { border-bottom-width: 0; }
 #header .caret { border-top-color: white; border-bottom-color: white; }
 #header .active > a { background-color: #5F87D4; }
-#header #user-dropdown img { width: 51px; height: 51px; }
+#header #user-dropdown img { width: 51px; height: 51px; margin-right: 10px; }
 #header .navbar-header img { height: 20px; }
 #header .navbar-header .navbar-brand { background-color: white; background-image: linear-gradient(to bottom,white 0,#ddd 100%); }
-#user-dropdown-menu {
-  width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 /* Elimina el padding del elemento dropdown del nombre
 del usuario para la redimesion de la imagen de perfil. */
 #user-dropdown {
 	padding: 0 12px 0 0;
+}
+#user-dropdown span {
+	vertical-align: middle;
+}
+#user-dropdown span.username {
+	display: inline-block;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #header .navbar-text,

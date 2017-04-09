@@ -123,7 +123,10 @@ export default {
     },
   },
   mounted: function() {
-    UI.problemTypeahead($('input.problems-dropdown', $(this.$el)));
+    var self = this;
+    UI.problemTypeahead($('input.problems-dropdown', $(this.$el)), function(event, item) {
+      self.problemAlias = item.alias;
+    });
   },
   methods: {
     onAddProblem: function() {
