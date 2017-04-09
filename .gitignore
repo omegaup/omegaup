@@ -78,6 +78,9 @@ frontend/www/templates/
 # Ignore sublime sftp config
 sftp-config.json
 
+# Ignore GitHub Atom sftp config
+.remote-sync.json
+
 # Ignore node modules folder
 node_modules
 
