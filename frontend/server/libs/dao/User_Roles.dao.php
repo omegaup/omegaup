@@ -98,4 +98,27 @@ class UserRolesDAO extends UserRolesDAOBase {
     public static function isSystemAdmin($user_id) {
         return self::isAdmin($user_id, Authorization::SYSTEM_ACL);
     }
+
+    public static function getSystemRoles($user_id) {
+        $sql = '
+            SELECT
+                r.name
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Roles r ON r.role_id = ur.role_id
+            WHERE
+                ur.user_id = ? AND ur.acl_id = ?;';
+        $params = [
+            $user_id,
+            Authorization::SYSTEM_ACL,
+        ];
+        global $conn;
+
+        $roles = [];
+        foreach ($conn->GetAll($sql, $params) as $role) {
+            $roles[] = $role['name'];
+        }
+        return $roles;
+    }
 }

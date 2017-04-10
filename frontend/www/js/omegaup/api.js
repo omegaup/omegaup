@@ -421,6 +421,10 @@ export default {
   },
 
   User: {
+    addExperiment: _call('/api/user/addexperiment/'),
+
+    addRole: _call('/api/user/addrole/'),
+
     changePassword: _call('/api/user/changepassword/'),
 
     contestStats: _call('/api/user/conteststats/'),
@@ -451,6 +455,10 @@ export default {
                    }),
 
     rankByProblemsSolved: _call('/api/user/rankByProblemsSolved/'),
+
+    removeExperiment: _call('/api/user/removeexperiment/'),
+
+    removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),
 
