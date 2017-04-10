@@ -1912,7 +1912,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($user) && Authorization::canEditProblem($user->user_id, $problem)) {
+                    if (!is_null($user) && Authorization::isProblemAdmin($user->user_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif ($problem->public != '1') {
                         throw new ForbiddenAccessException('problemIsPrivate');

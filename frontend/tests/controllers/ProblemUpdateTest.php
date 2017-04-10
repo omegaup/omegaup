@@ -367,4 +367,58 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertTrue($adminFound);
         $this->assertTrue($ownerFound);
     }
+
+    /**
+     * Test reviewers can do some problem-related tasks.
+     */
+    public function testProblemUpdateByReviewer() {
+        // Create a private problem.
+        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', null, 0);
+
+        // Normal user shouldn't even be able to see the problem.
+        $reviewer = UserFactory::createUser();
+        $login = self::login($reviewer);
+        try {
+            ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['alias'],
+            ]));
+            $this->fail('Should not have been able to see the problem');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'problemIsPrivate');
+        }
+
+        // Promote to reviewer, can see the problem now.
+        UserFactory::addSystemRole($reviewer, Authorization::REVIEWER_ROLE);
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals($response['status'], 'ok');
+        $this->assertArrayContainsWithPredicate($response['results'], function ($problem) use (&$problemData) {
+            return $problem['alias'] == $problemData['request']['alias'];
+        });
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+        ]));
+        $this->assertEquals($response['status'], 'ok');
+
+        // Update statement
+        $statement = 'This is the new statement \$x\$';
+        $response = ProblemController::apiUpdateStatement(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'message' => 'Statement is now more fun',
+            'statement' => $statement
+        ]));
+        $this->assertEquals($response['status'], 'ok');
+
+        // Add a tag
+        $response = ProblemController::apiAddTag(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'name' => 'test',
+        ]));
+        $this->assertEquals($response['status'], 'ok');
+    }
 }
