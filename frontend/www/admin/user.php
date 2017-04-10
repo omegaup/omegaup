@@ -16,6 +16,7 @@ $emails = EmailsDAO::search(new Emails([
 $userExperiments = UsersExperimentsDAO::search(new UsersExperiments([
     'user_id' => $user->user_id,
 ]));
+// TODO: Also support GroupRoles.
 $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
 $roles = RolesDAO::getAll();
 $systemExperiments = [];
