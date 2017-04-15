@@ -1,71 +1,83 @@
 <template>
   <div class="omegaup-course-details panel-primary panel">
-    <div v-if="!update" class="panel-heading">
+    <div class="panel-heading"
+         v-if="!update">
       <h3 class="panel-title">{{ T.courseNew }}</h3>
     </div>
     <div class="panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form"
+            v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-8">
-            <label>
-              {{ T.wordsTitle }}
-              <input v-model="name" type="text" class="form-control" />
-            </label>
+            <label>{{ T.wordsTitle }} <input class="form-control"
+                   type="text"
+                   v-model="name"></label>
           </div>
-
           <div class="form-group col-md-4">
-            <label>
-              {{ T.courseNewFormShortTitle_alias_ }}
-              <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseNewFormShortTitle_alias_Desc" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <input v-model="alias" type="text" class="form-control" v-bind:disabled="update" />
-            </label>
+            <label>{{ T.courseNewFormShortTitle_alias_ }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormShortTitle_alias_Desc"></span> <input class=
+                  "form-control"
+                   type="text"
+                   v-bind:disabled="update"
+                   v-model="alias"></label>
           </div>
         </div>
-
         <div class="row">
           <div class="form-group col-md-4">
-            <label>
-              {{ T.courseNewFormStartDate }}
-              <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseNewFormEndDateDesc" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <omegaup-datepicker v-model="startTime"></omegaup-datepicker>
-            </label>
+            <label>{{ T.courseNewFormStartDate }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormEndDateDesc"></span> <omegaup-datepicker v-model=
+                  "startTime"></omegaup-datepicker></label>
           </div>
           <div class="form-group col-md-4">
-            <label>
-              {{ T.courseNewFormEndDate }}
-              <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseNewFormEndDateDesc" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <omegaup-datepicker v-model="finishTime"></omegaup-datepicker>
-            </label>
+            <label>{{ T.courseNewFormEndDate }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormEndDateDesc"></span> <omegaup-datepicker v-model=
+                  "finishTime"></omegaup-datepicker></label>
           </div>
           <div class="form-group col-md-4">
-            <span class="faux-label">
-              {{ T.courseNewFormShowScoreboard }}
-              <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseNewFormShowScoreboardDesc" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-            </span>
+            <span class="faux-label">{{ T.courseNewFormShowScoreboard }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormShowScoreboardDesc"></span></span>
             <div class="form-control container">
-              <label class="radio-inline"><input type="radio" value="1" v-model="showScoreboard">{{ T.wordsYes }}</label>
-              <label class="radio-inline"><input type="radio" value="0" v-model="showScoreboard">{{ T.wordsNo }}</label>
+              <label class="radio-inline"><input type="radio"
+                     v-model="showScoreboard"
+                     value="1">{{ T.wordsYes }}</label> <label class="radio-inline"><input type=
+                     "radio"
+                     v-model="showScoreboard"
+                     value="0">{{ T.wordsNo }}</label>
             </div>
           </div>
         </div>
-
         <div class="row">
           <div class="form-group container">
-            <label>
-              {{ T.courseNewFormDescription }}
-              <textarea v-model="description" cols="30" rows="5" class="form-control"></textarea>
-            </label>
+            <label>{{ T.courseNewFormDescription }}
+            <textarea class="form-control"
+                      cols="30"
+                      rows="5"
+                      v-model="description"></textarea></label>
           </div>
         </div>
-
         <div class="form-group pull-right">
-          <button type="submit" class="btn btn-primary">
-            <template v-if="update">{{ T.courseNewFormUpdateCourse }}</template>
-            <template v-else>{{ T.courseNewFormScheduleCourse }}</template>
-          </button>
-          <button v-on:click.prevent="onCancel" type="reset" class="btn btn-secondary">
-            {{ T.wordsCancel }}
-          </button>
+          <button class="btn btn-primary"
+               type="submit">
+          <template v-if="update">
+            {{ T.courseNewFormUpdateCourse }}
+          </template>
+          <template v-else="">
+            {{ T.courseNewFormScheduleCourse }}
+          </template></button> <button class="btn btn-secondary"
+               type="reset"
+               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
         </div>
       </form>
     </div>
@@ -92,9 +104,7 @@ export default {
     };
   },
   watch: {
-    course: function(val) {
-      this.reset();
-    },
+    course: function(val) { this.reset();},
   },
   methods: {
     reset: function() {
@@ -105,9 +115,7 @@ export default {
       this.startTime = this.course.start_time || new Date();
       this.name = this.course.name;
     },
-    onSubmit: function() {
-      this.$emit('submit', this);
-    },
+    onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
       this.reset();
       this.$emit('cancel');

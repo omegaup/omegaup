@@ -9,31 +9,50 @@
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
             <a v-bind:href="'#problems/' + problem.alias"
-               v-bind:title="problem.alias">{{ String.fromCharCode(65 + index) }}</a>
+                v-bind:title="problem.alias">{{ String.fromCharCode(65 + index) }}</a>
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(user, index) in ranking">
-          <td class="legend" v-bind:style="{ backgroundColor: legendColor(index) }"></td>
+          <td class="legend"
+              v-bind:style="{ backgroundColor: legendColor(index) }"></td>
           <td class="position">{{ user.place }}</td>
-          <td>{{ renderUser(user) }} <img v-if="user.country" width="16" height="11" v-bind:title="user.country" v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'" /></td>
-          <td v-for="problem in user.problems" v-bind:class="problemClass(problem)">
-            <template v-if="problem.runs > 0">
-              <div class="points">{{ renderPoints(problem) }}</div>
-              <div class="penalty"><span v-if="showPenalty">{{ problem.penalty }} </span>({{ problem.runs }})</div>
+          <td>{{ renderUser(user) }} <img alt=""
+               height="11"
+               v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
+               v-bind:title="user.country"
+               v-if="user.country"
+               width="16"></td>
+          <td v-bind:class="problemClass(problem)"
+              v-for="problem in user.problems">
+            <template v-if="problem.runs &gt; 0">
+              <div class="points">
+                {{ renderPoints(problem) }}
+              </div>
+              <div class="penalty">
+                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{ problem.runs }})
+              </div>
             </template>
-            <template v-else>-</template>
+            <template v-else="">
+              -
+            </template>
           </td>
           <td>
-            <div class="points">{{ user.total.points }}</div>
-            <div class="penalty">{{ user.total.penalty }} ({{ totalRuns(user) }})</div>
+            <div class="points">
+              {{ user.total.points }}
+            </div>
+            <div class="penalty">
+              {{ user.total.penalty }} ({{ totalRuns(user) }})
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="footer">{{ lastUpdatedString }}</div>
+    <div class="footer">
+      {{ lastUpdatedString }}
+    </div>
   </div>
 </template>
 
@@ -50,10 +69,7 @@ export default {
       'default': true,
     },
   },
-  data: function() {
-    return {
-    };
-  },
+  data: function() { return {};},
   computed: {
     lastUpdatedString: function() {
       if (!this.lastUpdated) {
@@ -64,17 +80,14 @@ export default {
   },
   methods: {
     legendColor: function(idx) {
-      return (idx < this.scoreboardColors.length) ?
-          this.scoreboardColors[idx] :
-          '';
+      return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
+                                                    '';
     },
     renderUser: function(u) {
       return u.username +
-          (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
+             (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
     },
-    renderPoints: function(p) {
-      return (p.points > 0 ? '+' : '') + p.points;
-    },
+    renderPoints: function(p) { return (p.points > 0 ? '+' : '') + p.points;},
     totalRuns: function(u) {
       return u.problems.reduce((acc, val) => acc + val.runs, 0);
     },

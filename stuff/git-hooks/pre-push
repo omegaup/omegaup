@@ -56,3 +56,4 @@ fi
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/whitespace-purge.py validate $ARGS
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/php-format.py validate $ARGS
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/js-lint.py validate $ARGS
+/usr/bin/python3 $OMEGAUP_ROOT/stuff/vue-lint.py validate $ARGS

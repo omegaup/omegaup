@@ -1,0 +1,14 @@
+char-encoding: utf8
+custom-tags: inline
+doctype: html5
+drop-empty-elements: no
+indent-attributes: yes
+indent-spaces: 2
+indent: auto
+join-classes: yes
+logical-emphasis: yes
+markup: yes
+newline: LF
+sort-attributes: alpha
+warn-proprietary-attributes: no
+wrap: 100

@@ -84,6 +84,9 @@ script:
           python3 stuff/js-lint.py validate --all-files < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python3 stuff/vue-lint.py validate --all-files < /dev/null
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
           python3 stuff/php-format.py validate --all-files < /dev/null
 
 notifications:

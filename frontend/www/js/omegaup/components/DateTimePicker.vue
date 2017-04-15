@@ -1,5 +1,7 @@
 <template>
-  <input class="form-control" type="text" size="16" />
+  <input class="form-control"
+        size="16"
+        type="text">
 </template>
 
 <script>
@@ -11,14 +13,11 @@ export default {
       'default': 'mm/dd/yyyy hh:ii',
     },
   },
-  data: function() {
-    return {
-    };
-  },
+  data: function() { return {};},
   watch: {
-    value: function(val) {
-      $(this.$el).data('datetimepicker').setDate(val);
-    },
+    value: function(val) { $(this.$el)
+                               .data('datetimepicker')
+                               .setDate(val);},
   },
   mounted: function() {
     var self = this;

@@ -8,23 +8,29 @@
         <thead>
           <tr>
             <th>{{ T.wordsName }}</th>
-            <th class="score" v-for="assignment in assignments">{{ assignment.name }}</th>
+            <th class="score"
+                v-for="assignment in assignments">{{ assignment.name }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="student in students">
-            <td><a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username }}</a></td>
-            <td class="score" v-for="assignment in assignments">{{ score(student, assignment).toPrecision(2) }}</td>
+            <td>
+              <a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username
+              }}</a>
+            </td>
+            <td class="score"
+                v-for="assignment in assignments">{{ score(student, assignment).toPrecision(2)
+                }}</td>
           </tr>
         </tbody>
       </table>
-    </div> <!-- panel-body -->
+    </div><!-- panel-body -->
     <div class="panel-footer">
-      {{ T.courseStudentsProgressExportToSpreadsheet }}:
-      <a v-bind:href="csvDataUrl" v-bind:download="csvFilename">.csv</a>
-      <a v-bind:href="odsDataUrl" v-bind:download="odsFilename">.ods</a>
+      {{ T.courseStudentsProgressExportToSpreadsheet }}: <a v-bind:download="csvFilename"
+           v-bind:href="csvDataUrl">.csv</a> <a v-bind:download="odsFilename"
+           v-bind:href="odsDataUrl">.ods</a>
     </div>
-  </div> <!-- panel -->
+  </div><!-- panel -->
 </template>
 
 <script>
@@ -52,12 +58,11 @@ function escapeCsv(cell) {
 }
 
 function escapeXml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/'/g, '&apos;')
-    .replace(/"/g, '&quot;');
+  return str.replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/'/g, '&apos;')
+      .replace(/"/g, '&quot;');
 }
 
 function toCsv(table) {
@@ -66,14 +71,18 @@ function toCsv(table) {
 
 function toOds(courseName, table) {
   let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
-  result += '<table:table-column table:number-columns-repeated="' + table[0].length + '"/>\n';
+  result += '<table:table-column table:number-columns-repeated="' +
+            table[0].length + '"/>\n';
   for (let row of table) {
     result += '<table:table-row>\n';
     for (let cell of row) {
       if (typeof cell === 'number') {
-        result += '<table:table-cell office:value-type="float" office:value="' + cell + '"><text:p>' + cell.toPrecision(2) + '</text:p></table:table-cell>';
+        result += '<table:table-cell office:value-type="float" office:value="' +
+                  cell + '"><text:p>' + cell.toPrecision(2) +
+                  '</text:p></table:table-cell>';
       } else {
-        result += '<table:table-cell office:value-type="string"><text:p>' + escapeXml(cell) + '</text:p></table:table-cell>';
+        result += '<table:table-cell office:value-type="string"><text:p>' +
+                  escapeXml(cell) + '</text:p></table:table-cell>';
       }
     }
     result += '</table:table-row>\n';
@@ -89,23 +98,19 @@ export default {
     students: Array,
     assignments: Array,
   },
-  data: function() {
-    return {
-    };
-  },
+  data: function() { return {};},
   methods: {
     score: function(student, assignment) {
       let score = student.progress[assignment.alias] || '0';
       return parseFloat(score);
     },
     studentProgressUrl: function(student) {
-      return '/course/' + this.course.alias + '/student/' + student.username + '/';
+      return '/course/' + this.course.alias + '/student/' + student.username +
+             '/';
     },
   },
   computed: {
-    courseUrl: function() {
-      return '/course/' + this.course.alias + '/';
-    },
+    courseUrl: function() { return '/course/' + this.course.alias + '/';},
     progressTable: function() {
       let table = [];
       let header = [this.T.profileUsername, this.T.wordsName];
@@ -122,17 +127,13 @@ export default {
       }
       return table;
     },
-    csvFilename: function() {
-      return this.course.alias + '.csv';
-    },
+    csvFilename: function() { return this.course.alias + '.csv';},
     csvDataUrl: function() {
       let table = this.progressTable;
-      let blob = new Blob([toCsv(table)], { type: 'text/csv;charset=utf-8;' });
+      let blob = new Blob([toCsv(table)], {type: 'text/csv;charset=utf-8;'});
       return window.URL.createObjectURL(blob);
     },
-    odsFilename: function() {
-      return this.course.alias + '.ods';
-    },
+    odsFilename: function() { return this.course.alias + '.ods';},
   },
   asyncComputed: {
     async odsDataUrl() {
@@ -178,7 +179,8 @@ export default {
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     office:version="1.2">
   <office:body>
-    <office:spreadsheet>` + toOds(this.course.name, table) + `</office:spreadsheet>
+    <office:spreadsheet>` + toOds(this.course.name, table) +
+                                  `</office:spreadsheet>
   </office:body>
 </office:document-content>`);
       return window.URL.createObjectURL(await zip.generateAsync({
@@ -189,6 +191,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <style>
