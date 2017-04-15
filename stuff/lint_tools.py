@@ -57,21 +57,21 @@ def lint_javascript(filename, contents):
 def lint_html(contents):
   '''Runs tidy on |contents|.'''
 
-  contents = ('<!DOCTYPE html>\n<html>\n<head>\n  <title></title>\n'
-              '</head><body>\n%s\n</body>\n</html>') % contents
+  contents = (b'<!DOCTYPE html>\n<html>\n<head>\n  <title></title>\n'
+              b'</head><body>\n' + contents + b'\n</body>\n</html>')
 
   args = [_TIDY_PATH, '-q', '-config',
       os.path.join(git_tools.OMEGAUP_ROOT, 'stuff/tidy.txt')]
   p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-      stderr=subprocess.PIPE, universal_newlines=True)
+      stderr=subprocess.PIPE)
 
   new_contents, stderr = p.communicate(contents)
   retcode = p.wait()
 
   if retcode in (0, 1):
     # |retcode| == 1 means that there were warnings.
-    lines = new_contents.split('\n')
-    return '\n'.join(line.rstrip() for line in lines[8:-3])
+    lines = new_contents.split(b'\n')
+    return b'\n'.join(line.rstrip() for line in lines[8:-3])
 
   raise subprocess.CalledProcessError(retcode, cmd, output=stderr)
 

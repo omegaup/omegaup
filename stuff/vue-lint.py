@@ -70,34 +70,29 @@ def run_linter(args, files, validate_only):
 
     new_sections = []
     for tag, starttag, section_contents in sections:
-      if tag == 'script':
-        try:
+      try:
+        if tag == 'script':
           new_section_contents = lint_tools.lint_javascript(filename + '.js',
                                                             section_contents.encode('utf-8'))
-          new_sections.append('%s\n%s\n</%s>' % (starttag, new_section_contents.decode('utf-8'), tag))
-        except subprocess.CalledProcessError as e:
-          print('File %s%s%s lint failed:\n%s' % (COLORS.FAIL,
-            filename, COLORS.NORMAL, str(b'\n'.join(e.output.split(b'\n')[1:]),
-              encoding='utf-8')), file=sys.stderr)
-          validation_passed = False
-          break
-      elif tag == 'template':
-        try:
-          new_section_contents = lint_tools.lint_html(section_contents)
-          new_sections.append('%s\n%s\n</%s>' % (starttag, new_section_contents, tag))
-        except subprocess.CalledProcessError as e:
-          print('File %s%s%s lint failed' % (COLORS.FAIL, filename,
-                                                  COLORS.NORMAL),
-                file=sys.stderr)
-          validation_passed = False
-          break
-      else:
-        new_sections.append('%s\n%s\n</%s>' % (starttag, section_contents, tag))
+          new_sections.append('%s\n%s\n</%s>' % (starttag,
+            new_section_contents.decode('utf-8'), tag))
+        elif tag == 'template':
+          new_section_contents = lint_tools.lint_html(section_contents.encode('utf-8'))
+          new_sections.append('%s\n%s\n</%s>' % (starttag,
+            new_section_contents.decode('utf-8'), tag))
+        else:
+          new_sections.append('%s\n%s\n</%s>' % (starttag, section_contents, tag))
+      except subprocess.CalledProcessError as e:
+        print('File %s%s%s lint failed:\n%s' % (COLORS.FAIL,
+          filename, COLORS.NORMAL, str(b'\n'.join(e.output.split(b'\n')[1:]),
+            encoding='utf-8')), file=sys.stderr)
+        validation_passed = False
+        break
 
     if len(new_sections) != len(sections):
       continue
 
-    new_contents = ('\n\n'.join(new_sections)).encode('utf-8')
+    new_contents = ('\n\n'.join(new_sections)).encode('utf-8') + b'\n'
     if contents != new_contents:
       validation_passed = False
       if validate_only:
