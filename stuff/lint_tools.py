@@ -60,13 +60,19 @@ def lint_html(contents):
   contents = ('<!DOCTYPE html>\n<html>\n<head>\n  <title></title>\n'
               '</head><body>\n%s\n</body>\n</html>') % contents
 
-  new_contents = subprocess.check_output([_TIDY_PATH, '-q', '-config',
-                                          os.path.join(git_tools.OMEGAUP_ROOT,
-                                                       'stuff/tidy.txt')],
-                                          input=contents,
-                                          universal_newlines=True).strip()
-  lines = new_contents.split('\n')
-  return '\n'.join(lines[8:-2])
+  args = [_TIDY_PATH, '-q', '-config',
+      os.path.join(git_tools.OMEGAUP_ROOT, 'stuff/tidy.txt')]
+  p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE, universal_newlines=True)
 
+  new_contents, stderr = p.communicate(contents)
+  retcode = p.wait()
+
+  if retcode in (0, 1):
+    # |retcode| == 1 means that there were warnings.
+    lines = new_contents.split('\n')
+    return '\n'.join(line.rstrip() for line in lines[8:-3])
+
+  raise subprocess.CalledProcessError(retcode, cmd, output=stderr)
 
 # vim: expandtab shiftwidth=2 tabstop=2
