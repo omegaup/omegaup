@@ -1,5 +1,7 @@
 <template>
-  <input class="form-control" type="text" size="16" />
+  <input class="form-control"
+        size="16"
+        type="text">
 </template>
 
 <script>
@@ -11,15 +13,10 @@ export default {
       'default': 'mm/dd/yyyy',
     },
   },
-  data: function() {
-    return {
-    };
-  },
+  data: function() { return {};},
   watch: {
-    value: function(val) {
-      $(this.$el)
-          .datepicker('setValue', val);
-    },
+    value: function(val) { $(this.$el)
+                               .datepicker('setValue', val);},
   },
   mounted: function() {
     var self = this;
@@ -28,9 +25,7 @@ export default {
           weekStart: 1,
           format: self.format,
         })
-        .on('changeDate', function(ev) {
-          self.$emit('input', ev.date);
-        })
+        .on('changeDate', function(ev) { self.$emit('input', ev.date); })
         .datepicker('setValue', self.value);
   },
 };

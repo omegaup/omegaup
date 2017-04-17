@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 
+OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 GIT_DIFF_TREE_PATTERN = re.compile(
     br'^:\d+ (\d+) [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
 GIT_LS_TREE_PATTERN = re.compile(br'^\d* blob [0-9a-f]+\t(.*)$')

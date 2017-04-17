@@ -6,32 +6,48 @@
     <div class="panel-body">
       <form>
         <select v-model="selectedStudent">
-          <option v-for="student in students" v-bind:value="student">
+          <option v-bind:value="student"
+                  v-for="student in students">
             {{ student.name || student.username }}
           </option>
         </select>
       </form>
-      <hr />
+      <hr>
       <form>
         <select v-model="selectedAssignment">
-          <option v-for="assignment in assignments" v-bind:value="assignment">
+          <option v-bind:value="assignment"
+                  v-for="assignment in assignments">
             {{ assignment.name }}
           </option>
         </select>
       </form>
       <div v-if="selectedAssignment">
-        <p class="assignment-description" v-text="selectedAssignment.description"></p>
-        <hr />
+        <p class="assignment-description"
+           v-text="selectedAssignment.description"></p>
+        <hr>
         <div>
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" v-bind:class="{ active: problem == selectedProblem }" v-for="problem in problems">
-              <a href="#home" aria-controls="home" role="tab" data-toggle="tab" v-on:click="selectedProblem = problem"><template v-if="problem.runs.length > 0">{{ bestScore(problem) * problem.points }} / {{ problem.points }} - </template>{{ problem.title }} ({{ problem.runs.length }})</a>
+          <ul class="nav nav-tabs"
+              role="tablist">
+            <li role="presentation"
+                v-bind:class="{ active: problem == selectedProblem }"
+                v-for="problem in problems">
+              <a aria-controls="home"
+                  data-toggle="tab"
+                  href="#home"
+                  role="tab"
+                  v-on:click="selectedProblem = problem">
+              <template v-if="problem.runs.length &gt; 0">
+                {{ bestScore(problem) * problem.points }} / {{ problem.points }} -
+              </template>{{ problem.title }} ({{ problem.runs.length }})</a>
             </li>
           </ul>
           <div v-if="!selectedProblem || selectedProblem.runs.length == 0">
-            <div class="empty-category">{{ T.courseAssignmentProblemRunsEmpty }}</div>
+            <div class="empty-category">
+              {{ T.courseAssignmentProblemRunsEmpty }}
+            </div>
           </div>
-          <div class="panel" v-else>
+          <div class="panel"
+               v-else="">
             <div class="panel-header">
               <pre>{{ bestRunSource(selectedProblem) }}</pre>
             </div>
@@ -54,8 +70,8 @@
           </div>
         </div>
       </div>
-    </div> <!-- panel-body -->
-  </div> <!-- panel -->
+    </div><!-- panel-body -->
+  </div><!-- panel -->
 </template>
 
 <script>
@@ -81,8 +97,7 @@ export default {
     bestRun: function(problem) {
       var best = null;
       for (let run of problem.runs) {
-        if (!best ||
-            best.score < run.score ||
+        if (!best || best.score < run.score ||
             best.score == run.score && best.penalty > run.penalty) {
           best = run;
         }
@@ -97,23 +112,20 @@ export default {
       let best = this.bestRun(problem);
       return (best && best.score) || 0.0;
     },
-    formatDateTime: function(date) {
-      return UI.formatDateTime(date);
-    },
+    formatDateTime: function(date) { return UI.formatDateTime(date);},
     score: function(student, assignment) {
       let score = student.progress[assignment.alias] || '0';
       return parseFloat(score).toPrecision(2);
     },
   },
   computed: {
-    courseUrl: function() {
-      return '/course/' + this.course.alias + '/';
-    },
+    courseUrl: function() { return '/course/' + this.course.alias + '/';},
   },
   mounted: function() {
     let self = this;
     window.addEventListener('popstate', function(ev) {
-      self.selectedStudent = (ev.state && ev.state.student) || self.initialStudent;
+      self.selectedStudent =
+          (ev.state && ev.state.student) || self.initialStudent;
     });
   },
   watch: {
@@ -122,11 +134,9 @@ export default {
       if (student && oldStudent && student.username == oldStudent.username) {
         return;
       }
-      window.history.pushState(
-        {student: student},
-        document.title,
-        '/course/' + this.course.alias + '/student/' + student.username + '/'
-      );
+      window.history.pushState({student: student}, document.title,
+                               '/course/' + this.course.alias + '/student/' +
+                                   student.username + '/');
     },
     selectedAssignment: function(assignment) {
       this.$emit('update', this.selectedStudent, this.selectedAssignment);

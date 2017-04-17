@@ -1,77 +1,82 @@
 <template>
-  <div v-show="show" class="omegaup-course-assignmentdetails panel">
+  <div class="omegaup-course-assignmentdetails panel"
+       v-show="show">
     <div class="panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form"
+            v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-8">
-            <label>
-              {{ T.wordsTitle }}
-              <input v-model="name" type="text" size="30" class="form-control">
-            </label>
+            <label>{{ T.wordsTitle }} <input class="form-control"
+                   size="30"
+                   type="text"
+                   v-model="name"></label>
           </div>
-
           <div class="form-group col-md-4">
-            <label>
-              {{ T.courseNewFormShortTitle_alias_ }}
-              <span data-toggle="tooltip" data-placement="top"
-                  v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"
-                  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <input v-model="alias" type="text" class="form-control"
-                  v-bind:disabled="update">
-            </label>
+            <label>{{ T.courseNewFormShortTitle_alias_ }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"></span>
+                  <input class="form-control"
+                   type="text"
+                   v-bind:disabled="update"
+                   v-model="alias"></label>
           </div>
         </div>
-
         <div class="row">
           <div class="form-group col-md-4">
-            <label>{{ T.courseNewFormStartDate }}
-              <span data-toggle="tooltip" data-placement="top"
-                  v-bind:title="T.courseAssignmentNewFormStartDateDesc"
-                  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <omegaup-datetimepicker v-model="startTime"></omegaup-datetimepicker>
-            </label>
+            <label>{{ T.courseNewFormStartDate }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseAssignmentNewFormStartDateDesc"></span>
+                  <omegaup-datetimepicker v-model="startTime"></omegaup-datetimepicker></label>
           </div>
-
           <div class="form-group col-md-4">
-            <label>{{ T.courseNewFormEndDate }}
-              <span data-toggle="tooltip" data-placement="top"
-                  v-bind:title="T.courseAssignmentNewFormEndDateDesc"
-                  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <omegaup-datetimepicker v-model="finishTime"></omegaup-datetimepicker>
-            </label>
+            <label>{{ T.courseNewFormEndDate }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseAssignmentNewFormEndDateDesc"></span>
+                  <omegaup-datetimepicker v-model="finishTime"></omegaup-datetimepicker></label>
           </div>
-
           <div class="form-group col-md-4">
-            <label>
-              {{ T.courseAssignmentNewFormType }}
-              <span data-toggle="tooltip" data-placement="top"
-                  v-bind:title="T.courseAssignmentNewFormTypeDesc"
-                  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              <select class="form-control" v-model="assignmentType">
-                <option value="homework">{{ T.wordsHomework }}</option>
-                <option value="test">{{ T.wordsTest }}</option>
-              </select>
-            </label>
+            <label>{{ T.courseAssignmentNewFormType }} <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseAssignmentNewFormTypeDesc"></span> <select class=
+                  "form-control"
+                    v-model="assignmentType">
+              <option value="homework">
+                {{ T.wordsHomework }}
+              </option>
+              <option value="test">
+                {{ T.wordsTest }}
+              </option>
+            </select></label>
           </div>
         </div>
-
         <div class="row">
           <div class="form-group container">
-            <label>
-              {{ T.courseNewFormDescription }}</label>
-              <textarea cols="30" rows="5" class="form-control" v-model="description"></textarea>
-            </label>
+            <label>{{ T.courseNewFormDescription }}
+            <textarea class="form-control"
+                      cols="30"
+                      rows="5"
+                      v-model="description"></textarea></label>
           </div>
         </div>
-
         <div class="form-group pull-right">
-          <button type="submit" class="btn btn-primary">
-            <template v-if="update">{{ T.courseAssignmentNewFormUpdate }}</template>
-            <template v-else>{{ T.courseAssignmentNewFormSchedule }}</template>
-          </button>
-          <button v-on:click.prevent="onCancel" type="reset" class="btn btn-secondary">
-            {{ T.wordsCancel }}
-          </button>
+          <button class="btn btn-primary"
+               type="submit">
+          <template v-if="update">
+            {{ T.courseAssignmentNewFormUpdate }}
+          </template>
+          <template v-else="">
+            {{ T.courseAssignmentNewFormSchedule }}
+          </template></button> <button class="btn btn-secondary"
+               type="reset"
+               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
         </div>
       </form>
     </div>
@@ -102,9 +107,7 @@ export default {
     };
   },
   watch: {
-    assignment: function(val) {
-      this.reset();
-    },
+    assignment: function(val) { this.reset();},
   },
   methods: {
     reset: function() {
@@ -115,9 +118,7 @@ export default {
       this.name = this.assignment.name;
       this.startTime = this.assignment.start_time || new Date();
     },
-    onSubmit: function() {
-      this.$emit('submit', this);
-    },
+    onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
       this.reset();
       this.$emit('cancel');
