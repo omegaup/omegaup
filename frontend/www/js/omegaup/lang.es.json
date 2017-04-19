@@ -449,7 +449,7 @@
 	"problemEditSlowWarning": "<strong>Advertencia</strong>: Este problema ser\u00e1 evaluado en la cola lenta porque en caso de enviar un TLE puede tardar m\u00e1s de 30s en terminar (n\u00famero de casos * tiempo l\u00edmite en segundos redondeado hacia arriba). Los problemas en la cola lenta pueden tardar varios minutos en ser evaluados, para evitar volver m\u00e1s lento el resto de la plataforma. Si quieres que este problema no est\u00e9 en la cola lenta, elimina casos o reduce el tiempo l\u00edmite.",
 	"problemEditStackLimit": "L\u00edmite de pila (bytes)",
 	"problemExists": "Otro problema ya usa ese nombre. Elige otro nombre.",
-	"problemIsNotPublic": "El problema no es publico",
+	"problemIsNotPublic": "El problema no es p\u00fablico y est\u00e1 siendo usado en al menos un concurso activo.",
 	"problemIsPrivate": "El problema es privado",
 	"problemLevelEasy": "F\u00e1cil",
 	"problemLevelHard": "Dif\u00edcil",
