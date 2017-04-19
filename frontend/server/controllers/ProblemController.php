@@ -1007,7 +1007,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
             throw new ForbiddenAccessException();
         }
     }
