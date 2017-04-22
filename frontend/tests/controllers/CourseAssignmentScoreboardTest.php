@@ -30,14 +30,19 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
             $problemAssignmentsMap[$courseData['assignment_alias']][] = $problemData;
         }
 
-        // Create & add students to course
+        // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
             $students[] = CoursesFactory::addStudentToCourse($courseData);
         }
 
         // Generate runs
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse($courseData, $students, [$courseData['assignment_alias']], $problemAssignmentsMap);
+        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+            $courseData,
+            $students,
+            [$courseData['assignment_alias']],
+            $problemAssignmentsMap
+        );
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
@@ -48,7 +53,13 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         ]));
 
         // Validation
-        array_multisort(array_values($expectedScores), SORT_DESC, array_keys($expectedScores), SORT_ASC, $expectedScores);
+        array_multisort(
+            array_values($expectedScores),
+            SORT_DESC,
+            array_keys($expectedScores),
+            SORT_ASC,
+            $expectedScores
+        );
         $expectedPlace = 0;
         $lastScore = 0;
         $i = 0;
@@ -58,7 +69,11 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
                 $lastScore = $score;
             }
 
-            $this->assertEquals($username, $response['ranking'][$i]['username'], 'Scoreboard is not properly sorted by contest score.');
+            $this->assertEquals(
+                $username,
+                $response['ranking'][$i]['username'],
+                'Scoreboard is not properly sorted by contest score.'
+            );
             $this->assertEquals($expectedPlace, $response['ranking'][$i]['place']);
             $i++;
         }

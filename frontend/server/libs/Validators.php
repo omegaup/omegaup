@@ -256,6 +256,27 @@ class Validators {
     }
 
     /**
+     * Checks if array contains a key defined by $parameter
+     * @param  string  $parameter
+     * @param  array   $array
+     * @param  boolean $required
+     * @param    $default
+     * @return boolean
+     * @throws InvalidParameterException
+     */
+    public static function isInArray($parameter, array& $array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
+            if ($required) {
+                throw new InvalidParameterException('parameterEmpty', $parameter);
+            }
+
+            $array[$parameter] = $default;
+        }
+
+        return true;
+    }
+
+    /**
      *
      * @param type $parameter
      * @param type $parameterName

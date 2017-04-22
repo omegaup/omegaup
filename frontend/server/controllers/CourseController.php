@@ -1045,16 +1045,16 @@ class CourseController extends Controller {
         }
 
         $scoreboard = new Scoreboard(
-            new ScoreboardParams(
-                $r['assignment']->alias,
-                $r['assignment']->name,
-                $r['assignment']->problemset_id,
-                $r['assignment']->start_time,
-                $r['assignment']->finish_time,
-                $r['assignment']->acl_id,
-                $r['course']->group_id
-            ),
-            true /*showAllRuns*/
+            new ScoreboardParams([
+                'alias' => $r['assignment']->alias,
+                'title' => $r['assignment']->name,
+                'problemset_id' => $r['assignment']->problemset_id,
+                'start_time' => $r['assignment']->start_time,
+                'finish_time' => $r['assignment']->finish_time,
+                'acl_id' => $r['assignment']->acl_id,
+                'group_id' => $r['course']->group_id,
+                'show_all_runs' => true
+            ])
         );
 
         return $scoreboard->generate();

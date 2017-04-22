@@ -135,7 +135,12 @@ class CoursesFactory {
         return $responses;
     }
 
-    public static function submitRunsToAssignmentsInCourse($courseData, array $students, array $assignmentAliases, array $problemAssignmentsMap) {
+    public static function submitRunsToAssignmentsInCourse(
+        $courseData,
+        array $students,
+        array $assignmentAliases,
+        array $problemAssignmentsMap
+    ) {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {

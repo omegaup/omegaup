@@ -102,7 +102,12 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         // Submit runs - Simulate each student submitting runs to some problems and some others not.
         // Also, sometimes only PAs are sent, other times ACs.
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse($courseData, $students, $courseData['assignment_aliases'], $problemAssignmentsMap);
+        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+            $courseData,
+            $students,
+            $courseData['assignment_aliases'],
+            $problemAssignmentsMap
+        );
 
         // Adding a new student with no runs. Should show in progress
         $studentWithNoRuns = CoursesFactory::addStudentToCourse($courseData);
