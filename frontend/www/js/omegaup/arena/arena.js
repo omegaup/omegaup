@@ -1176,7 +1176,7 @@ export class Arena {
 
   computeProblemsetArg() {
     var self = this;
-    if (self.options.isPractice || self.options.isOnlyProblem) {
+    if (self.options.isOnlyProblem) {
       return {};
     }
     if (self.options.contestAlias) {
@@ -1187,7 +1187,7 @@ export class Arena {
 
   submitRun(code) {
     var self = this;
-    var problemset = self.computeProblemsetArg();
+    var problemset = self.options.isPractice ? {} : self.computeProblemsetArg();
     var lang = self.elements.submitForm.language.val();
 
     $('input', self.elements.submitForm).attr('disabled', 'disabled');
