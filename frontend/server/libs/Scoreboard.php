@@ -1,28 +1,28 @@
 <?php
 
-/*
- * Scoreboard
+/**
+ * ScoreboardParams
  *
+ * @author joemmanuel
  */
-
 class ScoreboardParams implements ArrayAccess {
     public $params;
 
     public function __construct(array $params) {
-        Validators::isInArray('alias', $params, true /*is_required*/);
-        Validators::isInArray('title', $params, true /*is_required*/);
-        Validators::isInArray('problemset_id', $params, true /*is_required*/);
-        Validators::isInArray('start_time', $params, true /*is_required*/);
-        Validators::isInArray('finish_time', $params, true /*is_required*/);
-        Validators::isInArray('acl_id', $params, true /*is_required*/);
-        Validators::isInArray('group_id', $params, false /*is_required*/, null);
-        Validators::isInArray('penalty', $params, false /*is_required*/, 0);
-        Validators::isInArray('penalty_calc_policy', $params, false /*is_required*/, 'sum');
-        Validators::isInArray('show_scoreboard_after', $params, false /*is_required*/, 1);
-        Validators::isInArray('scoreboard_pct', $params, false /*is_required*/, 100);
-        Validators::isInArray('show_all_runs', $params, false /*is_required*/, false);
-        Validators::isInArray('auth_token', $params, false /*is_required*/, null);
-        Validators::isInArray('only_ac', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('title', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('problemset_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('start_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('finish_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('acl_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('group_id', $params, false /*is_required*/, null);
+        ScoreboardParams::validateParameter('penalty', $params, false /*is_required*/, 0);
+        ScoreboardParams::validateParameter('penalty_calc_policy', $params, false /*is_required*/, 'sum');
+        ScoreboardParams::validateParameter('show_scoreboard_after', $params, false /*is_required*/, 1);
+        ScoreboardParams::validateParameter('scoreboard_pct', $params, false /*is_required*/, 100);
+        ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
+        ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
 
         $params['start_time'] = strtotime($params['start_time']);
         $params['finish_time'] = strtotime($params['finish_time']);
@@ -49,8 +49,37 @@ class ScoreboardParams implements ArrayAccess {
     public function offsetUnset($offset) {
         unset($this->params[$offset]);
     }
+
+    /**
+     * Checks if array contains a key defined by $parameter
+     * @param  string  $parameter
+     * @param  array   $array
+     * @param  boolean $required
+     * @param    $default
+     * @return boolean
+     * @throws InvalidParameterException
+     */
+    public static function validateParameter($parameter, array& $array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
+            if ($required) {
+                throw new InvalidParameterException('parameterEmpty', $parameter);
+            }
+
+            $array[$parameter] = $default;
+        }
+
+        return true;
+    }
 }
 
+/**
+ *  Scoreboard
+ *
+ * @author alanboy
+ * @author pablo.aguilar
+ * @author lhchavez
+ * @author joemmanuel
+ */
 class Scoreboard {
     // Column to return total score per user
     const TOTAL_COLUMN = 'total';
