@@ -1,44 +1,112 @@
 <?php
 
-/*
- * Scoreboard
+/**
+ * ScoreboardParams
  *
+ * @author joemmanuel
  */
+class ScoreboardParams implements ArrayAccess {
+    private $params;
 
+    public function __construct(array $params) {
+        ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('title', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('problemset_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('start_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('finish_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('acl_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter('group_id', $params, false /*is_required*/, null);
+        ScoreboardParams::validateParameter('penalty', $params, false /*is_required*/, 0);
+        ScoreboardParams::validateParameter('penalty_calc_policy', $params, false /*is_required*/, 'sum');
+        ScoreboardParams::validateParameter('show_scoreboard_after', $params, false /*is_required*/, 1);
+        ScoreboardParams::validateParameter('scoreboard_pct', $params, false /*is_required*/, 100);
+        ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
+        ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
+
+        $params['start_time'] = strtotime($params['start_time']);
+        $params['finish_time'] = strtotime($params['finish_time']);
+
+        $this->params = $params;
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->params[$offset]) ? $this->params[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->params[] = $value;
+        } else {
+            $this->params[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->params[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->params[$offset]);
+    }
+
+    /**
+     * Checks if array contains a key defined by $parameter
+     * @param  string  $parameter
+     * @param  array   $array
+     * @param  boolean $required
+     * @param    $default
+     * @return boolean
+     * @throws InvalidParameterException
+     */
+    public static function validateParameter($parameter, array& $array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
+            if ($required) {
+                throw new InvalidParameterException('parameterEmpty', $parameter);
+            }
+
+            $array[$parameter] = $default;
+        }
+
+        return true;
+    }
+}
+
+/**
+ *  Scoreboard
+ *
+ * @author alanboy
+ * @author pablo.aguilar
+ * @author lhchavez
+ * @author joemmanuel
+ */
 class Scoreboard {
     // Column to return total score per user
     const TOTAL_COLUMN = 'total';
 
-    // Contest's data
-    private $contest;
-    private $showAllRuns;
-    private $auth_token;
-    private $onlyAC;
+    private $params;
     public $log;
 
-    public function __construct(Contests $contest, $showAllRuns = false, $auth_token = null, $onlyAC = false) {
-        $this->contest = $contest;
-        $this->showAllRuns = $showAllRuns;
-        $this->auth_token = $auth_token;
+    public function __construct(ScoreboardParams $params) {
+        $this->params = $params;
         $this->log = Logger::getLogger('Scoreboard');
-        $this->onlyAC = $onlyAC;
     }
 
     public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = null) {
         $result = null;
 
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest->contest_id);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest->contest_id);
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->params['problemset_id']);
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->params['problemset_id']);
 
-        $can_use_contestant_cache = !$this->showAllRuns &&
+        $can_use_contestant_cache = !$this->params['show_all_runs'] &&
             !$sortByName &&
             is_null($filterUsersBy) &&
-            !$this->onlyAC;
+            !$this->params['only_ac'];
 
-        $can_use_admin_cache = $this->showAllRuns &&
+        $can_use_admin_cache = $this->params['show_all_runs'] &&
             !$sortByName &&
             is_null($filterUsersBy) &&
-            !$this->onlyAC;
+            !$this->params['only_ac'];
 
         // If cache is turned on and we're not looking for admin-only runs
         if ($can_use_contestant_cache) {
@@ -51,19 +119,21 @@ class Scoreboard {
             try {
                 // Get all distinct contestants participating in the given contest
                 $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                    $this->contest,
+                    $this->params['problemset_id'],
+                    $this->params['acl_id'],
                     true /* show all runs */,
-                    $filterUsersBy
+                    $filterUsersBy,
+                    $this->params['group_id']
                 );
 
                 // Get all problems given problemset
-                $problemset = ProblemsetsDAO::getByPK($this->contest->problemset_id);
+                $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
                 $raw_problemset_problems =
                     ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
                 $contest_runs = RunsDAO::getProblemsetRuns(
                     $problemset,
-                    $this->onlyAC
+                    $this->params['only_ac']
                 );
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
@@ -79,23 +149,25 @@ class Scoreboard {
                 ];
             }
 
-            $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->contest, $this->showAllRuns);
+            $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->params);
 
             $result = Scoreboard::getScoreboardFromRuns(
                 $contest_runs,
                 $raw_contest_users,
                 $problem_mapping,
-                $this->contest->penalty,
-                $this->contest->penalty_calc_policy,
+                $this->params['penalty'],
+                $this->params['penalty_calc_policy'],
                 $scoreboardLimit,
-                $this->contest,
-                $this->showAllRuns,
+                $this->params['title'],
+                $this->params['start_time'],
+                $this->params['finish_time'],
+                $this->params['show_all_runs'],
                 $sortByName,
                 $withRunDetails,
-                $this->auth_token
+                $this->params['auth_token']
             );
 
-            $timeout = max(0, strtotime($this->contest->finish_time) - time());
+            $timeout = max(0, $this->params['finish_time'] - time());
             if ($can_use_contestant_cache) {
                 $contestantScoreboardCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -112,8 +184,8 @@ class Scoreboard {
         $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
         $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
 
-        $can_use_contestant_cache = !$this->showAllRuns;
-        $can_use_admin_cache = $this->showAllRuns;
+        $can_use_contestant_cache = !$this->params['show_all_runs'];
+        $can_use_admin_cache = $this->params['show_all_runs'];
 
         // If cache is turned on and we're not looking for admin-only runs
         if ($can_use_contestant_cache) {
@@ -126,8 +198,9 @@ class Scoreboard {
             try {
                 // Get all distinct contestants participating in the given contest
                 $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                    $this->contest,
-                    $this->showAllRuns
+                    $this->contest->problemset_id,
+                    $this->contest->acl_id,
+                    $this->params['show_all_runs']
                 );
 
                 // Get all problems given problemset
@@ -155,7 +228,7 @@ class Scoreboard {
                 $contest_runs,
                 $raw_contest_users,
                 $problem_mapping,
-                $this->showAllRuns
+                $this->params['show_all_runs']
             );
 
             $timeout = max(0, strtotime($this->contest->finish_time) - time());
@@ -195,7 +268,8 @@ class Scoreboard {
 
             // Get all distinct contestants participating in the contest
             $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                $contest,
+                $contest->problemset_id,
+                $contest->acl_id,
                 true /* show all runs */,
                 null
             );
@@ -230,7 +304,9 @@ class Scoreboard {
             $contest->penalty,
             $contest->penalty_calc_policy,
             $scoreboardLimit,
-            $contest,
+            $contest->title,
+            $contest->start_time,
+            $contest->finish_time,
             false, /* showAllRuns */
             false  /* sortByName */
         );
@@ -244,7 +320,9 @@ class Scoreboard {
             $contest->penalty,
             $contest->penalty_calc_policy,
             $scoreboardLimit,
-            $contest,
+            $contest->title,
+            $contest->start_time,
+            $contest->finish_time,
             true, /* showAllRuns */
             false /* sortByName */
         );
@@ -305,19 +383,18 @@ class Scoreboard {
     }
 
     private static function getScoreboardTimeLimitUnixTimestamp(
-        Contests $contest,
-        $showAllRuns = false
+        ScoreboardParams $params
     ) {
-        if ($showAllRuns || (ContestsDAO::hasFinished($contest) && $contest->show_scoreboard_after)) {
+        if ($params['show_all_runs'] || ((time() >= $params['finish_time']) && $params['show_scoreboard_after'])) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
             return null;
         }
 
-        $start = strtotime($contest->start_time);
-        $finish = strtotime($contest->finish_time);
+        $start = $params['start_time'];
+        $finish = $params['finish_time'];
 
-        $percentage = (double)$contest->scoreboard / 100.0;
+        $percentage = (double)$params['scoreboard_pct'] / 100.0;
 
         $limit = $start + (int) (($finish - $start) * $percentage);
 
@@ -350,7 +427,9 @@ class Scoreboard {
         $contest_penalty,
         $contest_penalty_calc_policy,
         $scoreboard_time_limit,
-        $contest,
+        $contest_title,
+        $contest_start_time,
+        $contest_finish_time,
         $showAllRuns,
         $sortByName,
         $withRunDetails = false,
@@ -470,9 +549,9 @@ class Scoreboard {
             'status' => 'ok',
             'problems' => $problems,
             'ranking' => $result,
-            'start_time' => strtotime($contest->start_time),
-            'finish_time' => strtotime($contest->finish_time),
-            'title' => $contest->title,
+            'start_time' => strtotime($contest_start_time),
+            'finish_time' => strtotime($contest_finish_time),
+            'title' => $contest_title,
             'time' => time() * 1000
         ];
     }
@@ -547,9 +626,7 @@ class Scoreboard {
         }
 
         $result = [];
-
         $user_problems_score = [];
-
         $contestStart = strtotime($contest->start_time);
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $showAllRuns);
 

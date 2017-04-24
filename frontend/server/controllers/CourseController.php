@@ -10,6 +10,42 @@
  */
 class CourseController extends Controller {
     /**
+     * Validate course_alias exists and set into $r['course']
+     *
+     * @param  Request $r
+     * @return array
+     */
+    private static function validateCourseAlias(Request $r) {
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+    }
+
+    /**
+     * Validate assignment_alias existis into the course and set into $r['assignment']
+     *
+     * @param  Request $r
+     * @return array
+     */
+    private static function validateCourseAssignmentAlias(Request $r) {
+        try {
+            $r['assignment'] = CoursesDAO::getAssignmentByAlias($r['course'], $r['assignment_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['assignment'])) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+    }
+
+    /**
      * Validates request for creating a new Assignment
      *
      * @throws InvalidDatabaseOperationException
@@ -30,14 +66,7 @@ class CourseController extends Controller {
         Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
 
-        try {
-            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['course'])) {
-            throw new NotFoundException('courseNotFound');
-        }
+        self::validateCourseAlias($r);
     }
 
     /**
@@ -64,14 +93,8 @@ class CourseController extends Controller {
         $start_time = null;
         $finish_time = null;
         if ($is_update) {
-            try {
-                $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-            if (is_null($r['course'])) {
-                throw new NotFoundException('courseNotFound');
-            }
+            self::validateCourseAlias($r);
+
             $r['course']->toUnixTime();
             if (is_null($r['start_time'])) {
                 $r['start_time'] = $r['course']->start_time;
@@ -1013,5 +1036,36 @@ class CourseController extends Controller {
 
         self::$log->info('Course updated (alias): ' . $r['contest_alias']);
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Gets Scoreboard for an assignment
+     *
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiScoreboard(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+        self::validateCourseAssignmentAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $scoreboard = new Scoreboard(
+            new ScoreboardParams([
+                'alias' => $r['assignment']->alias,
+                'title' => $r['assignment']->name,
+                'problemset_id' => $r['assignment']->problemset_id,
+                'start_time' => $r['assignment']->start_time,
+                'finish_time' => $r['assignment']->finish_time,
+                'acl_id' => $r['assignment']->acl_id,
+                'group_id' => $r['course']->group_id,
+                'show_all_runs' => true
+            ])
+        );
+
+        return $scoreboard->generate();
     }
 }
