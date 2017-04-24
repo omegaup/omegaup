@@ -75,7 +75,7 @@ rewrite ^/problem/mine/?$ /problemmine.php last;
 rewrite ^/problem/new/?$ /problemnew.php last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problemedit.php?problem=$1 last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problemstats.php?problem=$1 last;
-rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/profile/?$ /profile.php last;
 rewrite ^/profile/edit/?$ /profileedit.php last;
+rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/rank/?$ /rank.php last;
