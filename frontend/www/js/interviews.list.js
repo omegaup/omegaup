@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   function fillInterviewsTable() {
-    omegaup.API.Inteview.list()
+    omegaup.API.Interview.list()
         .then(function(interviews) {
           var html = '';
           for (var i = interviews.results.length - 1; i >= 0; i--) {

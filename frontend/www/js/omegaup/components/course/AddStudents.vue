@@ -1,29 +1,47 @@
 <template>
   <div class="omegaup-course-addstudent panel">
     <div class="panel-body">
-      <form class="form" v-on:submit.prevent="onAddStudent">
+      <form class="form"
+            v-on:submit.prevent="onAddStudent">
         <div class="form-group">
-          <label for="member-username">{{ T.wordsStudent }}</label>
-          <span data-toggle="tooltip" data-placement="top" v-bind:title="T.courseEditAddStudentsTooltip"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-          <input id="student-username" v-model="studentUsername" type="text" size="20" class="form-control" autocomplete="off" />
+          <label for="member-username">{{ T.wordsStudent }}</label> <span aria-hidden="true"
+               class="glyphicon glyphicon-info-sign"
+               data-placement="top"
+               data-toggle="tooltip"
+               v-bind:title="T.courseEditAddStudentsTooltip"></span> <input autocomplete="off"
+               class="form-control typeahead"
+               size="20"
+               type="text">
         </div>
         <div class="form-group pull-right">
-          <button class="btn btn-primary" type="submit">{{ T.wordsAddStudent }}</button>
-          <button v-on:click.prevent="onCancel" class="btn btn-secondary" type="reset">{{ T.wordsCancel }}</button>
+          <button class="btn btn-primary"
+               type="submit">{{ T.wordsAddStudent }}</button> <button class="btn btn-secondary"
+               type="reset"
+               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
         </div>
       </form>
       <div v-if="students.length == 0">
-        <div class="empty-category">{{ T.courseStudentsEmpty }}</div>
+        <div class="empty-category">
+          {{ T.courseStudentsEmpty }}
+        </div>
       </div>
-      <table class="table table-striped table-over" v-else>
+      <table class="table table-striped table-over"
+             v-else="">
         <thead>
-          <th>{{ T.wordsUser }}</th>
-          <th class="align-right">{{ T.contestEditRegisteredAdminDelete }}</th>
+          <tr>
+            <th>{{ T.wordsUser }}</th>
+            <th class="align-right">{{ T.contestEditRegisteredAdminDelete }}</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="student in students">
-            <td><a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username }}</a></td>
-            <td><button type="button" class="close" v-on:click="onRemove(student)">&times;</button></td>
+            <td>
+              <a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username
+              }}</a>
+            </td>
+            <td><button class="close"
+                    type="button"
+                    v-on:click="onRemove(student)">×</button></td>
           </tr>
         </tbody>
       </table>
@@ -46,23 +64,21 @@ export default {
     };
   },
   mounted: function() {
-    UI.userTypeahead($('input', $(this.$el)));
+    var self = this;
+    UI.userTypeahead($('input.typeahead', $(this.$el)), function(event, item) {
+      self.studentUsername = item.value;
+    });
   },
   methods: {
     onAddStudent: function() {
       this.$emit('add-student', this.studentUsername);
     },
-    onCancel: function() {
-      this.$emit('cancel');
-    },
-    onRemove: function(student) {
-      this.$emit('remove', student);
-    },
-    reset: function() {
-      this.studentUsername = '';
-    },
+    onCancel: function() { this.$emit('cancel');},
+    onRemove: function(student) { this.$emit('remove', student);},
+    reset: function() { this.studentUsername = '';},
     studentProgressUrl: function(student) {
-      return '/course/' + this.courseAlias + '/student/' + student.username + '/';
+      return '/course/' + this.courseAlias + '/student/' + student.username +
+             '/';
     },
   },
 };

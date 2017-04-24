@@ -1912,7 +1912,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($user) && Authorization::canEditProblem($user->user_id, $problem)) {
+                    if (!is_null($user) && Authorization::isProblemAdmin($user->user_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif ($problem->public != '1') {
                         throw new ForbiddenAccessException('problemIsPrivate');
@@ -1923,6 +1923,168 @@ class UserController extends Controller {
         }
 
         return $response;
+    }
+
+    private static function validateAddRemoveRole(Request $r) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Validate request
+        Validators::isValidUsername($r['username'], 'username');
+        try {
+            $r['user'] = UsersDAO::FindByUsername($r['username']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userNotExist');
+        }
+
+        Validators::isStringNonEmpty($r['role'], 'role');
+        $role = RolesDAO::search(new Roles([
+            'name' => $r['role'],
+        ]));
+        if (sizeof($role) != 1) {
+            throw new InvalidParameterException('parameterNotFound', 'role');
+        }
+        $r['role'] = $role[0];
+
+        if ($r['role']->role_id == Authorization::ADMIN_ROLE) {
+            // System-admin role cannot be added/removed from the UI.
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+    }
+
+    /**
+     * Adds the role to the user.
+     *
+     * @param Request $r
+     */
+    public static function apiAddRole(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveRole($r);
+
+        try {
+            UserRolesDAO::save(new UserRoles([
+                'user_id' => $r['user']->user_id,
+                'role_id' => $r['role']->role_id,
+                'acl_id' => Authorization::SYSTEM_ACL,
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Removes the role from the user.
+     *
+     * @param Request $r
+     */
+    public static function apiRemoveRole(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveRole($r);
+
+        try {
+            UserRolesDAO::delete(new UserRoles([
+                'user_id' => $r['user']->user_id,
+                'role_id' => $r['role']->role_id,
+                'acl_id' => Authorization::SYSTEM_ACL,
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    private static function validateAddRemoveExperiment(Request $r) {
+        global $experiments;
+
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Validate request
+        Validators::isValidUsername($r['username'], 'username');
+        try {
+            $r['user'] = UsersDAO::FindByUsername($r['username']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userNotExist');
+        }
+
+        Validators::isStringNonEmpty($r['experiment'], 'experiment');
+        if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
+            throw new InvalidParameterException('parameterNotFound', 'experiment');
+        }
+    }
+
+    /**
+     * Adds the experiment to the user.
+     *
+     * @param Request $r
+     */
+    public static function apiAddExperiment(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveExperiment($r);
+
+        try {
+            UsersExperimentsDAO::save(new UsersExperiments([
+                'user_id' => $r['user']->user_id,
+                'experiment' => $r['experiment'],
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Removes the experiment from the user.
+     *
+     * @param Request $r
+     */
+    public static function apiRemoveExperiment(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveExperiment($r);
+
+        try {
+            UsersExperimentsDAO::delete($r['user']->user_id, $r['experiment']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
     }
 }
 

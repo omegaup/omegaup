@@ -4,12 +4,12 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>omegaUp &mdash; {$title}</title>
 <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
-<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-<link rel="stylesheet" href="/css/reset.css" />
-<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="{version_hash src="/third_party/css/reset.css"}" />
+<link rel="stylesheet" href="{version_hash src="/css/common.css"}" />
 <link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
-<link rel="stylesheet" href="/css/report.css" />
+<link rel="stylesheet" href="{version_hash src="/css/report.css"}" />
 </head>
 <body id="report">
 	<div class="title">

@@ -118,26 +118,23 @@ class UserFactory {
     public static function createAdminUser($username = null, $password = null, $email = null) {
         $user = self::createUser($username, $password, $email);
 
-        $userRoles = new UserRoles([
-            'user_id' => $user->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
-        ]);
-        UserRolesDAO::save($userRoles);
+        self::addSystemRole($user, Authorization::ADMIN_ROLE);
 
         return $user;
     }
 
-    public static function createInterviewerUser() {
-        $user = self::createUser(null, null, null, null, true);
-
-        $ur = new UserRoles([
+    /**
+     * Adds a system role to the user.
+     *
+     * @param Users $user
+     * @param int $role_id
+     */
+    public static function addSystemRole(Users $user, $role_id) {
+        $userRoles = new UserRoles([
             'user_id' => $user->user_id,
-            'role_id' => Authorization::INTERVIEWER_ROLE,
+            'role_id' => $role_id,
             'acl_id' => Authorization::SYSTEM_ACL,
         ]);
-        UserRolesDAO::save($ur);
-
-        return $user;
+        UserRolesDAO::save($userRoles);
     }
 }

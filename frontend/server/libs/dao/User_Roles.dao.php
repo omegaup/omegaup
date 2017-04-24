@@ -69,7 +69,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $admins;
     }
 
-    public static function isAdmin($user_id, $acl_id) {
+    public static function hasRole($user_id, $acl_id, $role_id) {
         $sql = '
             SELECT
                 COUNT(*)
@@ -79,12 +79,16 @@ class UserRolesDAO extends UserRolesDAOBase {
                 ur.user_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
             $user_id,
-            Authorization::ADMIN_ROLE,
+            $role_id,
             Authorization::SYSTEM_ACL,
             $acl_id,
         ];
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
+    }
+
+    public static function isAdmin($user_id, $acl_id) {
+        return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
     }
 
     public static function getContestAdmins(Contests $contest) {
@@ -96,6 +100,29 @@ class UserRolesDAO extends UserRolesDAOBase {
     }
 
     public static function isSystemAdmin($user_id) {
-        return self::isAdmin($user_id, Authorization::SYSTEM_ACL);
+        return self::hasRole($user_id, Authorization::SYSTEM_ACL, Authorization::ADMIN_ROLE);
+    }
+
+    public static function getSystemRoles($user_id) {
+        $sql = '
+            SELECT
+                r.name
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Roles r ON r.role_id = ur.role_id
+            WHERE
+                ur.user_id = ? AND ur.acl_id = ?;';
+        $params = [
+            $user_id,
+            Authorization::SYSTEM_ACL,
+        ];
+        global $conn;
+
+        $roles = [];
+        foreach ($conn->GetAll($sql, $params) as $role) {
+            $roles[] = $role['name'];
+        }
+        return $roles;
     }
 }

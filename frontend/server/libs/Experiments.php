@@ -200,12 +200,20 @@ class Experiments {
     }
 
     /**
+     * Returns an array with all the known experiments.
+     * @return array The array with all the known experiment names.
+     */
+    public function getAllKnownExperiments() {
+        return self::$kKnownExperiments;
+    }
+
+    /**
      * Returns whether an experiment is enabled by a config definition.
      * @param string $name The experiment name.
      * @param array $defines The array with all the user-defined constants.
      * @return boolean True iff the experiment is enabled by config.
      */
-    private function isEnabledByConfig($name, $defines) {
+    public function isEnabledByConfig($name, $defines) {
         return array_key_exists(
             self::EXPERIMENT_PREFIX . strtoupper($name),
             $defines

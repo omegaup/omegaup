@@ -14,6 +14,9 @@ class Authorization {
     // Allowed to submit to a problemset.
     const CONTESTANT_ROLE = 2;
 
+    // Problem reviewer.
+    const REVIEWER_ROLE = 3;
+
     // Interviewer.
     const INTERVIEWER_ROLE = 4;
 
@@ -96,12 +99,17 @@ class Authorization {
                 || Authorization::isAdmin($user_id, $problemset));
     }
 
+    /**
+     * Returns whether the user can edit the problem. Only problem admins and
+     * reviewers can do so.
+     */
     public static function canEditProblem($user_id, Problems $problem) {
         if (is_null($problem) || !is_a($problem, 'Problems')) {
             return false;
         }
 
-        return Authorization::isProblemAdmin($user_id, $problem);
+        return Authorization::isProblemAdmin($user_id, $problem) ||
+            self::hasRole($user_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
     }
 
     public static function canViewCourse($user_id, Courses $course, Groups $group) {
@@ -118,8 +126,7 @@ class Authorization {
             return false;
         }
         return self::isOwner($user_id, $entity->acl_id) ||
-            UserRolesDAO::isAdmin($user_id, $entity->acl_id) ||
-            GroupRolesDAO::isAdmin($user_id, $entity->acl_id);
+            self::hasRole($user_id, $entity->acl_id, Authorization::ADMIN_ROLE);
     }
 
     public static function isContestAdmin($user_id, Contests $contest) {
@@ -139,15 +146,21 @@ class Authorization {
             return true;
         }
 
-        return GroupRolesDAO::isAdmin($user_id, $problem->acl_id) ||
-               UserRolesDAO::isAdmin($user_id, $problem->acl_id);
+        return Authorization::hasRole($user_id, $problem->acl_id, Authorization::ADMIN_ROLE);
+    }
+
+    public static function hasRole($user_id, $acl_id, $role_id) {
+        return GroupRolesDAO::hasRole($user_id, $acl_id, $role_id) ||
+            UserRolesDAO::hasRole($user_id, $acl_id, $role_id);
     }
 
     public static function isSystemAdmin($user_id) {
         if (self::$is_system_admin == null) {
-            self::$is_system_admin =
-                GroupRolesDAO::isSystemAdmin($user_id) ||
-                UserRolesDAO::isSystemAdmin($user_id);
+            self::$is_system_admin = Authorization::hasRole(
+                $user_id,
+                Authorization::SYSTEM_ACL,
+                Authorization::ADMIN_ROLE
+            );
         }
         return self::$is_system_admin;
     }

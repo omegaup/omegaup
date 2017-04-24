@@ -219,8 +219,9 @@ class ProblemController extends Controller {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        // We need to check that the user can actually edit the problem
-        if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
+        // We need to check that the user actually has admin privileges over
+        // the problem.
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -342,7 +343,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+        if (!Authorization::canEditProblem($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -518,7 +519,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('tag');
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+        if (!Authorization::canEditProblem($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -590,7 +591,7 @@ class ProblemController extends Controller {
         $response = [];
         $response['tags'] = ProblemsTagsDAO::getProblemTags(
             $problem,
-            !Authorization::isProblemAdmin($r['current_user_id'], $problem)
+            !Authorization::canEditProblem($r['current_user_id'], $problem)
         );
 
         $response['status'] = 'ok';
@@ -1006,7 +1007,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -1273,7 +1274,7 @@ class ProblemController extends Controller {
         $response = [];
 
         if ($r['show_all']) {
-            if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
+            if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
                 throw new ForbiddenAccessException();
             }
             if (!is_null($r['username'])) {
@@ -1360,7 +1361,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateRuns($r);
 
-        $is_problem_admin = Authorization::canEditProblem($r['current_user_id'], $r['problem']);
+        $is_problem_admin = Authorization::isProblemAdmin($r['current_user_id'], $r['problem']);
 
         try {
             $clarifications = ClarificationsDAO::GetProblemClarifications(
@@ -1403,7 +1404,7 @@ class ProblemController extends Controller {
         self::validateRuns($r);
 
         // We need to check that the user has priviledges on the problem
-        if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1559,7 +1560,13 @@ class ProblemController extends Controller {
         $user_type = USER_ANONYMOUS;
         if (!is_null($r['current_user_id'])) {
             $author_id = intval($r['current_user_id']);
-            if (Authorization::isSystemAdmin($r['current_user_id'])) {
+            if (Authorization::isSystemAdmin($r['current_user_id']) ||
+                Authorization::hasRole(
+                    $r['current_user_id'],
+                    Authorization::SYSTEM_ACL,
+                    Authorization::REVIEWER_ROLE
+                )
+            ) {
                 $user_type = USER_ADMIN;
             } else {
                 $user_type = USER_NORMAL;

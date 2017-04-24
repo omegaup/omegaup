@@ -84,8 +84,11 @@ script:
           python3 stuff/js-lint.py validate --all-files < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python3 stuff/vue-lint.py validate --all-files < /dev/null
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
           python3 stuff/php-format.py validate --all-files < /dev/null
 
 notifications:
   slack:
-    secure: BGGaWyzHJ0Fb+oU93EjuZZ7e/2GK+dT1Ao3W5Ulbv8dQbzV761151T4Vby40hxIMim+MoXq+zL2GQ9i7tg6GnEMNVVBpHqL40S1Y5qZbZMPkcy0vq14t41uX5vJNIYVp24IvTxWKy3XA2+cq7irILTD2lMzv6xMveawhYdiqkwU=
+    secure: Dw6yE/lCYGuAvZDthzUAxqYMzn6CxPvNaCt1RheZPs9Na7gq/LWbfPz1g7vigwvNzBDd8+NFHAo4HEZ5ajWyoXeL2b83P7+sn6sZZcpO3ZG2kjNqkroW84Aum5l3KHqi8aIvAfNXZyQm5WUABKktEza7vGUeWZs1PAu8OJuLdIU=
