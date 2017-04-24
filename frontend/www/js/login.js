@@ -42,9 +42,12 @@ function signInCallback(authResult) {
     gapi.auth.signOut();
     logmeoutOnce = false;
   } else if (authResult['code']) {
-    omegaup.API.Session.googleLogin({storeToken: authResult['code']})
-        .then(function(data) { window.location.reload(); })
-        .fail(omegaup.UI.apiError);
+    if (authResult.status.method != 'AUTO') {
+      // Only log in if the user actually clicked the sign-in button.
+      omegaup.API.Session.googleLogin({storeToken: authResult['code']})
+          .then(function(data) { window.location.reload(); })
+          .fail(omegaup.UI.apiError);
+    }
   } else if (authResult['error']) {
     // Esto se hace en cada refresh a la pagina de login.
     // omegaup.UI.error('There was an error: ' + authResult['error']);
