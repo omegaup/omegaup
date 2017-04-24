@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 class ScoreboardParams implements ArrayAccess {
-    public $params;
+    private $params;
 
     public function __construct(array $params) {
         ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
