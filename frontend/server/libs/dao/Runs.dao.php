@@ -334,48 +334,27 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function getAllRelevantUsers($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null) {
+    final public static function getAllRelevantUsers(Contests $contest, $showAllRuns = false, $filterUsersBy = null) {
         // Build SQL statement
         if ($showAllRuns) {
-            if (is_null($group_id)) {
-                $sql = '
-                    SELECT
-                        u.user_id, u.username, u.name, u.country_id
-                    FROM
-                        Users u
-                    INNER JOIN
-                        Problemset_Users pu ON u.user_id = pu.user_id
-                    WHERE
-                        pu.problemset_id = ? AND
-                        u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
-                $val = [
-                    $problemset_id,
-                    $acl_id,
-                    $acl_id,
-                    Authorization::SYSTEM_ACL,
-                    Authorization::ADMIN_ROLE,
-                ];
-            } else {
-                $sql = '
-                    SELECT
-                        u.user_id, u.username, u.name, u.country_id
-                    FROM
-                        Users u
-                    INNER JOIN
-                        Groups_Users g ON u.user_id = g.user_id
-                    WHERE
-                        g.group_id = ? AND
-                        u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
-                $val = [
-                    $group_id,
-                    $acl_id,
-                    $acl_id,
-                    Authorization::SYSTEM_ACL,
-                    Authorization::ADMIN_ROLE,
-                ];
-            }
+            $sql = '
+                SELECT
+                    u.user_id, u.username, u.name, u.country_id
+                FROM
+                    Users u
+                INNER JOIN
+                    Problemset_Users pu ON u.user_id = pu.user_id
+                WHERE
+                    pu.problemset_id = ? AND
+                    u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
+                    u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+            $val = [
+                $contest->problemset_id,
+                $contest->acl_id,
+                $contest->acl_id,
+                Authorization::SYSTEM_ACL,
+                Authorization::ADMIN_ROLE,
+            ];
         } else {
             $sql = '
                 SELECT
@@ -392,7 +371,7 @@ class RunsDAO extends RunsDAOBase {
                         r.problemset_id = ? AND
                         r.status = \'ready\' AND
                         r.test = 0) rc ON u.user_id = rc.user_id';
-            $val = [$problemset_id];
+            $val = [$contest->problemset_id];
             if (!is_null($filterUsersBy)) {
                 $sql .= ' WHERE u.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
