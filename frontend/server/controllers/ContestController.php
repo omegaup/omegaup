@@ -1667,19 +1667,8 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            new ScoreboardParams([
-                'alias' => $r['contest']->alias,
-                'title' => $r['contest']->title,
-                'problemset_id' => $r['contest']->problemset_id,
-                'start_time' => $r['contest']->start_time,
-                'finish_time' => $r['contest']->finish_time,
-                'acl_id' => $r['contest']->acl_id,
-                'penalty' => $r['contest']->penalty,
-                'penalty_calc_policy' => $r['contest']->penalty_calc_policy,
-                'show_scoreboard_after' => $r['contest']->show_scoreboard_after,
-                'scoreboard_pct' => $r['contest']->scoreboard,
-                'show_all_runs' => $showAllRuns
-                ])
+            $r['contest'],
+            $showAllRuns
         );
 
         return $scoreboard->generate();
@@ -1741,21 +1730,10 @@ class ContestController extends Controller {
             }
 
             $s = new Scoreboard(
-                new ScoreboardParams([
-                    'alias' => $contest->alias,
-                    'title' => $contest->title,
-                    'problemset_id' =>$contest->problemset_id,
-                    'start_time' => $contest->start_time,
-                    'finish_time' => $contest->finish_time,
-                    'acl_id' => $contest->acl_id,
-                    'penalty' => $contest->penalty,
-                    'penalty_calc_policy' => $contest->penalty_calc_policy,
-                    'show_scoreboard_after' => $contest->show_scoreboard_after,
-                    'scoreboard_pct' => $contest->scoreboard,
-                    'show_all_runs' => false,
-                    'auth_token' => null,
-                    'only_ac' => $r['contest_params'][$contest->alias]['only_ac']
-                ])
+                $contest,
+                false, /*showAllRuns*/
+                null, /*auth_token*/
+                $r['contest_params'][$contest->alias]['only_ac']
             );
 
             $scoreboards[$contest->alias] = $s->generate();
@@ -2447,20 +2425,9 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $scoreboard = new Scoreboard(
-            new ScoreboardParams([
-                'alias' => $r['contest']->alias,
-                'title' =>$r['contest']->title,
-                'problemset_id' => $r['contest']->problemset_id,
-                'start_time' => $r['contest']->start_time,
-                'finish_time' => $r['contest']->finish_time,
-                'acl_id' => $r['contest']->acl_id,
-                'penalty' => $r['contest']->penalty,
-                'penalty_calc_policy' => $r['contest']->penalty_calc_policy,
-                'show_scoreboard_after' => $r['contest']->show_scoreboard_after,
-                'scoreboard_pct' => $r['contest']->scoreboard,
-                'show_all_runs' => true,
-                'auth_token' => $r['auth_token']
-            ])
+            $r['contest'],
+            true, //Show only relevant runs
+            $r['auth_token']
         );
 
         // Check the filter if we have one
