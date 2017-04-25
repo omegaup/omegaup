@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 CREATE TABLE IF NOT EXISTS `Problemset_Users` (
   `user_id` int(11) NOT NULL,
   `problemset_id` int(11) NOT NULL,
-  `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',
+  `access_time` datetime NULL DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   PRIMARY KEY (`user_id`,`problemset_id`),
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS `Problemset_User_Request` (
 	`user_id` int(11) NOT NULL,
 	`problemset_id` int(11) NOT NULL,
 	`request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`last_update` timestamp NOT NULL ,
+	`last_update` timestamp NULL DEFAULT NULL,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
 	PRIMARY KEY (`user_id`,`problemset_id`)

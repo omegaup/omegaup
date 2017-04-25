@@ -206,9 +206,6 @@ abstract class ProblemsetUsersDAOBase extends DAO {
      * @param ProblemsetUsers [$Problemset_Users] El objeto de tipo ProblemsetUsers a crear.
      */
     final private static function create(ProblemsetUsers $Problemset_Users) {
-        if (is_null($Problemset_Users->access_time)) {
-            $Problemset_Users->access_time = '0000-00-00 00:00:00';
-        }
         if (is_null($Problemset_Users->score)) {
             $Problemset_Users->score = '1';
         }
