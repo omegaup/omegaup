@@ -21,4 +21,4 @@ CALL `Problemset_Users_Migrate`();
 DROP PROCEDURE `Problemset_Users_Migrate`;
 
 ALTER TABLE `Problemset_User_Request`
-  MODIFY COLUMN `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+  MODIFY COLUMN `last_update` timestamp NULL DEFAULT NULL;
