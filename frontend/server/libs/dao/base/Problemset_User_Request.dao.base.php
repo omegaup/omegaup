@@ -214,9 +214,6 @@ abstract class ProblemsetUserRequestDAOBase extends DAO {
         if (is_null($Problemset_User_Request->request_time)) {
             $Problemset_User_Request->request_time = gmdate('Y-m-d H:i:s');
         }
-        if (is_null($Problemset_User_Request->last_update)) {
-            $Problemset_User_Request->last_update = gmdate('Y-m-d H:i:s');
-        }
         $sql = 'INSERT INTO Problemset_User_Request (`user_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Problemset_User_Request->user_id,

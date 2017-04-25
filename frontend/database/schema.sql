@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS `Problemset_User_Request` (
 	`user_id` int(11) NOT NULL,
 	`problemset_id` int(11) NOT NULL,
 	`request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`last_update` timestamp NULL DEFAULT NULL,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
 	PRIMARY KEY (`user_id`,`problemset_id`)
