@@ -231,6 +231,7 @@ class ContestListTest extends OmegaupTestCase {
             null,
             0,
             null,
+            null,
             $recommendedContestData['request']['finish_time'] + 1
         );
 
