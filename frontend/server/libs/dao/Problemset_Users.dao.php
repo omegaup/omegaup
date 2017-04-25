@@ -24,7 +24,7 @@ class ProblemsetUsersDAO extends ProblemsetUsersDAOBase {
             $problemset_user->score = 0;
             $problemset_user->time = 0;
             ProblemsetUsersDAO::save($problemset_user);
-        } elseif ($problemset_user->access_time === '0000-00-00 00:00:00') {
+        } elseif (is_null($problemset_user->access_time)) {
             // If its set to default time, update it
             $problemset_user->access_time = date('Y-m-d H:i:s');
             ProblemsetUsersDAO::save($problemset_user);
