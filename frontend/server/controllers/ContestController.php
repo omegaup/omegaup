@@ -1608,11 +1608,9 @@ class ContestController extends Controller {
         // Get the current user
         self::validateDetails($r);
 
-        // Create scoreboard
-        $scoreboard = new Scoreboard(
-            $r['contest'],
-            Authorization::isContestAdmin($r['current_user_id'], $r['contest'])
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = Authorization::isContestAdmin($r['current_user_id'], $r['contest']);
+        $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
         $response = [];
@@ -1666,21 +1664,9 @@ class ContestController extends Controller {
         }
 
         // Create scoreboard
-        $scoreboard = new Scoreboard(
-            new ScoreboardParams([
-                'alias' => $r['contest']->alias,
-                'title' => $r['contest']->title,
-                'problemset_id' => $r['contest']->problemset_id,
-                'start_time' => $r['contest']->start_time,
-                'finish_time' => $r['contest']->finish_time,
-                'acl_id' => $r['contest']->acl_id,
-                'penalty' => $r['contest']->penalty,
-                'penalty_calc_policy' => $r['contest']->penalty_calc_policy,
-                'show_scoreboard_after' => $r['contest']->show_scoreboard_after,
-                'scoreboard_pct' => $r['contest']->scoreboard,
-                'show_all_runs' => $showAllRuns
-                ])
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = $showAllRuns;
+        $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate();
     }
@@ -1740,23 +1726,11 @@ class ContestController extends Controller {
                 $r['contest_params'] = $cp;
             }
 
-            $s = new Scoreboard(
-                new ScoreboardParams([
-                    'alias' => $contest->alias,
-                    'title' => $contest->title,
-                    'problemset_id' =>$contest->problemset_id,
-                    'start_time' => $contest->start_time,
-                    'finish_time' => $contest->finish_time,
-                    'acl_id' => $contest->acl_id,
-                    'penalty' => $contest->penalty,
-                    'penalty_calc_policy' => $contest->penalty_calc_policy,
-                    'show_scoreboard_after' => $contest->show_scoreboard_after,
-                    'scoreboard_pct' => $contest->scoreboard,
-                    'show_all_runs' => false,
-                    'auth_token' => null,
-                    'only_ac' => $r['contest_params'][$contest->alias]['only_ac']
-                ])
-            );
+            $params = ScoreboardParams::fromContest($contest);
+            $params['show_all_runs'] = false;
+            $params['auth_token'] = null;
+            $params['only_ac'] = $r['contest_params'][$contest->alias]['only_ac'];
+            $s = new Scoreboard($params);
 
             $scoreboards[$contest->alias] = $s->generate();
         }
@@ -2446,22 +2420,10 @@ class ContestController extends Controller {
 
         self::validateStats($r);
 
-        $scoreboard = new Scoreboard(
-            new ScoreboardParams([
-                'alias' => $r['contest']->alias,
-                'title' =>$r['contest']->title,
-                'problemset_id' => $r['contest']->problemset_id,
-                'start_time' => $r['contest']->start_time,
-                'finish_time' => $r['contest']->finish_time,
-                'acl_id' => $r['contest']->acl_id,
-                'penalty' => $r['contest']->penalty,
-                'penalty_calc_policy' => $r['contest']->penalty_calc_policy,
-                'show_scoreboard_after' => $r['contest']->show_scoreboard_after,
-                'scoreboard_pct' => $r['contest']->scoreboard,
-                'show_all_runs' => true,
-                'auth_token' => $r['auth_token']
-            ])
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = true;
+        $params['auth_token'] = $r['auth_token'];
+        $scoreboard = new Scoreboard($params);
 
         // Check the filter if we have one
         Validators::isStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);

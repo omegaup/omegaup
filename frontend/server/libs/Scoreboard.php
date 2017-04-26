@@ -50,6 +50,20 @@ class ScoreboardParams implements ArrayAccess {
         unset($this->params[$offset]);
     }
 
+    public static function fromContest(Contests $contest) {
+        return new ScoreboardParams([
+                'alias' => $contest->alias,
+                'title' => $contest->title,
+                'problemset_id' => $contest->problemset_id,
+                'start_time' => $contest->start_time,
+                'finish_time' => $contest->finish_time,
+                'acl_id' => $contest->acl_id,
+                'penalty' => $contest->penalty,
+                'penalty_calc_policy' => $contest->penalty_calc_policy,
+                'show_scoreboard_after' => $contest->show_scoreboard_after,
+                'scoreboard_pct' => $contest->scoreboard]);
+    }
+
     /**
      * Checks if array contains a key defined by $parameter
      * @param  string  $parameter
@@ -59,7 +73,7 @@ class ScoreboardParams implements ArrayAccess {
      * @return boolean
      * @throws InvalidParameterException
      */
-    public static function validateParameter($parameter, array& $array, $required = true, $default = null) {
+    private static function validateParameter($parameter, array& $array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
                 throw new InvalidParameterException('parameterEmpty', $parameter);
@@ -181,8 +195,8 @@ class Scoreboard {
     public function events() {
         $result = null;
 
-        $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
-        $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
+        $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
+        $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
 
         $can_use_contestant_cache = !$this->params['show_all_runs'];
         $can_use_admin_cache = $this->params['show_all_runs'];
@@ -198,13 +212,13 @@ class Scoreboard {
             try {
                 // Get all distinct contestants participating in the given contest
                 $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                    $this->contest->problemset_id,
-                    $this->contest->acl_id,
+                    $this->params['problemset_id'],
+                    $this->params['acl_id'],
                     $this->params['show_all_runs']
                 );
 
                 // Get all problems given problemset
-                $problemset = ProblemsetsDAO::getByPK($this->contest->problemset_id);
+                $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
                 $raw_problemset_problems =
                     ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
@@ -224,14 +238,13 @@ class Scoreboard {
             }
 
             $result = Scoreboard::calculateEvents(
-                $this->contest,
+                $this->params,
                 $contest_runs,
                 $raw_contest_users,
-                $problem_mapping,
-                $this->params['show_all_runs']
+                $problem_mapping
             );
 
-            $timeout = max(0, strtotime($this->contest->finish_time) - time());
+            $timeout = max(0, $this->params['finish_time'] - time());
             if ($can_use_contestant_cache) {
                 $contestantEventsCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -253,12 +266,12 @@ class Scoreboard {
         $log->info('Invalidating scoreboard cache.');
 
         // Invalidar cache del contestant
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->contest_id);
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
+        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->problemset_id);
+        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->problemset_id);
 
         // Invalidar cache del admin
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->contest_id);
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
+        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->problemset_id);
+        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->problemset_id);
     }
 
     public static function refreshScoreboardCache($contest) {
@@ -295,7 +308,7 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         $timeout = max(0, strtotime($contest->finish_time) - time());
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->contest_id);
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->problemset_id);
 
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
@@ -311,7 +324,7 @@ class Scoreboard {
             false  /* sortByName */
         );
         $contestantScoreboardCache->set($contestantScoreboard, $timeout);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->contest_id);
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->problemset_id);
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, true);
         $adminScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
@@ -328,7 +341,7 @@ class Scoreboard {
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
 
-        $contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
+        $contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->problemset_id);
         $contestantEventCache->set(Scoreboard::calculateEvents(
             $contest,
             $contest_runs,
@@ -337,7 +350,7 @@ class Scoreboard {
             false /* showAllRuns */
         ), $timeout);
 
-        $adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
+        $adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->problemset_id);
         $adminEventCache->set(Scoreboard::calculateEvents(
             $contest,
             $contest_runs,
@@ -613,11 +626,10 @@ class Scoreboard {
     }
 
     private static function calculateEvents(
-        $contest,
+        ScoreboardParams $params,
         $contest_runs,
         $raw_contest_users,
-        $problem_mapping,
-        $showAllRuns
+        $problem_mapping
     ) {
         $contest_users = [];
 
@@ -627,12 +639,12 @@ class Scoreboard {
 
         $result = [];
         $user_problems_score = [];
-        $contestStart = strtotime($contest->start_time);
-        $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $showAllRuns);
+        $contestStart = $params['start_time'];
+        $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($params);
 
         // Calculate score for each contestant x problem x run
         foreach ($contest_runs as $run) {
-            if (!$showAllRuns && $run->test != 0) {
+            if (!$params['show_all_runs'] && $run->test != 0) {
                 continue;
             }
 
@@ -692,7 +704,7 @@ class Scoreboard {
 
             foreach ($user_problems_score[$user_id] as $problem) {
                 $data['total']['points'] += $problem['points'];
-                if ($contest->penalty_calc_policy == 'sum') {
+                if ($params['penalty_calc_policy'] == 'sum') {
                     $data['total']['penalty'] += $problem['penalty'];
                 } else {
                     $data['total']['penalty'] = max(

@@ -8,52 +8,106 @@
 
 class ContestScoreboardTest extends OmegaupTestCase {
     /**
-     * Basic test of scoreboard, shows at least the run
-     * just submitted
+     * Sets the context for a basic scoreboard test
+     * @param  integer $nUsers
+     * @param  array  $runMap
+     * @param  boolean $runForAdmin
+     * @param  boolean $runForDirector
+     * @return array
      */
-    public function testBasicScoreboard() {
-        // Get two problems
-        $problemData = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
-
-        // Get a contest
+    private function prepareContestScoreboardData($nUsers = 3, array $runMap, $runForAdmin = true, $runForDirector = true) {
+        $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
         $contestData = ContestsFactory::createContest();
 
         // Add the problems to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        ContestsFactory::addProblemToContest($problemData[0], $contestData);
+        ContestsFactory::addProblemToContest($problemData[1], $contestData);
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
-        $contestant2 = UserFactory::createUser();
-        $contestant3 = UserFactory::createUser();
+        $contestants = [];
+        for ($i = 0; $i < $nUsers; $i++) {
+            $contestants[] = UserFactory::createUser();
+        }
         $contestDirector = $contestData['director'];
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
-        // Create runs
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
-        $runData1 = RunsFactory::createRun($problemData, $contestData, $contestant);
-        $runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
-        $runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
-        $runData4 = RunsFactory::createRun($problemData2, $contestData, $contestant);
-        $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
-        $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
+        foreach ($runMap as $runDescription) {
+            $runData = RunsFactory::createRun(
+                $problemData[$runDescription['problem_idx']],
+                $contestData,
+                $contestants[$runDescription['contestant_idx']]
+            );
 
-        // Grade the runs
-        RunsFactory::gradeRun($runData, 0, 'CE', 60);
-        RunsFactory::gradeRun($runData1, 1, 'AC', 60);
-        RunsFactory::gradeRun($runData2, .9, 'PA', 60);
-        RunsFactory::gradeRun($runData3, 1, 'AC', 180);
-        RunsFactory::gradeRun($runData4, 1, 'AC', 200);
-        RunsFactory::gradeRun($runDataDirector, 1, 'AC', 120);
-        RunsFactory::gradeRun($runDataAdmin, 1, 'AC', 110);
+            RunsFactory::gradeRun(
+                $runData,
+                $runDescription['points'],
+                $runDescription['verdict'],
+                $runDescription['submit_delay']
+            );
+        }
+
+        if ($runForDirector) {
+            $runDataDirector = RunsFactory::createRun($problemData[0], $contestData, $contestDirector);
+        }
+
+        if ($runForAdmin) {
+            $runDataAdmin = RunsFactory::createRun($problemData[0], $contestData, $contestAdmin);
+        }
+
+        return [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestants' => $contestants,
+            'contestAdmin' => $contestAdmin,
+            'runMap' => $runMap
+        ];
+    }
+
+    /**
+     * Basic test of scoreboard, shows at least the run
+     * just submitted
+     */
+    public function testBasicScoreboard() {
+        $runMap = [
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 0,
+             'verdict' => 'CE',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 1,
+             'points' => .9,
+             'verdict' => 'PA',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 2,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 200
+            ],
+            ['problem_idx' => 1,
+             'contestant_idx' => 0,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 200
+            ],
+        ];
+        $testData = $this->prepareContestScoreboardData(3, $runMap);
 
         // Create request
-        $login = self::login($contestant);
+        $login = self::login($testData['contestants'][0]);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
+            'contest_alias' => $testData['contestData']['request']['alias'],
         ]);
 
         // Create API
@@ -62,7 +116,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Validate that we have ranking
         $this->assertEquals(3, count($response['ranking']));
-        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
+        $this->assertEquals($testData['contestants'][0]->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
@@ -82,10 +136,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(1, $response['ranking'][0]['problems'][1]['runs']);
 
         // Now get the scoreboard as an contest director
-        $login = self::login($contestDirector);
+        $login = self::login($testData['contestData']['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
+            'contest_alias' => $testData['contestData']['request']['alias'],
         ]);
 
         // Create API
@@ -93,7 +147,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Validate that we have ranking
         $this->assertEquals(3, count($response['ranking']));
-        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
+        $this->assertEquals($testData['contestants'][0]->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
@@ -446,5 +500,99 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals('100', $scoreboardResponse['ranking'][0]['total']['points']);
+    }
+
+    /**
+     * Basic happy path for Scoreboard events
+     */
+    public function testBasicScoreboardEventsPositive() {
+        $runMap = [
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 0,
+             'verdict' => 'CE',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 1,
+             'points' => .9,
+             'verdict' => 'PA',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 2,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 200
+            ],
+            ['problem_idx' => 1,
+             'contestant_idx' => 0,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 200
+            ],
+            ['problem_idx' => 1,
+             'contestant_idx' => 2,
+             'points' => 0,
+             'verdict' => 'CE',
+             'submit_delay' => 200
+            ],
+        ];
+
+        $testData = $this->prepareContestScoreboardData(3, $runMap);
+        $login = self::login($testData['contestants'][0]);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $testData['contestData']['request']['alias'],
+        ]);
+
+        // Create API
+        $response = ContestController::apiScoreboardEvents($r);
+
+        // From the map above, there are 4 meaningful combinations for events
+        $this->assertEquals(4, count($response['events']));
+        $this->assertRunMapEntryIsOnEvents($runMap[1], $testData, $response['events']);
+        $this->assertRunMapEntryIsOnEvents($runMap[2], $testData, $response['events']);
+        $this->assertRunMapEntryIsOnEvents($runMap[3], $testData, $response['events']);
+        $this->assertRunMapEntryIsOnEvents($runMap[4], $testData, $response['events']);
+        $this->assertRunMapEntryIsOnEvents($runMap[5], $testData, $response['events'], false /*sholdBeIn*/);
+    }
+
+    /**
+     * Verify an entry on Scoreboard events maps to an expected input value
+     * @param  array  $runMapEntry
+     * @param  array  $testData
+     * @param  array  $events
+     */
+    private function assertRunMapEntryIsOnEvents(array $runMapEntry, array $testData, array $events, $shouldBeIn = true) {
+        $username = $testData['contestants'][$runMapEntry['contestant_idx']]->username;
+        $problemAlias = $testData['problemData'][$runMapEntry['problem_idx']]['request']['alias'];
+        $eventFound = null;
+        foreach ($events as $event) {
+            if ($event['name'] === $username &&
+                $event['problem']['alias'] === $problemAlias) {
+                $eventFound = $event;
+            }
+        }
+
+        if ($shouldBeIn === true) {
+            if (is_null($eventFound)) {
+                $this->fail("$username $problemAlias combination not found on events.");
+            }
+        } else {
+            if (!is_null($eventFound)) {
+                $this->fail("$username $problemAlias combination was found on events when it was not expected.");
+            }
+        }
+
+        if ($eventFound['problem']['points'] != $runMapEntry['points'] * 100) {
+            $this->fail("$username $problemAlias has unexpected points.");
+        }
     }
 }
