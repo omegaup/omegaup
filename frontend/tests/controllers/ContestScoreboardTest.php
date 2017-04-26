@@ -49,10 +49,12 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         if ($runForDirector) {
             $runDataDirector = RunsFactory::createRun($problemData[0], $contestData, $contestDirector);
+            RunsFactory::gradeRun($runDataDirector);
         }
 
         if ($runForAdmin) {
             $runDataAdmin = RunsFactory::createRun($problemData[0], $contestData, $contestAdmin);
+            RunsFactory::gradeRun($runDataAdmin);
         }
 
         return [
@@ -552,7 +554,6 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'contest_alias' => $testData['contestData']['request']['alias'],
         ]);
 
-        // Create API
         $response = ContestController::apiScoreboardEvents($r);
 
         // From the map above, there are 4 meaningful combinations for events
@@ -594,5 +595,55 @@ class ContestScoreboardTest extends OmegaupTestCase {
         if ($eventFound['problem']['points'] != $runMapEntry['points'] * 100) {
             $this->fail("$username $problemAlias has unexpected points.");
         }
+    }
+
+    /**
+     * Test scoreboard is retreived from cache on the second try and invalidation
+     * @return [type] [description]
+     */
+    public function testScoreboardFromUserCache() {
+        $runMap = [
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 0,
+             'verdict' => 'CE',
+             'submit_delay' => 60
+            ],
+            ['problem_idx' => 0,
+             'contestant_idx' => 0,
+             'points' => 1,
+             'verdict' => 'AC',
+             'submit_delay' => 60
+            ]
+        ];
+
+        $testData = $this->prepareContestScoreboardData(2, $runMap);
+        $login = self::login($testData['contestants'][0]);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $testData['contestData']['request']['alias'],
+        ]);
+
+        $response1 = ContestController::apiScoreboard($r);
+        $response2 = ContestController::apiScoreboard($r);
+
+        $this->assertEquals(false, $response1['from_cache']);
+        $this->assertEquals(true, $response2['from_cache']);
+        $response1['from_cache'] = $response2['from_cache'] = null;
+        $this->assertEquals($response1, $response2);
+
+        // Invalidate previously cached scoreboard
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
+        $response3 = ContestController::apiScoreboard($r);
+        $this->assertEquals(false, $response3['from_cache']);
+
+        // Single invalidation works, now invalidate again and check force referesh API
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
+        Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
+        $response4 = ContestController::apiScoreboard($r);
+        $this->assertEquals(true, $response4['from_cache']);
+
+        $response3['from_cache'] = $response4['from_cache'] = null;
+        $this->assertEquals($response3, $response4);
     }
 }

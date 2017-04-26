@@ -50,7 +50,7 @@ try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
 # #########################
 # CACHE CONFIG
 # #########################
-try_define('APC_USER_CACHE_ENABLED', false);
+try_define('APC_USER_CACHE_ENABLED', true);
 try_define('OMEGAUP_SESSION_CACHE_ENABLED', false);
 
 # #########################

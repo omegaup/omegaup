@@ -1080,7 +1080,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache($params['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -1165,7 +1165,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache($params['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -2192,7 +2192,7 @@ class ContestController extends Controller {
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
-        Scoreboard::invalidateScoreboardCache($r['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($r['contest']));
 
         // Expire contest-list cache
         Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
