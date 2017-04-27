@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 class ScoreboardParams implements ArrayAccess {
-    private $params;
+    public $params;
 
     public function __construct(array $params) {
         ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
@@ -100,6 +100,8 @@ class Scoreboard {
 
     private $params;
     public $log;
+    public static $_testRun = false;
+    public static $_lastRunFromCache = false;
 
     public function __construct(ScoreboardParams $params) {
         $this->params = $params;
@@ -187,7 +189,6 @@ class Scoreboard {
                 $withRunDetails,
                 $this->params['auth_token']
             );
-            $result['from_cache'] = false;
 
             $timeout = max(0, $this->params['finish_time'] - time());
             if ($can_use_contestant_cache) {
@@ -195,8 +196,10 @@ class Scoreboard {
             } elseif ($can_use_admin_cache) {
                 $adminScoreboardCache->set($result, $timeout);
             }
+
+            Scoreboard::setLastRunFromCache(false);
         } else {
-            $result['from_cache'] = true;
+            Scoreboard::setLastRunFromCache(true);
         }
 
         return $result;
@@ -265,6 +268,10 @@ class Scoreboard {
             } elseif ($can_use_admin_cache) {
                 $adminEventsCache->set($result, $timeout);
             }
+
+            Scoreboard::setLastRunFromCache(false);
+        } else {
+            Scoreboard::setLastRunFromCache(true);
         }
 
         return $result;
@@ -748,5 +755,15 @@ class Scoreboard {
         }
 
         return $result;
+    }
+
+    /**
+     * Set last run from cache for testing purposes
+     * @param bool $value
+     */
+    private function setLastRunFromCache($value) {
+        if (Scoreboard::$_testRun) {
+            Scoreboard::$_lastRunFromCache = $value;
+        }
     }
 }
