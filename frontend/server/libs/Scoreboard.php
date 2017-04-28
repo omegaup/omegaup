@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 class ScoreboardParams implements ArrayAccess {
-    public $params;
+    private $params;
 
     public function __construct(array $params) {
         ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
@@ -100,8 +100,8 @@ class Scoreboard {
 
     private $params;
     public $log;
-    public static $_testRun = false;
-    public static $_lastRunFromCache = false;
+    private static $isTestRun = false;
+    private static $isLastRunFromCache = false;
 
     public function __construct(ScoreboardParams $params) {
         $this->params = $params;
@@ -197,9 +197,9 @@ class Scoreboard {
                 $adminScoreboardCache->set($result, $timeout);
             }
 
-            Scoreboard::setLastRunFromCache(false);
+            Scoreboard::setIsLastRunFromCacheForTesting(false);
         } else {
-            Scoreboard::setLastRunFromCache(true);
+            Scoreboard::setIsLastRunFromCacheForTesting(true);
         }
 
         return $result;
@@ -269,9 +269,9 @@ class Scoreboard {
                 $adminEventsCache->set($result, $timeout);
             }
 
-            Scoreboard::setLastRunFromCache(false);
+            Scoreboard::setIsLastRunFromCacheForTesting(false);
         } else {
-            Scoreboard::setLastRunFromCache(true);
+            Scoreboard::setIsLastRunFromCacheForTesting(true);
         }
 
         return $result;
@@ -761,9 +761,25 @@ class Scoreboard {
      * Set last run from cache for testing purposes
      * @param bool $value
      */
-    private function setLastRunFromCache($value) {
-        if (Scoreboard::$_testRun) {
-            Scoreboard::$_lastRunFromCache = $value;
+    private function setIsLastRunFromCacheForTesting($value) {
+        if (Scoreboard::$isTestRun) {
+            Scoreboard::$isLastRunFromCache = $value;
         }
+    }
+
+    /**
+     * Get last run from Cache valu
+     * @return bool
+     */
+    public function getIsLastRunFromCacheForTesting() {
+        return Scoreboard::$isLastRunFromCache;
+    }
+
+    /**
+     * Enable testing extras
+     * @param bool $value
+     */
+    public function setIsTestRunForTesting($value) {
+        Scoreboard::$isTestRun = $value;
     }
 }

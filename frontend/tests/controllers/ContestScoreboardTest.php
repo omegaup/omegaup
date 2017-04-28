@@ -631,7 +631,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      * @param string $testApi
      */
     private function scoreboardCacheHelper($isAdmin = false, $testApi = 'apiScoreboard') {
-        Scoreboard::$_testRun = true;
+        $scoreboardTestRun = new ScopedScoreboardTestRun();
 
         $runMap = [
             ['problem_idx' => 0,
@@ -656,23 +656,23 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         $response1 = ContestController::$testApi($r);
-        $this->assertEquals(false, Scoreboard::$_lastRunFromCache);
+        $this->assertEquals(false, Scoreboard::getIsLastRunFromCacheForTesting());
 
         $response2 = ContestController::$testApi($r);
-        $this->assertEquals(true, Scoreboard::$_lastRunFromCache);
+        $this->assertEquals(true, Scoreboard::getIsLastRunFromCacheForTesting());
 
         $this->assertEquals($response1, $response2);
 
         // Invalidate previously cached scoreboard
         Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
         $response3 = ContestController::$testApi($r);
-        $this->assertEquals(false, Scoreboard::$_lastRunFromCache);
+        $this->assertEquals(false, Scoreboard::getIsLastRunFromCacheForTesting());
 
         // Single invalidation works, now invalidate again and check force referesh API
         Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
         Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
         $response4 = ContestController::$testApi($r);
-        $this->assertEquals(true, Scoreboard::$_lastRunFromCache);
+        $this->assertEquals(true, Scoreboard::getIsLastRunFromCacheForTesting());
         $this->assertEquals($response3, $response4);
     }
 }
