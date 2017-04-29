@@ -106,6 +106,7 @@ class Scoreboard {
     public function __construct(ScoreboardParams $params) {
         $this->params = $params;
         $this->log = Logger::getLogger('Scoreboard');
+        Scoreboard::setIsLastRunFromCacheForTesting(false);
     }
 
     /**
@@ -138,68 +139,67 @@ class Scoreboard {
             $result = $adminScoreboardCache->get();
         }
 
-        if (is_null($result)) {
-            try {
-                // Get all distinct contestants participating in the given contest
-                $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                    $this->params['problemset_id'],
-                    $this->params['acl_id'],
-                    true /* show all runs */,
-                    $filterUsersBy,
-                    $this->params['group_id']
-                );
+        if (!is_null($result)) {
+            Scoreboard::setIsLastRunFromCacheForTesting(true);
+            return $result;
+        }
 
-                // Get all problems given problemset
-                $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
-                $raw_problemset_problems =
-                    ProblemsetProblemsDAO::getRelevantProblems($problemset);
-
-                $contest_runs = RunsDAO::getProblemsetRuns(
-                    $problemset,
-                    $this->params['only_ac']
-                );
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            $problem_mapping = [];
-
-            $order = 0;
-            foreach ($raw_problemset_problems as $problem) {
-                $problem_mapping[$problem->problem_id] = [
-                    'order' => $order++,
-                    'alias' => $problem->alias
-                ];
-            }
-
-            $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->params);
-
-            $result = Scoreboard::getScoreboardFromRuns(
-                $contest_runs,
-                $raw_contest_users,
-                $problem_mapping,
-                $this->params['penalty'],
-                $this->params['penalty_calc_policy'],
-                $scoreboardLimit,
-                $this->params['title'],
-                $this->params['start_time'],
-                $this->params['finish_time'],
-                $this->params['show_all_runs'],
-                $sortByName,
-                $withRunDetails,
-                $this->params['auth_token']
+        try {
+            // Get all distinct contestants participating in the given contest
+            $raw_contest_users = RunsDAO::getAllRelevantUsers(
+                $this->params['problemset_id'],
+                $this->params['acl_id'],
+                true /* show all runs */,
+                $filterUsersBy,
+                $this->params['group_id']
             );
 
-            $timeout = max(0, $this->params['finish_time'] - time());
-            if ($can_use_contestant_cache) {
-                $contestantScoreboardCache->set($result, $timeout);
-            } elseif ($can_use_admin_cache) {
-                $adminScoreboardCache->set($result, $timeout);
-            }
+            // Get all problems given problemset
+            $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
+            $raw_problemset_problems =
+                ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-            Scoreboard::setIsLastRunFromCacheForTesting(false);
-        } else {
-            Scoreboard::setIsLastRunFromCacheForTesting(true);
+            $contest_runs = RunsDAO::getProblemsetRuns(
+                $problemset,
+                $this->params['only_ac']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $problem_mapping = [];
+
+        $order = 0;
+        foreach ($raw_problemset_problems as $problem) {
+            $problem_mapping[$problem->problem_id] = [
+                'order' => $order++,
+                'alias' => $problem->alias
+            ];
+        }
+
+        $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->params);
+
+        $result = Scoreboard::getScoreboardFromRuns(
+            $contest_runs,
+            $raw_contest_users,
+            $problem_mapping,
+            $this->params['penalty'],
+            $this->params['penalty_calc_policy'],
+            $scoreboardLimit,
+            $this->params['title'],
+            $this->params['start_time'],
+            $this->params['finish_time'],
+            $this->params['show_all_runs'],
+            $sortByName,
+            $withRunDetails,
+            $this->params['auth_token']
+        );
+
+        $timeout = max(0, $this->params['finish_time'] - time());
+        if ($can_use_contestant_cache) {
+            $contestantScoreboardCache->set($result, $timeout);
+        } elseif ($can_use_admin_cache) {
+            $adminScoreboardCache->set($result, $timeout);
         }
 
         return $result;
@@ -226,52 +226,51 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        if (is_null($result)) {
-            try {
-                // Get all distinct contestants participating in the given contest
-                $raw_contest_users = RunsDAO::getAllRelevantUsers(
-                    $this->params['problemset_id'],
-                    $this->params['acl_id'],
-                    $this->params['show_all_runs']
-                );
+        if (!is_null($result)) {
+            Scoreboard::setIsLastRunFromCacheForTesting(true);
+            return $result;
+        }
 
-                // Get all problems given problemset
-                $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
-                $raw_problemset_problems =
-                    ProblemsetProblemsDAO::getRelevantProblems($problemset);
-
-                $contest_runs = RunsDAO::getProblemsetRuns($problemset);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            $problem_mapping = [];
-
-            $order = 0;
-            foreach ($raw_problemset_problems as $problem) {
-                $problem_mapping[$problem->problem_id] = [
-                    'order' => $order++,
-                    'alias' => $problem->alias
-                ];
-            }
-
-            $result = Scoreboard::calculateEvents(
-                $this->params,
-                $contest_runs,
-                $raw_contest_users,
-                $problem_mapping
+        try {
+            // Get all distinct contestants participating in the given contest
+            $raw_contest_users = RunsDAO::getAllRelevantUsers(
+                $this->params['problemset_id'],
+                $this->params['acl_id'],
+                $this->params['show_all_runs']
             );
 
-            $timeout = max(0, $this->params['finish_time'] - time());
-            if ($can_use_contestant_cache) {
-                $contestantEventsCache->set($result, $timeout);
-            } elseif ($can_use_admin_cache) {
-                $adminEventsCache->set($result, $timeout);
-            }
+            // Get all problems given problemset
+            $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
+            $raw_problemset_problems =
+                ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-            Scoreboard::setIsLastRunFromCacheForTesting(false);
-        } else {
-            Scoreboard::setIsLastRunFromCacheForTesting(true);
+            $contest_runs = RunsDAO::getProblemsetRuns($problemset);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $problem_mapping = [];
+
+        $order = 0;
+        foreach ($raw_problemset_problems as $problem) {
+            $problem_mapping[$problem->problem_id] = [
+                'order' => $order++,
+                'alias' => $problem->alias
+            ];
+        }
+
+        $result = Scoreboard::calculateEvents(
+            $this->params,
+            $contest_runs,
+            $raw_contest_users,
+            $problem_mapping
+        );
+
+        $timeout = max(0, $this->params['finish_time'] - time());
+        if ($can_use_contestant_cache) {
+            $contestantEventsCache->set($result, $timeout);
+        } elseif ($can_use_admin_cache) {
+            $adminEventsCache->set($result, $timeout);
         }
 
         return $result;
