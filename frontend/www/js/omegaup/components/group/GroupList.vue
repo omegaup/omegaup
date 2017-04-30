@@ -35,12 +35,17 @@
 </template>
 
 <script>
+import {T} from '../../omegaup.js';
+
 export default {
   props: {
-    T: Object,
     groups: Array,
   },
-  data: function() { return {};},
+  data: function() {
+    return {
+      T: T,
+    };
+  },
   methods: {
     groupScoreboardUrl: function(group) {
       return '/group/' + group.alias + '/edit/#scoreboards';

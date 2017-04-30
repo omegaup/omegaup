@@ -1,5 +1,5 @@
 import group_GroupList from '../components/group/GroupList.vue';
-import {OmegaUp, T} from '../omegaup.js';
+import {OmegaUp} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -8,7 +8,7 @@ OmegaUp.on('ready', function() {
     el: '#group_list',
     render: function(createElement) {
       return createElement('omegaup-group-grouplist', {
-        props: {T: T, groups: this.groups},
+        props: {groups: this.groups},
       });
     },
     data: {
