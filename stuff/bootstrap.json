@@ -19,7 +19,7 @@
 					"source": "omegaUp classics",
 					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
 					"stack_limit": 33554432,
-					"email_clarifications": true
+					"email_clarifications": 1
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -41,7 +41,7 @@
 					"source": "omegaUp classics",
 					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
 					"stack_limit": 33554432,
-					"email_clarifications": true
+					"email_clarifications": 1
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/triangulos.zip"

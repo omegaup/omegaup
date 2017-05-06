@@ -1256,7 +1256,7 @@ class UserController extends Controller {
         // User already started the problemset.
         $problemsetOpened = ProblemsetUsersDAO::getByPK($user_id, $problemset_id);
 
-        if (!is_null($problemsetOpened) && $problemsetOpened->access_time != '0000-00-00 00:00:00') {
+        if (!is_null($problemsetOpened) && !is_null($problemsetOpened->access_time)) {
             return true;
         }
 

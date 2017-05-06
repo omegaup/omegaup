@@ -324,9 +324,8 @@ class ContestController extends Controller {
             $r['current_user_id'],
             $r['contest']->problemset_id
         );
-        if (!is_null($contestOpened) &&
-            $contestOpened->access_time != '0000-00-00 00:00:00') {
-            self::$log->debug('Not intro because you already started the contest');
+        if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
+            self::$log->debug('No intro because you already started the contest');
             return !ContestController::SHOW_INTRO;
         }
 
@@ -811,7 +810,7 @@ class ContestController extends Controller {
                     $temp_user_contest = new ProblemsetUsers([
                                 'problemset_id' => $problemset->problemset_id,
                                 'user_id' => $userkey,
-                                'access_time' => '0000-00-00 00:00:00',
+                                'access_time' => null,
                                 'score' => 0,
                                 'time' => 0
                             ]);
@@ -1291,7 +1290,7 @@ class ContestController extends Controller {
             ProblemsetUsersDAO::save(new ProblemsetUsers([
                 'problemset_id' => $r['contest']->problemset_id,
                 'user_id' => $r['user']->user_id,
-                'access_time' => '0000-00-00 00:00:00',
+                'access_time' => null,
                 'score' => '0',
                 'time' => '0',
             ]));
@@ -2121,7 +2120,7 @@ class ContestController extends Controller {
                     $temp_user_contest = new ProblemsetUsers([
                                 'problemset_id' => $r['contest']->problemset_id,
                                 'user_id' => $userkey,
-                                'access_time' => '0000-00-00 00:00:00',
+                                'access_time' => null,
                                 'score' => 0,
                                 'time' => 0
                             ]);

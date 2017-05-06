@@ -165,7 +165,7 @@ class InterviewController extends Controller {
             ProblemsetUsersDAO::save(new ProblemsetUsers([
                 'problemset_id' => $r['interview']->problemset_id,
                 'user_id' => $r['user']->user_id,
-                'access_time' => '0000-00-00 00:00:00',
+                'access_time' => null,
                 'score' => '0',
                 'time' => '0',
             ]));
