@@ -1066,6 +1066,9 @@ class CourseController extends Controller {
             ])
         );
 
-        return $scoreboard->generate();
+        return $scoreboard->generate(
+            false /*withRunDetails*/,
+            true /*sortByName*/
+        );
     }
 }
