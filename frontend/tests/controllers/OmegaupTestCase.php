@@ -384,3 +384,16 @@ class ScopedLoginToken {
         Authorization::clearSystemAdminCache();
     }
 }
+
+/**
+ * Simple RAII class to enable Test runs on Scoreboard
+ */
+class ScopedScoreboardTestRun {
+    public function __construct() {
+        Scoreboard::setIsTestRunForTesting(true);
+    }
+
+    public function __destruct() {
+        Scoreboard::setIsTestRunForTesting(false);
+    }
+}

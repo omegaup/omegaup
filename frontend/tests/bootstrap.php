@@ -50,6 +50,9 @@ for ($i = 0; $i < 256; $i++) {
 // Clean DB
 Utils::CleanupDB();
 
+// Clean APC cache
+apc_clear_cache('user');
+
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;
 $admin = UserFactory::createUser('admintest', 'testtesttest');
