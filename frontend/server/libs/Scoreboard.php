@@ -659,8 +659,10 @@ class Scoreboard {
                 }
             }
 
-            // Set the place for the current user
-            $userData['place'] = $place;
+            if (!$sortByName) {
+                // Set the place for the current user
+                $userData['place'] = $place;
+            }
         }
     }
 

@@ -52,12 +52,12 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
             'assignment_alias' => $courseData['assignment_alias']
         ]));
 
-        // Validation
+        // Validation. Courses should be sorted by names instead of ranking.
         array_multisort(
-            array_values($expectedScores),
-            SORT_DESC,
             array_keys($expectedScores),
             SORT_ASC,
+            array_values($expectedScores),
+            SORT_DESC,
             $expectedScores
         );
         $expectedPlace = 0;
@@ -72,9 +72,12 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
             $this->assertEquals(
                 $username,
                 $response['ranking'][$i]['username'],
-                'Scoreboard is not properly sorted by contest score.'
+                'Scoreboard is not properly sorted by username.'
             );
-            $this->assertEquals($expectedPlace, $response['ranking'][$i]['place']);
+            $this->assertFalse(
+                array_key_exists('place', $response['ranking'][$i]),
+                'Course scoreboard contains place information and should not.'
+            );
             $i++;
         }
     }
