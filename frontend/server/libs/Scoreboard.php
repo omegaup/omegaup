@@ -774,7 +774,7 @@ class Scoreboard {
      * Get last run from Cache valu
      * @return bool
      */
-    public function getIsLastRunFromCacheForTesting() {
+    public static function getIsLastRunFromCacheForTesting() {
         return Scoreboard::$isLastRunFromCache;
     }
 
@@ -782,7 +782,7 @@ class Scoreboard {
      * Enable testing extras
      * @param bool $value
      */
-    public function setIsTestRunForTesting($value) {
+    public static function setIsTestRunForTesting($value) {
         Scoreboard::$isTestRun = $value;
     }
 }
