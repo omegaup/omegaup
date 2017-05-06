@@ -1044,7 +1044,7 @@ class CourseController extends Controller {
      * @param  Request $r
      * @return array
      */
-    public static function apiScoreboard(Request $r) {
+    public static function apiAssignmentScoreboard(Request $r) {
         self::authenticateRequest($r);
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);

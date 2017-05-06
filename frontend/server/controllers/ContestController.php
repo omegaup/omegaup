@@ -1727,8 +1727,6 @@ class ContestController extends Controller {
             }
 
             $params = ScoreboardParams::fromContest($contest);
-            $params['show_all_runs'] = false;
-            $params['auth_token'] = null;
             $params['only_ac'] = $r['contest_params'][$contest->alias]['only_ac'];
             $s = new Scoreboard($params);
 

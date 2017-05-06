@@ -46,7 +46,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiScoreboard(new Request([
+        $response = CourseController::apiAssignmentScoreboard(new Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment_alias']

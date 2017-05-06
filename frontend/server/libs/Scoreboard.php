@@ -24,8 +24,12 @@ class ScoreboardParams implements ArrayAccess {
         ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
         ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
 
-        $params['start_time'] = strtotime($params['start_time']);
-        $params['finish_time'] = strtotime($params['finish_time']);
+        // Convert any string dates into timestamps.
+        foreach (['start_time', 'finish_time'] as $time_param) {
+            if (is_string($params[$time_param])) {
+                $params[$time_param] = strtotime($params[$time_param]);
+            }
+        }
 
         $this->params = $params;
     }
