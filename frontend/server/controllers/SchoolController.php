@@ -83,4 +83,31 @@ class SchoolController extends Controller {
 
         return ['status' => 'ok', 'school_id' => $school_id];
     }
+
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     */
+    public static function apiRank(Request $r) {
+        self::authenticateRequest($r);
+        Validators::isNumber($r['offset'], 'offset', false);
+        Validators::isNumber($r['rowcount'], 'rowcount', false);
+
+        // Defaults for offset and rowcount
+        if (null == $r['offset']) {
+            $r['offset'] = 0;
+        }
+        if (null == $r['rowcount']) {
+            $r['rowcount'] = 100;
+        }
+
+        $startOfMonth = new DateTime('First day of this month');
+        $result = SchoolsDAO::getRankByUsersAndProblemsWithAC($startOfMonth, $r['offset'], $r['rowcount']);
+
+        return ['status' => 'ok', 'rank' => $result];
+    }
 }
