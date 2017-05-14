@@ -107,16 +107,16 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        (null == $r['start_time']) ? 
+        (null == $r['start_time']) ?
             $r['start_time'] = new DateTime('First day of this month') :
             $r['start_time'] = new DateTime('@'.$r['start_time']);
-        
-        (null == $r['finish_time']) ? 
+
+        (null == $r['finish_time']) ?
             $r['finish_time'] = new DateTime('Last day of this month') :
             $r['finish_time'] = new DateTime('@'.$r['finish_time']);
 
-        $cache_key = $r['start_time']->getTimestamp() ."-". 
-                        $r['finish_time']->getTimestamp() ."-". 
+        $cache_key = $r['start_time']->getTimestamp() ."-".
+                        $r['finish_time']->getTimestamp() ."-".
                         $r['offset'] ."-". $r['rowcount'];
         $result = [];
 
@@ -126,9 +126,9 @@ class SchoolController extends Controller {
                     $r,
                     function (Request $r) {
                         return SchoolsDAO::getRankByUsersAndProblemsWithAC(
-                            $r['start_time'], 
-                            $r['finish_time'], 
-                            $r['offset'], 
+                            $r['start_time'],
+                            $r['finish_time'],
+                            $r['offset'],
                             $r['rowcount']);
                     },
                     $result
