@@ -115,7 +115,24 @@ class SchoolController extends Controller {
             $r['finish_time'] = new DateTime('Last day of this month') :
             $r['finish_time'] = new DateTime('@'.$r['finish_time']);
 
-        $result = SchoolsDAO::getRankByUsersAndProblemsWithAC($r['start_time'], $r['finish_time'], $r['offset'], $r['rowcount']);
+        $cache_key = $r['start_time']->getTimestamp() ."-". 
+                        $r['finish_time']->getTimestamp() ."-". 
+                        $r['offset'] ."-". $r['rowcount'];
+        $result = [];
+
+        Cache::getFromCacheOrSet(
+                    Cache::SCHOOL_RANK,
+                    $cache_key,
+                    $r,
+                    function (Request $r) {
+                        return SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                            $r['start_time'], 
+                            $r['finish_time'], 
+                            $r['offset'], 
+                            $r['rowcount']);
+                    },
+                    $result
+                );
 
         return ['status' => 'ok', 'rank' => $result];
     }

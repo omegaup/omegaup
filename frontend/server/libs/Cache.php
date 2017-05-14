@@ -22,6 +22,7 @@ class Cache {
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
+    const SCHOOL_RANK = 'school-rank';
 
     private $enabled;
     private $log;
