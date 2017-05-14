@@ -273,6 +273,7 @@ class ProblemList extends OmegaupTestCase {
         $author = UserFactory::createUser();
 
         $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+        $alias = $problemDataPrivate['request']['alias'];
 
         $addedAdmin = UserFactory::createUser();
 
@@ -283,11 +284,15 @@ class ProblemList extends OmegaupTestCase {
 
         // Should not be contained in problem list.
         $response = ProblemController::apiList($r);
-        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayNotContainsInKey($response['results'], 'alias', $alias);
+
+        $response = ProblemController::apiAdminList($r);
+        $this->assertArrayNotContainsInKey($response['problems'], 'alias', $alias);
 
         $authorLogin = self::login($author);
         $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
         GroupsFactory::addUserToGroup($group, $addedAdmin, $authorLogin);
+        GroupsFactory::addUserToGroup($group, $author, $authorLogin);
 
         $response = ProblemController::apiAddGroupAdmin(new Request([
             'auth_token' => $authorLogin->auth_token,
@@ -299,7 +304,43 @@ class ProblemList extends OmegaupTestCase {
 
         // Now it should be visible.
         $response = ProblemController::apiList($r);
-        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $alias);
+
+        $response = ProblemController::apiAdminList($r);
+        $this->assertArrayContainsInKeyExactlyOnce($response['problems'], 'alias', $alias);
+    }
+
+    /**
+     * Authors with admin groups should only see each problem once.
+     */
+    public function testAuthorOnlySeesProblemsOnce() {
+        $author = UserFactory::createUser();
+
+        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+        $alias = $problemDataPrivate['request']['alias'];
+
+        $authorLogin = self::login($author);
+        $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
+        GroupsFactory::addUserToGroup($group, UserFactory::createUser(), $authorLogin);
+        GroupsFactory::addUserToGroup($group, $author, $authorLogin);
+
+        $response = ProblemController::apiAddGroupAdmin(new Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'group' => $group['group']->alias,
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+
+        // It should be visible just once.
+        $r = new Request([
+            'auth_token' => $authorLogin->auth_token,
+        ]);
+        $response = ProblemController::apiList($r);
+        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $alias);
+
+        $response = ProblemController::apiAdminList($r);
+        $this->assertArrayContainsInKeyExactlyOnce($response['problems'], 'alias', $alias);
     }
 
     /**
