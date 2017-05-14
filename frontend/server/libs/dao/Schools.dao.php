@@ -55,9 +55,9 @@ class SchoolsDAO extends SchoolsDAOBase {
      * @return array
      */
     public static function getRankByUsersAndProblemsWithAC(DateTime $startDate, DateTime $finishDate, $offset, $rowcount) {
-      global  $conn;
+        global  $conn;
 
-      $sql = '
+        $sql = '
         SELECT
           s.name,
           COUNT(DISTINCT u.user_id) as distinct_users,
@@ -80,17 +80,17 @@ class SchoolsDAO extends SchoolsDAOBase {
         LIMIT ?, ?;
       ';
 
-      $args = [$startDate->format('Y-m-d'), $finishDate->format('Y-m-d'), $offset, $rowcount];
+        $args = [$startDate->format('Y-m-d'), $finishDate->format('Y-m-d'), $offset, $rowcount];
 
-      $result = [];
-      foreach ($conn->Execute($sql, $args) as $row) {
-        $result[] = [
-          'name' => $row['name'],
-          'distinct_users' => $row['distinct_users'],
-          'distinct_problems' => $row['distinct_problems']
-        ];
-      }
+        $result = [];
+        foreach ($conn->Execute($sql, $args) as $row) {
+            $result[] = [
+            'name' => $row['name'],
+            'distinct_users' => $row['distinct_users'],
+            'distinct_problems' => $row['distinct_problems']
+            ];
+        }
 
-      return $result;
+        return $result;
     }
 }
