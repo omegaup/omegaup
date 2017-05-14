@@ -180,25 +180,33 @@ class ContestListTest extends OmegaupTestCase {
     }
 
     /**
-     *
+     * An added admin group should see those contests as well
      */
     public function testPrivateContestForContestGroupAdmin() {
         // Create new private contest
         $contestData = ContestsFactory::createContest(null, true /*private*/);
+        $title = $contestData['request']['title'];
 
         $admin1 = UserFactory::createUser();
         $admin2 = UserFactory::createUser();
 
         $login = self::login($admin1);
-        $response = ContestController::apiList(new Request([
+        $r = new Request([
             'auth_token' => $login->auth_token,
-        ]));
+        ]);
 
-        // Assert our contest is there
+        // Assert our contest is not there.
+        $response = ContestController::apiList($r);
         $this->assertArrayNotContainsInKey(
             $response['results'],
             'title',
-            $contestData['request']['title']
+            $title
+        );
+        $response = ContestController::apiAdminList($r);
+        $this->assertArrayNotContainsInKey(
+            $response['contests'],
+            'title',
+            $title
         );
 
         // Add user to our private contest
@@ -207,15 +215,56 @@ class ContestListTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($group, $admin2);
         ContestsFactory::addGroupAdmin($contestData, $group['group']);
 
-        $response = ContestController::apiList(new Request([
-            'auth_token' => $login->auth_token,
-        ]));
-
         // Assert our contest is there
+        $response = ContestController::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
-            $contestData['request']['title']
+            $title
+        );
+        $response = ContestController::apiAdminList($r);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['contests'],
+            'title',
+            $title
+        );
+    }
+
+    /**
+     * Authors with admin groups should only see each contest once.
+     */
+    public function testAuthorOnlySeesContestsOnce() {
+        // Create new private contest
+        $contestData = ContestsFactory::createContest(null, true /*private*/);
+        $author = $contestData['director'];
+        $title = $contestData['request']['title'];
+
+        $admin1 = UserFactory::createUser();
+        $admin2 = UserFactory::createUser();
+
+        // Add user to our private contest
+        $group = GroupsFactory::createGroup($author);
+        GroupsFactory::addUserToGroup($group, $admin1);
+        GroupsFactory::addUserToGroup($group, $admin2);
+        ContestsFactory::addGroupAdmin($contestData, $group['group']);
+
+        $login = self::login($author);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
+
+        // Assert our contest is there, but just once.
+        $response = ContestController::apiList($r);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $title
+        );
+        $response = ContestController::apiAdminList($r);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['contests'],
+            'title',
+            $title
         );
     }
 
