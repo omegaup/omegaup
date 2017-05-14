@@ -96,6 +96,8 @@ class SchoolController extends Controller {
         self::authenticateRequest($r);
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
+        Validators::isNumber($r['start_time'], 'start_time', false);
+        Validators::isNumber($r['finish_time'], 'finish_time', false);
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -105,8 +107,15 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        $startOfMonth = new DateTime('First day of this month');
-        $result = SchoolsDAO::getRankByUsersAndProblemsWithAC($startOfMonth, $r['offset'], $r['rowcount']);
+        (null == $r['start_time']) ? 
+            $r['start_time'] = new DateTime('First day of this month') :
+            $r['start_time'] = new DateTime('@'.$r['start_time']);
+        
+        (null == $r['finish_time']) ? 
+            $r['finish_time'] = new DateTime('Last day of this month') :
+            $r['finish_time'] = new DateTime('@'.$r['finish_time']);
+
+        $result = SchoolsDAO::getRankByUsersAndProblemsWithAC($r['start_time'], $r['finish_time'], $r['offset'], $r['rowcount']);
 
         return ['status' => 'ok', 'rank' => $result];
     }
