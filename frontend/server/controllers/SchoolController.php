@@ -83,4 +83,71 @@ class SchoolController extends Controller {
 
         return ['status' => 'ok', 'school_id' => $school_id];
     }
+
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     */
+    public static function apiRank(Request $r) {
+        self::authenticateRequest($r);
+        Validators::isNumber($r['offset'], 'offset', false);
+        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        Validators::isNumber($r['start_time'], 'start_time', false);
+        Validators::isNumber($r['finish_time'], 'finish_time', false);
+
+        // Defaults for offset and rowcount
+        if (null == $r['offset']) {
+            $r['offset'] = 0;
+        }
+        if (null == $r['rowcount']) {
+            $r['rowcount'] = 100;
+        }
+
+        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
+
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = date('Y-m-01');
+        } else {
+            $r['start_time'] = date('Y-m-d', strtotime($r['start_time']));
+        }
+
+        if (is_null($r['finish_time'])) {
+            $r['finish_time'] = date('Y-m-d', strtotime('first day of next month'));
+        } else {
+            $r['finish_time'] = date('Y-m-d', strtotime($r['finish_time']));
+        }
+
+        $fetch = function (Request $r) {
+            try {
+                return SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                    $r['start_time'],
+                    $r['finish_time'],
+                    $r['offset'],
+                    $r['rowcount']
+                );
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        };
+
+        $result = [];
+        if ($canUseCache) {
+            $cache_key = $r['offset'] .'-'. $r['rowcount'];
+            Cache::getFromCacheOrSet(
+                Cache::SCHOOL_RANK,
+                $cache_key,
+                $r,
+                $fetch,
+                $result
+            );
+        } else {
+            $result = $fetch($r);
+        }
+
+        return ['status' => 'ok', 'rank' => $result];
+    }
 }
