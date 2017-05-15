@@ -71,7 +71,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         INNER JOIN
           Problems p ON p.problem_id = r.problem_id
         WHERE
-          r.Verdict = "AC" AND p.public = "1" AND time BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)
+          r.verdict = "AC" AND p.public = "1" AND r.time BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)
         GROUP BY
           s.school_id
         ORDER BY

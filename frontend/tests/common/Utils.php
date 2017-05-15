@@ -116,6 +116,7 @@ class Utils {
             'Problemset_Users',
             'Problemsets',
             'Runs',
+            'Schools',
             'Submission_Log',
             'Tags',
             'User_Login_Log',

@@ -107,33 +107,52 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        (null == $r['start_time']) ?
-            $r['start_time'] = new DateTime('First day of this month') :
-            $r['start_time'] = new DateTime('@'.$r['start_time']);
+        $canUseCache = false;
+        if (is_null($r['start_time']) && is_null($r['finish_time'])) {
+            $canUseCache = true;
+        }
 
-        (null == $r['finish_time']) ?
-            $r['finish_time'] = new DateTime('Last day of this month') :
-            $r['finish_time'] = new DateTime('@'.$r['finish_time']);
-
-        $cache_key = $r['start_time']->getTimestamp() .'-'.
-                        $r['finish_time']->getTimestamp() .'-'.
-                        $r['offset'] .'-'. $r['rowcount'];
-        $result = [];
-
-        Cache::getFromCacheOrSet(
-            Cache::SCHOOL_RANK,
-            $cache_key,
-            $r,
-            function (Request $r) {
-                        return SchoolsDAO::getRankByUsersAndProblemsWithAC(
-                            $r['start_time'],
-                            $r['finish_time'],
-                            $r['offset'],
-                            $r['rowcount']
-                        );
-            },
-            $result
+        $r['start_time'] = new DateTime(
+            $r['start_time'] != null ?
+                '@'.$r['start_time'] :
+                'First day of this month'
         );
+
+        $r['finish_time'] = new DateTime(
+            $r['finish_time'] != null ?
+                '@'.$r['finish_time'] :
+                'Last day of this month'
+        );
+
+        $result = [];
+        $fetch = function (Request $r) {
+                        $rank = [];
+            try {
+                $rank = SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                    $r['start_time'],
+                    $r['finish_time'],
+                    $r['offset'],
+                    $r['rowcount']
+                );
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+                        return $rank;
+        };
+
+        if ($canUseCache) {
+            $cache_key = $r['offset'] .'-'. $r['rowcount'];
+            Cache::getFromCacheOrSet(
+                Cache::SCHOOL_RANK,
+                $cache_key,
+                $r,
+                $fetch,
+                $result
+            );
+        } else {
+            $result = $fetch($r);
+        }
 
         return ['status' => 'ok', 'rank' => $result];
     }
