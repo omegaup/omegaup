@@ -36,7 +36,7 @@ class SchoolRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         $runData = RunsFactory::createRunToProblem($problemData, $users[3]);
-        RunsFactory::gradeRun($runData, 'PA', 0.5);
+        RunsFactory::gradeRun($runData, 0.5, 'PA');
 
         $runData = RunsFactory::createRunToProblem($problemData, $users[4]);
         RunsFactory::gradeRun($runData);
