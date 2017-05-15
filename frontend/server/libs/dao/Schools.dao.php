@@ -81,6 +81,7 @@ class SchoolsDAO extends SchoolsDAOBase {
       ';
 
         $args = [$startDate->format('Y-m-d'), $finishDate->format('Y-m-d'), $offset, $rowcount];
+        var_dump($args);
 
         $result = [];
         foreach ($conn->Execute($sql, $args) as $row) {

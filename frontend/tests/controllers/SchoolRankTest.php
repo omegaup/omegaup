@@ -49,6 +49,7 @@ class SchoolRankTest extends OmegaupTestCase {
 			'auth_token' => $rankViewerLogin->auth_token
 		]));
 
+		var_dump($response);
 		$this->assertEquals('ok', $response['status']);
 		$this->assertEquals(2, count($response['rank']));
 		$this->assertEquals($schoolsData[0]['request']['name'], $response['rank'][0]['name']);
