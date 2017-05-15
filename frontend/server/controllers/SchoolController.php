@@ -107,34 +107,23 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        $canUseCache = false;
-        if (is_null($r['start_time']) && is_null($r['finish_time'])) {
-            $canUseCache = true;
+        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
+
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = date('Y-m-01');
+        } else {
+            $r['start_time'] = date('Y-m-d', strtotime($r['start_time']));
         }
 
-        $r['start_time'] = date(
-            'Y-m-d',
-            strtotime(
-                is_null($r['start_time']) ?
-                    'First day of this month' :
-                    $r['start_time']
-            )
-        );
+        if (is_null($r['finish_time'])) {
+            $r['finish_time'] = date('Y-m-d', strtotime('tomorrow'));
+        } else {
+            $r['finish_time'] = date('Y-m-d', strtotime($r['finish_time']));
+        }
 
-        $r['finish_time'] = date(
-            'Y-m-d',
-            strtotime(
-                is_null($r['finish_time']) ?
-                    'Last day of this month' :
-                    $r['finish_time']
-            )
-        );
-
-        $result = [];
         $fetch = function (Request $r) {
-                        $rank = [];
             try {
-                $rank = SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                return SchoolsDAO::getRankByUsersAndProblemsWithAC(
                     $r['start_time'],
                     $r['finish_time'],
                     $r['offset'],
@@ -143,10 +132,9 @@ class SchoolController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-
-                        return $rank;
         };
 
+        $result = [];
         if ($canUseCache) {
             $cache_key = $r['offset'] .'-'. $r['rowcount'];
             Cache::getFromCacheOrSet(
