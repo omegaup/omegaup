@@ -116,7 +116,7 @@ class SchoolController extends Controller {
         }
 
         if (is_null($r['finish_time'])) {
-            $r['finish_time'] = date('Y-m-d', strtotime('tomorrow'));
+            $r['finish_time'] = date('Y-m-d', strtotime('first day of next month'));
         } else {
             $r['finish_time'] = date('Y-m-d', strtotime($r['finish_time']));
         }
