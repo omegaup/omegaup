@@ -412,6 +412,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
                 (gr.role_id = ? AND gu.user_id = ?)
+            GROUP BY
+                p.problem_id
             ORDER BY
                 p.problem_id DESC
             LIMIT
