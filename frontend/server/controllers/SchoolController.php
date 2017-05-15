@@ -112,16 +112,22 @@ class SchoolController extends Controller {
             $canUseCache = true;
         }
 
-        $r['start_time'] = new DateTime(
-            $r['start_time'] != null ?
-                '@'.$r['start_time'] :
-                'First day of this month'
+        $r['start_time'] = date(
+            'Y-m-d',
+            strtotime(
+                is_null($r['start_time']) ?
+                    'First day of this month' :
+                    $r['start_time']
+            )
         );
 
-        $r['finish_time'] = new DateTime(
-            $r['finish_time'] != null ?
-                '@'.$r['finish_time'] :
-                'Last day of this month'
+        $r['finish_time'] = date(
+            'Y-m-d',
+            strtotime(
+                is_null($r['finish_time']) ?
+                    'Last day of this month' :
+                    $r['finish_time']
+            )
         );
 
         $result = [];

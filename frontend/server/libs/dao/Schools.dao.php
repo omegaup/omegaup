@@ -48,13 +48,13 @@ class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Returns rank of schools by # of distinct users with at least one AC and # of distinct problems solved.
      *
-     * @param  DateTime $startDate
-     * @param  DateTime $finishDate
+     * @param  string (DateTime) $startDate
+     * @param  string (DateTime) $finishDate
      * @param  int   $offset
      * @param  int   $rowcount
      * @return array
      */
-    public static function getRankByUsersAndProblemsWithAC(DateTime $startDate, DateTime $finishDate, $offset, $rowcount) {
+    public static function getRankByUsersAndProblemsWithAC($startDate, $finishDate, $offset, $rowcount) {
         global  $conn;
 
         $sql = '
@@ -80,8 +80,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         LIMIT ?, ?;
       ';
 
-        $args = [$startDate->format('Y-m-d'), $finishDate->format('Y-m-d'), $offset, $rowcount];
-        var_dump($args);
+        $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
         foreach ($conn->Execute($sql, $args) as $row) {
