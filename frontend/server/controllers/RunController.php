@@ -533,8 +533,6 @@ class RunController extends Controller {
             // Expire details of the run
             Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
 
-            $contest = ContestsDAO::getByPK($run->contest_id);
-
             // Now we need to invalidate problem stats
             $problem = ProblemsDAO::getByPK($run->problem_id);
 
