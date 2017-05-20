@@ -485,8 +485,7 @@ export class Arena {
     var clock = '';
 
     if (date < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() -
-                                (date + OmegaUp._deltaTime));
+      clock = '-' + FormatDelta(self.startTime.getTime() - OmegaUp.time(date));
     } else if (date > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -503,8 +502,7 @@ export class Arena {
             .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
       }
     } else {
-      clock =
-          FormatDelta(countdownTime.getTime() - (date + OmegaUp._deltaTime));
+      clock = FormatDelta(countdownTime.getTime() - OmegaUp.time(date));
     }
 
     self.elements.clock.text(clock);
