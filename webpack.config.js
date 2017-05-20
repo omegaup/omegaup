@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     omegaup: ['babel-polyfill', './frontend/www/js/omegaup/omegaup.js'],
     admin_user: './frontend/www/js/omegaup/admin/user.js',
+    contest_list: './frontend/www/js/omegaup/contest/list.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_student: './frontend/www/js/omegaup/course/student.js',

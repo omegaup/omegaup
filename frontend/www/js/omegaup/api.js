@@ -414,6 +414,8 @@ export default {
      * @return {Promise}
      */
     get: _call('/api/time/get/'),
+
+    convert: _convertTimes,
   },
 
   Tag: {
