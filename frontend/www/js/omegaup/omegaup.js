@@ -154,7 +154,17 @@ export let OmegaUp = {
                                   options.server_sync;
         return new Date(OmegaUp._realTime(timestamp) +
                         (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
-      }
+      },
+
+      convertTimes: function(item) {
+        if (item.hasOwnProperty('start_time')) {
+          item.start_time = OmegaUp.time(item.start_time * 1000);
+        }
+        if (item.hasOwnProperty('finish_time')) {
+          item.finish_time = OmegaUp.time(item.finish_time * 1000);
+        }
+        return item;
+      },
 };
 
 if (document.readyState === 'complete' ||

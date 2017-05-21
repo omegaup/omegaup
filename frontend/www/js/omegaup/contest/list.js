@@ -20,8 +20,10 @@ OmegaUp.on('ready', function() {
     payload = JSON.parse(payloadElement.innerText);
     for (var idx in payload.contests) {
       var contest = payload.contests[idx];
-      API.Time.convert(contest);
+      OmegaUp.convertTimes(contest);
     }
+  } else {
+    fillContestsTable();
   }
 
   let contestList = new Vue({
@@ -34,8 +36,7 @@ OmegaUp.on('ready', function() {
             this.showAdmin = showAdmin;
             fillContestsTable();
           },
-          'bulk-make-public': () => this.makePublic(true),
-          'bulk-make-private': () => this.makePublic(false),
+          'bulk-update': (publiclyVisible) => this.makePublic(publiclyVisible),
         }
       });
     },

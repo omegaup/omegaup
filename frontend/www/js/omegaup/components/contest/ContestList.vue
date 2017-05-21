@@ -8,7 +8,7 @@
   <div class="panel-body">
     <div class="checkbox btn-group">
       <label>
-        <input type="checkbox" id="show-admin-contests" v-on:click="onShowAdmin" />
+        <input type="checkbox" class="show-admin-contests" v-on:click="onShowAdmin" />
         {{ T.contestListShowAdminContests }}
       </label>
     </div>
@@ -17,8 +17,8 @@
         {{ T.forSelectedItems }}<span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
-        <li><a id="bulk-make-public" v-on:click="onMakePublic">{{ T.makePublic }}</a></li>
-        <li><a id="bulk-make-private" v-on:click="onMakePrivate">{{ T.makePrivate }}</a></li>
+        <li><a v-on:click="onBulkUpdate(true)">{{ T.makePublic }}</a></li>
+        <li><a v-on:click="onBulkUpdate(false)">{{ T.makePrivate }}</a></li>
         <li class="divider"></li>
       </ul>
     </div>
@@ -43,9 +43,9 @@
     <tbody>
       <tr v-for="contest in contests">
         <td><input type='checkbox' v-bind:id="contest.alias"></input></td>
-        <td><b><a v-bind:href="'/arena/' + contest.alias + '/'">
+        <td><strong><a v-bind:href="'/arena/' + contest.alias + '/'">
             {{ contest.title }}
-        </a></b></td>
+        </a></strong></td>
         <td><a v-bind:href="makeWorldClockLink(contest.start_time)">
             {{ contest.start_time.format('long') }}
         </a></td>
@@ -121,14 +121,11 @@ export default {
       }
       return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' + date.toISOString();
     },
-    onMakePublic: function() {
-      this.$emit('bulk-make-public');
-    },
-    onMakePrivate: function() {
-      this.$emit('bulk-make-private');
+    onBulkUpdate: function(publiclyVisible) {
+      this.$emit('bulk-update', publiclyVisible);
     },
     onShowAdmin: function() {
-      this.$emit('toggle-show-admin', $('#show-admin-contests', this.$el).prop('checked'));
+      this.$emit('toggle-show-admin', this.$el.querySelector('.show-admin-contests').checked);
     },
   },
 };
