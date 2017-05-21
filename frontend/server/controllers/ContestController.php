@@ -1079,7 +1079,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache($params['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -1164,7 +1164,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache($params['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -1607,11 +1607,9 @@ class ContestController extends Controller {
         // Get the current user
         self::validateDetails($r);
 
-        // Create scoreboard
-        $scoreboard = new Scoreboard(
-            $r['contest'],
-            Authorization::isContestAdmin($r['current_user_id'], $r['contest'])
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = Authorization::isContestAdmin($r['current_user_id'], $r['contest']);
+        $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
         $response = [];
@@ -1665,10 +1663,9 @@ class ContestController extends Controller {
         }
 
         // Create scoreboard
-        $scoreboard = new Scoreboard(
-            $r['contest'],
-            $showAllRuns
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = $showAllRuns;
+        $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate();
     }
@@ -1728,12 +1725,9 @@ class ContestController extends Controller {
                 $r['contest_params'] = $cp;
             }
 
-            $s = new Scoreboard(
-                $contest,
-                false, /*showAllRuns*/
-                null, /*auth_token*/
-                $r['contest_params'][$contest->alias]['only_ac']
-            );
+            $params = ScoreboardParams::fromContest($contest);
+            $params['only_ac'] = $r['contest_params'][$contest->alias]['only_ac'];
+            $s = new Scoreboard($params);
 
             $scoreboards[$contest->alias] = $s->generate();
         }
@@ -2195,7 +2189,7 @@ class ContestController extends Controller {
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
-        Scoreboard::invalidateScoreboardCache($r['contest']);
+        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($r['contest']));
 
         // Expire contest-list cache
         Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
@@ -2423,11 +2417,10 @@ class ContestController extends Controller {
 
         self::validateStats($r);
 
-        $scoreboard = new Scoreboard(
-            $r['contest'],
-            true, //Show only relevant runs
-            $r['auth_token']
-        );
+        $params = ScoreboardParams::fromContest($r['contest']);
+        $params['show_all_runs'] = true;
+        $params['auth_token'] = $r['auth_token'];
+        $scoreboard = new Scoreboard($params);
 
         // Check the filter if we have one
         Validators::isStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);

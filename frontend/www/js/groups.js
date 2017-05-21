@@ -6,31 +6,7 @@ var formPage = formData.attr('data-page');
 var formAlias = formData.attr('data-alias');
 
 $(function() {
-  if (formPage === 'list') {
-    function fillGroupsList() {
-      omegaup.API.Group.myList()
-          .then(function(groups) {
-            var html = '';
-
-            for (var i = 0; i < groups.groups.length; i++) {
-              html += '<tr>' + "<td><b><a href='/group/" +
-                      groups.groups[i].alias + "/edit/#scoreboards'>" +
-                      omegaup.UI.escape(groups.groups[i].name) +
-                      '</a></b></td>' +
-                      '<td><a class="glyphicon glyphicon-edit" href="/group/' +
-                      groups.groups[i].alias +
-                      '/edit#edit" title="{#wordsEdit#}"></a></td>' +
-                      '</tr>';
-            }
-
-            $('#groups_list').removeClass('wait_for_ajax');
-            $('#groups_list > table > tbody').empty().html(html);
-          })
-          .fail(omegaup.UI.apiError);
-    }
-
-    fillGroupsList();
-  } else if (formPage === 'new') {
+  if (formPage === 'new') {
     $('.new_group_form')
         .submit(function() {
           omegaup.API.Group.create({

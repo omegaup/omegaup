@@ -31,6 +31,7 @@ require_once(OMEGAUP_ROOT . '/tests/factories/UserFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
+require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
 
 // Clean previous log
 Utils::CleanLog();
@@ -49,6 +50,9 @@ for ($i = 0; $i < 256; $i++) {
 
 // Clean DB
 Utils::CleanupDB();
+
+// Clean APC cache
+apc_clear_cache('user');
 
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;

@@ -10,6 +10,7 @@ module.exports = {
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
+    group_list: './frontend/www/js/omegaup/group/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
   },
   output: {

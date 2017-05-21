@@ -102,53 +102,12 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         // Submit runs - Simulate each student submitting runs to some problems and some others not.
         // Also, sometimes only PAs are sent, other times ACs.
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
-        $expectedScores = [];
-        for ($s = 0; $s < $studentCount; $s++) {
-            $studentUsername = $students[$s]->username;
-            $expectedScores[$studentUsername] = [];
-            $studentLogin = self::login($students[$s]);
-
-            // Loop through all problems inside assignments created
-            $p = 0;
-            foreach ($courseData['assignment_aliases'] as $assignmentAlias) {
-                $assignment = AssignmentsDAO::search(new Assignments([
-                    'course_id' => $course->course_id,
-                    'alias' => $assignmentAlias,
-                ]))[0];
-
-                $expectedScores[$studentUsername][$assignmentAlias] = 0;
-
-                foreach ($problemAssignmentsMap[$assignmentAlias] as $problemData) {
-                    $p++;
-                    if ($s % 2 == $p % 2) {
-                        // PA run
-                        $runResponsePA = RunController::apiCreate(new Request([
-                            'auth_token' => $studentLogin->auth_token,
-                            'problemset_id' => $assignment->problemset_id,
-                            'problem_alias' => $problemData['request']['alias'],
-                            'language' => 'c',
-                            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-                        ]));
-                        RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', 200, $runResponsePA['guid']);
-                        $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
-
-                        if (($s + $p) % 3 == 0) {
-                            // 100 pts run
-                            $runResponseAC = RunController::apiCreate(new Request([
-                                'auth_token' => $studentLogin->auth_token,
-                                'problemset_id' => $assignment->problemset_id,
-                                'problem_alias' => $problemData['request']['alias'],
-                                'language' => 'c',
-                                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-                            ]));
-                            RunsFactory::gradeRun(null /*runData*/, 1, 'AC', 200, $runResponseAC['guid']);
-                            $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
-                        }
-                    }
-                }
-            }
-        }
+        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+            $courseData,
+            $students,
+            $courseData['assignment_aliases'],
+            $problemAssignmentsMap
+        );
 
         // Adding a new student with no runs. Should show in progress
         $studentWithNoRuns = CoursesFactory::addStudentToCourse($courseData);
