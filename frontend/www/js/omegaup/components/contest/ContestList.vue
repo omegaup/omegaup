@@ -1,31 +1,31 @@
 <template>
 <div class="panel panel-default no-bottom-margin">
 
-	<div class="panel-heading">
-		<h3 class="panel-title">{{ T.wordsContests }}</h3>
-	</div>
+  <div class="panel-heading">
+    <h3 class="panel-title">{{ T.wordsContests }}</h3>
+  </div>
 
-	<div class="panel-body">
-		<div class="checkbox btn-group">
-			<label>
-				<input type="checkbox" id="show-admin-contests" v-on:click="onShowAdmin" />
-				{{ T.contestListShowAdminContests }}
-			</label>
-		</div>
-		<div class="btn-group">
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-				{{ T.forSelectedItems }}<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				<li><a id="bulk-make-public" v-on:click="onMakePublic">{{ T.makePublic }}</a></li>
-				<li><a id="bulk-make-private" v-on:click="onMakePrivate">{{ T.makePrivate }}</a></li>
-				<li class="divider"></li>
-			</ul>
-		</div>
-	</div>
+  <div class="panel-body">
+    <div class="checkbox btn-group">
+      <label>
+        <input type="checkbox" id="show-admin-contests" v-on:click="onShowAdmin" />
+        {{ T.contestListShowAdminContests }}
+      </label>
+    </div>
+    <div class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        {{ T.forSelectedItems }}<span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li><a id="bulk-make-public" v-on:click="onMakePublic">{{ T.makePublic }}</a></li>
+        <li><a id="bulk-make-private" v-on:click="onMakePrivate">{{ T.makePrivate }}</a></li>
+        <li class="divider"></li>
+      </ul>
+    </div>
+  </div>
 
-	<table class="table">
-		<thead>
+  <table class="table">
+    <thead>
       <tr>
         <th></th>
         <th>{{ T.wordsTitle }}</th>
@@ -39,8 +39,8 @@
         <th></th>
         <th></th>
       </tr>
-		</thead>
-		<tbody>
+    </thead>
+    <tbody>
       <tr v-for="contest in contests">
         <td><input type='checkbox' v-bind:id="contest.alias"></input></td>
         <td><b><a v-bind:href="'/arena/' + contest.alias + '/'">
@@ -98,8 +98,8 @@
              v-bind:title="T.contestPrintableVersion"></a>
         </td>
       </tr>
-		</tbody>
-	</table>
+    </tbody>
+  </table>
 </div>
 </template>
 
@@ -116,11 +116,10 @@ export default {
   },
   methods: {
     makeWorldClockLink: function(date) {
-      try {
-        return 'http://timeanddate.com/worldclock/fixedtime.html?iso=' + date.toISOString();
-      } catch (e) {
+      if (!date) {
         return '#';
       }
+      return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' + date.toISOString();
     },
     onMakePublic: function() {
       this.$emit('bulk-make-public');
