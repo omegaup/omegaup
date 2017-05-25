@@ -192,7 +192,7 @@ export default {
     /**
      * Returns the list of users signed up for the course that have
      * attempted the requested problem.
-     * 
+     *
      * @param {string} course_alias
      * @param {string} problem_alias
      * @return {Promise}
