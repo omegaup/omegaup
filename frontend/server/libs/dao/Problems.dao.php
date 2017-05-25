@@ -475,4 +475,32 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
         return $problems;
     }
+
+    final public static function getUsersInGroupWhoAttemptedProblem(
+        $group_id,
+        $problem_id
+    ) {
+        $sql = '
+            SELECT DISTINCT
+                gu.user_id
+            FROM
+                Runs r
+            JOIN
+                Groups_Users gu
+            ON
+                r.user_id = gu.user_id
+            WHERE
+                gu.group_id = ?
+                AND r.problem_id = ?';
+        $params = [$group_id, $problem_id];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $users = [];
+        foreach ($rs as $row) {
+            $users[] = $row['user_id'];
+        }
+        return $users;
+    }
 }
