@@ -12,7 +12,7 @@
 					<div class="panel-body">
 
 						<ul class="nav nav-pills">
-							<li class="nav-item active">
+							<li class="nav-item">
 								<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">
 									{#arenaRecommendedCurrentContests#}</a>
 							</li>
@@ -31,7 +31,7 @@
 						</ul>
 
 						<div class="tab-content">
-							<div class="tab-pane active" id="list-recommended-current-contest">
+							<div class="tab-pane" id="list-recommended-current-contest">
 								<div class="panel panel-primary" id="recommended-current-contests"
 									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
 							</div>
