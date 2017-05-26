@@ -481,7 +481,13 @@ class ProblemsDAO extends ProblemsDAOBase {
         $problem_id
     ) {
         $sql = '
-            SELECT DISTINCT
+            SELECT
+                u.username
+            FROM
+                Users u
+            WHERE
+                u.user_id
+            IN (SELECT DISTINCT
                 gu.user_id
             FROM
                 Runs r
@@ -491,7 +497,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 r.user_id = gu.user_id
             WHERE
                 gu.group_id = ?
-                AND r.problem_id = ?';
+                AND r.problem_id = ?)';
         $params = [$group_id, $problem_id];
 
         global $conn;
@@ -499,7 +505,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $users = [];
         foreach ($rs as $row) {
-            $users[] = $row['user_id'];
+            $users[] = $row['username'];
         }
         return $users;
     }
