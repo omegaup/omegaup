@@ -305,6 +305,85 @@ omegaup.OmegaUp.on('ready', function() {
           $('#state_id')
               .append(
                   $('<option></option>').attr('value', '51').text('Wyoming'));
+        } else if ($('#country_id').val() == 'PE') {
+          // Enable
+          $('#state_id').removeAttr('disabled');
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '1').text('Amazonas'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '2').text('Áncash'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '3').text('Apurímac'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '4').text('Arequipa'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '5').text('Ayacucho'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '6').text('Cajamarca'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '7').text('Callao'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '8').text('Cusco'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '9')
+                          .text('Huancavelica'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '10').text('Huánuco'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '11').text('Ica'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '12').text('Junín'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '13')
+                          .text('La Libertad'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '14')
+                          .text('Lambayeque'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '15')
+                          .text('Lima Metropolitana'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '16')
+                          .text('Lima (departamento)'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '17').text('Loreto'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '18')
+                          .text('Madre de Dios'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '19').text('Moquegua'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '20').text('Pasco'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '21').text('Piura'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '22').text('Puno'));
+          $('#state_id')
+              .append($('<option></option>')
+                          .attr('value', '23')
+                          .text('San Martín'));
+          $('#state_id')
+              .append($('<option></option>').attr('value', '24').text('Tacna'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '25').text('Tumbes'));
+          $('#state_id')
+              .append(
+                  $('<option></option>').attr('value', '26').text('Ucayali'));
         } else {
           // Disable
           $('#state_id').attr('disabled', 'disabled');
