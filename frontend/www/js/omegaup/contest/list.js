@@ -1,16 +1,12 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
-import {API,OmegaUp,UI} from '../omegaup.js';
+import {API, OmegaUp, UI} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   function fillContestsTable() {
-    var deferred = contestList.showAdmin ?
-                       API.Contest.adminList() :
-                       API.Contest.myList();
-    deferred
-        .then(function(result) {
-          contestList.contests = result.contests;
-        })
+    var deferred =
+        contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList();
+    deferred.then(function(result) { contestList.contests = result.contests; })
         .fail(UI.apiError);
   }
 
@@ -48,15 +44,12 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      makePublic: function (isPublic) {
-        UI.bulkOperation(
-            function(alias, resolve, reject) {
-              API.Contest
-                  .update({contest_alias: alias, 'public': isPublic ? 1 : 0})
-                  .then(resolve)
-                  .fail(reject);
-            },
-            fillContestsTable);
+      makePublic: function(isPublic) {
+        UI.bulkOperation(function(alias, resolve, reject) {
+          API.Contest.update({contest_alias: alias, 'public': isPublic ? 1 : 0})
+              .then(resolve)
+              .fail(reject);
+        }, fillContestsTable);
       }
     }
   });

@@ -78,16 +78,7 @@ script:
           python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/whitespace-purge.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/js-lint.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/vue-lint.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/php-format.py validate --all-files < /dev/null
+          python3 stuff/hook_tools.py validate --all < /dev/null
 
 notifications:
   slack:

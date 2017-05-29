@@ -1,0 +1,40 @@
+{
+	"lint": {
+		"whitespace": {
+			"whitelist": [
+				"^frontend/.*\\.(php|css|js|sql|tpl|py|vue)$"
+			],
+			"blacklist": [
+				".*third_party.*"
+			]
+		},
+		"php": {
+			"whitelist": [
+				"^frontend/.*\\.php$"
+			],
+			"blacklist": [
+				".*third_party.*"
+			]
+		},
+		"javascript": {
+			"extra_js_linters": [
+				"yarn run refactor"
+			],
+			"whitelist": [
+				"frontend/www/(js|ux)/.*\\.js$"
+			],
+			"blacklist": [
+				".*third_party.*",
+				".*js/omegaup/lang\\..*"
+			]
+		},
+		"vue": {
+			"extra_js_linters": [
+				"yarn run refactor"
+			],
+			"whitelist": [
+				"frontend/www/.*\\.vue$"
+			]
+		}
+	}
+}
