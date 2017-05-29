@@ -8,14 +8,15 @@ const fs = require('fs');
 const process = require('process');
 const t = require('babel-types');
 const traverse = require('babel-traverse').default;
-const parseArg = require('minimist');
 
-const argv = parseArg(process.argv.slice(2));
+if (process.argv.length != 4) {
+  console.error('Usage: ' + process.argv[1] + ' <filename> <original filename>');
+  process.exit(1);
+}
 
-const filename = argv._[0];
+const filename = process.argv[2];
 const buf = fs.readFileSync(filename, 'utf8');
-const isModule =
-    (argv['assume-filename'] || filename).indexOf('/js/omegaup/') != -1;
+const isModule = process.argv[3].indexOf('/js/omegaup/') != -1;
 const ast = babylon.parse(buf, {
   sourceType: isModule ? 'module' : 'script',
 });
