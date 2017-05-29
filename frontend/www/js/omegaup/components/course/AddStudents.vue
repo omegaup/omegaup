@@ -4,7 +4,7 @@
       <form class="form"
             v-on:submit.prevent="onAddStudent">
         <div class="form-group">
-          <label for="member-username">{{ T.wordsStudent }}</label> <span aria-hidden="true"
+          <label>{{ T.wordsStudent }}</label> <span aria-hidden="true"
                class="glyphicon glyphicon-info-sign"
                data-placement="top"
                data-toggle="tooltip"
@@ -64,18 +64,32 @@ export default {
     };
   },
   mounted: function() {
-    var self = this;
-    UI.userTypeahead($('input.typeahead', $(this.$el)), function(event, item) {
+    let self = this;
+    UI.userTypeahead($('input.typeahead', self.$el), function(event, item) {
       self.studentUsername = item.value;
     });
   },
   methods: {
     onAddStudent: function() {
+      let hintElem = $('input.typeahead.tt-hint', this.$el);
+      let hint = hintElem.val();
+      if (hint) {
+        // There is a hint currently visible in the UI, the user likely
+        // expects that hint to be used when trying to add someone, instead
+        // of what they've actually typed so far.
+        this.studentUsername = hint;
+      }
       this.$emit('add-student', this.studentUsername);
     },
     onCancel: function() { this.$emit('cancel');},
     onRemove: function(student) { this.$emit('remove', student);},
-    reset: function() { this.studentUsername = '';},
+    reset: function() {
+      this.studentUsername = '';
+
+      let inputElem = $('input.typeahead', this.$el);
+      inputElem.typeahead('close');
+      inputElem.val('');
+    },
     studentProgressUrl: function(student) {
       return '/course/' + this.courseAlias + '/student/' + student.username +
              '/';
