@@ -31,6 +31,7 @@ git:
 before_install:
   - |
       ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || git submodule update --init \
+          stuff/hook_tools \
           frontend/server/libs/third_party/smarty \
           frontend/server/libs/third_party/phpmailer \
           frontend/server/libs/third_party/log4php \
