@@ -504,7 +504,7 @@ omegaup.OmegaUp.loadTranslations({
 	runProblemNotPublic: "The problem is not public.",
 	runWaitGap: "You have to wait between consecutive submissions.",
 	schoolNotFound: "School not found",
-	schoolRankHeaderPostCount: "Most active schools this month",
+	schoolRankHeader: "Top %(count) most active schools this month",
 	schoolToBeAdded: "Your school has not been registered in omegaUp. It will be added when you save your changes.",
 	schoolsCreateCoursesThatMeetNeeds: "Courses that meet your needs. You can create your own problems.",
 	schoolsCreateYourCourse: "Create your courses",
