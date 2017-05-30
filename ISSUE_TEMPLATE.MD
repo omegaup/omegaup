@@ -1,6 +1,6 @@
-*En el caso de un feature, proveé un título en el siguiente formato:*
-*Como un <tipo de usuario>, quiero <funcionalidad o mejora esperada> para <beneficio esperado>*
-*E.g. Como <usuario>, quiero <un botón de inicio> para <poder regresar a la página inicial con un solo click>*
+*En el caso de un feature, provee un título en el siguiente formato:*
+*Como un [tipo de usuario], quiero [funcionalidad o mejora esperada] para [beneficio esperado]*
+*E.g. Como [usuario], quiero [un botón de inicio] para [poder regresar a la página inicial con un solo click]*
 
 ## Comportamiento Esperado
 *Si estás describiendo un bug, describe lo que pasó*
@@ -17,10 +17,10 @@
 ## Pasos para reproducir (para bugs)
 *Provee un link a un ejemplo, o una lista de pasos detallada de*
 *cómo reproducir este bug. Incluye el código que lo reproduce, si es relevante*
-1.
-2.
-3.
-4.
+1. 
+2. 
+3. 
+4. 
 
 ## Contexto
 *Cómo te ha afectado este issue? Cuál es el objetivo a cumplir?*
