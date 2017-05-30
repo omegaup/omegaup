@@ -29,8 +29,7 @@ omegaup.OmegaUp.on('ready', function() {
   for (var i = 0, len = contestListConfigs.length; i < len; i++) {
     var config = contestListConfigs[i];
     var contestList = new omegaup.arena.ContestList(
-        config[0],
-        {active: config[1], recommended: config[2]},
+        config[0], {active: config[1], recommended: config[2]},
         {header: config[3]});
     contestLists.push(contestList);
     requests.push(contestList.deferred);

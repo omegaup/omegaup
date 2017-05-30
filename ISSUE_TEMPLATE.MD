@@ -33,8 +33,7 @@
 
 ## Tu ambiente
 *Incluye los detalles relevantes acerca del ambiente en el que reproduciste este bug*
-
 * Nombre del navegador (e.g. Chrome 39, node.js 5.4):
 * Sistema Operativo y versión (escritorio o móbil):
-* Captura de pantalla:
 * Link al sitio en el que este problema pasa:
+* Captura de pantalla:

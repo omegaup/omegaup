@@ -36,3 +36,6 @@
 	path = frontend/server/libs/third_party/facebook-php-graph-sdk
 	url = https://github.com/facebook/php-graph-sdk.git
 	shallow = true
+[submodule "stuff/hook_tools"]
+	path = stuff/hook_tools
+	url = https://github.com/omegaup/hook_tools.git
