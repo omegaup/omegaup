@@ -392,6 +392,7 @@ export default {
 
   School: {
     list: _call('/api/school/list/'),
+    rank: _call('/api/school/rank'),
   },
 
   Session: {

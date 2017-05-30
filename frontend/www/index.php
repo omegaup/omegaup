@@ -7,10 +7,13 @@ if (OMEGAUP_LOCKDOWN) {
     die();
 }
 
-// Coder of the month
+// Fetch ranks
 try {
     $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
+
+    $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 5]));
+    $smarty->assign('schoolRankPayload', $schoolRankPayload['rank']);
 } catch (Exception $e) {
     // Oh, well...
 }

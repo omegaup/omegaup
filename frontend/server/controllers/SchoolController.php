@@ -93,7 +93,14 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        self::authenticateRequest($r);
+        $authenticated = false;
+        try {
+            self::authenticateRequest($r);
+            $authenticated = true;
+        } catch (UnauthorizedException $e) {
+            // Allow not authN calls but force cache
+        }
+
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
         Validators::isNumber($r['start_time'], 'start_time', false);
@@ -107,7 +114,7 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
+        $canUseCache = (is_null($r['start_time']) && is_null($r['finish_time'])) || !$authenticated;
 
         if (is_null($r['start_time'])) {
             $r['start_time'] = date('Y-m-01');

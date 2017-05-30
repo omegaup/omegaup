@@ -11,6 +11,7 @@ module.exports = {
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
+    schools_rank: './frontend/www/js/omegaup/schools/rank.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

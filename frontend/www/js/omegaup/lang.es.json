@@ -1,6 +1,7 @@
 {
 	"RegisterForContestRules": "Reglas",
 	"aboutToStart": "Estas a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciara.",
+	"activeUsers": "Usuarios activos",
 	"adminAdded": "Administrador agregado correctamente",
 	"adminRemoved": "Administrador eliminado correctamente",
 	"aliasInUse": "El alias (t\u00edtulo corto) ya est\u00e1 siendo usado. Por favor elige un alias distinto.",
@@ -500,6 +501,7 @@
 	"runProblemNotPublic": "El problema no es p\u00fablico.",
 	"runWaitGap": "Debes esperar unos segundos entre env\u00edos consecutivos.",
 	"schoolNotFound": "Escuela no encontrada",
+	"schoolRankHeaderPostCount": "Escuelas m\u00e1s activas este mes",
 	"schoolToBeAdded": "Tu escuela a\u00fan no existe en omegaUp. Ser\u00e1 agregada cuando guardes tus cambios.",
 	"schoolsCreateCoursesThatMeetNeeds": "Cursos que satisfacen sus necesidades. Puede crear sus propios problemas.",
 	"schoolsCreateYourCourse": "Cree sus cursos",
