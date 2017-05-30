@@ -387,6 +387,34 @@ class CourseController extends Controller {
         return ['status' => 'ok'];
     }
 
+    public static function apiGetProblemUsers(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get this problem
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $users = ProblemsDAO::getUsersInGroupWhoAttemptedProblem(
+            $r['course']->group_id,
+            $problem->problem_id
+        );
+
+        return ['status' => 'ok', 'users' => $users];
+    }
+
     /**
      * Remove a problem from an assignment
      *

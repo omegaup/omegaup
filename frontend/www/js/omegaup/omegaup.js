@@ -147,14 +147,27 @@ export let OmegaUp = {
             return new Date(timestamp).getTime();
           },
 
-      time: function(timestamp, options) {
-        options = options ||  {};
-        options.server_sync = (typeof(options.server_sync) === 'undefined') ?
-                                  true :
-                                  options.server_sync;
-        return new Date(OmegaUp._realTime(timestamp) +
-                        (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
-      }
+      time:
+          function(timestamp, options) {
+            options = options ||  {};
+            options.server_sync =
+                (typeof(options.server_sync) === 'undefined') ?
+                    true :
+                    options.server_sync;
+            return new Date(
+                OmegaUp._realTime(timestamp) +
+                (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
+          },
+
+      convertTimes: function(item) {
+        if (item.hasOwnProperty('start_time')) {
+          item.start_time = OmegaUp.time(item.start_time * 1000);
+        }
+        if (item.hasOwnProperty('finish_time')) {
+          item.finish_time = OmegaUp.time(item.finish_time * 1000);
+        }
+        return item;
+      },
 };
 
 if (document.readyState === 'complete' ||

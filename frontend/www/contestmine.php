@@ -16,5 +16,12 @@ if ($session['valid'] && !isset($_SESSION['private_contests_alert'])) {
 }
 
 $smarty->assign('PRIVATE_CONTESTS_ALERT', $private_contests_alert);
-
-$smarty->display('../templates/contest.mine.tpl');
+try {
+    $payload = ContestController::apiMyList(new Request([]));
+    $smarty->assign('payload', $payload);
+    $smarty->display('../templates/contest.mine.tpl');
+} catch (APIException $e) {
+    Logger::getLogger('contestlist')->error('APIException ' . $e);
+    header('HTTP/1.1 404 Not Found');
+    die();
+}

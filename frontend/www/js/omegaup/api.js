@@ -40,18 +40,15 @@ function _convertRuntimes(data) {
   return data;
 }
 
+// This alias is needed because, without it, webpack cries when
+// trying to export, e.g. Course.adminDetails, with the original
+// name OmegaUp.convertTimes.
 function _convertTimes(item) {
-  if (item.hasOwnProperty('start_time')) {
-    item.start_time = omegaup.OmegaUp.time(item.start_time * 1000);
-  }
-  if (item.hasOwnProperty('finish_time')) {
-    item.finish_time = omegaup.OmegaUp.time(item.finish_time * 1000);
-  }
-  return item;
+  return omegaup.OmegaUp.convertTimes(item);
 }
 
 function _normalizeContestFields(contest) {
-  _convertTimes(contest);
+  omegaup.OmegaUp.convertTimes(contest);
   contest.submission_deadline =
       omegaup.OmegaUp.time(contest.submission_deadline * 1000);
   contest.show_penalty =
@@ -104,7 +101,7 @@ export default {
                      function(result) {
                        for (var idx in result.contests) {
                          var contest = result.contests[idx];
-                         _convertTimes(contest);
+                         omegaup.OmegaUp.convertTimes(contest);
                        }
                        return result;
                      }),
@@ -131,7 +128,7 @@ export default {
                 function(result) {
                   for (var idx in result.results) {
                     var contest = result.results[idx];
-                    _convertTimes(contest);
+                    omegaup.OmegaUp.convertTimes(contest);
                   }
                   return result;
                 }),
@@ -140,7 +137,7 @@ export default {
                   function(result) {
                     for (var idx in result.contests) {
                       var contest = result.contests[idx];
-                      _convertTimes(contest);
+                      omegaup.OmegaUp.convertTimes(contest);
                     }
                     return result;
                   }),
@@ -192,6 +189,16 @@ export default {
 
     getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
 
+    /**
+     * Returns the list of users signed up for the course that have
+     * attempted the requested problem.
+     *
+     * @param {string} course_alias
+     * @param {string} problem_alias
+     * @return {Promise}
+     */
+    apiGetProblemUsers: _call('/api/course/getProblemUsers'),
+
     listAssignments: _call(
         '/api/course/listAssignments/',
         function(result) {
@@ -208,10 +215,10 @@ export default {
     listCourses: _call('/api/course/listCourses/',
                        function(result) {
                          for (var i = 0; i < result.admin.length; ++i) {
-                           _convertTimes(result.admin[i]);
+                           omegaup.OmegaUp.convertTimes(result.admin[i]);
                          }
                          for (var i = 0; i < result.student.length; ++i) {
-                           _convertTimes(result.student[i]);
+                           omegaup.OmegaUp.convertTimes(result.student[i]);
                          }
                          return result;
                        }),

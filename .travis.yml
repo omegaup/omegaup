@@ -38,6 +38,9 @@ before_install:
           frontend/server/libs/third_party/facebook-php-graph-sdk \
           frontend/server/libs/third_party/google-api-php-client
   - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || git submodule update --init \
+          stuff/hook_tools
+  - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user six
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user \
@@ -78,16 +81,7 @@ script:
           python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/whitespace-purge.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/js-lint.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/vue-lint.py validate --all-files < /dev/null
-  - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/php-format.py validate --all-files < /dev/null
+          python3 stuff/hook_tools/lint.py validate --all < /dev/null
 
 notifications:
   slack:
