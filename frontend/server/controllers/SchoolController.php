@@ -149,7 +149,8 @@ class SchoolController extends Controller {
                 $cache_key,
                 $r,
                 $fetch,
-                $result
+                $result,
+                60 * 60 * 24 // 1 day
             );
         } else {
             $result = $fetch($r);
