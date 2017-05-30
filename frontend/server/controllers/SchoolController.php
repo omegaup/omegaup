@@ -101,7 +101,8 @@ class SchoolController extends Controller {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
-            if (is_null($r['start_time']) || is_null($r['finish_time'])) {
+            if (!is_null($r['start_time']) || !is_null($r['finish_time'])) {
+                throw new InvalidParameterException('paramterInvalid', 'start_time');
             }
         }
 
