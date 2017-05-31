@@ -68,6 +68,9 @@ before_script:
           python3 stuff/db-migrate.py --username=travis --password= \
           migrate --databases=omegaup-test
   - |
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
+          mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+  - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
          (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash && pear list-files PHP_CodeSniffer)
 
