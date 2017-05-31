@@ -4,6 +4,7 @@ var omegaup = require('../dist/omegaup.js');
 omegaup.OmegaUp.loadTranslations({
 	RegisterForContestRules: "Rules",
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
+	activeUsers: "Active users",
 	adminAdded: "Admin successfully added.",
 	adminRemoved: "Admin successfully removed.",
 	aliasInUse: "alias already exists. Please choose a different alias.",
@@ -503,6 +504,7 @@ omegaup.OmegaUp.loadTranslations({
 	runProblemNotPublic: "The problem is not public.",
 	runWaitGap: "You have to wait between consecutive submissions.",
 	schoolNotFound: "School not found",
+	schoolRankHeader: "Top %(count) most active schools this month",
 	schoolToBeAdded: "Your school has not been registered in omegaUp. It will be added when you save your changes.",
 	schoolsCreateCoursesThatMeetNeeds: "Courses that meet your needs. You can create your own problems.",
 	schoolsCreateYourCourse: "Create your courses",

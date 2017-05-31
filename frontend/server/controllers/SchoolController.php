@@ -93,11 +93,18 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        self::authenticateRequest($r);
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
         Validators::isNumber($r['start_time'], 'start_time', false);
         Validators::isNumber($r['finish_time'], 'finish_time', false);
+
+        try {
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            if (!is_null($r['start_time']) || !is_null($r['finish_time'])) {
+                throw new InvalidParameterException('paramterInvalid', 'start_time');
+            }
+        }
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -142,7 +149,8 @@ class SchoolController extends Controller {
                 $cache_key,
                 $r,
                 $fetch,
-                $result
+                $result,
+                60 * 60 * 24 // 1 day
             );
         } else {
             $result = $fetch($r);

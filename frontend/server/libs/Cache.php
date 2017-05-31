@@ -53,7 +53,7 @@ class Cache {
      * Si el cache está prendido, guarda value en key con el timeout dado
      *
      * @param string $value
-     * @param int $timeout
+     * @param int $timeout (seconds)
      * @return boolean
      */
     public function set($value, $timeout = APC_USER_CACHE_TIMEOUT) {
@@ -119,7 +119,7 @@ class Cache {
      * @param string $id
      * @param Request $r
      * @param callable $setFunc
-     * @param int $timeout
+     * @param int $timeout (seconds)
      * @return boolean
      */
     public static function getFromCacheOrSet($prefix, $id, Request $r, $setFunc, &$returnValue, $timeout = 0) {
