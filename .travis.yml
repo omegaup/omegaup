@@ -32,7 +32,7 @@ git:
 
 before_install:
   - |
-      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || git submodule update --init \
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule update --init \
           frontend/server/libs/third_party/smarty \
           frontend/server/libs/third_party/phpmailer \
           frontend/server/libs/third_party/log4php \
@@ -40,17 +40,17 @@ before_install:
           frontend/server/libs/third_party/facebook-php-graph-sdk \
           frontend/server/libs/third_party/google-api-php-client
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || git submodule update --init \
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || git submodule update --init \
           stuff/hook_tools
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user six
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || pip install --user six
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user \
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || pip install --user \
          https://github.com/google/closure-linter/zipball/master
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || nvm install 6.9.1
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || nvm install 6.9.1
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || npm install -g yarn
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || npm install -g yarn
 
 cache:
   directories:
@@ -58,32 +58,32 @@ cache:
 
 before_script:
   - |
-      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
   - |
-      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
   - |
-      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           python3 stuff/db-migrate.py --username=travis --password= \
           migrate --databases=omegaup-test
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash)
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+         (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash && pear list-files PHP_CodeSniffer)
 
 script:
   - |
-      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
           frontend/tests/phpunit.xml frontend/tests/controllers
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn build && yarn test)
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || (yarn install && yarn build && yarn test)
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
           python3 stuff/i18n.py --validate < /dev/null
   - |
-      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
-          python3 stuff/hook_tools/lint.py validate --all < /dev/null
+      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+          python3 stuff/hook_tools/lint.py --verbose validate --all < /dev/null
 
 notifications:
   slack:
