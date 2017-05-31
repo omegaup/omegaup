@@ -86,7 +86,7 @@ script:
           python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-          (echo $PATH && PATH=/home/travis/.phpenv/versions/7.0.7/bin/:$PATH python3 stuff/hook_tools/lint.py --verbose validate --all < /dev/null)
+          (echo $PATH && python3 stuff/hook_tools/lint.py --verbose validate --all < /dev/null)
 
 notifications:
   slack:
