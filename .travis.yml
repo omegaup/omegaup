@@ -10,7 +10,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm
+  - hhvm-3.15
 
 env:
   - DB=mysql
