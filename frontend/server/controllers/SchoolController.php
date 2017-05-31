@@ -114,7 +114,7 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        $canUseCache = (is_null($r['start_time']) && is_null($r['finish_time']));
+        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
 
         if (is_null($r['start_time'])) {
             $r['start_time'] = date('Y-m-01');

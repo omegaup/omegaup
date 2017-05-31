@@ -20,9 +20,7 @@
               <td class="cell-school-name"
                   colspan="2"
                   v-bind:title="school.name">
-                <div class="school-rank-name">
                   {{school.name}}
-                </div>
               </td>
               <td class="numericColumn data-rank">{{ school.distinct_users }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_problems }}</td>
@@ -53,9 +51,6 @@ export default {
 
 .cell-school-name {
   max-width: 0;
-}
-
-.school-rank-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
