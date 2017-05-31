@@ -18,6 +18,7 @@ try_define('EXPERIMENT_SCHOOLS', true);
 try_define('OMEGAUP_DB_NAME', 'omegaup-test');
 try_define('OMEGAUP_DB_USER', 'root');
 try_define('OMEGAUP_DB_PASS', '');
+try_define('OMEGAUP_DB_HOST', '127.0.0.1');
 
 # ####################################
 # TEST CONFIG
