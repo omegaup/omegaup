@@ -72,7 +72,8 @@ before_script:
           mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-         (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash && pear list-files PHP_CodeSniffer)
+         (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash && pear list-files PHP_CodeSniffer && \
+          echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini)
 
 script:
   - |
