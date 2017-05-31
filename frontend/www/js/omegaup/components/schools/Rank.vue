@@ -48,20 +48,20 @@ export default {
 
 <style>
 .table-rank {
-	width: 100%;
+  width: 100%;
 }
 
 .cell-school-name {
-	max-width: 0;
+  max-width: 0;
 }
 
 .school-rank-name {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .data-rank {
-	width: 15%;
+  width: 15%;
 }
 </style>
