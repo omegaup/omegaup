@@ -381,8 +381,8 @@ class CourseController extends Controller {
         ProblemsetController::addProblem(
             $problemSet->problemset_id,
             $problem,
-            $points,
-            $r['current_user_id']
+            $r['current_user_id'],
+            $points
         );
 
         return ['status' => 'ok'];
