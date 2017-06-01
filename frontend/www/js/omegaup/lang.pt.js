@@ -487,6 +487,8 @@ omegaup.OmegaUp.loadTranslations({
 	publicContestMustHaveProb: "",
 	publish: "Publicar",
 	qualityNominationMustHaveSolvedProblem: "Voc\u00ea deve resolver o problema antes de nome\u00e1-lo",
+	qualityNominationProblemHasBeenBanned: "Este problema foi banido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
+	qualityNominationProblemHasBeenPromoted: "Este problema foi promovido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
 	rankHeaderPostCount: "usu\u00e1rios com mais problemas resolvidos",
 	rankHeaderPreCount: "Top",
 	rankScore: "Pontua\u00e7\u00e3o",
