@@ -435,14 +435,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => 0,
+            'visibility' => ProblemController::VISIBILITY_PRIVATE,
             'message' => 'public -> private',
         ]));
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => 0,
+            'visibility' => ProblemController::VISIBILITY_PRIVATE,
             'message' => 'no-op',
         ]));
         ProblemController::apiUpdate(new Request([
@@ -455,14 +455,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => 1,
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
             'message' => 'private -> public',
         ]));
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => 1,
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
             'message' => 'no-op',
         ]));
         ProblemController::apiUpdate(new Request([
@@ -475,7 +475,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => -1,
+                'visibility' => ProblemController::VISIBILITY_BANNED,
                 'message' => 'public -> banned',
             ]));
             $this->fail('Cannot ban problem from API');
@@ -486,7 +486,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => 2,
+                'visibility' => ProblemController::VISIBILITY_PROMOTED,
                 'message' => 'public -> promoted',
             ]));
             $this->fail('Cannot ban problem from API');
@@ -494,13 +494,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Ban the problem.
-        $problem->visibility = -1;
+        $problem->visibility = ProblemController::VISIBILITY_BANNED;
         ProblemsDAO::save($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => -1,
+            'visibility' => ProblemController::VISIBILITY_BANNED,
             'message' => 'no-op',
         ]));
         ProblemController::apiUpdate(new Request([
@@ -513,7 +513,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => 0,
+                'visibility' => ProblemController::VISIBILITY_PRIVATE,
                 'message' => 'banned -> private',
             ]));
             $this->fail('Cannot un-ban problem from API');
@@ -525,7 +525,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => 1,
+                'visibility' => ProblemController::VISIBILITY_PUBLIC,
                 'message' => 'banned -> public',
             ]));
             $this->fail('Cannot un-ban problem from API');
@@ -534,13 +534,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Promote the problem.
-        $problem->visibility = 2;
+        $problem->visibility = ProblemController::VISIBILITY_PROMOTED;
         ProblemsDAO::save($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => 2,
+            'visibility' => ProblemController::VISIBILITY_PROMOTED,
             'message' => 'no-op',
         ]));
         ProblemController::apiUpdate(new Request([
@@ -553,7 +553,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => 0,
+                'visibility' => ProblemController::VISIBILITY_PRIVATE,
                 'message' => 'promoted -> private',
             ]));
             $this->fail('Cannot un-promote problem from API');
@@ -565,7 +565,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ProblemController::apiUpdate(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => 1,
+                'visibility' => ProblemController::VISIBILITY_PUBLIC,
                 'message' => 'promoted -> public',
             ]));
             $this->fail('Cannot un-promote problem from API');

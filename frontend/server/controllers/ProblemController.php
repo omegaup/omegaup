@@ -9,6 +9,12 @@ require_once 'libs/third_party/Markdown/markdown.php';
 class ProblemController extends Controller {
     public static $grader = null;
 
+    // Constants for problem visibility.
+    const VISIBILITY_BANNED = -1;
+    const VISIBILITY_PRIVATE = 0;
+    const VISIBILITY_PUBLIC = 1;
+    const VISIBILITY_PROMOTED = 2;
+
     /**
      * Creates an instance of Grader if not already created
      */
@@ -59,17 +65,25 @@ class ProblemController extends Controller {
             }
 
             if (isset($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
-                if ($r['problem']->visibility == 2) {
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
-                } elseif ($r['problem']->visibility == -1) {
+                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
                 } else {
-                    Validators::isInEnum($r['visibility'], 'visibility', ['0', '1']);
+                    Validators::isInEnum(
+                        $r['visibility'],
+                        'visibility',
+                        [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+                    );
                 }
             }
         } else {
             Validators::isValidAlias($r['alias'], 'alias');
-            Validators::isInEnum($r['visibility'], 'visibility', ['0', '1']);
+            Validators::isInEnum(
+                $r['visibility'],
+                'visibility',
+                [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+            );
         }
 
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
