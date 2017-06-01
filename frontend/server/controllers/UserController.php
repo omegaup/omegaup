@@ -1373,7 +1373,7 @@ class UserController extends Controller {
         if (!is_null($db_results)) {
             $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
             foreach ($db_results as $problem) {
-                if ($problem->public == 1) {
+                if ($problem->visibility == 1) {
                     array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
                 }
             }
@@ -1914,7 +1914,7 @@ class UserController extends Controller {
                     }
                     if (!is_null($user) && Authorization::isProblemAdmin($user->user_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
-                    } elseif ($problem->public != '1') {
+                    } elseif ($problem->visibility != '1') {
                         throw new ForbiddenAccessException('problemIsPrivate');
                     }
 

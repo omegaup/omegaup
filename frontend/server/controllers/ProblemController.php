@@ -63,7 +63,7 @@ class ProblemController extends Controller {
 
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
         Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::isInEnum($r['public'], 'public', ['0', '1'], $is_required);
+        Validators::isInEnum($r['visibility'], 'visibility', ['0', '1'], $is_required);
         Validators::isInEnum(
             $r['validator'],
             'validator',
@@ -107,7 +107,7 @@ class ProblemController extends Controller {
 
         // Populate a new Problem object
         $problem = new Problems();
-        $problem->public = $r['public']; /* private by default */
+        $problem->visibility = $r['visibility']; /* private by default */
         $problem->title = $r['title'];
         $problem->validator = $r['validator'];
         $problem->time_limit = $r['time_limit'];
@@ -665,7 +665,7 @@ class ProblemController extends Controller {
 
         // Update the Problem object
         $valueProperties = [
-            'public',
+            'visibility',
             'title',
             'validator'     => ['important' => true], // requires rejudge
             'time_limit'    => ['important' => true], // requires rejudge
@@ -889,7 +889,7 @@ class ProblemController extends Controller {
             if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
-                if ($r['problem']->public != '1') {
+                if ($r['problem']->visibility != '1') {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
             }
@@ -1089,7 +1089,7 @@ class ProblemController extends Controller {
         $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
             'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
-            'difficulty', 'creation_date', 'source', 'order', 'points', 'public',
+            'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
             'languages', 'slow', 'stack_limit', 'email_clarifications'];
 
         // Read the file that contains the source
@@ -1130,7 +1130,7 @@ class ProblemController extends Controller {
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if ($r['problem']->public ||
+        if ($r['problem']->visibility ||
             Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
             $acl = ACLsDAO::getByPK($r['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);

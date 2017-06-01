@@ -16,7 +16,7 @@ try {
 $smarty->assign('problem_statement', $result['problem_statement']);
 $smarty->assign('problem_statement_language', $result['problem_statement_language']);
 $smarty->assign('problem_alias', $result['alias']);
-$smarty->assign('public', $result['public']);
+$smarty->assign('visibility', $result['visibility']);
 $smarty->assign('source', $result['source']);
 $smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);

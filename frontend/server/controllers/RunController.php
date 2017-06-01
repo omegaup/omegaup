@@ -117,7 +117,7 @@ class RunController extends Controller {
             } else {
                 // Check for practice or public problem, there is no contest info
                 // in this scenario.
-                if ($r['problem']->public == true ||
+                if ($r['problem']->visibility == 1 ||
                       Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
                       time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
