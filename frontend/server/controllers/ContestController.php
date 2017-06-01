@@ -964,9 +964,7 @@ class ContestController extends Controller {
                 if (is_null($p)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
                 }
-                if (!ProblemsDAO::isVisible($p) && !Authorization::isProblemAdmin($r['current_user_id'], $p)) {
-                    throw new ForbiddenAccessException('problemIsPrivate');
-                }
+                ProblemsetController::validateAddProblemToProblemset(null, $p, $r['current_user_id']);
                 array_push($problems, [
                     'id' => $p->problem_id,
                     'alias' => $problem->problem,
@@ -1064,18 +1062,13 @@ class ContestController extends Controller {
             throw new PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
-        try {
-            $relationship = new ProblemsetProblems([
-                        'problemset_id' => $params['contest']->problemset_id,
-                        'problem_id' => $params['problem']->problem_id,
-                        'points' => $r['points'],
-                        'order' => is_null($r['order_in_contest']) ?
-                                1 : $r['order_in_contest']]);
-
-            ProblemsetProblemsDAO::save($relationship);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ProblemsetController::addProblem(
+            $params['contest']->problemset_id,
+            $params['problem'],
+            $r['current_user_id'],
+            $r['points'],
+            is_null($r['order_in_contest']) ? 1 : $r['order_in_contest']
+        );
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
@@ -1125,6 +1118,9 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
+        if ($problem->visibility == ProblemController::VISIBILITY_BANNED) {
+            throw new ForbiddenAccessException('problemIsBanned');
+        }
         if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }

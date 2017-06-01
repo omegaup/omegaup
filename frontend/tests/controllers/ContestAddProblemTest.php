@@ -172,4 +172,46 @@ class AddProblemToContestTest extends OmegaupTestCase {
             }
         }
     }
+
+    /**
+     * Attempt to add banned problems to a contest.
+     */
+    public function testAddBannedProblemToContest() {
+        $contestData = ContestsFactory::createContest();
+        $problemData = ProblemsFactory::createProblem(null, null, 1, $contestData['director']);
+        $problem = $problemData['problem'];
+
+        // Ban the problem.
+        $problem->visibility = ProblemController::VISIBILITY_BANNED;
+        ProblemsDAO::save($problem);
+
+        $directorLogin = self::login($contestData['director']);
+        try {
+            ContestController::apiAddProblem(new Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['alias'],
+                'points' => 100,
+                'order_in_contest' => 1,
+            ]));
+            $this->fail('');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'problemIsBanned');
+        }
+
+        // Make it private. Now it should be possible to add it.
+        $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
+        ProblemsDAO::save($problem);
+
+        $r = new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+            'points' => 100,
+            'order_in_contest' => 1,
+        ]);
+        $response = ContestController::apiAddProblem($r);
+        $this->assertEquals('ok', $response['status']);
+        self::assertProblemAddedToContest($problemData, $contestData, $r);
+    }
 }

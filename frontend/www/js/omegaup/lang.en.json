@@ -450,6 +450,7 @@
 	"problemEditSlowWarning": "<strong>Warning</strong>: This problem will be judged in the slow queue to avoid slowing the rest of the system, since TLE runs might finish in more than 30s (number of cases * time limit in seconds rounded up). Problems in the slow queue might take several minutes to be judged. If don't want this problem to be in the slow queue, remove test cases or reduce the time limit.",
 	"problemEditStackLimit": "Stack limit (bytes)",
 	"problemExists": "Another problem with that name already exists. Choose another name.",
+	"problemIsBanned": "This problem has been banned.",
 	"problemIsNotPublic": "The problem is not public and is currently in at least one ongoing contest.",
 	"problemIsPrivate": "Problem is marked as private.",
 	"problemLevelEasy": "Easy",
