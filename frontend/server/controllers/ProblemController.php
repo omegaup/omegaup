@@ -889,7 +889,7 @@ class ProblemController extends Controller {
             if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
-                if ($r['problem']->visibility != '1') {
+                if (!ProblemsDAO::isVisible($r['problem'])) {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
             }
@@ -1130,7 +1130,7 @@ class ProblemController extends Controller {
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if ($r['problem']->visibility ||
+        if (ProblemsDAO::isVisible($r['problem']) ||
             Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
             $acl = ACLsDAO::getByPK($r['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);
