@@ -148,6 +148,7 @@ require_once('controllers/CourseController.php');
 require_once('controllers/GroupController.php');
 require_once('controllers/GroupScoreboardController.php');
 require_once('controllers/ResetController.php');
+require_once('controllers/QualityNominationController.php');
 
 require_once('libs/third_party/adodb/adodb.inc.php');
 require_once('libs/third_party/adodb/adodb-exceptions.inc.php');

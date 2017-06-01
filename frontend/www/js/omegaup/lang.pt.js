@@ -486,6 +486,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileUsername: "Nome de usu\u00e1rio",
 	publicContestMustHaveProb: "",
 	publish: "Publicar",
+	qualityNominationMustHaveSolvedProblem: "Voc\u00ea deve resolver o problema antes de nome\u00e1-lo",
 	rankHeaderPostCount: "usu\u00e1rios com mais problemas resolvidos",
 	rankHeaderPreCount: "Top",
 	rankScore: "Pontua\u00e7\u00e3o",
