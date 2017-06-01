@@ -57,13 +57,23 @@ class ProblemController extends Controller {
             if ($r['problem']->deprecated) {
                 throw new PreconditionFailedException('problemDeprecated');
             }
+
+            if (isset($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
+                if ($r['problem']->visibility == 2) {
+                    throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
+                } elseif ($r['problem']->visibility == -1) {
+                    throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
+                } else {
+                    Validators::isInEnum($r['visibility'], 'visibility', ['0', '1']);
+                }
+            }
         } else {
             Validators::isValidAlias($r['alias'], 'alias');
+            Validators::isInEnum($r['visibility'], 'visibility', ['0', '1']);
         }
 
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
         Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::isInEnum($r['visibility'], 'visibility', ['0', '1'], $is_required);
         Validators::isInEnum(
             $r['validator'],
             'validator',
