@@ -27,7 +27,7 @@
                                     .html(omegaup.UI.escape(problem.tags[j])));
                   }
                 }
-                if (problem.public != '1')
+                if (problem.visibility != '1')
                   $('.private', row).removeClass('hidden');
                 $('.edit', row)
                     .attr('href', '/problem/' + problem.alias + '/edit/');
@@ -49,7 +49,7 @@
           function(alias, resolve, reject) {
             omegaup.API.Problem.update({
                                  problem_alias: alias,
-                                 'public': isPublic ? 1 : 0,
+                                 'visibility': isPublic ? 1 : 0,
                                  message: isPublic ? 'private -> public' :
                                                      'public -> private',
                                })

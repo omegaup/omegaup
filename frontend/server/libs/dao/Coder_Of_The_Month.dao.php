@@ -55,7 +55,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 						r.time <= ?
 				) AS up
 			INNER JOIN
-				Problems ps ON ps.problem_id = up.problem_id and ps.public = 1
+				Problems ps ON ps.problem_id = up.problem_id and ps.visibility = 1
 			INNER JOIN
 				Users u ON u.user_id = up.user_id
 			LEFT JOIN

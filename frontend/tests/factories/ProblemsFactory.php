@@ -61,7 +61,7 @@ class ProblemsFactory {
         $r['memory_limit'] = 32000;
         $r['source'] = 'yo';
         $r['order'] = 'normal';
-        $r['public'] = $public;
+        $r['visibility'] = $public;
         $r['output_limit'] = 10240;
         if ($languages == null) {
             $r['languages'] = 'c,cpp,py';

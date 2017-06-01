@@ -286,7 +286,8 @@ omegaup.OmegaUp.on('ready', function() {
       ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.validator);
-    $('input[name=public][value=' + problem.public + ']').attr('checked', 1);
+    $('input[name=visibility][value=' + problem.visibility + ']')
+        .attr('checked', 1);
     $('#languages').val(problem.languages);
     $('input[name=alias]').val(problemAlias);
     if (chosenLanguage == null ||

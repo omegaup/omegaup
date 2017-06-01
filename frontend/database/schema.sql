@@ -806,9 +806,10 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
   `nomination` enum('promotion', 'demotion') NOT NULL DEFAULT 'promotion' COMMENT 'Si se está nominando el problema a promoción o democión',
+  `contents` TEXT NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
   `status` enum('open', 'approved', 'denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
-	PRIMARY KEY (`qualitynomination_id`),
+  PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominación a promoción / democión de problemas';
@@ -822,7 +823,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
 CREATE TABLE IF NOT EXISTS `QualityNomination_Reviewers` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
-	PRIMARY KEY (`qualitynomination_id`, `user_id`)
+  PRIMARY KEY (`qualitynomination_id`, `user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominación';
 
 -- --------------------------------------------------------
@@ -835,11 +836,12 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Comments` (
   `qualitynomination_comment_id` int(11) NOT NULL AUTO_INCREMENT,
   `qualitynomination_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que emitió el comentario',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de este comentario',
   `vote` tinyint(1) NOT NULL COMMENT 'El voto emitido en este comentario. En el rango de [-2, +2]',
-  `contents` TEXT NOT NULL COMMENT 'El contenido de la nominación',
-	PRIMARY KEY (`qualitynomination_comment_id`),
-  KEY `user_id` (`user_id`)
+  `contents` TEXT NOT NULL COMMENT 'El contenido del comentario',
+  PRIMARY KEY (`qualitynomination_comment_id`),
+  KEY `user_id` (`user_id`),
+  KEY `qualitynomination_id` (`qualitynomination_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominación';
 
 --
@@ -1226,7 +1228,7 @@ BEGIN
                   r.verdict = 'AC' AND r.test = 0
             ) AS up
             INNER JOIN
-                Problems ps ON ps.problem_id = up.problem_id AND ps.public = 1
+                Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
             INNER JOIN
                 Users u ON u.user_id = up.user_id
             GROUP BY

@@ -23,7 +23,7 @@ if (isset($_POST['request'])) {
                     'memory_limit' => $_POST['memory_limit'],
                     'output_limit' => $_POST['output_limit'],
                     'source' => $_POST['source'],
-                    'public' => $_POST['public'],
+                    'visibility' => $_POST['visibility'],
                     'languages' => $_POST['languages'],
                     'stack_limit' => $_POST['stack_limit'],
                     'email_clarifications' => $_POST['email_clarifications']

@@ -167,7 +167,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= '
-                (p.public = 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
+                (p.visibility = 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
             $args[] = $user_id;
 
             if (!is_null($query)) {
@@ -186,7 +186,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Problems p';
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
-            $sql .= ' p.public = 1 ';
+            $sql .= ' p.visibility = 1 ';
 
             if (!is_null($query)) {
                 $sql .= " AND p.title LIKE CONCAT('%', ?, '%') ";
@@ -215,7 +215,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.
-        $filters = ['title', 'submissions', 'accepted', 'alias', 'public'];
+        $filters = ['title', 'submissions', 'accepted', 'alias', 'visibility'];
         $problems = [];
         if (!is_null($result)) {
             foreach ($result as $row) {
@@ -282,6 +282,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         if ($public) {
             $sql .= ' AND pt.public = 1';
         }
+        $sql .= ';';
 
         $rs = $conn->Execute($sql, $problem->problem_id);
         $result = [];
@@ -326,7 +327,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         ON
             a.acl_id = p.acl_id
         WHERE
-            p.public = 0 and a.owner_id = ?;';
+            p.visibility = 0 and a.owner_id = ?;';
         $params = [$user->user_id];
 
         global $conn;

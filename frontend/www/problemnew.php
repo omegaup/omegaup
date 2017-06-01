@@ -15,7 +15,7 @@ $smarty->assign('MEMORY_LIMIT', '32768');
 $smarty->assign('STACK_LIMIT', '10485760');
 $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
-$smarty->assign('PUBLIC', '0');
+$smarty->assign('VISIBILITY', '0');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
@@ -30,7 +30,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'memory_limit' => $_POST['memory_limit'],
                 'output_limit' => $_POST['output_limit'],
                 'source' => $_POST['source'],
-                'public' => $_POST['public'],
+                'visibility' => $_POST['visibility'],
                 'stack_limit' => $_POST['stack_limit'],
                 'email_clarifications' => $_POST['email_clarifications']
             ]);
@@ -52,7 +52,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
         $smarty->assign('MEMORY_LIMIT', $_POST['memory_limit']);
         $smarty->assign('SOURCE', $_POST['source']);
-        $smarty->assign('PUBLIC', $_POST['public']);
+        $smarty->assign('VISIBILITY', $_POST['visibility']);
         $smarty->assign('STACK_LIMIT', $_POST['stack_limit']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
     } elseif ($response['status'] == 'ok') {

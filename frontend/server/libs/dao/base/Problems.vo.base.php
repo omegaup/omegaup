@@ -32,8 +32,8 @@ class Problems extends VO {
         if (isset($data['acl_id'])) {
             $this->acl_id = $data['acl_id'];
         }
-        if (isset($data['public'])) {
-            $this->public = $data['public'];
+        if (isset($data['visibility'])) {
+            $this->visibility = $data['visibility'];
         }
         if (isset($data['title'])) {
             $this->title = $data['title'];
@@ -137,11 +137,11 @@ class Problems extends VO {
     public $acl_id;
 
     /**
-      *  [Campo no documentado]
+      * -1 banned, 0 private, 1 public, 2 recommended
       * @access public
       * @var tinyint(1)
       */
-    public $public;
+    public $visibility;
 
     /**
       *  [Campo no documentado]

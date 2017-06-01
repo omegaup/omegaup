@@ -120,10 +120,10 @@
 				{/if}
 
 				<div class="form-group col-md-6">
-					<label for="public">{#problemEditFormAppearsAsPublic#}</label>
+					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="r2" name="public" value="1" {if $IS_UPDATE eq 0}checked=checked{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="r1" name="public" value="0">{#wordsNo#}</label>
+						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq 0}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0">{#wordsNo#}</label>
 					</div>
 				</div>
 			</div>

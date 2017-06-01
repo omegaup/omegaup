@@ -6,7 +6,7 @@
 			{
 				"api": "/problem/create",
 				"params": {
-					"public": 1,
+					"visibility": 1,
 					"title": "Sumas",
 					"alias": "sumas",
 					"validator": "token-numeric",
@@ -28,7 +28,7 @@
 			{
 				"api": "/problem/create",
 				"params": {
-					"public": 1,
+					"visibility": 1,
 					"title": "Triangulos",
 					"alias": "triangulos",
 					"validator": "token-numeric",
@@ -50,7 +50,7 @@
 			{
 				"api": "/contest/create",
 				"params": {
-					"public": 1,
+					"visibility": 1,
 					"title": "Prueba",
 					"alias": "prueba",
 					"description": "Concurso de prueba",
