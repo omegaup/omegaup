@@ -523,7 +523,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $users;
     }
 
-    public static final function isVisible(Problems $problem) {
+    final public static function isVisible(Problems $problem) {
         return ((int) $problem->visibility) >= 1;
     }
 }
