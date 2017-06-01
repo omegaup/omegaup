@@ -483,6 +483,7 @@
 	"profileUsername": "Username",
 	"publicContestMustHaveProb": "Public contest must have at least 1 problem added.",
 	"publish": "Publish",
+	"qualityNominationMustHaveSolvedProblem": "You must solve a problem before nominating it",
 	"rankHeaderPostCount": "users with the most points",
 	"rankHeaderPreCount": "Top",
 	"rankScore": "Score",

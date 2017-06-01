@@ -8,6 +8,15 @@ $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
     $problem = ProblemsDAO::GetByAlias($result['alias']);
+    $nominationStatus = null;
+    if ($sesion['valid']) {
+        $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
+            $problem,
+            $session['user']
+        );
+    } else {
+        $nominationStatus = ['solved' => false, 'nominated' => false];
+    }
 } catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
@@ -27,6 +36,8 @@ $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 .
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
+$smarty->assign('solved', $nominationStatus['solved']);
+$smarty->assign('nominated', $nominationStatus['nominated']);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),
     ['kp', 'kj']

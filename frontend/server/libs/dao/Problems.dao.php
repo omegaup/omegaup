@@ -317,6 +317,18 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
+    final public static function isProblemSolved(Problems $problem, Users $user) {
+        $sql = 'SELECT
+            COUNT(r.run_id) as solved
+        FROM
+            Runs AS r
+        WHERE
+            r.problem_id = ? AND r.user_id = ? AND r.verdict = "AC";';
+
+        global $conn;
+        return $conn->GetRow($sql, [$problem->problem_id, $user->user_id])['solved'] > 0;
+    }
+
     public static function getPrivateCount(Users $user) {
         $sql = 'SELECT
             COUNT(*) as Total
