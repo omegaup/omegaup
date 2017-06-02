@@ -9,7 +9,11 @@
 			<div id="problems" class="tab">
 				<div id="problem" class="main">
 					<script type="text/json" id="problem-json">{$problem}</script>
-					<h1 class="title">{if $visibility == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if} {$title|escape}
+					<h1 class="title">
+						{if $visibility < 0}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
+						{if $visibility == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
+						{if $visibility >= 2}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
+						{$title|escape}
 						{if $problem_admin}
 							(<a href="/problem/{$problem_alias}/edit/">{#wordsEdit#}</a>)
 						{/if}
