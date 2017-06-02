@@ -54,13 +54,28 @@ class GroupsDAO extends GroupsDAOBase {
                 Groups g
             INNER JOIN
                 ACLs AS a ON a.acl_id = g.acl_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = g.acl_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = g.acl_id
+            LEFT JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
-                a.owner_id = ?
+                a.owner_id = ? OR
+                (ur.role_id = ? AND ur.user_id = ?) OR
+                (gr.role_id = ? AND gu.user_id = ?)
             ORDER BY
                 g.group_id DESC;';
+        $params = [
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+        ];
 
         global $conn;
-        $rs = $conn->Execute($sql, [$user_id]);
+        $rs = $conn->Execute($sql, $params);
 
         $groups = [];
         foreach ($rs as $row) {
