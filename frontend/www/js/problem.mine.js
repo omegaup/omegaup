@@ -27,7 +27,7 @@
                                     .html(omegaup.UI.escape(problem.tags[j])));
                   }
                 }
-                if (problem.visibility != '1')
+                if (problem.visibility <= 0)
                   $('.private', row).removeClass('hidden');
                 $('.edit', row)
                     .attr('href', '/problem/' + problem.alias + '/edit/');

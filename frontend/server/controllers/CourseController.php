@@ -378,11 +378,12 @@ class CourseController extends Controller {
             $points = (int)$r['points'];
         }
 
-        ProblemsetProblemsDAO::save(new ProblemsetProblems([
-            'problemset_id' => $problemSet->problemset_id,
-            'problem_id' => $problem->problem_id,
-            'points' => $points,
-        ]));
+        ProblemsetController::addProblem(
+            $problemSet->problemset_id,
+            $problem,
+            $r['current_user_id'],
+            $points
+        );
 
         return ['status' => 'ok'];
     }
