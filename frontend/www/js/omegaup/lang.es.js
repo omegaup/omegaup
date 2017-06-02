@@ -623,7 +623,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsAssignment: "Trabajo",
 	wordsAssignments: "Tareas",
 	wordsAuthor: "Autor",
-	wordsBannedProblem: "Problema bloqueado",
+	wordsBannedProblem: "Problema suspendido",
 	wordsBestSolvers: "Mejores env\u00edos aceptados",
 	wordsBy: "por",
 	wordsCancel: "Cancelar",
