@@ -1,6 +1,6 @@
 -- Groups
 ALTER TABLE `Groups`
-	ADD COLUMN `acl_id` int(11) NULL AFTER `group_id`;
+  ADD COLUMN `acl_id` int(11) NULL AFTER `group_id`;
 
 DELIMITER $$
 CREATE PROCEDURE `Groups_ACLs_Migrate`()
@@ -43,5 +43,5 @@ ALTER TABLE `Groups`
 
 ALTER TABLE `Groups`
   DROP FOREIGN KEY `fk_g_user_id`,
-	DROP INDEX `owner_id`,
-	DROP COLUMN `owner_id`;
+  DROP INDEX `owner_id`,
+  DROP COLUMN `owner_id`;
