@@ -12,7 +12,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm-nightly
+  - hhvm-3.6
 
 env:
   - DB=mysql
@@ -59,6 +59,8 @@ cache:
   - $HOME/.yarn-cache
 
 before_script:
+  # Workaround for Travis' flaky MySQL connection.
+  - for _ in `seq 10`; do mysql -e 'SELECT 1;' --batch --skip-column-names || sleep 1; done
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
