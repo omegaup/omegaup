@@ -1,7 +1,13 @@
 <?php
 require_once 'libs/dao/QualityNominations.dao.php';
+require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
 
 class QualityNominationController extends Controller {
+    /**
+     * Number of reviewers to automatically assign each nomination.
+     */
+    const REVIEWERS_PER_NOMINATION = 2;
+
     /**
      * Creates a new QualityNomination
      *
@@ -91,13 +97,27 @@ class QualityNominationController extends Controller {
         }
 
         // Create object
-        QualityNominationsDAO::save(new QualityNominations([
+        $nomination = new QualityNominations([
             'user_id' => $r['current_user_id'],
             'problem_id' => $problem->problem_id,
             'nomination' => $r['nomination'],
             'contents' => json_encode($contents), // re-encoding it for normalization.
             'status' => 'open',
-        ]));
+        ]);
+        QualityNominationsDAO::save($nomination);
+
+        $qualityReviewerGroup = GroupsDAO::FindByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        foreach (GroupsDAO::sampleMembers(
+            $qualityReviewerGroup,
+            self::REVIEWERS_PER_NOMINATION
+        ) as $reviewer) {
+            QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                'qualitynomination_id' => $nomination->qualitynomination_id,
+                'user_id' => $reviewer->user_id,
+            ]));
+        }
 
         return ['status' => 'ok'];
     }

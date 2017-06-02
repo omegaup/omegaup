@@ -23,6 +23,9 @@ class Authorization {
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
+    // Group for quality reviewers.
+    const QUALITY_REVIEWER_GROUP_ALIAS = 'omegaup:quality-reviewer';
+
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
             return false;
