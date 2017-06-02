@@ -1,19 +1,19 @@
-<template> 
+<template>
   <transition name="fade">
     <div class="panel panel-default quality-nom-contents" v-show="showForm">
       <div class="quality-nom-contents-text" v-show="showQuestionText">
         {{ T.qualityFormCongrats }}
         <br/> <br/>
-        {{ T.qualityFormRecommendingQuestion }}        
+        {{ T.qualityFormRecommendingQuestion }}
         <br/>
       </div>
       <div class="quality-nom-yes-no-btns" v-show="showYesNo">
         <button v-on:click="onShowRationale">{{ T.wordsYes }}</button>
-        <button v-on:click="onHide">{{ T.wordsNo }}</button>    
+        <button v-on:click="onHide">{{ T.wordsNo }}</button>
       </div>
-      <div class="quality-nom-yes-rationale required" v-show="showRationale">        
+      <div class="quality-nom-yes-rationale required" v-show="showRationale">
         <label class="control-label">{{ T.qualityFormRationaleInput }}: <input type="text" name="Rationale" v-model="rationale"></label>
-        <button type="submit" v-on:click.prevent="onSubmit" :disabled="rationale.length <= 0">{{ T.wordsSend }}</button>            
+        <button type="submit" v-on:click.prevent="onSubmit" :disabled="rationale.length <= 0">{{ T.wordsSend }}</button>
       </div>
       <div class="quality-nom-thanks" v-show="showThanks">
         {{ T.qualityFormThanksForReview }}
@@ -33,9 +33,9 @@ export default {
     statement: String,
     source: String
   },
-  data: function() { 
+  data: function() {
     return {
-      T: T, 
+      T: T,
       UI: UI,
       showForm: this.solved && !this.nominated,
       showYesNo: true,
@@ -68,9 +68,9 @@ export default {
 </script>
 
 <style>
-.quality-nom-contents { 
-  position: fixed; 
-  bottom: 10px; 
+.quality-nom-contents {
+  position: fixed;
+  bottom: 10px;
   right: 20%;
   z-index: 9999999 !important;
   width: 350px;

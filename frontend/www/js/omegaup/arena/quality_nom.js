@@ -10,18 +10,18 @@ OmegaUp.on('ready', function() {
   let problemAlias = document.getElementById('problem-alias-payload').innerText;
   let problemStatement = document.getElementsByClassName('statement')[0].innerText;
   let sourceNode = document.getElementsByClassName('source-data');
-  let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';  
+  let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
   let qualityNominationForm = new Vue({
     el: '#quality-nom-form',
     render: function(createElement) {
       return createElement('quality-nom-form', {
         props: {
-          solved: this.solved, 
+          solved: this.solved,
           nominated: this.nominated,
           statement: problemStatement,
           source: source
-        },        
+        },
         on: {
           submit: function(ev) {
             API.QualityNomination.create({
@@ -31,7 +31,7 @@ OmegaUp.on('ready', function() {
                 'rationale': ev.rationale,
                 'statement': ev.statement,
                 'tags': [],
-                'source': ev.source,                
+                'source': ev.source,
               })
             }).fail(UI.apiError);
           }
@@ -39,7 +39,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      nominated: nominatedVal, 
+      nominated: nominatedVal,
       solved: solvedVal
     },
     components: {
