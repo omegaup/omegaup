@@ -76,6 +76,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $query,
         $user_id,
         $tag,
+        $min_visibility,
         &$total
     ) {
         global $conn;
@@ -167,7 +168,8 @@ class ProblemsDAO extends ProblemsDAOBase {
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= '
-                (p.visibility >= 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
+                (p.visibility >= ? OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
+            $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
             $args[] = $user_id;
 
             if (!is_null($query)) {
@@ -186,7 +188,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Problems p';
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
-            $sql .= ' p.visibility >= 1 ';
+            $sql .= ' p.visibility >= ? ';
+            $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
 
             if (!is_null($query)) {
                 $sql .= " AND p.title LIKE CONCAT('%', ?, '%') ";

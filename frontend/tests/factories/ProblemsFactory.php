@@ -36,7 +36,7 @@ class ProblemsFactory {
      * @param string $zipName
      * @return Array
      */
-    public static function getRequest($zipName = null, $title = null, $public = 1, Users $author = null, $languages = null) {
+    public static function getRequest($zipName = null, $title = null, $visibility = ProblemController::VISIBILITY_PUBLIC, Users $author = null, $languages = null) {
         if (is_null($author)) {
             $author = UserFactory::createUser();
         }
@@ -61,7 +61,7 @@ class ProblemsFactory {
         $r['memory_limit'] = 32000;
         $r['source'] = 'yo';
         $r['order'] = 'normal';
-        $r['visibility'] = $public;
+        $r['visibility'] = $visibility;
         $r['output_limit'] = 10240;
         if ($languages == null) {
             $r['languages'] = 'c,cpp,py';
@@ -80,19 +80,27 @@ class ProblemsFactory {
     }
 
     public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {
-        return self::createProblem(null, null, 1, $author, null, $login);
+        return self::createProblem(null, null, ProblemController::VISIBILITY_PUBLIC, $author, null, $login);
     }
 
     /**
      *
      */
-    public static function createProblem($zipName = null, $title = null, $public = 1, Users $author = null, $languages = null, ScopedLoginToken $login = null) {
+    public static function createProblem($zipName = null, $title = null, $visibility = ProblemController::VISIBILITY_PUBLIC, Users $author = null, $languages = null, ScopedLoginToken $login = null) {
         if (is_null($zipName)) {
             $zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
         }
 
         // Get a user
-        $problemData = self::getRequest($zipName, $title, $public, $author, $languages);
+        $problemData = self::getRequest(
+            $zipName,
+            $title,
+            ($visibility >= ProblemController::VISIBILITY_PUBLIC)
+                ? ProblemController::VISIBILITY_PUBLIC
+                : ProblemController::VISIBILITY_PRIVATE,
+            $author,
+            $languages
+        );
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -107,6 +115,14 @@ class ProblemsFactory {
 
         // Call the API
         ProblemController::apiCreate($r);
+        $problem = ProblemsDAO::getByAlias($r['alias']);
+
+        if ($visibility == ProblemController::VISIBILITY_BANNED
+            || $visibility == ProblemController::VISIBILITY_PROMOTED
+        ) {
+            $problem->visibility = $visibility;
+            ProblemsDAO::save($problem);
+        }
 
         // Clean up our mess
         unset($_REQUEST);
@@ -114,7 +130,7 @@ class ProblemsFactory {
         return  [
             'request' => $r,
             'author' => $problemAuthor,
-            'problem' => ProblemsDAO::getByAlias($r['alias']),
+            'problem' => $problem,
         ];
     }
 
