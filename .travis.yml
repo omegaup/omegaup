@@ -12,7 +12,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm-3.19
+  - hhvm-nightly
 
 env:
   - DB=mysql
