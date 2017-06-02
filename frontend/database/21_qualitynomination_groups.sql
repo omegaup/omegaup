@@ -17,7 +17,7 @@ INSERT INTO `Groups` (`acl_id`, `alias`, `name`, `description`) VALUES (
 	3,
 	'omegaup:quality-reviewer',
 	'omegaup:quality-reviewer',
-	'Administradores de omegaup:quality-reviewer'
+	'Jueces del programa de Problemas de Calidad'
 );
 
 INSERT INTO `Group_Roles` VALUES(@quality_reviewer_admin_id, 1, 3);
