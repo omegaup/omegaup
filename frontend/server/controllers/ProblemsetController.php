@@ -4,7 +4,7 @@ require_once('libs/dao/Problemsets.dao.php');
 require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
-    public function validateAddProblemToProblemset($problemset_id, Problems $problem, $current_user_id) {
+    public static function validateAddProblemToProblemset($problemset_id, Problems $problem, $current_user_id) {
         if ($problem->visibility == ProblemController::VISIBILITY_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
@@ -15,7 +15,7 @@ class ProblemsetController extends Controller {
         }
     }
 
-    public function addProblem($problemset_id, Problems $problem, $current_user_id, $points, $order_in_contest = 1) {
+    public static function addProblem($problemset_id, Problems $problem, $current_user_id, $points, $order_in_contest = 1) {
         ProblemsetController::validateAddProblemToProblemset(
             $problemset_id,
             $problem,
