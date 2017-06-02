@@ -36,7 +36,7 @@
 					<div class="statement">{$problem_statement}</div>
 					<hr />
 {if $source}
-					<div class="source">{#wordsSource#}: <span>{$source|escape}</span></div>
+					<div class="source">{#wordsSource#}: <span class="source-data">{$source|escape}</span></div>
 {/if}
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
@@ -75,6 +75,13 @@
 		<div id="overlay">
 {include file='arena.runsubmit.tpl'}
 {include file='arena.rundetails.tpl'}
+		</div>
+		<div id="quailty-nom">
+			<script type="text/json" id="solved-payload">{$solved}</script>
+			<script type="text/json" id="nominated-payload">{$nominated}</script>
+			<script type="text/json" id="problem-alias-payload">{$problem_alias}</script>
+			<div id="quality-nom-form"></div>
+			<script type="text/javascript" src="{version_hash src="/js/dist/arena_quality_nom.js"}"></script>
 		</div>
 		<div id="footer">
 		</div>

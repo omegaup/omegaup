@@ -13,6 +13,7 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
+    arena_quality_nom: './frontend/www/js/omegaup/arena/quality_nom.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
