@@ -24,7 +24,7 @@ class QualityNominationController extends Controller {
      * # Demotion
      *
      * A demoted problem is banned, and cannot be un-banned or added to any new
-     * problemsets. This expects the `nomination` field to be `promotion` and
+     * problemsets. This expects the `nomination` field to be `demotion` and
      * the `contents` field should be a JSON blob with the following fields:
      *
      * * `rationale`: A small text explaining the rationale for demotion.
