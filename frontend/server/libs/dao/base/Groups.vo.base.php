@@ -29,8 +29,8 @@ class Groups extends VO {
         if (isset($data['group_id'])) {
             $this->group_id = $data['group_id'];
         }
-        if (isset($data['owner_id'])) {
-            $this->owner_id = $data['owner_id'];
+        if (isset($data['acl_id'])) {
+            $this->acl_id = $data['acl_id'];
         }
         if (isset($data['create_time'])) {
             $this->create_time = $data['create_time'];
@@ -71,7 +71,7 @@ class Groups extends VO {
       * @access public
       * @var int(11)
       */
-    public $owner_id;
+    public $acl_id;
 
     /**
       *  [Campo no documentado]

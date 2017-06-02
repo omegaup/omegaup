@@ -20,7 +20,7 @@ abstract class GroupsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Groups`.`group_id`, `Groups`.`owner_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description`';
+    const FIELDS = '`Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class GroupsDAOBase extends DAO {
         if (is_null($group_id)) {
             return null;
         }
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`owner_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM Groups WHERE (group_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM Groups WHERE (group_id = ?) LIMIT 1;';
         $params = [$group_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class GroupsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Groups}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`owner_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` from Groups';
+        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` from Groups';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -131,9 +131,9 @@ abstract class GroupsDAOBase extends DAO {
             $clauses[] = '`group_id` = ?';
             $params[] = $Groups->group_id;
         }
-        if (!is_null($Groups->owner_id)) {
-            $clauses[] = '`owner_id` = ?';
-            $params[] = $Groups->owner_id;
+        if (!is_null($Groups->acl_id)) {
+            $clauses[] = '`acl_id` = ?';
+            $params[] = $Groups->acl_id;
         }
         if (!is_null($Groups->create_time)) {
             $clauses[] = '`create_time` = ?';
@@ -160,7 +160,7 @@ abstract class GroupsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`owner_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM `Groups`';
+        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM `Groups`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -185,9 +185,9 @@ abstract class GroupsDAOBase extends DAO {
       * @param Groups [$Groups] El objeto de tipo Groups a actualizar.
       */
     final private static function update(Groups $Groups) {
-        $sql = 'UPDATE `Groups` SET `owner_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
+        $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
         $params = [
-            $Groups->owner_id,
+            $Groups->acl_id,
             $Groups->create_time,
             $Groups->alias,
             $Groups->name,
@@ -215,10 +215,10 @@ abstract class GroupsDAOBase extends DAO {
         if (is_null($Groups->create_time)) {
             $Groups->create_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Groups (`group_id`, `owner_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Groups (`group_id`, `acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Groups->group_id,
-            $Groups->owner_id,
+            $Groups->acl_id,
             $Groups->create_time,
             $Groups->alias,
             $Groups->name,
@@ -281,14 +281,14 @@ abstract class GroupsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $GroupsA->owner_id;
-        $b = $GroupsB->owner_id;
+        $a = $GroupsA->acl_id;
+        $b = $GroupsB->acl_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`owner_id` >= ? AND `owner_id` <= ?';
+            $clauses[] = '`acl_id` >= ? AND `acl_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`owner_id` = ?';
+            $clauses[] = '`acl_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

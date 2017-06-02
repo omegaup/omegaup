@@ -689,13 +689,13 @@ CREATE TABLE IF NOT EXISTS `Users_Experiments` (
 
 CREATE TABLE IF NOT EXISTS `Groups` (
   `group_id` int(11) AUTO_INCREMENT NOT NULL,
-  `owner_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `alias` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`group_id`),
-  KEY `owner_id` (`owner_id`),
+  KEY `acl_id` (`acl_id`),
   UNIQUE KEY `groups_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
@@ -1101,7 +1101,7 @@ ALTER TABLE `Users_Experiments`
   ADD CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups`
-  ADD CONSTRAINT `fk_g_user_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_g_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups_Users`
   ADD CONSTRAINT `fk_gu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

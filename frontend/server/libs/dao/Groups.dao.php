@@ -42,4 +42,30 @@ class GroupsDAO extends GroupsDAOBase {
         }
         return $ar;
     }
+
+    /**
+     * Returns all groups that a user can manage.
+     */
+    final public static function getAllGroupsAdminedByUser($user_id) {
+        $sql = '
+            SELECT
+                g.*
+            FROM
+                Groups g
+            INNER JOIN
+                ACLs AS a ON a.acl_id = g.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                g.group_id DESC;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$user_id]);
+
+        $groups = [];
+        foreach ($rs as $row) {
+            array_push($groups, new Groups($row));
+        }
+        return $groups;
+    }
 }
