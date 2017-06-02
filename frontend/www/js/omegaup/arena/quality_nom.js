@@ -8,7 +8,8 @@ OmegaUp.on('ready', function() {
   let solvedVal =
       !!parseInt(document.getElementById('solved-payload').innerText);
   let problemAlias = document.getElementById('problem-alias-payload').innerText;
-  let problemStatement = document.getElementsByClassName('statement')[0].innerText;
+  let problemStatement =
+      document.getElementsByClassName('statement')[0].innerText;
   let sourceNode = document.getElementsByClassName('source-data');
   let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
@@ -25,23 +26,21 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             API.QualityNomination.create({
-              problem_alias: problemAlias,
-              nomination: 'promotion',
-              contents: JSON.stringify({
-                'rationale': ev.rationale,
-                'statement': ev.statement,
-                'tags': [],
-                'source': ev.source,
-              })
-            }).fail(UI.apiError);
+                                   problem_alias: problemAlias,
+                                   nomination: 'promotion',
+                                   contents: JSON.stringify({
+                                     'rationale': ev.rationale,
+                                     'statement': ev.statement,
+                                     'tags': [],
+                                     'source': ev.source,
+                                   })
+                                 })
+                .fail(UI.apiError);
           }
         }
       });
     },
-    data: {
-      nominated: nominatedVal,
-      solved: solvedVal
-    },
+    data: {nominated: nominatedVal, solved: solvedVal},
     components: {
       'quality-nom-form': arena_QualityNomination,
     }
