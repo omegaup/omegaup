@@ -1,6 +1,7 @@
-import course_AssignmentList from '../components/course/AssignmentList.vue';
-import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AddStudents from '../components/course/AddStudents.vue';
+import course_Administrators from '../components/course/Administrators.vue';
+import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
+import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
@@ -42,6 +43,57 @@ OmegaUp.on('ready', function() {
     // wait until the update is done.
     Vue.nextTick(function() { assignmentDetails.$el.scrollIntoView(); });
   }
+
+  var administrators = new Vue({
+    el: '#admins div',
+    render: function(createElement) {
+      return createElement('omegaup-course-administrators', {
+        props: {
+          admins: [],
+          groupAdmins: [],
+        },
+        on: {
+          edit: function(assignment) {
+            assignmentDetails.show = true;
+            assignmentDetails.update = true;
+            assignmentDetails.assignment = assignment;
+            assignmentDetails.$el.scrollIntoView();
+          },
+          'delete': function(assignment) {
+            if (!window.confirm(
+                    UI.formatString(T.courseAssignmentConfirmDelete, {
+                      assignment: assignment.name,
+                    }))) {
+              return;
+            }
+            omegaup.API.Course.removeAssignment({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.courseAssignmentDeleted);
+                  refreshAssignmentsList();
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'new': function() {
+            assignmentDetails.show = true;
+            assignmentDetails.update = false;
+            assignmentDetails.assignment = {
+              start_time: defaultStartTime,
+              finish_time: defaultFinishTime,
+            };
+          },
+        },
+      });
+    },
+    data: {
+      assignments: [],
+    },
+    components: {
+      'omegaup-course-administrators': course_Administrators,
+    },
+  });
 
   var assignmentList = new Vue({
     el: '#assignments div.list',
