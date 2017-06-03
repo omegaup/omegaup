@@ -489,7 +489,7 @@ omegaup.OmegaUp.loadTranslations({
 	publish: "(Pub1i5h)",
 	qualityFormCongrats: "(C0ngra7u1a7i0n5 f0r 501ving 7hi5 pr0b13m!)",
 	qualityFormRationaleInput: "(R3a50n)",
-	qualityFormRecommendingQuestion: "(D0 y0u wan7 70 r3c0mm3nd 7hi5 7a5k 70 07h3r 0m3gaUp u53r5?)",
+	qualityFormRecommendingQuestion: "(D0 y0u wan7 70 r3c0mm3nd 7hi5 pr0b13m 70 07h3r 0m3gaUp u53r5?)",
 	qualityFormThanksForReview: "(Thank5 f0r y0ur r3vi3w!)",
 	qualityNominationMustHaveSolvedProblem: "(Y0u mu57 501v3 a pr0b13m b3f0r3 n0mina7ing i7)",
 	qualityNominationProblemHasBeenBanned: "(Thi5 pr0b13m ha5 b33n bann3d. Y0u cann07 upda73 i75 vi5ibi1i7y.)",

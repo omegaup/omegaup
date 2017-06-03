@@ -1,29 +1,31 @@
 <template>
-  <transition name="fade">
-    <div class="panel panel-default popup"
-         v-show="showForm">
-      <div v-show="showQuestionText">
-        {{ T.qualityFormCongrats }}<br>
-        <br>
-        {{ T.qualityFormRecommendingQuestion }}<br>
+  <div class="qualitynomination-popup">
+    <transition name="fade">
+      <div class="panel panel-default popup"
+           v-show="showForm">
+        <div v-show="showQuestionText">
+          {{ T.qualityFormCongrats }}<br>
+          <br>
+          {{ T.qualityFormRecommendingQuestion }}<br>
+        </div>
+        <div v-show="showYesNo">
+          <button v-on:click="onShowRationale">{{ T.wordsYes }}</button> <button v-on:click=
+          "onHide">{{ T.wordsNo }}</button>
+        </div>
+        <div class="required"
+             v-show="showRationale">
+          <label class="control-label">{{ T.qualityFormRationaleInput }}: <input name="Rationale"
+                 type="text"
+                 v-model="rationale"></label> <button type="submit"
+               v-bind:disabled="rationale.length &lt;= 0"
+               v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
+        </div>
+        <div v-show="showThanks">
+          {{ T.qualityFormThanksForReview }}
+        </div>
       </div>
-      <div v-show="showYesNo">
-        <button v-on:click="onShowRationale">{{ T.wordsYes }}</button> <button v-on:click=
-        "onHide">{{ T.wordsNo }}</button>
-      </div>
-      <div class="required"
-           v-show="showRationale">
-        <label class="control-label">{{ T.qualityFormRationaleInput }}: <input name="Rationale"
-               type="text"
-               v-model="rationale"></label> <button type="submit"
-             v-bind:disabled="rationale.length &lt;= 0"
-             v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
-      </div>
-      <div v-show="showThanks">
-        {{ T.qualityFormThanksForReview }}
-      </div>
-    </div>
-  </transition>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -71,7 +73,7 @@ export default {
 </script>
 
 <style>
-.popup {
+.qualitynomination-popup .popup {
   position: fixed;
   bottom: 10px;
   right: 20%;
@@ -84,15 +86,15 @@ export default {
   overflow: auto;
 }
 
-.fade-enter-active, .fade-leave-active {
+.qualitynomination-popup .fade-enter-active, .qualitynomination-popup .fade-leave-active {
   transition: opacity .5s
 }
 
-.fade-enter, .fade-leave-to {
+.qualitynomination-popup .fade-enter, .qualitynomination-popup .fade-leave-to {
   opacity: 0
 }
 
-.required .control-label:before {
+.qualitynomination-popup .required .control-label:before {
   content:"*";
   color:red;
   position: absolute;

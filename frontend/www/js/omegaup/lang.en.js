@@ -489,7 +489,7 @@ omegaup.OmegaUp.loadTranslations({
 	publish: "Publish",
 	qualityFormCongrats: "Congratulations for solving this problem!",
 	qualityFormRationaleInput: "Reason",
-	qualityFormRecommendingQuestion: "Do you want to recommend this task to other omegaUp users?",
+	qualityFormRecommendingQuestion: "Do you want to recommend this problem to other omegaUp users?",
 	qualityFormThanksForReview: "Thanks for your review!",
 	qualityNominationMustHaveSolvedProblem: "You must solve a problem before nominating it",
 	qualityNominationProblemHasBeenBanned: "This problem has been banned. You cannot update its visibility.",

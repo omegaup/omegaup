@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
           submit: function(ev) {
             API.QualityNomination
                 .create({
-                  problem_alias: problemAlias,
+                  problem_alias: qualityPayload.problem_alias,
                   nomination: 'promotion',
                   contents: JSON.stringify({
                     'rationale': ev.rationale,
