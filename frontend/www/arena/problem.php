@@ -9,7 +9,7 @@ try {
     $result = ProblemController::apiDetails($r);
     $problem = ProblemsDAO::GetByAlias($result['alias']);
     $nominationStatus = null;
-    if ($sesion['valid']) {
+    if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
             $session['user']
@@ -21,7 +21,6 @@ try {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
-
 $smarty->assign('problem_statement', $result['problem_statement']);
 $smarty->assign('problem_statement_language', $result['problem_statement_language']);
 $smarty->assign('problem_alias', $result['alias']);
@@ -36,8 +35,11 @@ $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 .
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
-$smarty->assign('solved', $nominationStatus['solved']);
-$smarty->assign('nominated', $nominationStatus['nominated']);
+$smarty->assign('quality_payload', [
+    'solved' => (bool) $nominationStatus['solved'],
+    'nominated' => (bool) $nominationStatus['nominated'],
+    'problem_alias' => $result['alias']
+]);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),
     ['kp', 'kj']
