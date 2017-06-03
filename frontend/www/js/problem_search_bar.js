@@ -1,5 +1,5 @@
 omegaup.OmegaUp.on('ready', function() {
-  let checkbox = document.querySelector('#high-quality-filter');
+  var checkbox = document.querySelector('#high-quality-filter');
   checkbox.addEventListener('click', function() {
     $('tbody>tr').show();
     if (checkbox.checked) {
