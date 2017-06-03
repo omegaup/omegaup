@@ -24,7 +24,7 @@ omegaup.OmegaUp.on('ready', function() {
         if (errors) {
           return false;
         }
-        let visibilityFields = $('input[name=visibility]', this);
+        var visibilityFields = $('input[name=visibility]', this);
         if (visibilityFields.attr('disabled')) {
           // Clear field name to prevent it from being submitted with
           // the rest of the form.

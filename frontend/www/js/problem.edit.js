@@ -286,7 +286,7 @@ omegaup.OmegaUp.on('ready', function() {
       ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.validator);
-    let visibility = Math.max(0, Math.min(1, problem.visibility));
+    var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {
       // The problem is banned or promoted, so the user isn't allowed to
