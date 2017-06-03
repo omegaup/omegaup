@@ -12,6 +12,7 @@ if (!function_exists('try_define')) {
 try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
+try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_DEVELOPMENT_MODE', false);
 try_define('OMEGAUP_MAINTENANCE', null);
