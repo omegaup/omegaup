@@ -36,6 +36,9 @@
 			</div>
 
 			<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="problem-search-button"/>
+
+			<label class="control-label"><input type="checkbox" id="high-quality-filter"> {#wordsOnly#} <img src="/media/quality-badge-sm.png"></img></label>
 		</div>
 	</form>
 </div>
+<script type="text/javascript" src="{version_hash src="/js/problem_search_bar.js"}"></script>
