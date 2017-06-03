@@ -683,6 +683,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNoComment: "(N0 c0mm3n7)",
 	wordsNumHomeworks: "(Num. 0f h0m3w0rk a55ignm3n75)",
 	wordsNumTests: "(Num. 0f 73575)",
+	wordsOnly: "(On1y)",
 	wordsOrderBy: "(Ord3r by)",
 	wordsOther: "(O7h3r)",
 	wordsOverallWallTimeLimit: "(Tim3 1imi7 (707a1))",

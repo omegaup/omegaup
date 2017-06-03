@@ -683,6 +683,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNoComment: "Sin comentarios",
 	wordsNumHomeworks: "N\u00famero de tareas",
 	wordsNumTests: "N\u00famero de ex\u00e1menes",
+	wordsOnly: "S\u00f3lo",
 	wordsOrderBy: "Ordenar por",
 	wordsOther: "Otro",
 	wordsOverallWallTimeLimit: "L\u00edmite de tiempo (total)",
