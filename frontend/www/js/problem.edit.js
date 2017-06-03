@@ -286,13 +286,12 @@ omegaup.OmegaUp.on('ready', function() {
       ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.validator);
-    if (problem.visibility >= 0) {
-      $('input[name=visibility][value=' + Math.min(1, problem.visibility) + ']')
-          .attr('checked', 1);
-    } else {
-      // The problem is banned.
+    let visibility = Math.max(0, Math.min(1, problem.visibility));
+    $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
+    if (visibility != problem.visibility) {
+      // The problem is banned or promoted, so the user isn't allowed to
+      // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
-      $('input[name=visibility][value=0]').attr('checked', 1);
     }
     $('#languages').val(problem.languages);
     $('input[name=alias]').val(problemAlias);
