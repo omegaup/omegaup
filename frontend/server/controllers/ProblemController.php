@@ -923,27 +923,82 @@ class ProblemController extends Controller {
     /**
      * Gets the problem statement from the filesystem.
      *
-     * @param Request $r
+     * @param string $sourcePath The filesystem path for the problem statement.
+     *
+     * @return The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatement(Request $r) {
-        $statement_type = ProblemController::getStatementType($r);
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
-
+    public static function getProblemStatementImpl($sourcePath) {
         try {
-            $file_content = FileHandler::ReadFile($source_path);
+            return FileHandler::ReadFile($sourcePath);
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException('statementNotFound');
         }
-
-        return $file_content;
     }
 
-    public static function isLanguageSupportedForProblem(Request $r) {
-        $statement_type = ProblemController::getStatementType($r);
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
+    /**
+     * Gets the filesystem path for a problem statement.
+     *
+     * @param string $problemAlias    The alias of the problem.
+     * @param string $language        The language of the problem. Will default
+     *                                to spanish if not found.
+     * @param string $statementFormat The format in which the statement will be
+     *                                displayed.
+     *
+     * @return The path of the file.
+     */
+    private static function getSourcePath($problemAlias, $language, $statementFormat) {
+        return PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemAlias .
+            DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR .
+            $language . '.' . $statementFormat;
+    }
 
-        return file_exists($source_path);
+    /**
+     * Gets the problem statement from the filesystem.
+     *
+     * @param string $problemAlias    The alias of the problem.
+     * @param string $language        The language of the problem. Will default
+     *                                to spanish if not found.
+     * @param string $statementFormat The format in which the statement will be
+     *                                displayed.
+     *
+     * @return The contents of the file.
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getProblemStatement(
+        $problemAlias,
+        &$language,
+        $statementFormat = 'markdown'
+    ) {
+        $sourcePath = self::getSourcePath(
+            $problemAlias,
+            $language,
+            $statementFormat
+        );
+
+        // Read the file that contains the source
+        if (!file_exists($sourcePath)) {
+            // If there is no language file for the problem, return the spanish
+            // version.
+            $language = 'es';
+            $sourcePath = self::getSourcePath(
+                $problemAlias,
+                $language,
+                $statementFormat
+            );
+        }
+
+        $fileContents = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_STATEMENT,
+            $problemAlias . '-' . $language . '-' . $statementFormat,
+            $sourcePath,
+            'ProblemController::getProblemStatementImpl',
+            $fileContents,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+
+        return $fileContents;
     }
 
     /**
@@ -966,17 +1021,16 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Get the type of statement that was requested.
+     * Get the format of statement that was requested.
      * HTML is the default if statement_type unspecified in the request.
      *
      * @param Request $r
      */
-    private static function getStatementType(Request $r) {
-        $type = 'html';
-        if (isset($r['statement_type'])) {
-            $type = $r['statement_type'];
+    private static function getStatementFormat(Request $r) {
+        if (!isset($r['statement_type'])) {
+            return 'html';
         }
-        return $type;
+        return $r['statement_type'];
     }
 
     /**
@@ -1116,24 +1170,16 @@ class ProblemController extends Controller {
             'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
             'languages', 'slow', 'stack_limit', 'email_clarifications'];
 
-        // Read the file that contains the source
-        if (!ProblemController::isLanguageSupportedForProblem($r)) {
-            // If there is no language file for the problem, return the spanish version.
-            $r['lang'] = 'es';
-        }
-        $statement_type = ProblemController::getStatementType($r);
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_STATEMENT,
-            $r['problem']->alias . '-' . $r['lang'] . '-' . $statement_type,
-            $r,
-            'ProblemController::getProblemStatement',
-            $file_content,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        $language = $r['lang'];
+        $file_content = ProblemController::getProblemStatement(
+            $r['problem']->alias,
+            $language,
+            ProblemController::getStatementFormat($r)
         );
 
         // Add problem statement to source
         $response['problem_statement'] = $file_content;
-        $response['problem_statement_language'] = $r['lang'];
+        $response['problem_statement_language'] = $language;
 
         // Add the example input.
         $sample_input = null;
