@@ -940,8 +940,7 @@ class ProblemController extends Controller {
      * Gets the filesystem path for a problem statement.
      *
      * @param string $problemAlias    The alias of the problem.
-     * @param string $language        The language of the problem. Will default
-     *                                to spanish if not found.
+     * @param string $language        The language of the problem.
      * @param string $statementFormat The format in which the statement will be
      *                                displayed.
      *
@@ -958,7 +957,7 @@ class ProblemController extends Controller {
      *
      * @param string $problemAlias    The alias of the problem.
      * @param string $language        The language of the problem. Will default
-     *                                to spanish if not found.
+     *                                to Spanish if not found.
      * @param string $statementFormat The format in which the statement will be
      *                                displayed.
      *
@@ -978,7 +977,7 @@ class ProblemController extends Controller {
 
         // Read the file that contains the source
         if (!file_exists($sourcePath)) {
-            // If there is no language file for the problem, return the spanish
+            // If there is no language file for the problem, return the Spanish
             // version.
             $language = 'es';
             $sourcePath = self::getSourcePath(

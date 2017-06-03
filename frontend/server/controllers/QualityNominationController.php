@@ -297,7 +297,7 @@ class QualityNominationController extends Controller {
             ];
             foreach ($response['contents']['statements'] as $language => $_) {
                 // There might be the case that the language is not originally
-                // present, in which case it will be changed to spanish.
+                // present, in which case it will be changed to Spanish.
                 $actualLanguage = $language;
                 $markdown = ProblemController::getProblemStatement(
                     $problem->alias,
