@@ -21,7 +21,9 @@ class QualityNominationController extends Controller {
      * following fields:
      *
      * * `rationale`: A small text explaining the rationale for promotion.
-     * * `statement`: The markdown-formatted problem statement.
+     * * `statements`: A dictionary of languages to objects that contain a
+     *                 `markdown` field, which is the markdown-formatted
+     *                 problem statement for that language.
      * * `source`: A URL or string clearly documenting the source or full name
      *             of original author of the problem.
      * * `tags`: An array of tag names that will be added to the problem upon
@@ -74,11 +76,26 @@ class QualityNominationController extends Controller {
             if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
-            if ((!isset($contents['statement']) || !is_string($contents['statement']) || empty($contents['statement']))
+            if ((!isset($contents['statements']) || !is_array($contents['statements']))
                 || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
                 || (!isset($contents['tags']) || !is_array($contents['tags']))
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            // Tags must be strings.
+            foreach ($contents['tags'] as &$tag) {
+                if (!is_string($tag)) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $tag = TagController::normalize($tag);
+            }
+            // Statements must be a dictionary of language => { 'markdown': string }.
+            foreach ($contents['statements'] as $language => $statement) {
+                if (!is_array($statement) || empty($language)
+                    || (!isset($statement['markdown']) || !is_string($statement['markdown']) || empty($statement['markdown']))
+                ) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
             }
         } elseif ($r['nomination'] == 'demotion') {
             if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'offensive'])) {
