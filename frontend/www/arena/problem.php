@@ -35,8 +35,11 @@ $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 .
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
-$smarty->assign('solved', intval($nominationStatus['solved']));
-$smarty->assign('nominated', intval($nominationStatus['nominated']));
+$smarty->assign('quality_payload', [
+    'solved' => (bool) $nominationStatus['solved'],
+    'nominated' => (bool) $nominationStatus['nominated'],
+    'problem_alias' => $result['alias']
+]);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),
     ['kp', 'kj']

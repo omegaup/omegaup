@@ -1,22 +1,19 @@
-import arena_QualityNomination from '../components/arena/QualityNomination.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
+import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  let nominatedVal =
-      !!parseInt(document.getElementById('nominated-payload').innerText);
-  let solvedVal =
-      !!parseInt(document.getElementById('solved-payload').innerText);
-  let problemAlias = document.getElementById('problem-alias-payload').innerText;
+  let qualityPayload =
+      JSON.parse(document.getElementById('quality-payload').innerText);
   let problemStatement =
       document.getElementsByClassName('statement')[0].innerText;
   let sourceNode = document.getElementsByClassName('source-data');
   let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
   let qualityNominationForm = new Vue({
-    el: '#quality-nom-form',
+    el: '#qualitynomination-popup',
     render: function(createElement) {
-      return createElement('quality-nom-form', {
+      return createElement('qualitynomination-popup', {
         props: {
           solved: this.solved,
           nominated: this.nominated,
@@ -40,9 +37,9 @@ OmegaUp.on('ready', function() {
         }
       });
     },
-    data: {nominated: nominatedVal, solved: solvedVal},
+    data: {nominated: qualityPayload.nominated, solved: qualityPayload.solved},
     components: {
-      'quality-nom-form': arena_QualityNomination,
+      'qualitynomination-popup': qualitynomination_Popup,
     }
   });
 });

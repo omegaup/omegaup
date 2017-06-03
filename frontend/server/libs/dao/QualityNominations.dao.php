@@ -11,28 +11,25 @@ include_once('base/QualityNominations.vo.base.php');
   */
 class QualityNominationsDAO extends QualityNominationsDAOBase {
     public static function getNominationStatusForProblem(Problems $problem, Users $user) {
-        $solvedSql = '
-          SELECT
-            COUNT(r.run_id) > 0 as solved
-          FROM
-            Runs AS r
-          WHERE
-            r.problem_id = ? AND r.user_id = ? AND r.verdict = "AC";
+        $sql = '
+            SELECT
+                COUNT(r.run_id) > 0 as solved,
+                COUNT(qn.qualitynomination_id) > 0 as nominated
+            FROM
+                Problems p
+            INNER JOIN
+                Runs r
+            ON
+                r.problem_id = p.problem_id AND r.verdict = "AC"
+            LEFT JOIN
+                QualityNominations qn
+            ON
+                qn.problem_id = p.problem_id AND qn.user_id = r.user_id
+            WHERE
+                p.problem_id = ? AND r.user_id = ?;
         ';
 
         global $conn;
-        $solved = $conn->GetRow($solvedSql, [$problem->problem_id, $user->user_id]);
-
-        $nominatedSql = '
-          SELECT
-            COUNT(qn.qualitynomination_id) > 0 as nominated
-          FROM
-            QualityNominations qn
-          WHERE
-            qn.problem_id = ? AND qn.user_id = ?;
-        ';
-
-        $nominated = $conn->GetRow($nominatedSql, [$problem->problem_id, $user->user_id]);
-        return array_merge($solved, $nominated);
+        return $conn->GetRow($sql, [$problem->problem_id, $user->user_id]);
     }
 }

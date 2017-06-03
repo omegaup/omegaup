@@ -1,21 +1,21 @@
 <template>
   <transition name="fade">
-    <div class="panel panel-default quality-nom-contents" v-show="showForm">
-      <div class="quality-nom-contents-text" v-show="showQuestionText">
+    <div class="panel panel-default popup" v-show="showForm">
+      <div v-show="showQuestionText">
         {{ T.qualityFormCongrats }}
         <br/> <br/>
         {{ T.qualityFormRecommendingQuestion }}
         <br/>
       </div>
-      <div class="quality-nom-yes-no-btns" v-show="showYesNo">
+      <div v-show="showYesNo">
         <button v-on:click="onShowRationale">{{ T.wordsYes }}</button>
         <button v-on:click="onHide">{{ T.wordsNo }}</button>
       </div>
-      <div class="quality-nom-yes-rationale required" v-show="showRationale">
+      <div class="required" v-show="showRationale">
         <label class="control-label">{{ T.qualityFormRationaleInput }}: <input type="text" name="Rationale" v-model="rationale"></label>
-        <button type="submit" v-on:click.prevent="onSubmit" :disabled="rationale.length <= 0">{{ T.wordsSend }}</button>
+        <button type="submit" v-on:click.prevent="onSubmit" v-bind:disabled="rationale.length <= 0">{{ T.wordsSend }}</button>
       </div>
-      <div class="quality-nom-thanks" v-show="showThanks">
+      <div v-show="showThanks">
         {{ T.qualityFormThanksForReview }}
       </div>
     </div>
@@ -37,7 +37,7 @@ export default {
     return {
       T: T,
       UI: UI,
-      showForm: this.solved && !this.nominated,
+      showFormOverride: true,
       showYesNo: true,
       showQuestionText: true,
       showRationale: false,
@@ -45,9 +45,14 @@ export default {
       rationale: ''
     };
   },
+  computed: {
+    showForm: function() {
+      return this.showFormOverride && this.solved && !this.nominated;
+    }
+  },
   methods: {
     onHide() {
-      this.showForm = false
+      this.showFormOverride = false
     },
     onShowRationale() {
       this.$emit('show-rationale', this);
@@ -68,7 +73,7 @@ export default {
 </script>
 
 <style>
-.quality-nom-contents {
+.popup {
   position: fixed;
   bottom: 10px;
   right: 20%;

@@ -486,7 +486,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileUsername: "Nome de usu\u00e1rio",
 	publicContestMustHaveProb: "",
 	publish: "Publicar",
-	qualityFormCongrats: "Parab\u00e9ns por resolver esta tarefa!",
+	qualityFormCongrats: "Parab\u00e9ns por resolver esta problema!",
 	qualityFormRationaleInput: "Raz\u00e3o",
 	qualityFormRecommendingQuestion: "Deseja recomendar esta tarefa a outros usu\u00e1rios do omegaUp?",
 	qualityFormThanksForReview: "Obrigado por voc\u00ea reveja",
