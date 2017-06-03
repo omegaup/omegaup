@@ -8,6 +8,43 @@
 
 class GroupController extends Controller {
     /**
+     * Utility function to create a new group.
+     */
+    public static function createGroup($alias, $name, $description, $owner_id) {
+        $group = new Groups([
+            'alias' => $alias,
+            'name' => $name,
+            'description' => $description,
+        ]);
+        $group_acl = new ACLs([
+            'owner_id' => $owner_id,
+        ]);
+
+        GroupsDAO::transBegin();
+
+        try {
+            ACLsDAO::save($group_acl);
+            $group->acl_id = $group_acl->acl_id;
+
+            GroupsDAO::save($group);
+
+            self::$log->info('Group ' . $alias . ' created.');
+
+            GroupsDAO::transEnd();
+        } catch (Exception $e) {
+            GroupsDAO::transRollback();
+
+            if (strpos($e->getMessage(), '1062') !== false) {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+
+        return $group;
+    }
+
+    /**
      * New group
      *
      * @param Request $r
@@ -19,25 +56,12 @@ class GroupController extends Controller {
         Validators::isStringNonEmpty($r['name'], 'name', true);
         Validators::isStringNonEmpty($r['description'], 'description', false);
 
-        try {
-            $group = new Groups([
-                'owner_id' => $r['current_user_id'],
-                'name' => $r['name'],
-                'description' =>$r['description'],
-                'alias' => $r['alias'],
-                'create_time' => gmdate('Y-m-d H:i:s', time()),
-            ]);
-
-            GroupsDAO::save($group);
-
-            self::$log->info('Group ' . $r['alias'] . ' created.');
-        } catch (Exception $e) {
-            if (strpos($e->getMessage(), '1062') !== false) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
+        self::createGroup(
+            $r['alias'],
+            $r['name'],
+            $r['description'],
+            $r['current_user_id']
+        );
 
         return ['status' => 'ok'];
     }
@@ -150,9 +174,9 @@ class GroupController extends Controller {
         $response['groups'] = [];
 
         try {
-            $groups = GroupsDAO::search(new Groups([
-                'owner_id' => $r['current_user_id']
-            ]));
+            $groups = GroupsDAO::getAllGroupsAdminedByUser(
+                $r['current_user_id']
+            );
 
             foreach ($groups as $group) {
                 $response['groups'][] = $group->asArray();

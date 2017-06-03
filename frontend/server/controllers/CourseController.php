@@ -171,25 +171,12 @@ class CourseController extends Controller {
 
         CoursesDAO::transBegin();
 
-        $group = new Groups([
-            'owner_id' => $r['current_user_id'],
-            'name' => 'for-' . $r['alias'],
-            'description' => 'for-' . $r['alias'],
-            'alias' => $r['alias'],
-            'create_time' => gmdate('Y-m-d H:i:s', time()),
-        ]);
-
-        try {
-            GroupsDAO::save($group);
-        } catch (Exception $e) {
-            CoursesDAO::transRollback();
-
-            if (strpos($e->getMessage(), '1062') !== false) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
+        $group = GroupController::createGroup(
+            $r['alias'],
+            'students-' . $r['alias'],
+            'students-' . $r['alias'],
+            $r['current_user_id']
+        );
 
         try {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);

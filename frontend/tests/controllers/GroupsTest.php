@@ -32,7 +32,7 @@ class GroupsTest extends OmegaupTestCase {
         $group = $groups[0];
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
-        $this->assertEquals($owner->user_id, $group->owner_id);
+        $this->assertTrue(Authorization::isGroupAdmin($owner->user_id, $group));
     }
 
     /**
