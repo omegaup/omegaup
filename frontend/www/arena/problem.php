@@ -38,7 +38,8 @@ $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
     'nominated' => (bool) $nominationStatus['nominated'],
-    'problem_alias' => $result['alias']
+    'problem_alias' => $result['alias'],
+    'language' => $result['problem_statement_language'],
 ]);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),

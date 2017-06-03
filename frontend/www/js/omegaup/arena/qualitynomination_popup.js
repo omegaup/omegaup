@@ -22,13 +22,17 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: function(ev) {
+            let statements = {};
+            statements[qualityPayload.language] = {
+              markdown: ev.statement,
+            };
             API.QualityNomination
                 .create({
                   problem_alias: qualityPayload.problem_alias,
                   nomination: 'promotion',
                   contents: JSON.stringify({
                     'rationale': ev.rationale,
-                    'statement': ev.statement,
+                    'statements': statements,
                     'tags': [
                     ], /* TODO https://github.com/omegaup/omegaup/issues/1289 */
                     'source': ev.source,
