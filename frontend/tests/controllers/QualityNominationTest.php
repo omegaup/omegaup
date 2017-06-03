@@ -74,6 +74,16 @@ class QualityNominationTest extends OmegaupTestCase {
             QualityNominationController::REVIEWERS_PER_NOMINATION,
             count($nomination['votes'])
         );
+
+        $details = QualityNominationController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'qualitynomination_id' => $nomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals(
+            $contestant->username,
+            $details['nominator']['username']
+        );
+        $this->assertNotNull($details['original_contents']);
     }
 
     /**

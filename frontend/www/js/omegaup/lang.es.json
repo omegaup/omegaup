@@ -489,6 +489,7 @@
 	"qualityFormRecommendingQuestion": "\u00bfRecomendar\u00edas este problema a otros usuarios de omegaUp?",
 	"qualityFormThanksForReview": "\u00a1Gracias por tus comentarios!",
 	"qualityNominationMustHaveSolvedProblem": "Debes resolver el problema antes de poder nominarlo",
+	"qualityNominationNotFound": "Nominaci\u00f3n no encontrada",
 	"qualityNominationProblemHasBeenBanned": "Este problema ha sido suspendido. No puedes cambiar su visibilidad.",
 	"qualityNominationProblemHasBeenPromoted": "Este problema ha sido promovido. No puedes cambiar su visibilidad.",
 	"rankHeaderPostCount": "usuarios con m\u00e1s puntaje",

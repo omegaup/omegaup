@@ -78,7 +78,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         global $conn;
 
         $votes = [];
-        foreach ($conn->GetAll($sql, [$qualitynomination_id]) as $vote) {
+        foreach ($conn->Execute($sql, [$qualitynomination_id]) as $vote) {
             if (is_string($vote['time'])) {
                 $vote['time'] = (int)$vote['time'];
             }
@@ -93,6 +93,43 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             $votes[] = $vote;
         }
         return $votes;
+    }
+
+    /**
+     * Gets additional details for $nomination and structures it as an object
+     * instead of as a flat array.
+     */
+    private static function processNomination($nomination) {
+        if (is_null($nomination) || empty($nomination)) {
+            return null;
+        }
+
+        $nomination['time'] = (int)$nomination['time'];
+        $nomination['nominator'] = [
+            'username' => $nomination['username'],
+            'name' => $nomination['name'],
+        ];
+        unset($nomination['username']);
+        unset($nomination['name']);
+        $nomination['problem'] = [
+            'alias' => $nomination['alias'],
+            'title' => $nomination['title'],
+        ];
+        unset($nomination['alias']);
+        unset($nomination['title']);
+
+        $nomination['votes'] = self::getVotesForNomination(
+            $nomination['qualitynomination_id']
+        );
+
+        if (isset($nomination['contents'])) {
+            $nomination['contents'] = json_decode(
+                $nomination['contents'],
+                true /*assoc*/
+            );
+        }
+
+        return $nomination;
     }
 
     /**
@@ -152,28 +189,41 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         global $conn;
         $nominations = [];
         foreach ($conn->Execute($sql, $params) as $nomination) {
-            $nomination['time'] = (int)$nomination['time'];
-            $nomination['nominator'] = [
-                'username' => $nomination['username'],
-                'name' => $nomination['name'],
-            ];
-            unset($nomination['username']);
-            unset($nomination['name']);
-            $nomination['problem'] = [
-                'alias' => $nomination['alias'],
-                'title' => $nomination['title'],
-            ];
-            unset($nomination['alias']);
-            unset($nomination['title']);
-
-            $nomination['votes'] = self::getVotesForNomination(
-                $nomination['qualitynomination_id']
-            );
-            unset($nomination['qualitynomination_id']);
-
-            $nominations[] = $nomination;
+            $nominations[] = self::processNomination($nomination);
         }
 
         return $nominations;
+    }
+
+    /**
+     * Gets a single nomination by ID.
+     */
+    public static function getById($qualitynomination_id) {
+        $sql = '
+        SELECT
+            qn.qualitynomination_id,
+            qn.nomination,
+            qn.contents,
+            UNIX_TIMESTAMP(qn.time) as time,
+            qn.status,
+            nominator.username,
+            nominator.name,
+            p.alias,
+            p.title
+        FROM
+            QualityNominations qn
+        INNER JOIN
+            Problems p
+        ON
+            p.problem_id = qn.problem_id
+        INNER JOIN
+            Users nominator
+        ON
+            nominator.user_id = qn.user_id
+        WHERE
+            qn.qualitynomination_id = ?;';
+
+        global $conn;
+        return self::processNomination($conn->GetRow($sql, [$qualitynomination_id]));
     }
 }

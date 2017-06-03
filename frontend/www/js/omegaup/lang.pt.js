@@ -492,6 +492,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityFormRecommendingQuestion: "Deseja recomendar este problema a outros usu\u00e1rios do omegaUp?",
 	qualityFormThanksForReview: "Obrigado por voc\u00ea reveja",
 	qualityNominationMustHaveSolvedProblem: "Voc\u00ea deve resolver o problema antes de nome\u00e1-lo",
+	qualityNominationNotFound: "Nomea\u00e7\u00e3o n\u00e3o foi encontrada",
 	qualityNominationProblemHasBeenBanned: "Este problema foi banido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
 	qualityNominationProblemHasBeenPromoted: "Este problema foi promovido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
 	rankHeaderPostCount: "usu\u00e1rios com mais problemas resolvidos",

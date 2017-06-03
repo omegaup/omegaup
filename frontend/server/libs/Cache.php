@@ -122,14 +122,14 @@ class Cache {
      * @param int $timeout (seconds)
      * @return boolean
      */
-    public static function getFromCacheOrSet($prefix, $id, Request $r, $setFunc, &$returnValue, $timeout = 0) {
+    public static function getFromCacheOrSet($prefix, $id, $arg, $setFunc, &$returnValue, $timeout = 0) {
         $cache = new Cache($prefix, $id);
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
         if (is_null($returnValue)) {
             // Get the value from the function provided
-            $returnValue = call_user_func($setFunc, $r);
+            $returnValue = call_user_func($setFunc, $arg);
 
             // If the $setFunc() didn't disable the cache
             if (self::$cacheResults === true) {
