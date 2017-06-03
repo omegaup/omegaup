@@ -121,4 +121,96 @@ class QualityNominationController extends Controller {
 
         return ['status' => 'ok'];
     }
+
+    /**
+     * Displays all the nominations.
+     *
+     * @param Request $r
+     * @return array
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiList(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+
+        $quality_reviewer_group = GroupsDAO::findByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        if (!Authorization::isGroupMember($r['current_user_id'], $quality_reviewer_group)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        $nominations = null;
+        try {
+            $nominations = QualityNominationsDAO::getAllNominationsAssignedToUser(
+                null,
+                $page,
+                $pageSize
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'nominations' => $nominations,
+        ];
+    }
+
+    /**
+     * Displays the nominations that this user has been assigned.
+     *
+     * @param Request $r
+     * @return array
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyAssignedList(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+
+        $quality_reviewer_group = GroupsDAO::findByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        if (!Authorization::isGroupMember($r['current_user_id'], $quality_reviewer_group)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        $nominations = null;
+        try {
+            $nominations = QualityNominationsDAO::getAllNominationsAssignedToUser(
+                $r['current_user_id'],
+                $page,
+                $pageSize
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'nominations' => $nominations,
+        ];
+    }
 }

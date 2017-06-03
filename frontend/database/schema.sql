@@ -821,9 +821,9 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
 --
 
 CREATE TABLE IF NOT EXISTS `QualityNomination_Reviewers` (
-  `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
+  `qualitynomination_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
-  PRIMARY KEY (`qualitynomination_id`, `user_id`)
+  PRIMARY KEY (`qualitynomination_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominación';
 
 -- --------------------------------------------------------
