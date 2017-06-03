@@ -123,24 +123,19 @@ class QualityNominationController extends Controller {
     }
 
     /**
-     * Returns the list of nominations assigned to $user_id (if non-null) or
-     * all nominations (if $user_id is null).
+     * Returns the list of nominations made by $nominator (if non-null),
+     * assigned to $assignee (if non-null) or all nominations (if both
+     * $nominator and $assignee are null).
+     *
+     * @param Request $r         The request.
+     * @param int     $nominator The user id of the person that made the
+     *                           nomination.  May be null.
+     * @param int     $assignee  The user id of the person assigned to review
+     *                           nominations.  May be null.
+     *
+     * @return array The response.
      */
-    private static function getAssignedListImpl(Request $r, $user_id) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
-        }
-
-        // Validate request
-        self::authenticateRequest($r);
-
-        $quality_reviewer_group = GroupsDAO::findByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        if (!Authorization::isGroupMember($r['current_user_id'], $quality_reviewer_group)) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
-
+    private static function getListImpl(Request $r, $nominator, $assignee) {
         Validators::isNumber($r['page'], 'page', false);
         Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -149,8 +144,9 @@ class QualityNominationController extends Controller {
 
         $nominations = null;
         try {
-            $nominations = QualityNominationsDAO::getAllNominationsAssignedToUser(
-                $user_id,
+            $nominations = QualityNominationsDAO::getNominations(
+                $nominator,
+                $assignee,
                 $page,
                 $pageSize
             );
@@ -165,6 +161,24 @@ class QualityNominationController extends Controller {
     }
 
     /**
+     * Validates that the user making the request is member of the
+     * `omegaup:quality-reviewer` group.
+     *
+     * @param Request $r The request.
+     *
+     * @return void
+     * @throws ForbiddenAccessException
+     */
+    private static function validateMemberOfReviewerGroup(Request $r) {
+        $qualityReviewerGroup = GroupsDAO::findByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        if (!Authorization::isGroupMember($r['current_user_id'], $qualityReviewerGroup)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+    }
+
+    /**
      * Displays all the nominations.
      *
      * @param Request $r
@@ -173,7 +187,15 @@ class QualityNominationController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
-        return self::getAssignedListImpl($r, null);
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+        self::validateMemberOfReviewerGroup($r);
+
+        return self::getListImpl($r, null /* nominator */, null /* assignee */);
     }
 
     /**
@@ -185,6 +207,34 @@ class QualityNominationController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyAssignedList(Request $r) {
-        return self::getAssignedListImpl($r, $r['current_user_id']);
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+        self::validateMemberOfReviewerGroup($r);
+
+        return self::getListImpl($r, null /* nominator */, $r['current_user_id']);
+    }
+
+    /**
+     * Displays the nominations that this user has been created. The user does
+     * not need to be a member of the reviewer group.
+     *
+     * @param Request $r
+     * @return array
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyList(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+
+        return self::getListImpl($r, $r['current_user_id'], null /* assignee */);
     }
 }
