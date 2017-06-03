@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
                                    nomination: 'promotion',
                                    contents: JSON.stringify({
                                      'rationale': ev.rationale,
-                                     'statement': ev.statement, 
+                                     'statement': ev.statement,
                                      'tags': [], /* TODO https://github.com/omegaup/omegaup/issues/1289 */
                                      'source': ev.source,
                                    })
