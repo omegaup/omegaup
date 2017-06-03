@@ -19,7 +19,7 @@
 		</thead>
 		<tbody>
 			{foreach item=problem from=$problems}
-				<tr>
+				<tr {if $problem.visibility >= 2}class="high-quality"{/if}>
 				<td>
 					{if $problem.visibility < 0} <span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
 					{if $problem.visibility == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}

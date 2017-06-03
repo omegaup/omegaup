@@ -95,8 +95,17 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         return $votes;
     }
 
-    public static function getAllNominationsAssignedToUser(
-        $user_id,
+    /**
+     * Gets list of nominations.
+     *
+     * The list of nominations can be filtered by at most one of $nominator
+     * (user id of person who made the nomination) or $assignee (user id of
+     * person assigned to review the nomination). If both are null, the
+     * complete list of nominations is returned.
+     */
+    public static function getNominations(
+        $nominator,
+        $assignee,
         $page = 1,
         $pageSize = 1000
     ) {
@@ -120,16 +129,21 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         INNER JOIN
             Users nominator
         ON
-            nominator.user_id = qn.user_id
-        INNER JOIN
-            QualityNomination_Reviewers qnr
-        ON
-            qnr.qualitynomination_id = qn.qualitynomination_id';
+            nominator.user_id = qn.user_id';
         $params = [];
 
-        if (!is_null($user_id)) {
-            $sql .= ' WHERE qnr.user_id = ?';
-            $params[] = $user_id;
+        if (!is_null($nominator)) {
+            $sql .= ' WHERE qn.user_id = ?';
+            $params[] = $nominator;
+        } elseif (!is_null($assignee)) {
+            $sql .= '
+            INNER JOIN
+                QualityNomination_Reviewers qnr
+            ON
+                qnr.qualitynomination_id = qn.qualitynomination_id
+            WHERE
+                qnr.user_id = ?';
+            $params[] = $assignee;
         }
         $sql .= ' LIMIT ?, ?;';
         $params[] = $page * $pageSize;
@@ -137,7 +151,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
 
         global $conn;
         $nominations = [];
-        foreach ($conn->GetAll($sql, $params) as $nomination) {
+        foreach ($conn->Execute($sql, $params) as $nomination) {
             $nomination['time'] = (int)$nomination['time'];
             $nomination['nominator'] = [
                 'username' => $nomination['username'],
