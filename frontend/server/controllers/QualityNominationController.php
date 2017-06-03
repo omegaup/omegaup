@@ -219,7 +219,7 @@ class QualityNominationController extends Controller {
     }
 
     /**
-     * Displays the nominations that this user has been created. The user does
+     * Displays the nominations that this user has created. The user does
      * not need to be a member of the reviewer group.
      *
      * @param Request $r
