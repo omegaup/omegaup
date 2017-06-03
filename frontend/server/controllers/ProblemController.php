@@ -64,7 +64,7 @@ class ProblemController extends Controller {
                 throw new PreconditionFailedException('problemDeprecated');
             }
 
-            if (isset($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
+            if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
