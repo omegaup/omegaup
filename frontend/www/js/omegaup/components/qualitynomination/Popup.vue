@@ -1,19 +1,23 @@
 <template>
   <transition name="fade">
-    <div class="panel panel-default popup" v-show="showForm">
+    <div class="panel panel-default popup"
+         v-show="showForm">
       <div v-show="showQuestionText">
-        {{ T.qualityFormCongrats }}
-        <br/> <br/>
-        {{ T.qualityFormRecommendingQuestion }}
-        <br/>
+        {{ T.qualityFormCongrats }}<br>
+        <br>
+        {{ T.qualityFormRecommendingQuestion }}<br>
       </div>
       <div v-show="showYesNo">
-        <button v-on:click="onShowRationale">{{ T.wordsYes }}</button>
-        <button v-on:click="onHide">{{ T.wordsNo }}</button>
+        <button v-on:click="onShowRationale">{{ T.wordsYes }}</button> <button v-on:click=
+        "onHide">{{ T.wordsNo }}</button>
       </div>
-      <div class="required" v-show="showRationale">
-        <label class="control-label">{{ T.qualityFormRationaleInput }}: <input type="text" name="Rationale" v-model="rationale"></label>
-        <button type="submit" v-on:click.prevent="onSubmit" v-bind:disabled="rationale.length <= 0">{{ T.wordsSend }}</button>
+      <div class="required"
+           v-show="showRationale">
+        <label class="control-label">{{ T.qualityFormRationaleInput }}: <input name="Rationale"
+               type="text"
+               v-model="rationale"></label> <button type="submit"
+             v-bind:disabled="rationale.length &lt;= 0"
+             v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
       </div>
       <div v-show="showThanks">
         {{ T.qualityFormThanksForReview }}
@@ -27,12 +31,8 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {
-    solved: Boolean,
-    nominated: Boolean,
-    statement: String,
-    source: String
-  },
+  props:
+      {solved: Boolean, nominated: Boolean, statement: String, source: String},
   data: function() {
     return {
       T: T,
@@ -51,9 +51,7 @@ export default {
     }
   },
   methods: {
-    onHide() {
-      this.showFormOverride = false
-    },
+    onHide() { this.showFormOverride = false},
     onShowRationale() {
       this.$emit('show-rationale', this);
       this.showYesNo = false;
