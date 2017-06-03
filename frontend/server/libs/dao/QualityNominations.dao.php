@@ -28,6 +28,14 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         return $conn->GetRow($sql, [$problem->problem_id, $user->user_id]);
     }
 
+    /**
+     * Returns the votes from all the assigned reviewers for a particular
+     * nomination.
+     *
+     * If no votes have been cast by a reviewer, a default of 0 will be
+     * returned. "drive-by" reviewers are not considered for this, only
+     * assigned reviewers.
+     */
     private static function getVotesForNomination($qualitynomination_id) {
         $sql = '
         SELECT
@@ -43,6 +51,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qnc.qualitynomination_id = qnr.qualitynomination_id AND
             qnc.user_id = qnr.user_id AND
             qnc.qualitynomination_comment_id = (
+                -- Gets the last vote per qualitynomination_id, user_id.
                 SELECT
                     MAX(qualitynomination_comment_id)
                 FROM

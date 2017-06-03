@@ -105,7 +105,7 @@ class GroupsDAO extends GroupsDAOBase {
 
         $users = [];
         foreach ($conn->Execute($sql, [$group->group_id, $n]) as $row) {
-            array_push($users, new Users($row));
+            $users[] = new Users($row);
         }
         return $users;
     }
