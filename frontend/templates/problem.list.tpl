@@ -20,7 +20,11 @@
 		<tbody>
 			{foreach item=problem from=$problems}
 				<tr>
-				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a>{if $problem.visibility == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
+				<td>
+					{if $problem.visibility < 0} <span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
+					{if $problem.visibility == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
+					{if $problem.visibility >= 2} <img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
+					<a href="/arena/problem/{$problem.alias}">{$problem.title}</a>
 					{if count($problem.tags) > 0}
 					<div class="tag-list" title="{" "|implode:$problem.tags|escape}">
 					{foreach item=tag from=$problem.tags}

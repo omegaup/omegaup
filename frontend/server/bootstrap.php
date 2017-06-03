@@ -137,6 +137,7 @@ require_once('controllers/SessionController.php');
 require_once('controllers/ContestController.php');
 require_once('controllers/InterviewController.php');
 require_once('controllers/ProblemController.php');
+require_once('controllers/ProblemsetController.php');
 require_once('controllers/RunController.php');
 require_once('controllers/ScoreboardController.php');
 require_once('controllers/TagController.php');

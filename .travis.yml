@@ -2,6 +2,8 @@ language: php
 
 dist: trusty
 
+group: edge
+
 sudo: false
 
 branches:
@@ -10,7 +12,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm-3.15
+  - hhvm-3.6
 
 env:
   - DB=mysql
@@ -57,6 +59,8 @@ cache:
   - $HOME/.yarn-cache
 
 before_script:
+  # Workaround for Travis' flaky MySQL connection.
+  - for _ in `seq 30`; do mysql -e ';' && break || sleep 1 ; done
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
@@ -72,7 +76,7 @@ before_script:
           mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-         (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash && \
+         (pear install pear/PHP_CodeSniffer-2.9.1 && phpenv rehash && \
           echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini)
 
 script:
@@ -87,7 +91,7 @@ script:
           python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-          python3 stuff/hook_tools/lint.py validate --all < /dev/null
+          python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 
 notifications:
   slack:

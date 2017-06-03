@@ -421,4 +421,156 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
         $this->assertEquals($response['status'], 'ok');
     }
+
+    /**
+     * Tests that problems cannot change their visibility under some scenarios.
+     */
+    public function testProblemUpdateVisibility() {
+        // Create a public problem
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $problem = $problemData['problem'];
+
+        // Make it private.
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_PRIVATE,
+            'message' => 'public -> private',
+        ]));
+
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_PRIVATE,
+            'message' => 'no-op',
+        ]));
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'no-op',
+        ]));
+
+        // Make it public
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'message' => 'private -> public',
+        ]));
+
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'message' => 'no-op',
+        ]));
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'no-op',
+        ]));
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_BANNED,
+                'message' => 'public -> banned',
+            ]));
+            $this->fail('Cannot ban problem from API');
+        } catch (InvalidParameterException $e) {
+        }
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_PROMOTED,
+                'message' => 'public -> promoted',
+            ]));
+            $this->fail('Cannot ban problem from API');
+        } catch (InvalidParameterException $e) {
+        }
+
+        // Ban the problem.
+        $problem->visibility = ProblemController::VISIBILITY_BANNED;
+        ProblemsDAO::save($problem);
+
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_BANNED,
+            'message' => 'no-op',
+        ]));
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'no-op',
+        ]));
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_PRIVATE,
+                'message' => 'banned -> private',
+            ]));
+            $this->fail('Cannot un-ban problem from API');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
+        }
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_PUBLIC,
+                'message' => 'banned -> public',
+            ]));
+            $this->fail('Cannot un-ban problem from API');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
+        }
+
+        // Promote the problem.
+        $problem->visibility = ProblemController::VISIBILITY_PROMOTED;
+        ProblemsDAO::save($problem);
+
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_PROMOTED,
+            'message' => 'no-op',
+        ]));
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'no-op',
+        ]));
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_PRIVATE,
+                'message' => 'promoted -> private',
+            ]));
+            $this->fail('Cannot un-promote problem from API');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
+        }
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'visibility' => ProblemController::VISIBILITY_PUBLIC,
+                'message' => 'promoted -> public',
+            ]));
+            $this->fail('Cannot un-promote problem from API');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
+        }
+    }
 }

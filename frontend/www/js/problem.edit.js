@@ -286,8 +286,14 @@ omegaup.OmegaUp.on('ready', function() {
       ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.validator);
-    $('input[name=visibility][value=' + problem.visibility + ']')
-        .attr('checked', 1);
+    if (problem.visibility >= 0) {
+      $('input[name=visibility][value=' + Math.min(1, problem.visibility) + ']')
+          .attr('checked', 1);
+    } else {
+      // The problem is banned.
+      $('input[name=visibility]').attr('disabled', 1);
+      $('input[name=visibility][value=0]').attr('checked', 1);
+    }
     $('#languages').val(problem.languages);
     $('input[name=alias]').val(problemAlias);
     if (chosenLanguage == null ||

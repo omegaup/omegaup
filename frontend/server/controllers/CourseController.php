@@ -171,25 +171,12 @@ class CourseController extends Controller {
 
         CoursesDAO::transBegin();
 
-        $group = new Groups([
-            'owner_id' => $r['current_user_id'],
-            'name' => 'for-' . $r['alias'],
-            'description' => 'for-' . $r['alias'],
-            'alias' => $r['alias'],
-            'create_time' => gmdate('Y-m-d H:i:s', time()),
-        ]);
-
-        try {
-            GroupsDAO::save($group);
-        } catch (Exception $e) {
-            CoursesDAO::transRollback();
-
-            if (strpos($e->getMessage(), '1062') !== false) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
+        $group = GroupController::createGroup(
+            $r['alias'],
+            'students-' . $r['alias'],
+            'students-' . $r['alias'],
+            $r['current_user_id']
+        );
 
         try {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
@@ -378,11 +365,12 @@ class CourseController extends Controller {
             $points = (int)$r['points'];
         }
 
-        ProblemsetProblemsDAO::save(new ProblemsetProblems([
-            'problemset_id' => $problemSet->problemset_id,
-            'problem_id' => $problem->problem_id,
-            'points' => $points,
-        ]));
+        ProblemsetController::addProblem(
+            $problemSet->problemset_id,
+            $problem,
+            $r['current_user_id'],
+            $points
+        );
 
         return ['status' => 'ok'];
     }

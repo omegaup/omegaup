@@ -23,6 +23,9 @@ class Authorization {
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
+    // Group for quality reviewers.
+    const QUALITY_REVIEWER_GROUP_ALIAS = 'omegaup:quality-reviewer';
+
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
             return false;
@@ -138,15 +141,7 @@ class Authorization {
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
-        if (is_null($problem)) {
-            return false;
-        }
-
-        if (self::isOwner($user_id, $problem->acl_id)) {
-            return true;
-        }
-
-        return Authorization::hasRole($user_id, $problem->acl_id, Authorization::ADMIN_ROLE);
+        return self::isAdmin($user_id, $problem);
     }
 
     public static function hasRole($user_id, $acl_id, $role_id) {
@@ -166,15 +161,7 @@ class Authorization {
     }
 
     public static function isGroupAdmin($user_id, Groups $group) {
-        if (is_null($group)) {
-            return false;
-        }
-
-        if ($group->owner_id === $user_id) {
-            return true;
-        }
-
-        return Authorization::isSystemAdmin($user_id);
+        return self::isAdmin($user_id, $group);
     }
 
     private static function isOwner($user_id, $acl_id) {
