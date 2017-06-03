@@ -5,7 +5,35 @@ class QualityNominationController extends Controller {
     /**
      * Creates a new QualityNomination
      *
+     * There are two ways in which users can interact with this:
+     *
+     * # Promotion
+     *
+     * A user that has already solved a problem can nominate it to be promoted
+     * as a Quality Problem. This expects the `nomination` field to be
+     * `promotion` and the `contents` field should be a JSON blob with the
+     * following fields:
+     *
+     * * `rationale`: A small text explaining the rationale for promotion.
+     * * `statement`: The markdown-formatted problem statement.
+     * * `source`: A URL or string clearly documenting the source or full name
+     *             of original author of the problem.
+     * * `tags`: An array of tag names that will be added to the problem upon
+     *           promotion.
+     *
+     * # Demotion
+     *
+     * A demoted problem is banned, and cannot be un-banned or added to any new
+     * problemsets. This expects the `nomination` field to be `demotion` and
+     * the `contents` field should be a JSON blob with the following fields:
+     *
+     * * `rationale`: A small text explaining the rationale for demotion.
+     * * `reason`: One of `['duplicate', 'offensive']`.
+     * * `original`: If the `reason` is `duplicate`, the alias of the original
+     *               problem.
+     *
      * @param Request $r
+     *
      * @return array
      * @throws DuplicatedEntryInDatabaseException
      * @throws InvalidDatabaseOperationException
