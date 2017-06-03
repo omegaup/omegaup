@@ -22,16 +22,18 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: function(ev) {
-            API.QualityNomination.create({
-                                   problem_alias: problemAlias,
-                                   nomination: 'promotion',
-                                   contents: JSON.stringify({
-                                     'rationale': ev.rationale,
-                                     'statement': ev.statement,
-                                     'tags': [], /* TODO https://github.com/omegaup/omegaup/issues/1289 */
-                                     'source': ev.source,
-                                   })
-                                 })
+            API.QualityNomination
+                .create({
+                  problem_alias: problemAlias,
+                  nomination: 'promotion',
+                  contents: JSON.stringify({
+                    'rationale': ev.rationale,
+                    'statement': ev.statement,
+                    'tags': [
+                    ], /* TODO https://github.com/omegaup/omegaup/issues/1289 */
+                    'source': ev.source,
+                  })
+                })
                 .fail(UI.apiError);
           }
         }
