@@ -52,6 +52,24 @@ class QualityNominationTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         QualityNominationController::apiCreate($r);
+
+        $response = QualityNominationController::apiMyList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(1, count($response['nominations']));
+        $nomination = $response['nominations'][0];
+        $this->assertEquals(
+            $problemData['request']['alias'],
+            $nomination['problem']['alias']
+        );
+        $this->assertEquals(
+            $problemData['request']['alias'],
+            $nomination['problem']['alias']
+        );
+        $this->assertEquals(
+            QualityNominationController::REVIEWERS_PER_NOMINATION,
+            count($nomination['votes'])
+        );
     }
 
     /**
