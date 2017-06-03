@@ -83,4 +83,30 @@ class GroupsDAO extends GroupsDAOBase {
         }
         return $groups;
     }
+
+    /**
+     * Gets a random sample (of up to size $n) of group members.
+     */
+    final public static function sampleMembers(Groups $group, $n) {
+        $sql = '
+            SELECT
+                u.*
+            FROM
+                Groups_Users gu
+            INNER JOIN
+                Users u ON u.user_id = gu.user_id
+            WHERE
+                gu.group_id = ?
+            ORDER BY
+                RAND()
+            LIMIT
+                0, ?;';
+        global $conn;
+
+        $users = [];
+        foreach ($conn->Execute($sql, [$group->group_id, $n]) as $row) {
+            $users[] = new Users($row);
+        }
+        return $users;
+    }
 }

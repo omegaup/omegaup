@@ -101,7 +101,6 @@ class Utils {
             'Courses',
             'Emails',
             'Group_Roles',
-            'Groups',
             'Groups_Scoreboards',
             'Groups_Scoreboards_Contests',
             'Groups_Users',
@@ -133,9 +132,11 @@ class Utils {
             $conn->Execute('SET foreign_key_checks = 0;');
 
             foreach ($tables as $t) {
-                $sql = 'TRUNCATE TABLE `' . $t . '`; ';
-                $conn->Execute($sql);
+                $conn->Execute("TRUNCATE TABLE `$t`;");
             }
+
+            // Tables with special entries.
+            $conn->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($sql);

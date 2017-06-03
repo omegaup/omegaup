@@ -48,7 +48,6 @@ class QualityNominationReviewers extends VO {
     /**
       *  [Campo no documentado]
       * Llave Primaria
-      * Auto Incremento
       * @access public
       * @var int(11)
       */
@@ -56,6 +55,7 @@ class QualityNominationReviewers extends VO {
 
     /**
       * El revisor al que fue asignado esta nominación
+      * Llave Primaria
       * @access public
       * @var int(11)
       */

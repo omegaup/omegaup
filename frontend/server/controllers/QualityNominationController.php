@@ -1,7 +1,13 @@
 <?php
 require_once 'libs/dao/QualityNominations.dao.php';
+require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
 
 class QualityNominationController extends Controller {
+    /**
+     * Number of reviewers to automatically assign each nomination.
+     */
+    const REVIEWERS_PER_NOMINATION = 2;
+
     /**
      * Creates a new QualityNomination
      *
@@ -91,14 +97,94 @@ class QualityNominationController extends Controller {
         }
 
         // Create object
-        QualityNominationsDAO::save(new QualityNominations([
+        $nomination = new QualityNominations([
             'user_id' => $r['current_user_id'],
             'problem_id' => $problem->problem_id,
             'nomination' => $r['nomination'],
             'contents' => json_encode($contents), // re-encoding it for normalization.
             'status' => 'open',
-        ]));
+        ]);
+        QualityNominationsDAO::save($nomination);
+
+        $qualityReviewerGroup = GroupsDAO::FindByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        foreach (GroupsDAO::sampleMembers(
+            $qualityReviewerGroup,
+            self::REVIEWERS_PER_NOMINATION
+        ) as $reviewer) {
+            QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                'qualitynomination_id' => $nomination->qualitynomination_id,
+                'user_id' => $reviewer->user_id,
+            ]));
+        }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Returns the list of nominations assigned to $user_id (if non-null) or
+     * all nominations (if $user_id is null).
+     */
+    private static function getAssignedListImpl(Request $r, $user_id) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+
+        $quality_reviewer_group = GroupsDAO::findByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        if (!Authorization::isGroupMember($r['current_user_id'], $quality_reviewer_group)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        $nominations = null;
+        try {
+            $nominations = QualityNominationsDAO::getAllNominationsAssignedToUser(
+                $user_id,
+                $page,
+                $pageSize
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'nominations' => $nominations,
+        ];
+    }
+
+    /**
+     * Displays all the nominations.
+     *
+     * @param Request $r
+     * @return array
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiList(Request $r) {
+        return self::getAssignedListImpl($r, null);
+    }
+
+    /**
+     * Displays the nominations that this user has been assigned.
+     *
+     * @param Request $r
+     * @return array
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyAssignedList(Request $r) {
+        return self::getAssignedListImpl($r, $r['current_user_id']);
     }
 }

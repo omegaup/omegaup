@@ -36,7 +36,7 @@ abstract class QualityNominationReviewersDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(QualityNominationReviewers $QualityNomination_Reviewers) {
-        if (!is_null(self::getByPK($QualityNomination_Reviewers->qualitynomination_id))) {
+        if (!is_null(self::getByPK($QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id))) {
             return QualityNominationReviewersDAOBase::update($QualityNomination_Reviewers);
         } else {
             return QualityNominationReviewersDAOBase::create($QualityNomination_Reviewers);
@@ -52,12 +52,12 @@ abstract class QualityNominationReviewersDAOBase extends DAO {
      * @static
      * @return @link QualityNominationReviewers Un objeto del tipo {@link QualityNominationReviewers}. NULL si no hay tal registro.
      */
-    final public static function getByPK($qualitynomination_id) {
-        if (is_null($qualitynomination_id)) {
+    final public static function getByPK($qualitynomination_id, $user_id) {
+        if (is_null($qualitynomination_id) || is_null($user_id)) {
             return null;
         }
-        $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ?) LIMIT 1;';
-        $params = [$qualitynomination_id];
+        $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
+        $params = [$qualitynomination_id, $user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -169,14 +169,6 @@ abstract class QualityNominationReviewersDAOBase extends DAO {
       * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a actualizar.
       */
     final private static function update(QualityNominationReviewers $QualityNomination_Reviewers) {
-        $sql = 'UPDATE `QualityNomination_Reviewers` SET `user_id` = ? WHERE `qualitynomination_id` = ?;';
-        $params = [
-            $QualityNomination_Reviewers->user_id,
-            $QualityNomination_Reviewers->qualitynomination_id,
-        ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
     }
 
     /**
@@ -203,7 +195,6 @@ abstract class QualityNominationReviewersDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
-        $QualityNomination_Reviewers->qualitynomination_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -293,11 +284,11 @@ abstract class QualityNominationReviewersDAOBase extends DAO {
      * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a eliminar
      */
     final public static function delete(QualityNominationReviewers $QualityNomination_Reviewers) {
-        if (is_null(self::getByPK($QualityNomination_Reviewers->qualitynomination_id))) {
+        if (is_null(self::getByPK($QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `QualityNomination_Reviewers` WHERE qualitynomination_id = ?;';
-        $params = [$QualityNomination_Reviewers->qualitynomination_id];
+        $sql = 'DELETE FROM `QualityNomination_Reviewers` WHERE qualitynomination_id = ? AND user_id = ?;';
+        $params = [$QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id];
         global $conn;
 
         $conn->Execute($sql, $params);
