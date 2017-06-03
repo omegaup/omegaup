@@ -373,6 +373,8 @@ export default {
     update: _call('/api/problem/update/'),
   },
 
+  QualityNomination: {create: _call('/api/qualitynomination/create/')},
+
   Reset: {
     create: _call('/api/reset/create/'),
 
