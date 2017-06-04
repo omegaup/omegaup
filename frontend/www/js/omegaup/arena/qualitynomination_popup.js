@@ -17,27 +17,28 @@ OmegaUp.on('ready', function() {
         props: {
           solved: this.solved,
           nominated: this.nominated,
-          statement: problemStatement,
-          source: source
+          originalSource: source
         },
         on: {
           submit: function(ev) {
-            let statements = {};
-            statements[qualityPayload.language] = {
-              markdown: ev.statement,
+            let contents = {
+              'rationale': ev.rationale,
             };
-            API.QualityNomination
-                .create({
-                  problem_alias: qualityPayload.problem_alias,
-                  nomination: 'promotion',
-                  contents: JSON.stringify({
-                    'rationale': ev.rationale,
-                    'statements': statements,
-                    'tags': [
-                    ], /* TODO https://github.com/omegaup/omegaup/issues/1289 */
-                    'source': ev.source,
-                  })
-                })
+
+            if (typeof(ev.difficulty) !== 'undefined') {
+              contents.difficulty = Number.parseInt(ev.difficulty, 10);
+            }
+            if (ev.source !== source) {
+              contents.source = ev.source;
+            }
+            if (ev.tags.length > 0) {
+              contents.tags = ev.tags;
+            }
+            API.QualityNomination.create({
+                                   problem_alias: qualityPayload.problem_alias,
+                                   nomination: 'suggestion',
+                                   contents: JSON.stringify(contents),
+                                 })
                 .fail(UI.apiError);
           }
         }

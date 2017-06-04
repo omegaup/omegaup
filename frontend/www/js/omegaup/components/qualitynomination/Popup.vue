@@ -1,29 +1,83 @@
 <template>
   <div class="qualitynomination-popup">
     <transition name="fade">
-      <div class="panel panel-default popup"
-           v-show="showForm">
-        <div v-show="showQuestionText">
-          {{ T.qualityFormCongrats }}<br>
-          <br>
-          {{ T.qualityFormRecommendingQuestion }}<br>
+      <form class="panel panel-default popup"
+            v-on:submit.prevent=""
+            v-show="showForm">
+        <button class="close"
+              v-on:click="onHide">×</button>
+        <div class="container">
+          <template v-if="currentView == 'question'">
+            <h1>{{ T.qualityFormCongrats }}</h1>
+            <div class="question-text">
+              {{ T.qualityFormRecommendingQuestion }}
+            </div>
+            <div class="button-row row">
+              <button class="col-md-4 btn btn-primary"
+                   v-on:click="onShowSuggestion">{{ T.wordsYes }}</button>
+              <div class="col-md-4"></div><button class="col-md-4 btn btn-default"
+                   v-on:click="onHide">{{ T.wordsNo }}</button>
+            </div>
+          </template>
+          <template v-if="currentView == 'suggestion'">
+            <div class="form-group">
+              <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>
+              <label class="radio-inline"><input type="radio"
+                     v-model="difficulty"
+                     value="1"> {{ T.qualityFormDifficultyVeryEasy }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="difficulty"
+                     value="2"> {{ T.qualityFormDifficultyEasy }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="difficulty"
+                     value="3"> {{ T.qualityFormDifficultyMedium }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="difficulty"
+                     value="4"> {{ T.qualityFormDifficultyHard }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="difficulty"
+                     value="5"> {{ T.qualityFormDifficultyVeryHard }}</label>
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ T.qualityFormTags }} <select class="form-control"
+                      multiple
+                      v-model="tags">
+                <option value="busqueda-binaria">
+                  {{ T.problemTopicBinarySearch }}
+                </option>
+                <option value="grafos">
+                  {{ T.problemTopicGraphTheory }}
+                </option>
+                <option value="ordenamiento">
+                  {{ T.problemTopicSorting }}
+                </option>
+              </select></label>
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ T.qualityFormSource }} <input class="form-control"
+                     type="text"
+                     v-model="source"></label>
+            </div>
+            <div class="form-group required">
+              <label class="control-label">{{ T.qualityFormRationaleInput }} <input class=
+              "form-control"
+                     type="text"
+                     v-model="rationale"></label>
+            </div>
+            <div class="row">
+              <div class="col-md-4"></div><button class="col-md-4 btn btn-primary"
+                   type="submit"
+                   v-bind:disabled="rationale.length &lt;= 0"
+                   v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
+                   "col-md-4 btn btn-default"
+                   v-on:click="onHide">{{ T.wordsCancel }}</button>
+            </div>
+          </template>
+          <template v-if="currentView == 'thanks'">
+            <h1>{{ T.qualityFormThanksForReview }}</h1>
+          </template>
         </div>
-        <div v-show="showYesNo">
-          <button v-on:click="onShowRationale">{{ T.wordsYes }}</button> <button v-on:click=
-          "onHide">{{ T.wordsNo }}</button>
-        </div>
-        <div class="required"
-             v-show="showRationale">
-          <label class="control-label">{{ T.qualityFormRationaleInput }}: <input name="Rationale"
-                 type="text"
-                 v-model="rationale"></label> <button type="submit"
-               v-bind:disabled="rationale.length &lt;= 0"
-               v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
-        </div>
-        <div v-show="showThanks">
-          {{ T.qualityFormThanksForReview }}
-        </div>
-      </div>
+      </form>
     </transition>
   </div>
 </template>
@@ -33,18 +87,17 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props:
-      {solved: Boolean, nominated: Boolean, statement: String, source: String},
+  props: {solved: Boolean, nominated: Boolean, originalSource: String},
   data: function() {
     return {
       T: T,
       UI: UI,
+      currentView: 'question',
+      difficulty: undefined,
+      rationale: '',
+      source: this.originalSource,
       showFormOverride: true,
-      showYesNo: true,
-      showQuestionText: true,
-      showRationale: false,
-      showThanks: false,
-      rationale: ''
+      tags: [],
     };
   },
   computed: {
@@ -54,16 +107,13 @@ export default {
   },
   methods: {
     onHide() { this.showFormOverride = false},
-    onShowRationale() {
-      this.$emit('show-rationale', this);
-      this.showYesNo = false;
-      this.showRationale = true;
+    onShowSuggestion() {
+      this.$emit('show-suggestion', this);
+      this.currentView = 'suggestion';
     },
     onSubmit() {
       this.$emit('submit', this);
-      this.showRationale = false;
-      this.showThanks = true;
-      this.showQuestionText = false;
+      this.currentView = 'thanks';
 
       var self = this;
       setTimeout(function() { self.onHide() }, 1000);
@@ -78,12 +128,30 @@ export default {
   bottom: 10px;
   right: 20%;
   z-index: 9999999 !important;
-  width: 350px;
-  height: 11em;
+  width: 500px;
+  height: 400px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
   overflow: auto;
+}
+
+.qualitynomination-popup .control-label {
+  width: 100%;
+}
+
+.qualitynomination-popup .question-text, .qualitynomination-popup, h1 {
+  text-align: center;
+}
+
+.qualitynomination-popup h1 {
+  font-size: 120%;
+  font-weight: bold;
+  margin: 5em 0;
+}
+
+.qualitynomination-popup .button-row {
+  margin: 4em 0;
 }
 
 .qualitynomination-popup .fade-enter-active, .qualitynomination-popup .fade-leave-active {
