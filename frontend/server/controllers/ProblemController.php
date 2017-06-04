@@ -1667,7 +1667,7 @@ class ProblemController extends Controller {
             $query,
             $author_id,
             $r['tag'],
-            is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PROMOTED : (int) $r['min_visibility'],
+            is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
         );
         $response['total'] = $total;
