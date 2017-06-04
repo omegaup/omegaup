@@ -6,7 +6,7 @@ DELIMITER $$
 CREATE PROCEDURE `Groups_ACLs_Migrate`()
 BEGIN
   DECLARE done INT DEFAULT FALSE;
-  DECLARE acl_id, group_id, owner_id INT(11);
+  DECLARE aclid, groupid, ownerid INT(11);
   DECLARE cur CURSOR FOR SELECT `group_id`, `owner_id` FROM `Groups`;
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
@@ -17,14 +17,14 @@ BEGIN
   OPEN cur;
 
   read_loop: LOOP
-    FETCH cur INTO group_id, owner_id;
+    FETCH cur INTO groupid, ownerid;
     IF done THEN
       LEAVE read_loop;
     END IF;
 
-    INSERT INTO `ACLs` (`owner_id`) VALUES (owner_id);
-    SET acl_id = LAST_INSERT_ID();
-    UPDATE `Groups` SET `acl_id` = acl_id WHERE `group_id` = group_id;
+    INSERT INTO `ACLs` (`owner_id`) VALUES (ownerid);
+    SET aclid = LAST_INSERT_ID();
+    UPDATE `Groups` SET `acl_id` = aclid WHERE `group_id` = groupid;
   END LOOP read_loop;
 
   CLOSE cur;
