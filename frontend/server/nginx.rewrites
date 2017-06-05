@@ -1,9 +1,5 @@
 location /api/ {
-	rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
-}
-
-location ~ ^/(?!/api.*\.(hh|php))$ {
-	fastcgi_intercept_errors on;
+    rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
 }
 
 # Backendv1 WebSockets endpoint.
