@@ -87,6 +87,50 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that before suggesting improvements to a problem, the user must
+     * have solved it first.
+     */
+    public function testMustSolveBeforeSuggesting() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                'rationale' => 'cool!',
+                // No difficulty!
+                'source' => 'omegaUp',
+                'tags' => [],
+            ]),
+        ]);
+
+        try {
+            QualityNominationController::apiCreate($r);
+            $this->fail('Should not have been able to nominate the problem');
+        } catch (PreconditionFailedException $e) {
+            // still expected.
+        }
+
+        RunsFactory::gradeRun($runData);
+
+        QualityNominationController::apiCreate($r);
+
+        $response = QualityNominationController::apiMyList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(1, count($response['nominations']));
+        $nomination = $response['nominations'][0];
+        $this->assertEquals(
+            $problemData['request']['alias'],
+            $nomination['problem']['alias']
+        );
+    }
+
+    /**
      * Basic test. Check that before nominating a problem for demotion, the
      * user might not have solved it first.
      */

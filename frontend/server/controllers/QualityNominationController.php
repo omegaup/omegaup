@@ -11,7 +11,21 @@ class QualityNominationController extends Controller {
     /**
      * Creates a new QualityNomination
      *
-     * There are two ways in which users can interact with this:
+     * There are three ways in which users can interact with this:
+     *
+     * # Suggestion
+     *
+     * A user that has already solved a problem can make suggestions about a
+     * problem. This expects the `nomination` field to be `suggestion` and the
+     * `contents` field should be a JSON blob with the following fields:
+     *
+     * * `rationale`: A small text explaining the rationale for promotion.
+     * * `difficulty`: (Optional) A number in the range [1-5] indicating the
+     *                 difficulty of the problem.
+     * * `source`: (Optional) A URL or string clearly documenting the source or
+     *             full name of original author of the problem.
+     * * `tags`: (Optional) An array of tag names that will be added to the
+     *           problem upon promotion.
      *
      * # Promotion
      *
@@ -55,7 +69,7 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isInEnum($r['nomination'], 'nomination', ['promotion', 'demotion']);
+        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion']);
         Validators::isStringNonEmpty($r['contents'], 'contents');
 
         $contents = json_decode($r['contents'], true /*assoc*/);
@@ -70,7 +84,27 @@ class QualityNominationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if ($r['nomination'] == 'promotion') {
+        if ($r['nomination'] == 'suggestion') {
+            // The user making suggestions to a problem must have already
+            // solved it.
+            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
+                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+            }
+            if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
+                || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
+                || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
+                || (isset($contents['tags']) && !is_array($contents['tags']))
+            ) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            // Tags must be strings.
+            foreach ($contents['tags'] as &$tag) {
+                if (!is_string($tag)) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $tag = TagController::normalize($tag);
+            }
+        } elseif ($r['nomination'] == 'promotion') {
             // When a problem is being nominated for promotion, the user
             // nominating it must have already solved it.
             if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
