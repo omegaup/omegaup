@@ -140,7 +140,7 @@ export default {
   width: 100%;
 }
 
-.qualitynomination-popup .question-text, .qualitynomination-popup, h1 {
+.qualitynomination-popup .question-text, .qualitynomination-popup h1 {
   text-align: center;
 }
 
