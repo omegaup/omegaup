@@ -10,7 +10,8 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-    if (grecaptcha.getResponse().length == 0) {
+    if (typeof(grecaptcha) === 'undefined' ||
+        grecaptcha.getResponse().length == 0) {
       omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
       return false;
     }
