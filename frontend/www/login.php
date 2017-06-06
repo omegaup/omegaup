@@ -23,6 +23,11 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     }
 
     $triedToLogin = true;
+} elseif (isset($_POST['request']) && $_POST['request'] == 'register') {
+    // Something failed in the JavaScript side. This definitely will not have
+    // ReCAPTCHA validation, so let's error out with that.
+    $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
+    $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('unableToVerifyCaptcha'));
 }
 
 if (isset($_GET['linkedin'])) {
