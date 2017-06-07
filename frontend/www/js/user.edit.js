@@ -441,7 +441,7 @@ omegaup.OmegaUp.on('ready', function() {
                           name: $('#name').val(),
                           birth_date: birth_date.getTime() / 1000,
                           country_id: $('#country_id').val(),
-                          state_id: $('#state_id').val(),
+                          state_id: $('#state_id').val() || undefined,
                           scholar_degree: $('#scholar_degree').val(),
                           graduation_date: graduation_date.getTime() / 1000,
                           school_id: $('#school_id').val(),
