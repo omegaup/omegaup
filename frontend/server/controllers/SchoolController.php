@@ -95,8 +95,8 @@ class SchoolController extends Controller {
     public static function apiRank(Request $r) {
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
-        Validators::isNumber($r['start_time'], 'start_time', false);
-        Validators::isNumber($r['finish_time'], 'finish_time', false);
+        Validators::isNumber($r['start_time'], 'start_time', false); // Unix timestamp
+        Validators::isNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
 
         try {
             self::authenticateRequest($r);
@@ -119,13 +119,13 @@ class SchoolController extends Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = date('Y-m-01');
         } else {
-            $r['start_time'] = date('Y-m-d', strtotime($r['start_time']));
+            $r['start_time'] = gmdate('Y-m-d', $r['start_time']);
         }
 
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = date('Y-m-d', strtotime('first day of next month'));
         } else {
-            $r['finish_time'] = date('Y-m-d', strtotime($r['finish_time']));
+            $r['finish_time'] = gmdate('Y-m-d', $r['finish_time']);
         }
 
         $fetch = function (Request $r) {
