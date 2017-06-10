@@ -7,14 +7,10 @@
 
 class SchoolRankTest extends OmegaupTestCase {
     /**
-     * Basic test for school rank
+     *  Helper to create runs with users inside a school
      *
      */
-    public function testSchoolRankPositive() {
-        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
-        // 1 in school #2 but PA, 1 with no school.
-        $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
-
+    private function createRunsWithSchool(&$schoolsData) {
         $users = [];
         for ($i = 0; $i < 5; $i++) {
             $users[] = UserFactory::createUser();
@@ -40,6 +36,18 @@ class SchoolRankTest extends OmegaupTestCase {
 
         $runData = RunsFactory::createRunToProblem($problemData, $users[4]);
         RunsFactory::gradeRun($runData);
+    }
+
+    /**
+     * Basic test for school rank
+     *
+     */
+    public function testSchoolRankPositive() {
+        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
+        // 1 in school #2 but PA, 1 with no school.
+        $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
+
+        $this->createRunsWithSchool($schoolsData);
 
         // Call API
         $rankViewer = UserFactory::createUser();
@@ -61,5 +69,40 @@ class SchoolRankTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals($response, $cachedResponse);
+    }
+
+    /**
+     * Test School Rank API with start_time, end_time params
+     */
+    public function testSchoolRankApiWithTimes() {
+        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
+        // 1 in school #2 but PA, 1 with no school.
+        $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
+
+        $this->createRunsWithSchool($schoolsData);
+
+        $start_time = strtotime('-1 day');
+        $end_time = strtotime('+1 day');
+
+        // Call API
+        $rankViewer = UserFactory::createUser();
+        $rankViewerLogin = self::login($rankViewer);
+        $response = SchoolController::apiRank(new Request([
+            'auth_token' => $rankViewerLogin->auth_token,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(4, count($response['rank']));
+        $this->assertEquals(2, $response['rank'][0]['distinct_users']);
+        $this->assertEquals(1, $response['rank'][2]['distinct_users']);
+
+        $cachedResponse = SchoolController::apiRank(new Request([
+            'auth_token' => $rankViewerLogin->auth_token,
+        ]));
+
+        // start_time/finish_time path should not be the one cached..
+        $this->assertNotEquals($response, $cachedResponse);
     }
 }
