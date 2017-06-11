@@ -218,7 +218,7 @@ abstract class QualityNominationsDAOBase extends DAO {
      */
     final private static function create(QualityNominations $QualityNominations) {
         if (is_null($QualityNominations->nomination)) {
-            $QualityNominations->nomination = 'promotion';
+            $QualityNominations->nomination = 'suggestion';
         }
         if (is_null($QualityNominations->time)) {
             $QualityNominations->time = gmdate('Y-m-d H:i:s');

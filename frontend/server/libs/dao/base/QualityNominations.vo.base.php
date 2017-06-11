@@ -84,9 +84,9 @@ class QualityNominations extends VO {
     public $problem_id;
 
     /**
-      * Si se está nominando el problema a promoción o democión
+      * El tipo de nominación
       * @access public
-      * @var enum('promotion',
+      * @var enum('suggestion',
       */
     public $nomination;
 
