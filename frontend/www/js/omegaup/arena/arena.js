@@ -118,11 +118,12 @@ class EventsSocket {
     var data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = OmegaUp.time(data.run.time * 1000);
+      data.run.time = OmegaUp.remoteTime(data.run.time * 1000);
       self.arena.updateRun(data.run);
     } else if (data.message == '/clarification/update/') {
       if (!self.arena.options.disableClarifications) {
-        data.clarification.time = OmegaUp.time(data.clarification.time * 1000);
+        data.clarification.time =
+            OmegaUp.remoteTime(data.clarification.time * 1000);
         self.arena.updateClarification(data.clarification);
       }
     } else if (data.message == '/scoreboard/update/') {
@@ -391,7 +392,7 @@ export class Arena {
       } else if (contest.start_time) {
         var f = (function(x, y) {
           return function() {
-            var t = OmegaUp.time();
+            var t = new Date();
             self.elements.loadingOverlay.html(
                 x + ' ' + FormatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
@@ -403,7 +404,7 @@ export class Arena {
                   .fail(UI.ignoreError);
             }
           }
-        })(self.options.contestAlias, OmegaUp.time(contest.start_time * 1000));
+        })(self.options.contestAlias, contest.start_time);
         setTimeout(f, 1000);
       } else {
         self.elements.loadingOverlay.html('404');
@@ -411,7 +412,7 @@ export class Arena {
       return;
     }
     if (self.options.isPractice && contest.finish_time &&
-        OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+        Date.now() < contest.finish_time.getTime()) {
       window.location = window.location.pathname.replace(/\/practice.*/, '/');
       return;
     }
@@ -481,19 +482,19 @@ export class Arena {
       return;
     }
 
-    var date = OmegaUp.time().getTime();
+    var now = Date.now();
     var clock = '';
 
-    if (date < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() - OmegaUp.time(date));
-    } else if (date > countdownTime.getTime()) {
+    if (now < self.startTime.getTime()) {
+      clock = '-' + FormatDelta(self.startTime.getTime() - now);
+    } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
       clearInterval(self.clockInterval);
       self.clockInterval = null;
 
       // Show go-to-practice-mode messages on contest end
-      if (date > self.finishTime.getTime()) {
+      if (now > self.finishTime.getTime()) {
         UI.warning('<a href="/arena/' + self.options.contestAlias +
                    '/practice/">' + T.arenaContestEndedUsePractice + '</a>');
         $('#new-run').hide();
@@ -502,7 +503,7 @@ export class Arena {
             .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
       }
     } else {
-      clock = FormatDelta(countdownTime.getTime() - OmegaUp.time(date));
+      clock = FormatDelta(countdownTime.getTime() - now);
     }
 
     self.elements.clock.text(clock);
@@ -623,7 +624,7 @@ export class Arena {
 
     self.elements.rankingTable.ranking = ranking;
     if (data.time) {
-      self.elements.rankingTable.lastUpdated = OmegaUp.time(data.time);
+      self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
     }
 
     this.currentRanking = newRanking;
@@ -1119,7 +1120,7 @@ export class Arena {
     if (!self.options.isOnlyProblem &&
         (self.problems[self.currentProblem.alias].last_submission +
              self.submissionGap * 1000 >
-         OmegaUp.time().getTime())) {
+         Date.now())) {
       alert(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
                             {submissionGap: self.submissionGap}));
       return false;
@@ -1202,14 +1203,14 @@ export class Arena {
 
           if (!self.options.isOnlyProblem) {
             self.problems[self.currentProblem.alias].last_submission =
-                OmegaUp.time().getTime();
+                Date.now();
           }
 
           run.username = OmegaUp.username;
           run.status = 'new';
           run.alias = self.currentProblem.alias;
           run.contest_score = null;
-          run.time = OmegaUp.time();
+          run.time = new Date();
           run.penalty = 0;
           run.runtime = 0;
           run.memory = 0;

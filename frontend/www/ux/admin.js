@@ -32,8 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
             }
             return;
           } else if (arena.options.isPractice && contest.finish_time &&
-                     omegaup.OmegaUp.time().getTime() <
-                         contest.finish_time.getTime()) {
+                     Date.now() < contest.finish_time.getTime()) {
             window.location =
                 window.location.pathname.replace(/\/practice\/.*/, '/');
             return;
@@ -122,7 +121,7 @@ omegaup.OmegaUp.on('ready', function() {
               run.status = 'new';
               run.alias = arena.currentProblem.alias;
               run.contest_score = null;
-              run.time = omegaup.OmegaUp.time();
+              run.time = new Date();
               run.penalty = 0;
               run.runtime = 0;
               run.memory = 0;

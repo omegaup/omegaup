@@ -40,7 +40,7 @@ export default class {
       self.notifications.removeAll();
       for (var key in self.notificationMapping) {
         if (!self.notificationMapping.hasOwnProperty(key)) continue;
-        localStorage.setItem(key, new Date().getTime());
+        localStorage.setItem(key, Date.now());
       }
       self.notificationMapping = {};
     };
@@ -81,7 +81,7 @@ export default class {
       data[key] = ko.observable(data[key]);
     }
     data.onCloseClicked = function() {
-      localStorage.setItem(data.id(), new Date().getTime());
+      localStorage.setItem(data.id(), Date.now());
       self.notifications.remove(data);
     };
     self.notificationMapping[data.id()] = data;

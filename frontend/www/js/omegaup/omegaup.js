@@ -51,7 +51,7 @@ export let OmegaUp = {
 
       _initialized: false,
 
-      _deltaTime: undefined,
+      _remoteDeltaTime: undefined,
 
       _deltaTimeForTesting: 0,
 
@@ -90,7 +90,7 @@ export let OmegaUp = {
                     OmegaUp.username = data.session.user.username;
                     OmegaUp.email = data.session.email;
                   }
-                  OmegaUp._deltaTime = data.time * 1000 - t0;
+                  OmegaUp._remoteDeltaTime = t0 - data.time * 1000;
 
                   OmegaUp.ready = true;
                   if (OmegaUp._documentReady) {
@@ -137,13 +137,13 @@ export let OmegaUp = {
 
       _realTime:
           function(timestamp) {
-            if (typeof(timestamp) === 'undefined') {
-              return new Date().getTime() + OmegaUp._deltaTimeForTesting;
+            if (typeof(timestamp) !== 'undefined') {
+              return timestamp + OmegaUp._deltaTimeForTesting;
             }
-            return new Date(timestamp).getTime() + OmegaUp._deltaTimeForTesting;
+            return Date.now() + OmegaUp._deltaTimeForTesting;
           },
 
-      time:
+      remoteTime:
           function(timestamp, options) {
             options = options ||  {};
             options.server_sync =
@@ -152,15 +152,19 @@ export let OmegaUp = {
                     options.server_sync;
             return new Date(
                 OmegaUp._realTime(timestamp) +
-                (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
+                (options.server_sync ? (OmegaUp._remoteDeltaTime || 0) : 0));
           },
 
       convertTimes: function(item) {
         if (item.hasOwnProperty('start_time')) {
-          item.start_time = OmegaUp.time(item.start_time * 1000);
+          item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
         }
         if (item.hasOwnProperty('finish_time')) {
-          item.finish_time = OmegaUp.time(item.finish_time * 1000);
+          item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
+        }
+        if (item.hasOwnProperty('submission_deadline')) {
+          item.submission_deadline =
+              OmegaUp.remoteTime(item.submission_deadline * 1000);
         }
         return item;
       },
