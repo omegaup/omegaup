@@ -53,6 +53,8 @@ export let OmegaUp = {
 
       _deltaTime: undefined,
 
+      _deltaTimeForTesting: 0,
+
       _listeners:
           {
             'ready': [
@@ -67,8 +69,9 @@ export let OmegaUp = {
       _onDocumentReady:
           function() {
             OmegaUp._documentReady = true;
-            if (typeof(OmegaUp._deltaTime) !== 'undefined') {
+            if (OmegaUp.ready) {
               OmegaUp._notify('ready');
+              return;
             }
             // TODO(lhchavez): Remove this.
             OmegaUp._initialize();
@@ -76,15 +79,18 @@ export let OmegaUp = {
 
       _initialize:
           function() {
-            var t0 = new Date().getTime();
+            if (OmegaUp.ready) {
+              return;
+            }
+            var t0 = OmegaUp._realTime();
             API.Session.currentSession()
                 .then(function(data) {
                   if (data.session.valid) {
                     OmegaUp.loggedIn = true;
-                    OmegaUp._deltaTime = data.time * 1000 - t0;
                     OmegaUp.username = data.session.user.username;
                     OmegaUp.email = data.session.email;
                   }
+                  OmegaUp._deltaTime = data.time * 1000 - t0;
 
                   OmegaUp.ready = true;
                   if (OmegaUp._documentReady) {
@@ -129,22 +135,12 @@ export let OmegaUp = {
             }
           },
 
-      syncTime:
-          function() {
-            var t0 = new Date().getTime();
-            API.Time.get()
-                .then(function(data) {
-                  OmegaUp._deltaTime = data.time * 1000 - t0;
-                })
-                .fail(UI.apiError);
-          },
-
       _realTime:
           function(timestamp) {
             if (typeof(timestamp) === 'undefined') {
-              return new Date().getTime();
+              return new Date().getTime() + OmegaUp._deltaTimeForTesting;
             }
-            return new Date(timestamp).getTime();
+            return new Date(timestamp).getTime() + OmegaUp._deltaTimeForTesting;
           },
 
       time:
