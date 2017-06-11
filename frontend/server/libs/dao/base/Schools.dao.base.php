@@ -20,7 +20,7 @@ abstract class SchoolsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Schools`.`school_id`, `Schools`.`state_id`, `Schools`.`country_id`, `Schools`.`name`';
+    const FIELDS = '`Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class SchoolsDAOBase extends DAO {
         if (is_null($school_id)) {
             return null;
         }
-        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`state_id`, `Schools`.`country_id`, `Schools`.`name` FROM Schools WHERE (school_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name` FROM Schools WHERE (school_id = ?) LIMIT 1;';
         $params = [$school_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class SchoolsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Schools}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`state_id`, `Schools`.`country_id`, `Schools`.`name` from Schools';
+        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name` from Schools';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -131,13 +131,13 @@ abstract class SchoolsDAOBase extends DAO {
             $clauses[] = '`school_id` = ?';
             $params[] = $Schools->school_id;
         }
-        if (!is_null($Schools->state_id)) {
-            $clauses[] = '`state_id` = ?';
-            $params[] = $Schools->state_id;
-        }
         if (!is_null($Schools->country_id)) {
             $clauses[] = '`country_id` = ?';
             $params[] = $Schools->country_id;
+        }
+        if (!is_null($Schools->state_id)) {
+            $clauses[] = '`state_id` = ?';
+            $params[] = $Schools->state_id;
         }
         if (!is_null($Schools->name)) {
             $clauses[] = '`name` = ?';
@@ -152,7 +152,7 @@ abstract class SchoolsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`state_id`, `Schools`.`country_id`, `Schools`.`name` FROM `Schools`';
+        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name` FROM `Schools`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -177,10 +177,10 @@ abstract class SchoolsDAOBase extends DAO {
       * @param Schools [$Schools] El objeto de tipo Schools a actualizar.
       */
     final private static function update(Schools $Schools) {
-        $sql = 'UPDATE `Schools` SET `state_id` = ?, `country_id` = ?, `name` = ? WHERE `school_id` = ?;';
+        $sql = 'UPDATE `Schools` SET `country_id` = ?, `state_id` = ?, `name` = ? WHERE `school_id` = ?;';
         $params = [
-            $Schools->state_id,
             $Schools->country_id,
+            $Schools->state_id,
             $Schools->name,
             $Schools->school_id,
         ];
@@ -202,11 +202,11 @@ abstract class SchoolsDAOBase extends DAO {
      * @param Schools [$Schools] El objeto de tipo Schools a crear.
      */
     final private static function create(Schools $Schools) {
-        $sql = 'INSERT INTO Schools (`school_id`, `state_id`, `country_id`, `name`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Schools (`school_id`, `country_id`, `state_id`, `name`) VALUES (?, ?, ?, ?);';
         $params = [
             $Schools->school_id,
-            $Schools->state_id,
             $Schools->country_id,
+            $Schools->state_id,
             $Schools->name,
         ];
         global $conn;
@@ -266,17 +266,6 @@ abstract class SchoolsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $SchoolsA->state_id;
-        $b = $SchoolsB->state_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`state_id` >= ? AND `state_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`state_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
         $a = $SchoolsA->country_id;
         $b = $SchoolsB->country_id;
         if (!is_null($a) && !is_null($b)) {
@@ -285,6 +274,17 @@ abstract class SchoolsDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`country_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $SchoolsA->state_id;
+        $b = $SchoolsB->state_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`state_id` >= ? AND `state_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`state_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

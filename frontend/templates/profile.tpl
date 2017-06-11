@@ -76,6 +76,7 @@
 <div id="username" style="display:none" data-username="{$profile.userinfo.username|replace:"\\":""}"></div>
 
 <script src="{version_hash src="/js/profile.js"}"></script>
+<script src="{version_hash src="/third_party/js/iso-3166-2.js/iso3166.min.js"}"></script>
 
 {/if}
 

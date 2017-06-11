@@ -46,7 +46,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-            'country_id' => 'MX',
+            'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
             'scholar_degree' => 'Primaria',
             'birth_date' => strtotime('2000-02-02'),
@@ -77,7 +77,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Value for the recruitment optin flag should be non-negative
-     * @expectedException InvalidDatabaseOperationException
+     * @expectedException InvalidParameterException
      */
     public function testNegativeStateUpdate() {
         $user = UserFactory::createUser();

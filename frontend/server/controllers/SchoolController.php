@@ -50,22 +50,39 @@ class SchoolController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['name'], 'name');
-        Validators::isNumber($r['state_id'], 'state_id', false);
+        Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
+        Validators::isStringNonEmpty($r['state_id'], 'state_id', false);
 
         if (!is_null($r['state_id'])) {
+            $state = null;
             try {
-                $r['state'] = StatesDAO::getByPK($r['state_id']);
+                $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            if (is_null($r['state'])) {
-                throw new InvalidParameterException('parameterNotFound', 'state');
+            if (is_null($state)) {
+                throw new InvalidParameterException('parameterNotFound', 'state_id');
+            }
+        } elseif (!is_null($r['country_id'])) {
+            $country = null;
+            try {
+                $country = CountriesDAO::getByPK($r['country_id']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if (is_null($country)) {
+                throw new InvalidParameterException('parameterNotFound', 'country_id');
             }
         }
 
         // Create school object
-        $school = new Schools(['name' => $r['name'], 'state_id' => $r['state_id']]);
+        $school = new Schools([
+            'name' => $r['name'],
+            'country_id' => $r['country_id'],
+            'state_id' => $r['state_id'],
+        ]);
 
         $school_id = 0;
         try {

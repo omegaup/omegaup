@@ -578,11 +578,11 @@ CREATE TABLE IF NOT EXISTS `Runs` (
 
 CREATE TABLE IF NOT EXISTS `Schools` (
   `school_id` int(11) NOT NULL AUTO_INCREMENT,
-  `state_id` int(11) NULL,
   `country_id` char(3) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   PRIMARY KEY (`school_id`),
-  KEY `state_id` (`state_id`),
+  KEY `state_id` (`country_id`,`state_id`),
   KEY `country_id` (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
@@ -593,11 +593,10 @@ CREATE TABLE IF NOT EXISTS `Schools` (
 --
 
 CREATE TABLE IF NOT EXISTS `States` (
-  `state_id` int(11) NOT NULL AUTO_INCREMENT,
   `country_id` char(3) NOT NULL,
-  `state_code` CHAR( 3 ) NOT NULL,
+  `state_id` char(3) NOT NULL,
   `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`state_id`),
+  PRIMARY KEY (`country_id`,`state_id`),
   KEY `country_id` (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
@@ -617,7 +616,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `solved` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',
   `country_id` char(3) DEFAULT NULL,
-  `state_id` int(11) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
   `scholar_degree` varchar(64) DEFAULT NULL,
   `language_id` int(11) NULL DEFAULT NULL,
@@ -1053,7 +1052,7 @@ ALTER TABLE `Runs`
 -- Filtros para la tabla `Schools`
 --
 ALTER TABLE `Schools`
-  ADD CONSTRAINT `state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`,`state_id`) REFERENCES `States` (`country_id`,`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
@@ -1068,7 +1067,7 @@ ALTER TABLE `States`
 ALTER TABLE `Users`
   ADD CONSTRAINT `fk_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_us_state_id` FOREIGN KEY (`country_id`,`state_id`) REFERENCES `States` (`country_id`,`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
