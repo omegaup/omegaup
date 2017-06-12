@@ -505,6 +505,15 @@ class RunController extends Controller {
             self::$log->warn($e);
         }
 
+        // Reset fields.
+        $r['run']->verdict = 'JE';
+        $r['run']->status = 'new';
+        $r['run']->runtime = 0;
+        $r['run']->memory = 0;
+        $r['run']->score = 0;
+        $r['run']->contest_score = 0;
+        RunsDAO::save($r['run']);
+
         try {
             self::$grader->Grade([$r['run']->guid], true, $r['debug'] || false);
         } catch (Exception $e) {
