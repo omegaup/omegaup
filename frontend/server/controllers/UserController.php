@@ -1094,7 +1094,7 @@ class UserController extends Controller {
             $response['userinfo']['country'] = is_null($country) ? null : $country->name;
             $response['userinfo']['country_id'] = $user->country_id;
 
-            $state = StatesDAO::getByPK($user->state_id);
+            $state = StatesDAO::getByPK($user->country_id, $user->state_id);
             $response['userinfo']['state'] = is_null($state) ? null : $state->name;
             $response['userinfo']['state_id'] = $user->state_id;
 
@@ -1493,22 +1493,20 @@ class UserController extends Controller {
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
         }
 
-        if (!is_null($r['country_id'])) {
+        $state = null;
+        if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
+            // Both state and country must be specified together.
             Validators::isStringNonEmpty($r['country_id'], 'country_id', true);
+            Validators::isStringNonEmpty($r['state_id'], 'state_id', true);
+
             try {
-                $r['country'] = CountriesDAO::getByPK($r['country_id']);
+                $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-        }
 
-        if (!is_null($r['state_id'])) {
-            Validators::isNumber($r['state_id'], 'state_id', false);
-
-            try {
-                $r['state'] = StatesDAO::getByPK($r['state_id']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+            if (is_null($state)) {
+                throw new InvalidParameterException('parameterInvalid', 'state_id');
             }
         }
 
@@ -1527,8 +1525,12 @@ class UserController extends Controller {
                 $r['school_id'] = null;
             } else {
                 try {
-                    $schoolR = new Request(['name' => $r['school_name'], 'state_id' => $r['state_id'], 'auth_token' => $r['auth_token']]);
-                    $response = SchoolController::apiCreate($schoolR);
+                    $response = SchoolController::apiCreate(new Request([
+                        'name' => $r['school_name'],
+                        'country_id' => $state != null ? $state->country_id : null,
+                        'state_id' => $state != null ? $state->state_id : null,
+                        'auth_token' => $r['auth_token'],
+                    ]));
                     $r['school_id'] = $response['school_id'];
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);

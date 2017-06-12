@@ -39,3 +39,6 @@
 [submodule "stuff/hook_tools"]
 	path = stuff/hook_tools
 	url = https://github.com/omegaup/hook_tools.git
+[submodule "frontend/www/third_party/js/iso-3166-2.js"]
+	path = frontend/www/third_party/js/iso-3166-2.js
+	url = https://github.com/omegaup/iso-3166-2.js

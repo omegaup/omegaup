@@ -26,14 +26,11 @@ class States extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
-        }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
         }
-        if (isset($data['state_code'])) {
-            $this->state_code = $data['state_code'];
+        if (isset($data['state_id'])) {
+            $this->state_id = $data['state_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -54,14 +51,6 @@ class States extends VO {
     /**
       *  [Campo no documentado]
       * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $state_id;
-
-    /**
-      *  [Campo no documentado]
       * @access public
       * @var char(3)
       */
@@ -69,10 +58,11 @@ class States extends VO {
 
     /**
       *  [Campo no documentado]
+      * Llave Primaria
       * @access public
-      * @var char(
+      * @var char(3)
       */
-    public $state_code;
+    public $state_id;
 
     /**
       *  [Campo no documentado]

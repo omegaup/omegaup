@@ -29,11 +29,11 @@ class Schools extends VO {
         if (isset($data['school_id'])) {
             $this->school_id = $data['school_id'];
         }
-        if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
-        }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
+        }
+        if (isset($data['state_id'])) {
+            $this->state_id = $data['state_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -63,16 +63,16 @@ class Schools extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
+      * @var char(3)
       */
-    public $state_id;
+    public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
       * @var char(3)
       */
-    public $country_id;
+    public $state_id;
 
     /**
       *  [Campo no documentado]
