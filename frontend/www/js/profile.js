@@ -12,8 +12,8 @@ omegaup.API.User.contestStats({username: username})
       $('#contest-results-wait').hide();
       t = 0;
       for (var contest_alias in data['contests']) {
-        var now = omegaup.OmegaUp.time();
-        var end = omegaup.OmegaUp.time(
+        var now = new Date();
+        var end = omegaup.OmegaUp.remoteTime(
             data['contests'][contest_alias]['data']['finish_time'] * 1000);
 
         if (data['contests'][contest_alias]['place'] != null && now > end) {

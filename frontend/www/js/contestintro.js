@@ -57,21 +57,20 @@ omegaup.OmegaUp.on('ready', function() {
 
   function showCountdown() {
     var starttime = contestObject.start_time;
-    var date = new Date().getTime();
 
-    // we already know that date < starttime
-    $('#countdown_clock').html(formatDelta(starttime.getTime() - (date)));
+    // we already know that now < starttime
+    $('#countdown_clock').html(formatDelta(starttime.getTime() - Date.now()));
   }
 
   function readyToStart(contest) {
     // User is ready enter contest. If contest started,
     // show button, otherwise show countdown.
-    var date = new Date().getTime();
+    var now = Date.now();
     var clock = '';
 
-    if (date > contest.finish_time.getTime()) {  // Ended
+    if (now > contest.finish_time.getTime()) {  // Ended
       $('#click-to-proceed').removeClass('hidden');
-    } else if (date > contest.start_time.getTime()) {  // Started
+    } else if (now > contest.start_time.getTime()) {  // Started
       $('#click-to-proceed').removeClass('hidden');
     } else {  // Not started
       $('#ready-to-start').removeClass('hidden');

@@ -60,7 +60,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   function showCountdown() {
     var starttime = contestObject.start_time;
-    var date = new Date().getTime();
+    var date = Date.now();
 
     // we already know that date < starttime
     $('#countdown_clock').html(formatDelta(starttime.getTime() - (date)));
@@ -69,7 +69,7 @@ omegaup.OmegaUp.on('ready', function() {
   function readyToStart(contest) {
     // User is ready enter contest. If contest started,
     // show button, otherwise show countdown.
-    var date = new Date().getTime();
+    var date = Date.now();
     var clock = '';
 
     if (date > contest.finish_time.getTime()) {  // Ended

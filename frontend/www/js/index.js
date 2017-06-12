@@ -18,7 +18,7 @@
     omegaup.API.Contest.list({active: 'ACTIVE'})
         .then(function(data) {
           var list = data.results;
-          var now = omegaup.OmegaUp.time();
+          var now = new Date();
 
           for (var i = 0, len = list.length; i < len && i < 10; i++) {
             $('#next-contests-list')
@@ -44,7 +44,7 @@
       }
     }
 
-    var minDate = omegaup.OmegaUp.time();
+    var minDate = new Date();
     minDate.setDate(minDate.getDate() - (30 * 3));
 
     var minY = dataInSeries[0] - (dataInSeries[0] * 0.50);

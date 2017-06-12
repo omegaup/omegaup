@@ -51,7 +51,9 @@ export let OmegaUp = {
 
       _initialized: false,
 
-      _deltaTime: undefined,
+      _remoteDeltaTime: undefined,
+
+      _deltaTimeForTesting: 0,
 
       _listeners:
           {
@@ -67,8 +69,9 @@ export let OmegaUp = {
       _onDocumentReady:
           function() {
             OmegaUp._documentReady = true;
-            if (typeof(OmegaUp._deltaTime) !== 'undefined') {
+            if (OmegaUp.ready) {
               OmegaUp._notify('ready');
+              return;
             }
             // TODO(lhchavez): Remove this.
             OmegaUp._initialize();
@@ -76,15 +79,18 @@ export let OmegaUp = {
 
       _initialize:
           function() {
-            var t0 = new Date().getTime();
+            if (OmegaUp.ready) {
+              return;
+            }
+            var t0 = OmegaUp._realTime();
             API.Session.currentSession()
                 .then(function(data) {
                   if (data.session.valid) {
                     OmegaUp.loggedIn = true;
-                    OmegaUp._deltaTime = data.time * 1000 - t0;
                     OmegaUp.username = data.session.user.username;
                     OmegaUp.email = data.session.email;
                   }
+                  OmegaUp._remoteDeltaTime = t0 - data.time * 1000;
 
                   OmegaUp.ready = true;
                   if (OmegaUp._documentReady) {
@@ -129,25 +135,15 @@ export let OmegaUp = {
             }
           },
 
-      syncTime:
-          function() {
-            var t0 = new Date().getTime();
-            API.Time.get()
-                .then(function(data) {
-                  OmegaUp._deltaTime = data.time * 1000 - t0;
-                })
-                .fail(UI.apiError);
-          },
-
       _realTime:
           function(timestamp) {
-            if (typeof(timestamp) === 'undefined') {
-              return new Date().getTime();
+            if (typeof(timestamp) !== 'undefined') {
+              return timestamp + OmegaUp._deltaTimeForTesting;
             }
-            return new Date(timestamp).getTime();
+            return Date.now() + OmegaUp._deltaTimeForTesting;
           },
 
-      time:
+      remoteTime:
           function(timestamp, options) {
             options = options ||  {};
             options.server_sync =
@@ -156,15 +152,19 @@ export let OmegaUp = {
                     options.server_sync;
             return new Date(
                 OmegaUp._realTime(timestamp) +
-                (options.server_sync ? (OmegaUp._deltaTime || 0) : 0));
+                (options.server_sync ? (OmegaUp._remoteDeltaTime || 0) : 0));
           },
 
       convertTimes: function(item) {
         if (item.hasOwnProperty('start_time')) {
-          item.start_time = OmegaUp.time(item.start_time * 1000);
+          item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
         }
         if (item.hasOwnProperty('finish_time')) {
-          item.finish_time = OmegaUp.time(item.finish_time * 1000);
+          item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
+        }
+        if (item.hasOwnProperty('submission_deadline')) {
+          item.submission_deadline =
+              OmegaUp.remoteTime(item.submission_deadline * 1000);
         }
         return item;
       },
