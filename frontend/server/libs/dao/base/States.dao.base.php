@@ -20,7 +20,7 @@ abstract class StatesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`States`.`state_id`, `States`.`country_id`, `States`.`state_code`, `States`.`name`';
+    const FIELDS = '`States`.`country_id`, `States`.`state_id`, `States`.`name`';
 
     /**
      * Guardar registros.
@@ -36,7 +36,7 @@ abstract class StatesDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(States $States) {
-        if (!is_null(self::getByPK($States->state_id))) {
+        if (!is_null(self::getByPK($States->country_id, $States->state_id))) {
             return StatesDAOBase::update($States);
         } else {
             return StatesDAOBase::create($States);
@@ -52,12 +52,12 @@ abstract class StatesDAOBase extends DAO {
      * @static
      * @return @link States Un objeto del tipo {@link States}. NULL si no hay tal registro.
      */
-    final public static function getByPK($state_id) {
-        if (is_null($state_id)) {
+    final public static function getByPK($country_id, $state_id) {
+        if (is_null($country_id) || is_null($state_id)) {
             return null;
         }
-        $sql = 'SELECT `States`.`state_id`, `States`.`country_id`, `States`.`state_code`, `States`.`name` FROM States WHERE (state_id = ?) LIMIT 1;';
-        $params = [$state_id];
+        $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` FROM States WHERE (country_id = ? AND state_id = ?) LIMIT 1;';
+        $params = [$country_id, $state_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -82,7 +82,7 @@ abstract class StatesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link States}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `States`.`state_id`, `States`.`country_id`, `States`.`state_code`, `States`.`name` from States';
+        $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` from States';
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
         }
@@ -127,17 +127,13 @@ abstract class StatesDAOBase extends DAO {
 
         $clauses = [];
         $params = [];
-        if (!is_null($States->state_id)) {
-            $clauses[] = '`state_id` = ?';
-            $params[] = $States->state_id;
-        }
         if (!is_null($States->country_id)) {
             $clauses[] = '`country_id` = ?';
             $params[] = $States->country_id;
         }
-        if (!is_null($States->state_code)) {
-            $clauses[] = '`state_code` = ?';
-            $params[] = $States->state_code;
+        if (!is_null($States->state_id)) {
+            $clauses[] = '`state_id` = ?';
+            $params[] = $States->state_id;
         }
         if (!is_null($States->name)) {
             $clauses[] = '`name` = ?';
@@ -152,7 +148,7 @@ abstract class StatesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `States`.`state_id`, `States`.`country_id`, `States`.`state_code`, `States`.`name` FROM `States`';
+        $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` FROM `States`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
@@ -177,12 +173,10 @@ abstract class StatesDAOBase extends DAO {
       * @param States [$States] El objeto de tipo States a actualizar.
       */
     final private static function update(States $States) {
-        $sql = 'UPDATE `States` SET `country_id` = ?, `state_code` = ?, `name` = ? WHERE `state_id` = ?;';
+        $sql = 'UPDATE `States` SET `name` = ? WHERE `country_id` = ? AND `state_id` = ?;';
         $params = [
-            $States->country_id,
-            $States->state_code,
             $States->name,
-            $States->state_id,
+            $States->country_id,$States->state_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -202,11 +196,10 @@ abstract class StatesDAOBase extends DAO {
      * @param States [$States] El objeto de tipo States a crear.
      */
     final private static function create(States $States) {
-        $sql = 'INSERT INTO States (`state_id`, `country_id`, `state_code`, `name`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
         $params = [
-            $States->state_id,
             $States->country_id,
-            $States->state_code,
+            $States->state_id,
             $States->name,
         ];
         global $conn;
@@ -215,7 +208,6 @@ abstract class StatesDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
-        $States->state_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -255,17 +247,6 @@ abstract class StatesDAOBase extends DAO {
         $clauses = [];
         $params = [];
 
-        $a = $StatesA->state_id;
-        $b = $StatesB->state_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`state_id` >= ? AND `state_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`state_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
         $a = $StatesA->country_id;
         $b = $StatesB->country_id;
         if (!is_null($a) && !is_null($b)) {
@@ -277,14 +258,14 @@ abstract class StatesDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $StatesA->state_code;
-        $b = $StatesB->state_code;
+        $a = $StatesA->state_id;
+        $b = $StatesB->state_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`state_code` >= ? AND `state_code` <= ?';
+            $clauses[] = '`state_id` >= ? AND `state_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`state_code` = ?';
+            $clauses[] = '`state_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -327,11 +308,11 @@ abstract class StatesDAOBase extends DAO {
      * @param States [$States] El objeto de tipo States a eliminar
      */
     final public static function delete(States $States) {
-        if (is_null(self::getByPK($States->state_id))) {
+        if (is_null(self::getByPK($States->country_id, $States->state_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `States` WHERE state_id = ?;';
-        $params = [$States->state_id];
+        $sql = 'DELETE FROM `States` WHERE country_id = ? AND state_id = ?;';
+        $params = [$States->country_id, $States->state_id];
         global $conn;
 
         $conn->Execute($sql, $params);

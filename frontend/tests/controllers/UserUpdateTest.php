@@ -46,7 +46,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-            'country_id' => 'MX',
+            'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
             'scholar_degree' => 'Primaria',
             'birth_date' => strtotime('2000-02-02'),
@@ -77,7 +77,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Value for the recruitment optin flag should be non-negative
-     * @expectedException InvalidDatabaseOperationException
+     * @expectedException InvalidParameterException
      */
     public function testNegativeStateUpdate() {
         $user = UserFactory::createUser();
@@ -172,23 +172,25 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * https://github.com/omegaup/omegaup/issues/997
+     * Superceded by https://github.com/omegaup/omegaup/issues/1228
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        // Choose a country for which we dont have state
-        // data, like Nicaragua
-        $country_id = 'NI';
+        // Omit state.
+        $country_id = 'MX';
         $r = new Request([
             'auth_token' => $login->auth_token,
             'country_id' => $country_id,
         ]);
 
-        UserController::apiUpdate($r);
-
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->country_id, $country_id);
+        try {
+            UserController::apiUpdate($r);
+            $this->fail('All countries now have state information, so it must be provided.');
+        } catch (InvalidParameterException $e) {
+            // OK!
+        }
     }
 }
