@@ -172,23 +172,25 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * https://github.com/omegaup/omegaup/issues/997
+     * Superceded by https://github.com/omegaup/omegaup/issues/1228
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        // Choose a country for which we dont have state
-        // data, like Nicaragua
-        $country_id = 'NI';
+        // Omit state.
+        $country_id = 'MX';
         $r = new Request([
             'auth_token' => $login->auth_token,
             'country_id' => $country_id,
         ]);
 
-        UserController::apiUpdate($r);
-
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->country_id, $country_id);
+        try {
+            UserController::apiUpdate($r);
+            $this->fail('All countries now have state information, so it must be provided.');
+        } catch (InvalidParameterException $e) {
+            // OK!
+        }
     }
 }

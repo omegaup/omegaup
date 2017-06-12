@@ -1493,25 +1493,12 @@ class UserController extends Controller {
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
         }
 
-        if (!is_null($r['country_id'])) {
+        $state = null;
+        if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
+            // Both state and country must be specified together.
             Validators::isStringNonEmpty($r['country_id'], 'country_id', true);
-
-            $country = null;
-            try {
-                $country = CountriesDAO::getByPK($r['country_id']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            if (is_null($country)) {
-                throw new InvalidParameterException('parameterInvalid', 'country_id');
-            }
-        }
-
-        if (!is_null($r['state_id'])) {
             Validators::isStringNonEmpty($r['state_id'], 'state_id', true);
 
-            $state = null;
             try {
                 $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             } catch (Exception $e) {
@@ -1540,8 +1527,8 @@ class UserController extends Controller {
                 try {
                     $response = SchoolController::apiCreate(new Request([
                         'name' => $r['school_name'],
-                        'country_id' => $r['country_id'],
-                        'state_id' => $r['state_id'],
+                        'country_id' => $state != null ? $state->country_id : null,
+                        'state_id' => $state != null ? $state->state_id : null,
                         'auth_token' => $r['auth_token'],
                     ]));
                     $r['school_id'] = $response['school_id'];
