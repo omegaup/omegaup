@@ -27,6 +27,7 @@
 									<li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
 									<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
 									<li><a href="/problem/">{#wordsProblems#}</a></li>
+									<li><a href="/nomination/queue/">{#wordsQualityNominationQueue#}</a></li>
 								</ul>
 							</li>
 						{else}

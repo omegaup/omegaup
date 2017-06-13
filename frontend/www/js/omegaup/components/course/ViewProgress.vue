@@ -44,7 +44,7 @@ function escapeCsv(cell) {
     return '';
   }
   if (typeof(cell) === 'number') {
-    cell = cell.toPrecision(2);
+    cell = Math.round(cell);
   }
   if (typeof(cell) !== 'string') {
     cell = JSON.stringify(cell);
