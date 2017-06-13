@@ -1,8 +1,12 @@
 <template>
   <div class="panel">
-    <div class="page-header"><h1>{{ T.qualityNomination }}</h1></div>
-    <div class="pull-right" v-if="!myView">
-      <label><input type="checkbox" v-model="showAll"> {{ T.qualityNominationShowAll }}</label>
+    <div class="page-header">
+      <h1>{{ T.qualityNomination }}</h1>
+    </div>
+    <div class="pull-right"
+         v-if="!myView">
+      <label><input type="checkbox"
+             v-model="showAll"> {{ T.qualityNominationShowAll }}</label>
     </div>
     <div>
       <table class="table table-striped">
@@ -12,7 +16,7 @@
             <td>{{ T.wordsAlias }}</td>
             <td>{{ T.wordsUser }}</td>
             <td>{{ T.wordsSubmissionDate }}</td>
-            <td>{{ T.qualityNominationAssignedJudge }}</td> 
+            <td>{{ T.qualityNominationAssignedJudge }}</td>
             <td>{{ T.wordsStatus }}</td>
             <td><!-- view button --></td>
           </tr>
@@ -20,12 +24,21 @@
         <tbody>
           <tr v-for="nomination in visibleNominations">
             <td>{{ nomination.nomination }}</td>
-            <td><a v-bind:href="problemUrl(nomination.problem.alias)">{{ nomination.problem.title }}</a></td>
-            <td><a v-bind:href="userUrl(nomination.nominator.username)">{{ nomination.nominator.user || nomination.nominator.username }}</a></td>
+            <td>
+              <a v-bind:href="problemUrl(nomination.problem.alias)">{{ nomination.problem.title
+              }}</a>
+            </td>
+            <td>
+              <a v-bind:href="userUrl(nomination.nominator.username)">{{ nomination.nominator.user
+              || nomination.nominator.username }}</a>
+            </td>
             <td>{{ nomination.time.format('long') }}</td>
             <td><!-- TODO: Judges aren't returned from the API yet --></td>
             <td>{{ nomination.status }}</td>
-            <td><a v-bind:href="nominationDetailsUrl(nomination.qualitynomination_id)">{{ T.wordsDetails }}</a></td>
+            <td>
+              <a v-bind:href="nominationDetailsUrl(nomination.qualitynomination_id)">{{
+              T.wordsDetails }}</a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -65,9 +78,7 @@ export default {
     problemUrl: function(problemAlias) {
       return '/arena/problem/' + problemAlias + '#problems';
     },
-    userUrl: function(username) {
-      return '/profile/' + username;
-    },
+    userUrl: function(username) { return '/profile/' + username;},
     nominationDetailsUrl: function(nominationId) {
       return '/nomination/' + nominationId;
     }
