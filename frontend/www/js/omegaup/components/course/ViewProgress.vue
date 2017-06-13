@@ -19,8 +19,7 @@
               }}</a>
             </td>
             <td class="score"
-                v-for="assignment in assignments">{{ score(student, assignment).toPrecision(2)
-                }}</td>
+                v-for="assignment in assignments">{{ Math.round(score(student, assignment)) }}</td>
           </tr>
         </tbody>
       </table>
@@ -45,7 +44,7 @@ function escapeCsv(cell) {
     return '';
   }
   if (typeof(cell) === 'number') {
-    cell = cell.toPrecision(2);
+    cell = Math.round(cell);
   }
   if (typeof(cell) !== 'string') {
     cell = JSON.stringify(cell);

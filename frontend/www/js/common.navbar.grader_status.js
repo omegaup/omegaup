@@ -10,7 +10,6 @@
           var queueLength = -1;
 
           if (graderInfo.status == 'ok') {
-            var now = omegaup.OmegaUp.time().getTime() / 1000;
             if (graderInfo.queue) {
               queueLength = graderInfo.queue.run_queue_length +
                             graderInfo.queue.running.length;

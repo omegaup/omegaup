@@ -26,7 +26,7 @@ omegaup.OmegaUp.on('ready', function() {
                            })
             .then(arena.rankingChange.bind(arena))
             .fail(omegaup.UI.ignoreError);
-        if (omegaup.OmegaUp.time() < contest.finish_time && !arena.socket) {
+        if (new Date() < contest.finish_time && !arena.socket) {
           setInterval(function() {
             omegaup.API.Contest.scoreboard({
                                  contest_alias: arena.options.contestAlias,

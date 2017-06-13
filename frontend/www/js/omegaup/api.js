@@ -34,7 +34,7 @@ function _call(url, transform, defaultParams) {
 function _convertRuntimes(data) {
   if (data.runs) {
     for (var i = 0; i < data.runs.length; i++) {
-      data.runs[i].time = omegaup.OmegaUp.time(data.runs[i].time * 1000);
+      data.runs[i].time = omegaup.OmegaUp.remoteTime(data.runs[i].time * 1000);
     }
   }
   return data;
@@ -49,8 +49,6 @@ function _convertTimes(item) {
 
 function _normalizeContestFields(contest) {
   omegaup.OmegaUp.convertTimes(contest);
-  contest.submission_deadline =
-      omegaup.OmegaUp.time(contest.submission_deadline * 1000);
   contest.show_penalty =
       (contest.penalty != 0 || contest.penalty_type != 'none');
   return contest;
@@ -69,7 +67,8 @@ export default {
                             for (var idx in result.events) {
                               if (!result.events.hasOwnProperty(idx)) continue;
                               var ev = result.events[idx];
-                              ev.time = omegaup.OmegaUp.time(ev.time * 1000);
+                              ev.time =
+                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
                             }
                             return result;
                           }),
@@ -82,20 +81,19 @@ export default {
 
     addUser: _call('/api/contest/addUser/'),
 
-    adminDetails:
-        _call('/api/contest/admindetails/',
-              function(contest) {
-                // We cannot use |_normalizeContestFields| because admins need
-                // to be
-                // able to get the unmodified times.
-                contest.start_time = new Date(contest.start_time * 1000);
-                contest.finish_time = new Date(contest.finish_time * 1000);
-                contest.submission_deadline =
-                    omegaup.OmegaUp.time(contest.submission_deadline * 1000);
-                contest.show_penalty =
-                    (contest.penalty != 0 || contest.penalty_type != 'none');
-                return contest;
-              }),
+    adminDetails: _call(
+        '/api/contest/admindetails/',
+        function(contest) {
+          // We cannot use |_normalizeContestFields| because admins need to be
+          // able to get the unmodified times.
+          contest.start_time = new Date(contest.start_time * 1000);
+          contest.finish_time = new Date(contest.finish_time * 1000);
+          contest.submission_deadline =
+              omegaup.OmegaUp.remoteTime(contest.submission_deadline * 1000);
+          contest.show_penalty =
+              (contest.penalty != 0 || contest.penalty_type != 'none');
+          return contest;
+        }),
 
     adminList: _call('/api/contest/adminlist/',
                      function(result) {
@@ -114,7 +112,7 @@ export default {
                           function(data) {
                             for (var idx in data.clarifications) {
                               var clarification = data.clarifications[idx];
-                              clarification.time = omegaup.OmegaUp.time(
+                              clarification.time = omegaup.OmegaUp.remoteTime(
                                   clarification.time * 1000);
                             }
                             return data;
@@ -202,7 +200,7 @@ export default {
     listAssignments: _call(
         '/api/course/listAssignments/',
         function(result) {
-          // We cannot use omegaup.OmegaUp.time() because admins need to
+          // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
           // be able to get the unmodified times.
           for (var i = 0; i < result.assignments.length; ++i) {
             var assignment = result.assignments[i];
@@ -235,8 +233,8 @@ export default {
                            function(result) {
                              for (var problem of result.problems) {
                                for (var run of problem.runs) {
-                                 run.time =
-                                     omegaup.OmegaUp.time(run.time * 1000);
+                                 run.time = omegaup.OmegaUp.remoteTime(
+                                     run.time * 1000);
                                }
                              }
                              return result;
@@ -343,7 +341,7 @@ export default {
                           function(data) {
                             for (var idx in data.clarifications) {
                               var clarification = data.clarifications[idx];
-                              clarification.time = omegaup.OmegaUp.time(
+                              clarification.time = omegaup.OmegaUp.remoteTime(
                                   clarification.time * 1000);
                             }
                             return data;
@@ -394,7 +392,7 @@ export default {
 
     status: _call('/api/run/status/',
                   function(data) {
-                    data.time = omegaup.OmegaUp.time(data.time * 1000);
+                    data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
                     return data;
                   }),
   },
@@ -457,9 +455,9 @@ export default {
 
     profile: _call('/api/user/profile/',
                    function(data) {
-                     data.userinfo.birth_date =
-                         omegaup.OmegaUp.time(data.userinfo.birth_date * 1000);
-                     data.userinfo.graduation_date = omegaup.OmegaUp.time(
+                     data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
+                         data.userinfo.birth_date * 1000);
+                     data.userinfo.graduation_date = omegaup.OmegaUp.remoteTime(
                          data.userinfo.graduation_date * 1000);
                      return data;
                    }),

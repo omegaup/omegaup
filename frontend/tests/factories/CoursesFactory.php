@@ -170,7 +170,7 @@ class CoursesFactory {
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
                         RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $runResponsePA['guid']);
-                        $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
+                        $expectedScores[$studentUsername][$assignmentAlias] += 50;
 
                         if (($s + $p) % 3 == 0) {
                             // 100 pts run
@@ -182,7 +182,7 @@ class CoursesFactory {
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));
                             RunsFactory::gradeRun(null /*runData*/, 1, 'AC', null, $runResponseAC['guid']);
-                            $expectedScores[$studentUsername][$assignmentAlias] += 0.5;
+                            $expectedScores[$studentUsername][$assignmentAlias] += 50;
                         }
                     }
                 }

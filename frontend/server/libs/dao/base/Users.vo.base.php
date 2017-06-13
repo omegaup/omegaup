@@ -173,7 +173,7 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
+      * @var char(3)
       */
     public $state_id;
 
