@@ -104,7 +104,7 @@ class CoursesDAO extends CoursesDAOBase {
                 LEFT JOIN (
                     SELECT bpr.alias, bpr.user_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
