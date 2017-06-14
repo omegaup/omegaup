@@ -931,7 +931,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
                 ]
             );
         }
