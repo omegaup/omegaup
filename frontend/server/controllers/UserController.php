@@ -887,14 +887,14 @@ class UserController extends Controller {
             $keys =  [
                 'OVI17' => 100
             ];
-        } elseif ($r['contest_type'] == 'PROFEST') {
+        } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'PROFEST-2016' => 18
+                'UDCCUP-2017' => 40
             ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
             if ($r['current_user']->username != 'licgerman-yahoo'
@@ -931,7 +931,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
                 ]
             );
         }
