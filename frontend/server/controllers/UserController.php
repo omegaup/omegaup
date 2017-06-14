@@ -887,14 +887,14 @@ class UserController extends Controller {
             $keys =  [
                 'OVI17' => 100
             ];
-        } elseif ($r['contest_type'] == 'PROFEST') {
+        } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'PROFEST-2016' => 18
+                'UDCCUP-2017' => 40
             ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
             if ($r['current_user']->username != 'licgerman-yahoo'
