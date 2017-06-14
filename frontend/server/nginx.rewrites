@@ -79,3 +79,4 @@ rewrite ^/profile/?$ /profile.php last;
 rewrite ^/profile/edit/?$ /profileedit.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/rank/?$ /rank.php last;
+rewrite ^/schoolsrank/?$ /schoolsrank.php last;

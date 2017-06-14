@@ -77,6 +77,11 @@
 			<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
 			<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
 			<div id="omegaup-schools-rank"></div>
+			<div class="container-fluid">
+				<div class="col-xs-12 vertical-padding">
+					<a href="/schoolsrank/">{#rankViewFull#}</a>
+				</div>
+			</div>
 		</div>
 
 		<div class="panel panel-default">
