@@ -12,9 +12,11 @@ try {
     } else {
         $payload = [
         'nominations' => QualityNominationController::apiList(new Request([]))['nominations'],
-        'currentUser' => $session['user']->username,
         'myView' => false,
         ];
+        if ($session['valid']) {
+            $payload['currentUser'] = $session['user']->username;
+        }
         $template = '../templates/quality.nomination.list.tpl';
     }
     $smarty->assign('payload', $payload);

@@ -1,6 +1,7 @@
 <?php
 
 require_once('../server/bootstrap.php');
+UITools::redirectToLoginIfNotLoggedIn();
 
 try {
     $payload = [

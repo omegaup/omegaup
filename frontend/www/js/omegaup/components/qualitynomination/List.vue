@@ -76,11 +76,11 @@ export default {
   },
   methods: {
     problemUrl: function(problemAlias) {
-      return '/arena/problem/' + problemAlias + '#problems';
+      return '/arena/problem/' + problemAlias + '/';
     },
-    userUrl: function(username) { return '/profile/' + username;},
+    userUrl: function(username) { return '/profile/' + username + '/';},
     nominationDetailsUrl: function(nominationId) {
-      return '/nomination/' + nominationId;
+      return '/nomination/' + nominationId + '/';
     }
   }
 };
