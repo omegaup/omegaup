@@ -179,6 +179,8 @@ export default {
 
     adminDetails: _call('/api/course/adminDetails/', _convertTimes),
 
+    assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
+
     create: _call('/api/course/create/'),
 
     details: _call('/api/course/details/', _convertTimes),
