@@ -1,7 +1,8 @@
 <template>
   <div class="panel panel-default omegaup-schools-rank">
     <div class="panel-heading">
-      <h3 class="panel-title">{{ UI.formatString(T.schoolRankHeader, {count: rank?rank.length:0}) }}</h3>
+      <h3 class="panel-title">{{ UI.formatString(T.schoolRankHeader, {count: rank?rank.length:0})
+      }}</h3>
     </div>
     <div class="panel-body no-padding">
       <div class="table-responsive">
