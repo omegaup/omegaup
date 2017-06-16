@@ -351,10 +351,10 @@ export class Arena {
 
   setupPolls() {
     var self = this;
+    self.refreshRanking();
     if (!self.options.contestAlias) {
       return;
     }
-    self.refreshRanking();
     self.refreshClarifications();
 
     if (!self.socket) {
@@ -539,9 +539,18 @@ export class Arena {
   refreshRanking() {
     var self = this;
 
-    API.Contest.scoreboard({contest_alias: self.options.contestAlias})
-        .then(self.rankingChange.bind(self))
-        .fail(UI.ignoreError);
+    if (self.options.contestAlias) {
+      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
+          .then(self.rankingChange.bind(self))
+          .fail(UI.ignoreError);
+    } else if (self.options.assignmentAlias) {
+      API.Course.assignmentScoreboard({
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias
+                })
+          .then(self.rankingChange.bind(self))
+          .fail(UI.ignoreError);
+    }
   }
 
   rankingChange(data) {

@@ -27,7 +27,7 @@ export default {
           defaultDate: self.value,
         })
         .change(function(e) {
-          self.$emit('input', $(self.$el).data('datetimepicker').date);
+          self.$emit('input', $(self.$el).data('datetimepicker').getDate());
         });
     $(this.$el).data('datetimepicker').setDate(this.value);
   },
