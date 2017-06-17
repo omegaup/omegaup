@@ -1218,8 +1218,7 @@ class UserController extends Controller {
         }
 
         // Get the profile of the coder of the month
-        $r['user'] = $user;
-        $response = self::getProfile($r);
+        $response = self::getProfileImpl($user);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
