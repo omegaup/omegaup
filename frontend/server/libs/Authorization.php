@@ -208,8 +208,9 @@ class Authorization {
         return !is_null($groupUsers) && count($groupUsers) > 0;
     }
 
-    public static function clearSystemAdminCache() {
+    public static function clearCacheForTesting() {
         self::$is_system_admin = null;
+        self::$quality_reviewer_group = null;
     }
 
     public static function canSubmitToProblemset($user_id, $problemset) {
