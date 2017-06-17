@@ -229,7 +229,6 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
             'currentUserInfo',
             [
                 'username' => $session['user']->username,
-                'email' => $session['email'],
             ]
         );
 
