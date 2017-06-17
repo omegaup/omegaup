@@ -1060,7 +1060,7 @@ class UserController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    private static function getProfileImpl(Users $user) {
+    private static function getProfileImpl(Users $user, $includeEmail = false) {
         $response = [];
         $response['userinfo'] = [];
         $response['problems'] = [];
@@ -1083,10 +1083,11 @@ class UserController extends Controller {
         }
 
         try {
-            $emailDao = EmailsDAO::getByPK($user->main_email_id);
-            $email = null;
-            if (!is_null($email)) {
-                $email = $emailDao->email;
+            $email = EmailsDAO::getByPK($user->main_email_id);
+            if (is_null($email)) {
+                $response['userinfo']['email'] = null;
+            } else {
+                $response['userinfo']['email'] = $email->email;
             }
 
             $country = CountriesDAO::getByPK($user->country_id);
@@ -1104,7 +1105,7 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($email) . '?s=92';
+        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
 
         return $response;
     }
@@ -1217,7 +1218,8 @@ class UserController extends Controller {
         }
 
         // Get the profile of the coder of the month
-        $response = self::getProfileImpl($user);
+        $r['user'] = $user;
+        $response = self::getProfile($r);
 
         $response['status'] = 'ok';
         return $response;
