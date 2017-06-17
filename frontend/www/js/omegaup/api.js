@@ -373,7 +373,29 @@ export default {
     update: _call('/api/problem/update/'),
   },
 
-  QualityNomination: {create: _call('/api/qualitynomination/create/')},
+  QualityNomination: {
+    create: _call('/api/qualitynomination/create/'),
+
+    details: _call('/api/qualitynomination/details/'),
+
+    list: _call('/api/qualitynomination/list/',
+                function(result) {
+                  for (var idx in result.nominations) {
+                    var nomination = result.nominations[idx];
+                    omegaup.OmegaUp.convertTimes(nomination);
+                  }
+                  return result;
+                }),
+
+    myList: _call('/api/qualitynomination/mylist/',
+                  function(result) {
+                    for (var idx in result.nominations) {
+                      var nomination = result.nominations[idx];
+                      omegaup.OmegaUp.convertTimes(nomination);
+                    }
+                    return result;
+                  }),
+  },
 
   Reset: {
     create: _call('/api/reset/create/'),

@@ -221,10 +221,7 @@ class QualityNominationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(Request $r) {
-        $qualityReviewerGroup = GroupsDAO::findByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        if (!Authorization::isGroupMember($r['current_user_id'], $qualityReviewerGroup)) {
+        if (!Authorization::isQualityReviewer($r['current_user_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }

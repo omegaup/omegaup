@@ -156,6 +156,9 @@ export let OmegaUp = {
           },
 
       convertTimes: function(item) {
+        if (item.hasOwnProperty('time')) {
+          item.time = OmegaUp.remoteTime(item.time * 1000);
+        }
         if (item.hasOwnProperty('start_time')) {
           item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
         }

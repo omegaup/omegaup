@@ -8,6 +8,9 @@ class Authorization {
     // Cache for the system admin privilege. This is used sort of frequently.
     private static $is_system_admin = null;
 
+    // Cache for system group for quality reviewers.
+    private static $quality_reviewer_group = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -160,6 +163,18 @@ class Authorization {
         return self::$is_system_admin;
     }
 
+    public static function isQualityReviewer($user_id) {
+        if (self::$quality_reviewer_group == null) {
+            self::$quality_reviewer_group = GroupsDAO::findByAlias(
+                Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $user_id,
+            self::$quality_reviewer_group
+        );
+    }
+
     public static function isGroupAdmin($user_id, Groups $group) {
         return self::isAdmin($user_id, $group);
     }
@@ -193,8 +208,9 @@ class Authorization {
         return !is_null($groupUsers) && count($groupUsers) > 0;
     }
 
-    public static function clearSystemAdminCache() {
+    public static function clearCacheForTesting() {
         self::$is_system_admin = null;
+        self::$quality_reviewer_group = null;
     }
 
     public static function canSubmitToProblemset($user_id, $problemset) {
