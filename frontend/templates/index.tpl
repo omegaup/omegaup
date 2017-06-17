@@ -1,6 +1,12 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
+
+<script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
+<script type="text/json" id="current-user-payload">{$currentUserInfo|json_encode}</script>
+<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
+<div id="coder-of-the-month-notice"></div>
+
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-default">
