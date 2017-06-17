@@ -46,6 +46,7 @@ omegaup.OmegaUp.loadTranslations({
 	clarificationEmailSubject: "[omegaUp] New clarification for problem %(problem_name)",
 	clarificationNotFound: "Clarification not found",
 	coderOfTheMonthFullList: "See full list",
+	coderOfTheMonthNotice: "Hi %(username)! Congratulations on winning the Coder of the Month! We have a prize for you, please contact us at mentores@omegaup.org",
 	codersOfTheMonth: "Coders of the Month",
 	codersOfTheMonthDate: "Date",
 	codersOfTheMonthUser: "Username",

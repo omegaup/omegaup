@@ -42,6 +42,7 @@ clarificationEmailBody = "<p>Hola!</p><p>El usuario <strong><a href=\"https://om
 clarificationEmailSubject = "[omegaUp] Nueva clarificación para el problema %(problem_name)"
 clarificationNotFound = "Clarificacion no encontrada"
 coderOfTheMonthFullList = "Ver listado completo"
+coderOfTheMonthNotice = "¡Hola %(username)! ¡Felicidades por ser el ganador Coder del Mes! Tenemos un premio para tí, por favor contáctanos en mentores@omegaup.org"
 codersOfTheMonth = "Coders del Mes"
 codersOfTheMonthDate = "Fecha"
 codersOfTheMonthUser = "Usuario"

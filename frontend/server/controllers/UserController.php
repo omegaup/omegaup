@@ -1083,11 +1083,10 @@ class UserController extends Controller {
         }
 
         try {
-            $email = EmailsDAO::getByPK($user->main_email_id);
-            if (is_null($email)) {
-                $response['userinfo']['email'] = null;
-            } else {
-                $response['userinfo']['email'] = $email->email;
+            $emailDao = EmailsDAO::getByPK($user->main_email_id);
+            $email = null;
+            if (!is_null($email)) {
+                $email = $emailDao->email;
             }
 
             $country = CountriesDAO::getByPK($user->country_id);
@@ -1105,7 +1104,7 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
+        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($email) . '?s=92';
 
         return $response;
     }

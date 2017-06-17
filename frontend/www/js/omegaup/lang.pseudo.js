@@ -46,6 +46,7 @@ omegaup.OmegaUp.loadTranslations({
 	clarificationEmailSubject: "([0m3gaUp] N3w c1arifica7i0n f0r pr0b13m %(problem_name))",
 	clarificationNotFound: "(C1arifica7i0n n07 f0und)",
 	coderOfTheMonthFullList: "(S33 fu11 1i57)",
+	coderOfTheMonthNotice: "(Hi %(username)! C0ngra7u1a7i0n5 0n winning 7h3 C0d3r 0f 7h3 M0n7h! W3 hav3 a priz3 f0r y0u, p13a53 c0n7ac7 u5 a7 m3n70r35@0m3gaup.0rg)",
 	codersOfTheMonth: "(C0d3r5 0f 7h3 M0n7h)",
 	codersOfTheMonthDate: "(Da73)",
 	codersOfTheMonthUser: "(U53rnam3)",
