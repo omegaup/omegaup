@@ -1,7 +1,7 @@
 <template>
   <div class="alert alert-warning"
        id="notice"
-       v-if="currentUsername &amp;&amp; coderUsername == currentUsername">
+       v-if="show">
     {{ UI.formatString(T.coderOfTheMonthNotice, {username: coderUsername}) }}
   </div>
 </template>
@@ -12,6 +12,12 @@ import UI from '../../ui.js';
 
 export default {
   props: {coderUsername: String, currentUsername: String},
+  computed: {
+    show() {
+      return this.currentUsername && this.coderUsername &&
+             this.coderUsername == this.currentUsername;
+    }
+  },
   data: function() { return {T: T, UI: UI};},
 };
 </script>

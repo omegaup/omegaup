@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('coder-of-the-month-notice', {
         props: {
-          coderUsername: coderPayload.username,
+          coderUsername: (coderPayload ? coderPayload.username : null),
           currentUsername:
               (currentUserPayload ? currentUserPayload.username : null)
         },
