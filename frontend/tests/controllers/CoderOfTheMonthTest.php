@@ -39,6 +39,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $response = UserController::apiCoderOfTheMonth(new Request());
 
         $this->assertEquals($user->username, $response['userinfo']['username']);
+        $this->assertFalse(array_key_exists('email', $response['userinfo']));
     }
 
     public function testCoderOfTheMonthList() {

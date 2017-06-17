@@ -1,6 +1,12 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
+
+<script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
+<script type="text/json" id="current-user-payload">{$currentUserInfo|json_encode}</script>
+<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
+<div id="coder-of-the-month-notice"></div>
+
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-default">
@@ -16,6 +22,25 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-6">
+				{include file='rank.table.tpl' length=5 is_index=true}
+			</div>
+
+			<div class="col-md-6">
+				<div class="panel panel-default">
+					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
+					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
+					<div id="omegaup-schools-rank"></div>
+					<div class="container-fluid">
+						<div class="col-xs-12 vertical-padding">
+							<a href="/schoolsrank/">{#rankViewFull#}</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
 	</div>
 
 	<div class="col-md-4">
@@ -30,6 +55,7 @@
 					style="width:300px; height:20px;"></iframe>
 			</div>
 		</div>
+
 		{if isset($coderOfTheMonthData)}
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -69,14 +95,6 @@
 			</div>
 			<ul class="list-group" id="next-contests-list">
 		    </ul>
-		</div>
-
-		{include file='rank.table.tpl' length=5 is_index=true}
-
-		<div class="panel panel-default">
-			<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-			<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
-			<div id="omegaup-schools-rank"></div>
 		</div>
 
 		<div class="panel panel-default">
