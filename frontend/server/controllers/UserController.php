@@ -1221,6 +1221,9 @@ class UserController extends Controller {
         $r['user'] = $user;
         $response = self::getProfile($r);
 
+        // But avoid divulging the email in the response.
+        unset($response['userinfo']['email']);
+
         $response['status'] = 'ok';
         return $response;
     }
