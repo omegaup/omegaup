@@ -42,14 +42,41 @@
               <label class="control-label">{{ T.qualityFormTags }} <select class="form-control"
                       multiple
                       v-model="tags">
+                <option value="arboles">
+                  {{ T.problemTopicTrees }}
+                </option>
                 <option value="busqueda-binaria">
                   {{ T.problemTopicBinarySearch }}
+                </option>
+                <option value="busquedas">
+                  {{ T.problemTopicSearch }}
+                </option>
+                <option value="flujo-maximo">
+                  {{ T.problemTopicMaxFlow }}
+                </option>
+                <option value="fuerza-bruta">
+                  {{ T.problemTopicBruteForce }}
                 </option>
                 <option value="grafos">
                   {{ T.problemTopicGraphTheory }}
                 </option>
                 <option value="ordenamiento">
                   {{ T.problemTopicSorting }}
+                </option>
+                <option value="pilas-y-colas">
+                  {{ T.problemTopicStackQueue }}
+                </option>
+                <option value="programacion-dinamica">
+                  {{ T.problemTopicDP }}
+                </option>
+                <option value="simulacion">
+                  {{ T.problemTopicSimulation }}
+                </option>
+                <option value="teoria-de-numeros">
+                  {{ T.problemTopicNumberTheory }}
+                </option>
+                <option value="otro">
+                  {{ T.problemTopicOther }}
                 </option>
               </select></label>
             </div>
