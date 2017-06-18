@@ -51,6 +51,33 @@
                 <option value="ordenamiento">
                   {{ T.problemTopicSorting }}
                 </option>
+                <option value="teoria-de-numeros">
+                  {{ T.problemTopicNumberTheory }}
+                </option>
+                <option value="busquedas">
+                  {{ T.problemTopicSearch }}
+                </option>
+                <option value="fuerza-bruta">
+                  {{ T.problemTopicBruteForce }}
+                </option>
+                <option value="simulacion">
+                  {{ T.problemTopicSimulation }}
+                </option>
+                <option value="programacion-dinamica">
+                  {{ T.problemTopicDP }}
+                </option>
+                <option value="flujo-maximo">
+                  {{ T.problemTopicMaxFlow }}
+                </option>
+                <option value="pilas-y-colas">
+                  {{ T.problemTopicStackQueue }}
+                </option>
+                <option value="arboles">
+                  {{ T.problemTopicTrees }}
+                </option>
+                <option value="otro">
+                  {{ T.problemTopicOther }}
+                </option>
               </select></label>
             </div>
             <div class="form-group">
