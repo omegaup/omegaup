@@ -7,6 +7,7 @@
 <script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
 <div id="coder-of-the-month-notice"></div>
 
+<div class="container-fluid">
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-default">
@@ -102,6 +103,7 @@
 		</div>
 	</div>
 </div>
+</div><!-- container -->
 
 <script type="text/javascript" src="{version_hash src="/js/index.js"}"></script>
 
