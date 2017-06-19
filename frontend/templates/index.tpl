@@ -3,7 +3,11 @@
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
+{if $LOGGED_IN eq '1'}
 <script type="text/json" id="current-user-payload">{$currentUserInfo|json_encode}</script>
+{else}
+<script type="text/json" id="current-user-payload">null</script>
+{/if}
 <script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
 <div id="coder-of-the-month-notice"></div>
 
