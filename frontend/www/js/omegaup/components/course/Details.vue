@@ -48,7 +48,7 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseNewFormShowScoreboardDesc"></span></span>
-            <div class="form-control container">
+            <div class="form-control container-fluid">
               <label class="radio-inline"><input type="radio"
                      v-model="showScoreboard"
                      value="1">{{ T.wordsYes }}</label> <label class="radio-inline"><input type=
@@ -59,7 +59,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container">
+          <div class="form-group container-fluid">
             <label>{{ T.courseNewFormDescription }}
             <textarea class="form-control"
                       cols="30"
