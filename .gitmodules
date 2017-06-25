@@ -2,12 +2,10 @@
 	path = frontend/server/libs/third_party/adodb
 	url = https://github.com/ADOdb/ADOdb.git
 	shallow = true
-	branch = v5.20.9
 [submodule "frontend/server/libs/third_party/facebook-php-graph-sdk"]
 	path = frontend/server/libs/third_party/facebook-php-graph-sdk
 	url = https://github.com/facebook/php-graph-sdk.git
 	shallow = true
-	branch = 5.4.4
 [submodule "frontend/server/libs/google-api-php-client"]
 	path = frontend/server/libs/third_party/google-api-php-client
 	url = https://github.com/google/google-api-php-client
@@ -20,12 +18,10 @@
 	path = frontend/server/libs/third_party/phpmailer
 	url = https://github.com/PHPMailer/PHPMailer.git
 	shallow = true
-	branch = v5.2.21
 [submodule "frontend/server/libs/smarty"]
 	path = frontend/server/libs/third_party/smarty
 	url = https://github.com/smarty-php/smarty.git
 	shallow = true
-	branch = v3.1.24
 [submodule "frontend/www/karel.js"]
 	path = frontend/www/karel.js
 	url = https://github.com/omegaup/karel.js.git
@@ -39,7 +35,6 @@
 	path = frontend/www/third_party/js/mathjax
 	url = https://github.com/mathjax/MathJax.git
 	shallow = true
-	branch = v2.6.0
 [submodule "frontend/www/js/pagedown"]
 	path = frontend/www/third_party/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
