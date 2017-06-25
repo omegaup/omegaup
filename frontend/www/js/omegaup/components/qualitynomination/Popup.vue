@@ -6,7 +6,7 @@
             v-show="showForm">
         <button class="close"
               v-on:click="onHide">×</button>
-        <div class="container">
+        <div class="container-fluid">
           <template v-if="currentView == 'question'">
             <h1>{{ T.qualityFormCongrats }}</h1>
             <div class="question-text">
