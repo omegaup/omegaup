@@ -12,7 +12,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm-3.20
+  - hhvm-3.18
 
 env:
   - DB=mysql
@@ -34,16 +34,19 @@ git:
 
 before_install:
   - |
+      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
+         (echo hhvm.php7.all=1 >> /etc/hhvm/php.ini)
+  - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule update --init \
-          frontend/server/libs/third_party/smarty \
-          frontend/server/libs/third_party/phpmailer \
-          frontend/server/libs/third_party/log4php \
-          frontend/server/libs/third_party/adodb \
-          frontend/server/libs/third_party/facebook-php-graph-sdk \
-          frontend/server/libs/third_party/google-api-php-client
+         frontend/server/libs/third_party/smarty \
+         frontend/server/libs/third_party/phpmailer \
+         frontend/server/libs/third_party/log4php \
+         frontend/server/libs/third_party/adodb \
+         frontend/server/libs/third_party/facebook-php-graph-sdk \
+         frontend/server/libs/third_party/google-api-php-client
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || git submodule update --init \
-          stuff/hook_tools
+         stuff/hook_tools
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || pip install --user six
   - |
@@ -63,17 +66,17 @@ before_script:
   - for _ in `seq 30`; do mysql -e ';' && break || sleep 1 ; done
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
-          mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
+         mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
-          mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
+         mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
-          python3 stuff/db-migrate.py --username=travis --password= \
-          migrate --databases=omegaup-test
+         python3 stuff/db-migrate.py --username=travis --password= \
+         migrate --databases=omegaup-test
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
-          mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+         mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
          (pear install pear/PHP_CodeSniffer-2.9.1 && phpenv rehash && \
@@ -82,16 +85,16 @@ before_script:
 script:
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
-          phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
-          frontend/tests/phpunit.xml frontend/tests/controllers
+         phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
+         frontend/tests/phpunit.xml frontend/tests/controllers
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || (yarn install && yarn build && yarn test)
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-          python3 stuff/i18n.py --validate < /dev/null
+         python3 stuff/i18n.py --validate < /dev/null
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
-          python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
+         python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 
 notifications:
   slack:
