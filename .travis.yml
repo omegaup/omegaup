@@ -41,9 +41,7 @@ before_install:
           frontend/server/libs/third_party/adodb \
           frontend/server/libs/third_party/facebook-php-graph-sdk \
           frontend/server/libs/third_party/google-api-php-client
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule foreach \
-          'git fetch --tags'
+  - ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule foreach "git fetch --tags"
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule update --init \
           frontend/server/libs/third_party/smarty \
