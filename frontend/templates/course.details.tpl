@@ -36,7 +36,7 @@
 			</div>
 			<div class="">
 				<a style="text-decoration:none"><h1 id="title" data-bind="text: name"></h1></a>
-				<p id="description" data-bind="text: description" class='container-fluid'></p>
+				<p id="description" data-bind="text: description" class="container-fluid"></p>
 			</div>
 		</div>
 		<div class="panel-body table-responsive">
