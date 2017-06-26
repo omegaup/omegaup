@@ -52,7 +52,7 @@ for ($i = 0; $i < 256; $i++) {
 Utils::CleanupDB();
 
 // Clean APC cache
-apc_clear_cache('user');
+Cache::clearCacheForTesting();
 
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;

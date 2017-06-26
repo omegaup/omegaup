@@ -79,18 +79,21 @@ class SchoolRankTest extends OmegaupTestCase {
         // 1 in school #2 but PA, 1 with no school.
         $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
 
+        $rankViewer = UserFactory::createUser();
+        $rankViewerLogin = self::login($rankViewer);
+        $originalResponse = SchoolController::apiRank(new Request([
+            'auth_token' => $rankViewerLogin->auth_token,
+        ]));
+
         $this->createRunsWithSchool($schoolsData);
 
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
 
-        // Call API
-        $rankViewer = UserFactory::createUser();
-        $rankViewerLogin = self::login($rankViewer);
         $response = SchoolController::apiRank(new Request([
             'auth_token' => $rankViewerLogin->auth_token,
             'start_time' => $start_time,
-            'end_time' => $end_time
+            'finish_time' => $end_time
         ]));
 
         $this->assertEquals('ok', $response['status']);
@@ -103,6 +106,7 @@ class SchoolRankTest extends OmegaupTestCase {
         ]));
 
         // start_time/finish_time path should not be the one cached..
+        $this->assertEquals($originalResponse, $cachedResponse);
         $this->assertNotEquals($response, $cachedResponse);
     }
 }
