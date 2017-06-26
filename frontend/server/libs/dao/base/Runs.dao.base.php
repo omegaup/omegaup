@@ -83,13 +83,13 @@ abstract class RunsDAOBase extends DAO {
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` from Runs';
+        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
         }
-        global $conn;
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
@@ -195,9 +195,10 @@ abstract class RunsDAOBase extends DAO {
             $clauses[] = '`judged_by` = ?';
             $params[] = $Runs->judged_by;
         }
+        global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysql_real_escape_string($value);
+                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
                 $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
@@ -207,13 +208,12 @@ abstract class RunsDAOBase extends DAO {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`user_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`test`, `Runs`.`judged_by` FROM `Runs`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
         }
         // Add LIMIT offset, rowcount if rowcount is set
         if (!is_null($rowcount)) {
             $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
         }
-        global $conn;
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {

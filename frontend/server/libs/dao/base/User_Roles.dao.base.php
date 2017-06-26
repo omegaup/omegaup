@@ -83,13 +83,13 @@ abstract class UserRolesDAOBase extends DAO {
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` from User_Roles';
+        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
         }
-        global $conn;
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
@@ -139,9 +139,10 @@ abstract class UserRolesDAOBase extends DAO {
             $clauses[] = '`acl_id` = ?';
             $params[] = $User_Roles->acl_id;
         }
+        global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysql_real_escape_string($value);
+                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
                 $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
@@ -151,13 +152,12 @@ abstract class UserRolesDAOBase extends DAO {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` FROM `User_Roles`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
         }
         // Add LIMIT offset, rowcount if rowcount is set
         if (!is_null($rowcount)) {
             $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
         }
-        global $conn;
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {

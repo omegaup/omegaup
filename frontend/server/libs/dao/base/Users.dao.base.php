@@ -83,13 +83,13 @@ abstract class UsersDAOBase extends DAO {
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` from Users';
+        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
         }
-        global $conn;
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
@@ -215,9 +215,10 @@ abstract class UsersDAOBase extends DAO {
             $clauses[] = '`in_mailing_list` = ?';
             $params[] = $Users->in_mailing_list;
         }
+        global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysql_real_escape_string($value);
+                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
                 $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
@@ -227,13 +228,12 @@ abstract class UsersDAOBase extends DAO {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` FROM `Users`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
         }
         // Add LIMIT offset, rowcount if rowcount is set
         if (!is_null($rowcount)) {
             $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
         }
-        global $conn;
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
