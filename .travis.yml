@@ -12,7 +12,7 @@ branches:
 
 php:
   - 7.0
-  - hhvm-3.18
+  - 7.1
 
 env:
   - DB=mysql
@@ -34,7 +34,7 @@ git:
 
 before_install:
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || git submodule update --init \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || git submodule update --init \
          frontend/server/libs/third_party/smarty \
          frontend/server/libs/third_party/phpmailer \
          frontend/server/libs/third_party/log4php \
@@ -42,17 +42,17 @@ before_install:
          frontend/server/libs/third_party/facebook-php-graph-sdk \
          frontend/server/libs/third_party/google-api-php-client
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || git submodule update --init \
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || git submodule update --init \
          stuff/hook_tools
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || pip install --user six
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || pip install --user six
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || pip install --user \
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || pip install --user \
          https://github.com/google/closure-linter/zipball/master
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || nvm install 6.9.1
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || nvm install 6.9.1
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || npm install -g yarn
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || npm install -g yarn
 
 cache:
   directories:
@@ -62,35 +62,35 @@ before_script:
   # Workaround for Travis' flaky MySQL connection.
   - for _ in `seq 30`; do mysql -e ';' && break || sleep 1 ; done
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
          mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
          mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
          python3 stuff/db-migrate.py --username=travis --password= \
          migrate --databases=omegaup-test
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
          mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
          (pear install pear/PHP_CodeSniffer-2.9.1 && phpenv rehash && \
           echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini)
 
 script:
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
          phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
          frontend/tests/phpunit.xml frontend/tests/controllers
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || (yarn install && yarn build && yarn test)
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || (yarn install && yarn build && yarn test)
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
          python3 stuff/i18n.py --validate < /dev/null
   - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == hhvm* ]] || \
+      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
          python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 
 notifications:
