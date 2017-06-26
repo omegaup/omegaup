@@ -17,23 +17,23 @@ abstract class CacheAdapter {
         return CacheAdapter::$sInstance;
     }
 
-    abstract public function add(string $key, $var, $ttl = 0);
-    abstract public function cas(string $key, int $old, int $new);
+    abstract public function add($key, $var, $ttl = 0);
+    abstract public function cas($key, $old, $new);
     abstract public function clear();
-    abstract public function delete(string $key);
-    abstract public function fetch(string $key);
-    abstract public function store(string $key, $var, $ttl = 0);
+    abstract public function delete($key);
+    abstract public function fetch($key);
+    abstract public function store($key, $var, $ttl = 0);
 }
 
 /**
  * Implementation of CacheAdapter that uses the real APC functions.
  */
 class APCCacheAdapter extends CacheAdapter {
-    public function add(string $key, $var, $ttl = 0) {
+    public function add($key, $var, $ttl = 0) {
         return apc_add($key, $var, $ttl);
     }
 
-    public function cas(string $key, int $old, int $new) {
+    public function cas($key, $old, $new) {
         return apc_cas($key, $old, $new);
     }
 
@@ -41,15 +41,15 @@ class APCCacheAdapter extends CacheAdapter {
         apc_clear_cache('user');
     }
 
-    public function delete(string $key) {
+    public function delete($key) {
         return apc_delete($key);
     }
 
-    public function fetch(string $key) {
+    public function fetch($key) {
         return apc_fetch($key);
     }
 
-    public function store(string $key, $var, $ttl = 0) {
+    public function store($key, $var, $ttl = 0) {
         return apc_store($key, $var, $ttl);
     }
 }
@@ -61,7 +61,7 @@ class APCCacheAdapter extends CacheAdapter {
 class InProcessCacheAdapter extends CacheAdapter {
     private $cache = [];
 
-    public function add(string $key, $var, $ttl = 0) {
+    public function add($key, $var, $ttl = 0) {
         if (array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -69,7 +69,7 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function cas(string $key, int $old, int $new) {
+    public function cas($key, $old, $new) {
         if (!array_key_exists($key, $this->cache) || $this->cache[$key] !== $old) {
             return false;
         }
@@ -81,7 +81,7 @@ class InProcessCacheAdapter extends CacheAdapter {
         $this->cache = [];
     }
 
-    public function delete(string $key) {
+    public function delete($key) {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -89,14 +89,14 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function fetch(string $key) {
+    public function fetch($key) {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
         return $this->cache[$key];
     }
 
-    public function store(string $key, $var, $ttl = 0) {
+    public function store($key, $var, $ttl = 0) {
         $this->cache[$key] = $var;
         return true;
     }
