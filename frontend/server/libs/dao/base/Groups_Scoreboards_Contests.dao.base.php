@@ -83,13 +83,13 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO {
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
         $sql = 'SELECT `Groups_Scoreboards_Contests`.`group_scoreboard_id`, `Groups_Scoreboards_Contests`.`contest_id`, `Groups_Scoreboards_Contests`.`only_ac`, `Groups_Scoreboards_Contests`.`weight` from Groups_Scoreboards_Contests';
+        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orden) . '` ' . mysql_real_escape_string($tipo_de_orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
         }
-        global $conn;
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
@@ -143,9 +143,10 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO {
             $clauses[] = '`weight` = ?';
             $params[] = $Groups_Scoreboards_Contests->weight;
         }
+        global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysql_real_escape_string($value);
+                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
                 $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
             }
         }
@@ -155,13 +156,12 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO {
         $sql = 'SELECT `Groups_Scoreboards_Contests`.`group_scoreboard_id`, `Groups_Scoreboards_Contests`.`contest_id`, `Groups_Scoreboards_Contests`.`only_ac`, `Groups_Scoreboards_Contests`.`weight` FROM `Groups_Scoreboards_Contests`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysql_real_escape_string($orderBy) . '` ' . mysql_real_escape_string($orden);
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
         }
         // Add LIMIT offset, rowcount if rowcount is set
         if (!is_null($rowcount)) {
             $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
         }
-        global $conn;
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {

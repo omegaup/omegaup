@@ -1,6 +1,108 @@
 <?php
 
 /**
+ * A class that abstracts away support for APC user cache for PHP7 / Travis.
+ */
+abstract class CacheAdapter {
+    private static $sInstance = null;
+
+    public static function getInstance() {
+        if (CacheAdapter::$sInstance == null) {
+            if (function_exists('apc_clear_cache')) {
+                CacheAdapter::$sInstance = new APCCacheAdapter();
+            } else {
+                CacheAdapter::$sInstance = new InProcessCacheAdapter();
+            }
+        }
+        return CacheAdapter::$sInstance;
+    }
+
+    abstract public function add(string $key, $var, int $ttl = 0);
+    abstract public function cas(string $key, int $old, int $new);
+    abstract public function clear();
+    abstract public function delete(string $key);
+    abstract public function fetch(string $key);
+    abstract public function store(string $key, $var, int $ttl = 0);
+}
+
+/**
+ * Implementation of CacheAdapter that uses the real APC functions.
+ */
+class APCCacheAdapter extends CacheAdapter {
+    public function add(string $key, $var, int $ttl = 0) {
+        return apc_add($key, $var, $ttl);
+    }
+
+    public function cas(string $key, int $old, int $new) {
+        return apc_cas($key, $old, $new);
+    }
+
+    public function clear() {
+        apc_clear_cache('user');
+    }
+
+    public function delete(string $key) {
+        return apc_delete($key);
+    }
+
+    public function fetch(string $key) {
+        return apc_fetch($key);
+    }
+
+    public function store(string $key, $var, int $ttl = 0) {
+        return apc_store($key, $var, $ttl);
+    }
+}
+
+/**
+ * Implementation of CacheAdapter that uses an array to back the cache. Does
+ * not survive across test function invocations.
+ */
+class InProcessCacheAdapter extends CacheAdapter {
+    private $cache = [];
+
+    public function add(string $key, $var, int $ttl = 0) {
+        if (array_key_exists($key, $this->cache)) {
+            return false;
+        }
+        $this->cache[$key] = $var;
+        return true;
+    }
+
+    public function cas(string $key, int $old, int $new) {
+        if (!array_key_exists($key, $this->cache) || $this->cache[$key] !== $old) {
+            return false;
+        }
+        $this->cache[$key] = $new;
+        return true;
+    }
+
+    public function clear() {
+        $this->cache = [];
+    }
+
+    public function delete(string $key) {
+        if (!array_key_exists($key, $this->cache)) {
+            return false;
+        }
+        unset($this->cache[$key]);
+        return true;
+    }
+
+    public function fetch(string $key) {
+        if (!array_key_exists($key, $this->cache)) {
+            return false;
+        }
+        return $this->cache[$key];
+    }
+
+    public function store(string $key, $var, int $ttl = 0) {
+        $this->cache[$key] = $var;
+        return true;
+    }
+}
+
+/**
  * Maneja el acceso al cache (usando apc user cache)
  *
  */
@@ -58,11 +160,11 @@ class Cache {
      */
     public function set($value, $timeout = APC_USER_CACHE_TIMEOUT) {
         if ($this->enabled === true) {
-            if (apc_store($this->key, $value, $timeout) === true) {
-                $this->log->debug('apc_stored successful for key: ' . $this->key);
+            if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) === true) {
+                $this->log->debug('Cache stored successful for key: ' . $this->key);
                 return true;
             } else {
-                $this->log->debug('apc_store failed for key: ' . $this->key);
+                $this->log->debug('Cache store failed for key: ' . $this->key);
             }
         }
         return false;
@@ -77,7 +179,7 @@ class Cache {
      */
     public function delete() {
         if ($this->enabled === true) {
-            if (apc_delete($this->key) === true) {
+            if (CacheAdapter::getInstance()->delete($this->key) === true) {
                 return true;
             } else {
                 $this->log->warn('Failed to invalidate cache for key: ' . $this->key);
@@ -96,7 +198,7 @@ class Cache {
      */
     public function get() {
         if ($this->enabled === true) {
-            if (($result = apc_fetch($this->key)) !== false) {
+            if (($result = CacheAdapter::getInstance()->fetch($this->key)) !== false) {
                 $this->log->debug('Cache hit for key: ' . $this->key);
                 return $result;
             } else {
@@ -166,8 +268,8 @@ class Cache {
     private static function getVersion($prefix) {
         $version = false;
         $key = 'v'.$prefix;
-        while (($version = apc_fetch($key)) === false) {
-            if (apc_add($key, 0)) {
+        while (($version = CacheAdapter::getInstance()->fetch($key)) === false) {
+            if (CacheAdapter::getInstance()->add($key, 0)) {
                 $version = 0;
                 break;
             }
@@ -193,11 +295,20 @@ class Cache {
         do {
             // Ensure the version key exists.
             $version = self::getVersion($prefix);
-        } while (!apc_cas($key, $version, $version + 1));
+        } while (!CacheAdapter::getInstance()->cas($key, $version, $version + 1));
     }
 
     private static function cacheEnabled() {
         return defined('APC_USER_CACHE_ENABLED') &&
                APC_USER_CACHE_ENABLED === true;
+    }
+
+    /**
+     * Invalidates all entries in the user cache.
+     *
+     * Only use this for testing purposes.
+     */
+    public static function clearCacheForTesting() {
+        CacheAdapter::getInstance()->clear();
     }
 }
