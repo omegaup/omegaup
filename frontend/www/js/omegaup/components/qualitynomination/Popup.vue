@@ -5,8 +5,9 @@
             v-on:submit.prevent=""
             v-show="showForm">
         <button class="close"
+              type="button"
               v-on:click="onHide">×</button>
-        <div class="container">
+        <div class="container-fluid">
           <template v-if="currentView == 'question'">
             <h1>{{ T.qualityFormCongrats }}</h1>
             <div class="question-text">
@@ -14,8 +15,10 @@
             </div>
             <div class="button-row row">
               <button class="col-md-4 btn btn-primary"
+                   type="button"
                    v-on:click="onShowSuggestion">{{ T.wordsYes }}</button>
               <div class="col-md-4"></div><button class="col-md-4 btn btn-default"
+                   type="button"
                    v-on:click="onHide">{{ T.wordsNo }}</button>
             </div>
           </template>
@@ -97,6 +100,7 @@
                    v-bind:disabled="rationale.length &lt;= 0"
                    v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
                    "col-md-4 btn btn-default"
+                   type="button"
                    v-on:click="onHide">{{ T.wordsCancel }}</button>
             </div>
           </template>

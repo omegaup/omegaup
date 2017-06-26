@@ -19,7 +19,7 @@
 		</tr>
 	</tbody>
 </table>
-<div class="container" data-bind="if: course.isAdmin">
+<div class="container-fluid" data-bind="if: course.isAdmin">
     <div class="row">
         <a class="btn btn-primary pull-right"
            data-bind="text: newLabel, attr: { href: course.addAssignmentUrl }"></a>
@@ -36,7 +36,7 @@
 			</div>
 			<div class="">
 				<a style="text-decoration:none"><h1 id="title" data-bind="text: name"></h1></a>
-				<p id="description" data-bind="text: description" class='container'></p>
+				<p id="description" data-bind="text: description" class="container-fluid"></p>
 			</div>
 		</div>
 		<div class="panel-body table-responsive">

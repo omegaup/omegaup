@@ -123,7 +123,8 @@
 {/if}
 							<td class="status" data-bind="style: { backgroundColor: status_color }">
 								<span data-bind="text: status_text"></span>
-								<button data-bind="visible: status_help,
+								<button type="button"
+								        data-bind="visible: status_help,
 								                   click: showVerdictHelp,
 								                   attr: { title: status_text,
 								                           data-content: status_help }"
@@ -141,10 +142,10 @@
 							<td class="memory numeric" data-bind="text: memory_text"></td>
 							<td class="runtime numeric" data-bind="text: runtime_text"></td>
 {if isset($show_rejudge)}
-							<td class="rejudge"><button class="glyphicon glyphicon-repeat" title="rejudge" data-bind="click: rejudge" /><button class="glyphicon glyphicon-flag" title="debug" data-bind="click: debug_rejudge" /></td>
+							<td class="rejudge"><button type="button" class="glyphicon glyphicon-repeat" title="rejudge" data-bind="click: rejudge" /><button type="button" class="glyphicon glyphicon-flag" title="debug" data-bind="click: debug_rejudge" /></td>
 {/if}
 {if isset($show_details)}
-							<td><button class="details glyphicon glyphicon-zoom-in" data-bind="click: details"></button></td>
+							<td><button type="button" class="details glyphicon glyphicon-zoom-in" data-bind="click: details"></button></td>
 {/if}
 						</tr>
 					</tbody>

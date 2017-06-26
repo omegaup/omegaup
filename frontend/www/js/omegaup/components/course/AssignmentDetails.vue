@@ -58,7 +58,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container">
+          <div class="form-group container-fluid">
             <label>{{ T.courseNewFormDescription }}
             <textarea class="form-control"
                       cols="30"
