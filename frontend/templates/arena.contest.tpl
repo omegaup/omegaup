@@ -2,6 +2,9 @@
 {if !isset($showRanking)}
 {assign "showRanking" !$practice}
 {/if}
+{if !isset($isInterview)}
+{assign "isInterview" false}
+{/if}
 {if $admin}
 			<audio id="notification-audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
@@ -12,7 +15,7 @@
 				<div class="clock">00:00:00</div>
 			</div>
 
-{if !$practice}
+{if !$practice && !$isInterview}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
 {if $showRanking}
@@ -59,8 +62,10 @@
 					<h1 data-bind="text: title"></h1>
 					<p data-bind="text: description"></p>
 					<table>
+{if !$isInterview}
 						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td data-bind="text: startTime"></td></tr>
 						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td data-bind="text: finishTime"></td></tr>
+{/if}
 {if $showRanking}
 						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td data-bind="text: scoreboardCutoff"></td></tr>
 {/if}

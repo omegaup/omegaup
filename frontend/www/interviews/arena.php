@@ -7,7 +7,7 @@ $show_intro = true;
 try {
     $r = new Request([
         'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
-        'contest_alias' => $_REQUEST['contest_alias'],
+        'contest_alias' => $_REQUEST['alias'],
     ]);
 
     $show_intro = InterviewController::showIntro($r);
@@ -19,5 +19,10 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/interviews.arena.intro.tpl');
 } else {
-    $smarty->display('../../templates/interviews.arena.index.tpl');
+    $smarty->assign('jsfile', '/js/interviews.arena.contest.js');
+    $smarty->assign('admin', false);
+    $smarty->assign('isInterview', true);
+    $smarty->assign('practice', false);
+    $smarty->assign('showRanking', false);
+    $smarty->display('../../templates/arena.contest.tpl');
 }
