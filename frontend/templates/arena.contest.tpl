@@ -1,7 +1,4 @@
-{include file='head.tpl' jsfile=$jsfile inContest=!$practice inArena=true}
-{if !isset($showRanking)}
-{assign "showRanking" !$practice}
-{/if}
+{include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true}
 {if $admin}
 			<audio id="notification-audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
@@ -12,7 +9,7 @@
 				<div class="clock">00:00:00</div>
 			</div>
 
-{if !$practice}
+{if $showNavigation}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
 {if $showRanking}
@@ -59,8 +56,10 @@
 					<h1 data-bind="text: title"></h1>
 					<p data-bind="text: description"></p>
 					<table>
+{if $showDeadlines}
 						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td data-bind="text: startTime"></td></tr>
 						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td data-bind="text: finishTime"></td></tr>
+{/if}
 {if $showRanking}
 						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td data-bind="text: scoreboardCutoff"></td></tr>
 {/if}
@@ -107,10 +106,10 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
-{if $practice}
-{include file='arena.runs.tpl' show_submit=true show_details=true}
-{else}
+{if $showPoints}
 {include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
+{else}
+{include file='arena.runs.tpl' show_submit=true show_details=true}
 {/if}
 				</div>
 			</div>
