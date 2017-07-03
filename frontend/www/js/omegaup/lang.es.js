@@ -566,6 +566,7 @@ omegaup.OmegaUp.loadTranslations({
 	submittingUnOpenedProblem: "Estas intentando enviar una solucion a un problema que no haz abierto.",
 	successfulOperation: "Operacion exitosa",
 	titleInUse: "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
+	totalRuns: "Total de env\u00edos: %(numRuns)",
 	unableToVerifyCaptcha: "No fue posible verificar el captcha. Vuelve a cargar la p\u00e1gina e intenta de nuevo.",
 	unverifiedUser: "Usurio no verificado.",
 	userEditBachelors: "Licenciatura",

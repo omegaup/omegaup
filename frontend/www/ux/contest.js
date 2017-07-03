@@ -20,14 +20,14 @@ omegaup.OmegaUp.on('ready', function() {
       var prob = $('.solver-list .template').clone().removeClass('template');
       $('.user', prob)
           .attr('href', '/profile/' + solver.username)
-          .html(solver.username);
-      $('.language', prob).html(solver.language);
+          .text(solver.username);
+      $('.language', prob).text(solver.language);
       $('.runtime', prob)
-          .html((parseFloat(solver.runtime) / 1000.0).toFixed(2));
+          .text((parseFloat(solver.runtime) / 1000.0).toFixed(2));
       $('.memory', prob)
-          .html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
+          .text((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
       $('.time', prob)
-          .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
+          .text(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
       $('.solver-list').append(prob);
     }
 

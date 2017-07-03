@@ -26,7 +26,7 @@ omegaup.API.User.contestStats({username: username})
         }
       }
 
-      $('#contests-total').html(t);
+      $('#contests-total').text(t);
     })
     .fail(omegaup.UI.apiError);
 
@@ -49,6 +49,6 @@ omegaup.API.User.problemsSolved({username: username})
         $('#problems-solved tbody').append(content);
       }
 
-      $('#problems-solved-total').html(data['problems'].length);
+      $('#problems-solved-total').text(data['problems'].length);
     })
     .fail(omegaup.UI.apiError);

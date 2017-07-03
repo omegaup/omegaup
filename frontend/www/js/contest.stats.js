@@ -30,7 +30,9 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function drawCharts() {
-    $('#total-runs').html('Total de envíos: ' + stats.total_runs);
+    $('#total-runs')
+        .text(omeagup.UI.formatString(omegaup.T.totalRuns,
+                                      {numRuns: stats.total_runs}));
 
     // This function is called after we call getStats multiple times. We
     // just need to draw once.
