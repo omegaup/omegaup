@@ -49,7 +49,7 @@ omegaup.OmegaUp.on('ready', function() {
             });
       });
 
-  omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
+  omegaup.API.Contest.adminDetails({contest_alias: interviewAlias})
       .then(function(contest) {
         $('.page-header h1 span')
             .html(omegaup.T.interviewEdit + ' ' + contest.title);
