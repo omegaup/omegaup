@@ -49,7 +49,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.User.profile()
       .then(function(data) {
-        $('#username').html(data.userinfo.username);
+        $('#username').text(data.userinfo.username);
         $('#name').val(data.userinfo.name);
         $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
         $('#graduation_date')
