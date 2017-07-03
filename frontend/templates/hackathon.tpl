@@ -33,7 +33,6 @@
 				<a href="https://groups.google.com/d/forum/omegaup-hackathon">lista de discusión</a>
 				o envía un correo a <a href="mailto:omegaup-hackathon@googlegroups.com">omegaup-hackathon@googlegroups.com</a>.</p>
 				<iframe class="embedded-doc" src="https://docs.google.com/forms/d/1NLS8brcHDFIPlzh5dnjWpiNg4WeON5Fa683iTjXp2aM/viewform?embedded=true" width="760" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
-				<iframe class="embedded-doc" src="https://docs.google.com/spreadsheets/d/18FvTfYffP6Fvf5mJA7ga9Jy_7_bQ_Q6oK6RTue2D4Yk/pubhtml?widget=true&amp;headers=false"></iframe>
 			</div>
 		</div>
 	</div>
