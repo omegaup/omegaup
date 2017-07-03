@@ -21,8 +21,9 @@ if ($show_intro) {
 } else {
     $smarty->assign('jsfile', '/js/interviews.arena.contest.js');
     $smarty->assign('admin', false);
-    $smarty->assign('isInterview', true);
-    $smarty->assign('practice', false);
+    $smarty->assign('showDeadlines', false);
+    $smarty->assign('showNavigation', false);
+    $smarty->assign('showPoints', true);
     $smarty->assign('showRanking', false);
     $smarty->display('../../templates/arena.contest.tpl');
 }
