@@ -163,7 +163,7 @@ OmegaUp.on('ready', function() {
                         show_scoreboard: ev.showScoreboard,
                       })
                 .then(function(data) {
-                  UI.success('Tu curso ha sido editado! <a href="/course/' +
+                  UI.success(T.courseEditCourseEdited + ' <a href="/course/' +
                              ev.alias + '">' + T.courseEditGoToCourse + '</a>');
                   $('.course-header')
                       .text(ev.alias)

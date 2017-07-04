@@ -123,7 +123,8 @@ omegaup.OmegaUp.on('ready', function() {
         })
         .then(function(data) {
           if (data.status == 'ok') {
-            omegaup.UI.success('Tu concurso ha sido editado! <a href="/arena/' +
+            omegaup.UI.success(omegaup.T.contestEditContestEdited +
+                               ' <a href="/arena/' +
                                $('.new_contest_form #alias').val() + '">' +
                                omegaup.T.contestEditGoToContest + '</a>');
             $('div.post.footer').show();

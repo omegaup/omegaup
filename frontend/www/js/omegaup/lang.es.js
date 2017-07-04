@@ -198,6 +198,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddAssignment: "Agregar tarea",
 	courseEditAddProblems: "Agregar problema",
 	courseEditAddStudentsTooltip: "Agrega estudiantes utilizando su nombre de usuario de omegaUp",
+	courseEditCourseEdited: "Tu curso ha sido editado!",
 	courseEditGoToCourse: "Ir al curso",
 	courseEditStudents: "Estudiantes",
 	courseGroupNotFound: "No se encontr\u00f3 el grupo del curso",
