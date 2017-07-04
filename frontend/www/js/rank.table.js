@@ -2,26 +2,34 @@
   var problemsSolved = $('#rank-by-problems-solved');
   var length = parseInt(problemsSolved.attr('data-length'));
   var page = parseInt(problemsSolved.attr('data-page'));
-  var is_index = (problemsSolved.attr('is-index') === '1' ? true : false);
+  var isIndex = (problemsSolved.attr('is-index') === '1');
+  var rowTemplate =
+      '<tr>' +
+      '<td>%(rank)</td><td class="flagColumn">%(flag)</td>' +
+      '<td class="forcebreaks forcebreaks-top-5"><strong>' +
+      '<a href="/profile/%(username)">%(username)</a></strong><br/>' +
+      '%(name)</td>' +
+      '<td class="numericColumn">%(score)</td>' +
+      '%(problemsSolvedRow)' +
+      '</tr>';
   omegaup.API.User.rankByProblemsSolved({offset: page, rowcount: length})
       .then(function(result) {
         var html = '';
-        for (a = 0; a < result.rank.length; a++) {
-          html +=
-              '<tr>' +
-              '<td>' + result.rank[a].rank + '</td>' +
-              '<td class=\"flagColumn\">' +
-              omegaup.UI.getFlag(result.rank[a]['country_id']) + '</td>' +
-              '<td class=\"forcebreaks forcebreaks-top-5\">' +
-              '<b><a href=/profile/' + result.rank[a].username + '>' +
-              result.rank[a].username + '</a></b>' +
-              '<br/>' +
-              (result.rank[a].name == null ? '&nbsp;' : result.rank[a].name) +
-              '</td>' +
-              '<td class=\"numericColumn\">' + result.rank[a].score + '</td>' +
-              (is_index ? '' : ("<td class='numericColumn'>" +
-                                result.rank[a].problems_solved + '</td>')) +
-              '</tr>';
+        for (var i = 0; i < result.rank.length; ++i) {
+          var user = result.rank[i];
+          var problemsSolvedRow = '';
+          if (isIndex) {
+            problemsSolvedRow =
+                "<td class='numericColumn'>" + user.problems_solved + '</td>';
+          }
+          html += omegaup.UI.formatString(rowTemplate, {
+            rank: user.rank,
+            flag: omegaup.UI.getFlag(user.country_id),
+            username: user.username,
+            name: (user.name == null ? '&nbsp;' : user.name),
+            score: user.score,
+            problemsSolved: problemsSolvedRow,
+          });
         }
         $('#rank-by-problems-solved>tbody').append(html);
       })
