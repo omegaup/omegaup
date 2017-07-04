@@ -16,7 +16,7 @@
                 $('input[type="checkbox"]', row).attr('id', problem.alias);
                 $('.title', row)
                     .attr('href', '/arena/problem/' + problem.alias + '/')
-                    .html(omegaup.UI.escape(problem.title));
+                    .text(problem.title);
                 if (problem.tags && problem.tags.length > 0) {
                   var tags = $('.tag-list', row).removeClass('hidden');
                   for (var j = 0; j < problem.tags.length; j++) {
@@ -24,7 +24,7 @@
                                     .attr('href', '/problem/?tag=' +
                                                       omegaup.UI.escape(
                                                           problem.tags[j]))
-                                    .html(omegaup.UI.escape(problem.tags[j])));
+                                    .text(problem.tags[j]));
                   }
                 }
                 if (problem.visibility <= 0)

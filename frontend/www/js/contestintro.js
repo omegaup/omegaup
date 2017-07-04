@@ -59,7 +59,7 @@ omegaup.OmegaUp.on('ready', function() {
     var starttime = contestObject.start_time;
 
     // we already know that now < starttime
-    $('#countdown_clock').html(formatDelta(starttime.getTime() - Date.now()));
+    $('#countdown_clock').text(formatDelta(starttime.getTime() - Date.now()));
   }
 
   function readyToStart(contest) {
@@ -81,11 +81,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.Contest.publicDetails({contest_alias: contestAlias})
       .then(function(contest) {
-        $('.contest #title').html(omegaup.UI.escape(contest.title));
-        $('.contest #description').html(omegaup.UI.escape(contest.description));
+        $('.contest #title').text(contest.title);
+        $('.contest #description').text(contest.description);
 
-        $('.contest #time-until-start')
-            .html(omegaup.UI.escape(contest.start_time));
+        $('.contest #time-until-start').text(contest.start_time);
         $('.contest #start-time').text(contest.start_time.long());
         $('.contest #finish-time').text(contest.finish_time.long());
         if (contest.show_scoreboard_after == 1) {

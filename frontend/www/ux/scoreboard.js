@@ -18,7 +18,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(contest) {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
-        $('#title .contest-title').html(contest.title);
+        $('#title .contest-title').text(contest.title);
 
         omegaup.API.Contest.scoreboard({
                              contest_alias: arena.options.contestAlias,

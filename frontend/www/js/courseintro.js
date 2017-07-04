@@ -3,8 +3,8 @@ omegaup.OmegaUp.on('ready', function() {
 
   function onCourseLoaded(course) {
     if (course.status == 'ok') {
-      $('.course #title').html(omegaup.UI.escape(course.name));
-      $('.course #description').html(omegaup.UI.escape(course.description));
+      $('.course #title').text(course.name);
+      $('.course #description').text(course.description);
       $('.course #start_time')
           .val(omegaup.UI.formatDateTime(course.start_time));
       $('.course #finish_time')
