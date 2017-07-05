@@ -571,7 +571,7 @@ class UserController extends Controller {
      * @throws InvalidParameterException
      */
     public static function resolveUser($userOrEmail) {
-        Validators::isStringNonEmpty($userOrEmail, 'Username or email not found');
+        Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
 
         $user = null;
 
