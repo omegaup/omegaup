@@ -311,7 +311,7 @@
 								<option value="Middle school">{#userEditMiddleSchool#}</option>
 								<option value="High school">{#userEditHighSchool#}</option>
 								<option value="Bachelor's">{#userEditBachelors#}</option>
-								<option value="Maestría">{#userEditMasters#}</option>
+								<option value="Master's">{#userEditMasters#}</option>
 								<option value="Doctorate">{#userEditDoctorate#}</option>
 								<option value="Post-doc">Post-doc</option>
 							</select>
