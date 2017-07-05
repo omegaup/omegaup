@@ -306,14 +306,14 @@
 					<div class="form-group">
 						<label for="scholar_degree" class="col-md-3 control-label">{#userEditSchoolGrade#}</label>
 						<div class="col-md-7">
-							<select name='scholar_degree' id='scholar_degree' class="form-control">
-								<option value='{#userEditElementary#}'>{#userEditElementary#}</option>
-								<option value='{#userEditMiddleSchool#}'>{#userEditMiddleSchool#}</option>
-								<option value='{#userEditHighSchool#}'>{#userEditHighSchool#}</option>
-								<option value='{#userEditBachelors#}'>{#userEditBachelors#}</option>
-								<option value='Maestría'>{#userEditMasters#}</option>
-								<option value='{#userEditDoctorate#}'>{#userEditDoctorate#}</option>
-								<option value='Post-doc'>Post-doc</option>
+							<select name="scholar_degree" id="scholar_degree" class="form-control">
+								<option value="Elementary">{#userEditElementary#}</option>
+								<option value="Middle school">{#userEditMiddleSchool#}</option>
+								<option value="High school">{#userEditHighSchool#}</option>
+								<option value="Bachelor's">{#userEditBachelors#}</option>
+								<option value="Master's">{#userEditMasters#}</option>
+								<option value="Doctorate">{#userEditDoctorate#}</option>
+								<option value="Post-doc">Post-doc</option>
 							</select>
 						</div>
 					</div>
