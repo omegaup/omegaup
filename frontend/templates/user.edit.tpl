@@ -295,9 +295,9 @@
 						<label for="locale" class="col-md-3 control-label">{#wordsLanguage#}</label>
 						<div class="col-md-7">
 						<select id="locale" name='locale' class="form-control" >
-							<option value="es">es</option>
-							<option value="en">en</option>
-							<option value="pt">pt</option>
+							<option value="es">{#wordsSpanish#}</option>
+							<option value="en">{#wordsEnglish#}</option>
+							<option value="pt">{#wordsPortuguese#}</option>
 							<option value="pseudo">pseudo-loc</option>
 						</select>
 						</div>
