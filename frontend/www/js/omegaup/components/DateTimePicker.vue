@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import {T} from '../omegaup.js';
 export default {
   props: {
     value: Date,
@@ -25,6 +26,7 @@ export default {
         .datetimepicker({
           format: self.format,
           defaultDate: self.value,
+          language: T.locale,
         })
         .change(function(e) {
           self.$emit('input', $(self.$el).data('datetimepicker').getDate());
