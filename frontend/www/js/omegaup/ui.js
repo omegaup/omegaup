@@ -22,6 +22,10 @@ let UI = {
       console.error('Showing warning but there is no status div');
     }
 
+    // Just in case this needs to be displayed but the UI wasn't set up yet.
+    $('#loading').hide();
+    $('#root').show();
+
     $('#status .message').html(message);
     $('#status')
         .removeClass('alert-success alert-info alert-warning alert-danger')
