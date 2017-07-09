@@ -26,7 +26,7 @@ omegaup.OmegaUp.on('ready', function() {
 
         course.isAdmin = course.is_admin;
         course.addAssignmentUrl =
-            '/course/' + courseAlias + '/edit/#assignments';
+            '/course/' + courseAlias + '/edit/#assignments/new/';
         course.editUrl = '/course/' + courseAlias + '/edit/';
         course.scoreboardUrl = '/course/' + courseAlias + '/students/';
         course.addStudentsUrl = '/course/' + courseAlias + '/edit/#students';
