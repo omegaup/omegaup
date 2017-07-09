@@ -38,6 +38,8 @@ OmegaUp.on('ready', function() {
       finish_time: defaultFinishTime,
       assignment_type: assignmentType,
     };
+    // Vue lazily updates the DOM, so any interactions with `$el` need to
+    // wait until the update is done.
     Vue.nextTick(function() { assignmentDetails.$el.scrollIntoView(); });
   }
 
