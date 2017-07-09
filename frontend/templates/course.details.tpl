@@ -22,7 +22,7 @@
 <div class="container-fluid" data-bind="if: course.isAdmin">
     <div class="row">
         <a class="btn btn-primary pull-right"
-           data-bind="text: newLabel, attr: { href: course.addAssignmentUrl }"></a>
+           data-bind="text: newLabel, attr: { href: course.addAssignmentUrl + assignmentType + '/' }"></a>
     </div>
 </div>
 </script>
@@ -52,12 +52,14 @@
                                              data: { header: '{#wordsHomework#}',
                                                      newLabel: '{#wordsNewHomework#}',
                                                      course: $data,
-                                                     assignment: homework } } "></span>
+                                                     assignment: homework,
+                                                     assignmentType: 'homework' } } "></span>
                 <span data-bind="template: { name: 'assignments-list',
                                              data: { header: '{#wordsTest#}',
                                                      newLabel: '{#wordsNewTest#}',
                                                      course: $data,
-                                                     assignment: test } } "></span>
+                                                     assignment: test,
+                                                     assignmentType: 'test' } } "></span>
 			</div>
 		</div>
 	</div>

@@ -7,8 +7,10 @@ import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
+  let vuePath = [];
   if (window.location.hash) {
-    $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
+    vuePath = window.location.hash.split('/');
+    $('#sections').find('a[href="' + vuePath[0] + '"]').tab('show');
   }
 
   $('#sections')
@@ -28,13 +30,24 @@ OmegaUp.on('ready', function() {
   defaultDate.setHours(defaultDate.getHours() + 5);
   var defaultFinishTime = Date.create(defaultDate);
 
+  function onNewAssignment(assignmentType) {
+    assignmentDetails.show = true;
+    assignmentDetails.update = false;
+    assignmentDetails.assignment = {
+      start_time: defaultStartTime,
+      finish_time: defaultFinishTime,
+      assignment_type: assignmentType,
+    };
+    Vue.nextTick(function() { assignmentDetails.$el.scrollIntoView(); });
+  }
+
   var assignmentList = new Vue({
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
         props: {T: T, assignments: this.assignments, courseAlias: courseAlias},
         on: {
-          edit: function(assignment) {
+          'edit': function(assignment) {
             assignmentDetails.show = true;
             assignmentDetails.update = true;
             assignmentDetails.assignment = assignment;
@@ -57,14 +70,7 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(omegaup.UI.apiError);
           },
-          'new': function() {
-            assignmentDetails.show = true;
-            assignmentDetails.update = false;
-            assignmentDetails.assignment = {
-              start_time: defaultStartTime,
-              finish_time: defaultFinishTime,
-            };
-          },
+          'new': onNewAssignment,
         },
       });
     },
@@ -296,6 +302,22 @@ OmegaUp.on('ready', function() {
       'omegaup-course-addstudents': course_AddStudents,
     },
   });
+
+  let functionMap = {
+    '#assignments': {
+      'new': onNewAssignment,
+    },
+  };
+
+  if (vuePath.length >= 2) {
+    let section = functionMap[vuePath[0]];
+    if (section) {
+      let fn = section[vuePath[1]];
+      if (fn) {
+        Vue.nextTick(function() { fn.apply(this, vuePath.slice(2)); });
+      }
+    }
+  }
 
   API.Course.adminDetails({alias: courseAlias})
       .then(function(course) {
