@@ -1109,6 +1109,7 @@ export class Arena {
     self.elements.submitForm.file.replaceWith(
         self.elements.submitForm.file =
             self.elements.submitForm.file.clone(true));
+    self.elements.submitForm.file.val(null);
   }
 
   onLanguageSelect(e) {
@@ -1175,8 +1176,10 @@ export class Arena {
     }
 
     var code = submitForm.code.val();
-    if (!code) return false;
-
+    if (!code) {
+      alert(T.arenaRunSubmitEmptyCode);
+      return false;
+    }
     self.submitRun(code);
 
     return false;

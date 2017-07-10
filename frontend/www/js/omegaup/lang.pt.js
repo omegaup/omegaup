@@ -31,6 +31,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaPracticeStartTime: "Hora de in\u00edcio",
 	arenaRecommendedCurrentContests: "Competi\u00e7\u00f5es atuais recomendados",
 	arenaRecommendedOldContests: "Concursos pasados recomendados",
+	arenaRunSubmitEmptyCode: "N\u00e3o \u00e9 poss\u00edvel enviar o c\u00f3digo vazio",
 	arenaRunSubmitFilename: "Nome do arquivo seu c\u00f3digo ser\u00e1 guardada como: ",
 	arenaRunSubmitFilesize: "O limite para upload de arquivos s\u00e3o %(limit)",
 	arenaRunSubmitMissingLanguage: "Voc\u00ea deve escolher um idioma",
