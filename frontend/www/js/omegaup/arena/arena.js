@@ -1106,9 +1106,15 @@ export class Arena {
 
   clearInputFile() {
     var self = this;
+    // This worked, nay, was required, on older browsers.
+    // It stopped working sometime in 2017, and now .val(null)
+    // is enough to clear the input field.
+    // Leaving this here for now in case some older browsers
+    // still require it.
     self.elements.submitForm.file.replaceWith(
         self.elements.submitForm.file =
             self.elements.submitForm.file.clone(true));
+    self.elements.submitForm.file.val(null);
   }
 
   onLanguageSelect(e) {
@@ -1175,8 +1181,10 @@ export class Arena {
     }
 
     var code = submitForm.code.val();
-    if (!code) return false;
-
+    if (!code) {
+      alert(T.arenaRunSubmitEmptyCode);
+      return false;
+    }
     self.submitRun(code);
 
     return false;
