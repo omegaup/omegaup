@@ -309,6 +309,7 @@ omegaup.OmegaUp.loadTranslations({
 	loginLogIn: "Iniciar sesion",
 	loginNative: "Cuenta omegaUp",
 	loginPassword: "Contrase\u00f1a",
+	loginPasswordCreate: "Contrase\u00f1a (Min. 8 caracteres)",
 	loginPasswordNotEqual: "Las contrase\u00f1as no coinciden",
 	loginPasswordTooShort: "La contrase\u00f1a es muy corta",
 	loginRecover: "\u00bfOlvidaste tu contrase\u00f1a?",

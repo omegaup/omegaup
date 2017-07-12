@@ -309,6 +309,7 @@ omegaup.OmegaUp.loadTranslations({
 	loginLogIn: "Entrar",
 	loginNative: "Conta OmegaUp",
 	loginPassword: "Senha",
+	loginPasswordCreate: "Senha (no m\u00ednimo 8 caracteres)",
 	loginPasswordNotEqual: "As senhas n\u00e3o s\u00e3o iguais",
 	loginPasswordTooShort: "Senha \u00e9 muito curta",
 	loginRecover: "Esqueceu sua senha?",

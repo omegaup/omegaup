@@ -83,7 +83,7 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">
-							<label for="reg_pass" class="control-label">{#loginPassword#}</label>
+							<label for="reg_pass" class="control-label">{#loginPasswordCreate#}</label>
 							<input id='reg_pass' name='reg_pass' value='' type='password' class="form-control">
 						</div>
 					</div>
