@@ -309,6 +309,7 @@ omegaup.OmegaUp.loadTranslations({
 	loginLogIn: "(L0g in)",
 	loginNative: "(Om3gaUp acc0un7)",
 	loginPassword: "(Pa55w0rd)",
+	loginPasswordCreate: "(Pa55w0rd (Min. 8 charac73r5))",
 	loginPasswordNotEqual: "(Pa55w0rd5 d0 n07 ma7ch.)",
 	loginPasswordTooShort: "(Pa55w0rd i5 700 5h0r7.)",
 	loginRecover: "(F0rg07 y0ur pa55w0rd?)",
