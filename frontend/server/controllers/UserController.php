@@ -282,10 +282,13 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['mail_subject'] = 'Bienvenido a Omegaup!';
-        $r['mail_body'] = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email:'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->verification_id . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $r['user']->verification_id . '</a>';
+        global $smarty;
+        $r['mail_subject'] = $smarty->getConfigVars('verificationEmailSubject');
+        $r['mail_body'] = sprintf(
+            $smarty->getConfigVars('verificationEmailBody'),
+            OMEGAUP_URL,
+            $r['user']->verification_id
+        );
 
         if (self::$sendEmailOnVerify) {
             self::sendEmail($r);
@@ -311,6 +314,7 @@ class UserController extends Controller {
         $mail = new PHPMailer();
         $mail->IsSMTP();
         $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+        $mail->CharSet = 'utf-8';
         $mail->SMTPAuth = true;
         $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
         $mail->From = OMEGAUP_EMAIL_SMTP_FROM;

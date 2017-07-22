@@ -643,6 +643,8 @@ omegaup.OmegaUp.loadTranslations({
 	verdictTO: "(Tim3 1imi7 3xc33d3d)",
 	verdictWA: "(Wr0ng An5w3r)",
 	verifiationIdInvalid: "(V3rifica7i0n id i5 inva1id.)",
+	verificationEmailBody: "(W31c0m3 70 0m3gaUp! P13a53 c1ick 0n 7h3 f0110wing 1ink 70 10gin and v3rify y0ur 3mai1: <a hr3f=\"%1$5/api/u53r/v3rify3mai1/id/%2$5\">%1$5/api/u53r/v3rify3mai1/id/%2$5</a>)",
+	verificationEmailSubject: "(W31c0m3 70 0m3gaUp!)",
 	verificationIdInvalid: "(Th3 pr0vid3d v3rifica7i0n inf0rma7i0n i5 n07 va1id.)",
 	wordAccepted: "(Acc3p73d)",
 	wordsAccepted: "(Acc3p73d)",
