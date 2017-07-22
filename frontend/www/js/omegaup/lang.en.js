@@ -643,6 +643,8 @@ omegaup.OmegaUp.loadTranslations({
 	verdictTO: "Time limit exceeded",
 	verdictWA: "Wrong Answer",
 	verifiationIdInvalid: "Verification id is invalid.",
+	verificationEmailBody: "Welcome to omegaUp! Please click on the following link to login and verify your email: <a href=\"%1$s/api/user/verifyemail/id/%2$s\">%1$s/api/user/verifyemail/id/%2$s</a>",
+	verificationEmailSubject: "Welcome to omegaUp!",
 	verificationIdInvalid: "The provided verification information is not valid.",
 	wordAccepted: "Accepted",
 	wordsAccepted: "Accepted",
