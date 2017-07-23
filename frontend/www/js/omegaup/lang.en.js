@@ -339,7 +339,7 @@ omegaup.OmegaUp.loadTranslations({
 	navDevelopers: "Developers",
 	navGroups: "Groups",
 	navHelp: "Help",
-	navLogIn: "Log in",
+	navLogIn: "Log in / Sign up",
 	navLogOut: "Log out",
 	navMyContests: "My contests",
 	navMyGroups: "My groups",
