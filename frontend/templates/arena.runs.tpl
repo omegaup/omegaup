@@ -40,6 +40,7 @@
 									<option value="cpp11">C++11</option>
 									<option value="cpp">C++</option>
 									<option value="c">C</option>
+									<option value="cs">C#</option>
 									<option value="hs">Haskell</option>
 									<option value="java">Java</option>
 									<option value="pas">Pascal</option>
