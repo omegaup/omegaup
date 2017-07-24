@@ -8,50 +8,12 @@ import shlex
 import subprocess
 import tempfile
 
-LITERAL_FILES = {
-    '/etc/sudoers.d/minijail': b'''
-omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0
-'''.lstrip(),
-    '/etc/omegaup/runner/config.json': b'''
-{
-        "Logging": {
-                "File": "/var/log/omegaup/runner.log"
-        },
-        "Runner": {
-                "RuntimePath": "/var/lib/omegaup/runner",
-                "GraderURL": "https://omegaup.com:11302"
-        },
-        "TLS": {
-                "CertFile": "/etc/omegaup/runner/certificate.pem",
-                "KeyFile": "/etc/omegaup/runner/key.pem"
-        },
-        "Tracing": {
-                "File": "/var/log/omegaup/runner.tracing.json"
-        }
-}
-'''.lstrip(),
-    '/etc/systemd/system/omegaup-runner.service': b'''
-[Unit]
-Description=omegaUp runner
-After=network.target
-
-[Service]
-Type=simple
-User=omegaup
-Group=omegaup
-ExecStart=/usr/bin/omegaup-runner
-WorkingDirectory=/var/lib/omegaup
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-'''.lstrip(),
-}
-
 DOWNLOAD_FILES = {
     'minijail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-minijail/minijail-xenial-distrib-x86_64.tar.bz2',
-    'omegaup-runner.tar.bz2': 'https://omegaup.com/omegaup-runner.tar.bz2',
+    'omegaup-runner.tar.bz2': 'https://s3.amazonaws.com/omegaup-dist/omegaup-runner.tar.bz2',
 }
+
+NULL_HASH = '0000000000000000000000000000000000000000'
 
 class RemoteRunner:
     def __init__(self, hostname):
@@ -79,6 +41,15 @@ class RemoteRunner:
         if group != None:
             self.sudo(['/bin/chgrp', group, '.tmp'])
         return self.sudo(['/bin/mv', '.tmp', dest])
+
+def hash_for(filename):
+    sha1sum_filename = '%s.SHA1SUM' % filename
+    if not os.path.exists(sha1sum_filename):
+        logging.info('%s not found, returning null hash for %s',
+                     sha1sum_filename, filename)
+        return NULL_HASH
+    with open(sha1sum_filename) as f:
+        return f.read().strip()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -112,15 +83,11 @@ def main():
     if runner.run(['[', '-d', '/etc/omegaup/runner', ']']).returncode != 0:
         runner.sudo(['/bin/mkdir', '-p', '/etc/omegaup/runner'], check=True)
 
-    for path, contents in LITERAL_FILES.items():
-        expected = '%s  %s\n' % (hashlib.sha1(contents).hexdigest(), path)
-        output = runner.sudo(['/usr/bin/sha1sum', path])
-        if output.returncode != 0 or output.stdout != expected:
-            runner.sudo(['/usr/bin/tee', path], input=contents.decode('utf-8'))
-
     for path, url in DOWNLOAD_FILES.items():
-        if args.upgrade or runner.run(['[', '-f', path, ']']).returncode != 0:
+        if args.upgrade or runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
+                                       (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
             logging.info('Downloading %s...', url)
+            runner.run(['[ -f %s ] && rm %s' % (shlex.quote(path), shlex.quote(path))])
             runner.run(['/usr/bin/curl', '--remote-time', '--output', path,
                         '--url', url])
             logging.info('Extracting %s...', url)
