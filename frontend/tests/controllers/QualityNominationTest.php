@@ -268,7 +268,7 @@ class QualityNominationTest extends OmegaupTestCase {
     * Check that before discard a problem, the user must
     * have solved it first.
     */
-    public function testMustSolveBeforeDiscarded() {
+    public function testMustSolveBeforeDiscarding() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
