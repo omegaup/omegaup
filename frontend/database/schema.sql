@@ -843,6 +843,18 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Comments` (
   KEY `qualitynomination_id` (`qualitynomination_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominación';
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `QualityNomination_Discarded`
+--
+
+CREATE TABLE IF NOT EXISTS `QualityNomination_Discarded` (
+  `user_id` int(11) NOT NULL COMMENT 'El usuario que rechazó hacer recomendación',
+  `problem_id` int(11) NOT NULL COMMENT 'El problema que fue rechazado para ser recomendado por el usuario',
+  PRIMARY KEY (`user_id`, `problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de problemas rechazados para ser recomendados por cada usuario';
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -1137,6 +1149,13 @@ ALTER TABLE `QualityNomination_Reviewers`
 ALTER TABLE `QualityNomination_Comments`
   ADD CONSTRAINT `fk_qnc_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_qnc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `QualityNominations_Discarded`
+--
+ALTER TABLE `QualityNomination_Discarded`
+  ADD CONSTRAINT `fk_qnr_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_qnr_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Update AC Count on grade

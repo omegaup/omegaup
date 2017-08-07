@@ -263,4 +263,40 @@ class QualityNominationTest extends OmegaupTestCase {
             }
         );
     }
+
+    /**
+    * Check that before discard a problem, the user must
+    * have solved it first.
+    */
+    public function testMustSolveBeforeDiscarded() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            ]);
+
+        try {
+            QualityNominationController::discardNomination($r);
+            $this->fail('Should not have been able to discard the problem');
+        } catch (PreconditionFailedException $e) {
+            // still expected.
+        }
+
+        RunsFactory::gradeRun($runData);
+
+        $response = QualityNominationController::isNominationDiscarded($r);
+        if ($response['isDiscarded'] == true) {
+            $this->fail('Should not have been able to discard the problem');
+        } else {
+            QualityNominationController::discardNomination($r);
+            $finalresponse = QualityNominationController::isNominationDiscarded($r);
+            if ($finalresponse == false) {
+                $this->fail('The problem should have been discarded');
+            }
+        }
+    }
 }
