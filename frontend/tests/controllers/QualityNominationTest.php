@@ -265,10 +265,10 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-    * Check that before discard a problem, the user must
-    * have solved it first.
-    */
-    public function testMustSolveBeforeDiscarded() {
+     * Check that before discard a problem, the user must
+     * have solved it first.
+     */
+    public function testMustSolveBeforeDismissed() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -277,26 +277,28 @@ class QualityNominationTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
-            ]);
+            'nomination' => 'dismissal',
+            'contents' => json_encode([
+                'rationale' => 'dismiss' ]),
+        ]);
 
         try {
-            QualityNominationController::discardNomination($r);
-            $this->fail('Should not have been able to discard the problem');
+            QualityNominationController::apiCreate($r);
+            $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
             // still expected.
         }
 
         RunsFactory::gradeRun($runData);
 
-        $response = QualityNominationController::isNominationDiscarded($r);
-        if ($response['isDiscarded'] == true) {
-            $this->fail('Should not have been able to discard the problem');
-        } else {
-            QualityNominationController::discardNomination($r);
-            $finalresponse = QualityNominationController::isNominationDiscarded($r);
-            if ($finalresponse == false) {
-                $this->fail('The problem should have been discarded');
-            }
+        $response = QualityNominationController::isNominationDismissed($r);
+        if ($response['isDismissed'] == true) 
+            $this->fail('Should not have been able to dismissed the problem');
+        else {
+            QualityNominationController::dismissNomination($r);
+            $finalresponse = QualityNominationController::isNominationDismissed($r);
+            if ($finalresponse == false) 
+                $this->fail('The problem should have been dismissed');
         }
     }
 }

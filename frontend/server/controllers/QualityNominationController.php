@@ -1,7 +1,6 @@
 <?php
 require_once 'libs/dao/QualityNominations.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
-require_once 'libs/dao/QualityNomination_Discarded.dao.php';
 
 class QualityNominationController extends Controller {
     /**
@@ -54,6 +53,9 @@ class QualityNominationController extends Controller {
      * * `reason`: One of `['duplicate', 'offensive']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
+     * # Dismiss
+     * A user that has already solved a problem can dismiss suggestions. The
+     * `contents` field is empty except for `rationale = 'dismiss'`.
      *
      * @param Request $r
      *
@@ -70,16 +72,14 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion']);
+        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         Validators::isStringNonEmpty($r['contents'], 'contents');
-
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)
             || (!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
         ) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
         }
-
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
@@ -146,6 +146,18 @@ class QualityNominationController extends Controller {
                     throw new NotFoundException('problemNotFound');
                 }
             }
+        } elseif ($r['nomination'] == 'dismissal') {
+            // When a problem is being dismissal, the user
+            // must have already solved it.
+            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
+                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+            }
+            if (isset($contents['origin']) || isset($contents['difficulty']) || isset($contents['source'])
+                || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
+                || isset($contents['reason'])
+            ) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
         }
 
         // Create object
@@ -175,49 +187,50 @@ class QualityNominationController extends Controller {
     }
 
     /**
-     * Creates a new QualityNominationDiscarted if a user declines to make a
+     * Creates a new QualityNominations if a user declines to make a
      * suggestion
      *
      * @param Request $r
      *
      * @return array
      */
-    public static function discardNomination(Request $r) {
+    public static function dismissNomination(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
-        }
+             throw new ForbiddenAccessException('lockdown');
+         }
 
-        // Validate request
-        self::authenticateRequest($r);
+         // Validate request
+         self::authenticateRequest($r);
+         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+         if (is_null($problem)) {
+             throw new NotFoundException('problemNotFound');
+         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
+         if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
+             throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+         }
 
-        if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-            throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-        }
-
-        // Create object
-        $discarded = new QualityNominationDiscarded([
-            'user_id' => $r['current_user_id'],
-            'problem_id' => $problem->problem_id,
-        ]);
-        QualityNominationDiscardedDAO::save($discarded);
-
-        return ['status' => 'ok'];
-    }
+         // Create object
+         $dismissed = new QualityNominations([
+             'user_id' => $r['current_user_id'],
+             'problem_id' => $problem->problem_id,
+             'nomination' => 'dismissal',
+             'contents' => json_encode([
+                'rationale' => 'dismiss']),
+         ]);
+         QualityNominationsDAO::save($dismissed); 
+         return ['status' => 'ok'];
+     }
 
     /**
-     * Search if current user discarded a problem
+     * Search if current user dismissed a problem
      *
      * @param Request $r
      * @return array
      */
-    public static function isNominationDiscarded(Request $r) {
+    public static function isNominationDismissed(Request $r) {
         self::authenticateRequest($r);
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -226,14 +239,16 @@ class QualityNominationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        $key = new QualityNominationDiscarded([
+        $key = new QualityNominations([
             'problem_id' => $problem->problem_id,
-            'user_id' => $r['current_user_id']
+            'user_id' => $r['current_user_id'],
+            'contents' => json_encode([
+                'rationale' => 'dismiss']),
         ]);
-        $problem_discarded = QualityNominationDiscardedDAO::search($key);
+        $problem_dismissed = QualityNominationsDAO::search($key);
 
         $response = [];
-        $response['isDiscarded'] = count($problem_discarded) > 0;
+        $response['isDismissed'] = count($problem_dismissed) > 0;
         $response['status'] = 'ok';
         return $response;
     }
