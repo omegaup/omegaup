@@ -197,20 +197,20 @@ class QualityNominationController extends Controller {
     public static function dismissNomination(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
              throw new ForbiddenAccessException('lockdown');
-         }
+        }
 
          // Validate request
          self::authenticateRequest($r);
          Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
          $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-         if (is_null($problem)) {
-             throw new NotFoundException('problemNotFound');
-         }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
-         if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-             throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-         }
+        if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
+            throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+        }
 
          // Create object
          $dismissed = new QualityNominations([
@@ -220,9 +220,9 @@ class QualityNominationController extends Controller {
              'contents' => json_encode([
                 'rationale' => 'dismiss']),
          ]);
-         QualityNominationsDAO::save($dismissed); 
+         QualityNominationsDAO::save($dismissed);
          return ['status' => 'ok'];
-     }
+    }
 
     /**
      * Search if current user dismissed a problem

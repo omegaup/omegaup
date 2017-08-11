@@ -293,13 +293,14 @@ class QualityNominationTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         $response = QualityNominationController::isNominationDismissed($r);
-        if ($response['isDismissed'] == true) 
+        if ($response['isDismissed'] == true) {
             $this->fail('Should not have been able to dismissed the problem');
-        else {
+        } else {
             QualityNominationController::dismissNomination($r);
             $finalresponse = QualityNominationController::isNominationDismissed($r);
-            if ($finalresponse == false) 
+            if ($finalresponse == false) {
                 $this->fail('The problem should have been dismissed');
+            }
         }
     }
 }
