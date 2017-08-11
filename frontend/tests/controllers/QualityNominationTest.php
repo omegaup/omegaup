@@ -265,6 +265,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+<<<<<<< HEAD
      * Check that before discard a problem, the user must
      * have solved it first.
      */
