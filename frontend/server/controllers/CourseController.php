@@ -752,6 +752,48 @@ class CourseController extends Controller {
     }
 
     /**
+     * Returns details of a given course
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiCourseProgress(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'alias');
+        self::resolveGroup($r);
+
+        // Only Course Admins or Group Members (students) can see these results
+        if (!Authorization::canViewCourse(
+            $r['current_user_id'],
+            $r['course'],
+            $r['group']
+        )) {
+            throw new ForbiddenAccessException();
+        }
+
+        $assignments = null;
+
+        try {
+            $assignments = CoursesDAO::getAssignmentsProgress(
+                $r['course']->course_id,
+                $r['current_user_id']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'assignments' => $assignments,
+        ];
+    }
+
+    /**
      * Add Student to Course
      *
      * @param  Request $r
@@ -853,6 +895,7 @@ class CourseController extends Controller {
             $r['current_user_id'],
             $r['course']
         );
+
         $result = [
             'status' => 'ok',
             'assignments' => CoursesDAO::getAllAssignments($r['alias'], $isAdmin),

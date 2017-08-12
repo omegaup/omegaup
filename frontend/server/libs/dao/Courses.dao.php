@@ -146,6 +146,59 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     /**
+     * Returns the score per assignment of a user, as well as the maximum score attainable
+     * @param  int $course_id
+     * @param  int $user_id
+     * @return Array Students data
+     */
+    public static function getAssignmentsProgress($course_id, $user_id) {
+        global  $conn;
+
+        $sql = 'SELECT ps.alias as assignment, IFNULL(pr.total_score, 0) as score, ps.max_score as max_score
+                FROM (
+                    SELECT a.alias, a.assignment_id, sum(psp.points) as max_score
+                    FROM Assignments a
+                    INNER JOIN Problemsets ps
+                        ON a.problemset_id = ps.problemset_id
+                    INNER JOIN Problemset_Problems psp
+                        ON psp.problemset_id = ps.problemset_id
+                    WHERE a.course_id = ?
+                    GROUP BY a.assignment_id
+                ) ps
+                LEFT JOIN (
+                    SELECT bpr.alias, sum(best_score_of_problem) as total_score
+                    FROM (
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        FROM Assignments a
+                        INNER JOIN Problemsets ps
+                            ON a.problemset_id = ps.problemset_id
+                        INNER JOIN Problemset_Problems psp
+                            ON psp.problemset_id = ps.problemset_id
+                        INNER JOIN Runs r
+                            ON r.problem_id = psp.problem_id
+                            AND r.problemset_id = a.problemset_id
+                        WHERE a.course_id = ? AND r.user_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                    ) bpr
+                    GROUP BY bpr.assignment_id, bpr.user_id
+                ) pr
+                ON ps.alias = pr.alias';
+
+        $rs = $conn->Execute($sql, [$course_id, $course_id, $user_id]);
+
+        $progress = [];
+        foreach ($rs as $row) {
+            $assignment = $row['assignment'];
+            $progress[$assignment] = [
+                'score' => intval($row['score']),
+                'max_score' => intval($row['max_score']),
+            ];
+        }
+
+        return $progress;
+    }
+
+    /**
      * Returns all courses that a user can manage.
      */
     final public static function getAllCoursesAdminedByUser(
