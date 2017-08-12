@@ -88,6 +88,8 @@ class CourseController extends Controller {
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
 
+        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
+
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional.
         $start_time = null;
@@ -105,6 +107,13 @@ class CourseController extends Controller {
         }
         if ($r['start_time'] > $r['finish_time']) {
             throw new InvalidParameterException('courseInvalidStartTime');
+        }
+
+        // Only curator can set public
+        if (!is_null($r['public'])
+            && $r['public'] == 1
+            && !Authorization::canCreatePublicCourse($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
         }
     }
 
@@ -197,6 +206,7 @@ class CourseController extends Controller {
                 'acl_id' => $acl->acl_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+                'public' => is_null($r['public']) ? 0 : $r['public'],
             ]));
 
             CoursesDAO::transEnd();
@@ -1038,6 +1048,9 @@ class CourseController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'show_scoreboard',
+            'public' => ['transform' => function ($value) {
+                return is_null($value) ? 0 : $value;
+            }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
 

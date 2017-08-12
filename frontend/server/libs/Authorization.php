@@ -11,6 +11,9 @@ class Authorization {
     // Cache for system group for quality reviewers.
     private static $quality_reviewer_group = null;
 
+    // Cache for system group for curators
+    private static $curator_group = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -28,6 +31,9 @@ class Authorization {
 
     // Group for quality reviewers.
     const QUALITY_REVIEWER_GROUP_ALIAS = 'omegaup:quality-reviewer';
+
+    // Group for curators.
+    const CURATOR_GROUP_ALIAS = 'omegaup:curator';
 
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
@@ -219,5 +225,17 @@ class Authorization {
         }
         return self::isAdmin($user_id, $problemset) ||
                GroupRolesDAO::isContestant($user_id, $problemset->acl_id);
+    }
+
+    public static function canCreatePublicCourse($user_id) {
+        if (self::$curator_group == null) {
+            self::$curator_group = GroupsDAO::findByAlias(
+                Authorization::CURATOR_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $user_id,
+            self::$curator_group
+        );
     }
 }

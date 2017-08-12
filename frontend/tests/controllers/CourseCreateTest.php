@@ -1,6 +1,25 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
+    private static $curators = [];
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        $curatorGroup = GroupsDAO::FindByAlias(
+            Authorization::CURATOR_GROUP_ALIAS
+        );
+        for ($i = 0; $i < 5; $i++) {
+            $curator = UserFactory::createUser();
+            GroupsUsersDAO::save(new GroupsUsers([
+                'group_id' => $curatorGroup->group_id,
+                'user_id' => $curator->user_id,
+                'role_id' => Authorization::ADMIN_ROLE,
+            ]));
+            self::$curators[] = $curator;
+        }
+    }
+
     /**
      * Create course hot path
      */
@@ -209,5 +228,48 @@ class CourseCreateTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework'
         ]));
+    }
+
+    /**
+     * Public course can't be created by default
+     * @expectedException ForbiddenAccessException
+     */
+    public function testCreatePublicCourseFailForNonCurator() {
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => Utils::CreateRandomString(),
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'public' => 1,
+        ]);
+
+        $response = CourseController::apiCreate($r);
+    }
+
+    /**
+     * Only curators can make Public courses
+     */
+    public function testCreatePublicCourse() {
+        $user = UserFactory::createUser();
+
+        $login = self::login(self::$curators[0]);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => Utils::CreateRandomString(),
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'public' => 1,
+        ]);
+
+        $response = CourseController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(1, count(CoursesDAO::findByName($r['name'])));
     }
 }
