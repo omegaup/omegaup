@@ -156,6 +156,7 @@ class CoursesDAO extends CoursesDAOBase {
 
         $sql = 'SELECT ps.alias as assignment, IFNULL(pr.total_score, 0) as score, ps.max_score as max_score
                 FROM (
+                    -- get all assignments, as well as their maximum score
                     SELECT a.alias, a.assignment_id, sum(psp.points) as max_score
                     FROM Assignments a
                     INNER JOIN Problemsets ps
@@ -165,9 +166,11 @@ class CoursesDAO extends CoursesDAOBase {
                     WHERE a.course_id = ?
                     GROUP BY a.assignment_id
                 ) ps
-                LEFT JOIN (
+                LEFT JOIN ( -- we want a score even if there are no submissions yet
+                    -- aggregate all runs per assignment
                     SELECT bpr.alias, sum(best_score_of_problem) as total_score
                     FROM (
+                        -- get all runs belonging to an user and get the best score
                         SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
@@ -180,7 +183,7 @@ class CoursesDAO extends CoursesDAOBase {
                         WHERE a.course_id = ? AND r.user_id = ?
                         GROUP BY a.assignment_id, psp.problem_id, r.user_id
                     ) bpr
-                    GROUP BY bpr.assignment_id, bpr.user_id
+                    GROUP BY bpr.assignment_id
                 ) pr
                 ON ps.alias = pr.alias';
 
@@ -190,8 +193,8 @@ class CoursesDAO extends CoursesDAOBase {
         foreach ($rs as $row) {
             $assignment = $row['assignment'];
             $progress[$assignment] = [
-                'score' => intval($row['score']),
-                'max_score' => intval($row['max_score']),
+                'score' => floatval($row['score']),
+                'max_score' => floatval($row['max_score']),
             ];
         }
 
