@@ -111,7 +111,7 @@ class CourseController extends Controller {
 
         // Only curator can set public
         if (!is_null($r['public'])
-            && $r['public'] == 1
+            && $r['public'] == true
             && !Authorization::canCreatePublicCourse($r['current_user_id'])) {
             throw new ForbiddenAccessException();
         }
@@ -206,7 +206,7 @@ class CourseController extends Controller {
                 'acl_id' => $acl->acl_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-                'public' => is_null($r['public']) ? 0 : $r['public'],
+                'public' => is_null($r['public']) ? false : $r['public'],
             ]));
 
             CoursesDAO::transEnd();
@@ -1054,7 +1054,7 @@ class CourseController extends Controller {
             }],
             'show_scoreboard',
             'public' => ['transform' => function ($value) {
-                return is_null($value) ? 0 : $value;
+                return is_null($value) ? false : $value;
             }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
