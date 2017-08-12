@@ -762,7 +762,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Add Student to Course
+     * Add Student to Course.
      *
      * @param  Request $r
      * @return array
@@ -777,13 +777,17 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
-            throw new ForbiddenAccessException();
-        }
+        if ($r['course']->public == true) {
+            $r['user'] = $r['current_user'];
+        } else {
+            if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+                throw new ForbiddenAccessException();
+            }
 
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
-        if (is_null($r['user'])) {
-            throw new NotFoundException('userOrMailNotFound');
+            $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+            if (is_null($r['user'])) {
+                throw new NotFoundException('userOrMailNotFound');
+            }
         }
 
         $groupUser = new GroupsUsers([
@@ -872,6 +876,7 @@ class CourseController extends Controller {
             'start_time' => strtotime($r['course']->start_time),
             'finish_time' => strtotime($r['course']->finish_time),
             'is_admin' => $isAdmin,
+            'public' => $r['course']->public,
         ];
 
         if ($isAdmin) {
