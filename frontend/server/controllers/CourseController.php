@@ -791,7 +791,7 @@ class CourseController extends Controller {
      * @param  Request $r
      * @return array
      */
-    public static function apiCourseProgress(Request $r) {
+    public static function apiMyProgress(Request $r) {
         global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');

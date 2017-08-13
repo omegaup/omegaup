@@ -2,7 +2,7 @@ omegaup.OmegaUp.on('ready', function() {
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
 
   var details = omegaup.API.Course.details({alias: courseAlias});
-  var progress = omegaup.API.Course.courseProgress({alias: courseAlias});
+  var progress = omegaup.API.Course.myProgress({alias: courseAlias});
 
   $.when(details, progress)
       .then(function(course, score) {

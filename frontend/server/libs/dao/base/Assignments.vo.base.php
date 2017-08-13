@@ -62,6 +62,9 @@ class Assignments extends VO {
         if (isset($data['max_points'])) {
             $this->max_points = $data['max_points'];
         }
+        if (isset($data['order'])) {
+            $this->order = $data['order'];
+        }
     }
 
     /**
@@ -160,4 +163,11 @@ class Assignments extends VO {
       * @var double
       */
     public $max_points;
+
+    /**
+      * Define el orden de aparición de los problemas/tareas
+      * @access public
+      * @var int
+      */
+    public $order;
 }

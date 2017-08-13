@@ -185,7 +185,7 @@ export default {
 
     details: _call('/api/course/details/', _convertTimes),
 
-    courseProgress: _call('/api/course/courseProgress/'),
+    myProgress: _call('/api/course/myProgress/'),
 
     createAssignment: _call('/api/course/createAssignment/'),
 
