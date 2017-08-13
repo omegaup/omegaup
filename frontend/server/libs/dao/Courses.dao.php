@@ -154,29 +154,17 @@ class CoursesDAO extends CoursesDAOBase {
     public static function getAssignmentsProgress($course_id, $user_id) {
         global  $conn;
 
-        $sql = 'SELECT ps.alias as assignment, IFNULL(pr.total_score, 0) as score, ps.max_score as max_score
-                FROM (
-                    -- get all assignments, as well as their maximum score
-                    SELECT a.alias, a.assignment_id, sum(psp.points) as max_score
-                    FROM Assignments a
-                    INNER JOIN Problemsets ps
-                        ON a.problemset_id = ps.problemset_id
-                    INNER JOIN Problemset_Problems psp
-                        ON psp.problemset_id = ps.problemset_id
-                    WHERE a.course_id = ?
-                    GROUP BY a.assignment_id
-                ) ps
+        $sql = 'SELECT a.alias as assignment, IFNULL(pr.total_score, 0) as score, a.max_points as max_score
+                FROM Assignments a
                 LEFT JOIN ( -- we want a score even if there are no submissions yet
                     -- aggregate all runs per assignment
-                    SELECT bpr.alias, sum(best_score_of_problem) as total_score
+                    SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
                     FROM (
                         -- get all runs belonging to an user and get the best score
                         SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
-                        INNER JOIN Problemsets ps
-                            ON a.problemset_id = ps.problemset_id
                         INNER JOIN Problemset_Problems psp
-                            ON psp.problemset_id = ps.problemset_id
+                            ON a.problemset_id = psp.problemset_id
                         INNER JOIN Runs r
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
@@ -185,9 +173,10 @@ class CoursesDAO extends CoursesDAOBase {
                     ) bpr
                     GROUP BY bpr.assignment_id
                 ) pr
-                ON ps.alias = pr.alias';
+                ON a.assignment_id = pr.assignment_id
+                where a.course_id = ?';
 
-        $rs = $conn->Execute($sql, [$course_id, $course_id, $user_id]);
+        $rs = $conn->Execute($sql, [$course_id, $user_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {

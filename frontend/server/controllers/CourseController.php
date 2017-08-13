@@ -372,6 +372,16 @@ class CourseController extends Controller {
             $points
         );
 
+        // Update max_points
+        $assignment = CoursesDAO::getAssignmentByAlias(
+            $r['course'],
+            $r['assignment_alias']
+        );
+
+        $assignment->max_points += $points;
+
+        AssignmentsDAO::save($assignment);
+
         return ['status' => 'ok'];
     }
 
@@ -444,15 +454,30 @@ class CourseController extends Controller {
             'problemset_id' => $problemSet->problemset_id,
             'problem_id' => $problem->problem_id,
         ]);
-        if (is_null(ProblemsetProblemsDAO::getByPK(
+
+        $problemsetProblem = ProblemsetProblemsDAO::getByPK(
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id
-        ))) {
+        );
+
+        if (is_null($problemsetProblem)) {
             throw new NotFoundException('problemNotPartOfAssignment');
         }
 
+        $points = $problemsetProblem->points;
+
         // Delete the entry from the database
         ProblemsetProblemsDAO::delete($problemsetProblem);
+
+        // Update max_points
+        $assignment = CoursesDAO::getAssignmentByAlias(
+            $r['course'],
+            $r['assignment_alias']
+        );
+
+        $assignment->max_points -= $points;
+
+        AssignmentsDAO::save($assignment);
 
         return ['status' => 'ok'];
     }

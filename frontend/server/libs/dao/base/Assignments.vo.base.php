@@ -59,6 +59,9 @@ class Assignments extends VO {
         if (isset($data['finish_time'])) {
             $this->finish_time = $data['finish_time'];
         }
+        if (isset($data['max_points'])) {
+            $this->max_points = $data['max_points'];
+        }
     }
 
     /**
@@ -150,4 +153,11 @@ class Assignments extends VO {
       * @var timestamp
       */
     public $finish_time;
+
+    /**
+      * La cantidad total de puntos que se pueden obtener.
+      * @access public
+      * @var double
+      */
+    public $max_points;
 }
