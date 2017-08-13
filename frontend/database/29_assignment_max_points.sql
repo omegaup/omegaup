@@ -11,3 +11,5 @@ LEFT JOIN (
 ) q
 ON `Assignments`.`assignment_id` = q.`assignment_id`
 SET `Assignments`.`max_points` = IFNULL(q.`max_points`, 0);
+
+CREATE INDEX idx_problemset_problems_ids ON Problemset_Problems (`problem_id`, `problemset_id`);

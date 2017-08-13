@@ -1154,6 +1154,7 @@ DELIMITER ;
 CREATE INDEX idx_contest_public ON Contests (`public`);
 CREATE INDEX idx_user_roles_acl ON User_Roles (`acl_id`);
 CREATE INDEX idx_problems_visibility ON Problems (`visibility`);
+CREATE INDEX idx_problemset_problems_ids ON Problemset_Problems (`problem_id`, `problemset_id`);
 
 --
 -- Recalcula el ranking de todos los usuarios por Problemas resueltos.
