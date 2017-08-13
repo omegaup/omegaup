@@ -116,4 +116,49 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias']
             ]));
     }
+
+    /**
+     * Can't self-register unless Public
+     * @expectedException ForbiddenAccessException
+     */
+    public function testSelfAddStudentNoPublic() {
+        $courseData = CoursesFactory::createCourse();
+        $student = UserFactory::createUser();
+
+        $login = OmegaupTestCase::login($student);
+        CourseController::apiAddStudent(new Request([
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias']
+            ]));
+    }
+
+    /**
+     * Can self-register if course is Public
+     */
+    public function testSelfAddStudentPublic() {
+        $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
+        $student = UserFactory::createUser();
+
+        $login = OmegaupTestCase::login($student);
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias']
+            ]));
+
+        $this->assertEquals('ok', $response['status']);
+
+        // Validate student was added
+        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $this->assertNotNull($course);
+
+        $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
+            'group_id' => $course->group_id,
+            'user_id' => $student->user_id
+            ]));
+
+        $this->assertNotNull($studentsInGroup);
+        $this->assertEquals(1, count($studentsInGroup));
+    }
 }

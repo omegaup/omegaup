@@ -18,7 +18,7 @@
         for (var i = 0; i < result.rank.length; ++i) {
           var user = result.rank[i];
           var problemsSolvedRow = '';
-          if (isIndex) {
+          if (!isIndex) {
             problemsSolvedRow =
                 "<td class='numericColumn'>" + user.problems_solved + '</td>';
           }
@@ -28,7 +28,7 @@
             username: user.username,
             name: (user.name == null ? '&nbsp;' : user.name),
             score: user.score,
-            problemsSolved: problemsSolvedRow,
+            problemsSolvedRow: problemsSolvedRow,
           });
         }
         $('#rank-by-problems-solved>tbody').append(html);
