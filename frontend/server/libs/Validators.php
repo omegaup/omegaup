@@ -237,7 +237,7 @@ class Validators {
 
         if ($isPresent) {
             $bad_elements = [];
-            $elements = explode(',', $parameter);
+            $elements = array_filter(explode(',', $parameter));
             foreach ($elements as $element) {
                 if (!in_array($element, $enum)) {
                     $bad_elements[] = $element;

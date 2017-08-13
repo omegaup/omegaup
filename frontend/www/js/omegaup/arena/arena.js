@@ -896,6 +896,15 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     var self = this;
+
+    lang_array = lang_array.filter(function(x) { return x; });
+
+    var can_submit = lang_array != false;
+
+    $('.runs').toggle(can_submit);
+    $('.data').toggle(can_submit);
+    $('.best-solvers').toggle(can_submit);
+
     $('option', self.elements.submitForm.language)
         .each(function(index, item) {
           item = $(item);

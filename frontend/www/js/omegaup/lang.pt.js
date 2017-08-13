@@ -719,6 +719,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNextPage: "P\u00e1gina seguinte",
 	wordsNo: "N\u00e3o",
 	wordsNoComment: "N\u00e3o coment\u00e1rios",
+	wordsNoSubmissions: "Sem submiss\u00e3oes",
 	wordsNumHomeworks: "N\u00famero de tarefas",
 	wordsNumTests: "N\u00famero de exames",
 	wordsOnly: "Somente",

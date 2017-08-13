@@ -98,6 +98,7 @@
 						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua">C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
 						<option value="kp,kj">Karel</option>
 						<option value="cat">{#wordsJustOutput#}</option>
+						<option value="">{#wordsNoSubmissions#}</option>
 					</select>
 				</div>
 
