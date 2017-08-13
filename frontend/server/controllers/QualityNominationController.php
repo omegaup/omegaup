@@ -197,7 +197,7 @@ class QualityNominationController extends Controller {
      *
      * @return array The response.
      */
-    public static function apiResolve(Request $r, $status) {
+    public static function apiResolve(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -208,7 +208,7 @@ class QualityNominationController extends Controller {
             );
         }
 
-        if ($status != 'open' && $status != 'approved' && $status != 'denied') {
+        if ($r['status'] != 'open' && $r['status'] != 'approved' && $r['status'] != 'denied') {
             throw new InvalidParameterException('parameterInvalid', 'status');
         }
 
@@ -216,9 +216,9 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
 
-        if ($status == 'approved') {
+        if ($r['status'] == 'approved') {
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            $r['message'] = 'banneandoProblemaPorReporte';
+            $r['message'] = 'banningProblemDueToReport';
             $r['visibility'] = ProblemController::VISIBILITY_BANNED;
             ProblemController::apiUpdate($r);
         }
@@ -227,7 +227,7 @@ class QualityNominationController extends Controller {
         if (is_null($qualitynomination)) {
             throw new NotFoundException('qualitynominationNotFound');
         }
-        $qualitynomination->status = $status;
+        $qualitynomination->status = $r['status'];
         QualityNominationsDAO::save($qualitynomination);
 
         return ['status' => 'ok'];

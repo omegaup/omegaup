@@ -168,10 +168,11 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $request = new Request([
             'auth_token' => $login->auth_token,
+            'status' => 'approved',
             'nomination' => 'demotion',
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         try {
-            $response = QualityNominationController::apiResolve($request, 'approved');
+            $response = QualityNominationController::apiResolve($request);
             $this->fail("Normal user shouldn't be able to resolve demotion");
         } catch (ForbiddenAccessException $e) {
             // Expected.
@@ -199,10 +200,11 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login(self::$reviewers[0]);
         $request = new Request([
             'auth_token' => $login->auth_token,
+            'status' => 'approved',
             'nomination' => 'demotion',
             'problem_alias' => $problemData['request']['alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
-        $response = QualityNominationController::apiResolve($request, 'approved');
+        $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
         if ($details['status'] != 'approved') {
