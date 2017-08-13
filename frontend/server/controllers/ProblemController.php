@@ -151,11 +151,13 @@ class ProblemController extends Controller {
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
+        $acceptsSubmissions = $r['languages'] !== '';
+
         if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
             throw new DuplicatedEntryInDatabaseException('problemExists');
         }
 
-        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
+        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -711,7 +713,10 @@ class ProblemController extends Controller {
         $response = [
             'rejudged' => false
         ];
-        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
+
+        $acceptsSubmissions = $problem->languages === '';
+
+        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
 
         // Insert new problem
         try {

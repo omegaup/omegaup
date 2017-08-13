@@ -35,8 +35,9 @@ class ProblemDeployer {
     private $created = false;
     private $operation = null;
     private $updatedLanguages = [];
+    private $acceptsSubmissions = true;
 
-    public function __construct($alias, $operation) {
+    public function __construct($alias, $operation, $acceptsSubmissions) {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
@@ -44,6 +45,8 @@ class ProblemDeployer {
         $this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->operation = $operation;
+
+        $this->acceptsSubmissions = $acceptsSubmissions;
 
         if (!is_writable(PROBLEMS_GIT_PATH)) {
             $this->log->error('path is not writable:' . PROBLEMS_GIT_PATH);
@@ -258,15 +261,17 @@ class ProblemDeployer {
             ZipHandler::DeflateZip($this->zipPath, $this->tmpDir, $this->filesToUnzip);
 
             // Move all .in and .out files to their folder.
-            $dh = opendir("$this->tmpDir/cases/");
-            while (($file = readdir($dh)) !== false) {
-                if (ProblemDeployer::endsWith($file, '.out', true)) {
-                    rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
-                } elseif (ProblemDeployer::endsWith($file, '.in', true)) {
-                    rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
+            if ($this->acceptsSubmissions) {
+                $dh = opendir("$this->tmpDir/cases/");
+                while (($file = readdir($dh)) !== false) {
+                    if (ProblemDeployer::endsWith($file, '.out', true)) {
+                        rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
+                    } elseif (ProblemDeployer::endsWith($file, '.in', true)) {
+                        rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
+                    }
                 }
+                closedir($dh);
             }
-            closedir($dh);
 
             if ($this->isInteractive) {
                 $target = "$this->tmpDir/interactive/generated/";
@@ -454,7 +459,12 @@ class ProblemDeployer {
     private function checkCases(ZipArchive $zip, array $zipFilesArray) {
         $this->log->info('Validating /cases');
 
-        // Necesitamos tener al menos 1 caso
+        if (!$this->acceptsSubmissions) {
+            $this->log->info('This problem doesn\'t accept anything. Skipping.');
+            return true;
+        }
+
+        // We need to have at least one test case
         $cases = 0;
 
         // Add all files in cases/ that end either in .in or .out
