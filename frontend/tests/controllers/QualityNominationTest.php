@@ -286,7 +286,6 @@ class QualityNominationTest extends OmegaupTestCase {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
-            // still expected.
         }
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -303,19 +302,18 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
 
         $problem_dismissed = QualityNominationsDAO::search($key);
-        $response = count($problem_dismissed) > 0;
-
         RunsFactory::gradeRun($runData);
 
-        if ($response == true) {
-            $this->fail('Should not have been able to dismissed the problem');
-        } else {
+        try {
+            $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
+        } catch (PreconditionFailedException $e) {
+        }
+
+        try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::search($key);
-            $finalresponse = count($pd) > 0;
-            if ($finalresponse == false) {
-                $this->fail('The problem should have been dismissed');
-            }
+            $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
+        } catch (PreconditionFailedException $e) {
         }
     }
 }

@@ -85,12 +85,14 @@ class QualityNominationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if ($r['nomination'] == 'suggestion') {
-            // The user making suggestions to a problem must have already
-            // solved it.
+        if ($r['nomination'] != 'demotion') {
+            // All nominations types, except demotions, are only allowed for
+            // uses who have already solved the problem.
             if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
+        }
+        if ($r['nomination'] == 'suggestion') {
             if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
                 || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
                 || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
@@ -106,11 +108,6 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
-            // When a problem is being nominated for promotion, the user
-            // nominating it must have already solved it.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-            }
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
                 || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
                 || (!isset($contents['tags']) || !is_array($contents['tags']))
@@ -147,11 +144,6 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'dismissal') {
-            // When a problem is being dismissed, the user
-            // must have already solved it.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-            }
             if (isset($contents['origin']) || isset($contents['difficulty']) || isset($contents['source'])
                 || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
                 || isset($contents['reason'])
