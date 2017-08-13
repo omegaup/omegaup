@@ -74,7 +74,6 @@ export default {
   },
 
   methods: {
-
     onHide() { this.showReportDialog = false;},
 
     onReportInappropriateProblem() {
@@ -133,11 +132,11 @@ export default {
 .reportinappropriateproblem-popup .button-row {
 	width: 100%;
 	margin-left: 66%;
-}	
+}
 
 .reportinappropriateproblem-popup .centered {
 	margin-left: 20%;
 	margin-top: 24%;
 	position: absolute;
-}	
+}
 </style>
