@@ -85,10 +85,10 @@
 {include file='arena.runsubmit.tpl'}
 {include file='arena.rundetails.tpl'}
 		</div>
-		<div id="qualitynominationdemotion">
+		<div id="qualitynomination">
 			<script type="text/json" id="quality-payload">{$quality_payload|json_encode}</script>
-			<div id="qualitynominationdemotion-popup"></div>
-			<script type="text/javascript" src="{version_hash src="/js/dist/qualitynominationdemotion_popup.js"}"></script>
+			<div id="qualitynomination-popup"></div>
+			<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
 		</div>
 		<div id="footer">
 		</div>
