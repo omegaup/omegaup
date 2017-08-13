@@ -39,7 +39,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaRunSubmitUpload: "O sube un archivo",
 	arenaRunSubmitWaitBetweenUploads: "Eles devem passar %(submissionGap) segundos entre a entrega do mesmo problema",
 	assignmentNotFound: "Tarea/examen no encontrado",
-	banneandoProblemaPorReporte: "Banneando problema por reporte de usuario",
+	banningProblemDueToReport: "Banneando problema por reporte de usuario",
 	birthdayInTheFuture: "No tienes edad suficiente para usar omegaUp",
 	cannotAddProb: "No puedes agregar problemas porque no eres el director del concurso.",
 	cannotRemoveProblem: "No puedes eliminar problemas porque no eres el director del concurso.",
