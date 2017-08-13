@@ -186,8 +186,39 @@ class QualityNominationController extends Controller {
             ]));
         }
 
-        return ['status' => 'ok'];
+        return ['status' => 'ok',
+                'qualitynomination_id' => $nomination->qualitynomination_id];
     }
+
+    /**
+     * Marks a nomination (promotion or demotion) as resolved (approved or declined).
+     *
+     * @param Request $r         The request.
+     *
+     * @return array The response.
+     */
+    public static function apiResolve(Request $r, $status) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        if ($status != 'open' && $status != 'approved' && $status != 'denied') {
+            throw new InvalidParameterException('parameterInvalid', 'status');
+        }
+
+        // Validate request
+        self::authenticateRequest($r);
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
+        if (is_null($qualitynomination)) {
+            throw new NotFoundException('qualitynominationNotFound');
+        }
+        $qualitynomination->status = $status;
+        QualityNominationsDAO::save($qualitynomination);
+
+        return ['status' => 'ok'];
+    } 
 
     /**
      * Returns the list of nominations made by $nominator (if non-null),
@@ -371,7 +402,6 @@ class QualityNominationController extends Controller {
             // Force 'statements' to be an object.
             $response['original_contents']['statements'] = (object)[];
         }
-        $response['status'] = 'ok';
 
         return $response;
     }

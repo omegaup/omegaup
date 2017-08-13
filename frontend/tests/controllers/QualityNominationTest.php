@@ -149,6 +149,66 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion can be marked as approved by a reviewer. 
+     */
+    public function testDemotionCannotBeResolvedByRegularUser() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $request = new Request([
+            'auth_token' => $login->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        try {
+            $response = QualityNominationController::apiResolve($request, 'approved');
+            $this->fail("Normal user shouldn't be able to resolve demotion");
+        } catch (ForbiddenAccessException $e) {
+            // Expected.
+        }
+    }
+
+    /**
+     * Check that a demotion can be marked as approved by a reviewer. 
+     */
+    public function testDemotionCanBeResolvedByReviewer() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        // Login as a reviewer.
+        $login = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $login->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request, 'approved');
+
+        $details = QualityNominationController::apiDetails($request);
+        if ($details['status'] != 'approved') {
+            $this->fail('qualitynomination should have been marked as approved');
+        }
+    }
+
+    /**
      * Check that before a duplicate nomination needs to have a valid original problem.
      */
     public function testNominatingForDuplicate() {
