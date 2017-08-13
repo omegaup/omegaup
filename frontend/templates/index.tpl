@@ -84,7 +84,7 @@
 			</div>
 		</div>
 		{/if}
-
+		{if $LANG eq 'es'}
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageMaterial#}</h3>
@@ -95,6 +95,7 @@
 				</a>
 			</div>
 		</div>
+		{/if}
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -104,9 +105,12 @@
 		    </ul>
 		</div>
 
+		{if $LANG eq 'es'}
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
 		</div>
+		{/if}
+
 	</div>
 </div>
 </div><!-- container -->
