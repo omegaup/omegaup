@@ -41,6 +41,9 @@ $smarty->assign('quality_payload', [
     'problem_alias' => $result['alias'],
     'language' => $result['problem_statement_language'],
 ]);
+$smarty->assign('reportProblem_payload', [
+    'problem_alias' => $result['alias'],
+]);
 $smarty->assign('karel_problem', count(array_intersect(
     explode(',', $result['languages']),
     ['kp', 'kj']

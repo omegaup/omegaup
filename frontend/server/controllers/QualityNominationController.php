@@ -50,7 +50,7 @@ class QualityNominationController extends Controller {
      * the `contents` field should be a JSON blob with the following fields:
      *
      * * `rationale`: A small text explaining the rationale for demotion.
-     * * `reason`: One of `['duplicate', 'offensive']`.
+     * * `reason`: One of `['duplicate', 'not a statement', 'offensive', 'other', 'spam']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
      *
@@ -132,7 +132,7 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'offensive'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'not a statement', 'offensive', 'other', 'spam'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
