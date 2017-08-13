@@ -218,7 +218,7 @@ class QualityNominationController extends Controller {
         QualityNominationsDAO::save($qualitynomination);
 
         return ['status' => 'ok'];
-    } 
+    }
 
     /**
      * Returns the list of nominations made by $nominator (if non-null),

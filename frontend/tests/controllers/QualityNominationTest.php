@@ -149,7 +149,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-     * Check that a demotion can be marked as approved by a reviewer. 
+     * Check that a demotion can be marked as approved by a reviewer.
      */
     public function testDemotionCannotBeResolvedByRegularUser() {
         $problemData = ProblemsFactory::createProblem();
@@ -178,7 +178,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-     * Check that a demotion can be marked as approved by a reviewer. 
+     * Check that a demotion can be marked as approved by a reviewer.
      */
     public function testDemotionCanBeResolvedByReviewer() {
         $problemData = ProblemsFactory::createProblem();
