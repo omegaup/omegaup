@@ -1,7 +1,11 @@
 omegaup.OmegaUp.on('ready', function() {
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
-  omegaup.API.Course.details({alias: courseAlias})
-      .then(function(course) {
+
+  var details = omegaup.API.Course.details({alias: courseAlias});
+  var progress = omegaup.API.Course.courseProgress({alias: courseAlias});
+
+  $.when(details, progress)
+      .then(function(course, score) {
         // Assignment lists by type.
         var assignments = {};
         for (var i = 0; i < course.assignments.length; ++i) {
@@ -17,6 +21,9 @@ omegaup.OmegaUp.on('ready', function() {
               new Date(1000 * course.assignments[i].start_time));
           course.assignments[i].finishTime = omegaup.UI.formatDateTime(
               new Date(1000 * course.assignments[i].finish_time));
+          var iScore = score.assignments[course.assignments[i].alias];
+          var percent = iScore.score / iScore.max_score * 100;
+          course.assignments[i].progress = percent.toFixed(2) + '%';
         }
 
         // Put assignment lists back in a separate field per type.
