@@ -50,6 +50,9 @@ class Courses extends VO {
         if (isset($data['finish_time'])) {
             $this->finish_time = $data['finish_time'];
         }
+        if (isset($data['public'])) {
+            $this->public = $data['public'];
+        }
     }
 
     /**
@@ -120,4 +123,11 @@ class Courses extends VO {
       * @var timestamp
       */
     public $finish_time;
+
+    /**
+      * True implica cualquier usuario puede entrar al curso
+      * @access public
+      * @var tinyint(1)
+      */
+    public $public;
 }
