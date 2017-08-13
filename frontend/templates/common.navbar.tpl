@@ -46,7 +46,7 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>+</span><span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><a href='/rank/'>{#navRanking#}</a></li>
-								{if $lang eq 'es'}
+								{if $LANG eq 'es'}
 								<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 								<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 								{/if}

@@ -241,6 +241,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
+    $smarty->assign('$LANG', $lang);
 
     if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
         $smarty->force_compile = true;
