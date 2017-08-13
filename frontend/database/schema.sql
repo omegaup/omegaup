@@ -788,6 +788,7 @@ CREATE TABLE `Assignments` (
   `assignment_type` enum('homework', 'test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
   KEY `acl_id` (`acl_id`)
