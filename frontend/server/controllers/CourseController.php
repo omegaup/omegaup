@@ -88,6 +88,8 @@ class CourseController extends Controller {
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
 
+        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
+
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional.
         $start_time = null;
@@ -105,6 +107,13 @@ class CourseController extends Controller {
         }
         if ($r['start_time'] > $r['finish_time']) {
             throw new InvalidParameterException('courseInvalidStartTime');
+        }
+
+        // Only curator can set public
+        if (!is_null($r['public'])
+            && $r['public'] == true
+            && !Authorization::canCreatePublicCourse($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
         }
     }
 
@@ -197,6 +206,7 @@ class CourseController extends Controller {
                 'acl_id' => $acl->acl_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+                'public' => is_null($r['public']) ? false : $r['public'],
             ]));
 
             CoursesDAO::transEnd();
@@ -752,7 +762,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Add Student to Course
+     * Add Student to Course.
      *
      * @param  Request $r
      * @return array
@@ -767,13 +777,16 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
-            throw new ForbiddenAccessException();
-        }
-
         $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
         if (is_null($r['user'])) {
             throw new NotFoundException('userOrMailNotFound');
+        }
+
+        // Only course admins or users adding themselves when the course is public
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+            && ($r['course']->public == false
+            || $r['user']->user_id !== $r['current_user_id'])) {
+            throw new ForbiddenAccessException();
         }
 
         $groupUser = new GroupsUsers([
@@ -862,6 +875,7 @@ class CourseController extends Controller {
             'start_time' => strtotime($r['course']->start_time),
             'finish_time' => strtotime($r['course']->finish_time),
             'is_admin' => $isAdmin,
+            'public' => $r['course']->public,
         ];
 
         if ($isAdmin) {
@@ -1038,6 +1052,9 @@ class CourseController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'show_scoreboard',
+            'public' => ['transform' => function ($value) {
+                return is_null($value) ? false : $value;
+            }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
 

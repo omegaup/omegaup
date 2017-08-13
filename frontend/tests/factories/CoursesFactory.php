@@ -1,10 +1,22 @@
 <?php
 
 class CoursesFactory {
-    public static function createCourse(Users $admin = null, ScopedLoginToken $adminLogin = null) {
+    public static function createCourse(Users $admin = null, ScopedLoginToken $adminLogin = null, $public = false) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
+        }
+
+        if ($public != false) {
+            $curatorGroup = GroupsDAO::FindByAlias(
+                Authorization::COURSE_CURATOR_GROUP_ALIAS
+            );
+
+            GroupsUsersDAO::save(new GroupsUsers([
+                'group_id' => $curatorGroup->group_id,
+                'user_id' => $admin->user_id,
+                'role_id' => Authorization::ADMIN_ROLE,
+            ]));
         }
 
         $courseAlias = Utils::CreateRandomString();
@@ -15,7 +27,8 @@ class CoursesFactory {
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'public' => $public
         ]);
 
         $response = CourseController::apiCreate($r);
