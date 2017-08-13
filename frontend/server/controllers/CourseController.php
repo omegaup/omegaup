@@ -124,6 +124,10 @@ class CourseController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateCourseExists(Request $r, $column_name) {
+        if (!is_null($r['course']) && is_a($r['course'], 'Courses')) {
+            return;
+        }
+
         Validators::isStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
         $r['course'] = CoursesDAO::getByAlias($r[$column_name]);
         if (is_null($r['course'])) {
@@ -857,6 +861,44 @@ class CourseController extends Controller {
     }
 
     /**
+     * Check if a user is registered to the course. Internal API
+     * @param  Request $r
+     * @return Boolean
+     */
+    public static function isRegistered(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        $exists = false;
+        $groupUser = new GroupsUsers([
+            'group_id' => $r['course']->group_id,
+            'user_id' => $r['current_user_id']
+        ]);
+        if (!is_null(GroupsUsersDAO::getByPK(
+            $groupUser->group_id,
+            $groupUser->user_id
+        ))) {
+            $exists = true;
+        }
+
+        return $exists;
+    }
+
+    /**
+     * Show course intro only on public courses when user is not yet registered
+     * @param  Request $r
+     * @return Boolean
+     */
+    public static function showIntro(Request $r) {
+        self::validateCourseExists($r, 'course_alias');
+        if (!self::isRegistered($r) && $r['course']->public == true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns course details common between admin & non-admin
      * @param  Request $r
      * @return array
@@ -1014,7 +1056,7 @@ class CourseController extends Controller {
             $r['current_user_id'],
             $r['course'],
             $r['group']
-        )) {
+        ) && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
 

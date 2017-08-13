@@ -104,6 +104,19 @@ class CourseDetailsTest extends OmegaupTestCase {
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
+
+        $this->assertEquals('ok', $response['status']);
+    }
+
+    public function testGetCourseDetailsNoCourseMemberPublic() {
+        $courseData = CoursesFactory::createCourse(null, null, true);
+        $user = UserFactory::createUser();
+
+        $userLogin = self::login($user);
+        $response = CourseController::apiDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'alias' => $courseData['course_alias']
+        ]));
     }
 
     public function testGetCourseDetailsCourseMember() {

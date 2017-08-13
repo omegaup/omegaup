@@ -23,7 +23,24 @@ try {
     die();
 }
 
+$result = [];
+try {
+    $show_intro = CourseController::showIntro($r);
+
+    if ($show_intro) {
+        $result = CourseController::apiDetails($r);
+    }
+} catch (Exception $e) {
+    // Worst case detault to not show.
+}
+
 if ($show_intro) {
+    $smarty->assign('course_payload', [
+        'name' => $result['name'],
+        'description' => $result['description'],
+        'alias' => $result['alias'],
+        'currentUsername' => $session['user']->username,
+    ]);
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
