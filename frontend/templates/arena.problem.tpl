@@ -47,8 +47,8 @@
 {/if}
 					<div>
 						<script type="text/json" id="reportProblem-payload">{$reportProblem_payload|json_encode}</script>
-						<div id="qualitynominationdemotion-popup"></div>
-						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynominationdemotion_popup.js"}"></script>
+						<div id="qualitynomination-demotionpopup"></div>
+						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_demotionpopup.js"}"></script>
 					</div>
 {include file='arena.runs.tpl' show_submit=true show_details=true}
 					<table class="best-solvers">

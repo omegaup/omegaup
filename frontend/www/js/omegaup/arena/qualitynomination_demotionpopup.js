@@ -1,14 +1,14 @@
 import {API, UI, OmegaUp, T} from '../omegaup.js';
-import qualitynominationdemotion_Popup from '../components/qualitynomination/DemotionPopup.vue';
+import qualitynomination_demotionPopup from '../components/qualitynomination/DemotionPopup.vue';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   let reportProblemPayload =
       JSON.parse(document.getElementById('reportProblem-payload').innerText);
   let qualitynominationdemotionForm = new Vue({
-    el: '#qualitynominationdemotion-popup',
+    el: '#qualitynomination-demotionpopup',
     render: function(createElement) {
-      return createElement('qualitynominationdemotion-popup', {
+      return createElement('qualitynomination-demotionpopup', {
         props: {},
         on: {
           submit: function(ev) {
@@ -30,7 +30,7 @@ OmegaUp.on('ready', function() {
     },
     data: {},
     components: {
-      'qualitynominationdemotion-popup': qualitynominationdemotion_Popup,
+      'qualitynomination-demotionpopup': qualitynomination_demotionPopup,
     }
   });
 });

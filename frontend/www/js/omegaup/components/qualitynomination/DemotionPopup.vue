@@ -1,5 +1,5 @@
 <template>
-  <div class="qualitynominationdemotion-popup">
+  <div class="qualitynomination-demotionpopup">
     <a href="#"
          v-on:click="onReportInappropriateProblem">{{ T.wordsReportProblem }}</a>
     <form class="panel panel-default popup"
@@ -42,7 +42,7 @@
           <button class="col-md-4 btn btn-primary"
                type="submit"
                v-bind:disabled=
-               "selectedReason == undefined ? true : (rationale.length &lt;= 0 ? selectedReason == 'other' : false)"
+               "!selectedReason || (!rationale &amp;&amp; selectedReason == 'other')"
                v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
         </div>
       </template>
@@ -86,8 +86,7 @@ export default {
     onSubmit() {
       this.$emit('submit', this);
       this.currentView = 'thanks';
-      var self = this;
-      setTimeout(function() { self.onHide() }, 1000);
+      setTimeout(() => this.onHide(), 1000);
     }
   }
 };
@@ -96,7 +95,7 @@ export default {
 
 <style>
 
-.qualitynominationdemotion-popup .popup {
+.qualitynomination-demotionpopup .popup {
 	position: fixed;
 	bottom: 10px;
 	right: 4%;
@@ -109,32 +108,32 @@ export default {
 	overflow: auto;
 }
 
-.qualitynominationdemotion-popup .question-text {
+.qualitynomination-demotionpopup .question-text {
 	font-weight: bold;
 	padding-bottom: 4px;
 }
 
-.qualitynominationdemotion-popup .title-text {
+.qualitynomination-demotionpopup .title-text {
 	font-weight: bold;
 	font-size: 1em;
 	padding-bottom: 1em;
 }
 
-.qualitynominationdemotion-popup .control-label {
+.qualitynomination-demotionpopup .control-label {
 	width: 100%;
 }
 
-.qualitynominationdemotion-popup .input-text {
+.qualitynomination-demotionpopup .input-text {
 	height: 100px;
 	width: 100%;
 }
 
-.qualitynominationdemotion-popup .button-row {
+.qualitynomination-demotionpopup .button-row {
 	width: 100%;
 	margin-left: 66%;
 }
 
-.qualitynominationdemotion-popup .centered {
+.qualitynomination-demotionpopup .centered {
 	margin-left: 20%;
 	margin-top: 24%;
 	position: absolute;
