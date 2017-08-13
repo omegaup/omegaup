@@ -265,7 +265,6 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-<<<<<<< HEAD
      * Check that before discard a problem, the user must
      * have solved it first.
      */
@@ -280,7 +279,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'dismissal',
             'contents' => json_encode([
-                'rationale' => 'dismiss' ]),
+                'rationale' => 'dismiss', ]),
         ]);
 
         try {
@@ -290,14 +289,30 @@ class QualityNominationTest extends OmegaupTestCase {
             // still expected.
         }
 
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        $key = new QualityNominations([
+            'user_id' => $r['current_user_id'],
+            'problem_id' => $problem->problem_id,
+            'nomination' => $r['nomination'],
+            'contents' => json_encode([
+                'rationale' => 'dismiss' ]), // re-encoding it for normalization.
+            'status' => 'open',
+        ]);
+
+        $problem_dismissed = QualityNominationsDAO::search($key);
+        $response = count($problem_dismissed) > 0;
+
         RunsFactory::gradeRun($runData);
 
-        $response = QualityNominationController::isNominationDismissed($r);
-        if ($response['isDismissed'] == true) {
+        if ($response == true) {
             $this->fail('Should not have been able to dismissed the problem');
         } else {
-            QualityNominationController::dismissNomination($r);
-            $finalresponse = QualityNominationController::isNominationDismissed($r);
+            QualityNominationController::apiCreate($r);
+            $pd = QualityNominationsDAO::search($key);
+            $finalresponse = count($pd) > 0;
             if ($finalresponse == false) {
                 $this->fail('The problem should have been dismissed');
             }

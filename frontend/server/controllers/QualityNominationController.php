@@ -53,7 +53,7 @@ class QualityNominationController extends Controller {
      * * `reason`: One of `['duplicate', 'offensive']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
-     * # Dismiss
+     * # Dismissal
      * A user that has already solved a problem can dismiss suggestions. The
      * `contents` field is empty except for `rationale = 'dismiss'`.
      *
@@ -147,7 +147,7 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'dismissal') {
-            // When a problem is being dismissal, the user
+            // When a problem is being dismissed, the user
             // must have already solved it.
             if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
@@ -158,6 +158,7 @@ class QualityNominationController extends Controller {
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
+            $contents = ['rationale' => 'dismiss'];
         }
 
         // Create object
@@ -184,73 +185,6 @@ class QualityNominationController extends Controller {
         }
 
         return ['status' => 'ok'];
-    }
-
-    /**
-     * Creates a new QualityNominations if a user declines to make a
-     * suggestion
-     *
-     * @param Request $r
-     *
-     * @return array
-     */
-    public static function dismissNomination(Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-             throw new ForbiddenAccessException('lockdown');
-        }
-
-         // Validate request
-         self::authenticateRequest($r);
-         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
-
-        if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-            throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-        }
-
-         // Create object
-         $dismissed = new QualityNominations([
-             'user_id' => $r['current_user_id'],
-             'problem_id' => $problem->problem_id,
-             'nomination' => 'dismissal',
-             'contents' => json_encode([
-                'rationale' => 'dismiss']),
-         ]);
-         QualityNominationsDAO::save($dismissed);
-         return ['status' => 'ok'];
-    }
-
-    /**
-     * Search if current user dismissed a problem
-     *
-     * @param Request $r
-     * @return array
-     */
-    public static function isNominationDismissed(Request $r) {
-        self::authenticateRequest($r);
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
-
-        $key = new QualityNominations([
-            'problem_id' => $problem->problem_id,
-            'user_id' => $r['current_user_id'],
-            'contents' => json_encode([
-                'rationale' => 'dismiss']),
-        ]);
-        $problem_dismissed = QualityNominationsDAO::search($key);
-
-        $response = [];
-        $response['isDismissed'] = count($problem_dismissed) > 0;
-        $response['status'] = 'ok';
-        return $response;
     }
 
     /**
