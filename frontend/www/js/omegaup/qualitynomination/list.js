@@ -4,6 +4,7 @@ import {API, UI, OmegaUp, T} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
+
   for (let nomination of payload.nominations) {
     OmegaUp.convertTimes(nomination);
   }
