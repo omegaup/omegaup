@@ -4,8 +4,8 @@ import {API, UI, OmegaUp, T} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
-  console.log(payload);
-  var viewDetails = new Vue({
+
+  let viewDetails = new Vue({
     el: '#qualitynomination-details',
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
