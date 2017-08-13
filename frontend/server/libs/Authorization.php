@@ -11,8 +11,8 @@ class Authorization {
     // Cache for system group for quality reviewers.
     private static $quality_reviewer_group = null;
 
-    // Cache for system group for curators
-    private static $curator_group = null;
+    // Cache for system group for course curators
+    private static $course_curator_group = null;
 
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
@@ -215,14 +215,14 @@ class Authorization {
     }
 
     public static function isCourseCurator($user_id) {
-        if (self::$curator_group == null) {
-            self::$curator_group = GroupsDAO::findByAlias(
+        if (self::$course_curator_group == null) {
+            self::$course_curator_group = GroupsDAO::findByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
         }
         return Authorization::isGroupMember(
             $user_id,
-            self::$curator_group
+            self::$course_curator_group
         );
     }
 

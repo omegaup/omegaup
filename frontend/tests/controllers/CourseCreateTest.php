@@ -1,7 +1,7 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
-    private static $curators = [];
+    private static $curator = null;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -9,15 +9,13 @@ class CourseCreateTest extends OmegaupTestCase {
         $curatorGroup = GroupsDAO::FindByAlias(
             Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
-        for ($i = 0; $i < 5; $i++) {
-            $curator = UserFactory::createUser();
-            GroupsUsersDAO::save(new GroupsUsers([
-                'group_id' => $curatorGroup->group_id,
-                'user_id' => $curator->user_id,
-                'role_id' => Authorization::ADMIN_ROLE,
-            ]));
-            self::$curators[] = $curator;
-        }
+
+        self::$curator = UserFactory::createUser();
+        GroupsUsersDAO::save(new GroupsUsers([
+            'group_id' => $curatorGroup->group_id,
+            'user_id' => self::$curator->user_id,
+            'role_id' => Authorization::ADMIN_ROLE,
+        ]));
     }
 
     /**
@@ -255,7 +253,7 @@ class CourseCreateTest extends OmegaupTestCase {
      * Only curators can make Public courses
      */
     public function testCreatePublicCourse() {
-        $login = self::login(self::$curators[0]);
+        $login = self::login(self::$curator);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
