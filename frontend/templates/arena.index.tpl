@@ -5,9 +5,11 @@
 					<div class="panel-heading panel-default">
 						<h1>{#arenaPageTitle#}</h1>
 						<p>{#arenaPageIntroduction#}</p>
+						{if $LANG eq 'es'}
 						<p>{#frontPageIntroduction#}
 							<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" target="_blank">
 								<small><u>{#frontPageIntroductionButton#}</u></small></a></p>
+						{/if}
 					</div>
 					<div class="panel-body">
 
