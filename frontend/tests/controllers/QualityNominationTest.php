@@ -168,6 +168,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $request = new Request([
             'auth_token' => $login->auth_token,
+            'nomination' => 'demotion',
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         try {
             $response = QualityNominationController::apiResolve($request, 'approved');
@@ -194,17 +195,23 @@ class QualityNominationTest extends OmegaupTestCase {
                 'reason' => 'offensive',
             ]),
         ]));
-
         // Login as a reviewer.
         $login = self::login(self::$reviewers[0]);
         $request = new Request([
             'auth_token' => $login->auth_token,
+            'nomination' => 'demotion',
+            'problem_alias' => $problemData['request']['alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request, 'approved');
 
         $details = QualityNominationController::apiDetails($request);
         if ($details['status'] != 'approved') {
             $this->fail('qualitynomination should have been marked as approved');
+        }
+
+        $problem = ProblemController::apiDetails($request);
+        if ($problem['visibility'] != ProblemController::VISIBILITY_BANNED) {
+            $this->fail('Problem should have been made banned');
         }
     }
 

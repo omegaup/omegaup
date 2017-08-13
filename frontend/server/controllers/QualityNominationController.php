@@ -202,6 +202,12 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
+        if ($r['nomination'] != 'demotion') {
+            throw new InvalidParameterException(
+                'Resolution only supported for nominations for now.'
+            );
+        }
+
         if ($status != 'open' && $status != 'approved' && $status != 'denied') {
             throw new InvalidParameterException('parameterInvalid', 'status');
         }
@@ -209,6 +215,13 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
+
+        if ($status == 'approved') {
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $r['message'] = 'banneandoProblemaPorReporte';
+            $r['visibility'] = ProblemController::VISIBILITY_BANNED;
+            ProblemController::apiUpdate($r);
+        }
 
         $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
         if (is_null($qualitynomination)) {

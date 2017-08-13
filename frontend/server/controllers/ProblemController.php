@@ -73,7 +73,9 @@ class ProblemController extends Controller {
                     Validators::isInEnum(
                         $r['visibility'],
                         'visibility',
-                        [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+                        [ProblemController::VISIBILITY_PRIVATE,
+                            ProblemController::VISIBILITY_PUBLIC,
+                            ProblemController::VISIBILITY_BANNED]
                     );
                 }
             }
@@ -681,7 +683,6 @@ class ProblemController extends Controller {
      */
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
-
         self::validateCreateOrUpdate($r, true /* is update */);
 
         // Validate commit message.
