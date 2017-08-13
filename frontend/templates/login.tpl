@@ -67,7 +67,7 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">
-							<label for="reg_username" class="control-label">{#wordsUser#}</label>
+							<label for="reg_username" class="control-label">{#wordsUsername#}</label>
 							<input id='reg_username' name='reg_username' value='' type='text' class="form-control">
 						</div>
 					</div>

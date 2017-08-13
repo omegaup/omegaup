@@ -11,7 +11,7 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
       plotShadow: false,
       renderTo: renderTo
     },
-    title: {text: 'veredictos de ' + title},
+    title: {text: t.wordsVerdictFor + title},
     tooltip: {
       formatter: function() {
         return '<b>Envíos</b>: ' + stats.verdict_counts[this.point.name];

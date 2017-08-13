@@ -775,8 +775,10 @@ omegaup.OmegaUp.loadTranslations({
 	wordsTotal: "Total",
 	wordsUnimplemented: "This feature has not been implemented yet :(",
 	wordsUser: "User",
+	wordsUsername: "Username",
 	wordsValidator: "Validator",
 	wordsVerdict: "Verdict",
+	wordsVerdictFor: "Verdict for ",
 	wordsYes: "Yes",
 	youMustOpenBeforeSubmit: "You must open the problem before trying to submit a solution.",
 });

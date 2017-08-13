@@ -775,8 +775,10 @@ omegaup.OmegaUp.loadTranslations({
 	wordsTotal: "Total",
 	wordsUnimplemented: "Esta caracter\u00edstica no ha sido implementada a\u00fan :(",
 	wordsUser: "Usuario",
+	wordsUsername: "Usuario",
 	wordsValidator: "Validador",
 	wordsVerdict: "Veredicto",
+	wordsVerdictFor: "Veredicto de ",
 	wordsYes: "S\u00ed",
 	youMustOpenBeforeSubmit: "Debes abrir el problema antes de hacer un envio",
 });
