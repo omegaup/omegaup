@@ -263,4 +263,57 @@ class QualityNominationTest extends OmegaupTestCase {
             }
         );
     }
+
+    /**
+     * Check that before discard a problem, the user must
+     * have solved it first.
+     */
+    public function testMustSolveBeforeDismissed() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([
+                'rationale' => 'dismiss', ]),
+        ]);
+
+        try {
+            QualityNominationController::apiCreate($r);
+            $this->fail('Should not have been able to dismissed the problem');
+        } catch (PreconditionFailedException $e) {
+        }
+
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        $key = new QualityNominations([
+            'user_id' => $r['current_user_id'],
+            'problem_id' => $problem->problem_id,
+            'nomination' => $r['nomination'],
+            'contents' => json_encode([
+                'rationale' => 'dismiss' ]), // re-encoding it for normalization.
+            'status' => 'open',
+        ]);
+
+        $problem_dismissed = QualityNominationsDAO::search($key);
+        RunsFactory::gradeRun($runData);
+
+        try {
+            $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
+        } catch (PreconditionFailedException $e) {
+        }
+
+        try {
+            QualityNominationController::apiCreate($r);
+            $pd = QualityNominationsDAO::search($key);
+            $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
+        } catch (PreconditionFailedException $e) {
+        }
+    }
 }
