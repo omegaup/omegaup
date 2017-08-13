@@ -782,6 +782,7 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
+        // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
             && ($r['course']->public == false
             || $r['user']->user_id !== $r['current_user_id'])) {
