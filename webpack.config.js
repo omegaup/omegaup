@@ -12,11 +12,11 @@ module.exports = {
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
-		reportinappropriateproblem_popup: './frontend/www/js/omegaup/arena/reportinappropriateproblem_popup.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
+    qualitynominationdemotion_popup:'./frontend/www/js/omegaup/arena/qualitynominationdemotion_popup.js', 
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

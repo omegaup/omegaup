@@ -1,5 +1,5 @@
 <template>
-  <div class="reportinappropriateproblem-popup">
+  <div class="qualitynominationdemotion-popup">
     <a href="#"
          v-on:click="onReportInappropriateProblem">{{ T.wordsReportProblem }}</a>
     <form class="panel panel-default popup"
@@ -17,7 +17,7 @@
           </div><select class="control-label"
                name="selectedReason"
                v-model="selectedReason">
-            <option value="not a statement">
+            <option value="no-problem-statement">
               {{ T.reportProblemFormNotAProblemStatement }}
             </option>
             <option value="offensive">
@@ -96,7 +96,7 @@ export default {
 
 <style>
 
-.reportinappropriateproblem-popup .popup {
+.qualitynominationdemotion-popup .popup {
 	position: fixed;
 	bottom: 10px;
 	right: 4%;
@@ -109,32 +109,32 @@ export default {
 	overflow: auto;
 }
 
-.reportinappropriateproblem-popup .question-text {
+.qualitynominationdemotion-popup .question-text {
 	font-weight: bold;
 	padding-bottom: 4px;
 }
 
-.reportinappropriateproblem-popup .title-text {
+.qualitynominationdemotion-popup .title-text {
 	font-weight: bold;
 	font-size: 1em;
 	padding-bottom: 1em;
 }
 
-.reportinappropriateproblem-popup .control-label {
+.qualitynominationdemotion-popup .control-label {
 	width: 100%;
 }
 
-.reportinappropriateproblem-popup .input-text {
+.qualitynominationdemotion-popup .input-text {
 	height: 100px;
 	width: 100%;
 }
 
-.reportinappropriateproblem-popup .button-row {
+.qualitynominationdemotion-popup .button-row {
 	width: 100%;
 	margin-left: 66%;
 }
 
-.reportinappropriateproblem-popup .centered {
+.qualitynominationdemotion-popup .centered {
 	margin-left: 20%;
 	margin-top: 24%;
 	position: absolute;

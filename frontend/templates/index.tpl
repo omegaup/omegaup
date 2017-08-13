@@ -15,6 +15,15 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-default">
+			<div class="jumbotron no-bottom-margin">
+				<h1 class="text-center">{#frontPageWelcome#}</h1>
+				<p class="top-margin">{#frontPageDescription#}</p>
+				<div class="text-center">
+					<a href="/contest/new/" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
+				</div>
+				<p class="text-center top-margin">{#frontPageIntroduction#}</p>
+				<div class="text-center">
+					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
 				</div>
 			</div>
 		</div>
