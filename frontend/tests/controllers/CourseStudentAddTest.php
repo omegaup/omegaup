@@ -147,7 +147,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias']
             ]));
 
-                $this->assertEquals('ok', $response['status']);
+        $this->assertEquals('ok', $response['status']);
 
         // Validate student was added
         $course = CoursesDAO::getByAlias($courseData['course_alias']);

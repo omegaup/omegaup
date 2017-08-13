@@ -32,8 +32,8 @@ class Authorization {
     // Group for quality reviewers.
     const QUALITY_REVIEWER_GROUP_ALIAS = 'omegaup:quality-reviewer';
 
-    // Group for curators.
-    const CURATOR_GROUP_ALIAS = 'omegaup:curator';
+    // Group for course curators.
+    const COURSE_CURATOR_GROUP_ALIAS = 'omegaup:course-curator';
 
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
@@ -214,6 +214,18 @@ class Authorization {
         return !is_null($groupUsers) && count($groupUsers) > 0;
     }
 
+    public static function isCourseCurator($user_id) {
+        if (self::$curator_group == null) {
+            self::$curator_group = GroupsDAO::findByAlias(
+                Authorization::COURSE_CURATOR_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $user_id,
+            self::$curator_group
+        );
+    }
+
     public static function clearCacheForTesting() {
         self::$is_system_admin = null;
         self::$quality_reviewer_group = null;
@@ -228,14 +240,6 @@ class Authorization {
     }
 
     public static function canCreatePublicCourse($user_id) {
-        if (self::$curator_group == null) {
-            self::$curator_group = GroupsDAO::findByAlias(
-                Authorization::CURATOR_GROUP_ALIAS
-            );
-        }
-        return Authorization::isGroupMember(
-            $user_id,
-            self::$curator_group
-        );
+        return self::isCourseCurator($user_id);
     }
 }

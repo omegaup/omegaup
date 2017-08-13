@@ -5,4 +5,4 @@ ID    | Descripción
 1     | ACL reservado para el sistema. Los miembros de este ACL tienen capacidad de administradores del sistema.
 2     | `omegaup:quality-reviewer-admin`. Puede administrar `omegaup:quality-reviewer`.
 3     | `omegaup:quality-reviewer`. Los miembros de este grupo son jueces de calidad de problemas.
-4     | `omegaup:curator`. Los miembros de este grupo pueden hacer grupos Públicos.
+4     | `omegaup:course-curator`. Los miembros de este grupo pueden hacer cursos Públicos.

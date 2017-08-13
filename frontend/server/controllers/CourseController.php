@@ -777,17 +777,15 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
-        if ($r['course']->public == true) {
-            $r['user'] = $r['current_user'];
-        } else {
-            if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
-                throw new ForbiddenAccessException();
-            }
+        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userOrMailNotFound');
+        }
 
-            $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
-            if (is_null($r['user'])) {
-                throw new NotFoundException('userOrMailNotFound');
-            }
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+            && ($r['course']->public == false
+            || $r['user']->user_id !== $r['current_user_id'])) {
+            throw new ForbiddenAccessException();
         }
 
         $groupUser = new GroupsUsers([

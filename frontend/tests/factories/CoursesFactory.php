@@ -9,7 +9,7 @@ class CoursesFactory {
 
         if ($public != false) {
             $curatorGroup = GroupsDAO::FindByAlias(
-                Authorization::CURATOR_GROUP_ALIAS
+                Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
             GroupsUsersDAO::save(new GroupsUsers([

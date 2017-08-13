@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `Courses` (
   `acl_id` int(11) NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica cualquier usuario puede entrar al curso',
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
