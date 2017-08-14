@@ -317,8 +317,10 @@ class QualityNominationController extends Controller {
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        if ($r['current_user']->username != $response['nominator']['username']) {
-            self::validateMemberOfReviewerGroup($r);
+        $currentUserIsNominator = ($r['current_user']->username == $response['nominator']['username']);
+        $currentUserReviewer = Authorization::isQualityReviewer($r['current_user_id']);
+        if (!$currentUserIsNominator && !$currentUserReviewer) {
+            throw new ForbiddenAccessException('userNotAllowed');
         }
 
         // Get information from the original problem.
@@ -332,6 +334,11 @@ class QualityNominationController extends Controller {
             'source' => $problem->source,
             'tags' => ProblemsDAO::getTagsForProblem($problem, false),
         ];
+
+        // Dont leak private problem tags to nominator
+        if (!$currentUserReviewer) {
+            unset($response['original_contents']['tags']);
+        }
 
         foreach ($response['contents']['statements'] as $language => $_) {
             // There might be the case that the language is not originally

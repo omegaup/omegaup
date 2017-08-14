@@ -18,7 +18,8 @@
             <strong>{{ T.qualityUserThatNominated }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.nominator.name }} ({{ this.nominator.username }})
+            {{ this.nominator.name }} (<a v-bind:href="userUrl(this.nominator.username)">{{
+            this.nominator.username }}</a>)
           </div>
         </div>
         <div class="row">
@@ -26,8 +27,8 @@
             <strong>{{ T.wordsProblem }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.problem.title }} ({{ this.problem.alias }}) - <a v-bind:href=
-            "userUrl(this.problem.alias)">{{ T.problemEditGoToProblem }}</a>
+            {{ this.problem.title }} (<a v-bind:href="problemUrl(this.problem.alias)">{{
+            this.problem.alias }}</a>)
           </div>
         </div>
         <div class="row">
@@ -72,7 +73,8 @@ export default {
     };
   },
   methods: {
-    userUrl: function(alias) { return '/arena/problem/' + alias + '/';},
+    userUrl: function(alias) { return '/profile/' + alias + '/';},
+    problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
   }
 };
 </script>
