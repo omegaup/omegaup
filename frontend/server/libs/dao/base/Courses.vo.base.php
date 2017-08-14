@@ -125,7 +125,7 @@ class Courses extends VO {
     public $finish_time;
 
     /**
-      * True implica cualquier usuario puede entrar al curso
+      * True implica que cualquier usuario puede entrar al curso
       * @access public
       * @var tinyint(1)
       */

@@ -789,6 +789,7 @@ CREATE TABLE `Assignments` (
   `assignment_type` enum('homework', 'test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
   `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
@@ -1153,6 +1154,7 @@ DELIMITER ;
 CREATE INDEX idx_contest_public ON Contests (`public`);
 CREATE INDEX idx_user_roles_acl ON User_Roles (`acl_id`);
 CREATE INDEX idx_problems_visibility ON Problems (`visibility`);
+CREATE INDEX idx_problemset_problems_ids ON Problemset_Problems (`problem_id`, `problemset_id`);
 
 --
 -- Recalcula el ranking de todos los usuarios por Problemas resueltos.
