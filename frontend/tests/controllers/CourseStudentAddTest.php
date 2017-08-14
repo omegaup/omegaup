@@ -6,7 +6,7 @@
  */
 
 class CourseStudentAddTest extends OmegaupTestCase {
-     /**
+    /**
      * Basic apiAddStudent test
      */
     public function testAddStudentToCourse() {
@@ -163,45 +163,16 @@ class CourseStudentAddTest extends OmegaupTestCase {
     }
 
     /**
-     * Test isRegistered returns false before adding, true after adding
-     */
-    public function testIsRegistered() {
-        $courseData = CoursesFactory::createCourse();
-        $student = UserFactory::createUser();
-
-        // Before adding test - should be false
-        $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::isRegistered(new Request([
-            'auth_token' => $studentLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-            ])));
-
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
-        $response = CourseController::apiAddStudent(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $student->username,
-            'course_alias' => $courseData['course_alias']
-            ]));
-
-        // After adding test - should be true
-        $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(true, CourseController::isRegistered(new Request([
-            'auth_token' => $studentLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-            ])));
-    }
-
-    /**
      * Test showIntro with public and private contests
      */
-    public function testShowIntro() {
+    public function testShouldShowIntro() {
         $courseDataPrivate = CoursesFactory::createCourse();
         $courseDataPublic = CoursesFactory::createCourse(null, null, true);
         $student = UserFactory::createUser();
 
         // Before or after adding student to private course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::showIntro(new Request([
+        $this->assertEquals(false, CourseController::shouldShowIntro(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPrivate['course_alias']
             ])));
@@ -215,14 +186,14 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         // Before or after adding student to private course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::showIntro(new Request([
+        $this->assertEquals(false, CourseController::shouldShowIntro(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPrivate['course_alias']
             ])));
 
         // Before adding student to public course, intro should show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(true, CourseController::showIntro(new Request([
+        $this->assertEquals(true, CourseController::shouldShowIntro(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPublic['course_alias']
             ])));
@@ -234,9 +205,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseDataPublic['course_alias']
             ]));
 
-        // After adding student to private course, intro should not show
+        // After adding student to public course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::showIntro(new Request([
+        $this->assertEquals(false, CourseController::shouldShowIntro(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPublic['course_alias']
             ])));
