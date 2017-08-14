@@ -17,7 +17,6 @@ OmegaUp.on('ready', function() {
         props: {
           solved: this.solved,
           nominated: this.nominated,
-          dismissed: this.dismissed,
           originalSource: source
         },
         on: {
