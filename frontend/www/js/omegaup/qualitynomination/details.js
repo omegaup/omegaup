@@ -4,13 +4,13 @@ import {API, UI, OmegaUp, T} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
-
+  console.log(payload);
   let viewDetails = new Vue({
     el: '#qualitynomination-details',
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
-          contents: payload.contents,
+          contents: payload.original_contents,
           nomination: payload.nomination,
           nominator: {
             username: payload.nominator.username,

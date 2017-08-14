@@ -1,50 +1,51 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h2 class="panel-title">{{T.wordsReviewingProblem}}</h2>
+      <h2 class="panel-title">{{ T.wordsReviewingProblem }}</h2>
     </div>
     <div class="panel-body">
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{T.qualityNominationType}}</strong>
+            <strong>{{ T.qualityNominationType }}</strong>
           </div>
           <div class="col-sm-4">
-            {{this.nomination}}
+            {{ this.nomination }}
           </div>
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{T.qualityUserThatNominated}}</strong>
+            <strong>{{ T.qualityUserThatNominated }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.nominator.name}} ({{this.nominator.username}})
+            {{ this.nominator.name }} ({{ this.nominator.username }})
           </div>
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{T.wordsProblem}}</strong>
+            <strong>{{ T.wordsProblem }}</strong>
           </div>
           <div class="col-sm-4">
-            {{this.problem.title}} ({{this.problem.alias}}) - <a v-bind:href=
-            "userUrl(this.problem.alias)">{{T.problemEditGoToProblem}}</a>
+            {{ this.problem.title }} ({{ this.problem.alias }}) - <a v-bind:href=
+            "userUrl(this.problem.alias)">{{ T.problemEditGoToProblem }}</a>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{T.wordsDetails}}</strong>
+            <strong>{{ T.wordsDetails }}</strong>
           </div>
           <div class="col-sm-4">
-            {{this.contents}}
+            {{ this.contents }}
           </div>
         </div>
-        <div class="row">
+        <div class="row"
+             v-if="this.nomination == 'demotion'">
           <div class="col-sm-3">
-            <strong>{{T.wordsVerdict}}</strong>
+            <strong>{{ T.wordsVerdict }}</strong>
           </div>
           <div class="col-sm-4">
-            <button class="btn btn-danger">{{T.wordsBanProblem}}</button> <button class=
-            "btn btn-success">{{T.wordsKeepProblem}}</button>
+            <button class="btn btn-danger">{{ T.wordsBanProblem }}</button> <button class=
+            "btn btn-success">{{ T.wordsKeepProblem }}</button>
           </div>
         </div>
       </div>
@@ -58,7 +59,7 @@ import UI from '../../ui.js';
 
 export default {
   props: {
-    contents: Array,
+    contents: Object,
     nomination: String,
     nominator: {username: String, name: String},
     problem: {alias: String, title: String},
