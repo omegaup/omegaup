@@ -16,7 +16,7 @@ try {
     $show_intro = CourseController::shouldShowIntro($r);
 
     if ($show_intro) {
-        $result = CourseController::apiDetails($r);
+        $result = CourseController::apiPublicDetails($r);
     }
 
     if (isset($_REQUEST['assignment_alias'])) {

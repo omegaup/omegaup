@@ -106,6 +106,10 @@ class CourseDetailsTest extends OmegaupTestCase {
         ]));
     }
 
+    /**
+     * Get details with user not registered to the Course. Should fail even if course is Public.
+     * @expectedException ForbiddenAccessException
+     */
     public function testGetCourseDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
         $user = UserFactory::createUser();
@@ -115,8 +119,20 @@ class CourseDetailsTest extends OmegaupTestCase {
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
+    }
+
+    public function testGetCoursePublicDetailsNoCourseMemberPublic() {
+        $courseData = CoursesFactory::createCourse(null, null, true);
+        $user = UserFactory::createUser();
+
+        $userLogin = self::login($user);
+        $response = CourseController::apiPublicDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'alias' => $courseData['course_alias']
+        ]));
 
         $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($courseData['request']['name'], $response['name']);
     }
 
     public function testGetCourseDetailsCourseMember() {
