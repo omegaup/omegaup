@@ -1295,6 +1295,8 @@ class ProblemController extends Controller {
             );
         }
 
+        $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2));
+
         $response['score'] = self::bestScore($r);
         $response['status'] = 'ok';
         return $response;

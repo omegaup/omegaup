@@ -28,7 +28,7 @@ $smarty->assign('visibility', $result['visibility']);
 $smarty->assign('source', $result['source']);
 $smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);
-$smarty->assign('points', ROUND(100 / ( log10( ($result['accepted']>0?$result['accepted']:1) + 1) / log10(2) ), 2));
+$smarty->assign('points', $result['points']);
 $smarty->assign('validator', $result['validator']);
 $smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
 $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 . 's');
