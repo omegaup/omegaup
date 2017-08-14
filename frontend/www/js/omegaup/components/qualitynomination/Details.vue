@@ -45,8 +45,10 @@
             <strong>{{ T.wordsVerdict }}</strong>
           </div>
           <div class="col-sm-4">
-            <button class="btn btn-danger">{{ T.wordsBanProblem }}</button> <button class=
-            "btn btn-success">{{ T.wordsKeepProblem }}</button>
+            <button class="btn btn-danger"
+                 v-on:click="markResolution(true)">{{ T.wordsBanProblem }}</button> <button class=
+                 "btn btn-success"
+                 v-on:click="markResolution(false)">{{ T.wordsKeepProblem }}</button>
           </div>
         </div>
       </div>
@@ -55,7 +57,7 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {T, API} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
@@ -75,6 +77,15 @@ export default {
   methods: {
     userUrl: function(alias) { return '/profile/' + alias + '/';},
     problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
+    markResolution: function(banProblem) {
+      let newStatus = banProblem ? 'approved' : 'denied';
+      API.QualityNomination.resolve({
+                             problem: this.problem.alias,
+                             status: newStatus,
+                             qualitynomination_id: this.qualitynomination_id
+                           })
+          .fail(UI.apiError);
+    },
   }
 };
 </script>
