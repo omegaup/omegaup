@@ -118,7 +118,12 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {solved: Boolean, nominated: Boolean, originalSource: String},
+  props: {
+    solved: Boolean,
+    nominated: Boolean,
+    dismissal: Boolean,
+    originalSource: String
+  },
   data: function() {
     return {
       T: T,
@@ -133,11 +138,15 @@ export default {
   },
   computed: {
     showForm: function() {
-      return this.showFormOverride && this.solved && !this.nominated;
+      return this.showFormOverride && this.solved && !this.nominated &&
+             !this.dismissal;
     }
   },
   methods: {
-    onHide() { this.showFormOverride = false},
+    onHide() {
+      this.showFormOverride = false;
+      this.$emit('dismissal')
+    },
     onShowSuggestion() {
       this.$emit('show-suggestion', this);
       this.currentView = 'suggestion';

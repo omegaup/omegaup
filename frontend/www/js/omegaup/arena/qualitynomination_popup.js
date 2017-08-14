@@ -10,6 +10,7 @@ OmegaUp.on('ready', function() {
   let sourceNode = document.getElementsByClassName('source-data');
   let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
+  // before show popup. ask if is discarded
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
     render: function(createElement) {
@@ -17,6 +18,7 @@ OmegaUp.on('ready', function() {
         props: {
           solved: this.solved,
           nominated: this.nominated,
+          dismissed: this.dismissed,
           originalSource: source
         },
         on: {
@@ -40,11 +42,26 @@ OmegaUp.on('ready', function() {
                                    contents: JSON.stringify(contents),
                                  })
                 .fail(UI.apiError);
+          },
+          dismissal: function() {
+            let contents = {
+              'rationale': 'dismiss',
+            };
+            API.QualityNomination.create({
+                                   problem_alias: qualityPayload.problem_alias,
+                                   nomination: 'dismissal',
+                                   contents: JSON.stringify(contents),
+                                 })
+                .fail(UI.apiError);
           }
         }
       });
     },
-    data: {nominated: qualityPayload.nominated, solved: qualityPayload.solved},
+    data: {
+      nominated: qualityPayload.nominated,
+      solved: qualityPayload.solved,
+      dismissal: qualityPayload.dismissal
+    },
     components: {
       'qualitynomination-popup': qualitynomination_Popup,
     }
