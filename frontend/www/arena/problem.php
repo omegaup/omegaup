@@ -18,13 +18,12 @@ try {
         ]);
     $nominationStatus = null;
     $dismissal = null ;
-    $problem_dismissed = QualityNominationsDAO::search($key);
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
             $session['user']
         );
-        $dismissal = count($problem_dismissed) > 0;
+        $dismissal = count(QualityNominationsDAO::search($key)) > 0;
         $nominationStatus['dismissal'] = $dismissal;
     } else {
         $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissal' => false];

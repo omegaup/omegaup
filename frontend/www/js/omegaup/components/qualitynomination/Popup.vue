@@ -145,7 +145,7 @@ export default {
   methods: {
     onHide() {
       this.showFormOverride = false;
-      this.$emit('dismissal')
+      this.$emit('dismissal', this);
     },
     onShowSuggestion() {
       this.$emit('show-suggestion', this);

@@ -10,7 +10,6 @@ OmegaUp.on('ready', function() {
   let sourceNode = document.getElementsByClassName('source-data');
   let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
-  // before show popup. ask if is discarded
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
     render: function(createElement) {
