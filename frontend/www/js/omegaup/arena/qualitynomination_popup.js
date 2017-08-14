@@ -42,7 +42,7 @@ OmegaUp.on('ready', function() {
                                  })
                 .fail(UI.apiError);
           },
-          dismissal: function() {
+          dismiss: function() {
             let contents = {
               'rationale': 'dismiss',
             };
@@ -56,11 +56,7 @@ OmegaUp.on('ready', function() {
         }
       });
     },
-    data: {
-      nominated: qualityPayload.nominated,
-      solved: qualityPayload.solved,
-      dismissal: qualityPayload.dismissal
-    },
+    data: {nominated: qualityPayload.nominated, solved: qualityPayload.solved},
     components: {
       'qualitynomination-popup': qualitynomination_Popup,
     }

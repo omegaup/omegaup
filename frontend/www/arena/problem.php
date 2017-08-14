@@ -8,25 +8,14 @@ $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
     $problem = ProblemsDAO::GetByAlias($result['alias']);
-    $key = new QualityNominations([
-            'user_id' => $session['user'],
-            'problem_id' => $problem->problem_id,
-            'nomination' => 'dismissal',
-            'contents' => json_encode([
-                'rationale' => 'dismiss' ]),
-            'status' => 'open',
-        ]);
     $nominationStatus = null;
-    $dismissal = null ;
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
             $session['user']
         );
-        $dismissal = count(QualityNominationsDAO::search($key)) > 0;
-        $nominationStatus['dismissal'] = $dismissal;
     } else {
-        $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissal' => false];
+        $nominationStatus = ['solved' => false, 'nominated' => false];
     }
 } catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
@@ -49,7 +38,6 @@ $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
     'nominated' => (bool) $nominationStatus['nominated'],
-    'dismissal' => (bool) $nominationStatus['dismissal'],
     'problem_alias' => $result['alias'],
     'language' => $result['problem_statement_language'],
 ]);
