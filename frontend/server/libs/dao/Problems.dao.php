@@ -237,7 +237,7 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     final public static function getByAlias($alias) {
-        $sql = 'SELECT *, ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points FROM Problems WHERE (alias = ? ) LIMIT 1;';
+        $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [  $alias ];
 
         global $conn;
