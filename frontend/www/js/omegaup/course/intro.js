@@ -1,4 +1,4 @@
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import {API, UI, OmegaUp} from '../omegaup.js';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
 

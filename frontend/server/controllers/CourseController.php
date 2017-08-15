@@ -124,6 +124,9 @@ class CourseController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateCourseExists(Request $r, $column_name) {
+        /*
+         * TODO: This is used by the many calls of course.php. Could be removed.
+         */
         if (!is_null($r['course']) && is_a($r['course'], 'Courses')) {
             return;
         }
@@ -886,7 +889,7 @@ class CourseController extends Controller {
      * @param  Request $r
      * @return array
      */
-    private static function getCommonCourseDetails(Request $r, $onlyPublic = false) {
+    private static function getCommonCourseDetails(Request $r, $onlyPublic) {
         $isAdmin = Authorization::isCourseAdmin(
             $r['current_user_id'],
             $r['course']
@@ -950,7 +953,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r);
+        return self::getCommonCourseDetails($r, false /*onlyPublic*/);
     }
 
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
@@ -1053,7 +1056,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r);
+        return self::getCommonCourseDetails($r, false /*onlyPublic*/);
     }
 
     /**
@@ -1070,7 +1073,7 @@ class CourseController extends Controller {
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
 
-        // Details availble for public courses, otherwise Either only Course Admins or
+        // Details available for public courses, otherwise Either only Course Admins or
         // Group Members (students) can see these results
         if (!Authorization::canViewCourse(
             $r['current_user_id'],
@@ -1080,7 +1083,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r);
+        return self::getCommonCourseDetails($r, true /*onlyPublic*/);
     }
 
     /**
