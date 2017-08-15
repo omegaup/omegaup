@@ -789,6 +789,7 @@ CREATE TABLE `Assignments` (
   `assignment_type` enum('homework', 'test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
   `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
@@ -805,7 +806,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
-  `nomination` enum('suggestion', 'promotion', 'demotion') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
+  `nomination` enum('suggestion', 'promotion', 'demotion', 'dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
   `contents` TEXT NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
   `status` enum('open', 'approved', 'denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
@@ -1153,6 +1154,7 @@ DELIMITER ;
 CREATE INDEX idx_contest_public ON Contests (`public`);
 CREATE INDEX idx_user_roles_acl ON User_Roles (`acl_id`);
 CREATE INDEX idx_problems_visibility ON Problems (`visibility`);
+CREATE INDEX idx_problemset_problems_ids ON Problemset_Problems (`problem_id`, `problemset_id`);
 
 --
 -- Recalcula el ranking de todos los usuarios por Problemas resueltos.

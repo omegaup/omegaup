@@ -40,6 +40,17 @@ OmegaUp.on('ready', function() {
                                    contents: JSON.stringify(contents),
                                  })
                 .fail(UI.apiError);
+          },
+          dismiss: function() {
+            let contents = {
+              'rationale': 'dismiss',
+            };
+            API.QualityNomination.create({
+                                   problem_alias: qualityPayload.problem_alias,
+                                   nomination: 'dismissal',
+                                   contents: JSON.stringify(contents),
+                                 })
+                .fail(UI.apiError);
           }
         }
       });
