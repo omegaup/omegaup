@@ -29,18 +29,19 @@ class QualityNominationController extends Controller {
      *
      * # Promotion
      *
-     * A user that has already solved a problem can nominate it to be promoted
-     * as a Quality Problem. This expects the `nomination` field to be
-     * `promotion` and the `contents` field should be a JSON blob with the
-     * following fields:
+     * A user that has already solved a problem provide feedback about a problem. 
+     * This expects the `nomination` field to be `promotion` and the `contents` 
+		 * field should be a JSON blob with at least one of the following fields:
      *
-     * * `rationale`: A small text explaining the rationale for promotion.
-     * * `statements`: A dictionary of languages to objects that contain a
-     *                 `markdown` field, which is the markdown-formatted
-     *                 problem statement for that language.
-     * * `source`: A URL or string clearly documenting the source or full name
-     *             of original author of the problem.
-     * * `tags`: An array of tag names that will be added to the problem upon
+     * * `difficulty`: Tells us the difficulty of the problem. Must be an integer 
+		 *                 in the range [0, 4].
+		 *
+		 * * `quality`: Tells us the quality of the problem. Must be an integer int 
+		 *              the range [0, 4].
+		 *
+		 * * `rationale`: 'promotion'.
+		 *
+     * * `topics`: An array of topic names that will be added to the problem upon
      *           promotion.
      *
      * # Demotion
@@ -108,24 +109,15 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
-            if ((!isset($contents['statements']) || !is_array($contents['statements']))
-                || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
-                || (!isset($contents['tags']) || !is_array($contents['tags']))
+            if ((!isset($contents['difficulty']) || !is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4)
+                && (!isset($contents['quality']) || !is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4)
+                && (!isset($contents['topics']) || !is_array($contents['topics']))
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
-                }
-                $tag = TagController::normalize($tag);
-            }
-            // Statements must be a dictionary of language => { 'markdown': string }.
-            foreach ($contents['statements'] as $language => $statement) {
-                if (!is_array($statement) || empty($language)
-                    || (!isset($statement['markdown']) || !is_string($statement['markdown']) || empty($statement['markdown']))
-                ) {
+            foreach ($contents['topics'] as &$topic) {
+                if (!is_string($topic)) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
             }
