@@ -1,3 +1,4 @@
+{include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#enterCourse#}"}
 
 <div class="container-fluid">

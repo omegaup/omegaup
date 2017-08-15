@@ -5,6 +5,8 @@ if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
     die();
 }
 
+UITools::redirectToLoginIfNotLoggedIn();
+
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
