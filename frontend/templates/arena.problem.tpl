@@ -46,7 +46,7 @@
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
 					<div>
-						<script type="text/json" id="reportProblem-payload">{$reportProblem_payload|json_encode}</script>
+						<script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
 						<div id="qualitynomination-demotionpopup"></div>
 						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_demotionpopup.js"}"></script>
 					</div>

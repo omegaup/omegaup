@@ -41,7 +41,7 @@ $smarty->assign('quality_payload', [
     'problem_alias' => $result['alias'],
     'language' => $result['problem_statement_language'],
 ]);
-$smarty->assign('reportProblem_payload', [
+$smarty->assign('qualitynomination_reportproblem_payload', [
     'problem_alias' => $result['alias'],
 ]);
 $smarty->assign('karel_problem', count(array_intersect(
