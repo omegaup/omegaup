@@ -45,6 +45,11 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
+					<div>
+						<script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
+						<div id="qualitynomination-demotionpopup"></div>
+						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_demotionpopup.js"}"></script>
+					</div>
 {include file='arena.runs.tpl' show_submit=true show_details=true}
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
