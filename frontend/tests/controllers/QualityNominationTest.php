@@ -149,7 +149,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-     * Check that a demotion can be marked as approved by a reviewer.
+     * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
      */
     public function testDemotionCannotBeResolvedByRegularUser() {
         $problemData = ProblemsFactory::createProblem();
@@ -169,7 +169,6 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $login->auth_token,
             'status' => 'approved',
-            'nomination' => 'demotion',
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         try {
             $response = QualityNominationController::apiResolve($request);
@@ -201,20 +200,15 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $login->auth_token,
             'status' => 'approved',
-            'nomination' => 'demotion',
             'problem_alias' => $problemData['request']['alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
-        if ($details['status'] != 'approved') {
-            $this->fail('qualitynomination should have been marked as approved');
-        }
+        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        if ($problem['visibility'] != ProblemController::VISIBILITY_BANNED) {
-            $this->fail('Problem should have been made banned');
-        }
+        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been made banned');
     }
 
     /**

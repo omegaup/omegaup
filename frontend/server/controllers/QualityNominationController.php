@@ -48,7 +48,7 @@ class QualityNominationController extends Controller {
      * the `contents` field should be a JSON blob with the following fields:
      *
      * * `rationale`: A small text explaining the rationale for demotion.
-     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
+     * * `reason`: One of `['duplicate', 'offensive']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
      * # Dismissal
@@ -141,7 +141,7 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'offensive'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
@@ -202,31 +202,29 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        if ($r['nomination'] != 'demotion') {
-            throw new InvalidParameterException(
-                'Resolution only supported for nominations for now.'
-            );
-        }
-
-        if ($r['status'] != 'open' && $r['status'] != 'approved' && $r['status'] != 'denied') {
-            throw new InvalidParameterException('parameterInvalid', 'status');
-        }
+        Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
 
-        if ($r['status'] == 'approved') {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            $r['message'] = 'banningProblemDueToReport';
-            $r['visibility'] = ProblemController::VISIBILITY_BANNED;
-            ProblemController::apiUpdate($r);
-        }
-
         $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
         if (is_null($qualitynomination)) {
             throw new NotFoundException('qualitynominationNotFound');
         }
+        if ($qualitynomination->nomination != 'demotion') {
+            throw new InvalidParameterException('onlyDemotionsSupported');
+        }
+        if ($r['status'] == $qualitynomination->status) {
+            return ['status' => 'ok'];
+        }
+
+        // Is qualitynomination is made 'open', problem will become public.
+        $newProblemVisibility = ($r['status'] == 'approved') ? ProblemController::VISIBILITY_BANNED : ProblemController::VISIBILITY_PUBLIC;
+        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningRevertedByReviewer';
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['visibility'] = $newProblemVisibility;
+        ProblemController::apiUpdate($r);
         $qualitynomination->status = $r['status'];
         QualityNominationsDAO::save($qualitynomination);
 
@@ -415,6 +413,8 @@ class QualityNominationController extends Controller {
             // Force 'statements' to be an object.
             $response['original_contents']['statements'] = (object)[];
         }
+        $response['nomination_status'] = $response['status'];
+        $response['status'] = 'ok';
 
         return $response;
     }
