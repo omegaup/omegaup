@@ -1,4 +1,4 @@
-import {API, UI, OmegaUp} from '../omegaup.js';
+import {API, OmegaUp, UI} from '../omegaup.js';
 import qualitynomination_demotionPopup from '../components/qualitynomination/DemotionPopup.vue';
 import Vue from 'vue';
 
