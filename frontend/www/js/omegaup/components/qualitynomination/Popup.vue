@@ -137,7 +137,10 @@ export default {
     }
   },
   methods: {
-    onHide() { this.showFormOverride = false},
+    onHide() {
+      this.showFormOverride = false;
+      this.$emit('dismiss', this);
+    },
     onShowSuggestion() {
       this.$emit('show-suggestion', this);
       this.currentView = 'suggestion';
