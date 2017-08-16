@@ -284,6 +284,6 @@ export default {
 }
 
 .qualitynomination-popup .topics-container {
-	height: 120px;
+	height: 160px;
 }
 </style>
