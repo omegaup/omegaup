@@ -223,7 +223,6 @@ export default {
     },
     onSubmit() {
       this.$emit('submit', this);
-      this.$emit('dismiss', this);
       this.currentView = 'thanks';
       setTimeout(() => this.onHide(), 1000);
     }
