@@ -35,14 +35,10 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
-                'rationale' => 'cool!',
-                'statements' => [
-                    'es' => [
-                        'markdown' => 'a + b',
-                    ],
-                ],
-                'source' => 'omegaUp',
-                'tags' => [],
+                'rationale' => 'promotion',
+                'difficulty' => 0,
+                'quality' => 4,
+                'topics' => [],
             ]),
         ]);
 
@@ -216,14 +212,10 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
-                'rationale' => 'cool!',
-                'statements' => [
-                    'es' => [
-                        'markdown' => 'a + b',
-                    ],
-                ],
-                'source' => 'omegaUp',
-                'tags' => ['ez-pz'],
+                'rationale' => 'promotion',
+                'difficulty' => 0,
+                'quality' => 4,
+                'topics' => [],
             ]),
         ]));
 
