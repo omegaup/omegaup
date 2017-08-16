@@ -79,7 +79,6 @@ class QualityNominationTest extends OmegaupTestCase {
             $contestant->username,
             $details['nominator']['username']
         );
-        $this->assertNotNull($details['original_contents']);
     }
 
     /**
