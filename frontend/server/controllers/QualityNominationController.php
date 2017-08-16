@@ -29,18 +29,18 @@ class QualityNominationController extends Controller {
      *
      * # Promotion
      *
-     * A user that has already solved a problem provide feedback about a problem. 
-     * This expects the `nomination` field to be `promotion` and the `contents` 
-		 * field should be a JSON blob with at least one of the following fields:
+     * A user that has already solved a problem provide feedback about a problem.
+     * This expects the `nomination` field to be `promotion` and the `contents`
+         * field should be a JSON blob with at least one of the following fields:
      *
-     * * `difficulty`: Tells us the difficulty of the problem. Must be an integer 
-		 *                 in the range [0, 4].
-		 *
-		 * * `quality`: Tells us the quality of the problem. Must be an integer int 
-		 *              the range [0, 4].
-		 *
-		 * * `rationale`: 'promotion'.
-		 *
+     * * `difficulty`: Tells us the difficulty of the problem. Must be an integer
+         *                 in the range [0, 4].
+         *
+         * * `quality`: Tells us the quality of the problem. Must be an integer int
+         *              the range [0, 4].
+         *
+         * * `rationale`: 'promotion'.
+         *
      * * `topics`: An array of topic names that will be added to the problem upon
      *           promotion.
      *

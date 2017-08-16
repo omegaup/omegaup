@@ -22,7 +22,7 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             let contents = {
-							'rationale': 'promotion',
+              'rationale': 'promotion',
             };
 
             if (typeof(ev.difficulty) !== 'undefined') {

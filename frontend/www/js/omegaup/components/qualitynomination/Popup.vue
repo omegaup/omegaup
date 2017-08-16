@@ -31,135 +31,136 @@
                      value="5"> {{ T.qualityFormDifficultyVeryHard }}</label>
             </div>
             <div class="form-group">
-              <label class="control-label">{{ T.qualityFormTopics }} <select class="form-control topics-container"
+              <label class="control-label">{{ T.qualityFormTopics }} <select class=
+              "form-control topics-container"
                       multiple
                       v-model="topics">
-                        <option value="problemTopicImplementation">
-                          {{ T.problemTopicImplementation }}
-                        </option>
-                        <option value="problemTopicDynamicProgramming">
-                          {{ T.problemTopicDynamicProgramming }}
-                        </option>
-                        <option value="problemTopicMath">
-                          {{ T.problemTopicMath }}
-                        </option>
-                        <option value="problemTopicLoops">
-                          {{ T.problemTopicLoops }}
-                        </option>
-                        <option value="problemTopicIfElseSwitch">
-                          {{ T.problemTopicIfElseSwitch }}
-                        </option>
-                        <option value="problemTopicInputOutput">
-                          {{ T.problemTopicInputOutput }}
-                        </option>
-                        <option value="problemTopicArrays">
-                          {{ T.problemTopicArrays }}
-                        </option>
-                        <option value="problemTopicSimulation">
-                          {{ T.problemTopicSimulation }}
-                        </option>
-                        <option value="problemTopicGreedy">
-                          {{ T.problemTopicGreedy }}
-                        </option>
-                        <option value="problemTopicDataStructures">
-                          {{ T.problemTopicDataStructures }}
-                        </option>
-                        <option value="problemTopicBruteForce">
-                          {{ T.problemTopicBruteForce }}
-                        </option>
-                        <option value="problemTopicBreadthDepthFirstSearch">
-                          {{ T.problemTopicBreadthDepthFirstSearch }}
-                        </option>
-                        <option value="problemTopicSorting">
-                          {{ T.problemTopicSorting }}
-                        </option>
-                        <option value="problemTopicBinarySearch">
-                          {{ T.problemTopicBinarySearch }}
-                        </option>
-                        <option value="problemTopicGraphTheory">
-                          {{ T.problemTopicGraphTheory }}
-                        </option>
-                        <option value="problemTopicTrees">
-                          {{ T.problemTopicTrees }}
-                        </option>
-                        <option value="problemTopicStrings">
-                          {{ T.problemTopicStrings }}
-                        </option>
-                        <option value="problemTopicNumberTheory">
-                          {{ T.problemTopicNumberTheory }}
-                        </option>
-                        <option value="problemTopicGeometry">
-                          {{ T.problemTopicGeometry }}
-                        </option>
-                        <option value="problemTopicCombinatorics">
-                          {{ T.problemTopicCombinatorics }}
-                        </option>
-                        <option value="problemTopicTwoPointers">
-                          {{ T.problemTopicTwoPointers }}
-                        </option>
-                        <option value="problemTopicDisjointSets">
-                          {{ T.problemTopicDisjointSets }}
-                        </option>
-                        <option value="problemTopicBitmasks">
-                          {{ T.problemTopicBitmasks }}
-                        </option>
-                        <option value="problemTopicProbability">
-                          {{ T.problemTopicProbability }}
-                        </option>
-                        <option value="problemTopicShortestPath">
-                          {{ T.problemTopicShortestPath }}
-                        </option>
-                        <option value="problemTopicHashing">
-                          {{ T.problemTopicHashing }}
-                        </option>
-                        <option value="problemTopicDivideAndConquer">
-                          {{ T.problemTopicDivideAndConquer }}
-                        </option>
-                        <option value="problemTopicGameTheory">
-                          {{ T.problemTopicGameTheory }}
-                        </option>
-                        <option value="problemTopicMatrices">
-                          {{ T.problemTopicMatrices }}
-                        </option>
-                        <option value="problemTopicStackQueue">
-                          {{ T.problemTopicStackQueue }}
-                        </option>
-                        <option value="problemTopicBigNumbers">
-                          {{ T.problemTopicBigNumbers }}
-                        </option>
-                        <option value="problemTopicBuckets">
-                          {{ T.problemTopicBuckets }}
-                        </option>
-                        <option value="problemTopicMaxFlow">
-                          {{ T.problemTopicMaxFlow }}
-                        </option>
-                        <option value="problemTopicSuffixTree">
-                          {{ T.problemTopicSuffixTree }}
-                        </option>
-                        <option value="problemTopicSuffixArray">
-                          {{ T.problemTopicSuffixArray }}
-                        </option>
-                        <option value="problemTopicParsing">
-                          {{ T.problemTopicParsing }}
-                        </option>
-                        <option value="problemTopicTernarySearch">
-                          {{ T.problemTopicTernarySearch }}
-                        </option>
-                        <option value="problemTopicMeetInTheMiddle">
-                          {{ T.problemTopicMeetInTheMiddle }}
-                        </option>
-                        <option value="problemTopicFastFourierTransform">
-                          {{ T.problemTopicFastFourierTransform }}
-                        </option>
-                        <option value="problemTopic2Sat">
-                          {{ T.problemTopic2Sat }}
-                        </option>
-                        <option value="problemTopicBacktracking">
-                          {{ T.problemTopicBacktracking }}
-                        </option>
+                <option value="problemTopicImplementation">
+                  {{ T.problemTopicImplementation }}
+                </option>
+                <option value="problemTopicDynamicProgramming">
+                  {{ T.problemTopicDynamicProgramming }}
+                </option>
+                <option value="problemTopicMath">
+                  {{ T.problemTopicMath }}
+                </option>
+                <option value="problemTopicLoops">
+                  {{ T.problemTopicLoops }}
+                </option>
+                <option value="problemTopicIfElseSwitch">
+                  {{ T.problemTopicIfElseSwitch }}
+                </option>
+                <option value="problemTopicInputOutput">
+                  {{ T.problemTopicInputOutput }}
+                </option>
+                <option value="problemTopicArrays">
+                  {{ T.problemTopicArrays }}
+                </option>
+                <option value="problemTopicSimulation">
+                  {{ T.problemTopicSimulation }}
+                </option>
+                <option value="problemTopicGreedy">
+                  {{ T.problemTopicGreedy }}
+                </option>
+                <option value="problemTopicDataStructures">
+                  {{ T.problemTopicDataStructures }}
+                </option>
+                <option value="problemTopicBruteForce">
+                  {{ T.problemTopicBruteForce }}
+                </option>
+                <option value="problemTopicBreadthDepthFirstSearch">
+                  {{ T.problemTopicBreadthDepthFirstSearch }}
+                </option>
+                <option value="problemTopicSorting">
+                  {{ T.problemTopicSorting }}
+                </option>
+                <option value="problemTopicBinarySearch">
+                  {{ T.problemTopicBinarySearch }}
+                </option>
+                <option value="problemTopicGraphTheory">
+                  {{ T.problemTopicGraphTheory }}
+                </option>
+                <option value="problemTopicTrees">
+                  {{ T.problemTopicTrees }}
+                </option>
+                <option value="problemTopicStrings">
+                  {{ T.problemTopicStrings }}
+                </option>
+                <option value="problemTopicNumberTheory">
+                  {{ T.problemTopicNumberTheory }}
+                </option>
+                <option value="problemTopicGeometry">
+                  {{ T.problemTopicGeometry }}
+                </option>
+                <option value="problemTopicCombinatorics">
+                  {{ T.problemTopicCombinatorics }}
+                </option>
+                <option value="problemTopicTwoPointers">
+                  {{ T.problemTopicTwoPointers }}
+                </option>
+                <option value="problemTopicDisjointSets">
+                  {{ T.problemTopicDisjointSets }}
+                </option>
+                <option value="problemTopicBitmasks">
+                  {{ T.problemTopicBitmasks }}
+                </option>
+                <option value="problemTopicProbability">
+                  {{ T.problemTopicProbability }}
+                </option>
+                <option value="problemTopicShortestPath">
+                  {{ T.problemTopicShortestPath }}
+                </option>
+                <option value="problemTopicHashing">
+                  {{ T.problemTopicHashing }}
+                </option>
+                <option value="problemTopicDivideAndConquer">
+                  {{ T.problemTopicDivideAndConquer }}
+                </option>
+                <option value="problemTopicGameTheory">
+                  {{ T.problemTopicGameTheory }}
+                </option>
+                <option value="problemTopicMatrices">
+                  {{ T.problemTopicMatrices }}
+                </option>
+                <option value="problemTopicStackQueue">
+                  {{ T.problemTopicStackQueue }}
+                </option>
+                <option value="problemTopicBigNumbers">
+                  {{ T.problemTopicBigNumbers }}
+                </option>
+                <option value="problemTopicBuckets">
+                  {{ T.problemTopicBuckets }}
+                </option>
+                <option value="problemTopicMaxFlow">
+                  {{ T.problemTopicMaxFlow }}
+                </option>
+                <option value="problemTopicSuffixTree">
+                  {{ T.problemTopicSuffixTree }}
+                </option>
+                <option value="problemTopicSuffixArray">
+                  {{ T.problemTopicSuffixArray }}
+                </option>
+                <option value="problemTopicParsing">
+                  {{ T.problemTopicParsing }}
+                </option>
+                <option value="problemTopicTernarySearch">
+                  {{ T.problemTopicTernarySearch }}
+                </option>
+                <option value="problemTopicMeetInTheMiddle">
+                  {{ T.problemTopicMeetInTheMiddle }}
+                </option>
+                <option value="problemTopicFastFourierTransform">
+                  {{ T.problemTopicFastFourierTransform }}
+                </option>
+                <option value="problemTopic2Sat">
+                  {{ T.problemTopic2Sat }}
+                </option>
+                <option value="problemTopicBacktracking">
+                  {{ T.problemTopicBacktracking }}
+                </option>
               </select></label>
             </div>
-						<div class="form-group">
+            <div class="form-group">
               <label class="control-label">{{ T.qualityFormQuality }}</label><br>
               <label class="radio-inline"><input type="radio"
                      v-model="quality"
@@ -180,7 +181,7 @@
             <div class="row">
               <div class="col-md-4"></div><button class="col-md-4 btn btn-primary"
                    type="submit"
-                   v-bind:disabled="!quality && !topics.length && !difficulty"
+                   v-bind:disabled="!quality &amp;&amp; !topics.length &amp;&amp; !difficulty"
                    v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
                    "col-md-4 btn btn-default"
                    type="button"
@@ -208,16 +209,13 @@ export default {
       UI: UI,
       currentView: 'feedback',
       difficulty: undefined,
-			quality: undefined,
+      quality: undefined,
       showFormOverride: true,
       topics: [],
     };
   },
-  computed: {
-    showForm: function() {
-      return this.showFormOverride && this.solved; 
-    }
-  },
+  computed:
+      {showForm: function() { return this.showFormOverride && this.solved;}},
   methods: {
     onHide() {
       this.showFormOverride = false;
@@ -225,7 +223,7 @@ export default {
     },
     onSubmit() {
       this.$emit('submit', this);
-			this.$emit('dismiss', this);
+      this.$emit('dismiss', this);
       this.currentView = 'thanks';
       setTimeout(() => this.onHide(), 1000);
     }
