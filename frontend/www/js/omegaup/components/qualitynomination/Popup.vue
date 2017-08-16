@@ -189,7 +189,9 @@
             </div>
           </template>
           <template v-if="currentView == 'thanks'">
-            <h1>{{ T.qualityFormThanksForReview }}</h1>
+            <div class="thanks-title">
+              {{ T.qualityFormThanksForReview }}
+            </div>
           </template>
         </div>
       </form>
@@ -285,5 +287,13 @@ export default {
 
 .qualitynomination-popup .topics-container {
 	height: 160px;
+}
+
+.qualitynomination-popup .thanks-title {
+	display: block;
+  font-size: 2em;
+  font-weight: bold;
+	padding-left: 128px;
+	padding-top: 148px;
 }
 </style>
