@@ -332,10 +332,10 @@ class QualityNominationController extends Controller {
         $response['original_contents'] = [
             'statements' => [],
             'source' => $problem->source,
-            'tags' => ProblemsDAO::getTagsForProblem($problem, false),
+            'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
         ];
 
-        // Dont leak private problem tags to nominator
+        // Don't leak private problem tags to nominator
         if (!$currentUserReviewer) {
             unset($response['original_contents']['tags']);
         }
