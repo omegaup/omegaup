@@ -7,28 +7,28 @@
         <button class="close"
               type="button"
               v-on:click="onHide">×</button>
-        <div class="title-text">
-          {{T.qualityFormTitle}}
-        </div>
         <div class="container-fluid">
           <template v-if="currentView == 'feedback'">
+            <div class="title-text">
+              {{T.qualityFormCongrats}}
+            </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>
               <label class="radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="1"> {{ T.qualityFormDifficultyVeryEasy }}</label> <label class=
+                     value="0"> {{ T.qualityFormDifficultyVeryEasy }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="2"> {{ T.qualityFormDifficultyEasy }}</label> <label class=
+                     value="1"> {{ T.qualityFormDifficultyEasy }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="3"> {{ T.qualityFormDifficultyMedium }}</label> <label class=
+                     value="2"> {{ T.qualityFormDifficultyMedium }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="4"> {{ T.qualityFormDifficultyHard }}</label> <label class=
+                     value="3"> {{ T.qualityFormDifficultyHard }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="5"> {{ T.qualityFormDifficultyVeryHard }}</label>
+                     value="4"> {{ T.qualityFormDifficultyVeryHard }}</label>
             </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormTopics }} <select class=
@@ -286,14 +286,14 @@ export default {
 }
 
 .qualitynomination-popup .topics-container {
-	height: 160px;
+	height: 140px;
 }
 
 .qualitynomination-popup .thanks-title {
 	display: block;
   font-size: 2em;
   font-weight: bold;
-	padding-left: 128px;
+	padding-left: 120px;
 	padding-top: 148px;
 }
 </style>
