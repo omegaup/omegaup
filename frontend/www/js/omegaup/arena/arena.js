@@ -497,10 +497,11 @@ export class Arena {
       if (now > self.finishTime.getTime()) {
         if (self.options.contestAlias) {
           UI.warning('<a href="/arena/' + self.options.contestAlias +
-                    '/practice/">' + T.arenaContestEndedUsePractice + '</a>');
+                     '/practice/">' + T.arenaContestEndedUsePractice + '</a>');
           $('#new-run-practice-msg').show();
           $('#new-run-practice-msg a')
-              .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
+              .prop('href',
+                    '/arena/' + self.options.contestAlias + '/practice/');
         }
         $('#new-run').hide();
       }
