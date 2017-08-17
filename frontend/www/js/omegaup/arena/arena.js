@@ -495,12 +495,14 @@ export class Arena {
 
       // Show go-to-practice-mode messages on contest end
       if (now > self.finishTime.getTime()) {
-        UI.warning('<a href="/arena/' + self.options.contestAlias +
-                   '/practice/">' + T.arenaContestEndedUsePractice + '</a>');
+        if (self.options.contestAlias) {
+          UI.warning('<a href="/arena/' + self.options.contestAlias +
+                    '/practice/">' + T.arenaContestEndedUsePractice + '</a>');
+          $('#new-run-practice-msg').show();
+          $('#new-run-practice-msg a')
+              .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
+        }
         $('#new-run').hide();
-        $('#new-run-practice-msg').show();
-        $('#new-run-practice-msg a')
-            .prop('href', '/arena/' + self.options.contestAlias + '/practice/');
       }
     } else {
       clock = FormatDelta(countdownTime.getTime() - now);
