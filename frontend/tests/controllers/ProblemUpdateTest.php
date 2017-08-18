@@ -477,10 +477,10 @@ class UpdateProblemTest extends OmegaupTestCase {
             'visibility' => ProblemController::VISIBILITY_BANNED,
             'message' => 'public -> banned',
         ]));
-		
-        try {		
-            ProblemController::apiUpdate(new Request([		
-                'auth_token' => $login->auth_token,		
+
+        try {
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'visibility' => ProblemController::VISIBILITY_PROMOTED,
                 'message' => 'public -> promoted',
