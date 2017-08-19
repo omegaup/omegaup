@@ -369,7 +369,7 @@ class ContestController extends Controller {
         }
     }
 
-    public static function apiPublicDetails(Request $r) {
+    public static function apiIntroDetails(Request $r) {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $result = [];

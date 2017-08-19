@@ -126,6 +126,7 @@ class CourseController extends Controller {
     private static function validateCourseExists(Request $r, $column_name) {
         /*
          * TODO: This is used by the many calls of course.php. Could be removed.
+         * https://github.com/omegaup/omegaup/issues/1401
          */
         if (!is_null($r['course']) && is_a($r['course'], 'Courses')) {
             return;
@@ -870,18 +871,24 @@ class CourseController extends Controller {
     /**
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
+     * @throws NotFoundException Course not found or trying to directly access a private course.
      * @return Boolean
      */
     public static function shouldShowIntro(Request $r) {
         self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
 
-        if (!Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])
-            && $r['course']->public == true) {
-            return true;
+        // If canViewCourse is true, then user is already inside the course...
+        if (Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
+            return false;
         }
 
-        return false;
+        // If not previously registered and course is private, hide its existence
+        if (!$r['course']->public) {
+            throw new NotFoundException('courseNotFound');
+        }
+
+        return true;
     }
 
     /**
@@ -889,13 +896,13 @@ class CourseController extends Controller {
      * @param  Request $r
      * @return array
      */
-    private static function getCommonCourseDetails(Request $r, $onlyPublic) {
+    private static function getCommonCourseDetails(Request $r, $onlyIntroDetails) {
         $isAdmin = Authorization::isCourseAdmin(
             $r['current_user_id'],
             $r['course']
         );
 
-        if ($onlyPublic) {
+        if ($onlyIntroDetails) {
             $result = [
                 'status' => 'ok',
                 'name' => $r['course']->name,
@@ -953,7 +960,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r, false /*onlyPublic*/);
+        return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
@@ -1056,7 +1063,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r, false /*onlyPublic*/);
+        return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
     /**
@@ -1064,7 +1071,7 @@ class CourseController extends Controller {
      * @param  Request $r
      * @return array
      */
-    public static function apiPublicDetails(Request $r) {
+    public static function apiIntroDetails(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -1083,7 +1090,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r, true /*onlyPublic*/);
+        return self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
     }
 
     /**

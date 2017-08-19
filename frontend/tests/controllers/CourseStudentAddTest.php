@@ -172,10 +172,14 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         // Before or after adding student to private course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::shouldShowIntro(new Request([
-            'auth_token' => $studentLogin->auth_token,
-            'course_alias' => $courseDataPrivate['course_alias']
-            ])));
+        try {
+            CourseController::shouldShowIntro(new Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseDataPrivate['course_alias']
+                ]));
+        } catch (NotFoundException $e) {
+            // OK!
+        }
 
         $adminLogin = OmegaupTestCase::login($courseDataPrivate['admin']);
         $response = CourseController::apiAddStudent(new Request([
