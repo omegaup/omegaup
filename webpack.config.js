@@ -17,6 +17,7 @@ module.exports = {
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
+    qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js', 
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

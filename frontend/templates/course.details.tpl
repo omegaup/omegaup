@@ -7,6 +7,7 @@
 <table class="assignments-list table table-striped table-hover">
 	<thead><tr>
 		<th>{#wordsAssignment#}</th>
+		<th>{#wordsProgress#}</th>
 		<th class="time">{#wordsStartTime#}</th>
 		<th class="time">{#wordsEndTime#}</th>
 	</tr></thead>
@@ -14,6 +15,7 @@
 		<tr>
 			<td><a data-bind="text: name,
                               attr: { href: assignmentUrl }" /></td>
+			<td data-bind="text: progress" />
 			<td data-bind="text: startTime" />
 			<td data-bind="text: finishTime" />
 		</tr>

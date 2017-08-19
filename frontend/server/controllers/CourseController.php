@@ -394,6 +394,15 @@ class CourseController extends Controller {
             $points
         );
 
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $r['course'],
+                $r['assignment_alias']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         return ['status' => 'ok'];
     }
 
@@ -466,15 +475,27 @@ class CourseController extends Controller {
             'problemset_id' => $problemSet->problemset_id,
             'problem_id' => $problem->problem_id,
         ]);
-        if (is_null(ProblemsetProblemsDAO::getByPK(
+
+        $problemsetProblem = ProblemsetProblemsDAO::getByPK(
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id
-        ))) {
+        );
+
+        if (is_null($problemsetProblem)) {
             throw new NotFoundException('problemNotPartOfAssignment');
         }
 
         // Delete the entry from the database
         ProblemsetProblemsDAO::delete($problemsetProblem);
+
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $r['course'],
+                $r['assignment_alias']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return ['status' => 'ok'];
     }
@@ -770,6 +791,48 @@ class CourseController extends Controller {
         return [
             'status' => 'ok',
             'problems' => $problems,
+        ];
+    }
+
+    /**
+     * Returns details of a given course
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiMyProgress(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'alias');
+        self::resolveGroup($r);
+
+        // Only Course Admins or Group Members (students) can see these results
+        if (!Authorization::canViewCourse(
+            $r['current_user_id'],
+            $r['course'],
+            $r['group']
+        )) {
+            throw new ForbiddenAccessException();
+        }
+
+        $assignments = null;
+
+        try {
+            $assignments = CoursesDAO::getAssignmentsProgress(
+                $r['course']->course_id,
+                $r['current_user_id']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'assignments' => $assignments,
         ];
     }
 

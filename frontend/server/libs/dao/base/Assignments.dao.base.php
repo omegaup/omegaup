@@ -20,7 +20,7 @@ abstract class AssignmentsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`';
+    const FIELDS = '`Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class AssignmentsDAOBase extends DAO {
         if (is_null($assignment_id)) {
             return null;
         }
-        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
         $params = [$assignment_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class AssignmentsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Assignments}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time` from Assignments';
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` from Assignments';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -171,6 +171,14 @@ abstract class AssignmentsDAOBase extends DAO {
             $clauses[] = '`finish_time` = ?';
             $params[] = $Assignments->finish_time;
         }
+        if (!is_null($Assignments->max_points)) {
+            $clauses[] = '`max_points` = ?';
+            $params[] = $Assignments->max_points;
+        }
+        if (!is_null($Assignments->order)) {
+            $clauses[] = '`order` = ?';
+            $params[] = $Assignments->order;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -181,7 +189,7 @@ abstract class AssignmentsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time` FROM `Assignments`';
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM `Assignments`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -205,7 +213,7 @@ abstract class AssignmentsDAOBase extends DAO {
       * @param Assignments [$Assignments] El objeto de tipo Assignments a actualizar.
       */
     final private static function update(Assignments $Assignments) {
-        $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE `assignment_id` = ?;';
+        $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
         $params = [
             $Assignments->course_id,
             $Assignments->problemset_id,
@@ -217,6 +225,8 @@ abstract class AssignmentsDAOBase extends DAO {
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
+            $Assignments->max_points,
+            $Assignments->order,
             $Assignments->assignment_id,
         ];
         global $conn;
@@ -243,7 +253,13 @@ abstract class AssignmentsDAOBase extends DAO {
         if (is_null($Assignments->finish_time)) {
             $Assignments->finish_time = '2000-01-01 06:00:00';
         }
-        $sql = 'INSERT INTO Assignments (`assignment_id`, `course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        if (is_null($Assignments->max_points)) {
+            $Assignments->max_points = '0';
+        }
+        if (is_null($Assignments->order)) {
+            $Assignments->order =  '1';
+        }
+        $sql = 'INSERT INTO Assignments (`assignment_id`, `course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Assignments->assignment_id,
             $Assignments->course_id,
@@ -256,6 +272,8 @@ abstract class AssignmentsDAOBase extends DAO {
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
+            $Assignments->max_points,
+            $Assignments->order,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -421,6 +439,28 @@ abstract class AssignmentsDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`finish_time` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $AssignmentsA->max_points;
+        $b = $AssignmentsB->max_points;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`max_points` >= ? AND `max_points` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`max_points` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $AssignmentsA->order;
+        $b = $AssignmentsB->order;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`order` >= ? AND `order` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`order` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

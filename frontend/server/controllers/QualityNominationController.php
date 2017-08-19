@@ -50,9 +50,12 @@ class QualityNominationController extends Controller {
      * the `contents` field should be a JSON blob with the following fields:
      *
      * * `rationale`: A small text explaining the rationale for demotion.
-     * * `reason`: One of `['duplicate', 'offensive']`.
+     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
+     * # Dismissal
+     * A user that has already solved a problem can dismiss suggestions. The
+     * `contents` field is empty except for `rationale = 'dismiss'`.
      *
      * @param Request $r
      *
@@ -69,27 +72,27 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion']);
+        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         Validators::isStringNonEmpty($r['contents'], 'contents');
-
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)
             || (!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
         ) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
         }
-
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
 
-        if ($r['nomination'] == 'suggestion') {
-            // The user making suggestions to a problem must have already
-            // solved it.
+        if ($r['nomination'] != 'demotion') {
+            // All nominations types, except demotions, are only allowed for
+            // uses who have already solved the problem.
             if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
+        }
+        if ($r['nomination'] == 'suggestion') {
             if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
                 || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
                 || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
@@ -105,11 +108,6 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
-            // When a problem is being nominated for promotion, the user
-            // nominating it must have already solved it.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
-                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
-            }
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
                 || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
                 || (!isset($contents['tags']) || !is_array($contents['tags']))
@@ -132,7 +130,7 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'offensive'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
@@ -145,6 +143,14 @@ class QualityNominationController extends Controller {
                     throw new NotFoundException('problemNotFound');
                 }
             }
+        } elseif ($r['nomination'] == 'dismissal') {
+            if (isset($contents['origin']) || isset($contents['difficulty']) || isset($contents['source'])
+                || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
+                || isset($contents['reason'])
+            ) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            $contents = ['rationale' => 'dismiss'];
         }
 
         // Create object
