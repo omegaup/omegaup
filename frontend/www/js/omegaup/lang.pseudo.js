@@ -568,6 +568,7 @@ omegaup.OmegaUp.loadTranslations({
 	sortBySolved: "(S0r7 by 501v3d)",
 	spanishStatementMissing: "(Th3 pr0b13m mu57 c0n7ain a pr0b13m 57a73m3n7 in Spani5h.)",
 	startContest: "(S7ar7 C0n7357)",
+	startCourse: "(S7ar7 C0ur53)",
 	startEndMismatch: "(57ar7_7im3 cann07 b3 af73r fini5h_7im3.)",
 	stateNotFound: "(S7a73 n07 f0und)",
 	statementLanguage: "(Languag3)",

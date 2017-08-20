@@ -565,6 +565,7 @@
 	"sortBySolved": "Sort by solved",
 	"spanishStatementMissing": "The problem must contain a problem statement in Spanish.",
 	"startContest": "Start Contest",
+	"startCourse": "Start Course",
 	"startEndMismatch": "start_time cannot be after finish_time.",
 	"stateNotFound": "State not found",
 	"statementLanguage": "Language",

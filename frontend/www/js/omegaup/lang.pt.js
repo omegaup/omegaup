@@ -568,6 +568,7 @@ omegaup.OmegaUp.loadTranslations({
 	sortBySolved: "Ordenar por resolvidos",
 	spanishStatementMissing: "O problema deve conter uma reda\u00e7\u00e3o do problema em espanhol.",
 	startContest: "Iniciar concurso",
+	startCourse: "Iniciar curso",
 	startEndMismatch: "O tempo de in\u00edcio n\u00e3o pode ser ap\u00f3s do tempo do fim",
 	stateNotFound: "Estado n\u00e3o encontrado",
 	statementLanguage: "Idioma",

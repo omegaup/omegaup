@@ -8,6 +8,7 @@ module.exports = {
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
+    course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
