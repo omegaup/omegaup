@@ -22,21 +22,21 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             let contents = {
-              'rationale': ev.rationale,
+              'rationale': 'promotion',
             };
 
             if (typeof(ev.difficulty) !== 'undefined') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
             }
-            if (ev.source !== source) {
-              contents.source = ev.source;
+            if (typeof(ev.quality) !== 'undefined') {
+              contents.quality = Number.parseInt(ev.quality, 10);
             }
-            if (ev.tags.length > 0) {
-              contents.tags = ev.tags;
+            if (ev.topics.length > 0) {
+              contents.topics = ev.topics;
             }
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,
-                                   nomination: 'suggestion',
+                                   nomination: 'promotion',
                                    contents: JSON.stringify(contents),
                                  })
                 .fail(UI.apiError);
