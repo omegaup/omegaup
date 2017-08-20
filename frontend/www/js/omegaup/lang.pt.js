@@ -522,7 +522,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationProblemHasBeenPromoted: "Este problema foi promovido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
 	qualityNominationShowAll: "Mostrar todas as Nomea\u00e7\u00f5es",
 	qualityNominationType: "Tipo",
-	qualityUserThatNominated: "Usu\u00e1rio nomeado",
+	qualityUserThatNominated: "Usu\u00e1rio que nomeou",
 	rankHeaderPostCount: "usu\u00e1rios com mais problemas resolvidos",
 	rankHeaderPreCount: "Top",
 	rankScore: "Pontua\u00e7\u00e3o",
