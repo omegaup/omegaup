@@ -5,25 +5,38 @@ if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
     die();
 }
 
+UITools::redirectToLoginIfNotLoggedIn();
+
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
 $show_intro = false;
 $show_assignment = false;
+$result = [];
 
 try {
-    /*
-     * @TODO: Check if we should show intro
-     */
+    $show_intro = CourseController::shouldShowIntro($r);
+
+    if ($show_intro) {
+        $result = CourseController::apiIntroDetails($r);
+    }
+
     if (isset($_REQUEST['assignment_alias'])) {
         $show_assignment = true;
     }
 } catch (Exception $e) {
+    Logger::getLogger('course')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
     die();
 }
 
 if ($show_intro) {
+    $smarty->assign('course_payload', [
+        'name' => $result['name'],
+        'description' => $result['description'],
+        'alias' => $result['alias'],
+        'currentUsername' => $session['user']->username,
+    ]);
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
