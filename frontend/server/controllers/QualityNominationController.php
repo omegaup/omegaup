@@ -317,39 +317,46 @@ class QualityNominationController extends Controller {
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        if ($r['current_user']->username != $response['nominator']['username']) {
-            self::validateMemberOfReviewerGroup($r);
+        $currentUserIsNominator = ($r['current_user']->username == $response['nominator']['username']);
+        $currentUserReviewer = Authorization::isQualityReviewer($r['current_user_id']);
+        if (!$currentUserIsNominator && !$currentUserReviewer) {
+            throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        if ($response['nomination'] == 'promotion') {
-            // Get information from the original problem.
-            $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
-            if (is_null($problem)) {
-                throw new NotFoundException('problemNotFound');
-            }
-            $response['original_contents'] = [
-                'statements' => [],
-                'source' => $problem->source,
-                'tags' => ProblemsDAO::getTagsForProblem($problem, false),
+        // Get information from the original problem.
+        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $response['original_contents'] = [
+            'statements' => [],
+            'source' => $problem->source,
+            'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
+        ];
+
+        // Don't leak private problem tags to nominator
+        if (!$currentUserReviewer) {
+            unset($response['original_contents']['tags']);
+        }
+
+        foreach ($response['contents']['statements'] as $language => $_) {
+            // There might be the case that the language is not originally
+            // present, in which case it will be changed to Spanish.
+            $actualLanguage = $language;
+            $markdown = ProblemController::getProblemStatement(
+                $problem->alias,
+                $actualLanguage,
+                'markdown'
+            );
+            $response['original_contents']['statements'][$language] = [
+                'language' => $actualLanguage,
+                'markdown' => $markdown,
             ];
-            foreach ($response['contents']['statements'] as $language => $_) {
-                // There might be the case that the language is not originally
-                // present, in which case it will be changed to Spanish.
-                $actualLanguage = $language;
-                $markdown = ProblemController::getProblemStatement(
-                    $problem->alias,
-                    $actualLanguage,
-                    'markdown'
-                );
-                $response['original_contents']['statements'][$language] = [
-                    'language' => $actualLanguage,
-                    'markdown' => $markdown,
-                ];
-            }
-            if (empty($response['original_contents']['statements'])) {
-                // Force 'statements' to be an object.
-                $response['original_contents']['statements'] = (object)[];
-            }
+        }
+        if (empty($response['original_contents']['statements'])) {
+            // Force 'statements' to be an object.
+            $response['original_contents']['statements'] = (object)[];
         }
         $response['status'] = 'ok';
 

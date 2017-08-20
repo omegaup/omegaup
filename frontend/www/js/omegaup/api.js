@@ -397,6 +397,8 @@ export default {
                     }
                     return result;
                   }),
+
+    resolve: _call('/api/qualitynomination/resolve/'),
   },
 
   Reset: {
