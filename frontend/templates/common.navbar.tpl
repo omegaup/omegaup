@@ -1,6 +1,12 @@
 			<div id="header" class="navbar navbar-default navbar-fixed-top" role="navigation">
 				<div class="container navbar-inner">
 					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-8" aria-expanded="false">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
 						<a class="navbar-brand" href="/">
 							<img src="/media/omegaup_curves.png" alt="omegaUp" />
 							{if $smarty.const.OMEGAUP_LOCKDOWN}
@@ -8,53 +14,40 @@
 							{/if}
 						</a>
 					</div>
-					<ul class="nav navbar-nav">
-						{if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
-						<li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
-						{if $LOGGED_IN eq '1'}
-							<li id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
-								<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
-								<ul class="dropdown-menu">
-									<li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
-									<li><a href="/contest/mine/">{#navMyContests#}</a></li>
-									<li><a href="/group/">{#navMyGroups#}</a></li>
-									<li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
-								</ul>
-							</li>
-							<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
-								<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
-								<ul class="dropdown-menu">
-									<li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
-									<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
-									<li><a href="/problem/">{#wordsProblems#}</a></li>
-									<li><a href="/nomination/mine/">{#navMyQualityNomination#}</a></li>
-									{if $CURRENT_USER_IS_REVIEWER eq '1'}
-									<li><a href="/nomination/">{#navQualityNominationQueue#}</a></li>
-									{/if}
-								</ul>
-							</li>
-						{else}
-							<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
-						{/if}
-						<li class="hidden-xs hidden-sm{if isset($navbarSection) && $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
-						{if !empty($ENABLED_EXPERIMENTS) && in_array('schools', $ENABLED_EXPERIMENTS)}
-						<li class="hidden-xs hidden-sm{if isset($navbarSection) && $navbarSection == "schools"} active{/if}" id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
-						{/if}
-						<li class="hidden-xs hidden-sm"><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
-						<li class="hidden-xs hidden-sm"><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
-						<li id="nav-mas" class="hidden-md hidden-lg">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>+</span><span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href='/rank/'>{#navRanking#}</a></li>
-								<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
-								<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+					<div class="navbar-collapse collapse" id="navbar-collapse-8" aria-expanded="false" >
+						<ul class="nav navbar-nav">
+							{if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
+							<li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
+							{if $LOGGED_IN eq '1'}
+								<li id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
+										<li><a href="/contest/mine/">{#navMyContests#}</a></li>
+										<li><a href="/group/">{#navMyGroups#}</a></li>
+										<li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
+									</ul>
+								</li>
+								<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
+										<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
+										<li><a href="/problem/">{#wordsProblems#}</a></li>
+									</ul>
+								</li>
+							{else}
+								<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
+							{/if}<!-- LOGGED_IN -->
+							<li class="{if isset($navbarSection) && $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
+							{if !empty($ENABLED_EXPERIMENTS) && in_array('schools', $ENABLED_EXPERIMENTS)}
+							<li class="{if isset($navbarSection) && $navbarSection == "schools"} active{/if}" id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
+							{/if}
+							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
+							<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 							</ul>
-						</li>
-						{/if}
-					</ul>
-
-					<ul class="nav navbar-nav navbar-right">
-						{if $LOGGED_IN eq '1'}
+							<ul class="nav navbar-nav navbar-right">
+							{if $LOGGED_IN eq '1'}
 {if isset($inContest) && $inContest}
 {include file='common.navbar.notifications.tpl'}
 {/if}
@@ -65,7 +58,7 @@
 								 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
 								</ul>
 							</li>
-						{else}
+						{else}<!-- LOGGED_IN -->
 							<li><a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}'>{#navLogIn#}</a></li>
 						{/if}
 
@@ -75,8 +68,10 @@
 								<ul class="dropdown-menu">
 								</ul>
 							</li>
+						{/if}<!-- CURRENT_USER_IS_ADMIN -->
+						</ul>
 						{/if}
-					</ul>
+					</div>
 					{if $CURRENT_USER_IS_ADMIN eq '1'}
 					<script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
 					{/if}

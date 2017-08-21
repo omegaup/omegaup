@@ -12,103 +12,157 @@
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
-<div class="row">
-	<div class="col-md-8">
+<div class="row"> <!-- General information -->
+	<div class="col-md-8"> <!--Carrusel -->
 		<div class="panel panel-default">
-			<div class="jumbotron no-bottom-margin">
-				<h1 class="text-center">{#frontPageWelcome#}</h1>
-				<p class="top-margin">{#frontPageDescription#}</p>
-				<div class="text-center">
-					<a href="/contest/new/" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
-				</div>
-				<p class="text-center top-margin">{#frontPageIntroduction#}</p>
-				<div class="text-center">
-					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				{include file='rank.table.tpl' length=5 is_index=true}
-			</div>
+			<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+			<!-- Indicators -->
+			<ol class="carousel-indicators">
+				<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+				<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+				<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+				<li data-target="#carousel-example-generic" data-slide-to="3"></li>
+			</ol>
 
-			<div class="col-md-6">
-				<div class="panel panel-default">
-					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
-					<div id="omegaup-schools-rank"></div>
-					<div class="container-fluid">
-						<div class="col-xs-12 vertical-padding">
-							<a href="/schoolsrank/">{#rankViewFull#}</a>
-						</div>
+			<!-- Wrapper for slides -->
+			<div class="carousel-inner" >
+				<div class="item active">
+					<img src="/media/carrusel-background.png" alt="...">
+					<div class="carousel-caption">
+						<h3>Bienvenidos</h3>
+						<p></p>
+					</div>
+				</div>
+				<div class="item">
+					<img src="/media/carrusel-background.png" alt="...">
+					<div class="carousel-caption">
+						<h3>omegaUp mentors</h3>
+						<p>Un programa para </p>
+					</div>
+				</div>
+				<div class="item">
+					<img src="/media/carrusel-background.png" alt="...">
+					<div class="carousel-caption">
+						<h3>Schools</h3>
+						<p></p>
+					</div>
+				</div>
+				<div class="item">
+					<img src="/media/carrusel-background.png" alt="...">
+					<div class="carousel-caption">
+						<h3>omegaUp org</h3>
+						<p></p>
 					</div>
 				</div>
 			</div>
-
+			<!-- Controls -->
+			<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+			<span class="icon-prev"></span>
+			</a>
+			<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+				<span class="icon-next"></span>
+			</a>
+			</div>
 		</div>
-	</div>
-
+	</div> <!-- Carrusel -->
+	
 	<div class="col-md-4">
 		<div class="panel panel-default">
-			<div class="panel-body">
-				<!-- Facebook like button -->
-				<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21&amp;appId=197705690257857" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
-				<br/>
-				<!-- Twitter follow -->
-				<iframe allowtransparency="true" frameborder="0" scrolling="no"
-					src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
-					style="width:300px; height:20px;"></iframe>
-			</div>
-		</div>
-
-		{if isset($coderOfTheMonthData)}
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{#index#}</h3>
-			</div>
-			<div id="coder_of_the_month" class="panel-body">
-				<div class="rss_element">
-					<h4 class="text-center" id="coder-of-the-month-username"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}">{$coderOfTheMonthData.username|htmlspecialchars}</a><img src="/media/flags/{$coderOfTheMonthData.country_id|lower}.png" width="16" height="11" title="{$coderOfTheMonthData.country_id}"/></h4>
-					<div class="text-center" id="coder-of-the-month-img"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}"><img src="{$coderOfTheMonthData.gravatar_92}"></a></div>
-					<div id="coder-of-the-month-name">{$coderOfTheMonthData.name|htmlspecialchars}</div>
-					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>
-					<div id="coder-of-the-month-place">
-						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{$coderOfTheMonthData.country|htmlspecialchars}
+			<div class="row">
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="text-center" id="coder-of-the-month-img">
+							<a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}">
+								<img src="{$coderOfTheMonthData.gravatar_92}" />
+							</a>
+						</div>
+					</div> 
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<h3 class="panel-title">{#index#}</h3>
 					</div>
 				</div>
 			</div>
-			<div class="panel-body">
-				<a href="/coderofthemonth/">{#coderOfTheMonthFullList#}</a>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<img />
+					</div> 
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<h3 class="panel-title">School of the month</h3>
+					</div> 
+				</div>
 			</div>
-		</div>
-		{/if}
+		</div> 
+	</div> 
+</div>  <!-- General information -->
 
+<div class="row"> <!-- Educational series -->
+	<div class="col-md-4">
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{#frontPageMaterial#}</h3>
+			<div>
+				<img />
 			</div>
-			<div id="recommended_material" class="panel-body">
-				<a class="text-center center" href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
-				<img class="center top-margin" src="https://omegaup.com/img/libroluis.gif" width="75%"/>
-				</a>
+			<div>
+				<span>Curso 1</span>
 			</div>
-		</div>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{#frontPageNextContests#}</h3>
-			</div>
-			<ul class="list-group" id="next-contests-list">
-		    </ul>
-		</div>
-
-		<div class="panel panel-default">
-			<div id="runs-chart"></div>
 		</div>
 	</div>
-</div>
-</div><!-- container -->
+	<div class="col-md-4">
+		<div class="panel panel-default">
+		</div> 
+	</div>
+	<div class="col-md-4">
+		<div class="panel panel-default">
+		</div> 
+	</div>
+</div>  <!-- Educational series -->
 
+<div class="row"> <!-- Top users -->
+	<div class="col-md-6">
+		<img />
+	</div>
+	<div class="col-md-6"> 
+		<div class="panel panel-default">
+			{include file='rank.table.tpl' length=5 is_index=true}
+		</div>
+	</div>
+</div>  <!-- Top users -->
+
+<div class="row"> <!-- Top schools -->
+	<div class="col-md-6"> 
+		<div class="panel panel-default">
+			<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
+			<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
+			<div id="omegaup-schools-rank"></div>
+			<div class="container-fluid">
+				<div class="col-xs-12 vertical-padding">
+					<a href="/schoolsrank/">{#rankViewFull#}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<img />
+	</div>
+</div>  <!-- Top schools -->
+
+</div>
+
+<div>
+		<!-- Facebook like button -->
+	<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21&amp;appId=197705690257857" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+	<!-- Twitter follow -->
+	<iframe allowtransparency="true" frameborder="0" scrolling="no"
+		src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
+		style="width:300px; height:20px;"></iframe>
+</div>
+	
+</div><!-- container -->
 <script type="text/javascript" src="{version_hash src="/js/index.js"}"></script>
 
 {include file='footer.tpl'}
