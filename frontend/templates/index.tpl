@@ -65,7 +65,7 @@
 			</div>
 		</div>
 	</div> <!-- Carrusel -->
-	
+
 	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="row">
@@ -76,7 +76,7 @@
 								<img src="{$coderOfTheMonthData.gravatar_92}" />
 							</a>
 						</div>
-					</div> 
+					</div>
 				</div>
 				<div class="col-md-6">
 					<div class="panel panel-default">
@@ -88,16 +88,16 @@
 				<div class="col-md-6">
 					<div class="panel panel-default">
 						<img />
-					</div> 
+					</div>
 				</div>
 				<div class="col-md-6">
 					<div class="panel panel-default">
 						<h3 class="panel-title">School of the month</h3>
-					</div> 
+					</div>
 				</div>
 			</div>
-		</div> 
-	</div> 
+		</div>
+	</div>
 </div>  <!-- General information -->
 
 <div class="row"> <!-- Educational series -->
@@ -114,11 +114,11 @@
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		</div> 
+		</div>
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		</div> 
+		</div>
 	</div>
 </div>  <!-- Educational series -->
 
@@ -126,7 +126,7 @@
 	<div class="col-md-6">
 		<img />
 	</div>
-	<div class="col-md-6"> 
+	<div class="col-md-6">
 		<div class="panel panel-default">
 			{include file='rank.table.tpl' length=5 is_index=true}
 		</div>
@@ -134,7 +134,7 @@
 </div>  <!-- Top users -->
 
 <div class="row"> <!-- Top schools -->
-	<div class="col-md-6"> 
+	<div class="col-md-6">
 		<div class="panel panel-default">
 			<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
 			<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
@@ -161,7 +161,7 @@
 		src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
 		style="width:300px; height:20px;"></iframe>
 </div>
-	
+
 </div><!-- container -->
 <script type="text/javascript" src="{version_hash src="/js/index.js"}"></script>
 
