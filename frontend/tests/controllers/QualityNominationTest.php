@@ -277,12 +277,12 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         for ($i = 0; $i < 10; $i ++) {
             $users[] = UserFactory::createUser();
-            foreach($problems as $problem) {
+            foreach ($problems as $problem) {
                 $runData = RunsFactory::createRunToProblem($problem, $users[$i]);
                 RunsFactory::gradeRun($runData);
             }
         }
-        
+
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
@@ -326,6 +326,4 @@ class QualityNominationTest extends OmegaupTestCase {
         } catch (PreconditionFailedException $e) {
         }
     }
-    
-    
 }
