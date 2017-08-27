@@ -11,16 +11,15 @@
             <tr>
               <th>#</th>
               <th colspan="2">{{ T.profileSchool }}</th>
-              <th class="numericColumn data-rank">{{ T.activeUsers }}</th>
-              <th class="numericColumn data-rank">{{ T.profileSolvedProblems }}</th>
+              <th class="numericColumn data-rank">{{ T.contestActivityReportUsers }}</th>
+              <th class="numericColumn data-rank">{{ T.rankAC }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(school, index) in rank">
-              <td>{{index + 1}}</td>
-              <td class="cell-school-name"
-                  colspan="2"
-                  v-bind:title="school.name">{{school.name}}</td>
+              <td class="data-rank">{{index + 1}}</td>
+              <td class="flagColumn" v-html="UI.getFlag(school.country_id)"></td>
+              <td class="cell-school-name" v-bind:title="school.name">{{school.name}}</td>
               <td class="numericColumn data-rank">{{ school.distinct_users }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_problems }}</td>
             </tr>
@@ -56,6 +55,11 @@ export default {
 }
 
 .data-rank {
-  width: 15%;
+  width: 6%;
 }
+
+.omegaup-schools-rank {
+  margin-bottom: 0;
+}
+
 </style>
