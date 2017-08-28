@@ -185,6 +185,8 @@ export default {
 
     details: _call('/api/course/details/', _convertTimes),
 
+    myProgress: _call('/api/course/myProgress/'),
+
     createAssignment: _call('/api/course/createAssignment/'),
 
     getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
@@ -395,6 +397,8 @@ export default {
                     }
                     return result;
                   }),
+
+    resolve: _call('/api/qualitynomination/resolve/'),
   },
 
   Reset: {

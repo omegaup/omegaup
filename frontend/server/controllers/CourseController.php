@@ -88,6 +88,8 @@ class CourseController extends Controller {
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
 
+        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
+
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional.
         $start_time = null;
@@ -106,6 +108,13 @@ class CourseController extends Controller {
         if ($r['start_time'] > $r['finish_time']) {
             throw new InvalidParameterException('courseInvalidStartTime');
         }
+
+        // Only curator can set public
+        if (!is_null($r['public'])
+            && $r['public'] == true
+            && !Authorization::canCreatePublicCourse($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
     }
 
     /**
@@ -115,6 +124,14 @@ class CourseController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateCourseExists(Request $r, $column_name) {
+        /*
+         * TODO: This is used by the many calls of course.php. Could be removed.
+         * https://github.com/omegaup/omegaup/issues/1401
+         */
+        if (!is_null($r['course']) && is_a($r['course'], 'Courses')) {
+            return;
+        }
+
         Validators::isStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
         $r['course'] = CoursesDAO::getByAlias($r[$column_name]);
         if (is_null($r['course'])) {
@@ -132,6 +149,10 @@ class CourseController extends Controller {
     private static function resolveGroup(Request $r) {
         if (!is_a($r['course'], 'Courses')) {
             throw new InvalidParameterException('parameterNotFound', 'course');
+        }
+
+        if (!is_null($r['group']) && is_a($r['group'], 'Groups')) {
+            return;
         }
 
         try {
@@ -197,6 +218,7 @@ class CourseController extends Controller {
                 'acl_id' => $acl->acl_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+                'public' => is_null($r['public']) ? false : $r['public'],
             ]));
 
             CoursesDAO::transEnd();
@@ -372,6 +394,15 @@ class CourseController extends Controller {
             $points
         );
 
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $r['course'],
+                $r['assignment_alias']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         return ['status' => 'ok'];
     }
 
@@ -444,15 +475,27 @@ class CourseController extends Controller {
             'problemset_id' => $problemSet->problemset_id,
             'problem_id' => $problem->problem_id,
         ]);
-        if (is_null(ProblemsetProblemsDAO::getByPK(
+
+        $problemsetProblem = ProblemsetProblemsDAO::getByPK(
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id
-        ))) {
+        );
+
+        if (is_null($problemsetProblem)) {
             throw new NotFoundException('problemNotPartOfAssignment');
         }
 
         // Delete the entry from the database
         ProblemsetProblemsDAO::delete($problemsetProblem);
+
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $r['course'],
+                $r['assignment_alias']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return ['status' => 'ok'];
     }
@@ -752,7 +795,49 @@ class CourseController extends Controller {
     }
 
     /**
-     * Add Student to Course
+     * Returns details of a given course
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiMyProgress(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'alias');
+        self::resolveGroup($r);
+
+        // Only Course Admins or Group Members (students) can see these results
+        if (!Authorization::canViewCourse(
+            $r['current_user_id'],
+            $r['course'],
+            $r['group']
+        )) {
+            throw new ForbiddenAccessException();
+        }
+
+        $assignments = null;
+
+        try {
+            $assignments = CoursesDAO::getAssignmentsProgress(
+                $r['course']->course_id,
+                $r['current_user_id']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'assignments' => $assignments,
+        ];
+    }
+
+    /**
+     * Add Student to Course.
      *
      * @param  Request $r
      * @return array
@@ -767,13 +852,16 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
-            throw new ForbiddenAccessException();
-        }
-
         $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
         if (is_null($r['user'])) {
             throw new NotFoundException('userOrMailNotFound');
+        }
+
+        // Only course admins or users adding themselves when the course is public
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
+            && ($r['course']->public == false
+            || $r['user']->user_id !== $r['current_user_id'])) {
+            throw new ForbiddenAccessException();
         }
 
         $groupUser = new GroupsUsers([
@@ -844,38 +932,72 @@ class CourseController extends Controller {
     }
 
     /**
+     * Show course intro only on public courses when user is not yet registered
+     * @param  Request $r
+     * @throws NotFoundException Course not found or trying to directly access a private course.
+     * @return Boolean
+     */
+    public static function shouldShowIntro(Request $r) {
+        self::validateCourseExists($r, 'course_alias');
+        self::resolveGroup($r);
+
+        // If canViewCourse is true, then user is already inside the course...
+        if (Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
+            return false;
+        }
+
+        // If not previously registered and course is private, hide its existence
+        if (!$r['course']->public) {
+            throw new NotFoundException('courseNotFound');
+        }
+
+        return true;
+    }
+
+    /**
      * Returns course details common between admin & non-admin
      * @param  Request $r
      * @return array
      */
-    private static function getCommonCourseDetails(Request $r) {
+    private static function getCommonCourseDetails(Request $r, $onlyIntroDetails) {
         $isAdmin = Authorization::isCourseAdmin(
             $r['current_user_id'],
             $r['course']
         );
-        $result = [
-            'status' => 'ok',
-            'assignments' => CoursesDAO::getAllAssignments($r['alias'], $isAdmin),
-            'name' => $r['course']->name,
-            'description' => $r['course']->description,
-            'alias' => $r['course']->alias,
-            'start_time' => strtotime($r['course']->start_time),
-            'finish_time' => strtotime($r['course']->finish_time),
-            'is_admin' => $isAdmin,
-        ];
 
-        if ($isAdmin) {
-            try {
-                $group = GroupsDAO::getByPK($r['course']->group_id);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+        if ($onlyIntroDetails) {
+            $result = [
+                'status' => 'ok',
+                'name' => $r['course']->name,
+                'description' => $r['course']->description,
+                'alias' => $r['course']->alias,
+            ];
+        } else {
+            $result = [
+                'status' => 'ok',
+                'assignments' => CoursesDAO::getAllAssignments($r['alias'], $isAdmin),
+                'name' => $r['course']->name,
+                'description' => $r['course']->description,
+                'alias' => $r['course']->alias,
+                'start_time' => strtotime($r['course']->start_time),
+                'finish_time' => strtotime($r['course']->finish_time),
+                'is_admin' => $isAdmin,
+                'public' => $r['course']->public,
+            ];
+
+            if ($isAdmin) {
+                try {
+                    $group = GroupsDAO::getByPK($r['course']->group_id);
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
+                }
+                if (is_null($group)) {
+                    throw new NotFoundException('courseGroupNotFound');
+                }
+                $result['student_count'] = GroupsUsersDAO::GetMemberCountById(
+                    $group->group_id
+                );
             }
-            if (is_null($group)) {
-                throw new NotFoundException('courseGroupNotFound');
-            }
-            $result['student_count'] = GroupsUsersDAO::GetMemberCountById(
-                $group->group_id
-            );
         }
 
         return $result;
@@ -901,7 +1023,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r);
+        return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
@@ -1004,7 +1126,34 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($r);
+        return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
+    }
+
+    /**
+     * Returns public details of a given course
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiIntroDetails(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'alias');
+        self::resolveGroup($r);
+
+        // Details available for public courses, otherwise Either only Course Admins or
+        // Group Members (students) can see these results
+        if (!Authorization::canViewCourse(
+            $r['current_user_id'],
+            $r['course'],
+            $r['group']
+        ) && !$r['course']->public) {
+            throw new ForbiddenAccessException();
+        }
+
+        return self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
     }
 
     /**
@@ -1038,6 +1187,9 @@ class CourseController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'show_scoreboard',
+            'public' => ['transform' => function ($value) {
+                return is_null($value) ? false : $value;
+            }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
 

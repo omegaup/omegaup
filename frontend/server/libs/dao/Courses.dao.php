@@ -146,6 +146,51 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     /**
+     * Returns the score per assignment of a user, as well as the maximum score attainable
+     * @param  int $course_id
+     * @param  int $user_id
+     * @return Array Students data
+     */
+    public static function getAssignmentsProgress($course_id, $user_id) {
+        global  $conn;
+
+        $sql = 'SELECT a.alias as assignment, IFNULL(pr.total_score, 0) as score, a.max_points as max_score
+                FROM Assignments a
+                LEFT JOIN ( -- we want a score even if there are no submissions yet
+                    -- aggregate all runs per assignment
+                    SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
+                    FROM (
+                        -- get all runs belonging to an user and get the best score
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        FROM Assignments a
+                        INNER JOIN Problemset_Problems psp
+                            ON a.problemset_id = psp.problemset_id
+                        INNER JOIN Runs r
+                            ON r.problem_id = psp.problem_id
+                            AND r.problemset_id = a.problemset_id
+                        WHERE a.course_id = ? AND r.user_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                    ) bpr
+                    GROUP BY bpr.assignment_id
+                ) pr
+                ON a.assignment_id = pr.assignment_id
+                where a.course_id = ?';
+
+        $rs = $conn->Execute($sql, [$course_id, $user_id, $course_id]);
+
+        $progress = [];
+        foreach ($rs as $row) {
+            $assignment = $row['assignment'];
+            $progress[$assignment] = [
+                'score' => floatval($row['score']),
+                'max_score' => floatval($row['max_score']),
+            ];
+        }
+
+        return $progress;
+    }
+
+    /**
      * Returns all courses that a user can manage.
      */
     final public static function getAllCoursesAdminedByUser(
@@ -259,5 +304,26 @@ class CoursesDAO extends CoursesDAOBase {
         }
 
         return new Assignments($row);
+    }
+
+    final public static function updateAssignmentMaxPoints(Courses $course, $assignment_alias) {
+        $sql = 'UPDATE Assignments a
+                JOIN (
+                    SELECT assignment_id, sum(psp.points) as max_points
+                    FROM Assignments a
+                    INNER JOIN Problemset_Problems psp
+                        ON a.problemset_id = psp.problemset_id
+                    GROUP BY a.assignment_id
+                ) q
+                ON a.assignment_id = q.assignment_id
+                SET a.max_points = q.max_points
+                WHERE alias = ? AND course_id = ?;';
+
+        $params = [$assignment_alias, $course->course_id];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+
+        return $conn->Affected_Rows();
     }
 }

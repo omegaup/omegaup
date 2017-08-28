@@ -84,7 +84,7 @@ de tal manera que se establece overflow: hidden con un ancho máximo
 de 166px de contenido para mostrar.  */
 .forcebreaks-top-5 {
         word-wrap: initial !important;
-        max-width: 166px;
+        max-width: 155px;
 }
 
 /* Clase para quitar el padding de algn contenedor o div tag */
