@@ -159,7 +159,7 @@ class SchoolController extends Controller {
                 $result,
                 60 * 60 * 24 // 1 day
             );
-        } else { 
+        } else {
             $result = $fetch($r);
         }
 
