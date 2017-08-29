@@ -373,7 +373,7 @@ class ContestController extends Controller {
      * Temporal hotfix wrapper
      */
     public static function apiIntroDetails(Request $r) {
-        return self::apiPublicDetails($r)
+        return self::apiPublicDetails($r);
     }
     
     public static function apiPublicDetails(Request $r) {
