@@ -8,6 +8,7 @@ module.exports = {
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
+    course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
@@ -16,6 +17,8 @@ module.exports = {
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
+    qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
+    qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

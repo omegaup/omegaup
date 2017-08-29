@@ -208,6 +208,7 @@ CREATE TABLE IF NOT EXISTS `Courses` (
   `acl_id` int(11) NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
@@ -450,7 +451,6 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `email_clarifications` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`),
   KEY `acl_id` (`acl_id`),
-  KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
 
@@ -789,6 +789,8 @@ CREATE TABLE `Assignments` (
   `assignment_type` enum('homework', 'test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
+  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`),
   KEY `acl_id` (`acl_id`)
@@ -804,7 +806,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
-  `nomination` enum('suggestion', 'promotion', 'demotion') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
+  `nomination` enum('suggestion', 'promotion', 'demotion', 'dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
   `contents` TEXT NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
   `status` enum('open', 'approved', 'denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
@@ -899,7 +901,7 @@ ALTER TABLE `ACLs`
 --
 ALTER TABLE `Contests`
   ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsetss` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problemset_Users`
@@ -1087,13 +1089,6 @@ ALTER TABLE `User_Roles`
   ADD CONSTRAINT `fk_ura_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Users_Permissions`
---
-ALTER TABLE `Users_Permissions`
-  ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `Permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
 -- Filtros para la tabla `Users_Experiments`
 --
 ALTER TABLE `Users_Experiments`
@@ -1159,6 +1154,7 @@ DELIMITER ;
 CREATE INDEX idx_contest_public ON Contests (`public`);
 CREATE INDEX idx_user_roles_acl ON User_Roles (`acl_id`);
 CREATE INDEX idx_problems_visibility ON Problems (`visibility`);
+CREATE INDEX idx_problemset_problems_ids ON Problemset_Problems (`problem_id`, `problemset_id`);
 
 --
 -- Recalcula el ranking de todos los usuarios por Problemas resueltos.
