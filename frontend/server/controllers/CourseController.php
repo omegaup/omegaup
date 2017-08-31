@@ -938,6 +938,7 @@ class CourseController extends Controller {
      * @return Boolean
      */
     public static function shouldShowIntro(Request $r) {
+        self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
 
