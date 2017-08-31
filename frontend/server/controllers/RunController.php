@@ -738,6 +738,30 @@ class RunController extends Controller {
     }
 
     /**
+     * Given the run alias, returns a file with the source code stored by the user.
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     */
+    public static function apiDownloadcode(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+        // Get the user who is calling this API
+        self::authenticateRequest($r);
+
+        self::validateDetailsRequest($r);
+
+        $content = RunController::getSubmissionPath($r['run']);
+        $extension = $r['run']->language !== 'cpp11' ? $r['run']->language : 'cpp';
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename=Main.' . $extension);
+        header('Content-Length: ' . filesize($content));
+        readfile($content);
+        exit;
+    }
+
+    /**
      * Get total of last 6 months
      *
      * @param Request $r

@@ -1325,9 +1325,14 @@ export class Arena {
       $('#run-details .download a.details')
           .attr('href',
                 '/api/run/download/run_alias/' + data.guid + '/complete/true/');
+      $('#run-details .download a.sourcecode').hide();
       $('#run-details .download').show();
     } else {
-      $('#run-details .download').hide();
+      $('#run-details .download a.sourcecode')
+          .attr('href', '/api/run/downloadcode/run_alias/' + data.guid + '/');
+      $('#run-details .download a').hide();
+      $('#run-details .download a.sourcecode').show();
+      $('#run-details .download').show();
     }
 
     function numericSort(key) {
