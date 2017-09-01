@@ -16,23 +16,22 @@ OmegaUp.on('ready', function() {
       return createElement('qualitynomination-popup', {
         props: {
           solved: this.solved,
-          nominated: this.nominated,
-          originalSource: source
+          nominated: this.nominated
         },
         on: {
           submit: function(ev) {
             let contents = {
-              'rationale': ev.rationale,
+              'rationale': 'suggestion',
             };
 
             if (typeof(ev.difficulty) !== 'undefined') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
             }
-            if (ev.source !== source) {
-              contents.source = ev.source;
-            }
             if (ev.tags.length > 0) {
               contents.tags = ev.tags;
+            }
+            if (typeof(ev.quality) !== 'undefined') {
+              contents.quality = Number.parseInt(ev.quality, 10);
             }
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,

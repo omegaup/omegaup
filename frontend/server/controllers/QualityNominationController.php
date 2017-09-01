@@ -20,10 +20,10 @@ class QualityNominationController extends Controller {
      * `contents` field should be a JSON blob with the following fields:
      *
      * * `rationale`: A small text explaining the rationale for promotion.
-     * * `difficulty`: (Optional) A number in the range [1-5] indicating the
+     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
      *                 difficulty of the problem.
-     * * `source`: (Optional) A URL or string clearly documenting the source or
-     *             full name of original author of the problem.
+     * * `quality`: (Optional) A number in the range [0-4] indicating the quality 
+     *             of the problem.
      * * `tags`: (Optional) An array of tag names that will be added to the
      *           problem upon promotion.
      *
@@ -94,9 +94,9 @@ class QualityNominationController extends Controller {
         }
         if ($r['nomination'] == 'suggestion') {
             if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
-                || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
-                || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
-                || (isset($contents['tags']) && !is_array($contents['tags']))
+							  || ((!isset($contents['difficulty']) || !is_int($contents['difficulty']) || empty($contents['difficulty'] || $contents['difficulty'] < 0 || $contents['difficulty'] > 4))
+                	 && (!isset($contents['quality']) || !is_int($contents['quality']) || empty($contents['quality'] || $contents['quality'] < 0 || $contents['quality'] > 4))
+                   && (!isset($contents['tags']) && !is_array($contents['tags'])))
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
