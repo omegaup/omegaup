@@ -513,7 +513,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemTopicSuffixArray: "Arreglo De Sufijos",
 	problemTopicSuffixTree: "\u00c1rbol De Sufijos",
 	problemTopicTernarySearch: "B\u00fasqueda Ternaria",
-	problemTopicTrees: "\u00e1rboles",
+	problemTopicTrees: "\u00c1rboles",
 	problemTopicTwoPointers: "Ventana Deslizante",
 	problemsetNotFound: "El conjunto de problemas no encontrado.",
 	profile: "Nombre",
