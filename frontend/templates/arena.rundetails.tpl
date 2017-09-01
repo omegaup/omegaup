@@ -18,9 +18,9 @@
 				<div class="download">
 					<h3>{#wordsDownload#}</h3>
 					<ul>
-						<li><a href="#">{#wordsDownloadOutput#}</a></li>
-						<li><a href="#" class="details">{#wordsDownloadDetails#}</a></li>
 						<li><a href="#" class="sourcecode">{#wordsDownloadCode#}</a></li>
+						<li><a href="#" class="output">{#wordsDownloadOutput#}</a></li>
+						<li><a href="#" class="details">{#wordsDownloadDetails#}</a></li>
 					</ul>
 				</div>
 				<div class="judged_by">
