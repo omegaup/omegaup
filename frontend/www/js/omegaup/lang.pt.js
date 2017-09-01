@@ -686,6 +686,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsDescription: "Descri\u00e7\u00e3o",
 	wordsDetails: "Detalhes",
 	wordsDownload: "Baixar",
+	wordsDownloadCode: "Baixar c\u00f3digo",
 	wordsDownloadDetails: "Baixar .zip com sa\u00eddas",
 	wordsDownloadOutput: "Baixar saida ",
 	wordsDuration: "Duracion",
