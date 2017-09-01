@@ -1276,7 +1276,7 @@ export class Arena {
   displayRunDetails(guid, data) {
     var self = this;
     var problemAdmin = data.admin;
-    var blob = new Blob([data.source], {'type':'text/plain'});
+    var blob = new Blob([data.source], {'type': 'text/plain'});
     var elem = self.currentProblem.runs.find(getElement);
 
     if (data.status == 'error') {
@@ -1339,9 +1339,7 @@ export class Arena {
       //$('#run-details .download').show();
     }
 
-    function getElement(element){
-      return element.guid == data.guid; 
-    }
+    function getElement(element) { return element.guid == data.guid; }
 
     function numericSort(key) {
       function isDigit(x) { return '0' <= x && x <= '9'; }
