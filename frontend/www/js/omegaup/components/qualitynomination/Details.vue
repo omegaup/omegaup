@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="row"
-             v-if="this.nomination == 'demotion'">
+             v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true">
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>
           </div>
@@ -67,6 +67,7 @@ export default {
     nominator: {username: String, name: String},
     problem: {alias: String, title: String},
     qualitynomination_id: Number,
+    reviewer: Boolean,
     votes: Array
   },
   data: function() {
