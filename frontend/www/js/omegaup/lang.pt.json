@@ -469,7 +469,7 @@
 	"problemNotFoundInContest": "Problema n\u00e3o encontrado em concurso dado",
 	"problemNotInContest": "Problema n\u00e3o existe no concurso dado.",
 	"problemNotPartOfAssignment": "Problema n\u00e3o faz parte da designa\u00e7\u00e3o.",
-	"problemProvidedDoesNotExist": "",
+	"problemProvidedDoesNotExist": "Problema n\u00e3o existe",
 	"problemTitleExists": "J\u00e1 existe t\u00edtulo do problema. Por favor, tente um diferente.",
 	"problemTopic2Sat": "2-Sat",
 	"problemTopicArrays": "Arrays",
