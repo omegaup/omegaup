@@ -20,7 +20,6 @@
 					<ul>
 						<li><a href="#">{#wordsDownloadOutput#}</a></li>
 						<li><a href="#" class="details">{#wordsDownloadDetails#}</a></li>
-						<li><a href="#" class="code">{#wordsDownloadCode#}</a></li>
 					</ul>
 				</div>
 				<div class="judged_by">
