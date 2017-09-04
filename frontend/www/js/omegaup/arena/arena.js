@@ -1319,10 +1319,12 @@ export class Arena {
 
     $('#run-details .cases div').remove();
     $('#run-details .cases table').remove();
-    var runData = self.currentProblem.runs.find(function (run) { return run.guid == guid; });
+    var runData = self.currentProblem.runs.find(function(run) {
+      return run.guid == guid;
+    });
     $('#run-details .download a.sourcecode')
         .attr('href', window.URL.createObjectURL(
-          new Blob([data.source], {'type': 'text/plain'})))
+                          new Blob([data.source], {'type': 'text/plain'})))
         .attr('download', 'Main.' + runData.language);
     if (problemAdmin) {
       $('#run-details .download a.output')
