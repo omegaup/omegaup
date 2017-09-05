@@ -47,6 +47,7 @@ if ($show_intro) {
     $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['user']->user_id, $course);
     $smarty->assign('jsfile', '/ux/assignment.js');
     $smarty->assign('admin', false);
+    $smarty->assign('showClarifications', false);
     $smarty->assign('showDeadlines', true);
     $smarty->assign('showNavigation', true);
     $smarty->assign('showPoints', true);
