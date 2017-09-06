@@ -389,7 +389,7 @@ omegaup.OmegaUp.loadTranslations({
 	openInKarelJs: "Voc\u00ea pode usar karel.js para resolver este problema",
 	parameterEmpty: "Par\u00e2metro vazio",
 	parameterInvalid: "Par\u00e2metro inv\u00e1lido",
-	parameterInvalidAlias: "Par\u00e2metros s\u00f3 podem conter letras, d\u00edgitos, e _",
+	parameterInvalidAlias: "Par\u00e2metros s\u00f3 podem conter letras, d\u00edgitos, e _. Espa\u00e7os n\u00e3o permitidos.",
 	parameterNotANumber: "Par\u00e2metro deve ser um n\u00famero",
 	parameterNotFound: "Valor do par\u00e2metro n\u00e3o encontrado",
 	parameterNotInExpectedSet: "Valor n\u00e3o est\u00e1 em conjunto esperado",
