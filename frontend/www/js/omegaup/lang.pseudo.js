@@ -389,7 +389,7 @@ omegaup.OmegaUp.loadTranslations({
 	openInKarelJs: "(Y0u can u53 kar31.j5 70 501v3 7hi5 pr0b13m.)",
 	parameterEmpty: "(Emp7y param373r.)",
 	parameterInvalid: "(Inva1id param373r.)",
-	parameterInvalidAlias: "(Param373r can 0n1y c0n7ain 13773r5, digi75, and _. Spac35 n07 a110w3d.)",
+	parameterInvalidAlias: "(Param373r can 0n1y c0n7ain 13773r5, digi75, and _. Spac35 ar3 n07 a110w3d.)",
 	parameterNotANumber: "(Param373r mu57 b3 a numb3r.)",
 	parameterNotFound: "(Param373r va1u3 n07 f0und.)",
 	parameterNotInExpectedSet: "(Va1u3 (%(bad_elements)) n07 in 3xp3c73d 537 (%(expected_set)).)",
