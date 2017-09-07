@@ -386,7 +386,7 @@
 	"openInKarelJs": "Puedes utilizar karel.js para resolver este problema",
 	"parameterEmpty": "El campo no puede estar vac\u00edo",
 	"parameterInvalid": "Par\u00e1metro inv\u00e1lido",
-	"parameterInvalidAlias": "El campo debe constar de letras, n\u00fameros y _",
+	"parameterInvalidAlias": "El campo debe constar de letras, n\u00fameros y _. Los espacios no son permitidos.",
 	"parameterNotANumber": "El campo debe ser un n\u00famero",
 	"parameterNotFound": "No existe en la base de datos",
 	"parameterNotInExpectedSet": "El campo no est\u00e1 en el conjunto v\u00e1lido",
