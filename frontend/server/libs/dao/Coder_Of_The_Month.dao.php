@@ -29,15 +29,18 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     public static function calculateCoderOfTheMonth($firstDay) {
         $endTime = $firstDay;
         $startTime = null;
+        $date = explode('-', $firstDay);
+        $year = $date[0];
+        $month = $date[1];
 
-        $lastMonth = intval(date('m')) - 1;
+        $lastMonth = $month - 1;
 
         if ($lastMonth === 0) {
             // First month of the year, we need to check into last month of last year.
-            $lastYear = intval(date('Y')) - 1;
+            $lastYear = $year - 1;
             $startTime = date($lastYear . '-12-01');
         } else {
-            $startTime = date('Y-' . $lastMonth . '-01');
+            $startTime = date($year . '-' . $lastMonth . '-01');
         }
 
         $sql = "
@@ -61,7 +64,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LEFT JOIN
 				Coder_Of_The_Month cm on u.user_id = cm.user_id
 			WHERE
-				cm.user_id IS NULL
+				cm.user_id IS NULL OR DATEDIFF(?, cm.time) >= 365
 			GROUP BY
 				user_id
 			ORDER BY
@@ -69,7 +72,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LIMIT 1
 		";
 
-        $val = [$startTime, $endTime];
+        $val = [$startTime, $endTime, $endTime];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);

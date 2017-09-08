@@ -1184,8 +1184,13 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCoderOfTheMonth(Request $r) {
-        // Get first day of the current month
-        $firstDay = date('Y-m-01');
+        if (!empty($r['date'])) {
+            Validators::isDate($r['date'], 'date', false);
+            $firstDay = $r['date'];
+        } else {
+            // Get first day of the current month
+            $firstDay = date('Y-m-01');
+        }
 
         try {
             $coderOfTheMonth = null;
