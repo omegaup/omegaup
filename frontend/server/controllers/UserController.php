@@ -1186,7 +1186,7 @@ class UserController extends Controller {
     public static function apiCoderOfTheMonth(Request $r) {
         if (!empty($r['date'])) {
             Validators::isDate($r['date'], 'date', false);
-            $firstDay = $r['date'];
+            $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
@@ -1205,7 +1205,7 @@ class UserController extends Controller {
                 $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if ($retArray == null) {
                     self::$log->error('Missing paramer when calling apiCoderOfTheMonth.');
-                    throw new InvalidParameterException('parameterInvalid', 'date');
+                    throw new InvalidParameterException('parameterInvalid: ', 'date');
                 }
 
                 $user = $retArray['user'];

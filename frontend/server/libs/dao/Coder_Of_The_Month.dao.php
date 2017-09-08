@@ -64,7 +64,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LEFT JOIN
 				Coder_Of_The_Month cm on u.user_id = cm.user_id
 			WHERE
-				cm.user_id IS NULL OR DATEDIFF(?, cm.time) >= 365
+				cm.user_id IS NULL OR DATE_ADD(cm.time, INTERVAL 1 YEAR) < ?
 			GROUP BY
 				user_id
 			ORDER BY
