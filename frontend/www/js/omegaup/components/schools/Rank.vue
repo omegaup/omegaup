@@ -20,7 +20,8 @@
               <td>{{index + 1}}</td>
               <td class="cell-school-name"
                   colspan="2"
-                  v-bind:title="school.name">{{school.name}}</td>
+                  v-bind:title="school.name"><span class="country_id">{{ school.country_id
+                  }}</span> {{ school.name }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_users }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_problems }}</td>
             </tr>
