@@ -1319,23 +1319,15 @@ export class Arena {
 
     $('#run-details .cases div').remove();
     $('#run-details .cases table').remove();
-    var runData = self.currentProblem.runs.find(function(run) {
-      return run.guid == guid;
-    });
-    $('#run-details .download a.sourcecode')
-        .attr('href', window.URL.createObjectURL(
-                          new Blob([data.source], {'type': 'text/plain'})))
-        .attr('download', 'Main.' + runData.language);
     if (problemAdmin) {
-      $('#run-details .download a.output')
+      $('#run-details .download a')
           .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
       $('#run-details .download a.details')
           .attr('href',
                 '/api/run/download/run_alias/' + data.guid + '/complete/true/');
-      $('#run-details .download a').show();
+      $('#run-details .download').show();
     } else {
-      $('#run-details .download a').hide();
-      $('#run-details .download a.sourcecode').show();
+      $('#run-details .download').hide();
     }
 
     function numericSort(key) {
