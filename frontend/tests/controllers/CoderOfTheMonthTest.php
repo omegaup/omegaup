@@ -10,13 +10,11 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Creating 10 AC runs for our user in the last month
-        $n = 10;
-
         $runCreationDate = date_create(date('Y-m-d'));
         date_add($runCreationDate, date_interval_create_from_date_string('-1 month'));
         $runCreationDate = date_format($runCreationDate, 'Y-m-01');
 
-        $this->createRuns($user, $runCreationDate, $n);
+        $this->createRuns($user, $runCreationDate, 10 /*numRuns*/);
 
         $response = UserController::apiCoderOfTheMonth(new Request());
 
@@ -41,33 +39,29 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $userLastYear = UserFactory::createUser();
         $userThisYear = UserFactory::createUser();
 
-        // Creating runs
-        $n = 2;
-        $nThis = 1;
-        $nThisMonth = 2;
         $today = date('Y-m-d');
 
         $runCreationDate = date_create($today);
         date_add($runCreationDate, date_interval_create_from_date_string('-13 month'));
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($userLastYear, $runCreationDate, $n);
+        $this->createRuns($userLastYear, $runCreationDate, 2 /*numRuns*/);
 
         $runCreationDate = date_create($runCreationDate);
         date_add($runCreationDate, date_interval_create_from_date_string('1 month'));
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($userLastYear, $runCreationDate, $n);
-        $this->createRuns($userThisYear, $runCreationDate, $nThis);
+        $this->createRuns($userLastYear, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($userThisYear, $runCreationDate, 1 /*numRuns*/);
 
-        $this->createRuns($userLastYear, $today, $nThisMonth);
+        $this->createRuns($userLastYear, $today, 2 /*numRuns*/);
 
         // Getting Coder Of The Month
-        $responseCoder = $this->getCodetOfTheMonth($today, '-1 year');
+        $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
         $this->assertEquals($userLastYear->username, $responseCoder['userinfo']['username']);
 
-        $responseCoder = $this->getCodetOfTheMonth($today, '-11 month');
+        $responseCoder = $this->getCoderOfTheMonth($today, '-11 month');
         $this->assertNotEquals($userLastYear->username, $responseCoder['userinfo']['username']);
 
-        $responseCoder = $this->getCodetOfTheMonth($today, '1 month');
+        $responseCoder = $this->getCoderOfTheMonth($today, '1 month');
         $this->assertEquals($userLastYear->username, $responseCoder['userinfo']['username']);
     }
 
@@ -88,7 +82,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         }
     }
 
-    private function getCodetOfTheMonth($revDate, $interval) {
+    private function getCoderOfTheMonth($revDate, $interval) {
         $reviewDate = date_create($revDate);
         date_add($reviewDate, date_interval_create_from_date_string($interval));
         $reviewDate = date_format($reviewDate, 'Y-m-01');
