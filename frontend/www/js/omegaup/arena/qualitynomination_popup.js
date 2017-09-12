@@ -15,8 +15,7 @@ OmegaUp.on('ready', function() {
         props: {solved: this.solved, nominated: this.nominated},
         on: {
           submit: function(ev) {
-            let contents = {
-            };
+            let contents = {};
 
             if (typeof(ev.difficulty) !== 'undefined') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
@@ -35,8 +34,7 @@ OmegaUp.on('ready', function() {
                 .fail(UI.apiError);
           },
           dismiss: function() {
-            let contents = {
-            };
+            let contents = {};
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,
                                    nomination: 'dismissal',

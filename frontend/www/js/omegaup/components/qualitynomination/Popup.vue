@@ -35,10 +35,10 @@
               "form-control tags-container"
                       multiple
                       v-model="tags">
-									<option :value="problemTopic.value" v-for="problemTopic in sortedProblemTopics">
-										{{ problemTopic.text }}
-									</option>
-								</select>
+                <option v-for="problemTopic in sortedProblemTopics">
+                  {{ problemTopic.text }}
+                </option>
+              </select></label>
             </div>
             <div class="formGroup">
               <label class="control-label">{{ T.qualityFormQuality }}</label><br>
@@ -87,7 +87,7 @@ export default {
   props: {solved: Boolean, nominated: Boolean},
   data: function() {
     return {
-			API: API,
+      API: API,
       T: T,
       UI: UI,
       currentView: 'suggestion',
@@ -95,34 +95,67 @@ export default {
       quality: undefined,
       showFormOverride: true,
       tags: [],
-			problemTopics: [
-        {'value': 'problemTopicImplementation', 'text': T.problemTopicImplementation},
-        {'value': 'problemTopicDynamicProgramming', 'text': T.problemTopicDynamicProgramming},
+      problemTopics: [
+        {
+          'value': 'problemTopicImplementation',
+          'text': T.problemTopicImplementation
+        },
+        {
+          'value': 'problemTopicDynamicProgramming',
+          'text': T.problemTopicDynamicProgramming
+        },
         {'value': 'problemTopicMath', 'text': T.problemTopicMath},
         {'value': 'problemTopicLoops', 'text': T.problemTopicLoops},
-        {'value': 'problemTopicIfElseSwitch', 'text': T.problemTopicIfElseSwitch},
+        {
+          'value': 'problemTopicIfElseSwitch',
+          'text': T.problemTopicIfElseSwitch
+        },
         {'value': 'problemTopicInputOutput', 'text': T.problemTopicInputOutput},
         {'value': 'problemTopicArrays', 'text': T.problemTopicArrays},
         {'value': 'problemTopicSimulation', 'text': T.problemTopicSimulation},
         {'value': 'problemTopicGreedy', 'text': T.problemTopicGreedy},
-        {'value': 'problemTopicDataStructures', 'text': T.problemTopicDataStructures},
+        {
+          'value': 'problemTopicDataStructures',
+          'text': T.problemTopicDataStructures
+        },
         {'value': 'problemTopicBruteForce', 'text': T.problemTopicBruteForce},
-        {'value': 'problemTopicBreadthDepthFirstSearch', 'text': T.problemTopicBreadthDepthFirstSearch},
+        {
+          'value': 'problemTopicBreadthDepthFirstSearch',
+          'text': T.problemTopicBreadthDepthFirstSearch
+        },
         {'value': 'problemTopicSorting', 'text': T.problemTopicSorting},
-        {'value': 'problemTopicBinarySearch', 'text': T.problemTopicBinarySearch},
+        {
+          'value': 'problemTopicBinarySearch',
+          'text': T.problemTopicBinarySearch
+        },
         {'value': 'problemTopicGraphTheory', 'text': T.problemTopicGraphTheory},
         {'value': 'problemTopicTrees', 'text': T.problemTopicTrees},
         {'value': 'problemTopicStrings', 'text': T.problemTopicStrings},
-        {'value': 'problemTopicNumberTheory', 'text': T.problemTopicNumberTheory},
+        {
+          'value': 'problemTopicNumberTheory',
+          'text': T.problemTopicNumberTheory
+        },
         {'value': 'problemTopicGeometry', 'text': T.problemTopicGeometry},
-        {'value': 'problemTopicCombinatorics', 'text': T.problemTopicCombinatorics},
+        {
+          'value': 'problemTopicCombinatorics',
+          'text': T.problemTopicCombinatorics
+        },
         {'value': 'problemTopicTwoPointers', 'text': T.problemTopicTwoPointers},
-        {'value': 'problemTopicDisjointSets', 'text': T.problemTopicDisjointSets},
+        {
+          'value': 'problemTopicDisjointSets',
+          'text': T.problemTopicDisjointSets
+        },
         {'value': 'problemTopicBitmasks', 'text': T.problemTopicBitmasks},
         {'value': 'problemTopicProbability', 'text': T.problemTopicProbability},
-        {'value': 'problemTopicShortestPath', 'text': T.problemTopicShortestPath},
+        {
+          'value': 'problemTopicShortestPath',
+          'text': T.problemTopicShortestPath
+        },
         {'value': 'problemTopicHashing', 'text': T.problemTopicHashing},
-        {'value': 'problemTopicDivideAndConquer', 'text': T.problemTopicDivideAndConquer},
+        {
+          'value': 'problemTopicDivideAndConquer',
+          'text': T.problemTopicDivideAndConquer
+        },
         {'value': 'problemTopicGameTheory', 'text': T.problemTopicGameTheory},
         {'value': 'problemTopicMatrices', 'text': T.problemTopicMatrices},
         {'value': 'problemTopicStackQueue', 'text': T.problemTopicStackQueue},
@@ -132,34 +165,44 @@ export default {
         {'value': 'problemTopicSuffixTree', 'text': T.problemTopicSuffixTree},
         {'value': 'problemTopicSuffixArray', 'text': T.problemTopicSuffixArray},
         {'value': 'problemTopicParsing', 'text': T.problemTopicParsing},
-        {'value': 'problemTopicTernarySearch', 'text': T.problemTopicTernarySearch},
-        {'value': 'problemTopicMeetInTheMiddle', 'text': T.problemTopicMeetInTheMiddle},
-        {'value': 'problemTopicFastFourierTransform', 'text': T.problemTopicFastFourierTransform},
+        {
+          'value': 'problemTopicTernarySearch',
+          'text': T.problemTopicTernarySearch
+        },
+        {
+          'value': 'problemTopicMeetInTheMiddle',
+          'text': T.problemTopicMeetInTheMiddle
+        },
+        {
+          'value': 'problemTopicFastFourierTransform',
+          'text': T.problemTopicFastFourierTransform
+        },
         {'value': 'problemTopic2Sat', 'text': T.problemTopic2Sat},
-        {'value': 'problemTopicBacktracking', 'text': T.problemTopicBacktracking}
-			],
+        {
+          'value': 'problemTopicBacktracking',
+          'text': T.problemTopicBacktracking
+        }
+      ],
     };
   },
   computed: {
     showForm: function() {
       return this.showFormOverride && this.solved && !this.nominated;
     },
-		sortedProblemTopics: function() {
-			function compare(a, b) {
-				return a.text.localeCompare(b.text);
-			}
-			return this.problemTopics.sort(compare);
-		}
+    sortedProblemTopics: function() {
+      function compare(a, b) { return a.text.localeCompare(b.text); }
+      return this.problemTopics.sort(compare);
+    }
   },
   methods: {
     onHide() {
       this.showFormOverride = false;
       this.$emit('dismiss', this);
     },
-		onShowSuggestion() {
-			this.$emit('show-suggestion', this);
-			this.currentView = 'suggestion';
-		},
+    onShowSuggestion() {
+      this.$emit('show-suggestion', this);
+      this.currentView = 'suggestion';
+    },
     onSubmit() {
       this.$emit('submit', this);
       this.currentView = 'thanks';
