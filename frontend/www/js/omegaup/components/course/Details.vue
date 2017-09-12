@@ -9,7 +9,7 @@
             v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-8">
-            <label>{{ T.wordsTitle }} <input class="form-control"
+            <label>{{ T.wordsName }} <input class="form-control"
                    type="text"
                    v-model="name"></label>
           </div>

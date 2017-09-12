@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 DOWNLOAD_FILES = {
-    'minijail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-minijail/minijail-xenial-distrib-x86_64.tar.bz2',
+    'omegajail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-omegajail/omegajail-xenial-distrib-x86_64.tar.bz2',
     'omegaup-runner.tar.bz2': 'https://s3.amazonaws.com/omegaup-dist/omegaup-runner.tar.bz2',
 }
 
@@ -114,7 +114,8 @@ def main():
         ']']).returncode != 0:
         runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
 
-
+    runner.sudo(['/bin/rm', '-f', '/etc/sudoers.d/minijail'], check=True)
+    runner.sudo(['/bin/systemctl', 'daemon-reload'], check=True)
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
 
 if __name__ == '__main__':

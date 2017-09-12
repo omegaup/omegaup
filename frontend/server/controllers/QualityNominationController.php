@@ -339,6 +339,9 @@ class QualityNominationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
+        // Adding in the response object a flag to know whether the user is a reviewer
+        $response['reviewer'] = $currentUserReviewer;
+
         $response['original_contents'] = [
             'statements' => [],
             'source' => $problem->source,

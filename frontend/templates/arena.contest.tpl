@@ -18,7 +18,9 @@
 {if $admin}
 				<li><a href="#runs">{#wordsRuns#}</a></li>
 {/if}
+{if $showClarifications}
 				<li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
+{/if}
 			</ul>
 {/if}
 			<div id="problems" class="tab navleft">
