@@ -30,133 +30,14 @@
                      v-model="difficulty"
                      value="4"> {{ T.qualityFormDifficultyVeryHard }}</label>
             </div>
-            <div class="form-group">
+            <div class="form-group"
+                 id="showProblemTopics">
               <label class="control-label">{{ T.qualityFormTags }} <select class=
               "form-control tags-container"
                       multiple
                       v-model="tags">
-                <option value="problemTopic2Sat">
-                  {{ T.problemTopic2Sat }}
-                </option>
-                <option value="problemTopicArrays">
-                  {{ T.problemTopicArrays }}
-                </option>
-                <option value="problemTopicBacktracking">
-                  {{ T.problemTopicBacktracking }}
-                </option>
-                <option value="problemTopicBigNumbers">
-                  {{ T.problemTopicBigNumbers }}
-                </option>
-                <option value="problemTopicBinarySearch">
-                  {{ T.problemTopicBinarySearch }}
-                </option>
-                <option value="problemTopicBitmasks">
-                  {{ T.problemTopicBitmasks }}
-                </option>
-                <option value="problemTopicBreadthDepthFirstSearch">
-                  {{ T.problemTopicBreadthDepthFirstSearch }}
-                </option>
-                <option value="problemTopicBruteForce">
-                  {{ T.problemTopicBruteForce }}
-                </option>
-                <option value="problemTopicBuckets">
-                  {{ T.problemTopicBuckets }}
-                </option>
-                <option value="problemTopicCombinatorics">
-                  {{ T.problemTopicCombinatorics }}
-                </option>
-                <option value="problemTopicDataStructures">
-                  {{ T.problemTopicDataStructures }}
-                </option>
-                <option value="problemTopicDisjointSets">
-                  {{ T.problemTopicDisjointSets }}
-                </option>
-                <option value="problemTopicDivideAndConquer">
-                  {{ T.problemTopicDivideAndConquer }}
-                </option>
-                <option value="problemTopicDynamicProgramming">
-                  {{ T.problemTopicDynamicProgramming }}
-                </option>
-                <option value="problemTopicFastFourierTransform">
-                  {{ T.problemTopicFastFourierTransform }}
-                </option>
-                <option value="problemTopicGameTheory">
-                  {{ T.problemTopicGameTheory }}
-                </option>
-                <option value="problemTopicGeometry">
-                  {{ T.problemTopicGeometry }}
-                </option>
-                <option value="problemTopicGraphTheory">
-                  {{ T.problemTopicGraphTheory }}
-                </option>
-                <option value="problemTopicGreedy">
-                  {{ T.problemTopicGreedy }}
-                </option>
-                <option value="problemTopicHashing">
-                  {{ T.problemTopicHashing }}
-                </option>
-                <option value="problemTopicIfElseSwitch">
-                  {{ T.problemTopicIfElseSwitch }}
-                </option>
-                <option value="problemTopicImplementation">
-                  {{ T.problemTopicImplementation }}
-                </option>
-                <option value="problemTopicInputOutput">
-                  {{ T.problemTopicInputOutput }}
-                </option>
-                <option value="problemTopicLoops">
-                  {{ T.problemTopicLoops }}
-                </option>
-                <option value="problemTopicMath">
-                  {{ T.problemTopicMath }}
-                </option>
-                <option value="problemTopicMatrices">
-                  {{ T.problemTopicMatrices }}
-                </option>
-                <option value="problemTopicMaxFlow">
-                  {{ T.problemTopicMaxFlow }}
-                </option>
-                <option value="problemTopicMeetInTheMiddle">
-                  {{ T.problemTopicMeetInTheMiddle }}
-                </option>
-                <option value="problemTopicNumberTheory">
-                  {{ T.problemTopicNumberTheory }}
-                </option>
-                <option value="problemTopicParsing">
-                  {{ T.problemTopicParsing }}
-                </option>
-                <option value="problemTopicProbability">
-                  {{ T.problemTopicProbability }}
-                </option>
-                <option value="problemTopicShortestPath">
-                  {{ T.problemTopicShortestPath }}
-                </option>
-                <option value="problemTopicSimulation">
-                  {{ T.problemTopicSimulation }}
-                </option>
-                <option value="problemTopicSorting">
-                  {{ T.problemTopicSorting }}
-                </option>
-                <option value="problemTopicStackQueue">
-                  {{ T.problemTopicStackQueue }}
-                </option>
-                <option value="problemTopicStrings">
-                  {{ T.problemTopicStrings }}
-                </option>
-                <option value="problemTopicSuffixArray">
-                  {{ T.problemTopicSuffixArray }}
-                </option>
-                <option value="problemTopicSuffixTree">
-                  {{ T.problemTopicSuffixTree }}
-                </option>
-                <option value="problemTopicTernarySearch">
-                  {{ T.problemTopicTernarySearch }}
-                </option>
-                <option value="problemTopicTrees">
-                  {{ T.problemTopicTrees }}
-                </option>
-                <option value="problemTopicTwoPointers">
-                  {{ T.problemTopicTwoPointers }}
+                <option v-for="problemTopic in sortedProblemTopics">
+                  {{ problemTopic.text }}
                 </option>
               </select></label>
             </div>
@@ -164,19 +45,19 @@
               <label class="control-label">{{ T.qualityFormQuality }}</label><br>
               <label class="radio-inline"><input type="radio"
                      v-model="quality"
-                     value="0"> {{ T.qualityFormQualityNothing }}</label> <label class=
+                     value="0"> {{ T.qualityFormQualityVeryUnlikely }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="1"> {{ T.qualityFormQualityVeryUnlikely }}</label> <label class=
+                     value="1"> {{ T.qualityFormQualityNotLikely }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="2"> {{ T.qualityFormQualityUnlikely }}</label> <label class=
+                     value="2"> {{ T.qualityFormQualityNeutral }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="3"> {{ T.qualityFormNeutralLikely }}</label> <label class=
+                     value="3"> {{ T.qualityFormQualityLikely }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="4"> {{ T.qualityFormQualityVirtuallyCertain }}</label>
+                     value="4"> {{ T.qualityFormQualityVeryLikely }}</label>
             </div>
             <div class="button-row">
               <div class="col-md-4"></div><button class="col-md-4 btn btn-primary"
@@ -214,17 +95,113 @@ export default {
       quality: undefined,
       showFormOverride: true,
       tags: [],
+      problemTopics: [
+        {
+          'value': 'problemTopicImplementation',
+          'text': T.problemTopicImplementation
+        },
+        {
+          'value': 'problemTopicDynamicProgramming',
+          'text': T.problemTopicDynamicProgramming
+        },
+        {'value': 'problemTopicMath', 'text': T.problemTopicMath},
+        {'value': 'problemTopicLoops', 'text': T.problemTopicLoops},
+        {
+          'value': 'problemTopicIfElseSwitch',
+          'text': T.problemTopicIfElseSwitch
+        },
+        {'value': 'problemTopicInputOutput', 'text': T.problemTopicInputOutput},
+        {'value': 'problemTopicArrays', 'text': T.problemTopicArrays},
+        {'value': 'problemTopicSimulation', 'text': T.problemTopicSimulation},
+        {'value': 'problemTopicGreedy', 'text': T.problemTopicGreedy},
+        {
+          'value': 'problemTopicDataStructures',
+          'text': T.problemTopicDataStructures
+        },
+        {'value': 'problemTopicBruteForce', 'text': T.problemTopicBruteForce},
+        {
+          'value': 'problemTopicBreadthDepthFirstSearch',
+          'text': T.problemTopicBreadthDepthFirstSearch
+        },
+        {'value': 'problemTopicSorting', 'text': T.problemTopicSorting},
+        {
+          'value': 'problemTopicBinarySearch',
+          'text': T.problemTopicBinarySearch
+        },
+        {'value': 'problemTopicGraphTheory', 'text': T.problemTopicGraphTheory},
+        {'value': 'problemTopicTrees', 'text': T.problemTopicTrees},
+        {'value': 'problemTopicStrings', 'text': T.problemTopicStrings},
+        {
+          'value': 'problemTopicNumberTheory',
+          'text': T.problemTopicNumberTheory
+        },
+        {'value': 'problemTopicGeometry', 'text': T.problemTopicGeometry},
+        {
+          'value': 'problemTopicCombinatorics',
+          'text': T.problemTopicCombinatorics
+        },
+        {'value': 'problemTopicTwoPointers', 'text': T.problemTopicTwoPointers},
+        {
+          'value': 'problemTopicDisjointSets',
+          'text': T.problemTopicDisjointSets
+        },
+        {'value': 'problemTopicBitmasks', 'text': T.problemTopicBitmasks},
+        {'value': 'problemTopicProbability', 'text': T.problemTopicProbability},
+        {
+          'value': 'problemTopicShortestPath',
+          'text': T.problemTopicShortestPath
+        },
+        {'value': 'problemTopicHashing', 'text': T.problemTopicHashing},
+        {
+          'value': 'problemTopicDivideAndConquer',
+          'text': T.problemTopicDivideAndConquer
+        },
+        {'value': 'problemTopicGameTheory', 'text': T.problemTopicGameTheory},
+        {'value': 'problemTopicMatrices', 'text': T.problemTopicMatrices},
+        {'value': 'problemTopicStackQueue', 'text': T.problemTopicStackQueue},
+        {'value': 'problemTopicBigNumbers', 'text': T.problemTopicBigNumbers},
+        {'value': 'problemTopicBuckets', 'text': T.problemTopicBuckets},
+        {'value': 'problemTopicMaxFlow', 'text': T.problemTopicMaxFlow},
+        {'value': 'problemTopicSuffixTree', 'text': T.problemTopicSuffixTree},
+        {'value': 'problemTopicSuffixArray', 'text': T.problemTopicSuffixArray},
+        {'value': 'problemTopicParsing', 'text': T.problemTopicParsing},
+        {
+          'value': 'problemTopicTernarySearch',
+          'text': T.problemTopicTernarySearch
+        },
+        {
+          'value': 'problemTopicMeetInTheMiddle',
+          'text': T.problemTopicMeetInTheMiddle
+        },
+        {
+          'value': 'problemTopicFastFourierTransform',
+          'text': T.problemTopicFastFourierTransform
+        },
+        {'value': 'problemTopic2Sat', 'text': T.problemTopic2Sat},
+        {
+          'value': 'problemTopicBacktracking',
+          'text': T.problemTopicBacktracking
+        }
+      ],
     };
   },
   computed: {
     showForm: function() {
       return this.showFormOverride && this.solved && !this.nominated;
+    },
+    sortedProblemTopics: function() {
+      function compare(a, b) { return a.text.localeCompare(b.text); }
+      return this.problemTopics.sort(compare);
     }
   },
   methods: {
     onHide() {
       this.showFormOverride = false;
       this.$emit('dismiss', this);
+    },
+    onShowSuggestion() {
+      this.$emit('show-suggestion', this);
+      this.currentView = 'suggestion';
     },
     onSubmit() {
       this.$emit('submit', this);
@@ -289,7 +266,7 @@ export default {
 	display: block;
 	font-size: 2em;
 	font-weight: bold;
-	padding-left: 120px;
+	padding-left: 140px;
 	padding-top: 148px;
 }
 </style>
