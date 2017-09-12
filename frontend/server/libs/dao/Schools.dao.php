@@ -60,6 +60,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $sql = '
             SELECT
               s.name,
+              s.country_id,
               COUNT(DISTINCT u.user_id) as distinct_users,
               COUNT(DISTINCT p.problem_id) AS distinct_problems
             FROM
@@ -86,6 +87,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         foreach ($conn->Execute($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
+                'country_id' => $row['country_id'],
                 'distinct_users' => $row['distinct_users'],
                 'distinct_problems' => $row['distinct_problems'],
             ];
