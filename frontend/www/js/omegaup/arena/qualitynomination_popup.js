@@ -7,8 +7,6 @@ OmegaUp.on('ready', function() {
       JSON.parse(document.getElementById('quality-payload').innerText);
   let problemStatement =
       document.getElementsByClassName('statement')[0].innerText;
-  let sourceNode = document.getElementsByClassName('source-data');
-  let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
@@ -18,7 +16,6 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             let contents = {
-              'rationale': 'suggestion',
             };
 
             if (typeof(ev.difficulty) !== 'undefined') {
@@ -39,7 +36,6 @@ OmegaUp.on('ready', function() {
           },
           dismiss: function() {
             let contents = {
-              'rationale': 'dismiss',
             };
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,

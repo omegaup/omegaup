@@ -47,6 +47,7 @@ class QualityNominationController extends Controller {
      * problemsets. This expects the `nomination` field to be `demotion` and
      * the `contents` field should be a JSON blob with the following fields:
      *
+     * * `rationale`: A small text explaining the rationale for demotion.
      * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
      * * `original`: If the `reason` is `duplicate`, the alias of the original
      *               problem.
