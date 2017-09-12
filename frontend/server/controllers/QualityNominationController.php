@@ -89,9 +89,9 @@ class QualityNominationController extends Controller {
             }
         }
         if ($r['nomination'] == 'suggestion') {
-                        $atLeastOneFieldIsPresent = false;
+            $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
-                if (!is_int($contents['difficulty'])) {
+                if (!is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $atLeastOneFieldIsPresent = true;
@@ -103,7 +103,7 @@ class QualityNominationController extends Controller {
                 $atLeastOneFieldIsPresent = true;
             }
             if (isset($contents['quality'])) {
-                if (!is_int($contents['quality'])) {
+                if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $atLeastOneFieldIsPresent = true;

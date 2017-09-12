@@ -96,92 +96,47 @@ export default {
       showFormOverride: true,
       tags: [],
       problemTopics: [
-        {
-          'value': 'problemTopicImplementation',
-          'text': T.problemTopicImplementation
-        },
-        {
-          'value': 'problemTopicDynamicProgramming',
-          'text': T.problemTopicDynamicProgramming
-        },
-        {'value': 'problemTopicMath', 'text': T.problemTopicMath},
-        {'value': 'problemTopicLoops', 'text': T.problemTopicLoops},
-        {
-          'value': 'problemTopicIfElseSwitch',
-          'text': T.problemTopicIfElseSwitch
-        },
-        {'value': 'problemTopicInputOutput', 'text': T.problemTopicInputOutput},
-        {'value': 'problemTopicArrays', 'text': T.problemTopicArrays},
-        {'value': 'problemTopicSimulation', 'text': T.problemTopicSimulation},
-        {'value': 'problemTopicGreedy', 'text': T.problemTopicGreedy},
-        {
-          'value': 'problemTopicDataStructures',
-          'text': T.problemTopicDataStructures
-        },
-        {'value': 'problemTopicBruteForce', 'text': T.problemTopicBruteForce},
-        {
-          'value': 'problemTopicBreadthDepthFirstSearch',
-          'text': T.problemTopicBreadthDepthFirstSearch
-        },
-        {'value': 'problemTopicSorting', 'text': T.problemTopicSorting},
-        {
-          'value': 'problemTopicBinarySearch',
-          'text': T.problemTopicBinarySearch
-        },
-        {'value': 'problemTopicGraphTheory', 'text': T.problemTopicGraphTheory},
-        {'value': 'problemTopicTrees', 'text': T.problemTopicTrees},
-        {'value': 'problemTopicStrings', 'text': T.problemTopicStrings},
-        {
-          'value': 'problemTopicNumberTheory',
-          'text': T.problemTopicNumberTheory
-        },
-        {'value': 'problemTopicGeometry', 'text': T.problemTopicGeometry},
-        {
-          'value': 'problemTopicCombinatorics',
-          'text': T.problemTopicCombinatorics
-        },
-        {'value': 'problemTopicTwoPointers', 'text': T.problemTopicTwoPointers},
-        {
-          'value': 'problemTopicDisjointSets',
-          'text': T.problemTopicDisjointSets
-        },
-        {'value': 'problemTopicBitmasks', 'text': T.problemTopicBitmasks},
-        {'value': 'problemTopicProbability', 'text': T.problemTopicProbability},
-        {
-          'value': 'problemTopicShortestPath',
-          'text': T.problemTopicShortestPath
-        },
-        {'value': 'problemTopicHashing', 'text': T.problemTopicHashing},
-        {
-          'value': 'problemTopicDivideAndConquer',
-          'text': T.problemTopicDivideAndConquer
-        },
-        {'value': 'problemTopicGameTheory', 'text': T.problemTopicGameTheory},
-        {'value': 'problemTopicMatrices', 'text': T.problemTopicMatrices},
-        {'value': 'problemTopicStackQueue', 'text': T.problemTopicStackQueue},
-        {'value': 'problemTopicBigNumbers', 'text': T.problemTopicBigNumbers},
-        {'value': 'problemTopicBuckets', 'text': T.problemTopicBuckets},
-        {'value': 'problemTopicMaxFlow', 'text': T.problemTopicMaxFlow},
-        {'value': 'problemTopicSuffixTree', 'text': T.problemTopicSuffixTree},
-        {'value': 'problemTopicSuffixArray', 'text': T.problemTopicSuffixArray},
-        {'value': 'problemTopicParsing', 'text': T.problemTopicParsing},
-        {
-          'value': 'problemTopicTernarySearch',
-          'text': T.problemTopicTernarySearch
-        },
-        {
-          'value': 'problemTopicMeetInTheMiddle',
-          'text': T.problemTopicMeetInTheMiddle
-        },
-        {
-          'value': 'problemTopicFastFourierTransform',
-          'text': T.problemTopicFastFourierTransform
-        },
-        {'value': 'problemTopic2Sat', 'text': T.problemTopic2Sat},
-        {
-          'value': 'problemTopicBacktracking',
-          'text': T.problemTopicBacktracking
-        }
+        'problemTopicImplementation',
+        'problemTopicDynamicProgramming',
+        'problemTopicMath',
+        'problemTopicLoops',
+        'problemTopicIfElseSwitch',
+        'problemTopicInputOutput',
+        'problemTopicArrays',
+        'problemTopicSimulation',
+        'problemTopicGreedy',
+        'problemTopicDataStructures',
+        'problemTopicBruteForce',
+        'problemTopicBreadthDepthFirstSearch',
+        'problemTopicSorting',
+        'problemTopicBinarySearch',
+        'problemTopicGraphTheory',
+        'problemTopicTrees',
+        'problemTopicStrings',
+        'problemTopicNumberTheory',
+        'problemTopicGeometry',
+        'problemTopicCombinatorics',
+        'problemTopicTwoPointers',
+        'problemTopicDisjointSets',
+        'problemTopicBitmasks',
+        'problemTopicProbability',
+        'problemTopicShortestPath',
+        'problemTopicHashing',
+        'problemTopicDivideAndConquer',
+        'problemTopicGameTheory',
+        'problemTopicMatrices',
+        'problemTopicStackQueue',
+        'problemTopicBigNumbers',
+        'problemTopicBuckets',
+        'problemTopicMaxFlow',
+        'problemTopicSuffixTree',
+        'problemTopicSuffixArray',
+        'problemTopicParsing',
+        'problemTopicTernarySearch',
+        'problemTopicMeetInTheMiddle',
+        'problemTopicFastFourierTransform',
+        'problemTopic2Sat',
+        'problemTopicBacktracking'
       ],
     };
   },
@@ -190,8 +145,9 @@ export default {
       return this.showFormOverride && this.solved && !this.nominated;
     },
     sortedProblemTopics: function() {
-      function compare(a, b) { return a.text.localeCompare(b.text); }
-      return this.problemTopics.sort(compare);
+      let topics =
+          this.problemTopics.map(x => { return {value: x, text: T[x]}; });
+      return topics.sort((a, b) => a.text.localeCompare(b.text, T.lang));
     }
   },
   methods: {
