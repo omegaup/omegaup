@@ -16,7 +16,4 @@ OmegaUp.on('ready', function() {
       'omegaup-schools-rank': schools_Rank,
     },
   });
-  $('.country_id')
-      .each(function() { $(this)
-                             .html(UI.getFlag($(this).html())); });
 });
