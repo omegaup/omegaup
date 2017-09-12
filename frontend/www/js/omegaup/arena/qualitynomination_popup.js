@@ -12,7 +12,7 @@ OmegaUp.on('ready', function() {
     el: '#qualitynomination-popup',
     render: function(createElement) {
       return createElement('qualitynomination-popup', {
-        props: {solved: this.solved, nominated: this.nominated},
+        props: {nominated: this.nominated, solved: this.solved},
         on: {
           submit: function(ev) {
             let contents = {};

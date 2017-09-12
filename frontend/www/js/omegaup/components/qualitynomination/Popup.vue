@@ -84,7 +84,7 @@ import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {nominated: Boolean, solved: Boolean},
+  props: {solved: Boolean, nominated: Boolean},
   data: function() {
     return {
       API: API,
