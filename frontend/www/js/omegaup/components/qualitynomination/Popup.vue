@@ -8,96 +8,60 @@
               type="button"
               v-on:click="onHide">×</button>
         <div class="container-fluid">
-          <template v-if="currentView == 'question'">
-            <h1>{{ T.qualityFormCongrats }}</h1>
-            <div class="question-text">
-              {{ T.qualityFormRecommendingQuestion }}
-            </div>
-            <div class="button-row row">
-              <button class="col-md-4 btn btn-primary"
-                   type="button"
-                   v-on:click="onShowSuggestion">{{ T.wordsYes }}</button>
-              <div class="col-md-4"></div><button class="col-md-4 btn btn-default"
-                   type="button"
-                   v-on:click="onHide">{{ T.wordsNo }}</button>
-            </div>
-          </template>
           <template v-if="currentView == 'suggestion'">
+            <div class="title-text">
+              {{T.qualityFormCongrats }}
+            </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>
               <label class="radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="1"> {{ T.qualityFormDifficultyVeryEasy }}</label> <label class=
+                     value="0"> {{ T.qualityFormDifficultyVeryEasy }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="2"> {{ T.qualityFormDifficultyEasy }}</label> <label class=
+                     value="1"> {{ T.qualityFormDifficultyEasy }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="3"> {{ T.qualityFormDifficultyMedium }}</label> <label class=
+                     value="2"> {{ T.qualityFormDifficultyMedium }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="4"> {{ T.qualityFormDifficultyHard }}</label> <label class=
+                     value="3"> {{ T.qualityFormDifficultyHard }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="difficulty"
-                     value="5"> {{ T.qualityFormDifficultyVeryHard }}</label>
+                     value="4"> {{ T.qualityFormDifficultyVeryHard }}</label>
             </div>
             <div class="form-group">
-              <label class="control-label">{{ T.qualityFormTags }} <select class="form-control"
+              <label class="control-label">{{ T.qualityFormTags }} <select class=
+              "form-control tags-container"
                       multiple
                       v-model="tags">
-                <option value="arboles">
-                  {{ T.problemTopicTrees }}
-                </option>
-                <option value="busqueda-binaria">
-                  {{ T.problemTopicBinarySearch }}
-                </option>
-                <option value="busquedas">
-                  {{ T.problemTopicSearch }}
-                </option>
-                <option value="flujo-maximo">
-                  {{ T.problemTopicMaxFlow }}
-                </option>
-                <option value="fuerza-bruta">
-                  {{ T.problemTopicBruteForce }}
-                </option>
-                <option value="grafos">
-                  {{ T.problemTopicGraphTheory }}
-                </option>
-                <option value="ordenamiento">
-                  {{ T.problemTopicSorting }}
-                </option>
-                <option value="pilas-y-colas">
-                  {{ T.problemTopicStackQueue }}
-                </option>
-                <option value="programacion-dinamica">
-                  {{ T.problemTopicDP }}
-                </option>
-                <option value="simulacion">
-                  {{ T.problemTopicSimulation }}
-                </option>
-                <option value="teoria-de-numeros">
-                  {{ T.problemTopicNumberTheory }}
-                </option>
-                <option value="otro">
-                  {{ T.problemTopicOther }}
+                <option v-for="problemTopic in sortedProblemTopics">
+                  {{ problemTopic.text }}
                 </option>
               </select></label>
             </div>
-            <div class="form-group">
-              <label class="control-label">{{ T.qualityFormSource }} <input class="form-control"
-                     type="text"
-                     v-model="source"></label>
+            <div class="formGroup">
+              <label class="control-label">{{ T.qualityFormQuality }}</label><br>
+              <label class="radio-inline"><input type="radio"
+                     v-model="quality"
+                     value="0"> {{ T.qualityFormQualityVeryUnlikely }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="quality"
+                     value="1"> {{ T.qualityFormQualityNotLikely }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="quality"
+                     value="2"> {{ T.qualityFormQualityNeutral }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="quality"
+                     value="3"> {{ T.qualityFormQualityLikely }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-model="quality"
+                     value="4"> {{ T.qualityFormQualityVeryLikely }}</label>
             </div>
-            <div class="form-group required">
-              <label class="control-label">{{ T.qualityFormRationaleInput }} <input class=
-              "form-control"
-                     type="text"
-                     v-model="rationale"></label>
-            </div>
-            <div class="row">
+            <div class="button-row">
               <div class="col-md-4"></div><button class="col-md-4 btn btn-primary"
                    type="submit"
-                   v-bind:disabled="rationale.length &lt;= 0"
+                   v-bind:disabled="!quality &amp;&amp; !tags.length &amp;&amp; !difficulty"
                    v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
                    "col-md-4 btn btn-default"
                    type="button"
@@ -105,7 +69,9 @@
             </div>
           </template>
           <template v-if="currentView == 'thanks'">
-            <h1>{{ T.qualityFormThanksForReview }}</h1>
+            <div class="thanks-title">
+              {{ T.qualityFormThanksForReview }}
+            </div>
           </template>
         </div>
       </form>
@@ -114,26 +80,74 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {solved: Boolean, nominated: Boolean, originalSource: String},
+  props: {solved: Boolean, nominated: Boolean},
   data: function() {
     return {
+      API: API,
       T: T,
       UI: UI,
-      currentView: 'question',
+      currentView: 'suggestion',
       difficulty: undefined,
-      rationale: '',
-      source: this.originalSource,
+      quality: undefined,
       showFormOverride: true,
       tags: [],
+      problemTopics: [
+        'problemTopic2Sat',
+        'problemTopicArrays',
+        'problemTopicBacktracking',
+        'problemTopicBigNumbers',
+        'problemTopicBinarySearch',
+        'problemTopicBitmasks',
+        'problemTopicBreadthDepthFirstSearch',
+        'problemTopicBruteForce',
+        'problemTopicBuckets',
+        'problemTopicCombinatorics',
+        'problemTopicDataStructures',
+        'problemTopicDisjointSets',
+        'problemTopicDivideAndConquer',
+        'problemTopicDynamicProgramming',
+        'problemTopicFastFourierTransform',
+        'problemTopicGameTheory',
+        'problemTopicGeometry',
+        'problemTopicGraphTheory',
+        'problemTopicGreedy',
+        'problemTopicHashing',
+        'problemTopicIfElseSwitch',
+        'problemTopicImplementation',
+        'problemTopicInputOutput',
+        'problemTopicLoops',
+        'problemTopicMath',
+        'problemTopicMatrices',
+        'problemTopicMaxFlow',
+        'problemTopicMeetInTheMiddle',
+        'problemTopicNumberTheory',
+        'problemTopicParsing',
+        'problemTopicProbability',
+        'problemTopicShortestPath',
+        'problemTopicSimulation',
+        'problemTopicSorting',
+        'problemTopicStackQueue',
+        'problemTopicStrings',
+        'problemTopicSuffixArray',
+        'problemTopicSuffixTree',
+        'problemTopicTernarySearch',
+        'problemTopicTrees',
+        'problemTopicTwoPointers',
+      ],
     };
   },
   computed: {
     showForm: function() {
       return this.showFormOverride && this.solved && !this.nominated;
+    },
+    sortedProblemTopics: function() {
+      let topics =
+          this.problemTopics.map(x => { return {value: x, text: T[x]}; });
+      return topics.sort((a, b) => a.text.localeCompare(b.text, T.lang));
     }
   },
   methods: {
@@ -162,8 +176,8 @@ export default {
   bottom: 10px;
   right: 20%;
   z-index: 9999999 !important;
-  width: 500px;
-  height: 400px;
+  width: 632px;
+  height: 408px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
@@ -174,18 +188,8 @@ export default {
   width: 100%;
 }
 
-.qualitynomination-popup .question-text, .qualitynomination-popup h1 {
-  text-align: center;
-}
-
-.qualitynomination-popup h1 {
-  font-size: 120%;
-  font-weight: bold;
-  margin: 5em 0;
-}
-
 .qualitynomination-popup .button-row {
-  margin: 4em 0;
+  margin: 4px 0;
 }
 
 .qualitynomination-popup .fade-enter-active, .qualitynomination-popup .fade-leave-active {
@@ -201,5 +205,24 @@ export default {
   color:red;
   position: absolute;
   margin-left: -10px;
+}
+
+.qualitynomination-popup .title-text {
+	font-weight: bold;
+	font-size: 20px;
+	padding-bottom: 8px;
+	text-align: center;
+}
+
+.qualitynomination-popup .tags-container {
+	height: 148px;
+}
+
+.qualitynomination-popup .thanks-title {
+	display: block;
+	font-size: 2em;
+	font-weight: bold;
+	padding-left: 140px;
+	padding-top: 148px;
 }
 </style>
