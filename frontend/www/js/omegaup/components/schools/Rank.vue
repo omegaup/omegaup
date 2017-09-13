@@ -20,9 +20,8 @@
               <td>{{index + 1}}</td>
               <td class="cell-school-name"
                   colspan="2"
-                  v-bind:title="school.name">
-                  <omegaup-showflag :country="school.country_id"></omegaup-showflag>
-                  {{ school.name }}</td>
+                  v-bind:title="school.name"><omegaup-showflag></omegaup-showflag> {{ school.name
+                  }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_users }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_problems }}</td>
             </tr>
