@@ -1,6 +1,6 @@
 <template>
   <img height="11"
-        v-bind:src="normalizeCountry"
+        v-bind:src="flagUrl"
         v-bind:title="country"
         width="16">
 </template>
@@ -10,7 +10,7 @@
 export default {
   props: ['country'],
   computed: {
-    normalizeCountry: function() {
+    flagUrl: function() {
       return '/media/flags/' + this.country.toLowerCase() + '.png';
     }
   },
