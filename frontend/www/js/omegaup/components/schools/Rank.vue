@@ -20,7 +20,8 @@
               <td>{{index + 1}}</td>
               <td class="cell-school-name"
                   colspan="2"
-                  v-bind:title="school.name"><span v-html="UI.getFlag(school.country_id)"></span>
+                  v-bind:title="school.name">
+                  <omegaup-showflag :country="school.country_id"></omegaup-showflag>
                   {{ school.name }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_users }}</td>
               <td class="numericColumn data-rank">{{ school.distinct_problems }}</td>
@@ -35,12 +36,16 @@
 <script>
 import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
+import ShowFlag from '../ShowFlag.vue';
 
 export default {
   props: {
     rank: Array,
   },
   data: function() { return {T: T, UI: UI};},
+  components: {
+    'omegaup-showflag': ShowFlag,
+  },
 };
 </script>
 
