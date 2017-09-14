@@ -1,11 +1,10 @@
 <template>
-  <ul  class="list-group" id="my-next-contests-list">
-    <a v-for="item in list"
-      v-if="item.public == 0"
-      v-bind:href="contestUrl + item.alias" 
-      class="list-group-item">
-        {{ item.title }}
-    </a>
+  <ul class="list-group"
+      id="my-next-contests-list">
+    <a class="list-group-item"
+        v-bind:href="contestUrl + item.alias"
+        v-for="item in list"
+        v-if="item.public == 0">{{ item.title }}</a>
   </ul>
 </template>
 
@@ -17,11 +16,7 @@ export default {
   props: {
     list: Array,
   },
-  computed: {
-    contestUrl: function() {
-      return '/arena/';
-    }
-  },
+  computed: {contestUrl: function() { return '/arena/';}},
   data: function() { return {T: T, UI: UI};},
 };
 </script>
