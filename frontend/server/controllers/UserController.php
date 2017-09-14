@@ -1205,10 +1205,10 @@ class UserController extends Controller {
                 $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if ($retArray == null) {
                     return [
-                    'status' => 'ok',
-                    'userinfo' => null,
-                    'problems' => null
-                     ];
+                        'status' => 'ok',
+                        'userinfo' => null,
+                        'problems' => null,
+                    ];
                 }
                 $user = $retArray['user'];
 
@@ -1216,7 +1216,7 @@ class UserController extends Controller {
                 $c = new CoderOfTheMonth([
                     'user_id' => $user->user_id,
                     'time' => $firstDay,
-                    ]);
+                ]);
                 CoderOfTheMonthDAO::save($c);
             } else {
                 // Grab the user info
