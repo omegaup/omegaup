@@ -4,41 +4,47 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Issues del sprint</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-  </head>
-  <body>
-    <h1>Issues del sprint</h1>
 
-		<!-- Vue -->
+ 		<!-- Vue -->
 		<script src="https://unpkg.com/vue"></script>
 
 		<style>
-			.label {
-				background-color: #f00;
-				padding: 5px;
-				margin: 2px;
+			.issue-body pre {
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+
+				max-width: 500px;
+				max-heigh: 1.2em;
 			}
 		</style>
-
+ </head>
+  <body>
 		<table class="table table-striped" id="issues">
 			<thead class="thead-inverse">
 				<tr>
+					<th></th>
 					<th>Prioridad</th>
 					<th>Issue</th>
 					<th>Labels</th>
+					<th>Body</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="issue in issues">
+					<td><input type="checkbox"></td>
 					<td>{{ issue.priority }}</td>
-					<td><a v-bind:href="issue.url">{{ issue.title }}</a></td>
+					<td><a v-bind:href="issue.html_url" target="_blank">{{ issue.title }}</a></td>
 					<td>
 						<template v-for="label in issue.labels">
-							<a v-bind:href="label.url" span class="badge badge-primary" v-bind:style="labelStyle(label)">{{ label.name }}</a>&ensp;
+							<a class="badge badge-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
 						</template>
 					</td>
+					<td class="issue-body"><pre>{{ issue.body }}</pre></td>
 				</tr>
 			</tbody>
 		</table>
@@ -55,11 +61,14 @@
 						backgroundColor: '#' + label.color
 					};
 				},
+				labelUrl: function(label) {
+					return 'https://github.com/omegaup/omegaup/labels/' + label.name;
+				},
 			},
 		});
 
 		function fetchIssues(priority) {
-			fetch('https://api.github.com/repos/omegaup/omegaup/issues?asignee=none&state=open&labels=ready,' + priority)
+			return fetch('https://api.github.com/repos/omegaup/omegaup/issues?asignee=none&state=open&labels=ready,' + priority)
 				.then(function(response) {
 					if (response.status != 200) {
 						console.error('Error fetching issues with priority ' + priority, response.status);
@@ -68,7 +77,6 @@
 
 					response.json().then(function(issues) {
 						for (let issue of issues) {
-							console.log(issue);
 							issue.priority = priority;
 							app.issues.push(issue);
 						}
@@ -79,10 +87,10 @@
 				});
 		}
 
-		fetchIssues('P0');
-		fetchIssues('P1');
-		fetchIssues('P2');
-		fetchIssues('P3');
+		fetchIssues('P0')
+			.then(() => fetchIssues('P1'))
+			.then(() => fetchIssues('P2'))
+			.then(() => fetchIssues('P3'));
 	</script>
   </body>
 </html>
