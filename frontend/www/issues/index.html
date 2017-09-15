@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  </head>
+  <body>
+    <h1>Issues del sprint</h1>
+
+		<!-- Vue -->
+		<script src="https://unpkg.com/vue"></script>
+
+		<style>
+			.label {
+				background-color: #f00;
+				padding: 5px;
+				margin: 2px;
+			}
+		</style>
+
+		<table class="table table-striped" id="issues">
+			<thead class="thead-inverse">
+				<tr>
+					<th>Prioridad</th>
+					<th>Issue</th>
+					<th>Labels</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="issue in issues">
+					<td>{{ issue.priority }}</td>
+					<td><a v-bind:href="issue.url">{{ issue.title }}</a></td>
+					<td>
+						<template v-for="label in issue.labels">
+							<a v-bind:href="label.url" span class="badge badge-primary" v-bind:style="labelStyle(label)">{{ label.name }}</a>&ensp;
+						</template>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	<script>
+		let app = new Vue({
+			el: '#issues',
+			data: {
+				issues: []
+			},
+			methods: {
+				labelStyle: function(label) {
+					return {
+						backgroundColor: '#' + label.color
+					};
+				},
+			},
+		});
+
+		function fetchIssues(priority) {
+			fetch('https://api.github.com/repos/omegaup/omegaup/issues?asignee=none&state=open&labels=ready,' + priority)
+				.then(function(response) {
+					if (response.status != 200) {
+						console.error('Error fetching issues with priority ' + priority, response.status);
+						return;
+					}
+
+					response.json().then(function(issues) {
+						for (let issue of issues) {
+							console.log(issue);
+							issue.priority = priority;
+							app.issues.push(issue);
+						}
+					});
+				})
+				.catch(function(err) {
+					console.error('Error fetching issues with priority ' + priority, err);
+				});
+		}
+
+		fetchIssues('P0');
+		fetchIssues('P1');
+		fetchIssues('P2');
+		fetchIssues('P3');
+	</script>
+  </body>
+</html>
