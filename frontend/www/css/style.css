@@ -23,8 +23,12 @@ div#title {
 
 #status, #announcement {
 	max-width: 900px;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto;
+	z-index: 1;
+	position: fixed;
+	top: 70px;
+	right: : 2%;
+	width: 100%;
 }
 
 div.post {
