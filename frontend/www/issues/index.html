@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Issues del sprint</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+ 		<!-- Vue -->
+		<script src="https://unpkg.com/vue"></script>
+
+		<style>
+			.issue-body pre {
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+
+				max-width: 500px;
+				max-heigh: 1.2em;
+			}
+		</style>
+ </head>
+  <body>
+		<table class="table table-striped" id="issues">
+			<thead class="thead-inverse">
+				<tr>
+					<th></th>
+					<th>Prioridad</th>
+					<th>Issue</th>
+					<th>Labels</th>
+					<th>Body</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="issue in issues">
+					<td><input type="checkbox"></td>
+					<td>{{ issue.priority }}</td>
+					<td><a v-bind:href="issue.html_url" target="_blank">{{ issue.title }}</a></td>
+					<td>
+						<template v-for="label in issue.labels">
+							<a class="badge badge-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
+						</template>
+					</td>
+					<td class="issue-body"><pre>{{ issue.body }}</pre></td>
+				</tr>
+			</tbody>
+		</table>
+
+	<script>
+		let app = new Vue({
+			el: '#issues',
+			data: {
+				issues: []
+			},
+			methods: {
+				labelStyle: function(label) {
+					return {
+						backgroundColor: '#' + label.color
+					};
+				},
+				labelUrl: function(label) {
+					return 'https://github.com/omegaup/omegaup/labels/' + label.name;
+				},
+			},
+		});
+
+		function fetchIssues(priority) {
+			return fetch('https://api.github.com/repos/omegaup/omegaup/issues?asignee=none&state=open&labels=ready,' + priority)
+				.then(function(response) {
+					if (response.status != 200) {
+						console.error('Error fetching issues with priority ' + priority, response.status);
+						return;
+					}
+
+					response.json().then(function(issues) {
+						for (let issue of issues) {
+							issue.priority = priority;
+							app.issues.push(issue);
+						}
+					});
+				})
+				.catch(function(err) {
+					console.error('Error fetching issues with priority ' + priority, err);
+				});
+		}
+
+		fetchIssues('P0')
+			.then(() => fetchIssues('P1'))
+			.then(() => fetchIssues('P2'))
+			.then(() => fetchIssues('P3'));
+	</script>
+  </body>
+</html>

@@ -35,7 +35,6 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
-                'rationale' => 'cool!',
                 'statements' => [
                     'es' => [
                         'markdown' => 'a + b',
@@ -101,7 +100,6 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'suggestion',
             'contents' => json_encode([
-                'rationale' => 'cool!',
                 // No difficulty!
                 'source' => 'omegaUp',
                 'tags' => [],
@@ -278,8 +276,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'dismissal',
-            'contents' => json_encode([
-                'rationale' => 'dismiss', ]),
+            'contents' => json_encode([]),
         ]);
 
         try {
@@ -296,8 +293,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'user_id' => $r['current_user_id'],
             'problem_id' => $problem->problem_id,
             'nomination' => $r['nomination'],
-            'contents' => json_encode([
-                'rationale' => 'dismiss' ]), // re-encoding it for normalization.
+            'contents' => json_encode([]), // re-encoding it for normalization.
             'status' => 'open',
         ]);
 
