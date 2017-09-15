@@ -1322,7 +1322,7 @@ export class Arena {
     $('#run-details .download a.sourcecode')
         .attr('href', window.URL.createObjectURL(
                           new Blob([data.source], {'type': 'text/plain'})))
-        .attr('download', 'Main.' + data.lang);
+        .attr('download', 'Main.' + data.language);
     if (problemAdmin) {
       $('#run-details .download a.output')
           .attr('href', '/api/run/download/run_alias/' + data.guid + '/');

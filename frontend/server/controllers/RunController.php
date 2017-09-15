@@ -627,7 +627,7 @@ class RunController extends Controller {
         }
         $response['guid'] = $r['run']->guid;
         $response['status'] = 'ok';
-        $response['lang'] = $r['run']->language;
+        $response['language'] = $r['run']->language;
 
         return $response;
     }
