@@ -42,9 +42,6 @@
 		</div>
 
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#profileMyNextContests#}</h2>
-			</div>
 			<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
 			<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
 			<div id="my-next-contests"></div>

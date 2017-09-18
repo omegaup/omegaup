@@ -284,6 +284,49 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     /**
+     * Returns all contests where a user is participating in.
+     */
+    final public static function getContestsParticipating(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
+        $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
+        $offset = ($page - 1) * $pageSize;
+        $sql = "
+            SELECT
+                Contests.*
+            FROM
+                Contests
+            JOIN
+                Problemset_Users
+            ON
+                Contests.problemset_id = Problemset_Users.problemset_id
+            WHERE
+                Problemset_Users.user_id = ? AND
+                $recommended_check AND $end_check
+            ORDER BY
+                recommended DESC,
+                finish_time DESC
+            LIMIT ?, ?;";
+        $params = [
+            $user_id,
+            $offset,
+            $pageSize,
+        ];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
      * Regresa todos los concursos que un usuario puede ver.
      *
      * Explicación:

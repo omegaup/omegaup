@@ -15,14 +15,8 @@ try {
     $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 5]));
     $smarty->assign('schoolRankPayload', $schoolRankPayload['rank']);
 
-    $myContestsListPayload  = ContestController::apiList(
-        new Request([
-            'active' => 'ACTIVE',
-            'recommended' => 'NOT_RECOMMENDED',
-            'page_size' => 1000
-            ])
-    );
-        $smarty->assign('myContestsListPayload', $myContestsListPayload['results']);
+    $myContestsListPayload  = ContestController::apiListParticipating(new Request(['page_size' => 5]));
+    $smarty->assign('myContestsListPayload', $myContestsListPayload);
 } catch (Exception $e) {
     // Oh, well...
 }

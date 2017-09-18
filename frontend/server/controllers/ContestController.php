@@ -200,6 +200,48 @@ class ContestController extends Controller {
     }
 
     /**
+     * Returns a list of contests where current user is participating in
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListParticipating(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        // Create array of relevant columns
+        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time'];
+        $contests = null;
+        try {
+            $contests = ContestsDAO::getContestsParticipating(
+                $r['current_user_id'],
+                $page,
+                $pageSize
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $addedContests = [];
+        foreach ($contests as $c) {
+            $c->toUnixTime();
+            $contestInfo = $c->asFilteredArray($relevant_columns);
+            $addedContests[] = $contestInfo;
+        }
+
+        return [
+            'status' => 'ok',
+            'contests' => $addedContests,
+        ];
+    }
+
+    /**
      * Checks if user can access contests: If the contest is private then the user
      * must be added to the contest (an entry ProblemsetUsers must exists) OR the user
      * should be a Contest Admin.

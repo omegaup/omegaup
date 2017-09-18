@@ -35,6 +35,7 @@
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
+					<script type="text/json" id="is-index">{true|json_encode}</script>
 					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
 					<div id="omegaup-schools-rank"></div>
 					<div class="container-fluid">
@@ -103,15 +104,12 @@
 		</div>
 		{if $LOGGED_IN eq '1'}
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{#frontPageMyNextContests#}</h3>
-				</div>
 				<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
 				<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
 				<div id="my-next-contests"></div>
 				<div class="container-fluid">
 					<div class="col-xs-12 vertical-padding">
-						<a href="/arena/">{#contestMyFullList#}</a>
+						<a href="/arena/">{#contestFullList#}</a>
 					</div>
 				</div>
 		</div>
