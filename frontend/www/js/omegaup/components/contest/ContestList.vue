@@ -30,7 +30,6 @@
         </ul>
       </div>
     </div>
-    <template v-if="!isParticipant"></template>
     <table class="table">
       <thead v-if="!isIndex">
         <tr>
@@ -62,7 +61,8 @@
             <a v-bind:href="makeWorldClockLink(contest.finish_time)"
                 v-if="!isIndex">{{ contest.finish_time.format('long') }}</a>
           </td>
-          <td v-if="contest.public == '1'">{{ T.wordsYes }}</td>
+          <td v-if="isParticipant"></td>
+          <td v-else-if="contest.public == '1'">{{ T.wordsYes }}</td>
           <td v-else="">{{ T.wordsNo }}</td>
           <td v-if="contest.scoreboard_url &amp;&amp; !isParticipant">
             <a class="glyphicon glyphicon-link"
