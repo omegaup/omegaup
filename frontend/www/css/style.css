@@ -28,8 +28,9 @@ div#title {
 }
 
 #status {
-	z-index: 1;
+    position: -webkit-sticky; /* Safari */
 	position: sticky;
+	z-index: 1;
 	max-width: 900px;
 	margin-right: auto;
 	margin-left: auto;
