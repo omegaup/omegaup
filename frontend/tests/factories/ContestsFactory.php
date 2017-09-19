@@ -16,7 +16,7 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
+    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null, $isInFuture = false) {
         if (is_null($contestDirector)) {
             $contestDirector = UserFactory::createUser();
         }
@@ -54,9 +54,9 @@ class ContestsFactory {
             'director' => $contestDirector];
     }
 
-    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
+    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null, $isInFuture = false) {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy);
+        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy, $isInFuture);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -70,6 +70,11 @@ class ContestsFactory {
         if ($public === 1) {
             self::forcePublic($contestData);
             $r['public'] = 1;
+        }
+        if ($isInFuture === true) {
+            $dataContest = self::forceChangeStartTime($contestData);
+            $r['start_time'] = $dataContest['start_time'];
+            $r['finish_time'] = $dataContest['finish_time'];
         }
 
         $contest = ContestsDAO::getByAlias($r['alias']);
@@ -213,6 +218,26 @@ class ContestsFactory {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->public = 1;
         ContestsDAO::save($contest);
+    }
+
+    public static function forceChangeStartTime($contestData) {
+        $response = ['start_time' => '', 'finish_time' => ''];
+        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+
+        $contestStartDate = date_create(date('Y-m-d h:i:s'));
+        date_add($contestStartDate, date_interval_create_from_date_string('+1 day'));
+        $contest->start_time = date_format($contestStartDate, 'Y-m-d h:i:s');
+
+        $contestFinishDate = date_create(date('Y-m-d h:i:s'));
+        date_add($contestFinishDate, date_interval_create_from_date_string('+2 day'));
+        $contest->finish_time = date_format($contestFinishDate, 'Y-m-d h:i:s');
+
+        $response['start_time'] = $contest->start_time;
+        $response['finish_time'] = $contest->finish_time;
+
+        ContestsDAO::save($contest);
+
+        return $response;
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
