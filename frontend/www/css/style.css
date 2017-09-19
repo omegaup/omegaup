@@ -21,14 +21,20 @@ div#title {
 	margin-right: auto;
 }
 
-#status, #announcement {
+#announcement {
+	max-width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#status {
 	z-index: 1;
-	position: fixed;
-	max-width: 880px;
+	position: sticky;
+	max-width: 900px;
 	margin-right: auto;
 	margin-left: auto;
 	top: 50px;
-	width: 98%
+	width: 100%;
 }
 
 div.post {
