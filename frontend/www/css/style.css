@@ -28,7 +28,7 @@ div#title {
 }
 
 #status {
-    position: -webkit-sticky; /* Safari */
+	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	z-index: 1;
 	max-width: 900px;
