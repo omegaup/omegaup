@@ -167,7 +167,10 @@ let UI = {
   },
 
   problemTypeahead: function(elem, cb) {
-    cb = cb || function(event, val) { $(event.target).val(val.alias); };
+    cb = cb || function(event, val) {
+      $(event.target).val(val.alias);
+      $('#problem-search-button').trigger('click');
+    };
     elem.typeahead(
             {
               minLength: 3,
