@@ -77,7 +77,7 @@ class ActiveStatus extends StatusBase {
 
     public static $SQL_FOR_STATUS = [
         'TRUE',
-        'finish_time > NOW() AND start_time <= NOW()',
+        'finish_time > NOW() AND start_time <= DATE_ADD(NOW(),INTERVAL 24 HOUR)',
         'finish_time <= NOW()',
         'start_time > NOW()',
     ];

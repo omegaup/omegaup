@@ -221,23 +221,22 @@ class ContestsFactory {
     }
 
     public static function forceChangeStartTime($contestData) {
-        $response = ['start_time' => '', 'finish_time' => ''];
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         $contestStartDate = date_create(date('Y-m-d h:i:s'));
-        date_add($contestStartDate, date_interval_create_from_date_string('+1 day'));
+        date_add($contestStartDate, date_interval_create_from_date_string('+10 day'));
         $contest->start_time = date_format($contestStartDate, 'Y-m-d h:i:s');
 
         $contestFinishDate = date_create(date('Y-m-d h:i:s'));
-        date_add($contestFinishDate, date_interval_create_from_date_string('+2 day'));
+        date_add($contestFinishDate, date_interval_create_from_date_string('+11 day'));
         $contest->finish_time = date_format($contestFinishDate, 'Y-m-d h:i:s');
-
-        $response['start_time'] = $contest->start_time;
-        $response['finish_time'] = $contest->finish_time;
 
         ContestsDAO::save($contest);
 
-        return $response;
+        return [
+            'start_time' => $contest->start_time,
+            'finish_time' => $contest->finish_time
+        ];
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
