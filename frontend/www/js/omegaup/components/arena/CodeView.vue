@@ -44,6 +44,8 @@ export default {
       this.editorOptions.mode = languageModeMap[newLanguage];
     }
   },
-  components: {codemirror: "omegaup-arena-codemirror"}
+  components: {
+    "omegaup-arena-codemirror": codemirror,
+  }
 };
 </script>
