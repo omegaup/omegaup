@@ -1319,15 +1319,20 @@ export class Arena {
 
     $('#run-details .cases div').remove();
     $('#run-details .cases table').remove();
+    $('#run-details .download a.sourcecode')
+        .attr('href', window.URL.createObjectURL(
+                          new Blob([data.source], {'type': 'text/plain'})))
+        .attr('download', 'Main.' + data.language);
     if (problemAdmin) {
-      $('#run-details .download a')
+      $('#run-details .download a.output')
           .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
       $('#run-details .download a.details')
           .attr('href',
                 '/api/run/download/run_alias/' + data.guid + '/complete/true/');
-      $('#run-details .download').show();
+      $('#run-details .download a').show();
     } else {
-      $('#run-details .download').hide();
+      $('#run-details .download a').hide();
+      $('#run-details .download a.sourcecode').show();
     }
 
     function numericSort(key) {
