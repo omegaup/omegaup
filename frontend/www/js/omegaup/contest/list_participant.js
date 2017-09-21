@@ -1,5 +1,5 @@
 import contest_List from '../components/contest/ContestList.vue';
-import {OmegaUp} from '../omegaup.js';
+import {OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -12,21 +12,18 @@ OmegaUp.on('ready', function() {
       OmegaUp.convertTimes(contest);
     }
   }
-  let issetIsIndex = document.getElementById('is-index');
-  let isIndex = issetIsIndex ? JSON.parse(issetIsIndex.innerText) : false;
-
   let contestMyList = new Vue({
     el: '#my-next-contests',
     render: function(createElement) {
       return createElement('my-next-contests', {
         props: {
           contests: this.contests,
-          isParticipant: this.isParticipant,
-          isIndex: this.isIndex
+          isAdmin: false,
+          title: T.contestMyActiveContests
         },
       });
     },
-    data: {contests: payload.contests, isParticipant: true, isIndex: isIndex},
+    data: {contests: payload.contests},
     components: {
       'my-next-contests': contest_List,
     },

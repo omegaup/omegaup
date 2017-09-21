@@ -329,8 +329,8 @@ class ContestListTest extends OmegaupTestCase {
 
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
-        for ($i=0; $i<4; $i++) {
-            $isPublic = ($i===0) ? true : false;
+        for ($i = 0; $i < 4; $i++) {
+            $isPublic = ($i === 0) ? true : false;
             $contestData[$i] = ContestsFactory::createContest(null, $isPublic);
         }
 
@@ -338,8 +338,8 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Add user to two private contest
-        $n = 2; // Number of private contests
-        for ($i=0; $i<$n; $i++) {
+        $numberOfPrivateContests = 2;
+        for ($i = 0; $i < $n; $i++) {
             ContestsFactory::addUser($contestData[$i], $contestant);
         }
 
@@ -349,7 +349,6 @@ class ContestListTest extends OmegaupTestCase {
         ]);
         $response = ContestController::apiListParticipating($r);
 
-        $this->assertEquals($n, count($response['contests']));
-        //$this->assertDurationIsCorrect($response, $contestData);
+        $this->assertEquals($numberOfPrivateContests, count($response['contests']));
     }
 }

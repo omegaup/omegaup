@@ -158,13 +158,13 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns a list of contests where current user is the director
-     *
+     * Callback to get contests list, depending on a given method
      * @param Request $r
+     * @param $callback_user_function
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiMyList(Request $r) {
+    public static function getContestListInternal(Request $r, $callback_user_function) {
         self::authenticateRequest($r);
 
         Validators::isNumber($r['page'], 'page', false);
@@ -174,10 +174,19 @@ class ContestController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time', 'public', 'scoreboard_url', 'scoreboard_url_admin'];
+        $relevant_columns = [
+            'title',
+            'alias',
+            'start_time',
+            'finish_time',
+            'public',
+            'scoreboard_url',
+            'scoreboard_url_admin'
+        ];
         $contests = null;
         try {
-            $contests = ContestsDAO::getAllContestsOwnedByUser(
+            $contests = call_user_func(
+                $callback_user_function,
                 $r['current_user_id'],
                 $page,
                 $pageSize
@@ -200,6 +209,17 @@ class ContestController extends Controller {
     }
 
     /**
+     * Returns a list of contests where current user is the director
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyList(Request $r) {
+        return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
+    }
+
+    /**
      * Returns a list of contests where current user is participating in
      *
      * @param Request $r
@@ -207,38 +227,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListParticipating(Request $r) {
-        self::authenticateRequest($r);
-
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
-        // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time'];
-        $contests = null;
-        try {
-            $contests = ContestsDAO::getContestsParticipating(
-                $r['current_user_id'],
-                $page,
-                $pageSize
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $addedContests = [];
-        foreach ($contests as $c) {
-            $c->toUnixTime();
-            $contestInfo = $c->asFilteredArray($relevant_columns);
-            $addedContests[] = $contestInfo;
-        }
-
-        return [
-            'status' => 'ok',
-            'contests' => $addedContests,
-        ];
+        return self::getContestListInternal($r, 'ContestsDAO::getContestsParticipating');
     }
 
     /**

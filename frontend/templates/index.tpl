@@ -102,18 +102,7 @@
 			<ul class="list-group" id="next-contests-list">
 		    </ul>
 		</div>
-		{if $LOGGED_IN eq '1'}
-		<div class="panel panel-default">
-				<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
-				<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
-				<div id="my-next-contests"></div>
-				<div class="container-fluid">
-					<div class="col-xs-12 vertical-padding">
-						<a href="/arena/">{#contestFullList#}</a>
-					</div>
-				</div>
-		</div>
-		{/if}
+
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
 		</div>

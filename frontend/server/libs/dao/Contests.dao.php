@@ -294,7 +294,7 @@ class ContestsDAO extends ContestsDAOBase {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
         $offset = ($page - 1) * $pageSize;
-        $sql = "
+        $sql = '
             SELECT
                 Contests.*
             FROM
@@ -304,12 +304,12 @@ class ContestsDAO extends ContestsDAOBase {
             ON
                 Contests.problemset_id = Problemset_Users.problemset_id
             WHERE
-                Problemset_Users.user_id = ? AND
-                $recommended_check AND $end_check
+                Problemset_Users.user_id = ? AND ' .
+                $recommended_check . ' AND ' . $end_check . '
             ORDER BY
                 recommended DESC,
                 finish_time DESC
-            LIMIT ?, ?;";
+            LIMIT ?, ?;';
         $params = [
             $user_id,
             $offset,
