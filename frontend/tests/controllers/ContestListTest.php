@@ -339,7 +339,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Add user to two private contest
         $numberOfPrivateContests = 2;
-        for ($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $numberOfPrivateContests; $i++) {
             ContestsFactory::addUser($contestData[$i], $contestant);
         }
 
