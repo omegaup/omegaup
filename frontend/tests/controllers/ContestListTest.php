@@ -333,9 +333,17 @@ class ContestListTest extends OmegaupTestCase {
     public function testShowOnlyCurrentContests() {
         $r = new Request();
 
-        // Create 2 contests, the second one si forced to the future
+        // Create 2 contests, the second one will occur in to the future.
         $currentContestData = ContestsFactory::createContest(null, 0);
-        $futureContestData = ContestsFactory::createContest(null, 0, null, null, null, null, true);
+        $futureContestData = ContestsFactory::createContest(
+            null,
+            0,
+            null,
+            null,
+            $currentContestData['request']['finish_time'] + (60 * 60 * 49),
+            null,
+            $currentContestData['request']['finish_time'] + (60 * 60 * 48)
+        );
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
