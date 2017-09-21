@@ -29,7 +29,7 @@ class ContestsFactory {
         $r = new Request();
         $r['title'] = $title;
         $r['description'] = 'description';
-        $r['start_time'] = ($start_time == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $start_time);
+        $r['start_time'] = ($start_time == null ? (Utils::GetPhpUnixTimestamp() - 60 * 60) : $start_time);
         $r['finish_time'] = ($finish_time == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $finish_time);
         $r['window_length'] = null;
         $r['public'] = $public;
