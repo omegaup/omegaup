@@ -21,10 +21,21 @@ div#title {
 	margin-right: auto;
 }
 
-#status, #announcement {
+#announcement {
 	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+#status {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	z-index: 1;
+	max-width: 900px;
+	margin-right: auto;
+	margin-left: auto;
+	top: 50px;
+	width: 100%;
 }
 
 div.post {
