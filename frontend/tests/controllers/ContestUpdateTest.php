@@ -6,12 +6,20 @@
  * @author joemmanuel
  */
 class UpdateContestTest extends OmegaupTestCase {
+    private $contestFactory;
+    private $contestFactoryPrivate;
+
+    public function __construct() {
+        $this->contestFactory = new ContestsFactory(new ContestsParams([]));
+        $this->contestFactoryPrivate = new ContestsFactory(new ContestsParams(['public' => 0]));
+    }
+
     /**
      * Only update the contest title. Rest should stay the same
      */
     public function testUpdateContestTitle() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Update title.
         $login = self::login($contestData['director']);
@@ -37,7 +45,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdateContestNonDirector() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
         // Update title
         $login = self::login(UserFactory::createUser());
         $r = new Request([
@@ -57,7 +65,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactoryPrivate->createContest();
 
         // Update public
         $login = self::login($contestData['director']);
@@ -77,7 +85,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactoryPrivate->createContest();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -105,7 +113,7 @@ class UpdateContestTest extends OmegaupTestCase {
       */
     public function testSetRecommendedFlag() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Update value
         $login = self::login(UserFactory::createAdminUser());
@@ -140,7 +148,7 @@ class UpdateContestTest extends OmegaupTestCase {
       */
     public function testSetRecommendedFlagNonAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Update value
         $login = self::login($contestData['director']);
@@ -161,7 +169,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdateContestLengthTooLong() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Update length
         $login = self::login($contestData['director']);
@@ -218,7 +226,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdateContestStartWithRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Submit a run
         $this->createRunInContest($contestData);
@@ -241,7 +249,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdateContestStartNoRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Update length
         $login = self::login($contestData['director']);
@@ -265,7 +273,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdateContestTitleWithRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Submit a run
         $this->createRunInContest($contestData);

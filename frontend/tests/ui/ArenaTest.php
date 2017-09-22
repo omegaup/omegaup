@@ -9,7 +9,8 @@
 class ArenaTest extends OmegaupUITestCase {
     public function testArenaRoot() {
         // Create a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Open URL
         $this->open('/arena');

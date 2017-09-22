@@ -17,7 +17,8 @@ class AddProblemToContestUITest extends OmegaupUITestCase {
         $problemData = ProblemsFactory::createProblem(null, null, 1, $author);
 
         // Create a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
         ContestsFactory::addAdminUser($contestData, $author);
 
         // Open page

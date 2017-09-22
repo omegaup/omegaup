@@ -95,7 +95,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contest = $contestFactory->createContest()['contest'];
         $user = UserFactory::createUser();
 
         $login = self::login($user);
@@ -110,7 +111,8 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException UnauthorizedException
      */
     public function testAnonymousPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contest = $contestFactory->createContest()['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias,
@@ -122,7 +124,8 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException UnauthorizedException
      */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(null, 0)['contest'];
+        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+        $contest = $contestFactory->createContest()['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias,
@@ -131,7 +134,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(null, 0)['contest'];
+        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+        $contest = $contestFactory->createContest()['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
@@ -142,7 +146,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(null, 0)['contest'];
+        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+        $contest = $contestFactory->createContest()['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .

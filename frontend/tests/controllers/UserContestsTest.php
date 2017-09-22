@@ -13,8 +13,10 @@ class UserContestsTest extends OmegaupTestCase {
         // Our director
         $director = UserFactory::createUser();
 
-        $contestData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
-        $contestData[1] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $director]));
+        $contestData[0] = $contestFactory->createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $director]));
+        $contestData[1] = $contestFactory->createContest();
 
         // Call api
         $login = self::login($director);
@@ -42,24 +44,28 @@ class UserContestsTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
         GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
 
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
         // Get two contests with another director, add $director to their
         // admin list
-        $contestAdminData[0] = ContestsFactory::createContest();
+        $contestAdminData[0] = $contestFactory->createContest();
         ContestsFactory::addAdminUser($contestAdminData[0], $director);
         ContestsFactory::addGroupAdmin($contestAdminData[0], $helperGroup['group']);
 
         // Get two contests with another director, add $director to their
         // group admin list
-        $contestAdminData[1] = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestAdminData[1] = $contestFactory->createContest();
         $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
         GroupsFactory::addUserToGroup($group, $director);
         GroupsFactory::addUserToGroup($group, UserFactory::createUser());
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $helperGroup['group']);
 
-        $contestDirectorData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $director]));
+        $contestDirectorData[0] = $contestFactory->createContest();
         ContestsFactory::addGroupAdmin($contestDirectorData[0], $helperGroup['group']);
-        $contestDirectorData[1] = ContestsFactory::createContest(null /*title*/, 0 /*public*/, $director);
+        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $director, 'public' => 0]));
+        $contestDirectorData[1] = $contestFactory->createContest();
         ContestsFactory::addGroupAdmin($contestDirectorData[1], $helperGroup['group']);
 
         // Call api
@@ -83,7 +89,8 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCount() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(null, 0 /*public*/);
+        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+        $contestData = $contestFactory->createContest();
         $user = $contestData['director'];
 
         $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));
@@ -94,7 +101,8 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCountWithPublicContest() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(null, 1 /*public*/);
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
         $user = $contestData['director'];
 
         $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));

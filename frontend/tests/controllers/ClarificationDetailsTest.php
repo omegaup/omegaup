@@ -7,6 +7,12 @@
  */
 
 class DetailsClarificationTest extends OmegaupTestCase {
+    private $contestFactory;
+
+    public function __construct() {
+        $this->contestFactory = new ContestsFactory(new ContestsParams([]));
+    }
+
     /**
      * Validates a clarification given the clarification ID
      *
@@ -34,7 +40,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -74,7 +80,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -115,7 +121,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -151,7 +157,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = $this->contestFactory->createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

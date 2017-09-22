@@ -8,7 +8,8 @@
 class ContestAddAdminTest extends OmegaupTestCase {
     public function testAddContestAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get a user
         $user = UserFactory::createUser();
@@ -33,7 +34,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
     public function testIsContestAdminCheck() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get a user
         $user = UserFactory::createUser();
@@ -76,7 +78,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
      */
     public function testRemoveAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get users
         $user = UserFactory::createUser();
@@ -103,7 +106,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
     public function testAddContestGroupAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get a user
         $user = UserFactory::createUser();
@@ -131,7 +135,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
     public function testIsContestGroupAdminCheck() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get a user
         $user = UserFactory::createUser();
@@ -178,7 +183,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
      */
     public function testRemoveGroupAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Get users
         $user = UserFactory::createUser();

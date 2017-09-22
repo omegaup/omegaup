@@ -16,7 +16,8 @@ class UpdateClarificationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

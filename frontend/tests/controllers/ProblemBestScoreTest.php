@@ -37,7 +37,8 @@ class ProblemBestScoreTest extends OmegaupTestCase {
     public function testBestScoreInsideContest() {
         // Create problem and contest
         $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest();
+        $contestFactory = new ContestsFactory(new ContestsParams([]));
+        $contestData = $contestFactory->createContest();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant

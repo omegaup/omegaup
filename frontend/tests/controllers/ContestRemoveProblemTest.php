@@ -7,6 +7,12 @@
  */
 
 class ContestRemoveProblemTest extends OmegaupTestCase {
+    private $contestFactory;
+
+    public function __construct() {
+        $this->contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+    }
+
     /**
      * Check in DB that a problem does not exist on a contest
      *
@@ -51,7 +57,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and problem should have been removed.
      */
     public function testRemoveProblemFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
@@ -72,7 +78,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testRemoveInvalidProblemFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
@@ -97,7 +103,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testRemoveProblemFromInvalidContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
@@ -122,7 +128,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -163,7 +169,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and contest should have a single problem.
      */
     public function testRemoveOldestProblemFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
 
         $problemData1 = ProblemsFactory::createProblem();
         $problemData2 = ProblemsFactory::createProblem();
@@ -190,7 +196,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and contest should have a single problem.
      */
     public function testRemoveNewestProblemFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
 
         $problemData1 = ProblemsFactory::createProblem();
         $problemData2 = ProblemsFactory::createProblem();
@@ -218,7 +224,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
@@ -236,7 +242,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
 
         $problemData1 = ProblemsFactory::createProblem();
         $problemData2 = ProblemsFactory::createProblem();
@@ -266,7 +272,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      */
     public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -298,7 +304,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * while logged in with a user that is sysadmin.
      */
     public function testRemoveProblemWithAdminRunsFromContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
@@ -341,7 +347,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -363,7 +369,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -389,7 +395,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      */
     public function testRemoveProblemWithRunsOutsideContestFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -415,7 +421,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
@@ -436,7 +442,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * while logged in with a user that is not sysadmin.
      */
     public function testRemoveProblemWithMixedRunsFromContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $contestData = $this->contestFactory->createContest();
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
         $contestant = UserFactory::createUser();
