@@ -12,6 +12,13 @@
 		</h3>
 	</div>
 	{/if}
+	<div class="page-header text-center top-margin">
+		<p class="no-bottom-margin">{#problemEditFormFirstTimeCreatingAProblem#}
+			<strong>
+				<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup" target="_blank">{#problemEditFormHereIsHowToWriteProblems#}</a>
+			</strong>
+		</p>
+	</div>
 	<div class="panel-body">
 		<form method="POST" action="{$smarty.server.REQUEST_URI}" id="problem-form" class="form" enctype="multipart/form-data">
 			{if $IS_UPDATE eq 1}

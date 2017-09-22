@@ -6,4 +6,5 @@ omegaup.OmegaUp.on('ready', function() {
       $('tbody>tr:not(.high-quality)').hide();
     }
   });
+  omegaup.UI.problemTypeahead($('#problem-search-box'));
 });
