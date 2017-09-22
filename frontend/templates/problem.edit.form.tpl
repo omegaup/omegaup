@@ -42,11 +42,11 @@
 				<div class="form-group col-md-6">
 					<label for="validator">{#problemEditFormValidatorType#}</label>
 					<select name='validator' id='validator' class="form-control" >
-							<option value="token-caseless">{#problemEditFormTokenCaseless#}</option>
-							<option value="token-numeric">{#problemEditFormNumericTokensWithTolerance#}</option>
-							<option value="token">{#problemEditFormTokenByToken#}</option>
-							<option value="literal">{#problemEditFormLiteral#}</option>
-							<option value="custom">{#problemEditFormCustom#}</option>
+							<option value="token-caseless" {if $IS_UPDATE eq 0 && $VALIDATOR eq "token-caseless"}selected{/if}>{#problemEditFormTokenCaseless#}</option>
+							<option value="token-numeric" {if $IS_UPDATE eq 0 && $VALIDATOR eq "token-numeric"}selected{/if}>{#problemEditFormNumericTokensWithTolerance#}</option>
+							<option value="token" {if $IS_UPDATE eq 0 && $VALIDATOR eq "token"}selected{/if}>{#problemEditFormTokenByToken#}</option>
+							<option value="literal" {if $IS_UPDATE eq 0 && $VALIDATOR eq "literal"}selected{/if}>{#problemEditFormLiteral#}</option>
+							<option value="custom" {if $IS_UPDATE eq 0 && $VALIDATOR eq "custom"}selected{/if}>{#problemEditFormCustom#}</option>
 					</select>
 				</div>
 
@@ -102,9 +102,9 @@
 				<div class="form-group col-md-6">
 					<label for="languages">{#problemEditFormLanguages#}</label>
 					<select name="languages[]" id="languages" class="form-control">
-						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua">C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
-						<option value="kp,kj">Karel</option>
-						<option value="cat">{#wordsJustOutput#}</option>
+						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua" {if $IS_UPDATE eq 0 && $LANGUAGES eq "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
+						<option value="kp,kj" {if $IS_UPDATE eq 0 && $LANGUAGES eq "kp,kj"}selected{/if}>Karel</option>
+						<option value="cat" {if $IS_UPDATE eq 0 && $LANGUAGES eq "cat"}selected{/if}>{#wordsJustOutput#}</option>
 					</select>
 				</div>
 
@@ -129,8 +129,8 @@
 				<div class="form-group col-md-6">
 					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq 0}checked=checked{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0">{#wordsNo#}</label>
+						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq 0 && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq 0 && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
 			</div>

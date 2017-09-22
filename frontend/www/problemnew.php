@@ -16,6 +16,7 @@ $smarty->assign('STACK_LIMIT', '10485760');
 $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
 $smarty->assign('VISIBILITY', '0');
+$smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,pas,py,rb,lua');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
@@ -32,6 +33,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'source' => $_POST['source'],
                 'visibility' => $_POST['visibility'],
                 'stack_limit' => $_POST['stack_limit'],
+                'languages' => $_POST['languages'][0],
                 'email_clarifications' => $_POST['email_clarifications']
             ]);
     $r->method = 'ProblemController::apiCreate';
@@ -49,12 +51,15 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('VALIDATOR', $_POST['validator']);
         $smarty->assign('VALIDATOR_TIME_LIMIT', $_POST['validator_time_limit']);
         $smarty->assign('TIME_LIMIT', $_POST['time_limit']);
-        $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
+        $smarty->assign('OVERALL_WALL_TIME_LIMIT', $_POST['overall_wall_time_limit']);
+        $smarty->assign('EXTRA_WALL_TIME', $_POST['extra_wall_time']);
         $smarty->assign('MEMORY_LIMIT', $_POST['memory_limit']);
+        $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
         $smarty->assign('SOURCE', $_POST['source']);
-        $smarty->assign('VISIBILITY', $_POST['visibility']);
+        $smarty->assign('LANGUAGES', $_POST['languages'][0]);
         $smarty->assign('STACK_LIMIT', $_POST['stack_limit']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
+        $smarty->assign('VISIBILITY', $_POST['visibility']);
     } elseif ($response['status'] == 'ok') {
         header("Location: /problem/{$response['alias']}/edit/");
         die();
