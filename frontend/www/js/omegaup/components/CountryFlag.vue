@@ -11,10 +11,8 @@ export default {
   props: ['country'],
   computed: {
     flagUrl: function() {
-      if (this.country != null) {
-        return '/media/flags/' + this.country.toLowerCase() + '.png';
-      }
-      return '';
+      if (this.country == null) return '';
+      return '/media/flags/' + this.country.toLowerCase() + '.png';
     }
   },
   data: function() { return {};},
