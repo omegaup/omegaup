@@ -33,7 +33,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'source' => $_POST['source'],
                 'visibility' => $_POST['visibility'],
                 'stack_limit' => $_POST['stack_limit'],
-                'languages' => $_POST['languages'][0],
+                'languages' => $_POST['languages'],
                 'email_clarifications' => $_POST['email_clarifications']
             ]);
     $r->method = 'ProblemController::apiCreate';
@@ -56,7 +56,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('MEMORY_LIMIT', $_POST['memory_limit']);
         $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
         $smarty->assign('SOURCE', $_POST['source']);
-        $smarty->assign('LANGUAGES', $_POST['languages'][0]);
+        $smarty->assign('LANGUAGES', $_POST['languages']);
         $smarty->assign('STACK_LIMIT', $_POST['stack_limit']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
         $smarty->assign('VISIBILITY', $_POST['visibility']);
