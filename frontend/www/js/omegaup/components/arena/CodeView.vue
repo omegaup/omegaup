@@ -1,9 +1,8 @@
 <template>
-  <!-- TODO: Use a code editor for both -->
-  <pre v-if="fragment.readOnly">
-  {{ fragment.contents }}</pre><omegaup-arena-codemirror v-bind:options="editorOptions"
-        v-else
-        v-model="fragment.contents"></omegaup-arena-codemirror>
+  <omegaup-arena-codemirror v-bind:options="editorOptions"
+        v-bind:value="value"
+        v-on:change="onChange"
+        v-on:input="onInput"></omegaup-arena-codemirror>
 </template>
 
 <script>
@@ -28,16 +27,21 @@ let languageModeMap = {
 
 export default {
   props: {
-    // Object for mutable access
-    fragment: Object,
     language: String,
+    readOnly: Boolean,
+    value: String,
   },
   data: function() {
     return {
       editorOptions: {
         tabSize: 2, lineNumbers: true, mode: languageModeMap[this.language],
+            readOnly: this.readOnly,
       }
     }
+  },
+  methods: {
+    onChange: function(value) { this.$emit('change', value);},
+    onInput: function(value) { this.$emit('input', value);},
   },
   watch: {
     language: function(newLanguage) {
