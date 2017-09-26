@@ -7,10 +7,10 @@
  */
 
 class CreateContestTest extends OmegaupTestCase {
-    private $contestFactory;
+    private $contestsParams;
 
     public function __construct() {
-        $this->contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
+        $this->contestsParams = new ContestsParams(['public' => 0]);
     }
 
     /**
@@ -19,7 +19,7 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testCreateContestPositive() {
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -58,7 +58,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
-            $contestData = $this->contestFactory->getRequest();
+            $contestData = ContestsFactory::getRequest($this->contestsParams);
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
 
@@ -90,7 +90,7 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -113,7 +113,7 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -135,7 +135,7 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
         $r['public'] = 1;
@@ -155,7 +155,7 @@ class CreateContestTest extends OmegaupTestCase {
         $problem = ProblemsFactory::createProblem();
 
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
         $r['public'] = 1;
@@ -196,7 +196,7 @@ class CreateContestTest extends OmegaupTestCase {
         $problem = ProblemsFactory::createProblem(null, null, 0);
 
         // Create a valid contest Request object
-        $contestData = $this->contestFactory->getRequest();
+        $contestData = ContestsFactory::getRequest($this->contestsParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
         $r['public'] = 1;

@@ -77,12 +77,6 @@ class ContestsParams implements ArrayAccess {
  */
 
 class ContestsFactory {
-    private $params;
-
-    public function __construct(ContestsParams $params) {
-        $this->params = $params;
-    }
-
     /**
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
@@ -92,24 +86,25 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public function getRequest() {
-        if (is_null($this->params['contestDirector'])) {
-            $this->params['contestDirector'] = UserFactory::createUser();
+    public static function getRequest(ContestsParams $params) {
+        $privateParams = $params;
+        if (is_null($privateParams['contestDirector'])) {
+            $privateParams['contestDirector'] = UserFactory::createUser();
         }
 
-        if (is_null($this->params['title'])) {
-            $this->params['title'] = Utils::CreateRandomString();
+        if (is_null($privateParams['title'])) {
+            $privateParams['title'] = Utils::CreateRandomString();
         }
 
         // Set context
         $r = new Request();
-        $r['title'] = $this->params['title'];
+        $r['title'] = $privateParams['title'];
         $r['description'] = 'description';
-        $r['start_time'] = ($this->params['start_time'] == null ? (Utils::GetPhpUnixTimestamp() - 60 * 60) : $this->params['start_time']);
-        $r['finish_time'] = ($this->params['finish_time'] == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $this->params['finish_time']);
+        $r['start_time'] = ($privateParams['start_time'] == null ? (Utils::GetPhpUnixTimestamp() - 60 * 60) : $privateParams['start_time']);
+        $r['finish_time'] = ($privateParams['finish_time'] == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $privateParams['finish_time']);
         $r['window_length'] = null;
-        $r['public'] = $this->params['public'];
-        $r['alias'] = substr($this->params['title'], 0, 20);
+        $r['public'] = $privateParams['public'];
+        $r['alias'] = substr($privateParams['title'], 0, 20);
         $r['points_decay_factor'] = '.02';
         $r['partial_score'] = '0';
         $r['submissions_gap'] = '0';
@@ -117,26 +112,28 @@ class ContestsFactory {
         $r['penalty'] = 100;
         $r['scoreboard'] = 100;
         $r['penalty_type'] = 'contest_start';
-        if ($this->params['penalty_calc_policy'] == null) {
+        if ($privateParams['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
-            $r['penalty_calc_policy'] = $this->params['penalty_calc_policy'];
+            $r['penalty_calc_policy'] = $privateParams['penalty_calc_policy'];
         }
-        $r['languages'] = $this->params['languages'];
+        $r['languages'] = $privateParams['languages'];
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
         return [
             'request' => $r,
-            'director' => $this->params['contestDirector']
+            'director' => $privateParams['contestDirector']
         ];
     }
 
-    public function createContest() {
+    public static function createContest(array $params) {
         // Create a valid contest Request object
-        $tmpPublic = $this->params['public'];
-        $this->params['public'] = 0;
-        $contestData = ContestsFactory::getRequest();
-        $this->params['public'] = $tmpPublic;
+        $privateParams = new ContestsParams($params);
+        //$privateParams['public'] = 0;
+        $tmpPublic = $privateParams['public'];
+        $privateParams['public'] = 0;
+        $contestData = ContestsFactory::getRequest($privateParams);
+        $privateParams['public'] = $tmpPublic;
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -147,7 +144,7 @@ class ContestsFactory {
         // Call the API
         $response = ContestController::apiCreate($r);
 
-        if ($this->params['public'] === 1) {
+        if ($privateParams['public'] === 1) {
             self::forcePublic($contestData);
             $r['public'] = 1;
         }

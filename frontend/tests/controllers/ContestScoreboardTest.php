@@ -17,8 +17,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     private function prepareContestScoreboardData($nUsers = 3, array $runMap, $runForAdmin = true, $runForDirector = true) {
         $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Add the problems to the contest
         ContestsFactory::addProblemToContest($problemData[0], $contestData);
@@ -179,8 +178,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $problemData2 = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams(['penalty_calc_policy' => 'max']));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['penalty_calc_policy' => 'max']);
 
         // Add the problems to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -224,8 +222,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Set 0% of scoreboard show
         ContestsFactory::setScoreboardPercentage($contestData, 0);
@@ -275,8 +272,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Set 0% of scoreboard show
         ContestsFactory::setScoreboardPercentage($contestData, 0);
@@ -326,10 +322,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get contests
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData2 = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
+        $contestData2 = ContestsFactory::createContest([]);
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -369,8 +363,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrl() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem
@@ -441,8 +434,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $externalUser = UserFactory::createUser();
 
         // Get a contest with 0% of scoreboard show percentage
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Call scoreboard api from the user
         $login = self::login($externalUser);
@@ -459,8 +451,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlNoLogin() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem

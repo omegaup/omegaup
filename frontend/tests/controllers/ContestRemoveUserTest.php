@@ -8,8 +8,7 @@
 class ContestRemoveUserTest extends OmegaupTestCase {
     public function testRemoveUser() {
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Create a user
         $user = UserFactory::createUser();

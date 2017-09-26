@@ -9,8 +9,7 @@
 class ContestUsersTest extends OmegaupTestCase {
     public function testContestUsersValid() {
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Create 10 users
         $n = 10;
@@ -45,8 +44,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestActivityReport() {
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         $user = UserFactory::createUser();
         ContestsFactory::openContest($contestData, $user);

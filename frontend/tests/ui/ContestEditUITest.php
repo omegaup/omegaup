@@ -11,8 +11,7 @@ class ContestEditUITest extends OmegaupUITestCase {
         $author = $this->createUserAndLogin();
 
         // Create a problem
-        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $author]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['contestDirector' => $author]);
 
         // Open problem create
         $this->open('/contestedit.php');

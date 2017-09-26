@@ -7,11 +7,6 @@
  */
 
 class GroupsTest extends OmegaupTestCase {
-    private $contestFactory;
-
-    public function __construct() {
-        $this->contestFactory = new ContestsFactory(new ContestsParams([]));
-    }
     /**
      * Basic create group test
      */
@@ -220,7 +215,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testAddContestToScoreboard() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestData = $this->contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
         ContestsFactory::addAdminUser($contestData, $groupData['owner']);
 
         $login = self::login($groupData['owner']);
@@ -252,8 +247,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testAddContestToScoreboardNoContestAdmin() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestFactoryPublic = new ContestsFactory(new ContestsParams(['public' => 0]));
-        $contestData = $contestFactoryPublic->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
 
         $login = self::login($groupData['owner']);
         GroupScoreboardController::apiAddContest(new Request([
@@ -270,7 +264,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testRemoveContestFromScoreboard() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestData = $this->contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
         ContestsFactory::addAdminUser($contestData, $groupData['owner']);
 
         GroupsFactory::addContestToScoreboard($contestData, $scoreboardData, $groupData);
@@ -309,8 +303,7 @@ class GroupsTest extends OmegaupTestCase {
         $n = 5;
 
         for ($i = 0; $i < $n; $i++) {
-            $contestFactory = new ContestsFactory(new ContestsParams([]));
-            $contestsData[] = $contestFactory->createContest();
+            $contestsData[] = ContestsFactory::createContest([]);
             ContestsFactory::addAdminUser($contestsData[$i], $groupData['owner']);
             GroupsFactory::addContestToScoreboard($contestsData[$i], $scoreboardData, $groupData);
 
@@ -377,8 +370,7 @@ class GroupsTest extends OmegaupTestCase {
         $n = 5;
 
         for ($i = 0; $i < $n; $i++) {
-            $contestFactory = new ContestsFactory(new ContestsParams([]));
-            $contestsData[] = $contestFactory->createContest();
+            $contestsData[] = ContestsFactory::createContest([]);
             ContestsFactory::addAdminUser($contestsData[$i], $groupData['owner']);
             GroupsFactory::addContestToScoreboard($contestsData[$i], $scoreboardData, $groupData, 1 /*onlyAC*/, ($i === 0 ? 3 : 1));
 

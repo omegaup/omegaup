@@ -15,8 +15,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

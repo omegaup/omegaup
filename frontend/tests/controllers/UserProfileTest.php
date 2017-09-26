@@ -81,10 +81,8 @@ class UserProfileTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $contests = [];
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contests[0] = $contestFactory->createContest();
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contests[1] = $contestFactory->createContest();
+        $contests[0] = ContestsFactory::createContest([]);
+        $contests[1] = ContestsFactory::createContest([]);
 
         ContestsFactory::addUser($contests[0], $contestant);
         ContestsFactory::addUser($contests[1], $contestant);
@@ -115,10 +113,8 @@ class UserProfileTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $contests = [];
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-        $contests[0] = $contestFactory->createContest();
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contests[1] = $contestFactory->createContest();
+        $contests[0] = ContestsFactory::createContest(['public' => 0]);
+        $contests[1] = ContestsFactory::createContest([]);
 
         ContestsFactory::addUser($contests[0], $contestant);
         ContestsFactory::addUser($contests[1], $contestant);
@@ -150,8 +146,7 @@ class UserProfileTest extends OmegaupTestCase {
     public function testProblemsSolved() {
         $user = UserFactory::createUser();
 
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contest = $contestFactory->createContest();
+        $contest = ContestsFactory::createContest([]);
 
         $problemOne = ProblemsFactory::createProblem();
         $problemTwo = ProblemsFactory::createProblem();

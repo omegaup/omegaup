@@ -35,9 +35,8 @@ class ContestListTest extends OmegaupTestCase {
      * Basic test. Check that most recent contest is at the top of the list
      */
     public function testLatestPublicContest() {
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
         // Create new PUBLIC contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         // Log as a random contestant
         $contestant = UserFactory::createUser();
@@ -62,10 +61,9 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testLatestPublicContestNotLoggedIn() {
         $r = new Request();
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
 
         // Create new PUBLIC contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
 
         $response = ContestController::apiList($r);
 
@@ -81,10 +79,8 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForInvitedUser() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -110,10 +106,8 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForNonInvitedUser() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -139,10 +133,8 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForSystemAdmin() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
 
         $login = self::login(UserFactory::createAdminUser());
         $r = new Request([
@@ -163,10 +155,8 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForContestAdmin() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -193,10 +183,8 @@ class ContestListTest extends OmegaupTestCase {
      * An added admin group should see those contests as well
      */
     public function testPrivateContestForContestGroupAdmin() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
         $title = $contestData['request']['title'];
 
         $admin1 = UserFactory::createUser();
@@ -246,10 +234,8 @@ class ContestListTest extends OmegaupTestCase {
      * Authors with admin groups should only see each contest once.
      */
     public function testAuthorOnlySeesContestsOnce() {
-        $contestFactory = new ContestsFactory(new ContestsParams(['public' => 0]));
-
         // Create new private contest
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['public' => 0]);
         $author = $contestData['director'];
         $title = $contestData['request']['title'];
 
@@ -289,13 +275,12 @@ class ContestListTest extends OmegaupTestCase {
         $r = new Request();
 
         // Create 2 contests, with the not-recommended.finish_time > recommended.finish_time
-        $contestFactoryRecommended = new ContestsFactory(new ContestsParams([]));
-        $recommendedContestData = $contestFactoryRecommended->createContest();
-
-        $contestFactoryNotRecommended = new ContestsFactory(new ContestsParams(
-            ['finish_time' => $recommendedContestData['request']['finish_time'] + 1]
-        ));
-        $notRecommendedContestData = $contestFactoryNotRecommended->createContest();
+        $recommendedContestData = ContestsFactory::createContest([]);
+        $notRecommendedContestData = ContestsFactory::createContest(
+            [
+                'finish_time' => $recommendedContestData['request']['finish_time'] + 1
+            ]
+        );
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -338,5 +323,48 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         $this->assertTrue($recommendedPosition < $notRecommendedPosition);
+    }
+
+    /**
+     * Basic test. Check that only the first contest is on the list
+     */
+    public function testShowOnlyCurrentContests() {
+        $r = new Request();
+
+        // Create 2 contests, the second one will occur in to the future.
+        $currentContestData = ContestsFactory::createContest(['public' => 0]);
+        $futureContestData = ContestsFactory::createContest(
+            [
+                'public' => 0,
+                'finish_time' => $currentContestData['request']['finish_time'] + (60 * 60 * 49),
+                'start_time' => $currentContestData['request']['finish_time'] + (60 * 60 * 49),
+            ]
+        );
+
+        // Get a user for our scenario
+        $contestant = UserFactory::createUser();
+
+        // Add user to our private contests
+        ContestsFactory::addUser($currentContestData, $contestant);
+        ContestsFactory::addUser($futureContestData, $contestant);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'active' => ActiveStatus::ACTIVE,
+        ]);
+
+        $response = ContestController::apiList($r);
+
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
     }
 }

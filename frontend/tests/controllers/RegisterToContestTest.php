@@ -10,8 +10,7 @@ class RegisterToContestTest extends OmegaupTestCase {
     // listing all the contest details.
     public function testIntro() {
         // Create contest
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
@@ -76,8 +75,7 @@ class RegisterToContestTest extends OmegaupTestCase {
     public function testSimpleRegistrationActions() {
         // create a contest and its admin
         $contestAdmin = UserFactory::createUser();
-        $contestFactory = new ContestsFactory(new ContestsParams(['contestDirector' => $contestAdmin]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest(['contestDirector' => $contestAdmin]);
 
         // make it "registrable"
         self::log('Update contest to make it registrable');
@@ -153,8 +151,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
     public function testUserCannotSelfApprove() {
         // create a contest and its admin
-        $contestFactory = new ContestsFactory(new ContestsParams([]));
-        $contestData = $contestFactory->createContest();
+        $contestData = ContestsFactory::createContest([]);
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
