@@ -17,13 +17,12 @@ class QualityNominationController extends Controller {
      *
      * A user that has already solved a problem can make suggestions about a
      * problem. This expects the `nomination` field to be `suggestion` and the
-     * `contents` field should be a JSON blob with the following fields:
+     * `contents` field should be a JSON blob with at least one the following fields:
      *
-     * * `rationale`: A small text explaining the rationale for promotion.
-     * * `difficulty`: (Optional) A number in the range [1-5] indicating the
+     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
      *                 difficulty of the problem.
-     * * `source`: (Optional) A URL or string clearly documenting the source or
-     *             full name of original author of the problem.
+     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
+     *             of the problem.
      * * `tags`: (Optional) An array of tag names that will be added to the
      *           problem upon promotion.
      *
@@ -34,7 +33,6 @@ class QualityNominationController extends Controller {
      * `promotion` and the `contents` field should be a JSON blob with the
      * following fields:
      *
-     * * `rationale`: A small text explaining the rationale for promotion.
      * * `statements`: A dictionary of languages to objects that contain a
      *                 `markdown` field, which is the markdown-formatted
      *                 problem statement for that language.
@@ -55,7 +53,7 @@ class QualityNominationController extends Controller {
      *               problem.
      * # Dismissal
      * A user that has already solved a problem can dismiss suggestions. The
-     * `contents` field is empty except for `rationale = 'dismiss'`.
+     * `contents` field is empty.
      *
      * @param Request $r
      *
@@ -75,9 +73,7 @@ class QualityNominationController extends Controller {
         Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         Validators::isStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
-        if (!is_array($contents)
-            || (!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
-        ) {
+        if (!is_array($contents)) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -93,11 +89,26 @@ class QualityNominationController extends Controller {
             }
         }
         if ($r['nomination'] == 'suggestion') {
-            if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
-                || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
-                || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
-                || (isset($contents['tags']) && !is_array($contents['tags']))
-            ) {
+            $atLeastOneFieldIsPresent = false;
+            if (isset($contents['difficulty'])) {
+                if (!is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (isset($contents['tags'])) {
+                if (!is_array($contents['tags'])) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (isset($contents['quality'])) {
+                if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (!$atLeastOneFieldIsPresent) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
@@ -150,7 +161,6 @@ class QualityNominationController extends Controller {
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
-            $contents = ['rationale' => 'dismiss'];
         }
 
         // Create object

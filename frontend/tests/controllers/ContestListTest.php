@@ -326,4 +326,49 @@ class ContestListTest extends OmegaupTestCase {
 
         $this->assertTrue($recommendedPosition < $notRecommendedPosition);
     }
+
+    /**
+     * Basic test. Check that only the first contest is on the list
+     */
+    public function testShowOnlyCurrentContests() {
+        $r = new Request();
+
+        // Create 2 contests, the second one will occur in to the future.
+        $currentContestData = ContestsFactory::createContest(null, 0);
+        $futureContestData = ContestsFactory::createContest(
+            null,
+            0,
+            null,
+            null,
+            $currentContestData['request']['finish_time'] + (60 * 60 * 49),
+            null,
+            $currentContestData['request']['finish_time'] + (60 * 60 * 48)
+        );
+
+        // Get a user for our scenario
+        $contestant = UserFactory::createUser();
+
+        // Add user to our private contests
+        ContestsFactory::addUser($currentContestData, $contestant);
+        ContestsFactory::addUser($futureContestData, $contestant);
+
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'active' => ActiveStatus::ACTIVE,
+        ]);
+
+        $response = ContestController::apiList($r);
+
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
+    }
 }

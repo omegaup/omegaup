@@ -1184,8 +1184,13 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCoderOfTheMonth(Request $r) {
-        // Get first day of the current month
-        $firstDay = date('Y-m-01');
+        if (!empty($r['date'])) {
+            Validators::isDate($r['date'], 'date', false);
+            $firstDay = date('Y-m-01', strtotime($r['date']));
+        } else {
+            // Get first day of the current month
+            $firstDay = date('Y-m-01');
+        }
 
         try {
             $coderOfTheMonth = null;
@@ -1199,17 +1204,18 @@ class UserController extends Controller {
                 // Generate the coder
                 $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if ($retArray == null) {
-                    self::$log->error('Missing paramer when calling apiCoderOfTheMonth.');
-                    throw new InvalidParameterException('parameterInvalid', 'date');
+                    return [
+                        'status' => 'ok',
+                        'userinfo' => null,
+                        'problems' => null,
+                    ];
                 }
-
                 $user = $retArray['user'];
 
                 // Save it
                 $c = new CoderOfTheMonth([
                     'user_id' => $user->user_id,
                     'time' => $firstDay,
-
                 ]);
                 CoderOfTheMonthDAO::save($c);
             } else {
