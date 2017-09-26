@@ -12,7 +12,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testViewProblemInAContestDetailsValid() {
         // Get a contest
-        $contestData = ContestsFactory::createContest([]);
+        $contestData = ContestsFactory::createContest();
 
         // Get a user to be the author
         $author = UserFactory::createUser();
@@ -80,7 +80,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function internalViewProblemStatement($type, $expected_text) {
         // Get a contest
-        $contestData = ContestsFactory::createContest([]);
+        $contestData = ContestsFactory::createContest();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -193,7 +193,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     public function testScoreInDetailsInsideContest() {
         // Create problem and contest
         $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest([]);
+        $contestData = ContestsFactory::createContest();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant
@@ -221,7 +221,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testViewProblemHasCorrectRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest([]);
+        $contestData = ContestsFactory::createContest();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();

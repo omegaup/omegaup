@@ -14,7 +14,7 @@ class ArenaAdminAllTestextends extends OmegaupUITestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest([]);
+        $contestData = ContestsFactory::createContest();
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

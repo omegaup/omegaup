@@ -64,7 +64,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
     }
 
     private function createRuns($user, $runCreationDate, $n) {
-        $contest = ContestsFactory::createContest([]);
+        $contest = ContestsFactory::createContest();
         $problem = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problem, $contest);
         ContestsFactory::addUser($contest, $user);

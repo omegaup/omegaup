@@ -4,18 +4,21 @@
  * ContestsParams
  */
 class ContestsParams implements ArrayAccess {
-    private $params;
+    public $params;
 
-    public function __construct(array $params) {
-        ContestsParams::validateParameter('title', $params, false);
-        ContestsParams::validateParameter('public', $params, false, 1);
-        ContestsParams::validateParameter('contestDirector', $params, false);
-        ContestsParams::validateParameter('languages', $params, false);
-        ContestsParams::validateParameter('start_time', $params, false);
-        ContestsParams::validateParameter('finish_time', $params, false);
-        ContestsParams::validateParameter('penalty_calc_policy', $params, false);
+    public function __construct($params = null) {
+        $parameters = (array)$params;
+        ContestsParams::validateParameter('title', $parameters, false);
+        ContestsParams::validateParameter('public', $parameters, false, 1);
+        ContestsParams::validateParameter('contestDirector', $parameters, false);
+        ContestsParams::validateParameter('languages', $parameters, false);
+        ContestsParams::validateParameter('start_time', $parameters, false);
+        ContestsParams::validateParameter('finish_time', $parameters, false);
+        ContestsParams::validateParameter('penalty_calc_policy', $parameters, false);
 
-        $this->params = $params;
+        $this->params = $parameters;
+
+        return $this->params;
     }
 
     public function offsetGet($offset) {
@@ -86,25 +89,33 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest(ContestsParams $params) {
-        $privateParams = $params;
-        if (is_null($privateParams['contestDirector'])) {
-            $privateParams['contestDirector'] = UserFactory::createUser();
+    public static function getRequest($parameters = new ContestsParams([])) {
+        $params = isset($parameters['params']) ? $parameters['params'] : $parameters;
+        if (is_null($params['contestDirector'])) {
+            $params['contestDirector'] = UserFactory::createUser();
         }
 
-        if (is_null($privateParams['title'])) {
-            $privateParams['title'] = Utils::CreateRandomString();
+        if (is_null($params['title'])) {
+            $params['title'] = Utils::CreateRandomString();
+        }
+
+        if (is_null($params['start_time'])) {
+            $params['start_time'] = (Utils::GetPhpUnixTimestamp() - 60 * 60);
+        }
+
+        if (is_null($params['finish_time'])) {
+            $params['finish_time'] = (Utils::GetPhpUnixTimestamp() + 60 * 60);
         }
 
         // Set context
         $r = new Request();
-        $r['title'] = $privateParams['title'];
+        $r['title'] = $params['title'];
         $r['description'] = 'description';
-        $r['start_time'] = ($privateParams['start_time'] == null ? (Utils::GetPhpUnixTimestamp() - 60 * 60) : $privateParams['start_time']);
-        $r['finish_time'] = ($privateParams['finish_time'] == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $privateParams['finish_time']);
+        $r['start_time'] = $params['start_time'];
+        $r['finish_time'] = $params['finish_time'];
         $r['window_length'] = null;
-        $r['public'] = $privateParams['public'];
-        $r['alias'] = substr($privateParams['title'], 0, 20);
+        $r['public'] = $parameters['public'];
+        $r['alias'] = substr($params['title'], 0, 20);
         $r['points_decay_factor'] = '.02';
         $r['partial_score'] = '0';
         $r['submissions_gap'] = '0';
@@ -112,28 +123,26 @@ class ContestsFactory {
         $r['penalty'] = 100;
         $r['scoreboard'] = 100;
         $r['penalty_type'] = 'contest_start';
-        if ($privateParams['penalty_calc_policy'] == null) {
+        if ($params['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
-            $r['penalty_calc_policy'] = $privateParams['penalty_calc_policy'];
+            $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
-        $r['languages'] = $privateParams['languages'];
+        $r['languages'] = $params['languages'];
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
         return [
             'request' => $r,
-            'director' => $privateParams['contestDirector']
+            'director' => $params['contestDirector']
         ];
     }
 
-    public static function createContest(array $params) {
-        // Create a valid contest Request object
+    public static function createContest($params = new ContestsParams([])) {
         $privateParams = new ContestsParams($params);
-        //$privateParams['public'] = 0;
-        $tmpPublic = $privateParams['public'];
-        $privateParams['public'] = 0;
+        // Create a valid contest Request object
+
+        $privateParams->params['public'] = 0;
         $contestData = ContestsFactory::getRequest($privateParams);
-        $privateParams['public'] = $tmpPublic;
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -144,7 +153,7 @@ class ContestsFactory {
         // Call the API
         $response = ContestController::apiCreate($r);
 
-        if ($privateParams['public'] === 1) {
+        if ($params['public'] === 1) {
             self::forcePublic($contestData);
             $r['public'] = 1;
         }
