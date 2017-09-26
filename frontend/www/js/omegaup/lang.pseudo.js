@@ -22,6 +22,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaContestOrganizer: "(Organiz3r)",
 	arenaContestWindowLength: "(Tim3 70 501v3 a11 pr0b13m5)",
 	arenaCurrentContests: "(Curr3n7 c0n73575)",
+	arenaFutureContests: "(Fu7ur3 c0n73575)",
 	arenaOldContests: "(Pa57 c0n73575)",
 	arenaPageIntroduction: "(T0 j0in a 1iv3 c0n7357, c1ick 7h3 c0n7357 7i713 and f0110w 7h3 in57ruc7i0n5. A11 pa57 c0n73575 hav3 a Prac7ic3 m0d3 y0u can u53 70 c0n7inu3 501ving 7h3ir 7a5k5.)",
 	arenaPageRecommendedContestsText: "(T0 5h0w y0ur c0n7357 in 7h3 R3c0mm3nd3d C0n73575 1i57, c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m.)",

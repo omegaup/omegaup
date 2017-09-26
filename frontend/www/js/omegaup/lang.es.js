@@ -22,6 +22,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaContestOrganizer: "Organiza",
 	arenaContestWindowLength: "Tiempo para resolver los problemas",
 	arenaCurrentContests: "Concursos actuales",
+	arenaFutureContests: "Concursos futuros",
 	arenaOldContests: "Concursos pasados",
 	arenaPageIntroduction: "Para participar en un concurso en vivo, haz click en el t\u00edtulo de concurso y sigue las instrucciones. Todos los concursos pasados tienen un modo Pr\u00e1ctica donde puedes continuar resolviendo sus problemas.",
 	arenaPageRecommendedContestsText: "Para mostrar tu concurso en la lista de Concursos Recommendados, contacta a omegaup-soporte@googlegroups.com.",

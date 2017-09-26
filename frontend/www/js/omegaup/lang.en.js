@@ -22,6 +22,7 @@ omegaup.OmegaUp.loadTranslations({
 	arenaContestOrganizer: "Organizer",
 	arenaContestWindowLength: "Time to solve all problems",
 	arenaCurrentContests: "Current contests",
+	arenaFutureContests: "Future contests",
 	arenaOldContests: "Past contests",
 	arenaPageIntroduction: "To join a live contest, click the contest title and follow the instructions. All past contests have a Practice mode you can use to continue solving their tasks.",
 	arenaPageRecommendedContestsText: "To show your contest in the Recommended Contests list, contact omegaup-soporte@googlegroups.com.",
