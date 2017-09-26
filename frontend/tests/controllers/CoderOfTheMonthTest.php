@@ -37,7 +37,6 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
     public function testCoderOfTheMonthAfterYear() {
         $userLastYear = UserFactory::createUser();
-        $userThisYear = UserFactory::createUser();
 
         $today = date('Y-m-d');
 
@@ -50,7 +49,6 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         date_add($runCreationDate, date_interval_create_from_date_string('1 month'));
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($userLastYear, $runCreationDate, 2 /*numRuns*/);
-        $this->createRuns($userThisYear, $runCreationDate, 1 /*numRuns*/);
 
         $this->createRuns($userLastYear, $today, 2 /*numRuns*/);
 

@@ -118,7 +118,8 @@ class ProblemsDAO extends ProblemsDAOBase {
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             if (!is_null($query)) {
-                $sql .= " title LIKE CONCAT('%', ?, '%') ";
+                $sql .= " (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
+                $args[] = $query;
                 $args[] = $query;
             } else {
                 // Finish the WHERE clause opened by addTagFilter
@@ -173,7 +174,8 @@ class ProblemsDAO extends ProblemsDAOBase {
             $args[] = $user_id;
 
             if (!is_null($query)) {
-                $sql .= " AND p.title LIKE CONCAT('%', ?, '%')";
+                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
+                $args[] = $query;
                 $args[] = $query;
             }
         } elseif ($user_type === USER_ANONYMOUS) {
@@ -192,7 +194,8 @@ class ProblemsDAO extends ProblemsDAOBase {
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
 
             if (!is_null($query)) {
-                $sql .= " AND p.title LIKE CONCAT('%', ?, '%') ";
+                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
+                $args[] = $query;
                 $args[] = $query;
             }
         }

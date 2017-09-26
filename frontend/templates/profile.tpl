@@ -42,12 +42,6 @@
 		</div>
 
 		<div class="panel panel-default">
-			<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
-			<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
-			<div id="my-next-contests"></div>
-		</div>
-
-		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileSolvedProblems#} <span class="badge" id="problems-solved-total">0</span></h2>
 			</div>

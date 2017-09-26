@@ -9,8 +9,14 @@
 							<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" target="_blank">
 								<small><u>{#frontPageIntroductionButton#}</u></small></a></p>
 					</div>
-					<div class="panel-body">
 
+					<div class="panel panel-default">
+						<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
+						<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
+						<div id="my-next-contests"></div>
+					</div>
+
+					<div class="panel-body">
 						<ul class="nav nav-pills">
 							<li class="nav-item">
 								<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">

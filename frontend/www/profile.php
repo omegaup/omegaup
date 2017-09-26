@@ -6,8 +6,6 @@ UITools::setProfile($smarty);
 
 // Fetch contests
 try {
-    $myContestsListPayload  = ContestController::apiListParticipating(new Request([]));
-    $smarty->assign('myContestsListPayload', $myContestsListPayload);
 } catch (Exception $e) {
     // Oh, well...
 }

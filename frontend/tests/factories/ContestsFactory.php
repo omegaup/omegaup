@@ -16,7 +16,7 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
+    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null, $start_time = null) {
         if (is_null($contestDirector)) {
             $contestDirector = UserFactory::createUser();
         }
@@ -29,7 +29,7 @@ class ContestsFactory {
         $r = new Request();
         $r['title'] = $title;
         $r['description'] = 'description';
-        $r['start_time'] = Utils::GetPhpUnixTimestamp() - 60 * 60;
+        $r['start_time'] = ($start_time == null ? (Utils::GetPhpUnixTimestamp() - 60 * 60) : $start_time);
         $r['finish_time'] = ($finish_time == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $finish_time);
         $r['window_length'] = null;
         $r['public'] = $public;
@@ -54,9 +54,9 @@ class ContestsFactory {
             'director' => $contestDirector];
     }
 
-    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
+    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null, $start_time = null) {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy);
+        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy, $start_time);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
