@@ -674,6 +674,6 @@ las pestañas del framework. */
 }
 
 /* Estilos para las pestañas de arena. */
-.nav-pills>li>a {
+.arena-tabs>li>a {
 	width:160px;
 }

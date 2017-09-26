@@ -11,7 +11,7 @@
 					</div>
 					<div class="panel-body">
 
-						<ul class="nav nav-pills">
+						<ul class="nav nav-pills arena-tabs">
 							<li class="nav-item">
 								<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">
 									{#arenaRecommendedCurrentContests#}</a>
