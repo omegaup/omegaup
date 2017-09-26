@@ -674,6 +674,14 @@ las pestañas del framework. */
 }
 
 /* Estilos para las pestañas de arena. */
+.arena-tabs>li {
+	display: table;
+	height: 60px;
+}
+
 .arena-tabs>li>a {
 	width:160px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
 }
