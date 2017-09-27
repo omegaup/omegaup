@@ -85,7 +85,16 @@
 						<input id="username-contestant" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>{#contestAdduserAddUser#}</button>
+					<button class="btn btn-primary" type='submit' id="single">{#contestAdduserAddUser#}</button>
+
+					<hr>
+
+					<div class="form-group">
+						<label for="username-contestants">{#wordsMultipleUser#}</label>
+						<textarea id="username-contestants" name="usernames" rows="4" class="form-control"></textarea>
+					</div>
+
+					<button class="btn btn-primary" type='submit' id="multiple">{#contestAdduserAddUsers#}</button>
 				</form>
 			</div>
 

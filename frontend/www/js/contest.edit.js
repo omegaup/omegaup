@@ -307,46 +307,66 @@ omegaup.OmegaUp.on('ready', function() {
                                                 .append(omegaup.UI.getFlag(
                                                     user['country_id']))))
                         .append($('<td></td>').text(user.access_time))
-                        .append($('<td><button type="button" class="close">' +
-                                  '&times;</button></td>')
-                                    .click((function(username) {
-                                      return function(e) {
-                                        omegaup.API.Contest.removeUser({
-                                                             contest_alias:
-                                                                 contestAlias,
-                                                             usernameOrEmail:
-                                                                 username,
-                                                           })
-                                            .then(function(response) {
-                                              omegaup.UI.success(
-                                                  'User successfully removed!');
-                                              $('div.post.footer').show();
-                                              var tr = e.target.parentElement
-                                                           .parentElement;
-                                              $(tr).remove();
-                                            })
-                                            .fail(omegaup.UI.apiError);
-                                      };
-                                    })(user.username))));
+                        .append(
+                            $('<td><button type="button" class="close">' +
+                              '&times;</button></td>')
+                                .click((function(username) {
+                                  return function(e) {
+                                    omegaup.API.Contest.removeUser({
+                                                         contest_alias:
+                                                             contestAlias,
+                                                         usernameOrEmail:
+                                                             username,
+                                                       })
+                                        .then(function(response) {
+                                          omegaup.UI.success(
+                                              omegaup.T.successfulRemoveUser);
+                                          $('div.post.footer').show();
+                                          var tr = e.target.parentElement
+                                                       .parentElement;
+                                          $(tr).remove();
+                                        })
+                                        .fail(omegaup.UI.apiError);
+                                  };
+                                })(user.username))));
           }
         })
         .fail(omegaup.UI.apiError);
   }
 
   $('#add-contestant-form')
-      .submit(function() {
-        username = $('#username-contestant').val();
-        omegaup.API.Contest.addUser({
-                             contest_alias: contestAlias,
-                             usernameOrEmail: username,
-                           })
-            .then(function(response) {
-              omegaup.UI.success('User successfully added!');
-              $('div.post.footer').show();
-              refreshContestContestants();
-            })
-            .fail(omegaup.UI.apiError);
-        return false;  // Prevent refresh
+      .submit(function(evt) {
+        inputAction =
+            $(this).context.attributes[0].ownerDocument.activeElement.id;
+        if (inputAction != 'multiple') {
+          username = $('#username-contestant').val();
+          omegaup.API.Contest.addUser({
+                               contest_alias: contestAlias,
+                               usernameOrEmail: username,
+                             })
+              .then(function(response) {
+                omegaup.UI.success(omegaup.T.successfulAddUser);
+                $('div.post.footer').show();
+                refreshContestContestants();
+              })
+              .fail(omegaup.UI.apiError);
+          console.log($('#status'));
+          return false;
+        } else {
+          usernames = $('#username-contestants').val().split(',');
+          omegaup.UI.bulkOperationUsers(
+              function(alias, resolve, reject) {
+                username = $.trim(alias);
+                omegaup.API.Contest.addUser({
+                                     contest_alias: contestAlias,
+                                     usernameOrEmail: username,
+                                   })
+                    .then(resolve)
+                    .fail(reject);
+              },
+              function() { refreshContestContestants(); });
+          return false;
+        }
       });
 
   // Add admin

@@ -91,6 +91,40 @@ let UI = {
         });
   },
 
+  bulkOperationUsers: function(operation, onOperationFinished) {
+    var isStopExecuted = false;
+    var success = true;
+    var error = null;
+
+    var resolve = function(data) {};
+    var reject = function(data) {
+      success = false;
+      error = data.error;
+    };
+    usernames.each(function(event, index) {
+      operation(event, resolve, reject);
+    });
+    // Wait for all
+    $(document)
+        .ajaxStop(function() {
+          if (!isStopExecuted) {
+            // Make sure we execute this block once. onOperationFinish might
+            // have
+            // async calls that would fire ajaxStop event
+            isStopExecuted = true;
+            $(document).off('ajaxStop');
+
+            onOperationFinished();
+
+            if (success === false) {
+              UI.error(omegaup.T.failAddUsers + ': ' + error);
+            } else {
+              UI.success(omegaup.T.successfulAddUsers);
+            }
+          }
+        });
+  },
+
   prettyPrintJSON: function(json) {
     return UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
   },
