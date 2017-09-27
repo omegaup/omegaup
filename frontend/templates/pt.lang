@@ -18,6 +18,7 @@ arenaContestEndedUsePractice = "Este concurso terminou. Para continuar a enviar 
 arenaContestOrganizer = "Organizador"
 arenaContestWindowLength = "Tempo de resolver todos os problemas"
 arenaCurrentContests = "Concursos atuais"
+arenaFutureContests = "Concursos futuros"
 arenaOldContests = "Concursos passados"
 arenaPageIntroduction = "Para participar de um concurso ao vivo, clique no título do concurso e siga as instruções. Todas os concursos passados têm um modo de prática, onde você pode continuar a resolver os problemas."
 arenaPageRecommendedContestsText = "Para mostrar seus concursos na lista de Concursos Recomendados, entre em contato omegaup-soporte@googlegroups.com."

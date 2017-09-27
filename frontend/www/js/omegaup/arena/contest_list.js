@@ -18,7 +18,8 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
       {
         header: omegaup.T.wordsContests,
         pageSize: 10,
-        showTimes: (actualApiParams.active == 'ACTIVE'),
+        showTimes: (actualApiParams.active == 'ACTIVE' ||
+                    actualApiParams.active == 'FUTURE'),
         showPractice: (actualApiParams.active == 'PAST'),
       },
       uiParams);
