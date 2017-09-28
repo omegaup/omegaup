@@ -25,6 +25,12 @@ omegaup.OmegaUp.on('ready', function() {
       omegaup.T.arenaCurrentContests
     ],
     [
+      '#future-contests',
+      'FUTURE',
+      'NOT_RECOMMENDED',
+      omegaup.T.arenaFutureContests
+    ],
+    [
       '#recommended-past-contests',
       'PAST',
       'RECOMMENDED',

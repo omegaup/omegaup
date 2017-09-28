@@ -55,8 +55,12 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       }
-    ]
+    ],
   },
   resolve: {
     alias: {
