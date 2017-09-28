@@ -296,10 +296,11 @@ class ContestsDAO extends ContestsDAOBase {
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
+        $columns = ContestsDAO::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
         $sql = '
-            SELECT
-                Contests.*
+            SELECT ' .
+                $columns . '
             FROM
                 Contests
             JOIN

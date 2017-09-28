@@ -10,17 +10,15 @@
 								<small><u>{#frontPageIntroductionButton#}</u></small></a></p>
 					</div>
 
-					<div class="panel panel-default">
-						<script type="text/json" id="my-next-contests-payload">{$myContestsListPayload|json_encode}</script>
-						<script type="text/javascript" src="{version_hash src="/js/dist/contest_list_participant.js"}"></script>
-						<div id="my-next-contests"></div>
-					</div>
-
 					<div class="panel-body">
 						<ul class="nav nav-pills">
 							<li class="nav-item">
 								<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">
 									{#arenaRecommendedCurrentContests#}</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
+									{#arenaMyActiveContests#}</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link" href="#list-current-contest" data-toggle="tab">
@@ -39,6 +37,10 @@
 						<div class="tab-content">
 							<div class="tab-pane" id="list-recommended-current-contest">
 								<div class="panel panel-primary" id="recommended-current-contests"
+									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+							</div>
+							<div class="tab-pane" id="list-current-participating-contest">
+								<div class="panel panel-primary" id="participating-current-contests"
 									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
 							</div>
 							<div class="tab-pane" id="list-current-contest">

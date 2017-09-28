@@ -672,3 +672,16 @@ las pestañas del framework. */
 	color: #FFFFFF;
 	border-bottom: 1px solid #428BCA;
 }
+
+/* Estilos para las pestañas de arena. */
+.nav-pills>li {
+	display: table;
+	height: 80px;
+}
+
+.nav-pills>li>a {
+	width:142px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}

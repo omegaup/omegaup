@@ -371,7 +371,7 @@ class ContestListTest extends OmegaupTestCase {
             $futureContestData['contest']->contest_id
         );
     }
-    
+
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
