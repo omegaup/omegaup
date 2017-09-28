@@ -91,7 +91,7 @@ let UI = {
         });
   },
 
-  bulkOperationUsers: function(operation, onOperationFinished) {
+  bulkOperation: function(operation, onOperationFinished, options) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
@@ -117,9 +117,11 @@ let UI = {
             onOperationFinished();
 
             if (success === false) {
-              UI.error(omegaup.T.failAddUsers + ': ' + error);
+              UI.error(UI.formatString(options && options.errorTemplate ||
+                                           omegaup.T.bulkOperationError,
+                                       error));
             } else {
-              UI.success(omegaup.T.successfulAddUsers);
+              UI.success(omegaup.T.bulkUserAddSuccess);
             }
           }
         });
