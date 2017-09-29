@@ -53,7 +53,7 @@ let UI = {
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
-  bulkOperation: function(operation, onOperationFinished) {
+  bulkOperation: function(operation, onOperationFinished, options) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
@@ -69,41 +69,12 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
+    if (typeof usernames != 'undefined') {
+      usernames.each(function(event, index) {
+        operation(event, resolve, reject);
+      });
+    }
 
-    // Wait for all
-    $(document)
-        .ajaxStop(function() {
-          if (!isStopExecuted) {
-            // Make sure we execute this block once. onOperationFinish might
-            // have
-            // async calls that would fire ajaxStop event
-            isStopExecuted = true;
-            $(document).off('ajaxStop');
-
-            onOperationFinished();
-
-            if (success === false) {
-              UI.error('Error actualizando items: ' + error);
-            } else {
-              UI.success('Todos los items han sido actualizados');
-            }
-          }
-        });
-  },
-
-  bulkOperation: function(operation, onOperationFinished, options) {
-    var isStopExecuted = false;
-    var success = true;
-    var error = null;
-
-    var resolve = function(data) {};
-    var reject = function(data) {
-      success = false;
-      error = data.error;
-    };
-    usernames.each(function(event, index) {
-      operation(event, resolve, reject);
-    });
     // Wait for all
     $(document)
         .ajaxStop(function() {
@@ -121,7 +92,9 @@ let UI = {
                                            omegaup.T.bulkOperationError,
                                        error));
             } else {
-              UI.success(omegaup.T.bulkUserAddSuccess);
+              UI.success((typeof usernames != 'undefined') ?
+                             omegaup.T.bulkUserAddSuccess :
+                             omegaup.T.updateItemsSuccess);
             }
           }
         });
