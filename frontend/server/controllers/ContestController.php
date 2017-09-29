@@ -46,8 +46,8 @@ class ContestController extends Controller {
             // Same as above.
             Validators::isNumber($recommended, 'recommended', true /* required */);
             $participating = isset($r['participating'])
-                ? $r['participating']
-                : 'NO';
+                ? ParticipatingStatus::getIntValue($r['participating'])
+                : ParticipatingStatus::NO;
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -60,7 +60,7 @@ class ContestController extends Controller {
                     },
                     $contests
                 );
-            } elseif ($participating == 'YES') {
+            } elseif ($participating == ParticipatingStatus::YES) {
                 $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests

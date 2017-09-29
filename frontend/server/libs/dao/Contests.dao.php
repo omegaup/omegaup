@@ -95,6 +95,11 @@ class RecommendedStatus extends StatusBase {
     ];
 }
 
+class ParticipatingStatus extends StatusBase {
+    const NO = 0;
+    const YES = 1;
+}
+
 /** Contests Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para

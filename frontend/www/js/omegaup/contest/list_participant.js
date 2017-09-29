@@ -7,8 +7,7 @@ OmegaUp.on('ready', function() {
   let payload = {'contests': []};
   if (payloadElement) {
     payload = JSON.parse(payloadElement.innerText);
-    for (var idx in payload.contests) {
-      var contest = payload.contests[idx];
+    for (let contest of payload.contests) {
       OmegaUp.convertTimes(contest);
     }
   }
