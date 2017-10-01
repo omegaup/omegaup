@@ -191,14 +191,19 @@ class QualityNominationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
-                'rationale' => 'ew',
-                'reason' => 'offensive',
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
             ]),
         ]));
         // Login as a reviewer.
-        $login = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(self::$reviewers[0]);
         $request = new Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
             'problem_alias' => $problemData['request']['alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);

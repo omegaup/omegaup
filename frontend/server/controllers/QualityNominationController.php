@@ -186,8 +186,10 @@ class QualityNominationController extends Controller {
             ]));
         }
 
-        return ['status' => 'ok',
-                'qualitynomination_id' => $nomination->qualitynomination_id];
+        return [
+            'status' => 'ok',
+            'qualitynomination_id' => $nomination->qualitynomination_id
+        ];
     }
 
     /**
@@ -221,12 +223,23 @@ class QualityNominationController extends Controller {
 
         // Is qualitynomination is made 'open', problem will become public.
         $newProblemVisibility = ($r['status'] == 'approved') ? ProblemController::VISIBILITY_BANNED : ProblemController::VISIBILITY_PUBLIC;
-        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningRevertedByReviewer';
+        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($r['problem'])) {
+            throw new NotFoundException('problemNotFound');
+        }
         $r['visibility'] = $newProblemVisibility;
-        ProblemController::apiUpdate($r);
         $qualitynomination->status = $r['status'];
-        QualityNominationsDAO::save($qualitynomination);
+
+        QualityNominationsDAO::transBegin();
+        try {
+            ProblemController::apiUpdate($r);
+            QualityNominationsDAO::save($qualitynomination);
+            QualityNominationsDAO::transEnd();
+        } catch (Exception $e) {
+            CoursesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return ['status' => 'ok'];
     }
@@ -375,43 +388,45 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        // Get information from the original problem.
-        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
+        if ($response['nomination'] == 'promotion') {
+            // Get information from the original problem.
+            $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+            if (is_null($problem)) {
+                throw new NotFoundException('problemNotFound');
+            }
 
-        // Adding in the response object a flag to know whether the user is a reviewer
-        $response['reviewer'] = $currentUserReviewer;
+            // Adding in the response object a flag to know whether the user is a reviewer
+            $response['reviewer'] = $currentUserReviewer;
 
-        $response['original_contents'] = [
-            'statements' => [],
-            'source' => $problem->source,
-            'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
-        ];
-
-        // Don't leak private problem tags to nominator
-        if (!$currentUserReviewer) {
-            unset($response['original_contents']['tags']);
-        }
-
-        foreach ($response['contents']['statements'] as $language => $_) {
-            // There might be the case that the language is not originally
-            // present, in which case it will be changed to Spanish.
-            $actualLanguage = $language;
-            $markdown = ProblemController::getProblemStatement(
-                $problem->alias,
-                $actualLanguage,
-                'markdown'
-            );
-            $response['original_contents']['statements'][$language] = [
-                'language' => $actualLanguage,
-                'markdown' => $markdown,
+            $response['original_contents'] = [
+                'statements' => [],
+                'source' => $problem->source,
+                'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
             ];
-        }
-        if (empty($response['original_contents']['statements'])) {
-            // Force 'statements' to be an object.
-            $response['original_contents']['statements'] = (object)[];
+
+            // Don't leak private problem tags to nominator
+            if (!$currentUserReviewer) {
+                unset($response['original_contents']['tags']);
+            }
+
+            foreach ($response['contents']['statements'] as $language => $_) {
+                // There might be the case that the language is not originally
+                // present, in which case it will be changed to Spanish.
+                $actualLanguage = $language;
+                $markdown = ProblemController::getProblemStatement(
+                    $problem->alias,
+                    $actualLanguage,
+                    'markdown'
+                );
+                $response['original_contents']['statements'][$language] = [
+                    'language' => $actualLanguage,
+                    'markdown' => $markdown,
+                ];
+            }
+            if (empty($response['original_contents']['statements'])) {
+                // Force 'statements' to be an object.
+                $response['original_contents']['statements'] = (object)[];
+            }
         }
         $response['nomination_status'] = $response['status'];
         $response['status'] = 'ok';
