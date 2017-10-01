@@ -11,6 +11,7 @@ export default {
   props: ['country'],
   computed: {
     flagUrl: function() {
+      if (this.country == null) return '';
       return '/media/flags/' + this.country.toLowerCase() + '.png';
     }
   },

@@ -21,10 +21,21 @@ div#title {
 	margin-right: auto;
 }
 
-#status, #announcement {
+#announcement {
 	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+#status {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	z-index: 1;
+	max-width: 900px;
+	margin-right: auto;
+	margin-left: auto;
+	top: 50px;
+	width: 100%;
 }
 
 div.post {
@@ -660,4 +671,17 @@ las pestañas del framework. */
 	background-color: #428BCA;
 	color: #FFFFFF;
 	border-bottom: 1px solid #428BCA;
+}
+
+/* Estilos para las pestañas de arena. */
+.arena-tabs>li {
+	display: table;
+	height: 60px;
+}
+
+.arena-tabs>li>a {
+	width:160px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
 }
