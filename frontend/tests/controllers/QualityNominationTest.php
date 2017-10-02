@@ -179,9 +179,9 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
-     * Check that a demotion can be marked as approved by a reviewer.
+     * Check that a demotion can be approved and then reverted by a reviewer.
      */
-    public function testDemotionCanBeResolvedByReviewer() {
+    public function testDemotionCanBeApprovedAndLaterRevertedByReviewer() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
 
@@ -200,7 +200,7 @@ class QualityNominationTest extends OmegaupTestCase {
                  'reason' => 'offensive',
             ]),
         ]));
-        // Login as a reviewer.
+        // Login as a reviewer and approve ban.
         $reviewerLogin = self::login(self::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
@@ -213,7 +213,21 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been made banned');
+        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+
+        // Revert ban.
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been made private');
     }
 
     /**

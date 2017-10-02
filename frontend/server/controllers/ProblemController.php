@@ -60,6 +60,12 @@ class ProblemController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
+            // Only reviewers can revert bans.
+            if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED
+                    && !Authorization::isQualityReviewer($r['current_user_id'])) {
+                throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
+            }
+
             if ($r['problem']->deprecated) {
                 throw new PreconditionFailedException('problemDeprecated');
             }
@@ -67,8 +73,6 @@ class ProblemController extends Controller {
             if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
-                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
-                    throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
                 } else {
                     Validators::isInEnum(
                         $r['visibility'],

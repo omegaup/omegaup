@@ -193,7 +193,7 @@ class QualityNominationController extends Controller {
     }
 
     /**
-     * Marks a nomination (promotion or demotion) as resolved (approved or declined).
+     * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
      *
      * @param Request $r         The request.
      *
@@ -221,13 +221,26 @@ class QualityNominationController extends Controller {
             return ['status' => 'ok'];
         }
 
-        // Is qualitynomination is made 'open', problem will become public.
-        $newProblemVisibility = ($r['status'] == 'approved') ? ProblemController::VISIBILITY_BANNED : ProblemController::VISIBILITY_PUBLIC;
-        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
+
+        $newProblemVisibility = $r['problem']->visibility;
+        switch ($r['status']) {
+            case 'approved':
+                $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
+                break;
+            case 'denied':
+            case 'open':
+                // If banning is reverted, problem will become private.
+                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
+                }
+        }
+
+        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
         $r['visibility'] = $newProblemVisibility;
         $qualitynomination->status = $r['status'];
 
@@ -237,7 +250,8 @@ class QualityNominationController extends Controller {
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            QualityNominationsDAO::transRollback();
+            print($e);
             throw new InvalidDatabaseOperationException($e);
         }
 

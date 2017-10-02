@@ -119,7 +119,7 @@ class Authorization {
         if (is_null($problem) || !is_a($problem, 'Problems')) {
             return false;
         }
-        return Authorization::isProblemAdmin($user_id, $problem) ||
+        return self::isProblemAdmin($user_id, $problem) ||
             self::isQualityReviewer($user_id) ||
             self::hasRole($user_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
     }
