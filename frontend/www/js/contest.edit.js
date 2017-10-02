@@ -338,24 +338,11 @@ omegaup.OmegaUp.on('ready', function() {
         evt.preventDefault;
         isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
                      .hasClass('user-add-bulk');
-        if (isBulk != true) {
-          username = $('#username-contestant').val();
-          omegaup.API.Contest.addUser({
-                               contest_alias: contestAlias,
-                               usernameOrEmail: username,
-                             })
-              .then(function(response) {
-                omegaup.UI.success(omegaup.T.successfulAddUser);
-                $('div.post.footer').show();
-                refreshContestContestants();
-              })
-              .fail(omegaup.UI.apiError);
-          return false;
-        } else {
-          usernames = $('textarea[name="usernames"]').val().split(',');
+        if (isBulk) {
+          var usernames = $('textarea[name="usernames"]').val().split(',');
           omegaup.UI.bulkOperation(
               function(alias, resolve, reject) {
-                username = $.trim(alias);
+                var username = $.trim(alias);
                 omegaup.API.Contest.addUser({
                                      contest_alias: contestAlias,
                                      usernameOrEmail: username,
@@ -368,6 +355,19 @@ omegaup.OmegaUp.on('ready', function() {
                 errorTemplate: omegaup.T.bulkUserAddError,
                 successTemplate: omegaup.T.bulkUserAddSuccess
               });
+          return false;
+        } else {
+          var username = $('#username-contestant').val();
+          omegaup.API.Contest.addUser({
+                               contest_alias: contestAlias,
+                               usernameOrEmail: username,
+                             })
+              .then(function(response) {
+                omegaup.UI.success(omegaup.T.successfulAddUser);
+                $('div.post.footer').show();
+                refreshContestContestants();
+              })
+              .fail(omegaup.UI.apiError);
           return false;
         }
       });
