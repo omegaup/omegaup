@@ -62,6 +62,8 @@ class ProblemController extends Controller {
 
             // Only reviewers can revert bans.
             if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED
+                    && array_key_exists('visibility', $r)
+                    && $r['problem']->visibility != $r['visibility']
                     && !Authorization::isQualityReviewer($r['current_user_id'])) {
                 throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
             }
