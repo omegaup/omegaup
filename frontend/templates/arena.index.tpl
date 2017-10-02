@@ -17,10 +17,6 @@
 									{#arenaRecommendedCurrentContests#}</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
-									{#arenaMyActiveContests#}</a>
-							</li>
-							<li class="nav-item">
 								<a class="nav-link" href="#list-current-contest" data-toggle="tab">
 									{#arenaCurrentContests#}</a>
 							</li>
@@ -35,6 +31,10 @@
 							<li class="nav-item">
 								<a class="nav-link" href="#list-past-contest" data-toggle="tab">
 									{#arenaOldContests#}</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
+									{#arenaMyActiveContests#}</a>
 							</li>
 						</ul>
 

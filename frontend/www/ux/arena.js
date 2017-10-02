@@ -11,13 +11,6 @@ omegaup.OmegaUp.on('ready', function() {
       omegaup.T.arenaRecommendedCurrentContests
     ],
     [
-      '#participating-current-contests',
-      'ACTIVE',
-      'NOT_RECOMMENDED',
-      'YES',
-      omegaup.T.arenaMyActiveContests
-    ],
-    [
       '#current-contests',
       'ACTIVE',
       'NOT_RECOMMENDED',
@@ -43,6 +36,13 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'NO',
       omegaup.T.arenaOldContests
+    ],
+    [
+      '#participating-current-contests',
+      'ACTIVE',
+      'NOT_RECOMMENDED',
+      'YES',
+      omegaup.T.arenaMyActiveContests
     ],
   ];
 
