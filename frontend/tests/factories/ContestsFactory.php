@@ -4,21 +4,30 @@
  * ContestsParams
  */
 class ContestsParams implements ArrayAccess {
-    public $params;
+    private $params;
 
     public function __construct($params = null) {
-        $parameters = (array)$params;
-        ContestsParams::validateParameter('title', $parameters, false);
-        ContestsParams::validateParameter('public', $parameters, false, 1);
-        ContestsParams::validateParameter('contestDirector', $parameters, false);
-        ContestsParams::validateParameter('languages', $parameters, false);
-        ContestsParams::validateParameter('start_time', $parameters, false);
-        ContestsParams::validateParameter('finish_time', $parameters, false);
-        ContestsParams::validateParameter('penalty_calc_policy', $parameters, false);
-
-        $this->params = $parameters;
+        if (!is_object($params)) {
+            $this->params = [];
+            if (is_array($params)) {
+                $this->params = array_merge([], $params);
+            }
+        } else {
+            $this->params = clone $params;
+        }
+        ContestsParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
+        ContestsParams::validateParameter('public', $this->params, false, 1);
+        ContestsParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
+        ContestsParams::validateParameter('languages', $this->params, false);
+        ContestsParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
+        ContestsParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestsParams::validateParameter('penalty_calc_policy', $this->params, false);
 
         return $this->params;
+    }
+
+    public function setVisibility($visibility = 1) {
+        $this->params['public'] = $visibility;
     }
 
     public function offsetGet($offset) {
@@ -61,7 +70,7 @@ class ContestsParams implements ArrayAccess {
      * @return boolean
      * @throws InvalidParameterException
      */
-    private static function validateParameter($parameter, array& $array, $required = true, $default = null) {
+    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
                 throw new InvalidParameterException('ParameterEmpty', $parameter);
@@ -89,24 +98,7 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($parameters = new ContestsParams([])) {
-        $params = isset($parameters['params']) ? $parameters['params'] : $parameters;
-        if (is_null($params['contestDirector'])) {
-            $params['contestDirector'] = UserFactory::createUser();
-        }
-
-        if (is_null($params['title'])) {
-            $params['title'] = Utils::CreateRandomString();
-        }
-
-        if (is_null($params['start_time'])) {
-            $params['start_time'] = (Utils::GetPhpUnixTimestamp() - 60 * 60);
-        }
-
-        if (is_null($params['finish_time'])) {
-            $params['finish_time'] = (Utils::GetPhpUnixTimestamp() + 60 * 60);
-        }
-
+    public static function getRequest($params = new ContestsParams()) {
         // Set context
         $r = new Request();
         $r['title'] = $params['title'];
@@ -114,7 +106,7 @@ class ContestsFactory {
         $r['start_time'] = $params['start_time'];
         $r['finish_time'] = $params['finish_time'];
         $r['window_length'] = null;
-        $r['public'] = $parameters['public'];
+        $r['public'] = $params['public'];
         $r['alias'] = substr($params['title'], 0, 20);
         $r['points_decay_factor'] = '.02';
         $r['partial_score'] = '0';
@@ -137,11 +129,10 @@ class ContestsFactory {
         ];
     }
 
-    public static function createContest($params = new ContestsParams([])) {
+    public static function createContest($params = new ContestsParams()) {
         $privateParams = new ContestsParams($params);
         // Create a valid contest Request object
-
-        $privateParams->params['public'] = 0;
+        $privateParams->setVisibility(0);
         $contestData = ContestsFactory::getRequest($privateParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -152,7 +143,6 @@ class ContestsFactory {
 
         // Call the API
         $response = ContestController::apiCreate($r);
-
         if ($params['public'] === 1) {
             self::forcePublic($contestData);
             $r['public'] = 1;
