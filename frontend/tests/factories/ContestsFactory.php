@@ -26,10 +26,6 @@ class ContestsParams implements ArrayAccess {
         return $this->params;
     }
 
-    public function setVisibility($visibility = 1) {
-        $this->params['public'] = $visibility;
-    }
-
     public function offsetGet($offset) {
         return isset($this->params[$offset]) ? $this->params[$offset] : null;
     }
@@ -52,13 +48,14 @@ class ContestsParams implements ArrayAccess {
 
     public static function fromContest(Contests $contest) {
         return new ContestsParams([
-                'title' => $contest->title,
-                'public' => $contest->public,
-                'contestDirector' => $contest->contestDirector,
-                'languages' => $contest->languages,
-                'start_time' => $contest->start_time,
-                'finish_time' => $contest->finish_time,
-                'penalty_calc_policy' => $contest->penalty_calc_policy]);
+            'title' => $contest->title,
+            'public' => $contest->public,
+            'contestDirector' => $contest->contestDirector,
+            'languages' => $contest->languages,
+            'start_time' => $contest->start_time,
+            'finish_time' => $contest->finish_time,
+            'penalty_calc_policy' => $contest->penalty_calc_policy,
+        ]);
     }
 
     /**
@@ -132,7 +129,7 @@ class ContestsFactory {
     public static function createContest($params = new ContestsParams()) {
         $privateParams = new ContestsParams($params);
         // Create a valid contest Request object
-        $privateParams->setVisibility(0);
+        $privateParams['public'] = 0;
         $contestData = ContestsFactory::getRequest($privateParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
