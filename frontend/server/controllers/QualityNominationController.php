@@ -415,17 +415,15 @@ class QualityNominationController extends Controller {
             $response['original_contents'] = [
                 'statements' => [],
                 'source' => $problem->source,
-                'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
             ];
 
             // Don't leak private problem tags to nominator
-            if (!$currentUserReviewer) {
-                unset($response['original_contents']['tags']);
+            if ($currentUserReviewer) {
+                $response['original_contents']['tags'] = ProblemsDAO::getTagsForProblem($problem, false /* public */);
             }
 
+            // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
-                // There might be the case that the language is not originally
-                // present, in which case it will be changed to Spanish.
                 $actualLanguage = $language;
                 $markdown = ProblemController::getProblemStatement(
                     $problem->alias,
