@@ -57,7 +57,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Update public
         $login = self::login($contestData['director']);
@@ -77,7 +77,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();

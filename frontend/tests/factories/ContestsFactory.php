@@ -1,9 +1,9 @@
 <?php
 
 /**
- * ContestsParams
+ * ContestParams
  */
-class ContestsParams implements ArrayAccess {
+class ContestParams implements ArrayAccess {
     private $params;
 
     public function __construct($params = null) {
@@ -15,15 +15,13 @@ class ContestsParams implements ArrayAccess {
         } else {
             $this->params = clone $params;
         }
-        ContestsParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
-        ContestsParams::validateParameter('public', $this->params, false, 1);
-        ContestsParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
-        ContestsParams::validateParameter('languages', $this->params, false);
-        ContestsParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
-        ContestsParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
-        ContestsParams::validateParameter('penalty_calc_policy', $this->params, false);
-
-        return $this->params;
+        ContestParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
+        ContestParams::validateParameter('public', $this->params, false, 1);
+        ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
+        ContestParams::validateParameter('languages', $this->params, false);
+        ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 
     public function offsetGet($offset) {
@@ -47,7 +45,7 @@ class ContestsParams implements ArrayAccess {
     }
 
     public static function fromContest(Contests $contest) {
-        return new ContestsParams([
+        return new ContestParams([
             'title' => $contest->title,
             'public' => $contest->public,
             'contestDirector' => $contest->contestDirector,
@@ -95,7 +93,10 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($params = new ContestsParams()) {
+    public static function getRequest($params = null) {
+        if (!($params instanceof ContestParams)) {
+            $params = new ContestParams($params);
+        }
         // Set context
         $r = new Request();
         $r['title'] = $params['title'];
@@ -126,8 +127,8 @@ class ContestsFactory {
         ];
     }
 
-    public static function createContest($params = new ContestsParams()) {
-        $privateParams = new ContestsParams($params);
+    public static function createContest($params = new ContestParams()) {
+        $privateParams = new ContestParams($params);
         // Create a valid contest Request object
         $privateParams['public'] = 0;
         $contestData = ContestsFactory::getRequest($privateParams);

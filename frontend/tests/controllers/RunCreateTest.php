@@ -21,7 +21,7 @@ class RunCreateTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $this->contestData = ContestsFactory::createContest(new ContestsParams(['public' => $contest_public]));
+        $this->contestData = ContestsFactory::createContest(new ContestParams(['public' => $contest_public]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $this->contestData);
@@ -539,7 +539,7 @@ class RunCreateTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['languages' => 'cpp']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => 'cpp']));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

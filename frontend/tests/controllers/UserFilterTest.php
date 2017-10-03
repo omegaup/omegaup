@@ -122,7 +122,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException UnauthorizedException
      */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(new ContestsParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias,
@@ -131,7 +131,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(new ContestsParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
@@ -142,7 +142,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(new ContestsParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .

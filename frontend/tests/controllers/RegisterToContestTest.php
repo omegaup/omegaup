@@ -75,7 +75,7 @@ class RegisterToContestTest extends OmegaupTestCase {
     public function testSimpleRegistrationActions() {
         // create a contest and its admin
         $contestAdmin = UserFactory::createUser();
-        $contestData = ContestsFactory::createContest(new ContestsParams(['contestDirector' => $contestAdmin]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['contestDirector' => $contestAdmin]));
 
         // make it "registrable"
         self::log('Update contest to make it registrable');

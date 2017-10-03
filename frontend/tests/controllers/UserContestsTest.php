@@ -13,8 +13,8 @@ class UserContestsTest extends OmegaupTestCase {
         // Our director
         $director = UserFactory::createUser();
 
-        $contestData[0] = ContestsFactory::createContest(new ContestsParams(['contestDirector' => $director]));
-        $contestData[1] = ContestsFactory::createContest(new ContestsParams(['contestDirector' => $director]));
+        $contestData[0] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
+        $contestData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
 
         // Call api
         $login = self::login($director);
@@ -57,9 +57,9 @@ class UserContestsTest extends OmegaupTestCase {
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $helperGroup['group']);
 
-        $contestDirectorData[0] = ContestsFactory::createContest(new ContestsParams(['contestDirector' => $director]));
+        $contestDirectorData[0] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
         ContestsFactory::addGroupAdmin($contestDirectorData[0], $helperGroup['group']);
-        $contestDirectorData[1] = ContestsFactory::createContest(new ContestsParams(['contestDirector' => $director, 'public' => 0]));
+        $contestDirectorData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director, 'public' => 0]));
         ContestsFactory::addGroupAdmin($contestDirectorData[1], $helperGroup['group']);
 
         // Call api
@@ -83,7 +83,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCount() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         $user = $contestData['director'];
 
         $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));

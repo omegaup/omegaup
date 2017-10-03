@@ -80,7 +80,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForInvitedUser() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -107,7 +107,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForNonInvitedUser() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -134,7 +134,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForSystemAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         $login = self::login(UserFactory::createAdminUser());
         $r = new Request([
@@ -156,7 +156,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForContestAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -184,7 +184,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForContestGroupAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         $title = $contestData['request']['title'];
 
         $admin1 = UserFactory::createUser();
@@ -235,7 +235,7 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testAuthorOnlySeesContestsOnce() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         $author = $contestData['director'];
         $title = $contestData['request']['title'];
 
@@ -276,7 +276,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Create 2 contests, with the not-recommended.finish_time > recommended.finish_time
         $recommendedContestData = ContestsFactory::createContest();
-        $notRecommendedContestData = ContestsFactory::createContest(new ContestsParams(
+        $notRecommendedContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'finish_time' => $recommendedContestData['request']['finish_time'] + 1
             ]
@@ -332,8 +332,8 @@ class ContestListTest extends OmegaupTestCase {
         $r = new Request();
 
         // Create 2 contests, the second one will occur in to the future.
-        $currentContestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
-        $futureContestData = ContestsFactory::createContest(new ContestsParams(
+        $currentContestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $futureContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'public' => 0,
                 'finish_time' => ($currentContestData['request']['finish_time'] + (60 * 60 * 49)),

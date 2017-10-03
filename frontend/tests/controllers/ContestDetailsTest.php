@@ -127,7 +127,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testGetContestDetailsWithLanguageFilter() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['languages' => 'c,cpp,java']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => 'c,cpp,java']));
 
         // Get some problems into the contest
         $problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp,java,py');
@@ -160,7 +160,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testShowValidPrivateContest() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get some problems into the contest
         $numOfProblems = 3;
@@ -192,7 +192,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testDontShowPrivateContestForAnyUser() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get some problems into the contest
         $numOfProblems = 3;
@@ -290,7 +290,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testAccessTimeIsAlwaysFirstAccessForPrivate() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -353,7 +353,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testDetailsUsingToken() {
         // Get a private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Create our user not added to the contest
         $externalUser = UserFactory::createUser();
@@ -445,7 +445,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testDetailsUsingInvalidToken() {
         // Get a private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Create our user not added to the contest
         $externalUser = UserFactory::createUser();
@@ -465,7 +465,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testDetailsNoLoginUsingToken() {
         // Get a private contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get the scoreboard url by using the MyList api being the
         // contest director
@@ -573,7 +573,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testNoPrivilegeEscalationOccurs() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestsParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
 
         // Get some problems into the contest
         $numOfProblems = 3;
