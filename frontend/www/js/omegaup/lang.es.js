@@ -250,7 +250,7 @@ omegaup.OmegaUp.loadTranslations({
 	errorWhileSendingMail: "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
 	forSelectedItems: "Para los items seleccionados",
 	frontPageCreateContestButton: "&iexcl;Crea tu propio concurso en omegaUp!",
-	frontPageDescription: "omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en América Latina mediante la resolución de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.",
+	frontPageDescription: "omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en Am\u00e9rica Latina mediante la resoluci\u00f3n de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.",
 	frontPageDevelopers: "Desarrolladores",
 	frontPageFooter: "es un lugar para mejorar tus hablidades de desarrollo de software.",
 	frontPageIntroduction: "&iquest;Nunca has usado omegaUp?",
