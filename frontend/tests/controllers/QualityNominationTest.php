@@ -231,6 +231,44 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion can be denied by a reviewer.
+     */
+    public function testDemotionCanBeDeniedByReviewer() {
+        $problemData = ProblemsFactory::createProblem($zipName = null, $title = null, $visibility = ProblemController::VISIBILITY_PUBLIC);
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been banned');
+    }
+
+    /**
      * Check that before a duplicate nomination needs to have a valid original problem.
      */
     public function testNominatingForDuplicate() {
