@@ -40,7 +40,7 @@
 
 					<div class="form-group">
 						<input id='' name='request' value='submit' type='hidden'>
-						<button type='submit' class="btn btn-primary">{#wordsAddProblem#}</button>
+						<button type="submit" class="btn btn-primary">{#wordsAddProblem#}</button>
 					</div>
 				</form>
 			</div>
@@ -70,7 +70,7 @@
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
 
-					<button class="btn btn-primary" type='submit'>{#wordsSaveChanges#}</button>
+					<button class="btn btn-primary" type="submit">{#wordsSaveChanges#}</button>
 				</form>
 			</div>
 		</div>
@@ -85,7 +85,16 @@
 						<input id="username-contestant" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>{#contestAdduserAddUser#}</button>
+					<button class="btn btn-primary user-add-single" type="submit">{#contestAdduserAddUser#}</button>
+
+					<hr>
+
+					<div class="form-group">
+						<label for="username-contestants">{#wordsMultipleUser#}</label>
+						<textarea name="usernames" rows="4" class="form-control"></textarea>
+					</div>
+
+					<button class="btn btn-primary user-add-bulk" type="submit" id="multiple">{#contestAdduserAddUsers#}</button>
 				</form>
 			</div>
 
@@ -127,7 +136,7 @@
 						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>{#contestAdduserAddUser#}</button>
+					<button class="btn btn-primary" type="submit">{#contestAdduserAddUser#}</button>
 				</form>
 			</div>
 
@@ -151,7 +160,7 @@
 						<input id="groupalias-admin" name="alias" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>{#contestAddgroupAddGroup#}</button>
+					<button class="btn btn-primary" type="submit">{#contestAddgroupAddGroup#}</button>
 				</form>
 			</div>
 
