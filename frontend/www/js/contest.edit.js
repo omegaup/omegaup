@@ -319,7 +319,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  'User successfully removed!');
+                                                  omegaup.T.userRemoveSuccess);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -334,19 +334,42 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#add-contestant-form')
-      .submit(function() {
-        username = $('#username-contestant').val();
-        omegaup.API.Contest.addUser({
-                             contest_alias: contestAlias,
-                             usernameOrEmail: username,
-                           })
-            .then(function(response) {
-              omegaup.UI.success('User successfully added!');
-              $('div.post.footer').show();
-              refreshContestContestants();
-            })
-            .fail(omegaup.UI.apiError);
-        return false;  // Prevent refresh
+      .submit(function(evt) {
+        evt.preventDefault;
+        isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
+                     .hasClass('user-add-bulk');
+        if (isBulk) {
+          var usernames = $('textarea[name="usernames"]').val().split(',');
+          omegaup.UI.bulkOperation(
+              function(alias, resolve, reject) {
+                var username = $.trim(alias);
+                omegaup.API.Contest.addUser({
+                                     contest_alias: contestAlias,
+                                     usernameOrEmail: username,
+                                   })
+                    .then(resolve)
+                    .fail(reject);
+              },
+              function() { refreshContestContestants(); },
+              {
+                errorTemplate: omegaup.T.bulkUserAddError,
+                successTemplate: omegaup.T.bulkUserAddSuccess
+              });
+          return false;
+        } else {
+          var username = $('#username-contestant').val();
+          omegaup.API.Contest.addUser({
+                               contest_alias: contestAlias,
+                               usernameOrEmail: username,
+                             })
+              .then(function(response) {
+                omegaup.UI.success(omegaup.T.successfulAddUser);
+                $('div.post.footer').show();
+                refreshContestContestants();
+              })
+              .fail(omegaup.UI.apiError);
+          return false;
+        }
       });
 
   // Add admin
