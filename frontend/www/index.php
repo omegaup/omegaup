@@ -7,16 +7,13 @@ if (OMEGAUP_LOCKDOWN) {
     die();
 }
 
-// Fetch ranks and contests
+// Fetch ranks
 try {
     $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
 
     $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 5]));
     $smarty->assign('schoolRankPayload', $schoolRankPayload['rank']);
-
-    $myContestsListPayload  = ContestController::apiListParticipating(new Request(['page_size' => 5]));
-    $smarty->assign('myContestsListPayload', $myContestsListPayload);
 } catch (Exception $e) {
     // Oh, well...
 }
