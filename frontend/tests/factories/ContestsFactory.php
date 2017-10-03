@@ -127,7 +127,10 @@ class ContestsFactory {
         ];
     }
 
-    public static function createContest($params = new ContestParams()) {
+    public static function createContest($params = null) {
+        if (!($params instanceof ContestParams)) {
+            $params = new ContestParams($params);
+        }
         $privateParams = new ContestParams($params);
         // Create a valid contest Request object
         $privateParams['public'] = 0;
