@@ -45,6 +45,9 @@ class ContestController extends Controller {
                 : RecommendedStatus::ALL;
             // Same as above.
             Validators::isNumber($recommended, 'recommended', true /* required */);
+            $participating = isset($r['participating'])
+                ? ParticipatingStatus::getIntValue($r['participating'])
+                : ParticipatingStatus::NO;
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -57,6 +60,8 @@ class ContestController extends Controller {
                     },
                     $contests
                 );
+            } elseif ($participating == ParticipatingStatus::YES) {
+                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
@@ -158,13 +163,13 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns a list of contests where current user is the director
-     *
+     * Callback to get contests list, depending on a given method
      * @param Request $r
+     * @param $callback_user_function
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiMyList(Request $r) {
+    public static function getContestListInternal(Request $r, $callback_user_function) {
         self::authenticateRequest($r);
 
         Validators::isNumber($r['page'], 'page', false);
@@ -174,10 +179,19 @@ class ContestController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time', 'public', 'scoreboard_url', 'scoreboard_url_admin'];
+        $relevant_columns = [
+            'title',
+            'alias',
+            'start_time',
+            'finish_time',
+            'public',
+            'scoreboard_url',
+            'scoreboard_url_admin'
+        ];
         $contests = null;
         try {
-            $contests = ContestsDAO::getAllContestsOwnedByUser(
+            $contests = call_user_func(
+                $callback_user_function,
                 $r['current_user_id'],
                 $page,
                 $pageSize
@@ -197,6 +211,28 @@ class ContestController extends Controller {
             'status' => 'ok',
             'contests' => $addedContests,
         ];
+    }
+
+    /**
+     * Returns a list of contests where current user is the director
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyList(Request $r) {
+        return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
+    }
+
+    /**
+     * Returns a list of contests where current user is participating in
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListParticipating(Request $r) {
+        return self::getContestListInternal($r, 'ContestsDAO::getContestsParticipating');
     }
 
     /**

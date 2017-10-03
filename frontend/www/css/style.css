@@ -676,11 +676,11 @@ las pestañas del framework. */
 /* Estilos para las pestañas de arena. */
 .arena-tabs>li {
 	display: table;
-	height: 60px;
+	height: 80px;
 }
 
 .arena-tabs>li>a {
-	width:160px;
+	width:142px;
 	display: table-cell;
 	vertical-align: middle;
 	text-align: center;
