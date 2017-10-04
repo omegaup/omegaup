@@ -232,12 +232,12 @@ class QualityNominationController extends Controller {
                 $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
                 break;
             case 'denied':
-            case 'open':
                 // If banning is reverted, problem will become private.
                 // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
                     $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
                 }
+            case 'open':
         }
 
         $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
@@ -251,7 +251,8 @@ class QualityNominationController extends Controller {
             QualityNominationsDAO::transEnd();
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
-            print($e);
+            self::$log->error('Failed to resolve demotion request');
+            self::$log->error($e);
             throw new InvalidDatabaseOperationException($e);
         }
 
