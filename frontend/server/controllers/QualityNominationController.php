@@ -237,7 +237,10 @@ class QualityNominationController extends Controller {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
                     $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
                 }
+                break;
             case 'open':
+                // No-op.
+                break;
         }
 
         $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
