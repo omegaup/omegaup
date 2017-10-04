@@ -10,6 +10,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
       {
         active: 'ALL',
         recommended: 'ALL',
+        participating: 'NO',
         // TODO: Make this match uiParams.pageSize and do smaller requests.
         page_size: 1000,
       },

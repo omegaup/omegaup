@@ -7,7 +7,7 @@
  */
 class ContestCreateUITest extends OmegaupUITestCase {
     public function testCreateContest() {
-        $contestData = ContestsFactory::getRequest();
+        $contestData = ContestsFactory::getRequest(new ContestParams(['public' => 0]));
 
         // Login
         $director = $this->createUserAndLogin();
