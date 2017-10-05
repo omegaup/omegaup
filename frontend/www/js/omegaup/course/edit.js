@@ -49,8 +49,8 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-course-administrators', {
         props: {
-          admins: [],
-          groupAdmins: [],
+          admins: this.admins,
+          groupadmins: this.groupadmins,
         },
         on: {
           edit: function(assignment) {
@@ -84,11 +84,58 @@ OmegaUp.on('ready', function() {
               finish_time: defaultFinishTime,
             };
           },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          },
+          'removeAdmin': function(admin) {
+            API.Course.removeAdmin({
+                        course_alias: courseAlias,
+                        usernameOrEmail: admin.username
+                      })
+                .then(function(data) {
+                  refreshCourseAdmins();
+                  UI.success(T.adminRemoved);
+                })
+                .fail(UI.apiError);
+          },
+          'removeGroupAdmin': function(group) {
+            console.log(group.alias);
+            API.Course.removeGroupAdmin(
+                          {course_alias: courseAlias, group: group.alias})
+                .then(function(data) {
+                  refreshCourseAdmins();
+                  UI.success(T.groupAdminRemoved);
+                })
+                .fail(UI.apiError);
+          },
+          'add-admin': function(useradmin) {
+            omegaup.API.Course.addAdmin({
+                                course_alias: courseAlias,
+                                usernameOrEmail: useradmin,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.adminAdded);
+                  refreshCourseAdmins();
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'add-group-admin': function(groupadmin) {
+            omegaup.API.Course.addGroupAdmin({
+                                course_alias: courseAlias,
+                                group: groupadmin,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.groupAdminAdded);
+                  refreshCourseAdmins();
+                })
+                .fail(omegaup.UI.apiError);
+          }
         },
       });
     },
     data: {
-      assignments: [],
+      admins: [],
+      groupadmins: [],
     },
     components: {
       'omegaup-course-administrators': course_Administrators,
@@ -406,6 +453,16 @@ OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
   }
 
+  function refreshCourseAdmins() {
+    omegaup.API.Course.admins({course_alias: courseAlias})
+        .then(function(data) {
+          administrators.admins = data.admins;
+          administrators.groupadmins = data.group_admins;
+        })
+        .fail(UI.apiError);
+  }
+
   refreshStudentList();
   refreshAssignmentsList();
+  refreshCourseAdmins();
 });

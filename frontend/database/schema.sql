@@ -205,6 +205,7 @@ CREATE TABLE IF NOT EXISTS `Courses` (
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
   `group_id` int(11) NOT NULL,
+  `admin_group_id` int(11) NOT NULL,
   `acl_id` int(11) NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
@@ -1110,7 +1111,8 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 
 ALTER TABLE `Courses`
   ADD CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_g_admin_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `QualityNominations`

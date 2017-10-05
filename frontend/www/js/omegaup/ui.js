@@ -198,6 +198,10 @@ let UI = {
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
 
+  groupTypeahead: function(elem, cb) {
+    UI.typeahead(elem, API.Group.list, cb);
+  },
+
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },

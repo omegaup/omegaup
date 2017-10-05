@@ -932,6 +932,238 @@ class CourseController extends Controller {
     }
 
     /**
+     * Returns all courser administrators
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAdmins(Request $r) {
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = [];
+        $response['admins'] = UserRolesDAO::getCourseAdmins($course);
+        $response['group_admins'] = GroupRolesDAO::getCourseAdmins($course);
+        $response['status'] = 'ok';
+
+        return $response;
+    }
+
+    /**
+     * Adds an admin to a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiAddAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only director is allowed to create problems in contest
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $user_role = new UserRoles();
+        $user_role->acl_id = $r['course']->acl_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
+
+        // Save the contest to the DB
+        try {
+            UserRolesDAO::save($user_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Removes an admin from a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiRemoveAdmin(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Check if admin to delete is actually an admin
+        if (!Authorization::isCourseAdmin($user->user_id, $r['course'])) {
+            throw new NotFoundException();
+        }
+
+        $user_role = new UserRoles();
+        $user_role->acl_id = $r['course']->acl_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
+
+        // Delete the role
+        try {
+            UserRolesDAO::delete($user_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Adds an group admin to a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiAddGroupAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admins are allowed to modify contest
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->acl_id = $r['course']->acl_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
+
+        // Save the contest to the DB
+        try {
+            GroupRolesDAO::save($group_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Removes a group admin from a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiRemoveGroupAdmin(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->acl_id = $r['course']->acl_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
+
+        // Delete the role
+        try {
+            GroupRolesDAO::delete($group_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
      * @throws NotFoundException Course not found or trying to directly access a private course.
