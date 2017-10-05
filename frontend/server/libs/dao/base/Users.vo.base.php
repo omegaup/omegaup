@@ -71,6 +71,9 @@ class Users extends VO {
         if (isset($data['birth_date'])) {
             $this->birth_date = $data['birth_date'];
         }
+        if (isset($data['gender'])) {
+            $this->gender = $data['gender'];
+        }
         if (isset($data['last_access'])) {
             $this->last_access = $data['last_access'];
         }
@@ -211,6 +214,13 @@ class Users extends VO {
       * @var date
       */
     public $birth_date;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var enum('female',
+      */
+    public $gender;
 
     /**
       *  [Campo no documentado]

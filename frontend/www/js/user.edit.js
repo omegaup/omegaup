@@ -52,6 +52,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#username').text(data.userinfo.username);
         $('#name').val(data.userinfo.name);
         $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
+        $('#gender').val(data.userinfo.gender);
         $('#graduation_date')
             .val(omegaup.UI.formatDate(data.userinfo.graduation_date));
         $('#country_id').val(data.userinfo.country_id);
@@ -97,6 +98,7 @@ omegaup.OmegaUp.on('ready', function() {
         omegaup.API.User.update({
                           name: $('#name').val(),
                           birth_date: birth_date.getTime() / 1000,
+                          gender: $('#gender').val(),
                           country_id: $('#country_id').val() || undefined,
                           state_id: $('#state_id').val() || undefined,
                           scholar_degree: $('#scholar_degree').val(),
