@@ -8,6 +8,11 @@ function generateAlias(title) {
   // Remove invalid characters
   title = title.replace(/[^a-zA-Z0-9_-]/g, '');
 
+  if (title.length >= aliasLength) {
+    title = title.substring(0, aliasLength - 3);
+    title = title + '-01';
+  }
+
   return title;
 }
 
@@ -31,6 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 32;
       break;
 
     case 'groups':
@@ -39,6 +45,7 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 50;
       break;
 
     case 'interviews':
@@ -47,6 +54,7 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 32;
       break;
   }
 
