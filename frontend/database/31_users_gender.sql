@@ -1,3 +1,3 @@
 -- Users
 ALTER TABLE `Users`
-  ADD COLUMN `gender` enum('female', 'male', 'prefer_not_answer') NULL AFTER `birth_date`;
+  ADD COLUMN `gender` enum('female','male','other','decline') DEFAULT NULL AFTER `birth_date`;

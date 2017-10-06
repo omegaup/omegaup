@@ -27,7 +27,8 @@
 						<select id="gender" name='gender' class="form-control" >
 							<option value="female">{#wordsGenderFemale#}</option>
 							<option value="male">{#wordsGenderMale#}</option>
-							<option value="prefer_not_answer">{#wordsGenderPreferNotAnswer#}</option>
+							<option value="other">{#wordsGenderOther#}</option>
+							<option value="decline">{#wordsGenderDecline#}</option>
 						</select>
 						</div>
 					</div>

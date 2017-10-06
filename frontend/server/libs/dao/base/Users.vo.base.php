@@ -218,7 +218,7 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('female',
+      * @var enum('female','other','other','decline')
       */
     public $gender;
 
