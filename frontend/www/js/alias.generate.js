@@ -1,4 +1,4 @@
-function generateAlias(title) {
+function generateAlias(title, aliasLength) {
   // Remove accents
   title = title.latinize();
 
@@ -8,10 +8,7 @@ function generateAlias(title) {
   // Remove invalid characters
   title = title.replace(/[^a-zA-Z0-9_-]/g, '');
 
-  if (title.length >= aliasLength) {
-    title = title.substring(0, aliasLength - 3);
-    title = title + '-01';
-  }
+  title = title.substring(0, aliasLength);
 
   return title;
 }
@@ -20,6 +17,7 @@ omegaup.OmegaUp.on('ready', function() {
   var formData = $('#form-data');
   var formName = formData.attr('data-name');
   var existsFn = null;
+  var aliasLength = 0;
 
   function onAliasExists() {
     omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
@@ -60,7 +58,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#title')
       .blur(function() {
-        $('#alias').val(generateAlias($(this).val())).change();
+        $('#alias').val(generateAlias($(this).val(), aliasLength)).change();
       });
 
   $('#alias').change(function() { existsFn($('#alias').val()); });
