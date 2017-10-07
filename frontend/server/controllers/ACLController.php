@@ -13,27 +13,25 @@ class ACLController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getAdmins(Request $r) {
-        $variables = self::getVars($r);
-
+    public static function getAdmins(Request $r, $alias, $daoController, $methodIsAdmin, $methodGetAdmins) {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r[$variables['alias']], $variables['alias']);
+        Validators::isStringNonEmpty($r[$alias], $alias);
 
         try {
-            $data = $variables['daoController']::getByAlias($r[$variables['alias']]);
+            $data = $daoController::getByAlias($r[$alias]);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::$variables['methodIsAdmin']($r['current_user_id'], $data)) {
+        if (!Authorization::$methodIsAdmin($r['current_user_id'], $data)) {
             throw new ForbiddenAccessException();
         }
 
         $response = [];
-        $response['admins'] = UserRolesDAO::$variables['methodGetAdmins']($data);
-        $response['group_admins'] = GroupRolesDAO::$variables['methodGetAdmins']($data);
+        $response['admins'] = UserRolesDAO::$methodGetAdmins($data);
+        $response['group_admins'] = GroupRolesDAO::$methodGetAdmins($data);
         $response['status'] = 'ok';
 
         return $response;
@@ -47,9 +45,7 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    public static function addAdmin(Request $r) {
-        $variables = self::getVars($r);
-
+    public static function addAdmin(Request $r, $alias, $daoController, $methodIsAdmin) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -58,25 +54,25 @@ class ACLController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r[$variables['alias']], $variables['alias']);
+        Validators::isStringNonEmpty($r[$alias], $alias);
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $data = $variables['daoController']::getByAlias($r[$variables['alias']]);
+            $data = $daoController::getByAlias($r[$alias]);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if ($variables['alias'] === 'problem_alias') {
+        if ($alias === 'problem_alias') {
             if (is_null($data)) {
                 throw new NotFoundException('problemNotFound');
             }
         }
 
         // Only director is allowed to create problems in contest
-        if (!Authorization::$variables['methodIsAdmin']($r['current_user_id'], $data)) {
+        if (!Authorization::$methodIsAdmin($r['current_user_id'], $data)) {
             throw new ForbiddenAccessException();
         }
 
@@ -104,31 +100,29 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    public static function removeAdmin(Request $r) {
-        $variables = self::getVars($r);
-
+    public static function removeAdmin(Request $r, $alias, $daoController, $methodIsAdmin) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r[$variables['alias']], $variables['alias']);
+        Validators::isStringNonEmpty($r[$alias], $alias);
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $data = $variables['daoController']::getByAlias($r[$variables['alias']]);
+            $data = $daoController::getByAlias($r[$alias]);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::$variables['methodIsAdmin']($r['current_user_id'], $data)) {
+        if (!Authorization::$methodIsAdmin($r['current_user_id'], $data)) {
             throw new ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::$variables['methodIsAdmin']($user->user_id, $data)) {
+        if (!Authorization::$methodIsAdmin($user->user_id, $data)) {
             throw new NotFoundException();
         }
 
@@ -156,9 +150,7 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    public static function addGroupAdmin(Request $r) {
-        $variables = self::getVars($r);
-
+    public static function addGroupAdmin(Request $r, $alias, $daoController, $methodIsAdmin) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -167,7 +159,7 @@ class ACLController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r[$variables['alias']], $variables['alias']);
+        Validators::isStringNonEmpty($r[$alias], $alias);
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -176,14 +168,14 @@ class ACLController extends Controller {
         }
 
         try {
-            $data = $variables['daoController']::getByAlias($r[$variables['alias']]);
+            $data = $daoController::getByAlias($r[$alias]);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admins are allowed to modify contest
-        if (!Authorization::$variables['methodIsAdmin']($r['current_user_id'], $data)) {
+        if (!Authorization::$methodIsAdmin($r['current_user_id'], $data)) {
             throw new ForbiddenAccessException();
         }
 
@@ -211,14 +203,12 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    public static function removeGroupAdmin(Request $r) {
-        $variables = self::getVars($r);
-
+    public static function removeGroupAdmin(Request $r, $alias, $daoController, $methodIsAdmin) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r[$variables['alias']], $variables['alias']);
+        Validators::isStringNonEmpty($r[$alias], $alias);
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -227,14 +217,14 @@ class ACLController extends Controller {
         }
 
         try {
-            $data = $variables['daoController']::getByAlias($r[$variables['alias']]);
+            $data = $daoController::getByAlias($r[$alias]);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::$variables['methodIsAdmin']($r['current_user_id'], $data)) {
+        if (!Authorization::$methodIsAdmin($r['current_user_id'], $data)) {
             throw new ForbiddenAccessException();
         }
 
@@ -252,30 +242,5 @@ class ACLController extends Controller {
         }
 
         return ['status' => 'ok'];
-    }
-
-    private static function getVars(Request $r) {
-        if (isset($r['course_alias'])) {
-            $alias = 'course_alias';
-            $daoController = 'CoursesDAO';
-            $methodIsAdmin = 'isCourseAdmin';
-            $methodGetAdmins = 'getCourseAdmins';
-        } elseif (isset($r['contest_alias'])) {
-            $alias = 'contest_alias';
-            $daoController = 'ContestsDAO';
-            $methodIsAdmin = 'isContestAdmin';
-            $methodGetAdmins = 'getContestAdmins';
-        } elseif (isset($r['problem_alias'])) {
-            $alias = 'problem_alias';
-            $daoController = 'ProblemsDAO';
-            $methodIsAdmin = 'isProblemAdmin';
-            $methodGetAdmins = 'getProblemAdmins';
-        }
-        return [
-            'alias' => $alias,
-            'daoController' => $daoController,
-            'methodIsAdmin' => $methodIsAdmin,
-            'methodGetAdmins' => $methodGetAdmins,
-        ];
     }
 }

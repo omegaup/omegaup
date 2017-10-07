@@ -953,7 +953,7 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
-        return ACLController::getAdmins($r);
+        return ACLController::getAdmins($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin', 'getCourseAdmins');
         ;
     }
 
@@ -966,7 +966,7 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
-        return ACLController::addAdmin($r);
+        return ACLController::addAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
     }
 
     /**
@@ -978,7 +978,7 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
-        return ACLController::removeAdmin($r);
+        return ACLController::removeAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
     }
 
     /**
@@ -990,7 +990,7 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
-        return ACLController::addGroupAdmin($r);
+        return ACLController::addGroupAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
     }
 
     /**
@@ -1002,7 +1002,7 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
-        return ACLController::removeGroupAdmin($r);
+        return ACLController::removeGroupAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
     }
 
     /**
