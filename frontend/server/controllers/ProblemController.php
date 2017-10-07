@@ -259,45 +259,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
-        // Authenticate logged user
-        self::authenticateRequest($r);
-
-        // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        $user = UserController::resolveUser($r['usernameOrEmail']);
-
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
-
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
-            throw new ForbiddenAccessException();
-        }
-
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the contest to the DB
-        try {
-            UserRolesDAO::save($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return ['status' => 'ok'];
+        return ACLController::addAdmin($r);
     }
 
     /**
@@ -309,45 +271,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
-        // Authenticate logged user
-        self::authenticateRequest($r);
-
-        // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        $group = GroupsDAO::FindByAlias($r['group']);
-
-        if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
-        }
-
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
-            throw new ForbiddenAccessException();
-        }
-
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the role
-        try {
-            GroupRolesDAO::save($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return ['status' => 'ok'];
+        return ACLController::addGroupAdmin($r);
     }
 
     /**
@@ -426,44 +350,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
-        // Authenticate logged user
-        self::authenticateRequest($r);
-
-        // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        $user = UserController::resolveUser($r['usernameOrEmail']);
-
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
-            throw new ForbiddenAccessException();
-        }
-
-        // Check if admin to delete is actually an admin
-        if (!Authorization::isProblemAdmin($user->user_id, $problem)) {
-            throw new NotFoundException();
-        }
-
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            UserRolesDAO::delete($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return ['status' => 'ok'];
+        return ACLController::removeAdmin($r);
     }
 
     /**
@@ -475,43 +362,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
-        // Authenticate logged user
-        self::authenticateRequest($r);
-
-        // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        $group = GroupsDAO::FindByAlias($r['group']);
-
-        if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
-        }
-
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
-            throw new ForbiddenAccessException();
-        }
-
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            GroupRolesDAO::delete($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return ['status' => 'ok'];
+        return ACLController::removeGroupAdmin($r);
     }
 
     /**
@@ -570,27 +421,7 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
-        // Authenticate request
-        self::authenticateRequest($r);
-
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
-            throw new ForbiddenAccessException();
-        }
-
-        $response = [];
-        $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
-        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
-        $response['status'] = 'ok';
-
-        return $response;
+        return ACLController::getAdmins($r);
     }
 
     /**
