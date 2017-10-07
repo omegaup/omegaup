@@ -254,7 +254,7 @@ class ACLController extends Controller {
         return ['status' => 'ok'];
     }
 
-    protected function getVars(Request $r) {
+    private static function getVars(Request $r) {
         if (isset($r['course_alias'])) {
             $alias = 'course_alias';
             $daoController = 'CoursesDAO';

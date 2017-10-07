@@ -99,7 +99,6 @@ OmegaUp.on('ready', function() {
                 .fail(UI.apiError);
           },
           'removeGroupAdmin': function(group) {
-            console.log(group.alias);
             API.Course.removeGroupAdmin(
                           {course_alias: courseAlias, group: group.alias})
                 .then(function(data) {
