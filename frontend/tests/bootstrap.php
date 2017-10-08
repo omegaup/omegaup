@@ -32,6 +32,7 @@ require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
+require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
 
 // Clean previous log
 Utils::CleanLog();

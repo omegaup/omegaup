@@ -495,6 +495,94 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
+    public function testApiAggreateFeedback() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $contestant = UserFactory::createUser();
+            $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+            RunsFactory::gradeRun($runData);
+            $login[] = self::login($contestant);
+        }
+
+        QualityNominationFactory::createSuggestion(
+            $login[0],
+            $problemData['request']['alias'],
+            null,
+            1,
+            ['DP', 'Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[1],
+            $problemData['request']['alias'],
+            3,
+            3,
+            ['Math', 'DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[2],
+            $problemData['request']['alias'],
+            4,
+            0,
+            ['Matrices', 'Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[3],
+            $problemData['request']['alias'],
+            null,
+            null,
+            ['Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[4],
+            $problemData['request']['alias'],
+            3,
+            4,
+            ['DP', 'Math', 'Greedy']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[5],
+            $problemData['request']['alias'],
+            3,
+            null,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[6],
+            $problemData['request']['alias'],
+            null,
+            1,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[7],
+            $problemData['request']['alias'],
+            4,
+            null,
+            ['Greedy', 'DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[8],
+            $problemData['request']['alias'],
+            4,
+            0,
+            ['DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[9],
+            $problemData['request']['alias'],
+            4,
+            4,
+            ['DP', 'Math']
+        );
+
+        $filter = new QualityNominationReviewers([
+            'nomination' => 'feedback',
+        ]);
+        $allNominations = QualityNominationsDAO::search($filter);
+        print QualityNominationController::mapFeedbackRows($allNominations);
+    }
+
     public function testMostVotedTags() {
         $tags = [
             'DP' => 15,

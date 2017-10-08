@@ -476,7 +476,7 @@ class QualityNominationController extends Controller {
         }
     }
 
-    private static function mapFeedbackRows($allNominations) {
+    public static function mapFeedbackRows($allNominations) {
         $table = [];
         $globalQualitySum = 0;
         $globalQualityN = 0;
