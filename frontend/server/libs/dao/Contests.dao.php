@@ -73,11 +73,13 @@ class ActiveStatus extends StatusBase {
     const ALL = 0;
     const ACTIVE = 1;
     const PAST = 2;
+    const FUTURE = 3;
 
     public static $SQL_FOR_STATUS = [
         'TRUE',
-        'finish_time > NOW()',
+        'finish_time > NOW() AND start_time < NOW()',
         'finish_time <= NOW()',
+        'start_time > NOW()',
     ];
 }
 
@@ -91,6 +93,11 @@ class RecommendedStatus extends StatusBase {
         'recommended = 1',
         'recommended = 0',
     ];
+}
+
+class ParticipatingStatus extends StatusBase {
+    const NO = 0;
+    const YES = 1;
 }
 
 /** Contests Data Access Object (DAO).
@@ -266,6 +273,50 @@ class ContestsDAO extends ContestsDAOBase {
                 a.owner_id = ?
             ORDER BY
                 c.contest_id DESC
+            LIMIT ?, ?;';
+        $params = [
+            $user_id,
+            $offset,
+            $pageSize,
+        ];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
+     * Returns all contests where a user is participating in.
+     */
+    final public static function getContestsParticipating(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
+        $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
+        $columns = ContestsDAO::$getContestsColumns;
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT ' .
+                $columns . '
+            FROM
+                Contests
+            JOIN
+                Problemset_Users
+            ON
+                Contests.problemset_id = Problemset_Users.problemset_id
+            WHERE
+                Problemset_Users.user_id = ? AND ' .
+                $recommended_check . ' AND ' . $end_check . '
+            ORDER BY
+                recommended DESC,
+                finish_time DESC
             LIMIT ?, ?;';
         $params = [
             $user_id,

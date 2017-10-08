@@ -21,13 +21,12 @@ class QualityNominationController extends Controller {
      *
      * A user that has already solved a problem can make suggestions about a
      * problem. This expects the `nomination` field to be `suggestion` and the
-     * `contents` field should be a JSON blob with the following fields:
+     * `contents` field should be a JSON blob with at least one the following fields:
      *
-     * * `rationale`: A small text explaining the rationale for promotion.
-     * * `difficulty`: (Optional) A number in the range [1-5] indicating the
+     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
      *                 difficulty of the problem.
-     * * `source`: (Optional) A URL or string clearly documenting the source or
-     *             full name of original author of the problem.
+     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
+     *             of the problem.
      * * `tags`: (Optional) An array of tag names that will be added to the
      *           problem upon promotion.
      *
@@ -38,7 +37,6 @@ class QualityNominationController extends Controller {
      * `promotion` and the `contents` field should be a JSON blob with the
      * following fields:
      *
-     * * `rationale`: A small text explaining the rationale for promotion.
      * * `statements`: A dictionary of languages to objects that contain a
      *                 `markdown` field, which is the markdown-formatted
      *                 problem statement for that language.
@@ -59,7 +57,7 @@ class QualityNominationController extends Controller {
      *               problem.
      * # Dismissal
      * A user that has already solved a problem can dismiss suggestions. The
-     * `contents` field is empty except for `rationale = 'dismiss'`.
+     * `contents` field is empty.
      *
      * @param Request $r
      *
@@ -79,9 +77,7 @@ class QualityNominationController extends Controller {
         Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         Validators::isStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
-        if (!is_array($contents)
-            || (!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
-        ) {
+        if (!is_array($contents)) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -97,11 +93,26 @@ class QualityNominationController extends Controller {
             }
         }
         if ($r['nomination'] == 'suggestion') {
-            if ((!isset($contents['rationale']) || !is_string($contents['rationale']) || empty($contents['rationale']))
-                || (isset($contents['difficulty']) && (!is_int($contents['difficulty']) || empty($contents['difficulty'])))
-                || (isset($contents['source']) && (!is_string($contents['source']) || empty($contents['source'])))
-                || (isset($contents['tags']) && !is_array($contents['tags']))
-            ) {
+            $atLeastOneFieldIsPresent = false;
+            if (isset($contents['difficulty'])) {
+                if (!is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (isset($contents['tags'])) {
+                if (!is_array($contents['tags'])) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (isset($contents['quality'])) {
+                if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
+                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                }
+                $atLeastOneFieldIsPresent = true;
+            }
+            if (!$atLeastOneFieldIsPresent) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
@@ -154,7 +165,6 @@ class QualityNominationController extends Controller {
             ) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
-            $contents = ['rationale' => 'dismiss'];
         }
 
         // Create object
@@ -178,6 +188,79 @@ class QualityNominationController extends Controller {
                 'qualitynomination_id' => $nomination->qualitynomination_id,
                 'user_id' => $reviewer->user_id,
             ]));
+        }
+
+        return [
+            'status' => 'ok',
+            'qualitynomination_id' => $nomination->qualitynomination_id
+        ];
+    }
+
+    /**
+     * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+     *
+     * @param Request $r         The request.
+     *
+     * @return array The response.
+     */
+    public static function apiResolve(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+
+        // Validate request
+        self::authenticateRequest($r);
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
+        if (is_null($qualitynomination)) {
+            throw new NotFoundException('qualitynominationNotFound');
+        }
+        if ($qualitynomination->nomination != 'demotion') {
+            throw new InvalidParameterException('onlyDemotionsSupported');
+        }
+        if ($r['status'] == $qualitynomination->status) {
+            return ['status' => 'ok'];
+        }
+
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($r['problem'])) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $newProblemVisibility = $r['problem']->visibility;
+        switch ($r['status']) {
+            case 'approved':
+                $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
+                break;
+            case 'denied':
+                // If banning is reverted, problem will become private.
+                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
+                }
+                break;
+            case 'open':
+                // No-op.
+                break;
+        }
+
+        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $r['visibility'] = $newProblemVisibility;
+        $qualitynomination->status = $r['status'];
+
+        QualityNominationsDAO::transBegin();
+        try {
+            ProblemController::apiUpdate($r);
+            QualityNominationsDAO::save($qualitynomination);
+            QualityNominationsDAO::transEnd();
+        } catch (Exception $e) {
+            QualityNominationsDAO::transRollback();
+            self::$log->error('Failed to resolve demotion request');
+            self::$log->error($e);
+            throw new InvalidDatabaseOperationException($e);
         }
 
         return ['status' => 'ok'];
@@ -321,8 +404,10 @@ class QualityNominationController extends Controller {
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        if ($r['current_user']->username != $response['nominator']['username']) {
-            self::validateMemberOfReviewerGroup($r);
+        $currentUserIsNominator = ($r['current_user']->username == $response['nominator']['username']);
+        $currentUserReviewer = Authorization::isQualityReviewer($r['current_user_id']);
+        if (!$currentUserIsNominator && !$currentUserReviewer) {
+            throw new ForbiddenAccessException('userNotAllowed');
         }
 
         if ($response['nomination'] == 'promotion') {
@@ -331,14 +416,22 @@ class QualityNominationController extends Controller {
             if (is_null($problem)) {
                 throw new NotFoundException('problemNotFound');
             }
+
+            // Adding in the response object a flag to know whether the user is a reviewer
+            $response['reviewer'] = $currentUserReviewer;
+
             $response['original_contents'] = [
                 'statements' => [],
                 'source' => $problem->source,
-                'tags' => ProblemsDAO::getTagsForProblem($problem, false),
             ];
+
+            // Don't leak private problem tags to nominator
+            if ($currentUserReviewer) {
+                $response['original_contents']['tags'] = ProblemsDAO::getTagsForProblem($problem, false /* public */);
+            }
+
+            // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
-                // There might be the case that the language is not originally
-                // present, in which case it will be changed to Spanish.
                 $actualLanguage = $language;
                 $markdown = ProblemController::getProblemStatement(
                     $problem->alias,
@@ -355,6 +448,7 @@ class QualityNominationController extends Controller {
                 $response['original_contents']['statements'] = (object)[];
             }
         }
+        $response['nomination_status'] = $response['status'];
         $response['status'] = 'ok';
 
         return $response;

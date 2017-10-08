@@ -1,5 +1,5 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
-import {API, OmegaUp, UI} from '../omegaup.js';
+import {API, OmegaUp, UI, T} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -26,7 +26,7 @@ OmegaUp.on('ready', function() {
     el: '#contest_list',
     render: function(createElement) {
       return createElement('omegaup-contest-contestlist', {
-        props: {contests: this.contests},
+        props: {contests: this.contests, isAdmin: true, title: T.wordsContests},
         on: {
           'toggle-show-admin': showAdmin => {
             this.showAdmin = showAdmin;
