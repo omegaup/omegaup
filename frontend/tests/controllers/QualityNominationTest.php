@@ -494,4 +494,60 @@ class QualityNominationTest extends OmegaupTestCase {
         } catch (PreconditionFailedException $e) {
         }
     }
+
+    public function testMostVotedTags() {
+        $tags = [
+            'DP' => 15,
+            'Graph' => 10,
+            'Binary Search' => 5,
+            'Math' => 2,
+            'Greedy' => 1,
+        ];
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tags, 0.25),
+            ['DP', 'Graph', 'Binary Search']
+        );
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tags, 0.5),
+            ['DP', 'Graph']
+        );
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tags, 0.01),
+            ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
+        );
+
+        $tagsWithLittleVotes = [
+            'DP' => 2,
+            'Graph' => 1,
+        ];
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tagsWithLittleVotes, 0.25),
+            [],
+            'There must be at least 5 votes.'
+        );
+
+        $tooManyTagsWithMaxVotes = [
+            'T1' => 9, 'T2' => 9, 'T3' => 9, 'T4' => 9, 'T5' => 9, 'T6' => 9,
+            'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
+
+        $this->assertEquals(
+            QualityNominationController::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            [],
+            'There must be a maximum number of tags to be assigned.'
+        );
+    }
 }

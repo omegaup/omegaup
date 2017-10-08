@@ -526,8 +526,8 @@ class QualityNominationController extends Controller {
         return null;
     }
 
-    private static function mostVotedTags($totalVotes, $tags, $threshold) {
-        if ($totalVotes < 5) {
+    public static function mostVotedTags($tags, $threshold) {
+        if (array_sum($tags) < 5) {
             return [];
         }
 
