@@ -101,7 +101,7 @@ class QualityNominationController extends Controller {
                 $atLeastOneFieldIsPresent = true;
             }
             if (isset($contents['tags'])) {
-                if (!is_array($contents['tags'])) {
+                if (!is_array($contents['tags']) || empty($contents['tags'])) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $atLeastOneFieldIsPresent = true;
@@ -455,8 +455,8 @@ class QualityNominationController extends Controller {
     }
 
     public static function apiAggreateFeedback(Request $r) {
-        $filter = new QualityNominationReviewers([
-            'nomination' => 'feedback',
+        $filter = new QualityNomination([
+            'nomination' => 'suggestion',
         ]);
         $allNominations = QualityNominationsDAO::search($filter);
         $response = mapFeedbackRows($allNominations);
@@ -483,9 +483,17 @@ class QualityNominationController extends Controller {
         $globalDifficultySum = 0;
         $globalDifficultyN = 0;
         foreach ($allNominations as $nomination) {
-            $feedback = json_decode($nomination['contents']);
+            $nomination = (array) $nomination;
+            $feedback = (array) json_decode($nomination['contents']);
 
             $tableRow = &$table[$nomination['problem_id']];
+            if (!isset($tableRow['quality_sum'])) {
+                $tableRow['quality_sum'] = 0;
+                $tableRow['quality_n'] = 0;
+                $tableRow['difficulty_sum'] = 0;
+                $tableRow['difficulty_n'] = 0;
+                $tableRow['tags_n'] = 0;
+            }
 
             if (isset($feedback['quality'])) {
                 $tableRow['quality_sum'] += $feedback['quality'];
@@ -503,7 +511,11 @@ class QualityNominationController extends Controller {
 
             if (isset($feedback['tags'])) {
                 foreach ($feedback['tags'] as $tag) {
-                    $tableRow['tags'][$tag] ++;
+                    if (!isset($tableRow['tags'][$tag])) {
+                        $tableRow['tags'][$tag] = 1;
+                    } else {
+                        $tableRow['tags'][$tag] ++;
+                    }
                     $tableRow['tags_n'] ++;
                 }
             }

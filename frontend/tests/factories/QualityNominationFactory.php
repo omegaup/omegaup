@@ -22,13 +22,13 @@ class QualityNominationFactory {
     }
 
     public static function createQualityNomination($login, $problemAlias, $type, $contents) {
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $request = new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemAlias,
             'nomination' => $type,
             'contents' => $contents,
-        ]));
-
+        ]);
+        $qualitynomination = QualityNominationController::apiCreate($request);
         return $qualitynomination;
     }
 }
