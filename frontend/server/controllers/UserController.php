@@ -1074,6 +1074,7 @@ class UserController extends Controller {
         $response['userinfo']['solved'] = $user->solved;
         $response['userinfo']['submissions'] = $user->submissions;
         $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
+        $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
@@ -1600,6 +1601,7 @@ class UserController extends Controller {
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
+            'gender',
             'recruitment_optin',
         ];
 
