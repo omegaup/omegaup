@@ -259,7 +259,37 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
-        return ACLController::addAdmin($r, 'problem_alias', 'ProblemsDAO', 'isProblemAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check problem_alias
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        // Only director is allowed to create problems in contest
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLAdmin($problem->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -271,7 +301,37 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
-        return ACLController::addGroupAdmin($r, 'problem_alias', 'ProblemsDAO', 'isProblemAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check problem_alias
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admins are allowed to modify contest
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLGroupAdmin($problem->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -342,7 +402,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Removes an admin from a contest
+     * Removes an admin from a problem
      *
      * @param Request $r
      * @return array
@@ -350,7 +410,34 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
-        return ACLController::removeAdmin($r, 'problem_alias', 'ProblemsDAO', 'isProblemAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check problem_alias
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Check if admin to delete is actually an admin
+        if (!Authorization::isProblemAdmin($user->user_id, $problem)) {
+            throw new NotFoundException();
+        }
+
+        ACLController::removeACLAdmin($problem->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -362,7 +449,33 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
-        return ACLController::removeGroupAdmin($r, 'problem_alias', 'ProblemsDAO', 'isProblemAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check problem_alias
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::removeACLGroupAdmin($problem->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -421,7 +534,27 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
-        return ACLController::getAdmins($r, 'problem_alias', 'ProblemsDAO', 'isProblemAdmin', 'getProblemAdmins');
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = [];
+        $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
+        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
+        $response['status'] = 'ok';
+
+        return $response;
     }
 
     /**

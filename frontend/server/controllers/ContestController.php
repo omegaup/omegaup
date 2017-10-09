@@ -1375,7 +1375,33 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
-        return ACLController::addAdmin($r, 'contest_alias', 'ContestsDAO', 'isContestAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only director is allowed to create problems in contest
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLAdmin($contest->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1387,7 +1413,34 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
-        return ACLController::removeAdmin($r, 'contest_alias', 'ContestsDAO', 'isContestAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Check if admin to delete is actually an admin
+        if (!Authorization::isContestAdmin($user->user_id, $contest)) {
+            throw new NotFoundException();
+        }
+
+        ACLController::removeACLAdmin($contest->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1399,7 +1452,37 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
-        return ACLController::addGroupAdmin($r, 'contest_alias', 'ContestsDAO', 'isContestAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admins are allowed to modify contest
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLGroupAdmin($contest->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1411,7 +1494,33 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
-        return ACLController::removeGroupAdmin($r, 'contest_alias', 'ContestsDAO', 'isContestAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::removeACLGroupAdmin($contest->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -1885,7 +1994,27 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
-        return ACLController::getAdmins($r, 'contest_alias', 'ContestsDAO', 'isContestAdmin', 'getContestAdmins');
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        try {
+            $course = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::isContestAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = [];
+        $response['admins'] = UserRolesDAO::getContestAdmins($course);
+        $response['group_admins'] = GroupRolesDAO::getContestAdmins($course);
+        $response['status'] = 'ok';
+
+        return $response;
     }
 
     /**

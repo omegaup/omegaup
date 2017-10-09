@@ -953,8 +953,27 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
-        return ACLController::getAdmins($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin', 'getCourseAdmins');
-        ;
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = [];
+        $response['admins'] = UserRolesDAO::getCourseAdmins($course);
+        $response['group_admins'] = GroupRolesDAO::getCourseAdmins($course);
+        $response['status'] = 'ok';
+
+        return $response;
     }
 
     /**
@@ -966,7 +985,33 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
-        return ACLController::addAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check course_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only director is allowed to make modifications
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLAdmin($course->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
@@ -978,11 +1023,38 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
-        return ACLController::removeAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check course_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $user = UserController::resolveUser($r['usernameOrEmail']);
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Check if admin to delete is actually an admin
+        if (!Authorization::isCourseAdmin($user->user_id, $course)) {
+            throw new NotFoundException();
+        }
+
+        ACLController::removeACLAdmin($course->acl_id, $user->user_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
-     * Adds an group admin to a contest
+     * Adds an group admin to a course
      *
      * @param Request $r
      * @return array
@@ -990,11 +1062,41 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
-        return ACLController::addGroupAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check course_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admins are allowed to modify course
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::addACLGroupAdmin($course->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
-     * Removes a group admin from a contest
+     * Removes a group admin from a course
      *
      * @param Request $r
      * @return array
@@ -1002,7 +1104,33 @@ class CourseController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
-        return ACLController::removeGroupAdmin($r, 'course_alias', 'CoursesDAO', 'isCourseAdmin');
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check course_alias
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $course)) {
+            throw new ForbiddenAccessException();
+        }
+
+        ACLController::removeACLGroupAdmin($course->acl_id, $group->group_id);
+
+        return ['status' => 'ok'];
     }
 
     /**
