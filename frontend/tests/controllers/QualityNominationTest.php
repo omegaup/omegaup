@@ -493,7 +493,7 @@ class QualityNominationTest extends OmegaupTestCase {
         } catch (PreconditionFailedException $e) {
         }
     }
-    
+
     public function testApiAggreateFeedback() {
         TagsDAO::save(new Tags(['name' => 'dp']));
         TagsDAO::save(new Tags(['name' => 'math']));
@@ -501,7 +501,7 @@ class QualityNominationTest extends OmegaupTestCase {
         TagsDAO::save(new Tags(['name' => 'greedy']));
         TagsDAO::save(new Tags(['name' => 'geometry']));
         TagsDAO::save(new Tags(['name' => 'search']));
-        
+
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
@@ -510,10 +510,10 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
-        $this->assertEquals($newProblem[0]->difficulty, 3.48958, "Wrong difficulty.", 0.001);
-        $this->assertEquals($newProblem[0]->quality, 2.34545, "Wrong quality.", 0.001);
-        $this->assertEquals($newProblem[1]->difficulty, 3.27678, "Wrong difficulty.", 0.001);
-        $this->assertEquals($newProblem[1]->quality, 1.8595, "Wrong quality.", 0.001);
+        $this->assertEquals($newProblem[0]->difficulty, 3.48958, 'Wrong difficulty.', 0.001);
+        $this->assertEquals($newProblem[0]->quality, 2.34545, 'Wrong quality.', 0.001);
+        $this->assertEquals($newProblem[1]->difficulty, 3.27678, 'Wrong difficulty.', 0.001);
+        $this->assertEquals($newProblem[1]->quality, 1.8595, 'Wrong quality.', 0.001);
     }
 
     public function testMapFeedbackRows() {
@@ -526,7 +526,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
         $allNominations = QualityNominationsDAO::search($filter);
         $actualResult = QualityNominationController::mapFeedbackRows($allNominations);
-        
+
         $expectedResult = [
             'table' => [
                 13 =>  [
@@ -564,7 +564,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
         $this->assertEquals($expectedResult, $actualResult);
     }
-    
+
     public function setUpSyntheticSuggestions($problemData) {
         // First, remove all suggestions.
         $filter = new QualityNominations([
@@ -574,7 +574,7 @@ class QualityNominationTest extends OmegaupTestCase {
         foreach ($allNominations as $nomination) {
             QualityNominationsDAO::delete($nomination);
         }*/
-        
+
         // Setup synthetic data.
         $login = [];
         for ($i = 0; $i < 10; $i++) {
@@ -585,48 +585,148 @@ class QualityNominationTest extends OmegaupTestCase {
             }
             $login[] = self::login($contestant);
         }
-        
+
         QualityNominationFactory::createSuggestion(
-                $login[0], $problemData[0]['request']['alias'], null, 1, ['DP', 'Math']);
+            $login[0],
+            $problemData[0]['request']['alias'],
+            null,
+            1,
+            ['DP', 'Math']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[1], $problemData[0]['request']['alias'], 3, 3, ['Math', 'DP']);
+            $login[1],
+            $problemData[0]['request']['alias'],
+            3,
+            3,
+            ['Math', 'DP']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[2], $problemData[0]['request']['alias'], 4, 0, ['Matrices', 'Math']);
+            $login[2],
+            $problemData[0]['request']['alias'],
+            4,
+            0,
+            ['Matrices', 'Math']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[3], $problemData[0]['request']['alias'], null, null, ['Math']);
+            $login[3],
+            $problemData[0]['request']['alias'],
+            null,
+            null,
+            ['Math']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[4], $problemData[0]['request']['alias'], 3, 4, ['DP', 'Math', 'Greedy']);
+            $login[4],
+            $problemData[0]['request']['alias'],
+            3,
+            4,
+            ['DP', 'Math', 'Greedy']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[5], $problemData[0]['request']['alias'], 3, null, []);
+            $login[5],
+            $problemData[0]['request']['alias'],
+            3,
+            null,
+            []
+        );
         QualityNominationFactory::createSuggestion(
-                $login[6], $problemData[0]['request']['alias'], null, 1, []);
+            $login[6],
+            $problemData[0]['request']['alias'],
+            null,
+            1,
+            []
+        );
         QualityNominationFactory::createSuggestion(
-                $login[7], $problemData[0]['request']['alias'], 4, null, ['Greedy', 'DP']);
+            $login[7],
+            $problemData[0]['request']['alias'],
+            4,
+            null,
+            ['Greedy', 'DP']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[8], $problemData[0]['request']['alias'], 4, 0, ['DP']);
+            $login[8],
+            $problemData[0]['request']['alias'],
+            4,
+            0,
+            ['DP']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[9], $problemData[0]['request']['alias'], 4, 4, ['DP', 'Math']);
-        
+            $login[9],
+            $problemData[0]['request']['alias'],
+            4,
+            4,
+            ['DP', 'Math']
+        );
+
         QualityNominationFactory::createSuggestion(
-                $login[0], $problemData[1]['request']['alias'], 4, 1, ['Search', 'Geometry']);
+            $login[0],
+            $problemData[1]['request']['alias'],
+            4,
+            1,
+            ['Search', 'Geometry']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[1], $problemData[1]['request']['alias'], 1, 1, ['Search', 'Geometry']);
+            $login[1],
+            $problemData[1]['request']['alias'],
+            1,
+            1,
+            ['Search', 'Geometry']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[2], $problemData[1]['request']['alias'], 4, 3, ['Matrices', 'Search']);
+            $login[2],
+            $problemData[1]['request']['alias'],
+            4,
+            3,
+            ['Matrices', 'Search']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[3], $problemData[1]['request']['alias'], 3, null, ['Search']);
+            $login[3],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[4], $problemData[1]['request']['alias'], 3, null, ['Search', 'Math', 'Geometry']);
+            $login[4],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search', 'Math', 'Geometry']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[5], $problemData[1]['request']['alias'], 3, null, []);
+            $login[5],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            []
+        );
         QualityNominationFactory::createSuggestion(
-                $login[6], $problemData[1]['request']['alias'], null, 1, []);
+            $login[6],
+            $problemData[1]['request']['alias'],
+            null,
+            1,
+            []
+        );
         QualityNominationFactory::createSuggestion(
-                $login[7], $problemData[1]['request']['alias'], 3, null, ['Search', 'DP']);
+            $login[7],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search', 'DP']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[8], $problemData[1]['request']['alias'], 4, 1, ['DP']);
+            $login[8],
+            $problemData[1]['request']['alias'],
+            4,
+            1,
+            ['DP']
+        );
         QualityNominationFactory::createSuggestion(
-                $login[9], $problemData[1]['request']['alias'], 4, 3, ['Geometry', 'Math']);
+            $login[9],
+            $problemData[1]['request']['alias'],
+            4,
+            3,
+            ['Geometry', 'Math']
+        );
     }
 
     public function testMostVotedTags() {
@@ -637,26 +737,31 @@ class QualityNominationTest extends OmegaupTestCase {
             'Math' => 2,
             'Greedy' => 1,
         ];
-        
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tags, 0.25),
-                ['DP', 'Graph', 'Binary Search']);
-        
+            QualityNominationController::mostVotedTags($tags, 0.25),
+            ['DP', 'Graph', 'Binary Search']
+        );
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tags, 0.5),
-                ['DP', 'Graph']);
-        
+            QualityNominationController::mostVotedTags($tags, 0.5),
+            ['DP', 'Graph']
+        );
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tags, 0.9),
-                ['DP']);
-        
+            QualityNominationController::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tags, 0.9),
-                ['DP']);
-        
+            QualityNominationController::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tags, 0.01),
-                ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']);
+            QualityNominationController::mostVotedTags($tags, 0.01),
+            ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
+        );
 
         $tagsWithLittleVotes = [
             'DP' => 2,
@@ -664,18 +769,19 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tagsWithLittleVotes, 0.25),
-                [],
-                "There must be at least 5 votes.");
-        
+            QualityNominationController::mostVotedTags($tagsWithLittleVotes, 0.25),
+            [],
+            'There must be at least 5 votes.'
+        );
+
         $tooManyTagsWithMaxVotes = [
             'T1' => 9, 'T2' => 9, 'T3' => 9, 'T4' => 9, 'T5' => 9, 'T6' => 9,
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
-        
-        
+
         $this->assertEquals(
-                QualityNominationController::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
-                [],
-                "There must be a maximum number of tags to be assigned.");
+            QualityNominationController::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            [],
+            'There must be a maximum number of tags to be assigned.'
+        );
     }
 }
