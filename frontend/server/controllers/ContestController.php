@@ -1399,7 +1399,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLAdmin($contest->acl_id, $user->user_id);
+        ACLController::addUser($contest->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1438,7 +1438,7 @@ class ContestController extends Controller {
             throw new NotFoundException();
         }
 
-        ACLController::removeACLAdmin($contest->acl_id, $user->user_id);
+        ACLController::removeUser($contest->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1480,7 +1480,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLGroupAdmin($contest->acl_id, $group->group_id);
+        ACLController::addGroupUser($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1518,7 +1518,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeACLGroupAdmin($contest->acl_id, $group->group_id);
+        ACLController::removeGroupUser($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -2000,21 +2000,20 @@ class ContestController extends Controller {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
-            $course = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isContestAdmin($r['current_user_id'], $course)) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getContestAdmins($course);
-        $response['group_admins'] = GroupRolesDAO::getContestAdmins($course);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getContestAdmins($contest),
+            'group_admins' => GroupRolesDAO::getContestAdmins($contest)
+        ];
     }
 
     /**

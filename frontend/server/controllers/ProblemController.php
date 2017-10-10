@@ -282,12 +282,12 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        // Only director is allowed to create problems in contest
+        // Only an admin can add other problem admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLAdmin($problem->acl_id, $user->user_id);
+        ACLController::addUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -324,12 +324,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        // Only admins are allowed to modify contest
+        // Only an admin can add other problem group admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLGroupAdmin($problem->acl_id, $group->group_id);
+        ACLController::addGroupUser($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -435,7 +435,7 @@ class ProblemController extends Controller {
             throw new NotFoundException();
         }
 
-        ACLController::removeACLAdmin($problem->acl_id, $user->user_id);
+        ACLController::removeUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -473,7 +473,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeACLGroupAdmin($problem->acl_id, $group->group_id);
+        ACLController::removeGroupUser($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -549,12 +549,11 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
-        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getProblemAdmins($problem),
+            'group_admins' => GroupRolesDAO::getProblemAdmins($problem)
+        ];
     }
 
     /**

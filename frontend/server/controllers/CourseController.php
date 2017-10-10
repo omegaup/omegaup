@@ -199,13 +199,6 @@ class CourseController extends Controller {
             $r['current_user_id']
         );
 
-        $adminGroup = GroupController::createGroup(
-            'admin-' . $r['alias'],
-            'admin-' . $r['alias'],
-            'admin-' . $r['alias'],
-            $r['current_user_id']
-        );
-
         try {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
             ACLsDAO::save($acl);
@@ -216,19 +209,12 @@ class CourseController extends Controller {
                 'role_id' => Authorization::CONTESTANT_ROLE,
             ]));
 
-            GroupRolesDAO::save(new GroupRoles([
-                'group_id' => $adminGroup->group_id,
-                'acl_id' => $acl->acl_id,
-                'role_id' => Authorization::ADMIN_ROLE,
-            ]));
-
             // Create the actual course
             CoursesDAO::save(new Courses([
                 'name' => $r['name'],
                 'description' => $r['description'],
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
-                'admin_group_id' => $adminGroup->group_id,
                 'acl_id' => $acl->acl_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
@@ -968,12 +954,11 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getCourseAdmins($course);
-        $response['group_admins'] = GroupRolesDAO::getCourseAdmins($course);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getCourseAdmins($course),
+            'group_admins' => GroupRolesDAO::getCourseAdmins($course)
+        ];
     }
 
     /**
@@ -1009,7 +994,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLAdmin($course->acl_id, $user->user_id);
+        ACLController::addUser($course->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1048,7 +1033,7 @@ class CourseController extends Controller {
             throw new NotFoundException();
         }
 
-        ACLController::removeACLAdmin($course->acl_id, $user->user_id);
+        ACLController::removeUser($course->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1090,7 +1075,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addACLGroupAdmin($course->acl_id, $group->group_id);
+        ACLController::addGroupUser($course->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1128,7 +1113,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeACLGroupAdmin($course->acl_id, $group->group_id);
+        ACLController::removeGroupUser($course->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }

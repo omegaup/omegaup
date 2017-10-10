@@ -11,13 +11,14 @@ class ACLController extends Controller {
      *
      * @param $acl_id
      * @param $user_id
+     * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function addACLAdmin($acl_id, $user_id) {
+    public static function addUser($acl_id, $user_id, $role_id = Authorization::ADMIN_ROLE) {
         $user_role = new UserRoles();
         $user_role->acl_id = $acl_id;
         $user_role->user_id = $user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
+        $user_role->role_id = $role_id;
 
         // Save the ACL to the DB
         try {
@@ -33,13 +34,14 @@ class ACLController extends Controller {
      *
      * @param $acl_id
      * @param $user_id
+     * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function removeACLAdmin($acl_id, $user_id) {
+    public static function removeUser($acl_id, $user_id, $role_id = Authorization::ADMIN_ROLE) {
         $user_role = new UserRoles();
         $user_role->acl_id = $acl_id;
         $user_role->user_id = $user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
+        $user_role->role_id = $role_id;
 
         // Delete the role
         try {
@@ -55,13 +57,14 @@ class ACLController extends Controller {
      *
      * @param $acl_id
      * @param $group_id
+     * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function addACLGroupAdmin($acl_id, $group_id) {
+    public static function addGroupUser($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
         $group_role = new GroupRoles();
         $group_role->acl_id = $acl_id;
         $group_role->group_id = $group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
+        $group_role->role_id = $role_id;
 
         // Save the ACL to the DB
         try {
@@ -77,13 +80,14 @@ class ACLController extends Controller {
      *
      * @param $acl_id
      * @param $group_id
+     * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function removeACLGroupAdmin($acl_id, $group_id) {
+    public static function removeGroupUser($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
         $group_role = new GroupRoles();
         $group_role->acl_id = $acl_id;
         $group_role->group_id = $group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
+        $group_role->role_id = $role_id;
 
         // Delete the role
         try {

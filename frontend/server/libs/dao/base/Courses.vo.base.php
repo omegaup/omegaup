@@ -41,9 +41,6 @@ class Courses extends VO {
         if (isset($data['group_id'])) {
             $this->group_id = $data['group_id'];
         }
-        if (isset($data['admin_group_id'])) {
-            $this->admin_group_id = $data['admin_group_id'];
-        }
         if (isset($data['acl_id'])) {
             $this->acl_id = $data['acl_id'];
         }
@@ -105,13 +102,6 @@ class Courses extends VO {
       * @var int(11)
       */
     public $group_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $admin_group_id;
 
     /**
       *  [Campo no documentado]
