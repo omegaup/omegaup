@@ -332,12 +332,18 @@ class ContestListTest extends OmegaupTestCase {
         $r = new Request();
 
         // Create 2 contests, the second one will occur in to the future.
-        $currentContestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $currentContestData = ContestsFactory::createContest(new ContestParams(
+            [
+                'public' => 0,
+                'start_time' => Utils::GetPhpUnixTimestamp(DATE_TEST),
+                'finish_time' => (Utils::GetPhpUnixTimestamp(DATE_TEST) + (60 * 60 * 2)),
+            ]
+        ));
         $futureContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'public' => 0,
-                'finish_time' => ($currentContestData['request']['finish_time'] + (60 * 60 * 49)),
-                'start_time' => ($currentContestData['request']['finish_time'] + (60 * 60 * 48)),
+                'finish_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                'start_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
             ]
         ));
 
@@ -371,8 +377,14 @@ class ContestListTest extends OmegaupTestCase {
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
-            $isPublic = ($i === 0) ? true : false;
-            $contestData[$i] = ContestsFactory::createContest(null, $isPublic);
+            $isPublic = ($i === 0) ? 1 : 0;
+            $contestData[$i] = ContestsFactory::createContest(new ContestParams(
+                [
+                    'public' => $isPublic,
+                    'start_time' => Utils::GetPhpUnixTimestamp(DATE_TEST),
+                    'finish_time' => (Utils::GetPhpUnixTimestamp(DATE_TEST) + (60 * 60 * 2)),
+                ]
+            ));
         }
 
         // Get a user for our scenario

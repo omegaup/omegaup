@@ -3,9 +3,9 @@
 class DbConfigTest extends PHPUnit_Framework_TestCase {
     public function testTimeSync() {
         $db_time = Utils::GetDbDatetime();
-        $php_time = date('Y-m-d H:i:s');
+        $php_time = new DateTime(DATE_TEST);
 
-        $this->assertEquals($php_time, $db_time);
+        $this->assertEquals($php_time->format('Y-m-d H:i:s'), $db_time);
     }
 
     public function testPhpUtc() {
