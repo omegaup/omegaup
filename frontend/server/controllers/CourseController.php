@@ -1075,7 +1075,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addGroupUser($course->acl_id, $group->group_id);
+        ACLController::addGroup($course->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1113,7 +1113,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeGroupUser($course->acl_id, $group->group_id);
+        ACLController::removeGroup($course->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }

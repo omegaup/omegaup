@@ -329,7 +329,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addGroupUser($problem->acl_id, $group->group_id);
+        ACLController::addGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -473,7 +473,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeGroupUser($problem->acl_id, $group->group_id);
+        ACLController::removeGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }

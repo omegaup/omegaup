@@ -1480,7 +1480,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addGroupUser($contest->acl_id, $group->group_id);
+        ACLController::addGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1518,7 +1518,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::removeGroupUser($contest->acl_id, $group->group_id);
+        ACLController::removeGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }

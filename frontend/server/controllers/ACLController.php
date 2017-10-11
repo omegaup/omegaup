@@ -7,7 +7,7 @@
  */
 class ACLController extends Controller {
     /**
-     * Adds ACL to an admin
+     * Adds a user to an ACL with the specified role.
      *
      * @param $acl_id
      * @param $user_id
@@ -30,7 +30,7 @@ class ACLController extends Controller {
     }
 
     /**
-     * Removes ACL from a admin
+     * Removes a user from an ACL with the specified role.
      *
      * @param $acl_id
      * @param $user_id
@@ -53,14 +53,14 @@ class ACLController extends Controller {
     }
 
     /**
-     * Adds ACL to a group admin
+     * Adds a group to an ACL with the specified role.
      *
      * @param $acl_id
      * @param $group_id
      * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function addGroupUser($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
+    public static function addGroup($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
         $group_role = new GroupRoles();
         $group_role->acl_id = $acl_id;
         $group_role->group_id = $group_id;
@@ -76,14 +76,14 @@ class ACLController extends Controller {
     }
 
     /**
-     * Removes ACL from a group admin
+     * Removes a group from an ACL with the specified role.
      *
      * @param $acl_id
      * @param $group_id
      * @param $role_id
      * @throws InvalidDatabaseOperationException
      */
-    public static function removeGroupUser($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
+    public static function removeGroup($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
         $group_role = new GroupRoles();
         $group_role->acl_id = $acl_id;
         $group_role->group_id = $group_id;
