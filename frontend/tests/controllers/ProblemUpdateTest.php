@@ -471,16 +471,12 @@ class UpdateProblemTest extends OmegaupTestCase {
             'message' => 'no-op',
         ]));
 
-        try {
-            ProblemController::apiUpdate(new Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problem->alias,
-                'visibility' => ProblemController::VISIBILITY_BANNED,
-                'message' => 'public -> banned',
-            ]));
-            $this->fail('Cannot ban problem from API');
-        } catch (InvalidParameterException $e) {
-        }
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_BANNED,
+            'message' => 'public -> banned',
+        ]));
 
         try {
             ProblemController::apiUpdate(new Request([

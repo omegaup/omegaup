@@ -186,6 +186,79 @@ class QualityNominationController extends Controller {
             ]));
         }
 
+        return [
+            'status' => 'ok',
+            'qualitynomination_id' => $nomination->qualitynomination_id
+        ];
+    }
+
+    /**
+     * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+     *
+     * @param Request $r         The request.
+     *
+     * @return array The response.
+     */
+    public static function apiResolve(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+
+        // Validate request
+        self::authenticateRequest($r);
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
+        if (is_null($qualitynomination)) {
+            throw new NotFoundException('qualitynominationNotFound');
+        }
+        if ($qualitynomination->nomination != 'demotion') {
+            throw new InvalidParameterException('onlyDemotionsSupported');
+        }
+        if ($r['status'] == $qualitynomination->status) {
+            return ['status' => 'ok'];
+        }
+
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($r['problem'])) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $newProblemVisibility = $r['problem']->visibility;
+        switch ($r['status']) {
+            case 'approved':
+                $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
+                break;
+            case 'denied':
+                // If banning is reverted, problem will become private.
+                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
+                }
+                break;
+            case 'open':
+                // No-op.
+                break;
+        }
+
+        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $r['visibility'] = $newProblemVisibility;
+        $qualitynomination->status = $r['status'];
+
+        QualityNominationsDAO::transBegin();
+        try {
+            ProblemController::apiUpdate($r);
+            QualityNominationsDAO::save($qualitynomination);
+            QualityNominationsDAO::transEnd();
+        } catch (Exception $e) {
+            QualityNominationsDAO::transRollback();
+            self::$log->error('Failed to resolve demotion request');
+            self::$log->error($e);
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         return ['status' => 'ok'];
     }
 
@@ -333,44 +406,45 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        // Get information from the original problem.
-        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
+        if ($response['nomination'] == 'promotion') {
+            // Get information from the original problem.
+            $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+            if (is_null($problem)) {
+                throw new NotFoundException('problemNotFound');
+            }
 
-        // Adding in the response object a flag to know whether the user is a reviewer
-        $response['reviewer'] = $currentUserReviewer;
+            // Adding in the response object a flag to know whether the user is a reviewer
+            $response['reviewer'] = $currentUserReviewer;
 
-        $response['original_contents'] = [
-            'statements' => [],
-            'source' => $problem->source,
-            'tags' => ProblemsDAO::getTagsForProblem($problem, false /* public */),
-        ];
-
-        // Don't leak private problem tags to nominator
-        if (!$currentUserReviewer) {
-            unset($response['original_contents']['tags']);
-        }
-
-        foreach ($response['contents']['statements'] as $language => $_) {
-            // There might be the case that the language is not originally
-            // present, in which case it will be changed to Spanish.
-            $actualLanguage = $language;
-            $markdown = ProblemController::getProblemStatement(
-                $problem->alias,
-                $actualLanguage,
-                'markdown'
-            );
-            $response['original_contents']['statements'][$language] = [
-                'language' => $actualLanguage,
-                'markdown' => $markdown,
+            $response['original_contents'] = [
+                'statements' => [],
+                'source' => $problem->source,
             ];
+
+            // Don't leak private problem tags to nominator
+            if ($currentUserReviewer) {
+                $response['original_contents']['tags'] = ProblemsDAO::getTagsForProblem($problem, false /* public */);
+            }
+
+            // Pull original problem statements in every language the nominator is trying to override.
+            foreach ($response['contents']['statements'] as $language => $_) {
+                $actualLanguage = $language;
+                $markdown = ProblemController::getProblemStatement(
+                    $problem->alias,
+                    $actualLanguage,
+                    'markdown'
+                );
+                $response['original_contents']['statements'][$language] = [
+                    'language' => $actualLanguage,
+                    'markdown' => $markdown,
+                ];
+            }
+            if (empty($response['original_contents']['statements'])) {
+                // Force 'statements' to be an object.
+                $response['original_contents']['statements'] = (object)[];
+            }
         }
-        if (empty($response['original_contents']['statements'])) {
-            // Force 'statements' to be an object.
-            $response['original_contents']['statements'] = (object)[];
-        }
+        $response['nomination_status'] = $response['status'];
         $response['status'] = 'ok';
 
         return $response;

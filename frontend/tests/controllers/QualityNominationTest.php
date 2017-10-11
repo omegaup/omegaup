@@ -149,6 +149,178 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
+     */
+    public function testDemotionCannotBeResolvedByRegularUser() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $request = new Request([
+            'auth_token' => $login->auth_token,
+            'status' => 'approved',
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        try {
+            $response = QualityNominationController::apiResolve($request);
+            $this->fail("Normal user shouldn't be able to resolve demotion");
+        } catch (ForbiddenAccessException $e) {
+            // Expected.
+        }
+    }
+
+    /**
+     * Check that a demotion can be approved and then reverted by a reviewer.
+     */
+    public function testDemotionCanBeApprovedAndLaterRevertedByReviewer() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+
+        // Revert ban.
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been made private');
+    }
+
+    /**
+     * Check that a demotion can be denied by a reviewer.
+     */
+    public function testDemotionCanBeDeniedByReviewer() {
+        $problemData = ProblemsFactory::createProblem(null /* zipName */, null /* title */, ProblemController::VISIBILITY_PUBLIC);
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and deny ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have remained public');
+    }
+
+    /**
+     * Check that a demotion can be approved and then reopned by a reviewer.
+     */
+    public function testDemotionCanBeApprovedAndThenReopenedByReviewer() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+
+        // Reopen demotion request.
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'open',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have remained banned');
+    }
+
+    /**
      * Check that before a duplicate nomination needs to have a valid original problem.
      */
     public function testNominatingForDuplicate() {

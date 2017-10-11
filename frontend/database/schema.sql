@@ -622,6 +622,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `language_id` int(11) NULL DEFAULT NULL,
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
+  `gender` enum('female','male','other','decline') DEFAULT NULL,
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `verified` BOOLEAN NOT NULL DEFAULT false,
   `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
