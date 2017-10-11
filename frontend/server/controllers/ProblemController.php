@@ -222,6 +222,8 @@ class ProblemController extends Controller {
         $result['status'] = 'ok';
         $result['alias'] = $r['alias'];
 
+        self::apiSetLanguage($r, $problem);
+
         return $result;
     }
 
@@ -1791,5 +1793,60 @@ class ProblemController extends Controller {
         }
 
         return $score;
+    }
+
+    /**
+     * Gets all the problems and save language data
+     * into the DB
+     * @param Request $r
+     * @return Array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSetLanguage(Request $r, Problems $problem = null) {
+        // Authenticate request
+        try {
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+
+        try {
+            ProblemsLanguagesDAO::transBegin();
+            if (!is_null($problem)) {
+                $languages = LanguagesDAO::getAll();
+                foreach ($languages as $lang) {
+                    if (file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
+                        $problem_language = new ProblemsLanguages();
+                        $problem_language->problem_id = $problem->problem_id;
+                        $problem_language->language_id = $lang->language_id;
+                        $problem_language->translator_id = 1; // omegaUp admin problem_id
+
+                        ProblemsLanguagesDAO::save($problem_language);
+                    }
+                }
+            } else {
+                $all_problems = ProblemsDAO::getAll();
+                $languages = LanguagesDAO::getAll();
+
+                foreach ($all_problems as $index => $data) {
+                    foreach ($languages as $lang) {
+                        if (file_exists(self::getSourcePath($data->alias, $lang->name, 'markdown'))) {
+                            $problem_language = new ProblemsLanguages();
+                            $problem_language->problem_id = $data->problem_id;
+                            $problem_language->language_id = $lang->language_id;
+                            $problem_language->translator_id = 1; // omegaUp admin
+
+                            ProblemsLanguagesDAO::save($problem_language);
+                        }
+                    }
+                }
+            }
+            ProblemsLanguagesDAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in something we know it could fail, rollback transaction
+            ProblemsLanguagesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+        return ['status' => 'ok'];
     }
 }
