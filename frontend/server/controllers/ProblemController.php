@@ -265,6 +265,10 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -284,24 +288,12 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
+        // Only an admin can add other problem admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the contest to the DB
-        try {
-            UserRolesDAO::save($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -315,6 +307,10 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -334,24 +330,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only an admin can add other problem group admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the role
-        try {
-            GroupRolesDAO::save($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -424,7 +408,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Removes an admin from a contest
+     * Removes an admin from a problem
      *
      * @param Request $r
      * @return array
@@ -435,7 +419,7 @@ class ProblemController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        // Check whether problem exists
+        // Check problem_alias
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
@@ -447,6 +431,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
@@ -456,18 +441,7 @@ class ProblemController extends Controller {
             throw new NotFoundException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            UserRolesDAO::delete($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -484,7 +458,7 @@ class ProblemController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        // Check whether problem exists
+        // Check problem_alias
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
@@ -500,22 +474,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            GroupRolesDAO::delete($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -591,12 +555,11 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
-        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getProblemAdmins($problem),
+            'group_admins' => GroupRolesDAO::getProblemAdmins($problem)
+        ];
     }
 
     /**

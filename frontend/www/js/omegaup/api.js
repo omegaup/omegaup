@@ -173,11 +173,17 @@ export default {
   },
 
   Course: {
+    addAdmin: _call('/api/course/addAdmin/'),
+
+    addGroupAdmin: _call('/api/course/addGroupAdmin/'),
+
     addProblem: _call('/api/course/addProblem/'),
 
     addStudent: _call('/api/course/addStudent/'),
 
     adminDetails: _call('/api/course/adminDetails/', _convertTimes),
+
+    admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
 
@@ -227,7 +233,11 @@ export default {
 
     listStudents: _call('/api/course/listStudents/'),
 
+    removeAdmin: _call('/api/course/removeAdmin/'),
+
     removeAssignment: _call('/api/course/removeAssignment/'),
+
+    removeGroupAdmin: _call('/api/course/removeGroupAdmin/'),
 
     removeProblem: _call('/api/course/removeProblem/'),
 
