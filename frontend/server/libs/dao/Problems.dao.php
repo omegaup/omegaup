@@ -69,6 +69,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function byUserType(
         $user_type,
+        $filter,
         $order,
         $mode,
         $offset,
@@ -84,6 +85,16 @@ class ProblemsDAO extends ProblemsDAOBase {
         // Just in case.
         if ($mode !== 'asc' && $mode !== 'desc') {
             $mode = 'desc';
+        }
+
+        $join = '';
+        if ($filter !== 'all') {
+            $join = '
+                INNER JOIN
+                    Problems_Languages ON Problems_Languages.problem_id = p.problem_id
+                INNER JOIN
+                    Languages ON Problems_Languages.language_id = Languages.language_id
+                    AND Languages.name = \'' . $filter . '\'';
         }
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
@@ -114,7 +125,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id';
+                    ) ps ON ps.problem_id = p.problem_id' . $join;
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             if (!is_null($query)) {
@@ -160,7 +171,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gu.group_id
                     WHERE gu.user_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id';
+                ) gr ON p.acl_id = gr.acl_id' . $join;
             $args[] = $user_id;
             $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
@@ -187,7 +198,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         p.*';
             $sql = '
                     FROM
-                        Problems p';
+                        Problems p' . $join;
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= ' p.visibility >= ? ';
@@ -217,7 +228,6 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql .= ' LIMIT ?, ?';
         $args[] = $offset;
         $args[] = $rowcount;
-
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.

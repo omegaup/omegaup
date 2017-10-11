@@ -748,6 +748,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsExtraWallTime: "(Ex7ra 7im3 f0r 1ibin73rac7iv3)",
 	wordsExtraWallTimeMs: "(Ex7ra 7im3 f0r 1ibin73rac7iv3 (m5))",
 	wordsFeedback: "(F33dback)",
+	wordsFilterByLanguage: "(Fi173r by 1anguag3)",
 	wordsGender: "(G3nd3r)",
 	wordsGenderDecline: "(Pr3f3r n07 70 5ay)",
 	wordsGenderFemale: "(F3ma13)",

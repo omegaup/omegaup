@@ -748,6 +748,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsExtraWallTime: "Extra time for libinteractive",
 	wordsExtraWallTimeMs: "Extra time for libinteractive (ms)",
 	wordsFeedback: "Feedback",
+	wordsFilterByLanguage: "Filter by language",
 	wordsGender: "Gender",
 	wordsGenderDecline: "Prefer not to say",
 	wordsGenderFemale: "Female",
