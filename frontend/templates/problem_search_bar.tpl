@@ -17,11 +17,11 @@
 
 			<div class="form-group">
 				<label class="control-label" for="mode">{#wordsFilterByLanguage#}</label>
-				<select class="form-control" id="problem-search-language" name="filter_by">
-					<option {if $FILTER_BY == 'all'} selected="selected"{/if} value="all">{#wordsAll#}</option>
-					<option {if $FILTER_BY == 'es'}	selected="selected"{/if} value="es">{#wordsSpanish#}</option>
-					<option {if $FILTER_BY == 'en'}	selected="selected"{/if} value="en">{#wordsEnglish#}</option>
-					<option {if $FILTER_BY == 'pt'}	selected="selected"{/if} value="pt">{#wordsPortuguese#}</option>
+				<select class="form-control" id="problem-search-language" name="language">
+					<option {if $LANGUAGE == null} selected="selected"{/if} value="all">{#wordsAll#}</option>
+					<option {if $LANGUAGE == 'es'}	selected="selected"{/if} value="es">{#wordsSpanish#}</option>
+					<option {if $LANGUAGE == 'en'}	selected="selected"{/if} value="en">{#wordsEnglish#}</option>
+					<option {if $LANGUAGE == 'pt'}	selected="selected"{/if} value="pt">{#wordsPortuguese#}</option>
 				</select>
 			</div>
 

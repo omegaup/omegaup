@@ -1612,11 +1612,11 @@ class ProblemController extends Controller {
         self::validateList($r);
 
         // Filter results
-        $filter = 'all'; // Filter by language, all by default.
-        $filter_options = ['all', 'en', 'es', 'pt'];
-        // "filret_by" may be one of the allowed options, otherwise the default filter will be used.
-        if (!is_null($r['filter_by']) && in_array($r['filter_by'], $filter_options)) {
-            $filter = $r['filter_by'];
+        $language = null; // Filter by language, all by default.
+        $valid_languages = ['en', 'es', 'pt'];
+        // "language" may be one of the allowed options, otherwise the default filter will be used.
+        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+            $language = $r['language'];
         }
 
         // Sort results
@@ -1675,7 +1675,7 @@ class ProblemController extends Controller {
         $total = 0;
         $response['results'] = ProblemsDAO::byUserType(
             $user_type,
-            $filter,
+            $language,
             $order,
             $mode,
             $offset,
