@@ -186,11 +186,6 @@ try {
 }
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
-if (defined('IS_TEST') && IS_TEST === true) {
-    $fecha = date('Y-m-d H:i:s');
-    define('DATE_TEST', $fecha);
-    $conn->EXECUTE('SET TIMESTAMP = UNIX_TIMESTAMP(\'' . DATE_TEST . '\')');
-}
 
 include('libs/third_party/smarty/libs/Smarty.class.php');
 $smarty = new Smarty();

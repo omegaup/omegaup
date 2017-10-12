@@ -335,8 +335,8 @@ class ContestListTest extends OmegaupTestCase {
         $currentContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'public' => 0,
-                'start_time' => Utils::GetPhpUnixTimestamp(DATE_TEST),
-                'finish_time' => (Utils::GetPhpUnixTimestamp(DATE_TEST) + (60 * 60 * 2)),
+                'start_time' => TEST_TIMESTAMP,
+                'finish_time' => TEST_TIMESTAMP + (60 * 60 * 2),
             ]
         ));
         $futureContestData = ContestsFactory::createContest(new ContestParams(
@@ -381,8 +381,8 @@ class ContestListTest extends OmegaupTestCase {
             $contestData[$i] = ContestsFactory::createContest(new ContestParams(
                 [
                     'public' => $isPublic,
-                    'start_time' => Utils::GetPhpUnixTimestamp(DATE_TEST),
-                    'finish_time' => (Utils::GetPhpUnixTimestamp(DATE_TEST) + (60 * 60 * 2)),
+                    'start_time' => TEST_TIMESTAMP,
+                    'finish_time' => TEST_TIMESTAMP + (60 * 60 * 2),
                 ]
             ));
         }
