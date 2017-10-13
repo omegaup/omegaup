@@ -436,14 +436,14 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.Contest.removeGroupAdmin({
-                                                             contest_alias:
-                                                                 contestAlias,
-                                                             group: alias,
-                                                           })
+                                        omegaup.API.Contest
+                                            .removeGroupAdminFromContest({
+                                              contest_alias: contestAlias,
+                                              group: alias,
+                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
+                                                  omegaup.T.groupAdminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -480,7 +480,7 @@ omegaup.OmegaUp.on('ready', function() {
                              group: $('#groupalias-admin').val(),
                            })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              omegaup.UI.success(omegaup.T.groupAdminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
             })

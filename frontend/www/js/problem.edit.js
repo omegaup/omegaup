@@ -64,7 +64,7 @@ omegaup.OmegaUp.on('ready', function() {
                              group: $('#groupalias-admin').attr('data-alias'),
                            })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              omegaup.UI.success(omegaup.T.groupAdminAdded);
               $('div.post.footer').show();
 
               refreshProblemAdmins();
@@ -162,7 +162,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
+                                                  omegaup.T.groupAdminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
