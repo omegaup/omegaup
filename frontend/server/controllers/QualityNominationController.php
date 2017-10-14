@@ -454,6 +454,11 @@ class QualityNominationController extends Controller {
         return $response;
     }
 
+    /**
+     * This function aggregates users' suggestions to generate difficulty,
+     * quality and subject tags for each problem in the platform.
+     * This function is to be called (only) by a cronjob.
+     */
     public static function apiAggreateFeedback(Request $r) {
         $filter = new QualityNominations([
             'nomination' => 'suggestion',
@@ -476,6 +481,10 @@ class QualityNominationController extends Controller {
         }
     }
 
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
     public static function mapFeedbackRows($allNominations) {
         $table = [];
         $globalQualitySum = 0;
@@ -538,6 +547,10 @@ class QualityNominationController extends Controller {
         return null;
     }
 
+    /**
+     * Algorithm that computes the list of tags to be assigned to a problem
+     * based on the number of votes each tag got for each problem.
+     */
     public static function mostVotedTags($tags, $threshold) {
         if (array_sum($tags) < 5) {
             return [];

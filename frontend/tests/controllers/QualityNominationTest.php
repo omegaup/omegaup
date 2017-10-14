@@ -570,10 +570,10 @@ class QualityNominationTest extends OmegaupTestCase {
         $filter = new QualityNominations([
             'nomination' => 'suggestion',
         ]);
-        /*$allNominations = QualityNominationsDAO::search($filter);
+        $allNominations = QualityNominationsDAO::search($filter);
         foreach ($allNominations as $nomination) {
             QualityNominationsDAO::delete($nomination);
-        }*/
+        }
 
         // Setup synthetic data.
         $login = [];
