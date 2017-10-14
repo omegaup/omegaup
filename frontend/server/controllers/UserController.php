@@ -926,8 +926,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'ROOP-17' => 30,
-                'ROOS-17' => 30,
+                'OMIROO-18' => 500,
+                'ROOP-18' => 300,
+                'ROOS-18' => 300,
             ];
         } else {
             throw new InvalidParameterException(
