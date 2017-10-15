@@ -115,7 +115,7 @@ class Clarifications extends VO {
     public $problemset_id;
 
     /**
-      * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario.
+      * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
       * @access public
       * @var tinyint(1)
       */

@@ -198,10 +198,10 @@ abstract class RunCountsDAOBase extends DAO {
      */
     final private static function create(RunCounts $Run_Counts) {
         if (is_null($Run_Counts->total)) {
-            $Run_Counts->total = 0;
+            $Run_Counts->total = '0';
         }
         if (is_null($Run_Counts->ac_count)) {
-            $Run_Counts->ac_count = 0;
+            $Run_Counts->ac_count = '0';
         }
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [

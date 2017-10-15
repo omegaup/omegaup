@@ -205,7 +205,7 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
             $Problemset_Problems->points = '1';
         }
         if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order =  '1';
+            $Problemset_Problems->order = '1';
         }
         $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `points`, `order`) VALUES (?, ?, ?, ?);';
         $params = [

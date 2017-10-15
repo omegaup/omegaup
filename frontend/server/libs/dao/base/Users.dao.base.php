@@ -307,10 +307,10 @@ abstract class UsersDAOBase extends DAO {
             $Users->last_access = gmdate('Y-m-d H:i:s');
         }
         if (is_null($Users->verified)) {
-            $Users->verified = false;
+            $Users->verified = '0';
         }
         if (is_null($Users->in_mailing_list)) {
-            $Users->in_mailing_list = false;
+            $Users->in_mailing_list = '0';
         }
         $sql = 'INSERT INTO Users (`user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `gender`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin`, `in_mailing_list`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
