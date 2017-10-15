@@ -8,9 +8,7 @@
         'grader-error grader-ok grader-warning grader-unknown');
     graderCount.html("<img src='/media/waitcircle.gif' />");
     var html = '<li><a href="/arena/admin/">' +
-               omegaup.T.wordsLatestSubmissions + '</a></li>' +
-               '<li><a href="/api/problem/setLanguage">' +
-               'Llenar tabla de Problems_Languages</a></li>';
+               omegaup.T.wordsLatestSubmissions + '</a></li>';
     omegaup.API.Grader.status()
         .then(function(stats) {
           var graderInfo = stats.grader;

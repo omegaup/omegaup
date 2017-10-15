@@ -222,7 +222,7 @@ class ProblemController extends Controller {
         $result['status'] = 'ok';
         $result['alias'] = $r['alias'];
 
-        self::apiSetLanguage($r, $problem);
+        self::setLanguage($problem);
 
         return $result;
     }
@@ -751,6 +751,8 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
+        self::setLanguage($problem);
+
         // All clear
         $response['status'] = 'ok';
 
@@ -819,6 +821,9 @@ class ProblemController extends Controller {
         } finally {
             $problemDeployer->cleanup();
         }
+
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        self::setLanguage($problem);
 
         // All clear
         $response['status'] = 'ok';
@@ -1802,43 +1807,23 @@ class ProblemController extends Controller {
      * @return Array
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiSetLanguage(Request $r, Problems $problem = null) {
-        // Authenticate request
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing, we allow unauthenticated users to use this API
-        }
-
+    private static function setLanguage(Problems $problem) {
         try {
             ProblemsLanguagesDAO::transBegin();
-            if (!is_null($problem)) {
-                $languages = LanguagesDAO::getAll();
-                foreach ($languages as $lang) {
-                    if (file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
-                        $problem_language = new ProblemsLanguages();
-                        $problem_language->problem_id = $problem->problem_id;
-                        $problem_language->language_id = $lang->language_id;
-                        $problem_language->translator_id = 1; // omegaUp admin problem_id
 
-                        ProblemsLanguagesDAO::save($problem_language);
-                    }
+            $languages = LanguagesDAO::getAll();
+
+            foreach ($languages as $lang) {
+                $problem_language = new ProblemsLanguages();
+                $problem_language->problem_id = $problem->problem_id;
+                $problem_language->language_id = $lang->language_id;
+                // Removing existing data
+                $problem_languages = ProblemsLanguagesDAO::search($problem_language);
+                if (count($problem_languages)) {
+                    ProblemsLanguagesDAO::delete($problem_language);
                 }
-            } else {
-                $all_problems = ProblemsDAO::getAll();
-                $languages = LanguagesDAO::getAll();
-
-                foreach ($all_problems as $index => $data) {
-                    foreach ($languages as $lang) {
-                        if (file_exists(self::getSourcePath($data->alias, $lang->name, 'markdown'))) {
-                            $problem_language = new ProblemsLanguages();
-                            $problem_language->problem_id = $data->problem_id;
-                            $problem_language->language_id = $lang->language_id;
-                            $problem_language->translator_id = 1; // omegaUp admin
-
-                            ProblemsLanguagesDAO::save($problem_language);
-                        }
-                    }
+                if (file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
+                    ProblemsLanguagesDAO::save($problem_language);
                 }
             }
             ProblemsLanguagesDAO::transEnd();

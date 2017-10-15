@@ -490,11 +490,9 @@ CREATE TABLE IF NOT EXISTS `Problems_Badges` (
 CREATE TABLE IF NOT EXISTS `Problems_Languages` (
   `problem_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
-  `translator_id` int(11) NOT NULL,
   PRIMARY KEY (`problem_id`,`language_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `language_id` (`language_id`),
-  KEY `translator_id` (`translator_id`)
+  KEY `language_id` (`language_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
 
 -- --------------------------------------------------------
@@ -1019,8 +1017,7 @@ ALTER TABLE `Problems_Badges`
 --
 ALTER TABLE `Problems_Languages`
   ADD CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_pl_translator_id` FOREIGN KEY (`translator_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problemset_User_Request`
