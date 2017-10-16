@@ -207,6 +207,10 @@ class ContestController extends Controller {
             $addedContests[] = $contestInfo;
         }
 
+        // Expire contest-list cache
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+
         return [
             'status' => 'ok',
             'contests' => $addedContests,
