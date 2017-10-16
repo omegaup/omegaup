@@ -12,25 +12,26 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', 'Problem Language');
 
         // Update statement
-        $statement = 'This is the new statement';
         $login = self::login($problemData['author']);
 
-        $problem_language = new ProblemsLanguages();
-        $problem_language->problem_id = $problemData['problem']->problem_id;
-        $problem_languages = ProblemsLanguagesDAO::search($problem_language);
+        $problem_languages = ProblemsLanguagesDAO::search([
+            'problem_id' => $problemData['problem']->problem_id,
+        ]);
         // This problem only has one language in this point
         $this->assertEquals(1, count($problem_languages));
 
-        $response = ProblemController::apiUpdateStatement(new Request([
+        ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'New statement is now more fun',
-            'statement' => $statement,
+            'statement' => 'This is the new statement',
             'lang' => 'en'
         ]));
 
         // The problem has two languages in this point
-        $problem_languages = ProblemsLanguagesDAO::search($problem_language);
+        $problem_languages = ProblemsLanguagesDAO::search([
+            'problem_id' => $problemData['problem']->problem_id,
+        ]);
         $this->assertEquals(2, count($problem_languages));
     }
 

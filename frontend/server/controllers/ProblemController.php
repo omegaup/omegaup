@@ -222,7 +222,7 @@ class ProblemController extends Controller {
         $result['status'] = 'ok';
         $result['alias'] = $r['alias'];
 
-        self::setLanguage($problem);
+        self::updateLanguages($problem);
 
         return $result;
     }
@@ -751,7 +751,7 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
-        self::setLanguage($problem);
+        self::updateLanguages($problem);
 
         // All clear
         $response['status'] = 'ok';
@@ -823,7 +823,7 @@ class ProblemController extends Controller {
         }
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        self::setLanguage($problem);
+        self::updateLanguages($problem);
 
         // All clear
         $response['status'] = 'ok';
@@ -1807,24 +1807,25 @@ class ProblemController extends Controller {
      * @return Array
      * @throws InvalidDatabaseOperationException
      */
-    private static function setLanguage(Problems $problem) {
+    private static function updateLanguages(Problems $problem) {
         try {
             ProblemsLanguagesDAO::transBegin();
 
             $languages = LanguagesDAO::getAll();
 
+            // Removing existing data
+            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
+                'problem_id' => $problem->problem_id,
+            ]));
+
             foreach ($languages as $lang) {
-                $problem_language = new ProblemsLanguages();
-                $problem_language->problem_id = $problem->problem_id;
-                $problem_language->language_id = $lang->language_id;
-                // Removing existing data
-                $problem_languages = ProblemsLanguagesDAO::search($problem_language);
-                if (count($problem_languages)) {
-                    ProblemsLanguagesDAO::delete($problem_language);
+                if (!file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
+                    continue;
                 }
-                if (file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
-                    ProblemsLanguagesDAO::save($problem_language);
-                }
+                ProblemsLanguagesDAO::save(new ProblemsLanguages([
+                    'problem_id' => $problem->problem_id,
+                    'language_id' => $lang->language_id,
+                ]));
             }
             ProblemsLanguagesDAO::transEnd();
         } catch (ApiException $e) {
