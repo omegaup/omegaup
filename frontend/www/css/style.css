@@ -533,18 +533,24 @@ th.contains-long-desc{ min-width:369px; }
 	margin-bottom: 10px;
 }
 
+.search-bar #problem-search-language {
+	width: 100px;
+	margin-left: 2px;
+}
+
 .search-bar #problem-search-order {
-	width: 200px;
-	margin-left: 10px;
+	width: 160px;
+	margin-left: 2px;
 }
 
 .search-bar #problem-search-mode {
-	width: 150px;
-	margin-left: 10px;
+	width: 120px;
+	margin-left: 2px;
 }
 
 .search-bar #problem-search-button {
 	height: 32px;
+	margin-left: 5px;
 }
 
 table.problem-list td {

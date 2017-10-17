@@ -106,6 +106,7 @@ class Utils {
             'Groups_Users',
             'Interviews',
             'Problems',
+            'Problems_Languages',
             'Problems_Tags',
             'Problemset_Access_Log',
             'Problemset_Problem_Opened',

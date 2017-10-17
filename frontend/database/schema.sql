@@ -41,7 +41,7 @@ CREATE TABLE `Assignments` (
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
-  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
+  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparici�n de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
@@ -83,7 +83,7 @@ CREATE TABLE `Clarifications` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `problem_id` int(11) DEFAULT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.',
   `problemset_id` int(11) NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.',
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
   KEY `author_id` (`author_id`),
@@ -390,14 +390,11 @@ CREATE TABLE `Problems_Badges` (
 CREATE TABLE `Problems_Languages` (
   `problem_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
-  `translator_id` int(11) NOT NULL,
   PRIMARY KEY (`problem_id`,`language_id`),
   KEY `problem_id` (`problem_id`),
   KEY `language_id` (`language_id`),
-  KEY `translator_id` (`translator_id`),
   CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pl_translator_id` FOREIGN KEY (`translator_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -729,6 +726,7 @@ CREATE TABLE `User_Roles` (
   PRIMARY KEY (`user_id`,`role_id`,`acl_id`),
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
+  KEY `contest_id` (`acl_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
