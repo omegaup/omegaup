@@ -15,9 +15,9 @@ import database_utils
 import hook_tools.git_tools as git_tools
 
 
-def _expected_database_schema(auth):
+def _expected_database_schema(*, dbname='omegaup', auth=None):
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
-    schema = database_utils.mysqldump(dbname='omegaup', auth=auth)
+    schema = database_utils.mysqldump(dbname=dbname, auth=auth)
     return re.sub(r'AUTO_INCREMENT=\d+\s+', '', schema)
 
 
@@ -31,6 +31,8 @@ def main():
                     '--mysql-config-file',
                     default=database_utils.default_config_file(),
                     help='.my.cnf file that stores credentials'),
+                git_tools.Argument(
+                    '--database', default='omegaup', help='MySQL database'),
                 git_tools.Argument(
                     '--username', default='root', help='MySQL root username'),
                 git_tools.Argument(
@@ -53,7 +55,7 @@ def main():
                                          username=args.username,
                                          password=args.password)
     root = git_tools.root_dir()
-    expected = _expected_database_schema(auth)
+    expected = _expected_database_schema(dbname=args.database, auth=auth)
     actual = git_tools.file_contents(
             args, root, 'frontend/database/schema.sql').decode('utf-8')
 
