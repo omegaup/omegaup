@@ -5,6 +5,8 @@
 
 from __future__ import print_function
 
+import base64
+import gzip
 import logging
 import os.path
 import re
@@ -58,6 +60,8 @@ def main():
     expected = _expected_database_schema(dbname=args.database, auth=auth)
     actual = git_tools.file_contents(
             args, root, 'frontend/database/schema.sql').decode('utf-8')
+
+    print(base64.b64encode(gzip.compress(expected.encode('utf-8'))))
 
     if expected.strip() != actual.strip():
         if validate_only:
