@@ -18,9 +18,9 @@ require_once('base/Problems_Languages.vo.base.php');
   *
   */
 class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
-    final public static function deleteProblemLanguages(ProblemsLanguages $Problems_Languages) {
+    final public static function deleteProblemLanguages(ProblemsLanguages $problems_languages) {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ?;';
-        $params = [$Problems_Languages->problem_id];
+        $params = [$problems_languages->problem_id];
         global $conn;
 
         $conn->Execute($sql, $params);
