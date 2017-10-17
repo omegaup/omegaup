@@ -218,10 +218,10 @@ abstract class UserRankDAOBase extends DAO {
      */
     final private static function create(UserRank $User_Rank) {
         if (is_null($User_Rank->problems_solved_count)) {
-            $User_Rank->problems_solved_count = 0;
+            $User_Rank->problems_solved_count = '0';
         }
         if (is_null($User_Rank->score)) {
-            $User_Rank->score = 0;
+            $User_Rank->score = '0';
         }
         $sql = 'INSERT INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`) VALUES (?, ?, ?, ?, ?, ?, ?);';
         $params = [

@@ -77,7 +77,7 @@ class ProblemsetProblems extends VO {
     /**
       * Define el orden de aparición de los problemas en una lista de problemas
       * @access public
-      * @var int
+      * @var int(11)
       */
     public $order;
 }

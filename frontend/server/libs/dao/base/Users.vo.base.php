@@ -232,14 +232,14 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $verified;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(
+      * @var varchar(50)
       */
     public $verification_id;
 
@@ -267,7 +267,7 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $in_mailing_list;
 }

@@ -41,7 +41,7 @@ CREATE TABLE `Assignments` (
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
-  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparici�n de los problemas/tareas',
+  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
@@ -83,7 +83,7 @@ CREATE TABLE `Clarifications` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `problem_id` int(11) DEFAULT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.',
   `problemset_id` int(11) NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
   KEY `author_id` (`author_id`),
@@ -462,12 +462,12 @@ CREATE TABLE `Problemset_User_Request` (
   `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_update` timestamp NULL DEFAULT NULL,
   `accepted` tinyint(1) DEFAULT NULL,
-  `extra_note` text,
+  `extra_note` mediumtext,
   PRIMARY KEY (`user_id`,`problemset_id`),
   KEY `fk_purp_problemset_id` (`problemset_id`),
   CONSTRAINT `fk_purp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_puru_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used when contestant_must_register = 1';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -483,7 +483,7 @@ CREATE TABLE `Problemset_User_Request_History` (
   KEY `fk_purhp_problemset_id` (`problemset_id`),
   CONSTRAINT `fk_purhp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_purhu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -726,7 +726,6 @@ CREATE TABLE `User_Roles` (
   PRIMARY KEY (`user_id`,`role_id`,`acl_id`),
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
-  KEY `contest_id` (`acl_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
