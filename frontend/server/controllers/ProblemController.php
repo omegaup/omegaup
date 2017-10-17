@@ -1801,8 +1801,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets all the problems and save language data
-     * into the DB
+     * Save language data for a problem.
      * @param Request $r
      * @return Array
      * @throws InvalidDatabaseOperationException
@@ -1811,14 +1810,12 @@ class ProblemController extends Controller {
         try {
             ProblemsLanguagesDAO::transBegin();
 
-            $languages = LanguagesDAO::getAll();
-
             // Removing existing data
             $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
                 'problem_id' => $problem->problem_id,
             ]));
 
-            foreach ($languages as $lang) {
+            foreach (LanguagesDAO::getAll() as $lang) {
                 if (!file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
                     continue;
                 }
@@ -1833,6 +1830,5 @@ class ProblemController extends Controller {
             ProblemsLanguagesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
-        return ['status' => 'ok'];
     }
 }
