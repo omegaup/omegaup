@@ -390,14 +390,11 @@ CREATE TABLE `Problems_Badges` (
 CREATE TABLE `Problems_Languages` (
   `problem_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
-  `translator_id` int(11) NOT NULL,
   PRIMARY KEY (`problem_id`,`language_id`),
   KEY `problem_id` (`problem_id`),
   KEY `language_id` (`language_id`),
-  KEY `translator_id` (`translator_id`),
   CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pl_translator_id` FOREIGN KEY (`translator_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

@@ -222,6 +222,8 @@ class ProblemController extends Controller {
         $result['status'] = 'ok';
         $result['alias'] = $r['alias'];
 
+        self::updateLanguages($problem);
+
         return $result;
     }
 
@@ -749,6 +751,8 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
+        self::updateLanguages($problem);
+
         // All clear
         $response['status'] = 'ok';
 
@@ -817,6 +821,9 @@ class ProblemController extends Controller {
         } finally {
             $problemDeployer->cleanup();
         }
+
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        self::updateLanguages($problem);
 
         // All clear
         $response['status'] = 'ok';
@@ -1574,6 +1581,14 @@ class ProblemController extends Controller {
 
         self::validateList($r);
 
+        // Filter results
+        $language = null; // Filter by language, all by default.
+        $valid_languages = ['en', 'es', 'pt'];
+        // "language" may be one of the allowed options, otherwise the default filter will be used.
+        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+            $language = $r['language'];
+        }
+
         // Sort results
         $order = 'problem_id'; // Order by problem_id by default.
         $sorting_options = ['title', 'submissions', 'accepted', 'ratio', 'points', 'score'];
@@ -1630,6 +1645,7 @@ class ProblemController extends Controller {
         $total = 0;
         $response['results'] = ProblemsDAO::byUserType(
             $user_type,
+            $language,
             $order,
             $mode,
             $offset,
@@ -1791,5 +1807,37 @@ class ProblemController extends Controller {
         }
 
         return $score;
+    }
+
+    /**
+     * Save language data for a problem.
+     * @param Request $r
+     * @return Array
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function updateLanguages(Problems $problem) {
+        try {
+            ProblemsLanguagesDAO::transBegin();
+
+            // Removing existing data
+            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
+                'problem_id' => $problem->problem_id,
+            ]));
+
+            foreach (LanguagesDAO::getAll() as $lang) {
+                if (!file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
+                    continue;
+                }
+                ProblemsLanguagesDAO::save(new ProblemsLanguages([
+                    'problem_id' => $problem->problem_id,
+                    'language_id' => $lang->language_id,
+                ]));
+            }
+            ProblemsLanguagesDAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in something we know it could fail, rollback transaction
+            ProblemsLanguagesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
     }
 }
