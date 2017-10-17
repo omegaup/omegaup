@@ -20,7 +20,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id`, `Problems_Languages`.`translator_id`';
+    const FIELDS = '`Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
         if (is_null($problem_id) || is_null($language_id)) {
             return null;
         }
-        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id`, `Problems_Languages`.`translator_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
         $params = [$problem_id, $language_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsLanguages}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id`, `Problems_Languages`.`translator_id` from Problems_Languages';
+        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` from Problems_Languages';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -135,10 +135,6 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
             $clauses[] = '`language_id` = ?';
             $params[] = $Problems_Languages->language_id;
         }
-        if (!is_null($Problems_Languages->translator_id)) {
-            $clauses[] = '`translator_id` = ?';
-            $params[] = $Problems_Languages->translator_id;
-        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -149,7 +145,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id`, `Problems_Languages`.`translator_id` FROM `Problems_Languages`';
+        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM `Problems_Languages`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -173,14 +169,6 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
       * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages a actualizar.
       */
     final private static function update(ProblemsLanguages $Problems_Languages) {
-        $sql = 'UPDATE `Problems_Languages` SET `translator_id` = ? WHERE `problem_id` = ? AND `language_id` = ?;';
-        $params = [
-            $Problems_Languages->translator_id,
-            $Problems_Languages->problem_id,$Problems_Languages->language_id,
-        ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
     }
 
     /**
@@ -196,11 +184,10 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
      * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages a crear.
      */
     final private static function create(ProblemsLanguages $Problems_Languages) {
-        $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`, `translator_id`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
         $params = [
             $Problems_Languages->problem_id,
             $Problems_Languages->language_id,
-            $Problems_Languages->translator_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -266,17 +253,6 @@ abstract class ProblemsLanguagesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`language_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Problems_LanguagesA->translator_id;
-        $b = $Problems_LanguagesB->translator_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`translator_id` >= ? AND `translator_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`translator_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
