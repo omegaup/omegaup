@@ -326,6 +326,80 @@ class ContestListTest extends OmegaupTestCase {
     }
 
     /**
+     * Test to set recommended value in two contests.
+     */
+    public function testRecommendedSContestsList() {
+        $r = new Request();
+
+        // Create 2 contests, with the not-recommended.finish_time > recommended.finish_time
+        $recommendedContest1 = ContestsFactory::createContest();
+        $recommendedContest2 = ContestsFactory::createContest();
+
+        // Get a user for our scenario
+        $contestant = UserFactory::createUser();
+
+        // Get list of contests
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
+        $response = ContestController::apiList($r);
+
+        // Check that two contests are not-recommended
+        foreach ($response['results'] as $contest) {
+            if ($contest['title'] == $recommendedContest1['request']['title']) {
+                $this->assertEquals(0, $contest['recommended']);
+                break;
+            }
+        }
+
+        foreach ($response['results'] as $contest) {
+            if ($contest['title'] == $recommendedContest2['request']['title']) {
+                $this->assertEquals(0, $contest['recommended']);
+                break;
+            }
+        }
+
+        // Turn recommended ON
+        $login = self::login(UserFactory::createAdminUser());
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $recommendedContest1['request']['alias'],
+            'value' => 1,
+        ]);
+        ContestController::apiSetRecommended($r);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $recommendedContest2['request']['alias'],
+            'value' => 1,
+        ]);
+        ContestController::apiSetRecommended($r);
+        unset($login);
+
+        // Get list of contests
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
+        $response = ContestController::apiList($r);
+
+        // Check that two contests are recommended
+        foreach ($response['results'] as $contest) {
+            if ($contest['title'] == $recommendedContest1['request']['title']) {
+                $this->assertEquals(1, $contest['recommended']);
+                break;
+            }
+        }
+
+        foreach ($response['results'] as $contest) {
+            if ($contest['title'] == $recommendedContest2['request']['title']) {
+                $this->assertEquals(1, $contest['recommended']);
+                break;
+            }
+        }
+    }
+
+    /**
      * Basic test. Check that only the first contest is on the list
      */
     public function testShowOnlyCurrentContests() {
