@@ -1581,6 +1581,14 @@ class ProblemController extends Controller {
 
         self::validateList($r);
 
+        // Filter results
+        $language = null; // Filter by language, all by default.
+        $valid_languages = ['en', 'es', 'pt'];
+        // "language" may be one of the allowed options, otherwise the default filter will be used.
+        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+            $language = $r['language'];
+        }
+
         // Sort results
         $order = 'problem_id'; // Order by problem_id by default.
         $sorting_options = ['title', 'submissions', 'accepted', 'ratio', 'points', 'score'];
@@ -1637,6 +1645,7 @@ class ProblemController extends Controller {
         $total = 0;
         $response['results'] = ProblemsDAO::byUserType(
             $user_type,
+            $language,
             $order,
             $mode,
             $offset,
