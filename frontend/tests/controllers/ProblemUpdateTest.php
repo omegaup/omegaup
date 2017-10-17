@@ -17,7 +17,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problem_languages = ProblemsLanguagesDAO::search([
             'problem_id' => $problemData['problem']->problem_id,
         ]);
-        // This problem only has one language in this point
+        // This problem only has one language at this point
         $this->assertEquals(1, count($problem_languages));
 
         ProblemController::apiUpdateStatement(new Request([
@@ -28,7 +28,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'lang' => 'en'
         ]));
 
-        // The problem has two languages in this point
+        // The problem has two languages at this point
         $problem_languages = ProblemsLanguagesDAO::search([
             'problem_id' => $problemData['problem']->problem_id,
         ]);
