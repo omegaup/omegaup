@@ -85,6 +85,9 @@ script:
          phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
          frontend/tests/phpunit.xml frontend/tests/controllers
   - |
+      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
+         python3 stuff/database_schema.py validate --all < /dev/null
+  - |
       ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || (yarn install && yarn build && yarn test)
   - |
       ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
