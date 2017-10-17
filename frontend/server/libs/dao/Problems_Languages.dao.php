@@ -19,9 +19,6 @@ require_once('base/Problems_Languages.vo.base.php');
   */
 class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
     final public static function deleteProblemLanguages(ProblemsLanguages $Problems_Languages) {
-        if (is_null(self::search($Problems_Languages->problem_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ?;';
         $params = [$Problems_Languages->problem_id];
         global $conn;
