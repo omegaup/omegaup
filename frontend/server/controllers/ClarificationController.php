@@ -68,7 +68,7 @@ class ClarificationController extends Controller {
 
         $response = [];
 
-        $time = time();
+        $time = Utils::GetPhpUnixTimestamp();
         $r['clarification'] = new Clarifications([
             'author_id' => $r['current_user_id'],
             'problemset_id' => $r['contest']->problemset_id,
@@ -199,7 +199,7 @@ class ClarificationController extends Controller {
         $r['clarification'] = $clarification;
 
         // Let DB handle time update
-        $time = time();
+        $time = Utils::GetPhpUnixTimestamp();
         $clarification->time = gmdate('Y-m-d H:i:s', $time);
 
         // Save the clarification

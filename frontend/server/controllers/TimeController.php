@@ -16,7 +16,7 @@ class TimeController extends Controller {
      */
     public static function apiGet(Request $r = null) {
         $response = [];
-        $response['time'] = time();
+        $response['time'] = Utils::GetPhpUnixTimestamp();
         $response['status'] = 'ok';
 
         return $response;

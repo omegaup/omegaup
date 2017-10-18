@@ -124,7 +124,7 @@ class SchoolController extends Controller {
         $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
 
         if (is_null($r['start_time'])) {
-            $r['start_time'] = date('Y-m-01');
+            $r['start_time'] = date('Y-m-01', Utils::GetPhpUnixTimestamp());
         } else {
             $r['start_time'] = gmdate('Y-m-d', $r['start_time']);
         }

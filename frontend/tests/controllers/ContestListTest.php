@@ -44,6 +44,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 50
         ]);
         $response = ContestController::apiList($r);
 
@@ -60,12 +61,10 @@ class ContestListTest extends OmegaupTestCase {
      * Basic test. Check that most recent contest is at the top of the list
      */
     public function testLatestPublicContestNotLoggedIn() {
-        $r = new Request();
-
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
-        $response = ContestController::apiList($r);
+        $response = ContestController::apiList(new Request(['page_size' => 50]));
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
@@ -139,6 +138,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login(UserFactory::createAdminUser());
         $r = new Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 50
         ]);
         $response = ContestController::apiList($r);
 

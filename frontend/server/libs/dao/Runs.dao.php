@@ -326,7 +326,7 @@ class RunsDAO extends RunsDAOBase {
         }
 
         $run = new Runs($rs);
-        return [$run, time() - strtotime($run->time)];
+        return [$run, Utils::GetPhpUnixTimestamp() - strtotime($run->time)];
     }
 
     /*
@@ -562,7 +562,7 @@ class RunsDAO extends RunsDAOBase {
             );
         }
 
-        return time() >= (strtotime($lastrun->time) + $submission_gap);
+        return Utils::GetPhpUnixTimestamp() >= (strtotime($lastrun->time) + $submission_gap);
     }
 
     public static function GetRunCountsToDate($date) {

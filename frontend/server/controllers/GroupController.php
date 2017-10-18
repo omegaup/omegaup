@@ -287,7 +287,7 @@ class GroupController extends Controller {
                 'name' => $r['name'],
                 'description' =>$r['description'],
                 'alias' => $r['alias'],
-                'create_time' => gmdate('Y-m-d H:i:s', time())
+                'create_time' => gmdate('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp())
             ]);
 
             GroupsScoreboardsDAO::save($groupScoreboard);

@@ -119,7 +119,7 @@ class RunController extends Controller {
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
                       Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
-                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
+                      Utils::GetPhpUnixTimestamp() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
                         null,
                         null,
@@ -276,7 +276,7 @@ class RunController extends Controller {
 
             if (!is_null($start)) {
                 //ok, what time is it now?
-                $c_time = time();
+                $c_time = Utils::GetPhpUnixTimestamp();
                 $start = strtotime($start);
 
                 //asuming submit_delay is in minutes
@@ -301,6 +301,7 @@ class RunController extends Controller {
                     'memory' => 0,
                     'score' => 0,
                     'contest_score' => $problemset_id != null ? 0 : null,
+                    'time' => gmdate('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp()),
                     'submit_delay' => $submit_delay, /* based on penalty_type */
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',

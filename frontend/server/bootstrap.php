@@ -74,6 +74,7 @@ require_once('libs/third_party/Mailchimp/Mailchimp.php');
 require_once('libs/third_party/ZipStream.php');
 require_once('libs/third_party/phpmailer/class.phpmailer.php');
 require_once('libs/third_party/phpmailer/class.smtp.php');
+require_once(OMEGAUP_ROOT . '/tests/common/Utils.php');
 
 /*
  * Configurar log4php
