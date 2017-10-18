@@ -10,6 +10,7 @@ import subprocess
 
 
 _MYSQL_BINARY = '/usr/bin/mysql'
+_MYSQLDUMP_BINARY = '/usr/bin/mysqldump'
 
 
 def quote(s):
@@ -46,4 +47,14 @@ def mysql(query, *, dbname=None, auth=None):
         args.append(dbname)
     args.append('-NBe')
     args.append(query)
+    return subprocess.check_output(args, universal_newlines=True)
+
+
+def mysqldump(*, dbname=None, auth=None):
+    '''Runs the mysqldump commandline tool.'''
+    args = [_MYSQLDUMP_BINARY] + auth
+    if dbname:
+        args.append(dbname)
+    args.extend(['--no-data', '--skip-comments', '--skip-opt',
+                 '--create-options', '--single-transaction', '--routines'])
     return subprocess.check_output(args, universal_newlines=True)
