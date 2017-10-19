@@ -353,7 +353,9 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         // Turn recommended ON
-        {
+        // phpcbf does not like a block just for scoping purposes and
+        // messes up the alignment pretty badly.
+        if (true) {
             $login = self::login(UserFactory::createAdminUser());
             for ($i = 0; $i < 2; $i++) {
                 ContestController::apiSetRecommended(new Request([
