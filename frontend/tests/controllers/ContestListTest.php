@@ -353,16 +353,19 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         // Turn recommended ON
-        $login = self::login(UserFactory::createAdminUser());
+        {
+            $login = self::login(UserFactory::createAdminUser());
         for ($i = 0; $i < 2; $i++) {
             ContestController::apiSetRecommended(new Request([
-                'auth_token' => $login->auth_token,
-                'contest_alias' => $recommendedContest[$i]['request']['alias'],
-                'value' => 1,
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $recommendedContest[$i]['request']['alias'],
+            'value' => 1,
             ]));
+        }
         }
 
         // Get list of contests
+        $login = self::login($contestant);
         $response = ContestController::apiList(new Request([
             'auth_token' => $login->auth_token,
         ]));
