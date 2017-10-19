@@ -67,6 +67,7 @@ require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
 require_once('libs/SessionManager.php');
+require_once('libs/Time.php');
 require_once('libs/UITools.php');
 require_once('libs/UrlHelper.php');
 require_once('libs/Validators.php');
@@ -74,7 +75,6 @@ require_once('libs/third_party/Mailchimp/Mailchimp.php');
 require_once('libs/third_party/ZipStream.php');
 require_once('libs/third_party/phpmailer/class.phpmailer.php');
 require_once('libs/third_party/phpmailer/class.smtp.php');
-require_once(OMEGAUP_ROOT . '/tests/common/Utils.php');
 
 /*
  * Configurar log4php

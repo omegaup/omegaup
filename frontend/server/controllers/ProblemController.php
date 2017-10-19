@@ -1253,7 +1253,7 @@ class ProblemController extends Controller {
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset_id,
                         'problem_id' => $r['problem']->problem_id,
-                        'open_time' => gmdate('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp()),
+                        'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'user_id' => $r['current_user_id']
                     ]));
                 } catch (Exception $e) {

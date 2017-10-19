@@ -1571,7 +1571,7 @@ class UserController extends Controller {
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= strtotime('-5 year', Utils::GetPhpUnixTimestamp())) {
+            if ($r['birth_date'] >= strtotime('-5 year', Time::get())) {
                 throw new InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
         }
@@ -1845,7 +1845,7 @@ class UserController extends Controller {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
-        return $newUsername . Utils::GetPhpUnixTimestamp();
+        return $newUsername . Time::get();
     }
 
     /**

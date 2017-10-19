@@ -38,10 +38,7 @@ class Utils {
 
     public static function GetPhpUnixTimestamp($time = null) {
         if (is_null($time)) {
-            if (!defined('IS_TEST') || IS_TEST !== true) {
-                return time();
-            }
-            return TEST_TIMESTAMP;
+            return Time::get();
         } else {
             return strtotime($time);
         }

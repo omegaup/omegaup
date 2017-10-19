@@ -41,13 +41,13 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      */
     public static function isLateSubmission($container) {
         return isset($container->finish_time) &&
-               (Utils::GetPhpUnixTimestamp() > strtotime($container->finish_time));
+               (Time::get() > strtotime($container->finish_time));
     }
 
     public static function insideSubmissionWindow($container, $user_id) {
         if (isset($container->finish_time)) {
-            if (Utils::GetPhpUnixTimestamp() > strtotime($container->finish_time) ||
-                Utils::GetPhpUnixTimestamp() < strtotime($container->start_time)) {
+            if (Time::get() > strtotime($container->finish_time) ||
+                Time::get() < strtotime($container->start_time)) {
                 return false;
             }
         }
@@ -62,6 +62,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
         );
         $first_access_time = $problemset_user->access_time;
 
-        return Utils::GetPhpUnixTimestamp() <= strtotime($first_access_time) + $container->window_length * 60;
+        return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }
 }

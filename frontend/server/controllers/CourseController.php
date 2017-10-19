@@ -544,7 +544,7 @@ class CourseController extends Controller {
             'status' => 'ok',
             'assignments' => [],
         ];
-        $time = Utils::GetPhpUnixTimestamp();
+        $time = Time::get();
         foreach ($assignments as $a) {
             $a->toUnixTime();
             if (!$isAdmin && $v['start_time'] > $time) {
@@ -1236,7 +1236,7 @@ class CourseController extends Controller {
             return;
         }
 
-        if ($r['assignment']->start_time > Utils::GetPhpUnixTimestamp() ||
+        if ($r['assignment']->start_time > Time::get() ||
             !GroupRolesDAO::isContestant($r['current_user_id'], $r['assignment']->acl_id)
         ) {
             throw new ForbiddenAccessException();
