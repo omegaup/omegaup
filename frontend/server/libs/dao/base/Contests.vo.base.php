@@ -29,11 +29,11 @@ class Contests extends VO {
         if (isset($data['contest_id'])) {
             $this->contest_id = $data['contest_id'];
         }
-        if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
-        }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = $data['problemset_id'];
+        }
+        if (isset($data['acl_id'])) {
+            $this->acl_id = $data['acl_id'];
         }
         if (isset($data['title'])) {
             $this->title = $data['title'];
@@ -127,18 +127,18 @@ class Contests extends VO {
     public $contest_id;
 
     /**
-      * La lista de control de acceso del concurso
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
-
-    /**
       * La lista de problemas de este concurso
       * @access public
       * @var int(11)
       */
     public $problemset_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $acl_id;
 
     /**
       * El titulo que aparecera en cada concurso
@@ -241,35 +241,35 @@ class Contests extends VO {
     /**
       * Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).
       * @access public
-      * @var enum('contest_start','problem_open',
+      * @var enum('contest_start','problem_open','runtime','none')
       */
     public $penalty_type;
 
     /**
       * Indica como afecta el penalty al score.
       * @access public
-      * @var enum('sum',
+      * @var enum('sum','max')
       */
     public $penalty_calc_policy;
 
     /**
-      * 'Mostrar el scoreboard automáticamente después del concurso
+      * Mostrar el scoreboard automáticamente después del concurso
       * @access public
-      * @var bool
+      * @var tinyint(1)
       */
     public $show_scoreboard_after;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(
+      * @var varchar(30)
       */
     public $scoreboard_url;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(
+      * @var varchar(30)
       */
     public $scoreboard_url_admin;
 
@@ -283,6 +283,7 @@ class Contests extends VO {
     /**
       * Indica que los participantes deben pre-registrarse antes de poder paticipar
       * @access public
+      * @var tinyint(1)
       */
     public $contestant_must_register;
 
@@ -294,9 +295,9 @@ class Contests extends VO {
     public $languages;
 
     /**
-      * 'Mostrar el concurso en la lista de recomendados.
+      * Mostrar el concurso en la lista de recomendados.
       * @access public
-      * @var bool
+      * @var tinyint(1)
       */
     public $recommended;
 }

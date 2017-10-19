@@ -20,52 +20,24 @@ automatically.
 
 import argparse
 import os.path
-import shlex
 import subprocess
 import sys
 
+import database_utils
 
-MYSQL_BINARY = '/usr/bin/mysql'
+
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _quote(s):
-  '''
-  Escapes the string |s| so it can be safely used in a shell command.
-  '''
-  if 'quote' in dir(shlex):
-    # This is unavailable in Python <3.3
-    return shlex.quote(s)
-  import pipes
-  return pipes.quote(s)
-
-
-def _mysql(args, mysql_args):
-  '''
-  Runs the MySQL commandline client with |mysql_args| as arguments.
-  '''
-  auth = []
-  if os.path.isfile(args.config_file):
-    auth.append('--defaults-extra-file=%s' % _quote(args.config_file))
-  else:
-    auth.append('--user=%s' % _quote(args.username))
-    if args.password:
-      auth.append('--password=%s' % _quote(args.password))
-  return subprocess.check_output(
-      [MYSQL_BINARY] + auth + mysql_args,
-      universal_newlines=True)
-
-
-def _revision(args):
+def _revision(args, auth):
   '''
   Returns the latest revision that has been applied to the database. Returns 0
   if no revision has been applied.
   '''
-  ensure(args)
-  return int(
-      _mysql(args,
-             ['_omegaup_metadata', '-NBe',
-               'SELECT COALESCE(MAX(id), 0) FROM `Revision`;']).strip())
+  ensure(args, auth)
+  return int(database_utils.mysql(
+        'SELECT COALESCE(MAX(id), 0) FROM `Revision`;',
+        dbname='_omegaup_metadata', auth=auth).strip())
 
 
 def _scripts(args):
@@ -87,34 +59,36 @@ def _scripts(args):
   return scripts
 
 
-def exists(args):
+def exists(args, auth):
   '''
   A helper command for puppet. Exits with 1 (error) if the metadata database
   has not been installed.
   '''
-  if not _mysql(args, ['-NBe', 'SHOW DATABASES LIKE "_omegaup_metadata";']):
+  if not database_utils.mysql('SHOW DATABASES LIKE "_omegaup_metadata";',
+                              auth=auth):
     sys.exit(1)
-  if not _mysql(args, ['_omegaup_metadata', '-NBe', 'SHOW TABLES LIKE "Revision";']):
+  if not database_utils.mysql('SHOW TABLES LIKE "Revision";',
+                              dbname='_omegaup_metadata', auth=auth):
     sys.exit(1)
 
 
-def latest(args):
+def latest(args, auth):
   '''
   A helper command for puppet. Exits with 1 (error) if the latest script in the
   checkout has not been applied to the database.
   '''
-  if _revision(args) < _scripts(args)[-1][0]:
+  if _revision(args, auth) < _scripts(args)[-1][0]:
     sys.exit(1)
 
 
-def migrate(args):
+def migrate(args, auth):
   '''
   Performs the database schema migration.  This command applies all scripts
   that have not yet been applied in order, and records their application in the
   metadata database.  This command is idempotent and can be run any number of
   times.
   '''
-  latest_revision = _revision(args)
+  latest_revision = _revision(args, auth)
   for revision, name, path in _scripts(args):
     if latest_revision >= revision:
       continue
@@ -128,67 +102,69 @@ def migrate(args):
         comment = "skipped"
       else:
         for dbname in args.databases.split(','):
-          _mysql(args, [dbname, '-NBe', 'source %s;' % _quote(path)])
-      _mysql(args, ['_omegaup_metadata', '-NBe',
-        'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
-        (revision, comment)])
+          database_utils.mysql('source %s;' % database_utils.quote(path),
+                               dbname=dbname, auth=auth)
+      database_utils.mysql(
+          'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
+          (revision, comment), dbname='_omegaup_metadata', auth=auth)
 
 
-def ensure(args):
+def ensure(args, auth):
   '''
   Creates both the metadata database and table, if they don't exist yet.
   '''
-  _mysql(args, [
-    '-NBe', 'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;'])
+  database_utils.mysql('CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;',
+                       auth=auth)
   # This is the table that tracks the migrations. |id| is the revision,
   # |applied| is the timestamp the operation was made and |comment| is a
   # human-readable comment about the migration. It can be either 'migrate' if
   # it was applied normally, 'skipped' if it was not applied due to not being
   # run in a development environment, and 'manual reset' if it was added as a
   # result of the 'reset' command.
-  _mysql(args, [
-    '_omegaup_metadata', '-NBe', 'CREATE TABLE IF NOT EXISTS `Revision`'
-    '(`id` INTEGER NOT NULL PRIMARY KEY, '
-    '`applied` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, '
-    '`comment` VARCHAR(50));'])
+  database_utils.mysql(
+      'CREATE TABLE IF NOT EXISTS `Revision`'
+      '(`id` INTEGER NOT NULL PRIMARY KEY, '
+      '`applied` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, '
+      '`comment` VARCHAR(50));', dbname='_omegaup_metadata', auth=auth)
 
 
-def reset(args):
+def reset(args, auth):
   '''
   Forces the metadata table to be in a particular revision.  Note that this
   does not apply or unapply any changes to the actual database, so use this
   only for testing or recovering a botched migration!
   '''
-  ensure(args)
-  _mysql(args, ['_omegaup_metadata', '-NBe',
-                'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision])
+  ensure(args, auth)
+  database_utils.mysql(
+      'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision,
+      dbname='_omegaup_metadata', auth=auth)
   if args.revision > 0:
-    _mysql(args, ['_omegaup_metadata', '-NBe',
-      'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "manual reset");' %
-      args.revision])
+    database_utils.mysql(
+        'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "manual reset");'
+        % args.revision, dbname='_omegaup_metadata', auth=auth)
 
 
-def print_revision(args):
+def print_revision(args, auth):
   '''
   Prints the current revision.
   '''
-  print(_revision(args))
+  print(_revision(args, auth))
 
 
-def purge(args):
+def purge(args, auth):
   '''
   Use purge to start from scratch - Drops & re-creates databases including the
   metadata. Note that purge will not re-apply the schema.
   '''
   for dbname in args.databases.split(','):
-    _mysql(args, ['-NBe', 'DROP DATABASE IF EXISTS `%s`;' % dbname])
-    _mysql(args, ['-NBe', 'CREATE DATABASE `%s`;' % dbname])
+    database_utils.mysql('DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
+    database_utils.mysql('CREATE DATABASE `%s`;' % dbname, auth=auth)
 
 
 def main():
   parser = argparse.ArgumentParser()
-  parser.add_argument('--config-file', dest='config_file',
-      default=os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
+  parser.add_argument('--mysql-config-file',
+      default=database_utils.default_config_file(),
       help='.my.cnf file that stores credentials')
   parser.add_argument('--username', default='root', help='MySQL root username')
   parser.add_argument('--password', default='omegaup', help='MySQL password')
@@ -239,7 +215,10 @@ def main():
   parser_purge.set_defaults(func=purge)
 
   args = parser.parse_args()
-  args.func(args)
+  auth = database_utils.authentication(config_file=args.mysql_config_file,
+                                       username=args.username,
+                                       password=args.password)
+  args.func(args, auth)
 
 
 if __name__ == '__main__':

@@ -205,7 +205,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO {
             $Groups_Scoreboards_Contests->only_ac = '0';
         }
         if (is_null($Groups_Scoreboards_Contests->weight)) {
-            $Groups_Scoreboards_Contests->weight = 1;
+            $Groups_Scoreboards_Contests->weight = '1';
         }
         $sql = 'INSERT INTO Groups_Scoreboards_Contests (`group_scoreboard_id`, `contest_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
