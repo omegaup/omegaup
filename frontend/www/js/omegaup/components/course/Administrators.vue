@@ -18,7 +18,11 @@
                    v-model="useradmin">
             </div>
             <div class="form-group pull-right">
-              <button class="btn btn-primary"
+              <input id="toggle-site-admins"
+                   name="toggle-site-admins"
+                   type="checkbox"
+                   v-model="chkSiteAdmins"> <label for="toggle-site-admins">{{
+                   T.wordsShowSiteAdmins }}</label> <button class="btn btn-primary"
                    type="submit">{{ T.wordsAddAdmin }}</button> <button class="btn btn-secondary"
                    type="reset"
                    v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
@@ -38,13 +42,13 @@
                 <th class="text-right">{{ T.contestEditRegisteredAdminDelete }}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="course-admins">
               <tr v-for="admin in admins">
-                <td>
+                <td v-show="chkSiteAdmins || admin.role != 'site-admin'">
                   <a v-bind:href="adminProfile(admin)">{{ admin.name || admin.username }}</a>
                 </td>
-                <td>{{ admin.role }}</td>
-                <td><button class="close"
+                <td v-show="chkSiteAdmins || admin.role != 'site-admin'">{{ admin.role }}</td>
+                <td v-show="chkSiteAdmins || admin.role != 'site-admin'"><button class="close"
                         type="button"
                         v-if="admin.role != 'site-admin' &amp;&amp; admin.role != 'owner'"
                         v-on:click="onRemoveAdmin(admin)">×</button></td>
@@ -115,7 +119,9 @@ export default {
     admins: Array,
     groupadmins: Array,
   },
-  data: function() { return {T: T, useradmin: '', groupadmin: ''};},
+  data: function() {
+    return {T: T, useradmin: '', groupadmin: '', chkSiteAdmins: false};
+  },
   mounted: function() {
     let self = this;
     UI.userTypeahead(

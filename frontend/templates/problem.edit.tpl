@@ -88,7 +88,16 @@
 						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
+					<div class="form-group">
+						<div class="col-xs-5 col-sm-3 col-md-3 action-container">
+							<button class="btn btn-primary" type="submit">{#wordsAddAdmin#}</button>
+						</div>
+						<div class="col-xs-7 col-sm-9 col-md-9 toggle-container">
+							<input type="checkbox" name="toggle-site-admins" id="toggle-site-admins">
+							<label for="toggle-site-admins">{#wordsShowSiteAdmins#}</label>
+						</div>
+					</div>
+
 				</form>
 			</div>
 

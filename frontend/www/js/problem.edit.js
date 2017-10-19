@@ -57,6 +57,25 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent refresh
       });
 
+  $('#toggle-site-admins')
+      .on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#problem-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().show();
+                }
+              });
+        } else {
+          $('#problem-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().hide();
+                }
+              });
+        }
+      });
+
   $('#add-group-admin-form')
       .submit(function() {
         omegaup.API.Problem.addGroupAdmin({
@@ -172,6 +191,13 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
+
+          $('#problem-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().hide();
+                }
+              });
         })
         .fail(omegaup.UI.apiError);
   }

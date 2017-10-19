@@ -453,6 +453,13 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
+
+          $('#contest-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().hide();
+                }
+              });
         })
         .fail(omegaup.UI.apiError);
   }
@@ -471,6 +478,25 @@ omegaup.OmegaUp.on('ready', function() {
             .fail(omegaup.UI.apiError);
 
         return false;  // Prevent refresh
+      });
+
+  $('#toggle-site-admins')
+      .on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#contest-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().show();
+                }
+              });
+        } else {
+          $('#contest-admins tr td')
+              .each(function() {
+                if ($(this).html() == 'site-admin') {
+                  $(this).parent().hide();
+                }
+              });
+        }
       });
 
   $('#add-group-admin-form')
