@@ -74,6 +74,7 @@ UserController::$sendEmailOnVerify = true;
 // Globally disable run wait gap.
 RunController::$defaultSubmissionGap = 0;
 
+// Mock time
 $current_time = time();
 Time::setTimeForTesting($current_time);
 $conn->EXECUTE('SET TIMESTAMP = ' . $current_time);
