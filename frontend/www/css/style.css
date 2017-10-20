@@ -74,6 +74,10 @@ div.title {
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
 div.copy { padding: 16px; }
+div#ranking {
+	overflow: auto;
+	white-space: nowrap;
+}
 
 div.copy h3 {
 	font-size: 20px;
@@ -246,6 +250,7 @@ table.sample_io {
 }
 table.merged-scoreboard td {
 	vertical-align: middle;
+	padding: 5px;
 }
 table.merged-scoreboard tr:nth-child(even) {
 	background: #eee;
