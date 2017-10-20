@@ -9,7 +9,7 @@
 								{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
 								placeholder="{#wordsKeyword#}">
 					</div>
-					<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="contest-search-button"/>
+					<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}"/>
 				</div>
 			</form>
 		</div>
