@@ -162,11 +162,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return time() >= strtotime($contest->start_time);
+        return Time::get() >= strtotime($contest->start_time);
     }
 
     public static function hasFinished(Contests $contest) {
-        return time() >= strtotime($contest->finish_time);
+        return Time::get() >= strtotime($contest->finish_time);
     }
 
     public static function getContestsParticipated($user_id) {
