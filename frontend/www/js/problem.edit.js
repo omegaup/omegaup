@@ -60,19 +60,9 @@ omegaup.OmegaUp.on('ready', function() {
   $('#toggle-site-admins')
       .on('change', function() {
         if ($(this).is(':checked')) {
-          $('#problem-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().show();
-                }
-              });
+          $('#problem-admins .site-admin').show();
         } else {
-          $('#problem-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().hide();
-                }
-              });
+          $('#problem-admins .site-admin').hide();
         }
       });
 
@@ -117,9 +107,10 @@ omegaup.OmegaUp.on('ready', function() {
           // Got the contests, lets populate the dropdown with them
           for (var i = 0; i < admins.admins.length; i++) {
             var admin = admins.admins[i];
+            var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#problem-admins')
                 .append(
-                    $('<tr></tr>')
+                    $('<tr class="' + siteAdmin + '"></tr>')
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
@@ -192,12 +183,7 @@ omegaup.OmegaUp.on('ready', function() {
                                     })(group_admin.alias))));
           }
 
-          $('#problem-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().hide();
-                }
-              });
+          $('#problem-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }

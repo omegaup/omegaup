@@ -380,9 +380,10 @@ omegaup.OmegaUp.on('ready', function() {
           // Got the contests, lets populate the dropdown with them
           for (var i = 0; i < admins.admins.length; i++) {
             var admin = admins.admins[i];
+            var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#contest-admins')
                 .append(
-                    $('<tr></tr>')
+                    $('<tr class="' + siteAdmin + '"></tr>')
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
@@ -454,12 +455,7 @@ omegaup.OmegaUp.on('ready', function() {
                                     })(group_admin.alias))));
           }
 
-          $('#contest-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().hide();
-                }
-              });
+          $('#contest-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }
@@ -483,19 +479,9 @@ omegaup.OmegaUp.on('ready', function() {
   $('#toggle-site-admins')
       .on('change', function() {
         if ($(this).is(':checked')) {
-          $('#contest-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().show();
-                }
-              });
+          $('#contest-admins .site-admin').show();
         } else {
-          $('#contest-admins tr td')
-              .each(function() {
-                if ($(this).html() == 'site-admin') {
-                  $(this).parent().hide();
-                }
-              });
+          $('#contest-admins .site-admin').hide();
         }
       });
 

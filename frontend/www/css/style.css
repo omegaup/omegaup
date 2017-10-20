@@ -691,13 +691,3 @@ las pestañas del framework. */
 	vertical-align: middle;
 	text-align: center;
 }
-
-/* Estilos para contest */
-.action-container {
-	height: 34px;
-}
-
-.toggle-container {
-	height: 100%;
-	line-height: 34px;
-}
