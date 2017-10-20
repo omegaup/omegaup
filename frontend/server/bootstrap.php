@@ -67,6 +67,7 @@ require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
 require_once('libs/SessionManager.php');
+require_once('libs/Time.php');
 require_once('libs/UITools.php');
 require_once('libs/UrlHelper.php');
 require_once('libs/Validators.php');

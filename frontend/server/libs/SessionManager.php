@@ -7,8 +7,8 @@ class SessionManager {
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $old_name = trim($parts[0]);
-                setcookie($old_name, '', time()-1000);
-                setcookie($old_name, '', time()-1000, '/');
+                setcookie($old_name, '', Time::get() - 1000);
+                setcookie($old_name, '', Time::get() - 1000, '/');
             }
         }
 

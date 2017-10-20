@@ -53,4 +53,5 @@ if [ $GIT_PUSH -eq 1 ]; then
 fi
 
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/i18n.py --validate
+/usr/bin/python3 $OMEGAUP_ROOT/stuff/database_schema.py validate $ARGS
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/hook_tools/lint.py validate $ARGS

@@ -44,6 +44,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 50
         ]);
         $response = ContestController::apiList($r);
 
@@ -60,12 +61,10 @@ class ContestListTest extends OmegaupTestCase {
      * Basic test. Check that most recent contest is at the top of the list
      */
     public function testLatestPublicContestNotLoggedIn() {
-        $r = new Request();
-
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
-        $response = ContestController::apiList($r);
+        $response = ContestController::apiList(new Request(['page_size' => 50]));
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
@@ -139,6 +138,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login(UserFactory::createAdminUser());
         $r = new Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 50
         ]);
         $response = ContestController::apiList($r);
 
@@ -323,6 +323,64 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         $this->assertTrue($recommendedPosition < $notRecommendedPosition);
+    }
+
+    /**
+     * Test to set recommended value in two contests.
+     */
+    public function testRecommendedSContestsList() {
+        // Create 2 contests not-recommended
+        $recommendedContest[0] = ContestsFactory::createContest();
+        $recommendedContest[1] = ContestsFactory::createContest();
+
+        // Get a user for our scenario
+        $contestant = UserFactory::createUser();
+
+        // Get list of contests
+        $login = self::login($contestant);
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // Assert that two contests are not recommended
+        for ($i = 0; $i < 2; $i++) {
+            $contest = $recommendedContest[$i];
+            $contest = $this->findByPredicate($response['results'], function ($value) use ($contest) {
+                return $value['alias'] == $contest['contest']->alias;
+            });
+
+            $this->assertEquals(0, $contest['recommended']);
+        }
+
+        // Turn recommended ON
+        // phpcbf does not like a block just for scoping purposes and
+        // messes up the alignment pretty badly.
+        if (true) {
+            $login = self::login(UserFactory::createAdminUser());
+            for ($i = 0; $i < 2; $i++) {
+                ContestController::apiSetRecommended(new Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $recommendedContest[$i]['request']['alias'],
+                    'value' => 1,
+                ]));
+            }
+        }
+
+        // Get list of contests
+        $login = self::login($contestant);
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // Assert that two contests are already recommended
+        for ($i = 0; $i < 2; $i++) {
+            $contest = $recommendedContest[$i];
+            $contest = $this->findByPredicate($response['results'], function ($value) use ($contest) {
+                return $value['alias'] == $contest['contest']->alias;
+            });
+
+            $this->assertEquals(1, $contest['recommended']);
+        }
     }
 
     /**

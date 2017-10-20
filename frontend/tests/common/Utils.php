@@ -38,7 +38,7 @@ class Utils {
 
     public static function GetPhpUnixTimestamp($time = null) {
         if (is_null($time)) {
-            return time();
+            return Time::get();
         } else {
             return strtotime($time);
         }

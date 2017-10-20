@@ -199,7 +199,7 @@ class Scoreboard {
             $this->params['auth_token']
         );
 
-        $timeout = max(0, $this->params['finish_time'] - time());
+        $timeout = max(0, $this->params['finish_time'] - Time::get());
         if ($can_use_contestant_cache) {
             $contestantScoreboardCache->set($result, $timeout);
         } elseif ($can_use_admin_cache) {
@@ -270,7 +270,7 @@ class Scoreboard {
             $problem_mapping
         );
 
-        $timeout = max(0, $this->params['finish_time'] - time());
+        $timeout = max(0, $this->params['finish_time'] - Time::get());
         if ($can_use_contestant_cache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($can_use_admin_cache) {
@@ -338,7 +338,7 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout = max(0, $params['finish_time'] - time());
+        $timeout = max(0, $params['finish_time'] - Time::get());
         $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
@@ -437,7 +437,7 @@ class Scoreboard {
     private static function getScoreboardTimeLimitUnixTimestamp(
         ScoreboardParams $params
     ) {
-        if ($params['show_all_runs'] || ((time() >= $params['finish_time']) && $params['show_scoreboard_after'])) {
+        if ($params['show_all_runs'] || ((Time::get() >= $params['finish_time']) && $params['show_scoreboard_after'])) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
             return null;
@@ -604,7 +604,7 @@ class Scoreboard {
             'start_time' => $contest_start_time,
             'finish_time' => $contest_finish_time,
             'title' => $contest_title,
-            'time' => time() * 1000
+            'time' => Time::get() * 1000
         ];
     }
 

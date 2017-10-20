@@ -15,7 +15,7 @@ class UserRegistrationTest extends OmegaupTestCase {
 	 *			email=A@gmail.com
 	 */
     public function testUserNameCollision() {
-        $salt = time();
+        $salt = Utils::GetPhpUnixTimestamp();
 
         // Test users should not exist
         $this->assertNull(UsersDAO::FindByUsername('A'.$salt));
