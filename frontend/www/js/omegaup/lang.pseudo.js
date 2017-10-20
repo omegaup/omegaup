@@ -772,6 +772,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsHomeworks: "(H0m3w0rk a55ignm3n75)",
 	wordsHours: "(h0ur5)",
 	wordsID: "(ID)",
+	wordsInOutEqualsConsole: "(In / Ou7 = C0n5013)",
 	wordsJudgedBy: "(Judg3d by)",
 	wordsJustOutput: "(Ju57 0u7pu7)",
 	wordsKeepProblem: "(K33p pr0b13m)",

@@ -772,6 +772,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsHomeworks: "Tareas",
 	wordsHours: "horas",
 	wordsID: "ID",
+	wordsInOutEqualsConsole: "Entrada / Salida = Consola",
 	wordsJudgedBy: "Validado por",
 	wordsJustOutput: "Solo Salida",
 	wordsKeepProblem: "Conservar problema",

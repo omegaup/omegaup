@@ -89,6 +89,9 @@
 							<td>{#arenaCommonOverallWallTimeLimit#}</td>
 							<td class="overall_wall_time_limit"></td>
 						</tr>
+						<tr>
+							<td colspan="4">{#wordsInOutEqualsConsole#}</td>
+						</tr>
 					</table>
 {if $admin}
 					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
