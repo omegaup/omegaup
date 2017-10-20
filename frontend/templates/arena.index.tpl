@@ -1,5 +1,18 @@
 {include file='head.tpl' jsfile={version_hash src='/ux/arena.js' inArena=true}}
 {include file='arena.contest_list.tpl'}
+		<div class="search-bar-contest">
+			<form action="/arena/" method="GET">
+				<div class="form-inline">
+					<div class="form-group">
+						<input class="form-control"
+								type="text" name='query' autocomplete="off"
+								{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
+								placeholder="{#wordsKeyword#}">
+					</div>
+					<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="contest-search-button"/>
+				</div>
+			</form>
+		</div>
 			<div id="content">
 				<div class="panel">
 					<div class="panel-heading panel-default">

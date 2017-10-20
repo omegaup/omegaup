@@ -162,11 +162,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return Time::get() >= strtotime($contest->start_time);
+        return time() >= strtotime($contest->start_time);
     }
 
     public static function hasFinished(Contests $contest) {
-        return Time::get() >= strtotime($contest->finish_time);
+        return time() >= strtotime($contest->finish_time);
     }
 
     public static function getContestsParticipated($user_id) {
@@ -296,15 +296,24 @@ class ContestsDAO extends ContestsDAOBase {
     final public static function getContestsParticipating(
         $user_id,
         $page = 1,
-        $pageSize = 1000
+        $pageSize = 1000,
+        $query = null
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
         $columns = ContestsDAO::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
-        $sql = '
-            SELECT ' .
-                $columns . '
+        $params = [$user_id];
+        $query_check = ' TRUE ';
+        if (!is_null($query)) {
+            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
+            $params[] = $query;
+            $params[] = $query;
+        }
+
+        $sql = "
+            SELECT
+                $columns
             FROM
                 Contests
             JOIN
@@ -312,19 +321,16 @@ class ContestsDAO extends ContestsDAOBase {
             ON
                 Contests.problemset_id = Problemset_Users.problemset_id
             WHERE
-                Problemset_Users.user_id = ? AND ' .
-                $recommended_check . ' AND ' . $end_check . '
+                Problemset_Users.user_id = ? AND
+                $recommended_check  AND $end_check AND $query_check
             ORDER BY
                 recommended DESC,
                 finish_time DESC
-            LIMIT ?, ?;';
-        $params = [
-            $user_id,
-            $offset,
-            $pageSize,
-        ];
+            LIMIT ?, ?;";
 
         global $conn;
+        $params[] = $offset;
+        $params[] = $pageSize;
         $rs = $conn->Execute($sql, $params);
 
         $contests = [];
@@ -368,13 +374,50 @@ class ContestsDAO extends ContestsDAOBase {
         $pagina = 1,
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
-        $recomendados = RecommendedStatus::ALL
+        $recomendados = RecommendedStatus::ALL,
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
+        if (!is_null($query)) {
+            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
+            $query_check = ' TRUE ';
+            $params = [
+              $user_id,
+              $query,
+              $query,
+              $user_id,
+              $query,
+              $query,
+              $user_id,
+              Authorization::ADMIN_ROLE,
+              $query,
+              $query,
+              $user_id,
+              Authorization::ADMIN_ROLE,
+              $query,
+              $query,
+              $query,
+              $query,
+              $offset,
+              $renglones_por_pagina,
+            ];
+        } else {
+            $query_check = ' TRUE ';
+            $params = [
+              $user_id,
+              $user_id,
+              $user_id,
+              Authorization::ADMIN_ROLE,
+              $user_id,
+              Authorization::ADMIN_ROLE,
+              $offset,
+              $renglones_por_pagina,
+            ];
+        }
         $sql = "
                  (
                     SELECT
@@ -387,7 +430,7 @@ class ContestsDAO extends ContestsDAOBase {
                         ACLs.acl_id = Contests.acl_id
                     WHERE
                         Contests.public = 0 AND ACLs.owner_id = ? AND
-                        $recommended_check AND $end_check
+                        $recommended_check AND $end_check AND $query_check
                  )
                  UNION
                  (
@@ -401,7 +444,7 @@ class ContestsDAO extends ContestsDAOBase {
                         Contests.problemset_id = Problemset_Users.problemset_id
                     WHERE
                         Contests.public = 0 AND Problemset_Users.user_id = ? AND
-                        $recommended_check AND $end_check
+                        $recommended_check AND $end_check AND $query_check
                  )
                  UNION
                  (
@@ -417,7 +460,7 @@ class ContestsDAO extends ContestsDAOBase {
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
                          User_Roles.role_id = ? AND
-                         $recommended_check AND $end_check
+                         $recommended_check AND $end_check AND $query_check
                  )
                  UNION
                  (
@@ -433,7 +476,7 @@ class ContestsDAO extends ContestsDAOBase {
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND
                          Group_Roles.role_id = ? AND
-                         $recommended_check AND $end_check
+                         $recommended_check AND $end_check AND $query_check
                  )
                  UNION
                  (
@@ -442,7 +485,7 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      WHERE
-                         public = 1 AND $recommended_check AND $end_check
+                         public = 1 AND $recommended_check AND $end_check AND $query_check
                  )
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
@@ -450,17 +493,6 @@ class ContestsDAO extends ContestsDAOBase {
                      `original_finish_time` DESC
                  LIMIT ?, ?
                 ";
-
-        $params = [
-            $user_id,
-            $user_id,
-            $user_id,
-            Authorization::ADMIN_ROLE,
-            $user_id,
-            Authorization::ADMIN_ROLE,
-            $offset,
-            $renglones_por_pagina,
-        ];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
@@ -479,11 +511,18 @@ class ContestsDAO extends ContestsDAOBase {
         $pagina = 1,
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
-        $recomendados = RecommendedStatus::ALL
+        $recomendados = RecommendedStatus::ALL,
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
+        $query_check = ' TRUE ';
+        if (!is_null($query)) {
+            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
+            $params[] = $query;
+            $params[] = $query;
+        }
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -496,6 +535,7 @@ class ContestsDAO extends ContestsDAOBase {
                     Public = 1
                 AND $recommended_check
                 AND $end_check
+                AND $query_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -504,7 +544,8 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        $params = [$offset, $renglones_por_pagina];
+        $params[] = $offset;
+        $params[] = $renglones_por_pagina;
         $rs = $conn->Execute($sql, $params);
 
         $allData = [];
@@ -521,20 +562,27 @@ class ContestsDAO extends ContestsDAOBase {
         $pagina = 1,
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
-        $recomendados = RecommendedStatus::ALL
+        $recomendados = RecommendedStatus::ALL,
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
+        $query_check = ' TRUE ';
+        if (!is_null($query)) {
+            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
+            $params[] = $query;
+            $params[] = $query;
+        }
 
         $sql = "
                 SELECT
                     $columns
                 FROM
                     Contests
-                WHERE $recommended_check AND $end_check
+                WHERE $recommended_check AND $end_check AND $query_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -543,7 +591,8 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        $params = [$offset, $renglones_por_pagina];
+        $params[] = $offset;
+        $params[] = $renglones_por_pagina;
         $rs = $conn->Execute($sql, $params);
 
         $allData = [];

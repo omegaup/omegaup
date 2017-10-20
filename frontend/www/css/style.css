@@ -529,6 +529,15 @@ padding-right: 5px;
 
 th.contains-long-desc{ min-width:369px; }
 
+.search-bar-contest {
+	float: right;
+	padding: 10px 0;
+}
+
+.search-bar-contest input[type=submit] {
+	margin-left: 5px;
+}
+
 .search-bar {
 	margin-bottom: 10px;
 }
