@@ -11,6 +11,10 @@ class QualityNominationController extends Controller {
      * If a problem has more than this number of problems, none will be assigned.
      */
     const MAX_NUM_TOPICS = 5;
+    /**
+     * Number of suggestions retrieved per db query.
+     */
+    const CRON_JOB_PAGE_SIZE = 100000;
 
     /**
      * Creates a new QualityNomination
@@ -463,8 +467,14 @@ class QualityNominationController extends Controller {
         $filter = new QualityNominations([
             'nomination' => 'suggestion',
         ]);
-        $allNominations = QualityNominationsDAO::search($filter);
-        $response = self::mapFeedbackRows($allNominations);
+        $response = null;
+        $page = 1;
+        do {
+            print 'page: ' . $page . "\n";
+            $allNominations = QualityNominationsDAO::search($filter, null, null, ($page-1) * self::CRON_JOB_PAGE_SIZE, self::CRON_JOB_PAGE_SIZE);
+            $response = self::mapFeedbackRows($allNominations, $response);
+            $page ++;
+        } while (count($allNominations) != 0);
 
         $problemTable = $response['table'];
         $globalQualityAverage = $response['global_quality_sum'] / $response['global_quality_n'];
@@ -485,17 +495,21 @@ class QualityNominationController extends Controller {
      * This function computes sums of difficulty, quality, and tag votes for
      * each problem and returns that in the form of a table.
      */
-    public static function mapFeedbackRows($allNominations) {
-        $table = [];
-        $globalQualitySum = 0;
-        $globalQualityN = 0;
-        $globalDifficultySum = 0;
-        $globalDifficultyN = 0;
+    public static function mapFeedbackRows($allNominations, $map = null) {
+        if ($map == null) {
+            $map = [
+                'table' => [],
+                'global_quality_sum' => 0,
+                'global_quality_n' => 0,
+                'global_difficulty_sum' => 0,
+                'global_difficulty_n' => 0,
+            ];
+        }
         foreach ($allNominations as $nomination) {
             $nomination = (array) $nomination;
             $feedback = (array) json_decode($nomination['contents']);
 
-            $tableRow = &$table[$nomination['problem_id']];
+            $tableRow = &$map['table'][$nomination['problem_id']];
             if (!isset($tableRow['quality_sum'])) {
                 $tableRow['quality_sum'] = 0;
                 $tableRow['quality_n'] = 0;
@@ -507,15 +521,15 @@ class QualityNominationController extends Controller {
             if (isset($feedback['quality'])) {
                 $tableRow['quality_sum'] += $feedback['quality'];
                 $tableRow['quality_n'] ++;
-                $globalQualitySum += $feedback['quality'];
-                $globalQualityN ++;
+                $map['global_quality_sum'] += $feedback['quality'];
+                $map['global_quality_n'] ++;
             }
 
             if (isset($feedback['difficulty'])) {
                 $tableRow['difficulty_sum'] += $feedback['difficulty'];
                 $tableRow['difficulty_n'] ++;
-                $globalDifficultySum += $feedback['difficulty'];
-                $globalDifficultyN ++;
+                $map['global_difficulty_sum'] += $feedback['difficulty'];
+                $map['global_difficulty_n'] ++;
             }
 
             if (isset($feedback['tags'])) {
@@ -530,13 +544,7 @@ class QualityNominationController extends Controller {
             }
         }
 
-        return [
-            'table' => $table,
-            'global_quality_sum' => $globalQualitySum,
-            'global_quality_n' => $globalQualityN,
-            'global_difficulty_sum' => $globalDifficultySum,
-            'global_difficulty_n' => $globalDifficultyN,
-            ];
+        return $map;
     }
 
     private static function bayesianAverage($aprioriAverage, $sum, $n) {
