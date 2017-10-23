@@ -731,28 +731,36 @@ class RunController extends Controller {
         if (!file_exists($results_zip)) {
             $results_zip = "$grade_dir/results.zip";
         }
-        if (!file_exists($results_zip)) {
-            self::downloadRunFromS3($r['run']->guid);
-            exit;
+
+        if (file_exists($results_zip)) {
+            $output_callback = function () use ($results_zip) {
+                header('Content-Length: ' . filesize($results_zip));
+                readfile($results_zip);
+                return true;
+            };
+        } else {
+            $output_callback = function () use ($r) {
+                return self::downloadRunFromS3($r['run']->guid);
+            };
         }
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        header('Content-Length: ' . filesize($results_zip));
-        readfile($results_zip);
+        if (!$output_callback()) {
+            http_response_code(404);
+        }
         exit;
     }
 
     /**
      * Given the run GUID, fetches the .zip file with the results from S3.
-     * Returns 404 in case of errors.
      *
      * @param string $guid The run's GUID.
+     * @return bool True if successful.
      */
     private static function downloadRunFromS3($guid) {
         if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
-            http_response_code(404);
-            return;
+            return false;
         }
 
         $descriptorspec = [
@@ -774,25 +782,25 @@ class RunController extends Controller {
         if (!is_resource($proc)) {
             $errors = error_get_last();
             self::$log->error("Getting run $guid failed: {$errors['type']} {$errors['message']}");
-            http_response_code(404);
-            return;
+            return false;
         }
 
         fclose($pipes[0]);
         $err = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
         $stdout = fopen('php://output', 'wb');
 
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=' . $guid . '.zip');
         stream_copy_to_stream($pipes[1], $stdout);
+        fclose($pipes[1]);
         fclose($stdout);
 
         $retval = proc_close($proc);
 
         if ($retval != 0) {
             self::$log->error("Getting run $guid failed: $retval $err");
-            http_response_code(404);
+            return false;
         }
+        return true;
     }
 
     /**
