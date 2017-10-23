@@ -95,6 +95,16 @@ class RecommendedStatus extends StatusBase {
     ];
 }
 
+class FilteredStatus extends StatusBase {
+    const ALL = 0;
+    const FILTERED = 1;
+
+    public static $SQL_FOR_STATUS = [
+        'TRUE',
+        'MATCH(title, description) AGAINST(? IN NATURAL LANGUAGE MODE)',
+    ];
+}
+
 class ParticipatingStatus extends StatusBase {
     const NO = 0;
     const YES = 1;
@@ -162,11 +172,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return time() >= strtotime($contest->start_time);
+        return Time::get() >= strtotime($contest->start_time);
     }
 
     public static function hasFinished(Contests $contest) {
-        return time() >= strtotime($contest->finish_time);
+        return Time::get() >= strtotime($contest->finish_time);
     }
 
     public static function getContestsParticipated($user_id) {
@@ -297,17 +307,16 @@ class ContestsDAO extends ContestsDAOBase {
         $user_id,
         $page = 1,
         $pageSize = 1000,
-        $query = null
+        $query = FilteredStatus::ALL
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
         $columns = ContestsDAO::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
         $params = [$user_id];
-        $query_check = ' TRUE ';
+        $query_check = FilteredStatus::sql(FilteredStatus::ALL);
         if (!is_null($query)) {
-            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
-            $params[] = $query;
+            $query_check = FilteredStatus::sql(FilteredStatus::FILTERED);
             $params[] = $query;
         }
 
@@ -327,7 +336,6 @@ class ContestsDAO extends ContestsDAOBase {
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
-
         global $conn;
         $params[] = $offset;
         $params[] = $pageSize;
@@ -367,6 +375,7 @@ class ContestsDAO extends ContestsDAOBase {
      * @param int $renglones_por_pagina
      * @param ActiveStatus $activos
      * @param RecommendedStatus $recomendados
+     * @param FilteredStatus $query
      * @return array
      */
     final public static function getAllContestsForUser(
@@ -375,49 +384,18 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = null
+        $query = FilteredStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
+        $query_check = FilteredStatus::sql(FilteredStatus::ALL);
         if (!is_null($query)) {
-            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
-            $query_check = ' TRUE ';
-            $params = [
-              $user_id,
-              $query,
-              $query,
-              $user_id,
-              $query,
-              $query,
-              $user_id,
-              Authorization::ADMIN_ROLE,
-              $query,
-              $query,
-              $user_id,
-              Authorization::ADMIN_ROLE,
-              $query,
-              $query,
-              $query,
-              $query,
-              $offset,
-              $renglones_por_pagina,
-            ];
-        } else {
-            $query_check = ' TRUE ';
-            $params = [
-              $user_id,
-              $user_id,
-              $user_id,
-              Authorization::ADMIN_ROLE,
-              $user_id,
-              Authorization::ADMIN_ROLE,
-              $offset,
-              $renglones_por_pagina,
-            ];
+            $query_check = FilteredStatus::sql(FilteredStatus::FILTERED);
         }
+
         $sql = "
                  (
                     SELECT
@@ -431,7 +409,13 @@ class ContestsDAO extends ContestsDAOBase {
                     WHERE
                         Contests.public = 0 AND ACLs.owner_id = ? AND
                         $recommended_check AND $end_check AND $query_check
-                 )
+                 ) ";
+        $params[] = $user_id;
+        if (!is_null($query)) {
+            $params[] = $query;
+        }
+
+        $sql .= "
                  UNION
                  (
                     SELECT
@@ -445,7 +429,13 @@ class ContestsDAO extends ContestsDAOBase {
                     WHERE
                         Contests.public = 0 AND Problemset_Users.user_id = ? AND
                         $recommended_check AND $end_check AND $query_check
-                 )
+                 ) ";
+        $params[] = $user_id;
+        if (!is_null($query)) {
+            $params[] = $query;
+        }
+
+        $sql .= "
                  UNION
                  (
                      SELECT
@@ -461,7 +451,14 @@ class ContestsDAO extends ContestsDAOBase {
                          User_Roles.user_id = ? AND
                          User_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
-                 )
+                 ) ";
+        $params[] = $user_id;
+        $params[] = Authorization::ADMIN_ROLE;
+        if (!is_null($query)) {
+            $params[] = $query;
+        }
+
+        $sql .= "
                  UNION
                  (
                      SELECT
@@ -477,7 +474,14 @@ class ContestsDAO extends ContestsDAOBase {
                          Groups_Users.user_id = ? AND
                          Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
-                 )
+                 ) ";
+        $params[] = $user_id;
+        $params[] = Authorization::ADMIN_ROLE;
+        if (!is_null($query)) {
+            $params[] = $query;
+        }
+
+        $sql .= "
                  UNION
                  (
                      SELECT
@@ -493,6 +497,11 @@ class ContestsDAO extends ContestsDAOBase {
                      `original_finish_time` DESC
                  LIMIT ?, ?
                 ";
+        if (!is_null($query)) {
+            $params[] = $query;
+        }
+        $params[] = $offset;
+        $params[] = $renglones_por_pagina;
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
@@ -512,15 +521,14 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = null
+        $query = FilteredStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = ' TRUE ';
+        $query_check = FilteredStatus::sql(FilteredStatus::ALL);
         if (!is_null($query)) {
-            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
-            $params[] = $query;
+            $query_check = FilteredStatus::sql(FilteredStatus::FILTERED);
             $params[] = $query;
         }
 
@@ -563,17 +571,16 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = null
+        $query = FilteredStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = ' TRUE ';
+        $query_check = FilteredStatus::sql(FilteredStatus::ALL);
         if (!is_null($query)) {
-            $query_check = " (title LIKE CONCAT('%', ?, '%') OR description LIKE CONCAT('%', ?, '%')) ";
-            $params[] = $query;
+            $query_check = FilteredStatus::sql(FilteredStatus::FILTERED);
             $params[] = $query;
         }
 

@@ -47,7 +47,9 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
-            Validators::isNumber($participating, 'participating', true /* required */);
+            if (is_null($participating)) {
+                throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
             $query = is_null($r['query']) ? null : $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$participating-$query-$page-$page_size";
@@ -179,7 +181,7 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
+        $query = is_null($r['query']) ? null : $r['query'];
         // Create array of relevant columns
         $relevant_columns = [
             'title',
@@ -196,7 +198,8 @@ class ContestController extends Controller {
                 $callback_user_function,
                 $r['current_user_id'],
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
