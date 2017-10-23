@@ -788,11 +788,8 @@ class RunController extends Controller {
         fclose($pipes[0]);
         $err = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
-        $stdout = fopen('php://output', 'wb');
-
-        stream_copy_to_stream($pipes[1], $stdout);
+        fpassthru($pipes[1]);
         fclose($pipes[1]);
-        fclose($stdout);
 
         $retval = proc_close($proc);
 
