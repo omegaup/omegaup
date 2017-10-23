@@ -90,7 +90,8 @@
 							<td class="overall_wall_time_limit"></td>
 						</tr>
 						<tr>
-							<td colspan="4">{#wordsInOutEqualsConsole#}</td>
+							<td>{#wordsInOut#}</td>
+							<td>{#wordsConsole#}</td>
 						</tr>
 					</table>
 {if $admin}
