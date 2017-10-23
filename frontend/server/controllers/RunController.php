@@ -731,12 +731,68 @@ class RunController extends Controller {
         if (!file_exists($results_zip)) {
             $results_zip = "$grade_dir/results.zip";
         }
+        if (!file_exists($results_zip)) {
+            self::downloadRunFromS3($r['run']->guid);
+            exit;
+        }
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
         header('Content-Length: ' . filesize($results_zip));
         readfile($results_zip);
         exit;
+    }
+
+    /**
+     * Given the run GUID, fetches the .zip file with the results from S3.
+     * Returns 404 in case of errors.
+     *
+     * @param string $guid The run's GUID.
+     */
+    private static function downloadRunFromS3($guid) {
+        if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
+            http_response_code(404);
+            return;
+        }
+
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w']
+        ];
+        $proc = proc_open(
+            "/usr/bin/aws s3 cp s3://omegaup-runs/${guid}.zip -",
+            $descriptorspec,
+            $pipes,
+            '/tmp',
+            [
+                'AWS_ACCESS_KEY_ID' => AWS_CLI_ACCESS_KEY_ID,
+                'AWS_SECRET_ACCESS_KEY' => AWS_CLI_SECRET_ACCESS_KEY,
+            ]
+        );
+
+        if (!is_resource($proc)) {
+            $errors = error_get_last();
+            self::$log->error("Getting run $guid failed: {$errors['type']} {$errors['message']}");
+            http_response_code(404);
+            return;
+        }
+
+        fclose($pipes[0]);
+        $err = stream_get_contents($pipes[2]);
+        $stdout = fopen('php://output', 'wb');
+
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename=' . $guid . '.zip');
+        stream_copy_to_stream($pipes[1], $stdout);
+        fclose($stdout);
+
+        $retval = proc_close($proc);
+
+        if ($retval != 0) {
+            self::$log->error("Getting run $guid failed: $retval $err");
+            http_response_code(404);
+        }
     }
 
     /**
