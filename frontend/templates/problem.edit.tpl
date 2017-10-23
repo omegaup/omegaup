@@ -97,7 +97,6 @@
 							<label for="toggle-site-admins">{#wordsShowSiteAdmins#}</label>
 						</div>
 					</div>
-
 				</form>
 			</div>
 

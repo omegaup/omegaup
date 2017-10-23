@@ -110,7 +110,8 @@ omegaup.OmegaUp.on('ready', function() {
             var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#problem-admins')
                 .append(
-                    $('<tr class="' + siteAdmin + '"></tr>')
+                    $('<tr></tr>')
+                        .addClass(siteAdmin)
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
