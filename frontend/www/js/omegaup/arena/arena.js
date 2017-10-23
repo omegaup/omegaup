@@ -2,6 +2,7 @@ import {OmegaUp, T} from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
+import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -906,6 +907,59 @@ export class Arena {
         });
   }
 
+  selectDefaultLanauage() {
+    // TODO: Make this depend on a user setting.
+    //       See https://github.com/omegaup/omegaup/issues/1471
+    let self = this;
+    let langElement = self.elements.submitForm.language;
+    if (!langElement.val()) {
+      $('option', langElement)
+          .each(function() {
+            let option = $(this);
+            if (option.css('display') != 'none') {
+              option.prop('selected', true);
+              langElement.change();
+              return false;
+            }
+          });
+    }
+  }
+
+  mountEditor(problem) {
+    let self = this;
+    let lang = self.elements.submitForm.language.val();
+    let template = '';
+    if (problem.templates && lang) {
+      template = problem.templates[lang];
+    }
+    if (self.codeEditor) {
+      self.codeEditor.code = template;
+    } else {
+      self.codeEditor = new Vue({
+        el: self.elements.submitForm.code[0],
+        data: {
+          language: lang,
+          code: template,
+        },
+        render: function(createElement) {
+          return createElement('omegaup-arena-code-view', {
+            props: {
+              language: this.language,
+              value: this.code,
+            },
+            on: {
+              input: (value) => { this.code = value; },
+              change: (value) => { this.code = value; },
+            }
+          });
+        },
+        components: {
+          'omegaup-arena-code-view': arena_CodeView,
+        }
+      });
+    }
+  }
+
   onHashChanged() {
     var self = this;
     var tabChanged = false;
@@ -994,6 +1048,7 @@ export class Arena {
         $('#problem tbody.added').remove();
 
         self.updateAllowedLanguages(language_array);
+        self.selectDefaultLanauage();
 
         function updateRuns(runs) {
           if (runs) {
@@ -1012,6 +1067,7 @@ export class Arena {
           updateRuns(problem.runs);
         }
 
+        self.mountEditor(problem);
         MathJax.Hub.Queue(
             ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
       }
@@ -1028,6 +1084,7 @@ export class Arena {
               problem.problem_statement = problem_ext.problem_statement;
               problem.sample_input = problem_ext.sample_input;
               problem.runs = problem_ext.runs;
+              problem.templates = problem_ext.templates;
               update(problem);
             })
             .fail(UI.apiError);
@@ -1038,7 +1095,6 @@ export class Arena {
         $('input', self.elements.submitForm).show();
         self.elements.submitForm.show();
         $('#overlay').show();
-        self.elements.submitForm.code.val('');
       }
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
@@ -1131,6 +1187,9 @@ export class Arena {
     } else {
       ext.text('');
     }
+    if (self.codeEditor) {
+      self.codeEditor.language = lang;
+    }
   }
 
   onSubmit(e) {
@@ -1184,12 +1243,11 @@ export class Arena {
       return false;
     }
 
-    var code = submitForm.code.val();
-    if (!code) {
+    if (!self.codeEditor.code) {
       alert(T.arenaRunSubmitEmptyCode);
       return false;
     }
-    self.submitRun(code);
+    self.submitRun(self.codeEditor.code);
 
     return false;
   }
@@ -1239,7 +1297,6 @@ export class Arena {
           self.updateRun(run);
 
           $('input', self.elements.submitForm).removeAttr('disabled');
-          self.elements.submitForm.code.val('');
           self.hideOverlay();
           self.clearInputFile();
         })

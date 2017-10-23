@@ -10,7 +10,7 @@ import {T, API} from '../../omegaup.js';
 import UI from '../../ui.js';
 import {codemirror} from 'vue-codemirror';
 
-let languageModeMap = {
+const languageModeMap = {
   'c': 'text/x-csrc',
   'cpp': 'text/x-c++src',
   'java': 'text/x-java',
@@ -25,6 +25,13 @@ let languageModeMap = {
   'lua': 'text/x-lua',
 };
 
+// Preload all language modes.
+const modeList =
+    ['clike', 'python', 'ruby', 'perl', 'pascal', 'haskell', 'lua'];
+for (const mode of modeList) {
+  require('codemirror/mode/' + mode + '/' + mode + '.js');
+}
+
 export default {
   props: {
     language: String,
@@ -35,7 +42,7 @@ export default {
     return {
       editorOptions: {
         tabSize: 2, lineNumbers: true, mode: languageModeMap[this.language],
-            readOnly: this.readOnly,
+            readOnly: this.readOnly
       }
     }
   },
@@ -52,4 +59,5 @@ export default {
     "omegaup-arena-codemirror": codemirror,
   }
 };
+
 </script>
