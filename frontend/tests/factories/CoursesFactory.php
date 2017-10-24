@@ -58,8 +58,8 @@ class CoursesFactory {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => TEST_TIMESTAMP,
-            'finish_time' => TEST_TIMESTAMP + 120,
+            'start_time' => Utils::GetPhpUnixTimestamp(),
+            'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
         ]);
