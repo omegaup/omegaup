@@ -33,6 +33,8 @@ require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
 
+require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
+
 // Clean previous log
 Utils::CleanLog();
 
@@ -71,3 +73,8 @@ UserController::$sendEmailOnVerify = true;
 
 // Globally disable run wait gap.
 RunController::$defaultSubmissionGap = 0;
+
+// Mock time
+$current_time = time();
+Time::setTimeForTesting($current_time);
+$conn->EXECUTE('SET TIMESTAMP = ' . $current_time);
