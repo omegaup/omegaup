@@ -101,13 +101,14 @@ class QualityNominationTest extends OmegaupTestCase {
             'nomination' => 'suggestion',
             'contents' => json_encode([
                 // No difficulty!
+                'quality' => 3,
                 'tags' => [],
             ]),
         ]);
 
         try {
             QualityNominationController::apiCreate($r);
-            $this->fail('Should not have been able to nominate the problem');
+            $this->fail('Should not have been able to make suggestion about the problem');
         } catch (PreconditionFailedException $e) {
             // still expected.
         }
@@ -438,20 +439,9 @@ class QualityNominationTest extends OmegaupTestCase {
      * have solved it first.
      */
     public function testMustSolveBeforeDismissed() {
-        // Create 2 problems and 10 problems. Both users solved all 10 problems.
-        $problems = [];
-        $users = [];
-        for ($i = 0; $i < 2; $i ++) {
-            $problems[] = ProblemsFactory::createProblem();
-        }
-        for ($i = 0; $i < 10; $i ++) {
-            $users[] = UserFactory::createUser();
-            foreach ($problems as $problem) {
-                $runData = RunsFactory::createRunToProblem($problem, $users[$i]);
-                RunsFactory::gradeRun($runData);
-            }
-        }
-
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
@@ -459,13 +449,11 @@ class QualityNominationTest extends OmegaupTestCase {
             'nomination' => 'dismissal',
             'contents' => json_encode([]),
         ]);
-
         try {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
         }
-
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
@@ -477,15 +465,12 @@ class QualityNominationTest extends OmegaupTestCase {
             'contents' => json_encode([]), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-
         $problem_dismissed = QualityNominationsDAO::search($key);
         RunsFactory::gradeRun($runData);
-
         try {
             $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
         } catch (PreconditionFailedException $e) {
         }
-
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::search($key);
@@ -517,9 +502,9 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function testMapFeedbackRows() {
-        /*$problemData[0] = ProblemsFactory::createProblem();
+        $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
-        self::setUpSyntheticSuggestions($problemData);*/
+        self::setUpSyntheticSuggestions($problemData);
 
         $filter = new QualityNominations([
             'nomination' => 'suggestion',
@@ -529,7 +514,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $expectedResult = [
             'table' => [
-                13 =>  [
+                $problemData[0]['problem']->problem_id =>  [
                     'quality_sum' => 13,
                     'quality_n' => 5,
                     'difficulty_sum' => 25,
@@ -542,7 +527,7 @@ class QualityNominationTest extends OmegaupTestCase {
                         'greedy' => 2,
                     ],
                 ],
-                14 =>  [
+                $problemData[1]['problem']->problem_id =>  [
                     'quality_sum' => 10,
                     'quality_n' => 6,
                     'difficulty_sum' => 29,
