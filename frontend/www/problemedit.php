@@ -34,18 +34,24 @@ if (isset($_POST['request'])) {
             onError($smarty, $response);
         }
     } elseif ($_POST['request'] == 'markdown') {
-        // Update statement
-        $r = new Request([
-                    'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
-                    'problem_alias' => $_POST['problem_alias'],
-                    'statement' => $_POST['wmd-input-statement'],
-                    'message' => $_POST['message'],
-                    'lang' => $_POST['statement-language']
-                ]);
-        $r->method = 'ProblemController::apiUpdateStatement';
-        $response = ApiCaller::call($r);
-        if ($response['status'] == 'error') {
-            onError($smarty, $response);
+        $languages = ['en', 'es', 'pt'];
+
+        foreach ($languages as $language) {
+            // Update statement language
+            if (isset($_POST['wmd-input-statement-' . $language])) {
+                $r = new Request([
+                            'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+                            'problem_alias' => $_POST['problem_alias'],
+                            'statement' => $_POST['wmd-input-statement-' . $language],
+                            'message' => $_POST['message'],
+                            'lang' => $language
+                        ]);
+                $r->method = 'ProblemController::apiUpdateStatement';
+                $response = ApiCaller::call($r);
+                if ($response['status'] == 'error') {
+                    onError($smarty, $response);
+                }
+            }
         }
     }
     $smarty->assign('STATUS_SUCCESS', 'Problem updated succesfully!');

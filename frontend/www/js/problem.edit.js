@@ -1,5 +1,8 @@
 omegaup.OmegaUp.on('ready', function() {
   var chosenLanguage = null;
+  var selectedLanguage = null;
+  var currentMarkdown = null;
+  var avialableLanguajes = ['en', 'es', 'pt'];
 
   if (window.location.hash) {
     $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
@@ -83,6 +86,21 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#markdown form')
       .submit(function() {
+        avialableLanguajes.forEach(function(lang, index, array) {
+          currentMarkdown = 'markdown-' + problemAlias + '-' + lang;
+          if (localStorage.getItem(currentMarkdown) != null &&
+              $('#wmd-input-statement-' + lang).length == 0) {
+            $('#statement-source')
+                .append('<input id="wmd-input-statement-' + lang + '"/>');
+            $('#wmd-input-statement-' + lang)
+                .attr('type', 'hidden')
+                .attr('name', 'wmd-input-statement-' + lang);
+            $('#wmd-input-statement-' + lang)
+                .val(localStorage.getItem(currentMarkdown));
+            localStorage.removeItem(currentMarkdown);
+          }
+        });
+
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
           omegaup.UI.error(omegaup.T.editFieldRequired);
@@ -295,10 +313,17 @@ omegaup.OmegaUp.on('ready', function() {
     }
     $('#languages').val(problem.languages);
     $('input[name=alias]').val(problemAlias);
+
+    selectedLanguage = $('#statement-language').val();
+    currentMarkdown = 'markdown-' + problemAlias + '-' + selectedLanguage;
     if (chosenLanguage == null ||
         chosenLanguage == problem.problem_statement_language) {
       chosenLanguage = problem.problem_statement_language;
-      $('#wmd-input-statement').val(problem.problem_statement);
+      if (localStorage.getItem(currentMarkdown) != null) {
+        $('#wmd-input-statement').val(localStorage.getItem(currentMarkdown));
+      } else {
+        $('#wmd-input-statement').val(problem.problem_statement);
+      }
       $('#statement-language').val(problem.problem_statement_language);
     } else {
       $('#wmd-input-statement').val('');
@@ -315,6 +340,14 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('#statement-language')
+      .on('focus',
+          function(e) {
+            selectedLanguage = $('#statement-language').val();
+            currentMarkdown =
+                'markdown-' + problemAlias + '-' + selectedLanguage;
+            localStorage.setItem(currentMarkdown,
+                                 $('#wmd-input-statement').val());
+          })
       .on('change', function(e) {
         chosenLanguage = $('#statement-language').val();
         omegaup.API.Problem.details({
@@ -325,5 +358,12 @@ omegaup.OmegaUp.on('ready', function() {
                            })
             .then(problemCallback)
             .fail(omegaup.UI.apiError);
+      });
+
+  $('#wmd-input-statement')
+      .on('blur', function(e) {
+        selectedLanguage = $('#statement-language').val();
+        currentMarkdown = 'markdown-' + problemAlias + '-' + selectedLanguage;
+        localStorage.setItem(currentMarkdown, $(this).val());
       });
 });
