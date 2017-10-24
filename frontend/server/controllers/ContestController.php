@@ -50,9 +50,9 @@ class ContestController extends Controller {
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
             }
-            $query = is_null($r['query']) ? null : $r['query'];
+            $query = $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
-            $cache_key = "$active_contests-$recommended-$participating-$query-$page-$page_size";
+            $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
                 Cache::getFromCacheOrSet(
@@ -181,7 +181,7 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-        $query = is_null($r['query']) ? null : $r['query'];
+        $query = $r['query'];
         // Create array of relevant columns
         $relevant_columns = [
             'title',
