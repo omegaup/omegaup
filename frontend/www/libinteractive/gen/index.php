@@ -39,7 +39,9 @@ if ($_POST) {
             } else {
                 fclose($pipes[0]);
                 $output = stream_get_contents($pipes[1]);
+                fclose($pipes[1]);
                 $err = stream_get_contents($pipes[2]);
+                fclose($pipes[2]);
                 $retval = proc_close($proc);
 
                 if ($retval != 0) {
