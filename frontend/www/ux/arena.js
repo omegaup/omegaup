@@ -21,6 +21,7 @@ omegaup.OmegaUp.on('ready', function() {
       '#future-contests',
       'FUTURE',
       'NOT_RECOMMENDED',
+      'NO',
       omegaup.T.arenaFutureContests
     ],
     [
@@ -50,10 +51,15 @@ omegaup.OmegaUp.on('ready', function() {
   var contestLists = [];
   for (var i = 0, len = contestListConfigs.length; i < len; i++) {
     var config = contestListConfigs[i];
-    var contestList = new omegaup.arena.ContestList(
-        config[0],
-        {active: config[1], recommended: config[2], participating: config[3]},
-        {header: config[4]});
+    var contestList =
+        new omegaup.arena.ContestList(config[0],
+                                      {
+                                        active: config[1],
+                                        recommended: config[2],
+                                        participating: config[3],
+                                        query: $('input[name=query]').val()
+                                      },
+                                      {header: config[4]});
     contestLists.push(contestList);
     requests.push(contestList.deferred);
   }

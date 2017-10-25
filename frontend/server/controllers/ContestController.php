@@ -28,7 +28,6 @@ class ContestController extends Controller {
 
         try {
             $contests = [];
-
             Validators::isNumber($r['page'], 'page', false);
             Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -48,6 +47,11 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
+            if (is_null($participating)) {
+                throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
+            $query = $r['query'];
+            Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -55,27 +59,27 @@ class ContestController extends Controller {
                     Cache::CONTESTS_LIST_PUBLIC,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
-                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size);
+                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended);
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -177,7 +181,7 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
+        $query = $r['query'];
         // Create array of relevant columns
         $relevant_columns = [
             'title',
@@ -194,7 +198,8 @@ class ContestController extends Controller {
                 $callback_user_function,
                 $r['current_user_id'],
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
