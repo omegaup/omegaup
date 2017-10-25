@@ -12,7 +12,12 @@ $r['language'] = $language;
 $r['order_by'] = $order_by;
 $r['mode'] = $mode;
 if (!empty($_GET['tag'])) {
-    $r['tag'] = $_GET['tag'];
+    $isArrayTags = strpos($_GET['tag'], '-');
+    if ($isArrayTags === false) {
+        $r['tag'] = $_GET['tag'];
+    } else {
+        $r['tag'] = explode('-', $_GET['tag']);
+    }
 }
 $keyword = '';
 if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
