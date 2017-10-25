@@ -837,6 +837,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsScoreboard: "Lista de estudiantes",
 	wordsSearch: "Buscar",
 	wordsSend: "Enviar",
+	wordsShowSiteAdmins: "Mostrar site-admins",
 	wordsSource: "Fuente",
 	wordsSpanish: "Espa\u00f1ol",
 	wordsStartTime: "Inicio",
