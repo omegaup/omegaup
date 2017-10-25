@@ -907,22 +907,22 @@ export class Arena {
         });
   }
 
-  selectDefaultLanauage() {
+  selectDefaultLanguage() {
     // TODO: Make this depend on a user setting.
     //       See https://github.com/omegaup/omegaup/issues/1471
     let self = this;
     let langElement = self.elements.submitForm.language;
-    if (!langElement.val()) {
-      $('option', langElement)
-          .each(function() {
-            let option = $(this);
-            if (option.css('display') != 'none') {
-              option.prop('selected', true);
-              langElement.change();
-              return false;
-            }
-          });
-    }
+    if (langElement.val()) return;
+
+    $('option', langElement)
+        .each(function() {
+          let option = $(this);
+          if (option.css('display') != 'none') {
+            option.prop('selected', true);
+            langElement.change();
+            return false;
+          }
+        });
   }
 
   mountEditor(problem) {
@@ -934,30 +934,31 @@ export class Arena {
     }
     if (self.codeEditor) {
       self.codeEditor.code = template;
-    } else {
-      self.codeEditor = new Vue({
-        el: self.elements.submitForm.code[0],
-        data: {
-          language: lang,
-          code: template,
-        },
-        render: function(createElement) {
-          return createElement('omegaup-arena-code-view', {
-            props: {
-              language: this.language,
-              value: this.code,
-            },
-            on: {
-              input: (value) => { this.code = value; },
-              change: (value) => { this.code = value; },
-            }
-          });
-        },
-        components: {
-          'omegaup-arena-code-view': arena_CodeView,
-        }
-      });
+      return;
     }
+
+    self.codeEditor = new Vue({
+      el: self.elements.submitForm.code[0],
+      data: {
+        language: lang,
+        code: template,
+      },
+      render: function(createElement) {
+        return createElement('omegaup-arena-code-view', {
+          props: {
+            language: this.language,
+            value: this.code,
+          },
+          on: {
+            input: (value) => { this.code = value; },
+            change: (value) => { this.code = value; },
+          }
+        });
+      },
+      components: {
+        'omegaup-arena-code-view': arena_CodeView,
+      }
+    });
   }
 
   onHashChanged() {
@@ -1048,7 +1049,7 @@ export class Arena {
         $('#problem tbody.added').remove();
 
         self.updateAllowedLanguages(language_array);
-        self.selectDefaultLanauage();
+        self.selectDefaultLanguage();
 
         function updateRuns(runs) {
           if (runs) {
