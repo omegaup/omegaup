@@ -153,3 +153,9 @@ try_define('USER_ANONYMOUS', 'user_anonymous');
 # ########################
 try_define('PASSWORD_RESET_TIMEOUT', 2 * 3600);
 try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
+
+# ########################
+# S3 CONFIG
+# ########################
+try_define('AWS_CLI_ACCESS_KEY_ID', null);
+try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
