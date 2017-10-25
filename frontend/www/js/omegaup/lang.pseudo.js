@@ -839,6 +839,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsScoreboard: "(Sc0r3b0ard)",
 	wordsSearch: "(S3arch)",
 	wordsSend: "(S3nd)",
+	wordsShowSiteAdmins: "(Sh0w 5i73-admin5)",
 	wordsSource: "(S0urc3)",
 	wordsSpanish: "(Spani5h)",
 	wordsStartTime: "(S7ar7)",

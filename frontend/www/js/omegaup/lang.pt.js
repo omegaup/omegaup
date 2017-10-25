@@ -839,6 +839,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsScoreboard: "Scoreboard",
 	wordsSearch: "Pesquisar",
 	wordsSend: "Enviar",
+	wordsShowSiteAdmins: "Mostrar site-admins",
 	wordsSource: "Fonte",
 	wordsSpanish: "Espanhol",
 	wordsStartTime: "Iniciar",

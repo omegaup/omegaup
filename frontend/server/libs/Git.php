@@ -33,22 +33,24 @@ class Git {
             throw new Exception($errors['message']);
         }
 
-                            fclose($pipes[0]);
+        fclose($pipes[0]);
         if ($pipe_stdout) {
             $output = stream_get_contents($pipes[1]);
         } else {
             fpassthru($pipes[1]);
             $output = null;
         }
-                            $err = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        $err = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
 
-                            $retval = proc_close($proc);
+        $retval = proc_close($proc);
         if ($retval != 0) {
             $this->log->error("$cmd failed: $retval $output $err");
             throw new Exception($err);
         }
 
-                            return $output;
+        return $output;
     }
 
     public function get($args, $cwd_override = null) {
