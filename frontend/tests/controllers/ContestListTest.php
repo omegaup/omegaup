@@ -429,7 +429,7 @@ class ContestListTest extends OmegaupTestCase {
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
-            $isPublic = ($i === 0) ? 1 : 0;
+            $isPublic = ($i === 0);
             $contestData[$i] = ContestsFactory::createContest(new ContestParams(['public' => $isPublic]));
         }
 
