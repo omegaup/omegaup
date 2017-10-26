@@ -11,14 +11,8 @@ $r['page'] = $page;
 $r['language'] = $language;
 $r['order_by'] = $order_by;
 $r['mode'] = $mode;
-if (!empty($_GET['tag'])) {
-    $isArrayTags = strpos($_GET['tag'], '-');
-    if ($isArrayTags === false) {
-        $r['tag'] = $_GET['tag'];
-    } else {
-        $r['tag'] = explode('-', $_GET['tag']);
-    }
-}
+$r['tag'] = !empty($_GET['tag']) ? $_GET['tag'] : null;
+
 $keyword = '';
 if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
     $keyword = substr($_GET['query'], 0, 256);
@@ -28,7 +22,7 @@ $response = ProblemController::apiList($r);
 
 $params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode];
 if (!empty($_GET['tag'])) {
-    $params['tag'] = $_GET['tag'];
+    $params['tag'] = implode(',', $_GET['tag']);
 }
 $pager_items = Pager::paginate(
     $response['total'],

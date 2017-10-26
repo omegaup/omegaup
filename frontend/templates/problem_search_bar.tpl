@@ -3,9 +3,11 @@
 		<div class="form-inline">
 			{if !empty($smarty.get.tag)}
 			<div class="form-group">
-				<input type="hidden" name="tag" value="{$smarty.get.tag|urlencode}" />
-				<span class="tag">{$smarty.get.tag|escape}</span>
-				<a href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
+				{foreach item=tag from=$smarty.get.tag}
+					<input type="hidden" name="tag[]" value="{$tag|urlencode}" />
+					<span class="tag">{$tag|escape}</span>
+				{/foreach}
+				<a class="remove-tag" href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
 			</div>
 			{/if}
 			<div class="form-group">
