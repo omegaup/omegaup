@@ -209,7 +209,14 @@ class ProblemDeployer {
             $this->log->info("Starting statement update, lang: $lang");
 
             // Delete statement files
-            $markdownFile = $this->deleteStatementFiles($lang);
+            $markdownFile = "$this->tmpDir/statements/$lang.markdown";
+            $htmlFile = "$this->tmpDir/statements/$lang.html";
+            if (file_exists($markdownFile)) {
+                $this->git('rm -f ' . escapeshellarg($markdownFile), $this->tmpDir);
+            }
+            if (file_exists($htmlFile)) {
+                $this->git('rm -f ' . escapeshellarg($htmlFile), $this->tmpDir);
+            }
 
             if (!is_dir("$this->tmpDir/statements")) {
                 mkdir("$this->tmpDir/statements", 0755);
@@ -226,23 +233,6 @@ class ProblemDeployer {
             $this->log->error("Failed to deploy $e");
             throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
         }
-    }
-
-    /**
-     * Deletes statement files
-     * @param $lang
-     */
-    public function deleteStatementFiles($lang) {
-        // Delete statement files
-        $markdownFile = "$this->tmpDir/statements/$lang.markdown";
-        $htmlFile = "$this->tmpDir/statements/$lang.html";
-        if (file_exists($markdownFile)) {
-            $this->git('rm -f ' . escapeshellarg($markdownFile), $this->tmpDir);
-        }
-        if (file_exists($htmlFile)) {
-            $this->git('rm -f ' . escapeshellarg($htmlFile), $this->tmpDir);
-        }
-        return $markdownFile;
     }
 
     /**

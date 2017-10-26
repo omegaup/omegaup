@@ -780,6 +780,7 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r, true);
 
         // Validate statement
+        Validators::isStringNonEmpty($r['statement'], 'statement');
         Validators::isStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
@@ -806,11 +807,7 @@ class ProblemController extends Controller {
 
         $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
         try {
-            if (is_null($r['statement']) || $r['statement'] == '') {
-                $problemDeployer->deleteStatementFiles($r['lang']);
-            } else {
-                $problemDeployer->updateStatement($r['lang'], $r['statement']);
-            }
+            $problemDeployer->updateStatement($r['lang'], $r['statement']);
             $problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
 
             // Invalidar problem statement cache
