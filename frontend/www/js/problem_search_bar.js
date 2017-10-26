@@ -7,18 +7,5 @@ omegaup.OmegaUp.on('ready', function() {
     }
   });
 
-  $('.tag')
-      .on('click', function(e) {
-        e.preventDefault();
-        path = $(this).attr('href');
-        if (location.href.indexOf('tag') != -1) {
-          path = location.href + '&tag[]=' + $(this).html();
-        }
-        if (location.href.indexOf($(this).html()) != -1) {
-          return false;
-        }
-        window.location = path;
-      });
-
   omegaup.UI.problemTypeahead($('#problem-search-box'));
 });

@@ -7,7 +7,7 @@
 					<input type="hidden" name="tag[]" value="{$tag|urlencode}" />
 					<span class="tag">{$tag|escape}</span>
 				{/foreach}
-				<a class="remove-tag" href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
+				<a class="remove-all-tags" href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
 			</div>
 			{/if}
 			<div class="form-group">

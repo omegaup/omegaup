@@ -28,7 +28,15 @@
 					{if count($problem.tags) > 0}
 					<div class="tag-list" title="{" "|implode:$problem.tags|escape}">
 					{foreach item=tag from=$problem.tags}
+						{if count($current_tags) > 0}
+							{if $tag|in_array:$current_tags}
+							<a class="tag" href="/problem/?tag[]={"&tag[]="|implode:$current_tags|escape}">{$tag|escape}</a>
+							{else}
+							<a class="tag" href="/problem/?tag[]={"&tag[]="|implode:$current_tags|escape}&tag[]={$tag|escape}">{$tag|escape}</a>
+							{/if}
+						{else}
 						<a class="tag" href="/problem/?tag[]={$tag|escape}">{$tag|escape}</a>
+						{/if}
 					{/foreach}
 					</div>
 					{/if}
