@@ -313,11 +313,9 @@ class ContestsDAO extends ContestsDAOBase {
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
         $columns = ContestsDAO::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
-        $query_check = FilteredStatus::sql(
-            is_null($query) || empty($query)
-                ? FilteredStatus::ALL
-            : FilteredStatus::FILTERED
-        );
+        $query_check = FilteredStatus::sql(empty($query)
+            ? FilteredStatus::ALL
+            : FilteredStatus::FILTERED);
 
         $sql = "
             SELECT
@@ -337,7 +335,7 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT ?, ?;";
         global $conn;
         $params[] = $user_id;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
         $params[] = $offset;
@@ -394,11 +392,9 @@ class ContestsDAO extends ContestsDAOBase {
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(
-            is_null($query) || empty($query)
-                ? FilteredStatus::ALL
-            : FilteredStatus::FILTERED
-        );
+        $query_check = FilteredStatus::sql(empty($query)
+            ? FilteredStatus::ALL
+            : FilteredStatus::FILTERED);
 
         $sql = "
                  (
@@ -415,7 +411,7 @@ class ContestsDAO extends ContestsDAOBase {
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
 
@@ -435,7 +431,7 @@ class ContestsDAO extends ContestsDAOBase {
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
 
@@ -458,7 +454,7 @@ class ContestsDAO extends ContestsDAOBase {
                  ) ";
         $params[] = $user_id;
         $params[] = Authorization::ADMIN_ROLE;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
 
@@ -481,7 +477,7 @@ class ContestsDAO extends ContestsDAOBase {
                  ) ";
         $params[] = $user_id;
         $params[] = Authorization::ADMIN_ROLE;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
 
@@ -501,7 +497,7 @@ class ContestsDAO extends ContestsDAOBase {
                      `original_finish_time` DESC
                  LIMIT ?, ?
                 ";
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
         $params[] = $offset;
@@ -530,11 +526,9 @@ class ContestsDAO extends ContestsDAOBase {
         $offset = ($pagina - 1) * $renglones_por_pagina;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(
-            is_null($query) || empty($query)
-                ? FilteredStatus::ALL
-            : FilteredStatus::FILTERED
-        );
+        $query_check = FilteredStatus::sql(empty($query)
+            ? FilteredStatus::ALL
+            : FilteredStatus::FILTERED);
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -556,7 +550,7 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
         $params[] = $offset;
@@ -585,11 +579,9 @@ class ContestsDAO extends ContestsDAOBase {
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(
-            is_null($query) || empty($query)
-                ? FilteredStatus::ALL
-            : FilteredStatus::FILTERED
-        );
+        $query_check = FilteredStatus::sql(empty($query)
+            ? FilteredStatus::ALL
+            : FilteredStatus::FILTERED);
 
         $sql = "
                 SELECT
@@ -605,7 +597,7 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        if (!is_null($query) && !empty($query)) {
+        if (!empty($query)) {
             $params[] = self::formatSearch($query);
         }
         $params[] = $offset;
@@ -641,15 +633,14 @@ class ContestsDAO extends ContestsDAOBase {
         return null;
     }
 
-    private static function formatSearch($string) {
-        $separatedWords = explode(' ', $string);
-        $response = '';
-        foreach ($separatedWords as $index => $word) {
-            // short words or empty indexes are excluded
-            if ($word !== '' && strlen($word) > 3) {
-                $response .= '+' . $word . '* ';
+    private static function formatSearch($query) {
+        $result = [];
+        foreach (explode(' ', $query) as $token) {
+            if (empty($token) || strlen($token) <= 3) {
+                continue; // guard clause pattern
             }
+            $result[] = '+' . urlencode($token) . '*';
         }
-        return substr($response, 0, strlen($response) - 1);
+        return join(' ', $result);
     }
 }
