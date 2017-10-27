@@ -637,7 +637,7 @@ class ContestsDAO extends ContestsDAOBase {
         $result = [];
         foreach (explode(' ', $query) as $token) {
             if (empty($token) || strlen($token) <= 3) {
-                continue; // guard clause pattern
+                continue;
             }
             $result[] = '+' . urlencode($token) . '*';
         }
