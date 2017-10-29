@@ -524,7 +524,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function testAggreateFeedback() {
+    public function testAggregateFeedback() {
         TagsDAO::save(new Tags(['name' => 'dp']));
         TagsDAO::save(new Tags(['name' => 'math']));
         TagsDAO::save(new Tags(['name' => 'matrices']));
@@ -536,7 +536,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        QualityNominationController::aggreateFeedback(new Request([]));
+        QualityNominationController::aggregateFeedback(new Request([]));
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);

@@ -8,4 +8,4 @@
 
 require_once('/opt/omegaup/frontend/server/bootstrap.php');
 require_once('/opt/omegaup/frontend/server/controllers/QualityNominationController.php');
-QualityNominationController::aggreateFeedback(new Request([]));
+QualityNominationController::aggregateFeedback(new Request([]));
