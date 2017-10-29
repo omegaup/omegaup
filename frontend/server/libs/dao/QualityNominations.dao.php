@@ -171,13 +171,20 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $params = [];
 
         if ((!is_null($types) && !empty($types)) || !is_null($nominator)) {
-            $sql .= ' WHERE TRUE';
+            $conditions = [];
             if (!is_null($types) && !empty($types)) {
-                $sql .= ' AND qn.nomination in ("' . implode('", "', $types) . '")';
+                global $conn;
+                foreach ($types as &$type) {
+                        $type = mysqli_real_escape_string($conn->_connectionID, $type);
+                }
+                $conditions[] = ' qn.nomination in ("' . implode('", "', $types) . '")';
             }
             if (!is_null($nominator)) {
-                $sql .= ' AND qn.user_id = ?';
+                $conditions[] = ' qn.user_id = ?';
                 $params[] = $nominator;
+            }
+            if (!empty($conditions)) {
+                $sql .= ' WHERE ' . implode(' AND ', $conditions);
             }
         } elseif (!is_null($assignee)) {
             $sql .= '
