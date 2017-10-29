@@ -1,8 +1,8 @@
+#/usr/bin/php -d max_execution_time=720
+
 <?php
 /**
-* This script is to be called by crontab using the following parameters:
-* php -d max_execution_time=7200 /opt/omegaup/stuff/cron.php
-* 
+* This script is to be called by crontab.
 * max_execution_time is set here at 7200 seconds = 2 hours.
 **/
 
