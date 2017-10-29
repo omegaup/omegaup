@@ -943,6 +943,22 @@ export class Arena {
         language: lang,
         code: template,
       },
+      methods: {refresh: function() { this.codeMirror.refresh(); }},
+      mounted: function() {
+        let self = this;
+        // Wait for sub-components to be mounted...
+        this.$nextTick(() => {
+          // ... and then fish out a reference to the wrapped
+          // CodeMirror instance.
+          //
+          // The full path is:
+          // - self: this unnamed component
+          // - $children[0]: CodeView instance
+          // - $refs['cm-wrapper']: vue-codemirror instance
+          // - editor: the actual CodeMirror instance
+          self.codeMirror = self.$children[0].$refs['cm-wrapper'].editor;
+        });
+      },
       render: function(createElement) {
         return createElement('omegaup-arena-code-view', {
           props: {
@@ -1096,6 +1112,15 @@ export class Arena {
         $('input', self.elements.submitForm).show();
         self.elements.submitForm.show();
         $('#overlay').show();
+        if (self.codeEditor) {
+          // It might not be mounted yet if we refresh directly onto
+          // a /new-run view. This code executes directly, whereas
+          // codeEditor is mounted after update() finishes.
+          //
+          // Luckily in this case we don't require the call to refresh
+          // for the display to update correctly!
+          self.codeEditor.refresh();
+        }
       }
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();

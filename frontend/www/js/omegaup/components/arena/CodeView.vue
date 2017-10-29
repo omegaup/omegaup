@@ -1,5 +1,6 @@
 <template>
-  <omegaup-arena-codemirror v-bind:options="editorOptions"
+  <omegaup-arena-codemirror ref="cm-wrapper"
+        v-bind:options="editorOptions"
         v-bind:value="value"
         v-on:change="onChange"
         v-on:input="onInput"></omegaup-arena-codemirror>
