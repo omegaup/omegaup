@@ -144,7 +144,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $nominator,
         $assignee,
         $page = 1,
-        $pageSize = 1000
+        $pageSize = 1000,
+	$types = ['demotion', 'promotion']
     ) {
         $page = max(0, $page - 1);
         $sql = '
@@ -169,9 +170,15 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             nominator.user_id = qn.user_id';
         $params = [];
 
-        if (!is_null($nominator)) {
-            $sql .= ' WHERE qn.user_id = ?';
-            $params[] = $nominator;
+        if ((!is_null($types) && !empty($types)) || !is_null($nominator)) {
+            $sql .= ' WHERE TRUE';
+            if (!is_null($types) && !empty($types)) {
+                $sql .= ' AND qn.nomination in ("' . implode('", "', $types) . '")';
+            }
+            if (!is_null($nominator)) {
+                $sql .= ' AND qn.user_id = ?';
+                $params[] = $nominator;
+            }
         } elseif (!is_null($assignee)) {
             $sql .= '
             INNER JOIN
