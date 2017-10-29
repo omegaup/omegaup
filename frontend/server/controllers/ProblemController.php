@@ -157,10 +157,6 @@ class ProblemController extends Controller {
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
-        if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
-            throw new DuplicatedEntryInDatabaseException('problemExists');
-        }
-
         $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
 
         $acl = new ACLs();
