@@ -159,10 +159,7 @@ class ProblemDeployer {
         $this->git->get(['push', 'origin', 'master'], $this->tmpDir);
 
         if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . '.git')) {
-            $this->git->get(
-                ['clone', $this->gitDir, $this->targetDir],
-                PROBLEMS_PATH
-            );
+            $this->git->get(['clone', $this->gitDir, $this->targetDir]);
         } else {
             $this->git->get(['pull', '--rebase'], $this->targetDir);
         }
