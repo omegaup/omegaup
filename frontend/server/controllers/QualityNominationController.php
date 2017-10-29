@@ -467,7 +467,7 @@ class QualityNominationController extends Controller {
      * quality and subject tags for each problem in the platform.
      * This function is to be called (only) by a cronjob.
      */
-    public static function apiAggreateFeedback(Request $r) {
+    public static function aggreateFeedback(Request $r) {
         $response = QualityNominationsDAO::getSuggestionRowMap();
 
         $problemTable = $response['table'];
