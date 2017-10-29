@@ -1,6 +1,7 @@
 <?php
 
 require_once 'libs/FileHandler.php';
+require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ZipHandler.php';
 require_once 'libs/third_party/Markdown/markdown.php';
 /**
@@ -900,28 +901,13 @@ class ProblemController extends Controller {
      * @return The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl($sourcePath) {
+    public static function getProblemStatementImpl($params) {
+        list($problemArtifacts, $sourcePath) = $params;
         try {
-            return FileHandler::ReadFile($sourcePath);
+            return $problemArtifacts->get($sourcePath);
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException('statementNotFound');
         }
-    }
-
-    /**
-     * Gets the filesystem path for a problem statement.
-     *
-     * @param string $problemAlias    The alias of the problem.
-     * @param string $language        The language of the problem.
-     * @param string $statementFormat The format in which the statement will be
-     *                                displayed.
-     *
-     * @return The path of the file.
-     */
-    private static function getSourcePath($problemAlias, $language, $statementFormat) {
-        return PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemAlias .
-            DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR .
-            $language . '.' . $statementFormat;
     }
 
     /**
@@ -941,29 +927,22 @@ class ProblemController extends Controller {
         &$language,
         $statementFormat = 'markdown'
     ) {
-        $sourcePath = self::getSourcePath(
-            $problemAlias,
-            $language,
-            $statementFormat
-        );
+        $problemArtifacts = new ProblemArtifacts($problemAlias);
+        $sourcePath = "statements/{$language}.{$statementFormat}";
 
         // Read the file that contains the source
-        if (!file_exists($sourcePath)) {
+        if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
             $language = 'es';
-            $sourcePath = self::getSourcePath(
-                $problemAlias,
-                $language,
-                $statementFormat
-            );
+            $sourcePath = "statements/{$language}.{$statementFormat}";
         }
 
         $fileContents = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
             $problemAlias . '-' . $language . '-' . $statementFormat,
-            $sourcePath,
+            [$problemArtifacts, $sourcePath],
             'ProblemController::getProblemStatementImpl',
             $fileContents,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -979,10 +958,10 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getSampleInput(Request $r) {
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
+        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
 
         try {
-            $file_content = FileHandler::ReadFile($source_path);
+            $file_content = $problemArtifacts->get('examples/sample.in');
         } catch (Exception $e) {
             // Most problems won't have a sample input.
             $file_content = '';
@@ -1468,34 +1447,20 @@ class ProblemController extends Controller {
             // Array to count AC stats per case.
             // Let's try to get the last snapshot from cache.
             $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
-            $cases_stats = $problemStatsCache->get();
-            if (is_null($cases_stats)) {
+            $casesStats = $problemStatsCache->get();
+            if (is_null($casesStats)) {
                 // Initialize the array at counts = 0
-                $cases_stats = [];
-                $cases_stats['counts'] = [];
+                $casesStats = [];
+                $casesStats['counts'] = [];
 
                 // We need to save the last_id that we processed, so next time we do not repeat this
-                $cases_stats['last_id'] = 0;
-
-                // Build problem dir
-                $problem_dir = PROBLEMS_PATH . '/' . $r['problem']->alias . '/cases/';
-
-                // Get list of cases
-                $dir = opendir($problem_dir);
-                if (is_dir($problem_dir)) {
-                    while (($file = readdir($dir)) !== false) {
-                        // If we have an input
-                        if (strstr($file, '.in')) {
-                            // Initialize it to 0
-                            $cases_stats['counts'][str_replace('.in', '', $file)] = 0;
-                        }
-                    }
-                    closedir($dir);
-                }
+                $casesStats['last_id'] = 0;
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(['problem_id' => $r['problem']->problem_id]), $cases_stats['last_id'], 'run_id');
+            $runs = RunsDAO::searchRunIdGreaterThan(new Runs([
+                'problem_id' => $r['problem']->problem_id
+            ]), $casesStats['last_id'], 'run_id');
 
             // For each run we got
             foreach ($runs as $run) {
@@ -1512,9 +1477,13 @@ class ProblemController extends Controller {
                     $details = json_decode(file_get_contents("$grade_dir/details.json"));
                     foreach ($details as $group) {
                         foreach ($group->cases as $case) {
-                            if ($case->score > 0) {
-                                $cases_stats['counts'][$case->name]++;
+                            if (!array_key_exists($case->name, $casesStats['counts'])) {
+                                $casesStats['counts'][$case->name] = 0;
                             }
+                            if ($case->score == 0) {
+                                continue;
+                            }
+                            $casesStats['counts'][$case->name]++;
                         }
                     }
                 }
@@ -1525,17 +1494,17 @@ class ProblemController extends Controller {
 
         // Save the last id we saw in case we saw something
         if (!is_null($runs) && count($runs) > 0) {
-            $cases_stats['last_id'] = $runs[count($runs) - 1]->run_id;
+            $casesStats['last_id'] = $runs[count($runs) - 1]->run_id;
         }
 
         // Save in cache what we got
-        $problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
+        $problemStatsCache->set($casesStats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
 
         return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
             'verdict_counts' => $verdict_counts,
-            'cases_stats' => $cases_stats['counts'],
+            'cases_stats' => $casesStats['counts'],
             'status' => 'ok'
         ];
     }
@@ -1813,6 +1782,7 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     private static function updateLanguages(Problems $problem) {
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
         try {
             ProblemsLanguagesDAO::transBegin();
 
@@ -1822,7 +1792,7 @@ class ProblemController extends Controller {
             ]));
 
             foreach (LanguagesDAO::getAll() as $lang) {
-                if (!file_exists(self::getSourcePath($problem->alias, $lang->name, 'markdown'))) {
+                if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
                     continue;
                 }
                 ProblemsLanguagesDAO::save(new ProblemsLanguages([
