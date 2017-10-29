@@ -479,38 +479,12 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
-    public function testApiAggreateFeedback() {
-        TagsDAO::save(new Tags(['name' => 'dp']));
-        TagsDAO::save(new Tags(['name' => 'math']));
-        TagsDAO::save(new Tags(['name' => 'matrices']));
-        TagsDAO::save(new Tags(['name' => 'greedy']));
-        TagsDAO::save(new Tags(['name' => 'geometry']));
-        TagsDAO::save(new Tags(['name' => 'search']));
-
-        $problemData[0] = ProblemsFactory::createProblem();
-        $problemData[1] = ProblemsFactory::createProblem();
-        self::setUpSyntheticSuggestions($problemData);
-
-        QualityNominationController::apiAggreateFeedback(new Request([]));
-
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
-        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
-        $this->assertEquals($newProblem[0]->difficulty, 3.48958, 'Wrong difficulty.', 0.001);
-        $this->assertEquals($newProblem[0]->quality, 2.34545, 'Wrong quality.', 0.001);
-        $this->assertEquals($newProblem[1]->difficulty, 3.27678, 'Wrong difficulty.', 0.001);
-        $this->assertEquals($newProblem[1]->quality, 1.8595, 'Wrong quality.', 0.001);
-    }
-
     public function testMapFeedbackRows() {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $filter = new QualityNominations([
-            'nomination' => 'suggestion',
-        ]);
-        $allNominations = QualityNominationsDAO::search($filter);
-        $actualResult = QualityNominationController::mapFeedbackRows($allNominations);
+        $actualResult = QualityNominationsDAO::getSuggestionRowMap();
 
         $expectedResult = [
             'table' => [
@@ -548,6 +522,28 @@ class QualityNominationTest extends OmegaupTestCase {
             'global_difficulty_n' => 16,
         ];
         $this->assertEquals($expectedResult, $actualResult);
+    }
+
+    public function testApiAggreateFeedback() {
+        TagsDAO::save(new Tags(['name' => 'dp']));
+        TagsDAO::save(new Tags(['name' => 'math']));
+        TagsDAO::save(new Tags(['name' => 'matrices']));
+        TagsDAO::save(new Tags(['name' => 'greedy']));
+        TagsDAO::save(new Tags(['name' => 'geometry']));
+        TagsDAO::save(new Tags(['name' => 'search']));
+
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        QualityNominationController::apiAggreateFeedback(new Request([]));
+
+        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
+        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
+        $this->assertEquals(3.48958, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(2.34545, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $this->assertEquals(3.27678, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(1.8595, $newProblem[1]->quality, 'Wrong quality.', 0.001);
     }
 
     public function setUpSyntheticSuggestions($problemData) {

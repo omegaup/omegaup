@@ -226,4 +226,65 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         global $conn;
         return self::processNomination($conn->GetRow($sql, [$qualitynomination_id]));
     }
+
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
+    public static function getSuggestionRowMap() {
+        $sql = 'SELECT `QualityNominations`.`problem_id`, `QualityNominations`.`contents` '
+                . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
+        global $conn;
+        $row = $conn->Execute($sql);
+
+        $map = [
+            'table' => [],
+            'global_quality_sum' => 0,
+            'global_quality_n' => 0,
+            'global_difficulty_sum' => 0,
+            'global_difficulty_n' => 0,
+        ];
+
+        do {
+            $nomination = $row->GetRowAssoc();
+            $feedback = (array) json_decode($nomination['contents']);
+
+            $tableRow = &$map['table'][$nomination['problem_id']];
+            if (!isset($tableRow['quality_sum'])) {
+                $tableRow['quality_sum'] = 0;
+                $tableRow['quality_n'] = 0;
+                $tableRow['difficulty_sum'] = 0;
+                $tableRow['difficulty_n'] = 0;
+                $tableRow['tags_n'] = 0;
+                $tableRow['tags'] = [];
+            }
+
+            if (isset($feedback['quality'])) {
+                $tableRow['quality_sum'] += $feedback['quality'];
+                $tableRow['quality_n'] ++;
+                $map['global_quality_sum'] += $feedback['quality'];
+                $map['global_quality_n'] ++;
+            }
+
+            if (isset($feedback['difficulty'])) {
+                $tableRow['difficulty_sum'] += $feedback['difficulty'];
+                $tableRow['difficulty_n'] ++;
+                $map['global_difficulty_sum'] += $feedback['difficulty'];
+                $map['global_difficulty_n'] ++;
+            }
+
+            if (isset($feedback['tags'])) {
+                foreach ($feedback['tags'] as $tag) {
+                    if (!isset($tableRow['tags'][$tag])) {
+                        $tableRow['tags'][$tag] = 1;
+                    } else {
+                        $tableRow['tags'][$tag] ++;
+                    }
+                    $tableRow['tags_n'] ++;
+                }
+            }
+        } while ($row->MoveNext());
+
+        return $map;
+    }
 }
