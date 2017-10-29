@@ -25,7 +25,6 @@ class ProblemDeployer {
 
     private $alias;
     private $tmpDir = null;
-    private $targetDir = null;
     private $zipPath = null;
     public $hasValidator = false;
     public $requiresRejudge = false;
@@ -33,6 +32,7 @@ class ProblemDeployer {
     private $checkedForInteractive = false;
     private $idlFile = null;
     private $created = false;
+    private $committed = false;
     private $operation = null;
     private $updatedLanguages = [];
 
@@ -41,9 +41,9 @@ class ProblemDeployer {
         $this->alias = $alias;
 
         $this->tmpDir = FileHandler::TempDir('/tmp', 'ProblemDeployer', 0755);
-        $this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->operation = $operation;
+        $this->git = new Git($this->gitDir);
 
         if (!is_writable(PROBLEMS_GIT_PATH)) {
             $this->log->error('path is not writable:' . PROBLEMS_GIT_PATH);
@@ -55,13 +55,13 @@ class ProblemDeployer {
             if (!@mkdir($this->gitDir, 0755)) {
                 throw new InvalidParameterException('aliasInUse');
             }
-            $this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
+            $this->git->get(['init', '-q', '--bare', '.']);
             $this->created = true;
         }
 
         // Clone repository into tmp dir
-        $this->git(
-            'clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->tmpDir),
+        $this->git->get(
+            ['clone', $this->gitDir, $this->tmpDir],
             '/tmp'
         );
 
@@ -82,7 +82,7 @@ class ProblemDeployer {
                     $file == 'statements' || $file == '.gitattributes') {
                     continue;
                 }
-                $this->git('rm -rf ' . escapeshellarg($file), $this->tmpDir);
+                $this->git->get(['rm', '-rf', $file], $this->tmpDir);
             }
             closedir($dh);
         }
@@ -121,19 +121,11 @@ class ProblemDeployer {
         return $output;
     }
 
-    private function git($cmd, $cwd) {
-        try {
-            return $this->execute("/usr/bin/git $cmd", $cwd);
-        } catch (Exception $e) {
-            throw new ProblemDeploymentFailedException($e);
-        }
-    }
-
     public function commit($message, $user) {
-        $this->git('add .', $this->tmpDir);
+        $this->git->get(['add', '.'], $this->tmpDir);
         $this->requiresRejudge = false;
         $changedFiles = false;
-        foreach (explode('\n', $this->git('status -s --porcelain', $this->tmpDir)) as $line) {
+        foreach (explode('\n', $this->git->get(['status', '-s', '--porcelain'], $this->tmpDir)) as $line) {
             if ($line == '') {
                 // Happens when the input is empty.
                 continue;
@@ -156,23 +148,14 @@ class ProblemDeployer {
         } else {
             $this->log->debug('Files changed.');
         }
-        $this->git(
-            'config user.email ' . escapeshellarg("$user->username@omegaup"),
+        $this->git->get(
+            ['config', 'user.email', "$user->username@omegaup"],
             $this->tmpDir
         );
-        $this->git('config user.name ' . escapeshellarg($user->username), $this->tmpDir);
-        $this->git('config push.default matching', $this->tmpDir);
-        $this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
-        $this->git('push origin master', $this->tmpDir);
-
-        if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . '.git')) {
-            $this->git(
-                'clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->targetDir),
-                PROBLEMS_PATH
-            );
-        } else {
-            $this->git('pull --rebase', $this->targetDir);
-        }
+        $this->git->get(['config', 'user.name', $user->username], $this->tmpDir);
+        $this->git->get(['config', 'push.default', 'matching'], $this->tmpDir);
+        $this->git->get(['commit', '-am', $message], $this->tmpDir);
+        $this->git->get(['push', 'origin', 'master'], $this->tmpDir);
 
         // Copy the libinteractive templates to a publically accessible location.
         $publicDestination = TEMPLATES_PATH . "/$this->alias/";
@@ -186,6 +169,7 @@ class ProblemDeployer {
                 $publicDestination
             );
         }
+        $this->committed = true;
     }
 
     public function cleanup() {
@@ -194,7 +178,7 @@ class ProblemDeployer {
         }
 
         // Something went wrong and the target directory was not committed. Rollback.
-        if ($this->created && !file_exists($this->targetDir)) {
+        if ($this->created && !$this->committed) {
             FileHandler::DeleteDirRecursive($this->gitDir);
         }
     }
@@ -214,10 +198,10 @@ class ProblemDeployer {
             $markdownFile = "$this->tmpDir/statements/$lang.markdown";
             $htmlFile = "$this->tmpDir/statements/$lang.html";
             if (file_exists($markdownFile)) {
-                $this->git('rm -f ' . escapeshellarg($markdownFile), $this->tmpDir);
+                $this->git->get(['rm', '-f', $markdownFile], $this->tmpDir);
             }
             if (file_exists($htmlFile)) {
-                $this->git('rm -f ' . escapeshellarg($htmlFile), $this->tmpDir);
+                $this->git->get(['rm', '-f', $htmlFile], $this->tmpDir);
             }
 
             if (!is_dir("$this->tmpDir/statements")) {
@@ -341,37 +325,29 @@ class ProblemDeployer {
             return 0;
         }
 
-        $dirpath = $this->tmpDir;
-
-        if (!is_dir("$dirpath/cases")) {
-            $dirpath = $this->targetDir;
+        $problemArtifacts = null;
+        if (is_dir("{$this->tmpDir}/cases")) {
+            $problemArtifacts = new WorkingDirProblemArtifacts($this->tmpDir);
+        } else {
+            $problemArtifacts = new ProblemArtifacts($problem->alias);
         }
 
-        if ($handle = opendir($dirpath)) {
-            while (false !== ($entry = readdir($handle))) {
-                if (stripos($entry, 'validator.') === 0) {
-                    $validator = 1;
-                    break;
-                } elseif (stripos($entry, 'interactive') === 0) {
-                    $validator = 1;
-                    break;
-                }
+        foreach ($problemArtifacts->lsTree('') as $entry) {
+            if (stripos($entry, 'validator.') === 0) {
+                $validator = 1;
+                break;
+            } elseif (stripos($entry, 'interactive') === 0) {
+                $validator = 1;
+                break;
             }
-            closedir($handle);
         }
-
-        $dirpath .= '/cases/in';
 
         $input_count = 0;
-
-        if ($handle = opendir($dirpath)) {
-            while (false !== ($entry = readdir($handle))) {
-                if (!ProblemDeployer::endsWith($entry, '.in', true)) {
-                    continue;
-                }
-                $input_count += 1;
+        foreach ($problemArtifacts->lsTree('cases/in/') as $entry) {
+            if (!ProblemDeployer::endsWith($entry, '.in', true)) {
+                continue;
             }
-            closedir($handle);
+            $input_count += 1;
         }
 
         $max_ms_per_run = $problem->time_limit + $problem->extra_wall_time +
@@ -438,7 +414,7 @@ class ProblemDeployer {
             $this->filesToUnzip[] = $file;
             $this->imageHashes[substr($file, strlen('statements/'))] = true;
             if (file_exists("$this->tmpDir/$file")) {
-                $this->git("rm -f $this->tmpDir/$file", $this->tmpDir);
+                $this->git->get(['rm', '-f', $file], $this->tmpDir);
             }
         }
 
