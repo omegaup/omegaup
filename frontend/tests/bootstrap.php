@@ -39,7 +39,6 @@ require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
 Utils::CleanLog();
 
 // Clean problems and runs path
-Utils::CleanPath(PROBLEMS_PATH);
 Utils::CleanPath(PROBLEMS_GIT_PATH);
 Utils::CleanPath(RUNS_PATH);
 Utils::CleanPath(GRADE_PATH);
