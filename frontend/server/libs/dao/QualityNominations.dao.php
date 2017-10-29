@@ -145,7 +145,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $assignee,
         $page = 1,
         $pageSize = 1000,
-	$types = ['demotion', 'promotion']
+        $types = ['demotion', 'promotion']
     ) {
         $page = max(0, $page - 1);
         $sql = '
