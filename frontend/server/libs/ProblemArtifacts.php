@@ -24,4 +24,38 @@ class ProblemArtifacts {
             return false;
         }
     }
+
+    public function lsTree($path) {
+        return explode('\n', $this->git->get([
+            'ls-tree', '--name-only', 'HEAD:' . $path
+        ]));
+    }
+}
+
+class WorkingDirProblemArtifacts extends ProblemArtifacts {
+    public function __construct($path) {
+        $this->log = Logger::getLogger('WorkingDirProblemDeployer');
+        $this->path = $path;
+    }
+
+    public function get($path) {
+        return file_get_contents("{$this->path}/$path");
+    }
+
+    public function exists($path) {
+        return file_exists("{$this->path}/$path");
+    }
+
+    public function lsTree($path) {
+        $handle = opendir("{$this->path}/$path");
+        if ($handle === false) {
+            return [];
+        }
+        $result = [];
+        while (($entry = readdir($handle)) !== false) {
+            $result[] = $entry;
+        }
+        closedir($handle);
+        return $result;
+    }
 }
