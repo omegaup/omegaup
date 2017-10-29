@@ -235,7 +235,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`problem_id`, `QualityNominations`.`contents` '
                 . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
         global $conn;
-        $row = $conn->Execute($sql);
+        $result = $conn->Execute($sql);
 
         $map = [
             'table' => [],
@@ -245,8 +245,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             'global_difficulty_n' => 0,
         ];
 
-        do {
-            $nomination = $row->GetRowAssoc();
+        foreach ($result as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
 
             $tableRow = &$map['table'][$nomination['problem_id']];
@@ -283,7 +282,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     $tableRow['tags_n'] ++;
                 }
             }
-        } while ($row->MoveNext());
+        };
 
         return $map;
     }
