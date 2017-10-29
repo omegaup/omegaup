@@ -170,14 +170,16 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             nominator.user_id = qn.user_id';
         $params = [];
 
-        if ((!is_null($types) && !empty($types)) || !is_null($nominator)) {
+        if (!empty($types) || !is_null($nominator)) {
             $conditions = [];
-            if (!is_null($types) && !empty($types)) {
+            if (!empty($types)) {
                 global $conn;
-                foreach ($types as &$type) {
-                        $type = mysqli_real_escape_string($conn->_connectionID, $type);
-                }
-                $conditions[] = ' qn.nomination in ("' . implode('", "', $types) . '")';
+                $connectionID = $conn->_connectionID;
+                $escapeFunc = function ($type) use ($connectionID) {
+                    return mysqli_real_escape_string($connectionID, $type);
+                };
+                $conditions[] =
+                    ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
             }
             if (!is_null($nominator)) {
                 $conditions[] = ' qn.user_id = ?';
