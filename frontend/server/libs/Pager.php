@@ -7,8 +7,13 @@ class Pager {
         $params = [];
         $str = '';
         foreach ($dict as $key => $val) {
-            $str .= "$key=$val";
-            $params[] = urlencode($key) . '=' . urlencode($val);
+            if (is_string($val)) {
+                $params[] = urlencode($key) . '=' . urlencode($val);
+            } elseif (is_array($val)) {
+                foreach ($val as $item) {
+                    $params[] = urlencode($key) . '[]=' . urlencode($item);
+                }
+            }
         }
 
         return implode('&', $params);

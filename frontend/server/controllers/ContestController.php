@@ -2597,13 +2597,6 @@ class ContestController extends Controller {
 
         $zip->add_file('summary.csv', $table);
 
-        // Add problem cases to zip
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $contest_problems = ProblemsetProblemsDAO::GetRelevantProblems($problemset);
-        foreach ($contest_problems as $problem) {
-            $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
-        }
-
         // Return zip
         $zip->finish();
         die();
