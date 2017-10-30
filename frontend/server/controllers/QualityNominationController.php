@@ -114,11 +114,13 @@ class QualityNominationController extends Controller {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+            if (isset($contents['tags']) && is_array($contents['tags'])) {
+                foreach ($contents['tags'] as &$tag) {
+                    if (!is_string($tag)) {
+                        throw new InvalidParameterException('parameterInvalid', 'contents');
+                    }
+                    $tag = TagController::normalize($tag);
                 }
-                $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
