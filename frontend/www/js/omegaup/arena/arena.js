@@ -929,7 +929,7 @@ export class Arena {
     let self = this;
     let lang = self.elements.submitForm.language.val();
     let template = '';
-    if (problem.templates && lang) {
+    if (problem.templates && lang && problem.templates[lang]) {
       template = problem.templates[lang];
     }
     if (self.codeEditor) {
@@ -943,7 +943,16 @@ export class Arena {
         language: lang,
         code: template,
       },
-      methods: {refresh: function() { this.codeMirror.refresh(); }},
+      methods: {
+        refresh: function() {
+          // It's possible for codeMirror not to have been set yet
+          // if this method used before the mounted event handler
+          // is called.
+          if (this.codeMirror) {
+            this.codeMirror.refresh();
+          }
+        }
+      },
       mounted: function() {
         let self = this;
         // Wait for sub-components to be mounted...
