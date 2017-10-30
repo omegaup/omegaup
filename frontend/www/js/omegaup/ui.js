@@ -53,7 +53,7 @@ let UI = {
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
-  bulkOperation: function(operation, onOperationFinished) {
+  bulkOperation: function(operation, onOperationFinished, options) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
@@ -69,6 +69,11 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
+    if (typeof usernames != 'undefined') {
+      usernames.each(function(event, index) {
+        operation(event, resolve, reject);
+      });
+    }
 
     // Wait for all
     $(document)
@@ -83,9 +88,13 @@ let UI = {
             onOperationFinished();
 
             if (success === false) {
-              UI.error('Error actualizando items: ' + error);
+              UI.error(UI.formatString(options && options.errorTemplate ||
+                                           omegaup.T.bulkOperationError,
+                                       error));
             } else {
-              UI.success('Todos los items han sido actualizados');
+              UI.success((typeof usernames != 'undefined') ?
+                             omegaup.T.bulkUserAddSuccess :
+                             omegaup.T.updateItemsSuccess);
             }
           }
         });
@@ -188,6 +197,10 @@ let UI = {
   },
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
+
+  groupTypeahead: function(elem, cb) {
+    UI.typeahead(elem, API.Group.list, cb);
+  },
 
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';

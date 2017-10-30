@@ -319,7 +319,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  'User successfully removed!');
+                                                  omegaup.T.userRemoveSuccess);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -334,19 +334,42 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#add-contestant-form')
-      .submit(function() {
-        username = $('#username-contestant').val();
-        omegaup.API.Contest.addUser({
-                             contest_alias: contestAlias,
-                             usernameOrEmail: username,
-                           })
-            .then(function(response) {
-              omegaup.UI.success('User successfully added!');
-              $('div.post.footer').show();
-              refreshContestContestants();
-            })
-            .fail(omegaup.UI.apiError);
-        return false;  // Prevent refresh
+      .submit(function(evt) {
+        evt.preventDefault;
+        isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
+                     .hasClass('user-add-bulk');
+        if (isBulk) {
+          var usernames = $('textarea[name="usernames"]').val().split(',');
+          omegaup.UI.bulkOperation(
+              function(alias, resolve, reject) {
+                var username = $.trim(alias);
+                omegaup.API.Contest.addUser({
+                                     contest_alias: contestAlias,
+                                     usernameOrEmail: username,
+                                   })
+                    .then(resolve)
+                    .fail(reject);
+              },
+              function() { refreshContestContestants(); },
+              {
+                errorTemplate: omegaup.T.bulkUserAddError,
+                successTemplate: omegaup.T.bulkUserAddSuccess
+              });
+          return false;
+        } else {
+          var username = $('#username-contestant').val();
+          omegaup.API.Contest.addUser({
+                               contest_alias: contestAlias,
+                               usernameOrEmail: username,
+                             })
+              .then(function(response) {
+                omegaup.UI.success(omegaup.T.successfulAddUser);
+                $('div.post.footer').show();
+                refreshContestContestants();
+              })
+              .fail(omegaup.UI.apiError);
+          return false;
+        }
       });
 
   // Add admin
@@ -357,9 +380,11 @@ omegaup.OmegaUp.on('ready', function() {
           // Got the contests, lets populate the dropdown with them
           for (var i = 0; i < admins.admins.length; i++) {
             var admin = admins.admins[i];
+            var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#contest-admins')
                 .append(
                     $('<tr></tr>')
+                        .addClass(siteAdmin)
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
@@ -413,14 +438,14 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.Contest.removeGroupAdmin({
-                                                             contest_alias:
-                                                                 contestAlias,
-                                                             group: alias,
-                                                           })
+                                        omegaup.API.Contest
+                                            .removeGroupAdminFromContest({
+                                              contest_alias: contestAlias,
+                                              group: alias,
+                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
+                                                  omegaup.T.groupAdminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -430,6 +455,8 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
+
+          $('#contest-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }
@@ -450,6 +477,15 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent refresh
       });
 
+  $('#toggle-site-admins')
+      .on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#contest-admins .site-admin').show();
+        } else {
+          $('#contest-admins .site-admin').hide();
+        }
+      });
+
   $('#add-group-admin-form')
       .submit(function() {
         omegaup.API.Contest.addGroupAdmin({
@@ -457,7 +493,7 @@ omegaup.OmegaUp.on('ready', function() {
                              group: $('#groupalias-admin').val(),
                            })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              omegaup.UI.success(omegaup.T.groupAdminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
             })

@@ -63,12 +63,12 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->alias . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
 
-        $this->assertFileExists($targetpath . 'testplan');
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'en.html');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'en.markdown');
+        $this->assertTrue($problemArtifacts->exists('testplan'));
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/en.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
 
         // Default data
         $this->assertEquals(0, $problem->visits);
@@ -186,13 +186,13 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('cases/g1.train0.out', $response['uploaded_files'][1]);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'] . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($r['alias']);
 
-        $this->assertFileExists($targetpath . 'testplan');
-        $this->assertFileExists($targetpath . 'cases/in/g1.train0.in');
-        $this->assertFileExists($targetpath . 'cases/out/g1.train0.out');
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $this->assertTrue($problemArtifacts->exists('testplan'));
+        $this->assertTrue($problemArtifacts->exists('cases/in/g1.train0.in'));
+        $this->assertTrue($problemArtifacts->exists('cases/out/g1.train0.out'));
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
     }
 
     /**
@@ -319,10 +319,10 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->alias . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
 
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
 
         // Default data
         $this->assertEquals(0, $problem->visits);
@@ -361,18 +361,18 @@ class CreateProblemTest extends OmegaupTestCase {
         $problem = $problems[0];
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->alias . DIRECTORY_SEPARATOR;
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Verify we have the accents, lol
-        $markdown_contents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
+        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
         if (strpos($markdown_contents, 'ó') === false) {
             $this->fail('ó not found when expected.');
         }
 
-        $html_contents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $html_contents = $problemArtifacts->get('statements/es.html');
         if (strpos($html_contents, 'ó') === false) {
             $this->fail('ó not found when expected.');
         }
@@ -405,15 +405,15 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'] . DIRECTORY_SEPARATOR;
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'bunny.jpg');
+        $problemArtifacts = new ProblemArtifacts($r['alias']);
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+        $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
         $this->assertFileExists(IMAGES_PATH . $imageSha1 . '.' . $imageExtension);
 
         // Verify that all the images are there.
-        $html_contents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $html_contents = $problemArtifacts->get('statements/es.html');
         $this->assertContains('<img src="'. IMAGES_URL_PATH ."$imageSha1.$imageExtension\"", $html_contents);
         // And the direct URL.
         $this->assertContains("<img src=\"$imageAbsoluteUrl\"", $html_contents);
@@ -421,7 +421,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertContains('<img src="notfound.jpg"', $html_contents);
 
         // Do image paht replacement checks in the markdown file
-        $markdown_contents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
+        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
         $this->assertContains('![Saluda](' . IMAGES_URL_PATH . "$imageSha1.$imageExtension)", $markdown_contents);
         // And the direct URL.
         $this->assertContains("![Saluda]($imageAbsoluteUrl)", $markdown_contents);
@@ -473,11 +473,11 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($r['title'], $problem->title);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->alias . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
 
-        $this->assertFileExists($targetpath . 'testplan');
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'en.html');
+        $this->assertTrue($problemArtifacts->exists('testplan'));
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/en.html'));
     }
 
     /**

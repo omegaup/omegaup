@@ -197,7 +197,7 @@ abstract class ProblemsTagsDAOBase extends DAO {
      */
     final private static function create(ProblemsTags $Problems_Tags) {
         if (is_null($Problems_Tags->public)) {
-            $Problems_Tags->public = 0;
+            $Problems_Tags->public = '0';
         }
         $sql = 'INSERT INTO Problems_Tags (`problem_id`, `tag_id`, `public`) VALUES (?, ?, ?);';
         $params = [

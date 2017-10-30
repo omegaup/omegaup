@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 DOWNLOAD_FILES = {
-    'minijail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-minijail/minijail-xenial-distrib-x86_64.tar.bz2',
+    'omegajail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-omegajail/omegajail-xenial-distrib-x86_64.tar.bz2',
     'omegaup-runner.tar.bz2': 'https://s3.amazonaws.com/omegaup-dist/omegaup-runner.tar.bz2',
 }
 
@@ -84,8 +84,8 @@ def main():
         runner.sudo(['/bin/mkdir', '-p', '/etc/omegaup/runner'], check=True)
 
     for path, url in DOWNLOAD_FILES.items():
-        if args.upgrade or runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
-                                       (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
+        if runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
+                      (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
             logging.info('Downloading %s...', url)
             runner.run(['[ -f %s ] && rm %s' % (shlex.quote(path), shlex.quote(path))])
             runner.run(['/usr/bin/curl', '--remote-time', '--output', path,
@@ -114,7 +114,9 @@ def main():
         ']']).returncode != 0:
         runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
 
-
+    runner.sudo(['/bin/rm', '-f', '/var/lib/minijail'], check=True)
+    runner.sudo(['/bin/rm', '-f', '/etc/sudoers.d/minijail'], check=True)
+    runner.sudo(['/bin/systemctl', 'daemon-reload'], check=True)
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
 
 if __name__ == '__main__':

@@ -178,7 +178,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $problemData2 = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(null, 1, null, null, null, 'max');
+        $contestData = ContestsFactory::createContest(new ContestParams(['penalty_calc_policy' => 'max']));
 
         // Add the problems to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -363,7 +363,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrl() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(null, 0);
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem
@@ -451,7 +451,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlNoLogin() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(null, 0);
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem

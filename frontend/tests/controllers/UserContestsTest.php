@@ -13,8 +13,8 @@ class UserContestsTest extends OmegaupTestCase {
         // Our director
         $director = UserFactory::createUser();
 
-        $contestData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
-        $contestData[1] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        $contestData[0] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
+        $contestData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
 
         // Call api
         $login = self::login($director);
@@ -57,9 +57,9 @@ class UserContestsTest extends OmegaupTestCase {
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $helperGroup['group']);
 
-        $contestDirectorData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        $contestDirectorData[0] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
         ContestsFactory::addGroupAdmin($contestDirectorData[0], $helperGroup['group']);
-        $contestDirectorData[1] = ContestsFactory::createContest(null /*title*/, 0 /*public*/, $director);
+        $contestDirectorData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director, 'public' => 0]));
         ContestsFactory::addGroupAdmin($contestDirectorData[1], $helperGroup['group']);
 
         // Call api
@@ -83,7 +83,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCount() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(null, 0 /*public*/);
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
         $user = $contestData['director'];
 
         $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));
@@ -94,7 +94,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCountWithPublicContest() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(null, 1 /*public*/);
+        $contestData = ContestsFactory::createContest();
         $user = $contestData['director'];
 
         $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));

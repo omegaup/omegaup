@@ -1,7 +1,7 @@
 <?php
 
 // From https://gist.github.com/Xeoncross/dc2ebf017676ae946082
-function prefered_language(array $available_languages, $http_accept_language) {
+function preferred_language(array $available_languages, $http_accept_language) {
     $available_languages = array_flip($available_languages);
 
     $langs;
@@ -30,7 +30,7 @@ function prefered_language(array $available_languages, $http_accept_language) {
 $languages = ['en', 'es'];
 $preferred = $languages[0];
 
-if (in_array('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
+if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
     $preferred = preferred_language($languages, $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 }
 

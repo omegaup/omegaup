@@ -71,6 +71,9 @@ class Users extends VO {
         if (isset($data['birth_date'])) {
             $this->birth_date = $data['birth_date'];
         }
+        if (isset($data['gender'])) {
+            $this->gender = $data['gender'];
+        }
         if (isset($data['last_access'])) {
             $this->last_access = $data['last_access'];
         }
@@ -215,6 +218,13 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
+      * @var enum('female','male','other','decline')
+      */
+    public $gender;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
       * @var timestamp
       */
     public $last_access;
@@ -222,14 +232,14 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $verified;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(
+      * @var varchar(50)
       */
     public $verification_id;
 
@@ -257,7 +267,7 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $in_mailing_list;
 }

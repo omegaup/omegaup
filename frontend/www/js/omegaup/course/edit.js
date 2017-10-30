@@ -1,6 +1,7 @@
-import course_AssignmentList from '../components/course/AssignmentList.vue';
-import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AddStudents from '../components/course/AddStudents.vue';
+import course_Administrators from '../components/course/Administrators.vue';
+import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
+import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
@@ -42,6 +43,103 @@ OmegaUp.on('ready', function() {
     // wait until the update is done.
     Vue.nextTick(function() { assignmentDetails.$el.scrollIntoView(); });
   }
+
+  var administrators = new Vue({
+    el: '#admins div',
+    render: function(createElement) {
+      return createElement('omegaup-course-administrators', {
+        props: {
+          admins: this.admins,
+          groupadmins: this.groupadmins,
+        },
+        on: {
+          edit: function(assignment) {
+            assignmentDetails.show = true;
+            assignmentDetails.update = true;
+            assignmentDetails.assignment = assignment;
+            assignmentDetails.$el.scrollIntoView();
+          },
+          'delete': function(assignment) {
+            if (!window.confirm(
+                    UI.formatString(T.courseAssignmentConfirmDelete, {
+                      assignment: assignment.name,
+                    }))) {
+              return;
+            }
+            omegaup.API.Course.removeAssignment({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.courseAssignmentDeleted);
+                  refreshAssignmentsList();
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'new': function() {
+            assignmentDetails.show = true;
+            assignmentDetails.update = false;
+            assignmentDetails.assignment = {
+              start_time: defaultStartTime,
+              finish_time: defaultFinishTime,
+            };
+          },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          },
+          'removeAdmin': function(admin) {
+            API.Course.removeAdmin({
+                        course_alias: courseAlias,
+                        usernameOrEmail: admin.username
+                      })
+                .then(function(data) {
+                  refreshCourseAdmins();
+                  UI.success(T.adminRemoved);
+                })
+                .fail(UI.apiError);
+          },
+          'removeGroupAdmin': function(group) {
+            API.Course.removeGroupAdmin(
+                          {course_alias: courseAlias, group: group.alias})
+                .then(function(data) {
+                  refreshCourseAdmins();
+                  UI.success(T.groupAdminRemoved);
+                })
+                .fail(UI.apiError);
+          },
+          'add-admin': function(useradmin) {
+            omegaup.API.Course.addAdmin({
+                                course_alias: courseAlias,
+                                usernameOrEmail: useradmin,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.adminAdded);
+                  refreshCourseAdmins();
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'add-group-admin': function(groupadmin) {
+            omegaup.API.Course.addGroupAdmin({
+                                course_alias: courseAlias,
+                                group: groupadmin,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(omegaup.T.groupAdminAdded);
+                  refreshCourseAdmins();
+                })
+                .fail(omegaup.UI.apiError);
+          }
+        },
+      });
+    },
+    data: {
+      admins: [],
+      groupadmins: [],
+    },
+    components: {
+      'omegaup-course-administrators': course_Administrators,
+    },
+  });
 
   var assignmentList = new Vue({
     el: '#assignments div.list',
@@ -354,6 +452,16 @@ OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
   }
 
+  function refreshCourseAdmins() {
+    omegaup.API.Course.admins({course_alias: courseAlias})
+        .then(function(data) {
+          administrators.admins = data.admins;
+          administrators.groupadmins = data.group_admins;
+        })
+        .fail(UI.apiError);
+  }
+
   refreshStudentList();
   refreshAssignmentsList();
+  refreshCourseAdmins();
 });

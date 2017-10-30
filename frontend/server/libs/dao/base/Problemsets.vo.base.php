@@ -70,7 +70,7 @@ class Problemsets extends VO {
     /**
       * La modalidad de acceso a este conjunto de problemas
       * @access public
-      * @var enum('private',
+      * @var enum('private','public','registration')
       */
     public $access_mode;
 

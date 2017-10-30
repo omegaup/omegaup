@@ -7,6 +7,34 @@
  */
 
 class UpdateProblemTest extends OmegaupTestCase {
+    public function testProblemUpdateLanguages() {
+        // Get a problem (with 'es' statements)
+        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', 'Problem Language');
+
+        // Update statement
+        $login = self::login($problemData['author']);
+
+        $problem_languages = ProblemsLanguagesDAO::search([
+            'problem_id' => $problemData['problem']->problem_id,
+        ]);
+        // This problem only has one language at this point
+        $this->assertEquals(1, count($problem_languages));
+
+        ProblemController::apiUpdateStatement(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'message' => 'New statement is now more fun',
+            'statement' => 'This is the new statement',
+            'lang' => 'en'
+        ]));
+
+        // The problem has two languages at this point
+        $problem_languages = ProblemsLanguagesDAO::search([
+            'problem_id' => $problemData['problem']->problem_id,
+        ]);
+        $this->assertEquals(2, count($problem_languages));
+    }
+
     public function testUpdateProblemTitleAndContents() {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -65,14 +93,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals('cases/1.in', $response['uploaded_files'][0]);
 
         // Verify problem contents were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem_alias'] . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements/es.html');
-        $this->assertFileNotExists($targetpath . 'examples/sample.in');
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertFalse($problemArtifacts->exists('examples/sample.in'));
 
         // Check update in statements
-        $statement = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $statement = $problemArtifacts->get('statements/es.html');
         $this->assertContains('perímetro', $statement);
 
         $this->assertEquals(12345, $problems[0]->stack_limit);
@@ -82,7 +110,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiUpdate($r);
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['rejudged']);
-        $this->assertFileExists($targetpath . 'examples/sample.in');
+        $this->assertTrue($problemArtifacts->exists('examples/sample.in'));
     }
 
     public function testUpdateProblemWithValidLanguages() {
@@ -154,9 +182,10 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemData['request']['alias'] . DIRECTORY_SEPARATOR;
-        $statementHtmlContents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
-        $statementMarkdownContents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['alias']);
+
+        $statementHtmlContents = $problemArtifacts->get('statements/es.html');
+        $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
         $this->assertContains('<p>This is the new statement \$x\$</p>', $statementHtmlContents);
         $this->assertContains($statement, $statementMarkdownContents);
@@ -185,12 +214,12 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemData['request']['alias'] . DIRECTORY_SEPARATOR;
-        $statementHtmlContents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
-        $statementMarkdownContents = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.markdown');
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['alias']);
+        $statementHtmlContents = $problemArtifacts->get('statements/es.html');
+        $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
         $this->assertFileExists(IMAGES_PATH . $imgFilename);
-        $this->assertFileExists("$targetpath/statements/$imgFilename");
+        $this->assertTrue($problemArtifacts->exists("statements/$imgFilename"));
         $this->assertContains('<img src="' . IMAGES_URL_PATH . $imgFilename . '" alt="Alt text" title="Optional title" />', $statementHtmlContents);
         $this->assertContains('![Alt text](' . IMAGES_URL_PATH . "$imgFilename \"Optional title\")", $statementMarkdownContents);
     }
@@ -231,15 +260,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Verify contents were not erased
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem_alias'] . DIRECTORY_SEPARATOR;
-        $temppath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem_alias'] . '_tmp' . DIRECTORY_SEPARATOR;
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
-        $this->assertFileNotExists($temppath);
-        $this->assertFileExists($targetpath . 'cases');
-        $this->assertFileExists($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
 
         // Check statements still is the original one
-        $statement = file_get_contents($targetpath . 'statements' . DIRECTORY_SEPARATOR . 'es.html');
+        $statement = $problemArtifacts->get('statements/es.html');
         $this->assertContains('<h1>Entrada</h1>', $statement);
     }
 
@@ -471,16 +498,12 @@ class UpdateProblemTest extends OmegaupTestCase {
             'message' => 'no-op',
         ]));
 
-        try {
-            ProblemController::apiUpdate(new Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problem->alias,
-                'visibility' => ProblemController::VISIBILITY_BANNED,
-                'message' => 'public -> banned',
-            ]));
-            $this->fail('Cannot ban problem from API');
-        } catch (InvalidParameterException $e) {
-        }
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'visibility' => ProblemController::VISIBILITY_BANNED,
+            'message' => 'public -> banned',
+        ]));
 
         try {
             ProblemController::apiUpdate(new Request([

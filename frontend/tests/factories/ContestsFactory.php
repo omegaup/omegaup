@@ -1,6 +1,83 @@
 <?php
 
 /**
+ * ContestParams
+ */
+class ContestParams implements ArrayAccess {
+    private $params;
+
+    public function __construct($params = null) {
+        if (!is_object($params)) {
+            $this->params = [];
+            if (is_array($params)) {
+                $this->params = array_merge([], $params);
+            }
+        } else {
+            $this->params = clone $params;
+        }
+        ContestParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
+        ContestParams::validateParameter('public', $this->params, false, 1);
+        ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
+        ContestParams::validateParameter('languages', $this->params, false);
+        ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->params[$offset]) ? $this->params[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->params[] = $value;
+        } else {
+            $this->params[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->params[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->params[$offset]);
+    }
+
+    public static function fromContest(Contests $contest) {
+        return new ContestParams([
+            'title' => $contest->title,
+            'public' => $contest->public,
+            'contestDirector' => $contest->contestDirector,
+            'languages' => $contest->languages,
+            'start_time' => $contest->start_time,
+            'finish_time' => $contest->finish_time,
+            'penalty_calc_policy' => $contest->penalty_calc_policy,
+        ]);
+    }
+
+    /**
+     * Checks if array contains a key defined by $parameter
+     * @param string $parameter
+     * @param array $array
+     * @param boolean $required
+     * @param $default
+     * @return boolean
+     * @throws InvalidParameterException
+     */
+    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
+            if ($required) {
+                throw new InvalidParameterException('ParameterEmpty', $parameter);
+            }
+            $array[$parameter] = $default;
+        }
+
+        return true;
+    }
+}
+
+/**
  * ContestsFactory
  *
  * @author joemmanuel
@@ -16,24 +93,19 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
-        if (is_null($contestDirector)) {
-            $contestDirector = UserFactory::createUser();
+    public static function getRequest($params = null) {
+        if (!($params instanceof ContestParams)) {
+            $params = new ContestParams($params);
         }
-
-        if (is_null($title)) {
-            $title = Utils::CreateRandomString();
-        }
-
         // Set context
         $r = new Request();
-        $r['title'] = $title;
+        $r['title'] = $params['title'];
         $r['description'] = 'description';
-        $r['start_time'] = Utils::GetPhpUnixTimestamp() - 60 * 60;
-        $r['finish_time'] = ($finish_time == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $finish_time);
+        $r['start_time'] = $params['start_time'];
+        $r['finish_time'] = $params['finish_time'];
         $r['window_length'] = null;
-        $r['public'] = $public;
-        $r['alias'] = substr($title, 0, 20);
+        $r['public'] = $params['public'];
+        $r['alias'] = substr($params['title'], 0, 20);
         $r['points_decay_factor'] = '.02';
         $r['partial_score'] = '0';
         $r['submissions_gap'] = '0';
@@ -41,22 +113,28 @@ class ContestsFactory {
         $r['penalty'] = 100;
         $r['scoreboard'] = 100;
         $r['penalty_type'] = 'contest_start';
-        if ($penalty_calc_policy == null) {
+        if ($params['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
-            $r['penalty_calc_policy'] = $penalty_calc_policy;
+            $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
-        $r['languages'] = $languages;
+        $r['languages'] = $params['languages'];
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
         return [
             'request' => $r,
-            'director' => $contestDirector];
+            'director' => $params['contestDirector']
+        ];
     }
 
-    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
+    public static function createContest($params = null) {
+        if (!($params instanceof ContestParams)) {
+            $params = new ContestParams($params);
+        }
+        $privateParams = new ContestParams($params);
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy);
+        $privateParams['public'] = 0;
+        $contestData = ContestsFactory::getRequest($privateParams);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
@@ -66,8 +144,7 @@ class ContestsFactory {
 
         // Call the API
         $response = ContestController::apiCreate($r);
-
-        if ($public === 1) {
+        if ($params['public'] === 1) {
             self::forcePublic($contestData);
             $r['public'] = 1;
         }

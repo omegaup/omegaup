@@ -928,6 +928,14 @@ export class Arena {
     }
 
     var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
+    // Check if we were already viewing this problem to avoid reloading
+    // it and repainting the screen.
+    let problemChanged = true;
+    if (self.previousHash == window.location.hash + '/new-run' ||
+        window.location.hash == self.previousHash + '/new-run') {
+      problemChanged = false;
+    }
+    self.previousHash = window.location.hash;
 
     if (problem && self.problems[problem[1]]) {
       var newRun = problem[2];
@@ -1016,21 +1024,23 @@ export class Arena {
             ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
       }
 
-      if (problem.problem_statement) {
-        update(problem);
-      } else {
-        var problemset = self.computeProblemsetArg();
-        API.Problem.details(
-                       $.extend(problemset, {problem_alias: problem.alias}))
-            .then(function(problem_ext) {
-              problem.source = problem_ext.source;
-              problem.problemsetter = problem_ext.problemsetter;
-              problem.problem_statement = problem_ext.problem_statement;
-              problem.sample_input = problem_ext.sample_input;
-              problem.runs = problem_ext.runs;
-              update(problem);
-            })
-            .fail(UI.apiError);
+      if (problemChanged) {
+        if (problem.problem_statement) {
+          update(problem);
+        } else {
+          var problemset = self.computeProblemsetArg();
+          API.Problem.details(
+                         $.extend(problemset, {problem_alias: problem.alias}))
+              .then(function(problem_ext) {
+                problem.source = problem_ext.source;
+                problem.problemsetter = problem_ext.problemsetter;
+                problem.problem_statement = problem_ext.problem_statement;
+                problem.sample_input = problem_ext.sample_input;
+                problem.runs = problem_ext.runs;
+                update(problem);
+              })
+              .fail(UI.apiError);
+        }
       }
 
       if (newRun) {
@@ -1319,15 +1329,20 @@ export class Arena {
 
     $('#run-details .cases div').remove();
     $('#run-details .cases table').remove();
+    $('#run-details .download a.sourcecode')
+        .attr('href', window.URL.createObjectURL(
+                          new Blob([data.source], {'type': 'text/plain'})))
+        .attr('download', 'Main.' + data.language);
     if (problemAdmin) {
-      $('#run-details .download a')
+      $('#run-details .download a.output')
           .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
       $('#run-details .download a.details')
           .attr('href',
                 '/api/run/download/run_alias/' + data.guid + '/complete/true/');
-      $('#run-details .download').show();
+      $('#run-details .download a').show();
     } else {
-      $('#run-details .download').hide();
+      $('#run-details .download a').hide();
+      $('#run-details .download a.sourcecode').show();
     }
 
     function numericSort(key) {
