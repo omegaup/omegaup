@@ -22,6 +22,18 @@
 					</div>
 
 					<div class="form-group">
+						<label for="gender" class="col-md-3 control-label">{#wordsGender#}</label>
+						<div class="col-md-7">
+						<select id="gender" name='gender' class="form-control" >
+							<option value="female">{#wordsGenderFemale#}</option>
+							<option value="male">{#wordsGenderMale#}</option>
+							<option value="other">{#wordsGenderOther#}</option>
+							<option value="decline">{#wordsGenderDecline#}</option>
+						</select>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label for="country_id" class="col-md-3 control-label">{#userEditCountry#}</label>
 						<div class="col-md-7">
 							<select name='country_id' id='country_id' class="form-control">

@@ -926,8 +926,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'ROOP-17' => 30,
-                'ROOS-17' => 30,
+                'OMIROO-18' => 500,
+                'ROOP-18' => 300,
+                'ROOS-18' => 300,
             ];
         } else {
             throw new InvalidParameterException(
@@ -1074,6 +1075,7 @@ class UserController extends Controller {
         $response['userinfo']['solved'] = $user->solved;
         $response['userinfo']['submissions'] = $user->submissions;
         $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
+        $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
@@ -1569,7 +1571,7 @@ class UserController extends Controller {
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= strtotime('-5 year', time())) {
+            if ($r['birth_date'] >= strtotime('-5 year', Time::get())) {
                 throw new InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
         }
@@ -1600,6 +1602,7 @@ class UserController extends Controller {
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
+            'gender',
             'recruitment_optin',
         ];
 
@@ -1842,7 +1845,7 @@ class UserController extends Controller {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
-        return $newUsername . time();
+        return $newUsername . Time::get();
     }
 
     /**

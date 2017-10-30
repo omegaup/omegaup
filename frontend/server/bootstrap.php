@@ -67,6 +67,7 @@ require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
 require_once('libs/SessionManager.php');
+require_once('libs/Time.php');
 require_once('libs/UITools.php');
 require_once('libs/UrlHelper.php');
 require_once('libs/Validators.php');
@@ -132,6 +133,7 @@ $log = Logger::getLogger('bootstrap');
  * */
 require_once('controllers/Controller.php');
 require_once('controllers/UserController.php');
+require_once('controllers/ACLController.php');
 require_once('controllers/SessionController.php');
 require_once('controllers/ContestController.php');
 require_once('controllers/InterviewController.php');

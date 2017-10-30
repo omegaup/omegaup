@@ -11,7 +11,7 @@ class TimeTest extends OmegaupTestCase {
         $response = TimeController::apiGet();
 
         // Validate result
-        $time = time();
+        $time = Utils::GetPhpUnixTimestamp();
         $this->assertLessThanOrEqual($time, $response['time']);
     }
 }

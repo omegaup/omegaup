@@ -57,6 +57,15 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent refresh
       });
 
+  $('#toggle-site-admins')
+      .on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#problem-admins .site-admin').show();
+        } else {
+          $('#problem-admins .site-admin').hide();
+        }
+      });
+
   $('#add-group-admin-form')
       .submit(function() {
         omegaup.API.Problem.addGroupAdmin({
@@ -64,7 +73,7 @@ omegaup.OmegaUp.on('ready', function() {
                              group: $('#groupalias-admin').attr('data-alias'),
                            })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              omegaup.UI.success(omegaup.T.groupAdminAdded);
               $('div.post.footer').show();
 
               refreshProblemAdmins();
@@ -98,9 +107,11 @@ omegaup.OmegaUp.on('ready', function() {
           // Got the contests, lets populate the dropdown with them
           for (var i = 0; i < admins.admins.length; i++) {
             var admin = admins.admins[i];
+            var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#problem-admins')
                 .append(
                     $('<tr></tr>')
+                        .addClass(siteAdmin)
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
@@ -162,7 +173,7 @@ omegaup.OmegaUp.on('ready', function() {
                                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
+                                                  omegaup.T.groupAdminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -172,6 +183,8 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
+
+          $('#problem-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }

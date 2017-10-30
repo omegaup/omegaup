@@ -38,7 +38,7 @@ class Utils {
 
     public static function GetPhpUnixTimestamp($time = null) {
         if (is_null($time)) {
-            return time();
+            return Time::get();
         } else {
             return strtotime($time);
         }
@@ -106,6 +106,7 @@ class Utils {
             'Groups_Users',
             'Interviews',
             'Problems',
+            'Problems_Languages',
             'Problems_Tags',
             'Problemset_Access_Log',
             'Problemset_Problem_Opened',

@@ -380,9 +380,11 @@ omegaup.OmegaUp.on('ready', function() {
           // Got the contests, lets populate the dropdown with them
           for (var i = 0; i < admins.admins.length; i++) {
             var admin = admins.admins[i];
+            var siteAdmin = (admin.role == 'site-admin') ? admin.role : '';
             $('#contest-admins')
                 .append(
                     $('<tr></tr>')
+                        .addClass(siteAdmin)
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href',
@@ -436,14 +438,14 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .click((function(alias) {
                                       return function(e) {
-                                        omegaup.API.Contest.removeGroupAdmin({
-                                                             contest_alias:
-                                                                 contestAlias,
-                                                             group: alias,
-                                                           })
+                                        omegaup.API.Contest
+                                            .removeGroupAdminFromContest({
+                                              contest_alias: contestAlias,
+                                              group: alias,
+                                            })
                                             .then(function(response) {
                                               omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
+                                                  omegaup.T.groupAdminRemoved);
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
@@ -453,6 +455,8 @@ omegaup.OmegaUp.on('ready', function() {
                                       };
                                     })(group_admin.alias))));
           }
+
+          $('#contest-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }
@@ -473,6 +477,15 @@ omegaup.OmegaUp.on('ready', function() {
         return false;  // Prevent refresh
       });
 
+  $('#toggle-site-admins')
+      .on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#contest-admins .site-admin').show();
+        } else {
+          $('#contest-admins .site-admin').hide();
+        }
+      });
+
   $('#add-group-admin-form')
       .submit(function() {
         omegaup.API.Contest.addGroupAdmin({
@@ -480,7 +493,7 @@ omegaup.OmegaUp.on('ready', function() {
                              group: $('#groupalias-admin').val(),
                            })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              omegaup.UI.success(omegaup.T.groupAdminAdded);
               $('div.post.footer').show();
               refreshContestAdmins();
             })

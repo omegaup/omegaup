@@ -28,7 +28,6 @@ class ContestController extends Controller {
 
         try {
             $contests = [];
-
             Validators::isNumber($r['page'], 'page', false);
             Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -48,6 +47,11 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
+            if (is_null($participating)) {
+                throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
+            $query = $r['query'];
+            Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -55,27 +59,27 @@ class ContestController extends Controller {
                     Cache::CONTESTS_LIST_PUBLIC,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
-                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size);
+                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended);
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -177,7 +181,7 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
+        $query = $r['query'];
         // Create array of relevant columns
         $relevant_columns = [
             'title',
@@ -194,7 +198,8 @@ class ContestController extends Controller {
                 $callback_user_function,
                 $r['current_user_id'],
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -206,6 +211,10 @@ class ContestController extends Controller {
             $contestInfo = $c->asFilteredArray($relevant_columns);
             $addedContests[] = $contestInfo;
         }
+
+        // Expire contest-list cache
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         return [
             'status' => 'ok',
@@ -1388,29 +1397,18 @@ class ContestController extends Controller {
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only director is allowed to create problems in contest
-        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $r['contest']->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the contest to the DB
-        try {
-            UserRolesDAO::save($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addUser($contest->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1433,34 +1431,23 @@ class ContestController extends Controller {
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isContestAdmin($user->user_id, $r['contest'])) {
+        if (!Authorization::isContestAdmin($user->user_id, $contest)) {
             throw new NotFoundException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $r['contest']->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            UserRolesDAO::delete($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeUser($contest->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1491,29 +1478,18 @@ class ContestController extends Controller {
         }
 
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admins are allowed to modify contest
-        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $r['contest']->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the contest to the DB
-        try {
-            GroupRolesDAO::save($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1540,29 +1516,18 @@ class ContestController extends Controller {
         }
 
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $r['contest']->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            GroupRolesDAO::delete($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -2053,12 +2018,11 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getContestAdmins($contest);
-        $response['group_admins'] = GroupRolesDAO::getContestAdmins($contest);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getContestAdmins($contest),
+            'group_admins' => GroupRolesDAO::getContestAdmins($contest)
+        ];
     }
 
     /**
@@ -2632,13 +2596,6 @@ class ContestController extends Controller {
         }
 
         $zip->add_file('summary.csv', $table);
-
-        // Add problem cases to zip
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $contest_problems = ProblemsetProblemsDAO::GetRelevantProblems($problemset);
-        foreach ($contest_problems as $problem) {
-            $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
-        }
 
         // Return zip
         $zip->finish();

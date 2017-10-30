@@ -119,7 +119,7 @@ class RunController extends Controller {
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
                       Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
-                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
+                      Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
                         null,
                         null,
@@ -276,7 +276,7 @@ class RunController extends Controller {
 
             if (!is_null($start)) {
                 //ok, what time is it now?
-                $c_time = time();
+                $c_time = Time::get();
                 $start = strtotime($start);
 
                 //asuming submit_delay is in minutes
@@ -301,6 +301,7 @@ class RunController extends Controller {
                     'memory' => 0,
                     'score' => 0,
                     'contest_score' => $problemset_id != null ? 0 : null,
+                    'time' => gmdate('Y-m-d H:i:s', Time::get()),
                     'submit_delay' => $submit_delay, /* based on penalty_type */
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',
@@ -731,11 +732,72 @@ class RunController extends Controller {
             $results_zip = "$grade_dir/results.zip";
         }
 
+        if (file_exists($results_zip)) {
+            $output_callback = function () use ($results_zip) {
+                header('Content-Length: ' . filesize($results_zip));
+                readfile($results_zip);
+                return true;
+            };
+        } else {
+            $output_callback = function () use ($r) {
+                return self::downloadRunFromS3($r['run']->guid);
+            };
+        }
+
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        header('Content-Length: ' . filesize($results_zip));
-        readfile($results_zip);
+        if (!$output_callback()) {
+            http_response_code(404);
+        }
         exit;
+    }
+
+    /**
+     * Given the run GUID, fetches the .zip file with the results from S3.
+     *
+     * @param string $guid The run's GUID.
+     * @return bool True if successful.
+     */
+    private static function downloadRunFromS3($guid) {
+        if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
+            return false;
+        }
+
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w']
+        ];
+        $proc = proc_open(
+            "/usr/bin/aws s3 cp s3://omegaup-runs/${guid}.zip -",
+            $descriptorspec,
+            $pipes,
+            '/tmp',
+            [
+                'AWS_ACCESS_KEY_ID' => AWS_CLI_ACCESS_KEY_ID,
+                'AWS_SECRET_ACCESS_KEY' => AWS_CLI_SECRET_ACCESS_KEY,
+            ]
+        );
+
+        if (!is_resource($proc)) {
+            $errors = error_get_last();
+            self::$log->error("Getting run $guid failed: {$errors['type']} {$errors['message']}");
+            return false;
+        }
+
+        fclose($pipes[0]);
+        $err = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        fpassthru($pipes[1]);
+        fclose($pipes[1]);
+
+        $retval = proc_close($proc);
+
+        if ($retval != 0) {
+            self::$log->error("Getting run $guid failed: $retval $err");
+            return false;
+        }
+        return true;
     }
 
     /**

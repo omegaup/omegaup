@@ -49,7 +49,7 @@ class GroupsDAO extends GroupsDAOBase {
     final public static function getAllGroupsAdminedByUser($user_id) {
         $sql = '
             SELECT
-                g.*
+                DISTINCT g.*
             FROM
                 Groups g
             INNER JOIN

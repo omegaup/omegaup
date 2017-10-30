@@ -20,7 +20,7 @@ abstract class UsersDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list`';
+    const FIELDS = '`Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class UsersDAOBase extends DAO {
         if (is_null($user_id)) {
             return null;
         }
-        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` FROM Users WHERE (user_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` FROM Users WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class UsersDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Users}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` from Users';
+        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` from Users';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -187,6 +187,10 @@ abstract class UsersDAOBase extends DAO {
             $clauses[] = '`birth_date` = ?';
             $params[] = $Users->birth_date;
         }
+        if (!is_null($Users->gender)) {
+            $clauses[] = '`gender` = ?';
+            $params[] = $Users->gender;
+        }
         if (!is_null($Users->last_access)) {
             $clauses[] = '`last_access` = ?';
             $params[] = $Users->last_access;
@@ -225,7 +229,7 @@ abstract class UsersDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` FROM `Users`';
+        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`name`, `Users`.`solved`, `Users`.`submissions`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`last_access`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`recruitment_optin`, `Users`.`in_mailing_list` FROM `Users`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -249,7 +253,7 @@ abstract class UsersDAOBase extends DAO {
       * @param Users [$Users] El objeto de tipo Users a actualizar.
       */
     final private static function update(Users $Users) {
-        $sql = 'UPDATE `Users` SET `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ?, `in_mailing_list` = ? WHERE `user_id` = ?;';
+        $sql = 'UPDATE `Users` SET `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `gender` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ?, `in_mailing_list` = ? WHERE `user_id` = ?;';
         $params = [
             $Users->username,
             $Users->facebook_user_id,
@@ -265,6 +269,7 @@ abstract class UsersDAOBase extends DAO {
             $Users->language_id,
             $Users->graduation_date,
             $Users->birth_date,
+            $Users->gender,
             $Users->last_access,
             $Users->verified,
             $Users->verification_id,
@@ -302,12 +307,12 @@ abstract class UsersDAOBase extends DAO {
             $Users->last_access = gmdate('Y-m-d H:i:s');
         }
         if (is_null($Users->verified)) {
-            $Users->verified = false;
+            $Users->verified = '0';
         }
         if (is_null($Users->in_mailing_list)) {
-            $Users->in_mailing_list = false;
+            $Users->in_mailing_list = '0';
         }
-        $sql = 'INSERT INTO Users (`user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin`, `in_mailing_list`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Users (`user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `gender`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin`, `in_mailing_list`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Users->user_id,
             $Users->username,
@@ -324,6 +329,7 @@ abstract class UsersDAOBase extends DAO {
             $Users->language_id,
             $Users->graduation_date,
             $Users->birth_date,
+            $Users->gender,
             $Users->last_access,
             $Users->verified,
             $Users->verification_id,
@@ -540,6 +546,17 @@ abstract class UsersDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`birth_date` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $UsersA->gender;
+        $b = $UsersB->gender;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`gender` >= ? AND `gender` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`gender` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

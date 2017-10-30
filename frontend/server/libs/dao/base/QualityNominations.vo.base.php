@@ -86,7 +86,7 @@ class QualityNominations extends VO {
     /**
       * El tipo de nominación
       * @access public
-      * @var enum('suggestion',
+      * @var enum('suggestion','promotion','demotion','dismissal')
       */
     public $nomination;
 
@@ -107,7 +107,7 @@ class QualityNominations extends VO {
     /**
       * El estado de la nominación
       * @access public
-      * @var enum('open',
+      * @var enum('open','approved','denied')
       */
     public $status;
 }

@@ -133,7 +133,7 @@ class Problems extends VO {
     public $problem_id;
 
     /**
-      * La lista de control de acceso del problema
+      *  [Campo no documentado]
       * @access public
       * @var int(11)
       */

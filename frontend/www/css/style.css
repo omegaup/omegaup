@@ -74,6 +74,10 @@ div.title {
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
 div.copy { padding: 16px; }
+div#ranking {
+	overflow: auto;
+	white-space: nowrap;
+}
 
 div.copy h3 {
 	font-size: 20px;
@@ -246,6 +250,7 @@ table.sample_io {
 }
 table.merged-scoreboard td {
 	vertical-align: middle;
+	padding: 5px;
 }
 table.merged-scoreboard tr:nth-child(even) {
 	background: #eee;
@@ -533,18 +538,24 @@ th.contains-long-desc{ min-width:369px; }
 	margin-bottom: 10px;
 }
 
+.search-bar #problem-search-language {
+	width: 100px;
+	margin-left: 2px;
+}
+
 .search-bar #problem-search-order {
-	width: 200px;
-	margin-left: 10px;
+	width: 160px;
+	margin-left: 2px;
 }
 
 .search-bar #problem-search-mode {
-	width: 150px;
-	margin-left: 10px;
+	width: 120px;
+	margin-left: 2px;
 }
 
 .search-bar #problem-search-button {
 	height: 32px;
+	margin-left: 5px;
 }
 
 table.problem-list td {

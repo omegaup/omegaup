@@ -368,16 +368,16 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->order = 'normal';
         }
         if (is_null($Problems->tolerance)) {
-            $Problems->tolerance = 1e-9;
+            $Problems->tolerance = '0.000000001';
         }
         if (is_null($Problems->slow)) {
-            $Problems->slow = 0;
+            $Problems->slow = '0';
         }
         if (is_null($Problems->deprecated)) {
-            $Problems->deprecated = 0;
+            $Problems->deprecated = '0';
         }
         if (is_null($Problems->email_clarifications)) {
-            $Problems->email_clarifications = 0;
+            $Problems->email_clarifications = '0';
         }
         $sql = 'INSERT INTO Problems (`problem_id`, `acl_id`, `visibility`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `quality`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [

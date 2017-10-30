@@ -3,9 +3,11 @@
 		<div class="form-inline">
 			{if !empty($smarty.get.tag)}
 			<div class="form-group">
-				<input type="hidden" name="tag" value="{$smarty.get.tag|urlencode}" />
-				<span class="tag">{$smarty.get.tag|escape}</span>
-				<a href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
+				{foreach item=tag from=$smarty.get.tag}
+					<input type="hidden" name="tag[]" value="{$tag|urlencode}" />
+					<span class="tag">{$tag|escape}</span>
+				{/foreach}
+				<a class="remove-all-tags" href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
 			</div>
 			{/if}
 			<div class="form-group">
@@ -14,6 +16,17 @@
 						{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
 						placeholder="{#wordsKeyword#}">
 			</div>
+
+			<div class="form-group">
+				<label class="control-label" for="mode">{#wordsFilterByLanguage#}</label>
+				<select class="form-control" id="problem-search-language" name="language">
+					<option {if $LANGUAGE == null} selected="selected"{/if} value="all">{#wordsAll#}</option>
+					<option {if $LANGUAGE == 'es'}	selected="selected"{/if} value="es">{#wordsSpanish#}</option>
+					<option {if $LANGUAGE == 'en'}	selected="selected"{/if} value="en">{#wordsEnglish#}</option>
+					<option {if $LANGUAGE == 'pt'}	selected="selected"{/if} value="pt">{#wordsPortuguese#}</option>
+				</select>
+			</div>
+
 			<div class="form-group">
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>
 				<select class="form-control" id="problem-search-order" name="order_by">
@@ -31,7 +44,7 @@
 				<label class="control-label" for="mode">{#wordsMode#}</label>
 				<select class="form-control" id="problem-search-mode" name="mode">
 					<option {if $MODE == 'asc'}	selected="selected"{/if}	value="asc">{#wordsModeAsc#}</option>
-					<option {if $MODE == 'desc'}selected="selected"{/if}	value="desc">{#wordsModeDesc#}</option>
+					<option {if $MODE == 'desc'} selected="selected"{/if}	value="desc">{#wordsModeDesc#}</option>
 				</select>
 			</div>
 

@@ -225,6 +225,11 @@ class Cache {
      * @return boolean
      */
     public static function getFromCacheOrSet($prefix, $id, $arg, $setFunc, &$returnValue, $timeout = 0) {
+        if (is_null($id)) {
+            // Unconditionally skipping cache.
+            $returnValue = call_user_func($setFunc, $r);
+            return false;
+        }
         $cache = new Cache($prefix, $id);
         $returnValue = $cache->get();
 
