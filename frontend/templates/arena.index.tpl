@@ -3,6 +3,19 @@
 			<div id="content">
 				<div class="panel">
 					<div class="panel-heading panel-default">
+						<div class="text-right">
+							<form action="/arena/" method="GET">
+								<div class="form-inline">
+									<div class="form-group">
+										<input class="form-control"
+												type="text" name="query" autocomplete="off"
+												{if $query != ''} value="{$query|escape}"{/if}
+												placeholder="{#wordsKeyword#}">
+									</div>
+									<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}"/>
+								</div>
+							</form>
+						</div>
 						<h1>{#arenaPageTitle#}</h1>
 						<p>{#arenaPageIntroduction#}</p>
 						<p>{#frontPageIntroduction#}
