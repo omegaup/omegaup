@@ -84,8 +84,8 @@ def main():
         runner.sudo(['/bin/mkdir', '-p', '/etc/omegaup/runner'], check=True)
 
     for path, url in DOWNLOAD_FILES.items():
-        if args.upgrade or runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
-                                       (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
+        if runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
+                      (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
             logging.info('Downloading %s...', url)
             runner.run(['[ -f %s ] && rm %s' % (shlex.quote(path), shlex.quote(path))])
             runner.run(['/usr/bin/curl', '--remote-time', '--output', path,
@@ -114,6 +114,7 @@ def main():
         ']']).returncode != 0:
         runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
 
+    runner.sudo(['/bin/rm', '-f', '/var/lib/minijail'], check=True)
     runner.sudo(['/bin/rm', '-f', '/etc/sudoers.d/minijail'], check=True)
     runner.sudo(['/bin/systemctl', 'daemon-reload'], check=True)
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
