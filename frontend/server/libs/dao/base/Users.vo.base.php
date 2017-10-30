@@ -275,7 +275,7 @@ class Users extends VO {
     public $in_mailing_list;
 
     /**
-      * El lenguaje de programación preferencia de este usuario
+      * El lenguaje de programación de preferencia de este usuario
       * @access public
       * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */

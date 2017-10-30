@@ -759,7 +759,7 @@ CREATE TABLE `Users` (
   `reset_sent_at` datetime DEFAULT NULL,
   `recruitment_optin` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
-  `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación preferencia de este usuario',
+  `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `country_id` (`country_id`),
