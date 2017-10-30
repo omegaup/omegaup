@@ -468,18 +468,28 @@ class QualityNominationController extends Controller {
      * This function is to be called (only) by a cronjob.
      */
     public static function aggregateFeedback(Request $r) {
-        $response = QualityNominationsDAO::getSuggestionRowMap();
+        $globals = QualityNominationsDAO::getGlobalDifficultyAndQuality();
+        $globalQualityAverage = $globals['quality'];
+        $globalDifficultyAverage = $globals['difficulty'];
 
-        $problemTable = $response['table'];
-        $globalQualityAverage = $response['global_quality_sum'] / $response['global_quality_n'];
-        $globalDifficultyAverage = $response['global_difficulty_sum'] / $response['global_difficulty_n'];
+        $listOfProblems = QualityNominationsDAO::getListOfProblemsWithSuggestions();
+        foreach ($listOfProblems as $problemId) {
+            $problemTable = QualityNominationsDAO::getProblemSuggestionTable($problemId);
 
-        foreach ($problemTable as $key => $row) {
-            $problem = ProblemsDAO::getByPK($key);
-            $problem->quality = self::bayesianAverage($globalQualityAverage, $row['quality_sum'], $row['quality_n']);
-            $problem->difficulty = self::bayesianAverage($globalDifficultyAverage, $row['difficulty_sum'], $row['difficulty_n']);
+            $problem = ProblemsDAO::getByPK($problemId);
+            $problem->quality = self::bayesianAverage(
+                $globalQualityAverage,
+                $problemTable['quality_sum'],
+                $problemTable['quality_n']
+            );
+            $problem->difficulty = self::bayesianAverage(
+                $globalDifficultyAverage,
+                $problemTable['difficulty_sum'],
+                $problemTable['difficulty_n']
+            );
             // TODO(heduenas): Get threshold parameter from DB for each problem independently.
-            $tags = self::mostVotedTags($row['tags'], 0.25);
+            $tags = self::mostVotedTags($problemTable['tags'], 0.25);
+
             if ($problem->quality != null || $problem->difficulty != null) {
                 ProblemsDAO::save($problem);
             }

@@ -228,62 +228,100 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function computes sums of difficulty, quality, and tag votes for
-     * each problem and returns that in the form of a table.
+     * This function computes the average difficulty and quality among all problems.
      */
-    public static function getSuggestionRowMap() {
-        $sql = 'SELECT `QualityNominations`.`problem_id`, `QualityNominations`.`contents` '
-                . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
+    public static function getGlobalDifficultyAndQuality() {
+        $sql = 'SELECT `QualityNominations`.`contents` '
+            . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
+
+        $qualitySum = 0;
+        $qualityN = 0;
+        $difficultySum = 0;
+        $difficultyN = 0;
+
         global $conn;
         $result = $conn->Execute($sql);
 
-        $map = [
-            'table' => [],
-            'global_quality_sum' => 0,
-            'global_quality_n' => 0,
-            'global_difficulty_sum' => 0,
-            'global_difficulty_n' => 0,
+        foreach ($result as $nomination) {
+            $feedback = (array) json_decode($nomination['contents']);
+            if (isset($feedback['quality'])) {
+                $qualitySum += $feedback['quality'];
+                $qualityN ++;
+            }
+            if (isset($feedback['difficulty'])) {
+                $difficultySum += $feedback['difficulty'];
+                $difficultyN ++;
+            }
+        }
+
+        return [
+            'quality' => $qualitySum / $qualityN,
+            'difficulty' => $difficultySum / $difficultyN,
         ];
+    }
+
+    /**
+     * This function returns a list with the IDs of those problems which have
+     * at least one suggestion associated with them.
+     */
+    public static function getListOfProblemsWithSuggestions() {
+        $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
+            . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
+        $problemIds = [];
+        global $conn;
+        foreach ($conn->Execute($sql) as $nomination) {
+            $problemIds[] = $nomination['problem_id'];
+        }
+        return $problemIds;
+    }
+
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
+    public static function getProblemSuggestionTable($problemId) {
+        $sql = 'SELECT `QualityNominations`.`contents` '
+            . 'FROM `QualityNominations` '
+            . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
+        global $conn;
+        $result = $conn->Execute($sql);
+
+        $problemTable = [];
 
         foreach ($result as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
 
-            $tableRow = &$map['table'][$nomination['problem_id']];
-            if (!isset($tableRow['quality_sum'])) {
-                $tableRow['quality_sum'] = 0;
-                $tableRow['quality_n'] = 0;
-                $tableRow['difficulty_sum'] = 0;
-                $tableRow['difficulty_n'] = 0;
-                $tableRow['tags_n'] = 0;
-                $tableRow['tags'] = [];
+            if (!isset($problemTable['quality_sum'])) {
+                $problemTable['quality_sum'] = 0;
+                $problemTable['quality_n'] = 0;
+                $problemTable['difficulty_sum'] = 0;
+                $problemTable['difficulty_n'] = 0;
+                $problemTable['tags_n'] = 0;
+                $problemTable['tags'] = [];
             }
 
             if (isset($feedback['quality'])) {
-                $tableRow['quality_sum'] += $feedback['quality'];
-                $tableRow['quality_n'] ++;
-                $map['global_quality_sum'] += $feedback['quality'];
-                $map['global_quality_n'] ++;
+                $problemTable['quality_sum'] += $feedback['quality'];
+                $problemTable['quality_n'] ++;
             }
 
             if (isset($feedback['difficulty'])) {
-                $tableRow['difficulty_sum'] += $feedback['difficulty'];
-                $tableRow['difficulty_n'] ++;
-                $map['global_difficulty_sum'] += $feedback['difficulty'];
-                $map['global_difficulty_n'] ++;
+                $problemTable['difficulty_sum'] += $feedback['difficulty'];
+                $problemTable['difficulty_n'] ++;
             }
 
             if (isset($feedback['tags'])) {
                 foreach ($feedback['tags'] as $tag) {
-                    if (!isset($tableRow['tags'][$tag])) {
-                        $tableRow['tags'][$tag] = 1;
+                    if (!isset($problemTable['tags'][$tag])) {
+                        $problemTable['tags'][$tag] = 1;
                     } else {
-                        $tableRow['tags'][$tag] ++;
+                        $problemTable['tags'][$tag] ++;
                     }
-                    $tableRow['tags_n'] ++;
+                    $problemTable['tags_n'] ++;
                 }
             }
-        };
+        }
 
-        return $map;
+        return $problemTable;
     }
 }

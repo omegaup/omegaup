@@ -479,47 +479,54 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
-    public function testMapFeedbackRows() {
+    public function testGetGlobalDifficultyAndQuality() {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $actualResult = QualityNominationsDAO::getSuggestionRowMap();
+        $actualGlobals = QualityNominationsDAO::getGlobalDifficultyAndQuality();
+        $expectedGlobals = [
+            'quality' => 23/11,
+            'difficulty' => 54/16,
+        ];
 
-        $expectedResult = [
-            'table' => [
-                $problemData[0]['problem']->problem_id =>  [
-                    'quality_sum' => 13,
-                    'quality_n' => 5,
-                    'difficulty_sum' => 25,
-                    'difficulty_n' => 7,
-                    'tags_n' => 15,
-                    'tags' => [
-                        'dp' => 6,
-                        'math' => 6,
-                        'matrices' => 1,
-                        'greedy' => 2,
-                    ],
-                ],
-                $problemData[1]['problem']->problem_id =>  [
-                    'quality_sum' => 10,
-                    'quality_n' => 6,
-                    'difficulty_sum' => 29,
-                    'difficulty_n' => 9,
-                    'tags_n' => 15,
-                    'tags' => [
-                        'search' => 6,
-                        'geometry' => 4,
-                        'matrices' => 1,
-                        'math' => 2,
-                        'dp' => 2,
-                    ],
-                ],
+        $this->assertEquals($expectedGlobals, $actualGlobals);
+    }
+
+    public function testGetSuggestionRowMap() {
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        $actualResult[0] = QualityNominationsDAO::getProblemSuggestionTable($problemData[0]['problem']->problem_id);
+        $actualResult[1] = QualityNominationsDAO::getProblemSuggestionTable($problemData[1]['problem']->problem_id);
+
+        $expectedResult[0] = [
+            'quality_sum' => 13,
+            'quality_n' => 5,
+            'difficulty_sum' => 25,
+            'difficulty_n' => 7,
+            'tags_n' => 15,
+            'tags' => [
+                'dp' => 6,
+                'math' => 6,
+                'matrices' => 1,
+                'greedy' => 2,
+                ]
+            ];
+        $expectedResult[1] = [
+            'quality_sum' => 10,
+            'quality_n' => 6,
+            'difficulty_sum' => 29,
+            'difficulty_n' => 9,
+            'tags_n' => 15,
+            'tags' => [
+                'search' => 6,
+                'geometry' => 4,
+                'matrices' => 1,
+                'math' => 2,
+                'dp' => 2,
             ],
-            'global_quality_sum' => 23,
-            'global_quality_n' => 11,
-            'global_difficulty_sum' => 54,
-            'global_difficulty_n' => 16,
         ];
         $this->assertEquals($expectedResult, $actualResult);
     }
