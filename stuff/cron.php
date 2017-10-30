@@ -1,3 +1,4 @@
+#/usr/bin/php -d max_execution_time=720
 <?php
 /**
 * This script is to be called by crontab.
