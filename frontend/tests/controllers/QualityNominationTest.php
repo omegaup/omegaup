@@ -543,7 +543,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        QualityNominationController::aggregateFeedback(new Request([]));
+        QualityNominationsDAO::aggregateFeedback(new Request([]));
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
@@ -727,27 +727,27 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tags, 0.25),
+            QualityNominationsDAO::mostVotedTags($tags, 0.25),
             ['DP', 'Graph', 'Binary Search']
         );
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tags, 0.5),
+            QualityNominationsDAO::mostVotedTags($tags, 0.5),
             ['DP', 'Graph']
         );
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tags, 0.9),
+            QualityNominationsDAO::mostVotedTags($tags, 0.9),
             ['DP']
         );
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tags, 0.9),
+            QualityNominationsDAO::mostVotedTags($tags, 0.9),
             ['DP']
         );
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tags, 0.01),
+            QualityNominationsDAO::mostVotedTags($tags, 0.01),
             ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
         );
 
@@ -757,7 +757,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tagsWithLittleVotes, 0.25),
+            QualityNominationsDAO::mostVotedTags($tagsWithLittleVotes, 0.25),
             [],
             'There must be at least 5 votes.'
         );
@@ -767,7 +767,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
 
         $this->assertEquals(
-            QualityNominationController::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            QualityNominationsDAO::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
             [],
             'There must be a maximum number of tags to be assigned.'
         );

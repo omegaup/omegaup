@@ -1,5 +1,3 @@
-#/usr/bin/php -d max_execution_time=720
-
 <?php
 /**
 * This script is to be called by crontab.
@@ -7,5 +5,4 @@
 **/
 
 require_once('/opt/omegaup/frontend/server/bootstrap.php');
-require_once('/opt/omegaup/frontend/server/controllers/QualityNominationController.php');
-QualityNominationController::aggregateFeedback(new Request([]));
+QualityNominationsDAO::aggregateFeedback(new Request([]));
