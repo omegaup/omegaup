@@ -946,7 +946,7 @@ export class Arena {
       methods: {
         refresh: function() {
           // It's possible for codeMirror not to have been set yet
-          // if this method used before the mounted event handler
+          // if this method is used before the mounted event handler
           // is called.
           if (this.codeMirror) {
             this.codeMirror.refresh();
