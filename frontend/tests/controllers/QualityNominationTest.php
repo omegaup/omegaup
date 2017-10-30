@@ -119,6 +119,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $response = QualityNominationController::apiMyList(new Request([
             'auth_token' => $login->auth_token,
+            'types' => ['suggestion'],
         ]));
         $this->assertEquals(1, count($response['nominations']));
         $nomination = $response['nominations'][0];

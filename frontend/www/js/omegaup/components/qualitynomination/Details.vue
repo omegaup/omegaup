@@ -35,8 +35,8 @@
           <div class="col-sm-3">
             <strong>{{ T.wordsDetails }}</strong>
           </div>
-          <div class="col-sm-4">
-            {{ this.contents }}
+          <div class="col-sm-8">
+            <pre>{{ this.contents | pretty }}</pre>
           </div>
         </div>
         <div class="row"

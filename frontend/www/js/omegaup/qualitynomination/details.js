@@ -9,7 +9,7 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
-          contents: payload.original_contents,
+          contents: payload.contents,
           nomination: payload.nomination,
           nominator: {
             username: payload.nominator.username,

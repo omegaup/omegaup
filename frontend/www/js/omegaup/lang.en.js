@@ -572,7 +572,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationNotFound: "Nomination not found",
 	qualityNominationProblemHasBeenBanned: "This problem has been banned. You cannot update its visibility.",
 	qualityNominationProblemHasBeenPromoted: "This problem has been promoted. You cannot update its visibility.",
-	qualityNominationShowAll: "Show all nominations",
+	qualityNominationShowAll: "Also show resolved nominations",
 	qualityNominationType: "Type",
 	qualityUserThatNominated: "User that nominated",
 	rankHeaderPostCount: "users with the most points",

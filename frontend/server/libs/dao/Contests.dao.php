@@ -97,11 +97,13 @@ class RecommendedStatus extends StatusBase {
 
 class FilteredStatus extends StatusBase {
     const ALL = 0;
-    const FILTERED = 1;
+    const SIMPLE = 1;
+    const FULLTEXT = 2;
 
     public static $SQL_FOR_STATUS = [
         'TRUE',
-        'MATCH(title, description) AGAINST(? IN NATURAL LANGUAGE MODE)',
+        '(title LIKE CONCAT(\'%\', ?, \'%\') OR description LIKE CONCAT(\'%\', ?, \'%\'))',
+        'MATCH(title, description) AGAINST(? IN BOOLEAN MODE)',
     ];
 }
 
@@ -307,13 +309,14 @@ class ContestsDAO extends ContestsDAOBase {
         $user_id,
         $page = 1,
         $pageSize = 1000,
-        $query = FilteredStatus::ALL
+        $query = null
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
         $columns = ContestsDAO::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
-        $query_check = FilteredStatus::sql(is_null($query) ? FilteredStatus::ALL : FilteredStatus::FILTERED);
+        $filter = self::formatSearch($query);
+        $query_check = FilteredStatus::sql($filter['type']);
 
         $sql = "
             SELECT
@@ -333,8 +336,11 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT ?, ?;";
         global $conn;
         $params[] = $user_id;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
         $params[] = $offset;
         $params[] = $pageSize;
@@ -383,14 +389,15 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = FilteredStatus::ALL
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(is_null($query) ? FilteredStatus::ALL : FilteredStatus::FILTERED);
+        $filter = self::formatSearch($query);
+        $query_check = FilteredStatus::sql($filter['type']);
 
         $sql = "
                  (
@@ -407,8 +414,11 @@ class ContestsDAO extends ContestsDAOBase {
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
 
         $sql .= "
@@ -427,8 +437,11 @@ class ContestsDAO extends ContestsDAOBase {
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
 
         $sql .= "
@@ -450,8 +463,11 @@ class ContestsDAO extends ContestsDAOBase {
                  ) ";
         $params[] = $user_id;
         $params[] = Authorization::ADMIN_ROLE;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
 
         $sql .= "
@@ -473,10 +489,12 @@ class ContestsDAO extends ContestsDAOBase {
                  ) ";
         $params[] = $user_id;
         $params[] = Authorization::ADMIN_ROLE;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
-
         $sql .= "
                  UNION
                  (
@@ -493,8 +511,11 @@ class ContestsDAO extends ContestsDAOBase {
                      `original_finish_time` DESC
                  LIMIT ?, ?
                 ";
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
@@ -517,12 +538,13 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = FilteredStatus::ALL
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(is_null($query) ? FilteredStatus::ALL : FilteredStatus::FILTERED);
+        $filter = self::formatSearch($query);
+        $query_check = FilteredStatus::sql($filter['type']);
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -544,8 +566,11 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
@@ -566,14 +591,15 @@ class ContestsDAO extends ContestsDAOBase {
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
         $recomendados = RecommendedStatus::ALL,
-        $query = FilteredStatus::ALL
+        $query = null
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
         $end_check = ActiveStatus::sql($activos);
         $recommended_check = RecommendedStatus::sql($recomendados);
-        $query_check = FilteredStatus::sql(is_null($query) ? FilteredStatus::ALL : FilteredStatus::FILTERED);
+        $filter = self::formatSearch($query);
+        $query_check = FilteredStatus::sql($filter['type']);
 
         $sql = "
                 SELECT
@@ -589,8 +615,11 @@ class ContestsDAO extends ContestsDAOBase {
                 ";
 
         global $conn;
-        if (!is_null($query)) {
-            $params[] = $query;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
@@ -623,5 +652,24 @@ class ContestsDAO extends ContestsDAOBase {
         }
 
         return null;
+    }
+
+    /**
+     * @param $query
+     * @return Array [type, query]
+     */
+    private static function formatSearch($query) {
+        if (empty($query)) {
+            return ['type' => FilteredStatus::ALL];
+        }
+        $query = preg_replace('/\s+/', ' ', $query);
+        $result = [];
+        foreach (explode(' ', $query) as $token) {
+            if (strlen($token) <= 3) {
+                return ['type' => FilteredStatus::SIMPLE, 'query' => $query];
+            }
+            $result[] = '+' . urlencode($token) . '*';
+        }
+        return ['type' => FilteredStatus::FULLTEXT, 'query' => join(' ', $result)];
     }
 }
