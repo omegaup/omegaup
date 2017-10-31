@@ -85,6 +85,9 @@ export default {
                              status: newStatus,
                              qualitynomination_id: this.qualitynomination_id
                            })
+          .then(function() {
+            omegaup.UI.success(T.qualityNominationResolutionSuccess);
+          })
           .fail(UI.apiError);
     },
   }

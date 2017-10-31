@@ -568,6 +568,7 @@ qualityNominationMustHaveSolvedProblem = "Debes resolver el problema antes de po
 qualityNominationNotFound = "Nominación no encontrada"
 qualityNominationProblemHasBeenBanned = "Este problema ha sido suspendido. No puedes cambiar su visibilidad."
 qualityNominationProblemHasBeenPromoted = "Este problema ha sido promovido. No puedes cambiar su visibilidad."
+qualityNominationResolutionSuccess = "Nominación resuelta exitosamente."
 qualityNominationShowAll = "También mostrar nominaciones resueltas"
 qualityNominationType = "Tipo"
 qualityUserThatNominated = "Usuario que nominó"
