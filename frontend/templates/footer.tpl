@@ -1,9 +1,9 @@
 		<hr>
 		<div class="footer navbar" id="footer">
 			<div class="row">
-				
+
 				<div class="col-md-6">
-					<img alt="OmegaUp" class="logo" src='/media/omegaup_curves.png'>
+					<img alt="OmegaUp" class="logo" src="/media/omegaup_curves.png">
 					<h5>{#frontPageFooter#}</h5>
 					<h6><a href="mailto:hello@omegaup">hello@omegaup.com</a></h6>
 					<div class="row">
@@ -33,7 +33,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 		</div>
 	</div>
 	<!-- #content -->
