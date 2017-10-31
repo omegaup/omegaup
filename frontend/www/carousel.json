@@ -1,11 +1,7 @@
-/* Information to generate the homepage carousel.
-
-To add a new slide on the carousel, your need a key that identifies the new
-element, the file path of the image (relative to /media/) to add on the slide
-(imageName), a title and brief description in all supported languages. 
-
-*/
-{
+{ "_comments": "Information to generate the homepage carousel.",
+  "_comments2": "To add a new slide on the carousel, your need a key that identifies the new",
+  "_comments3": "element, the file path of the image (relative to /media/) to add on the slide",
+  "_comments4": "(imageName), a title and brief description in all supported languages.",
     "Intro": {
         "imageName": "intro.jpg",
         "title": {
