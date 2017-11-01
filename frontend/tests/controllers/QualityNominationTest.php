@@ -20,6 +20,43 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
+    public function testApiDetailsReturnsFieldsRequiredByUI() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $contents = json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]);
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => $contents,
+        ]));
+
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
+        $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
+        $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
+        $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
+        $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
+    }
+
     /**
      * Basic test. Check that before nominating a problem for quality, the user
      * must have solved it first.
