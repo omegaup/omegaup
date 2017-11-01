@@ -1694,12 +1694,6 @@ class UserController extends Controller {
                 }
                 return $response;
             }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
-
-            // If cache was set, we need to maintain a list of different ranks in the cache
-            // (A different rankCacheName means different offset and rowcount params
-            if ($cacheUsed === false) {
-                self::setProblemsSolvedRankCacheList($rankCacheName);
-            }
         } else {
             $response = [];
 
@@ -1725,43 +1719,12 @@ class UserController extends Controller {
     }
 
     /**
-     * Adds the rank name to a list of stored ranks so we know we ranks to delete
-     * after
-     *
-     * @param string $rankCacheName
-     */
-    private static function setProblemsSolvedRankCacheList($rankCacheName) {
-        // Save the instance of the rankName in a key/value array, so we know all ranks to
-        // expire
-        $rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, '');
-        $ranksList = $rankCacheList->get();
-
-        if (is_null($ranksList)) {
-            // Simulating a set
-            $ranksList = [$rankCacheName => 1];
-        } else {
-            $ranksList[$rankCacheName] = 1;
-        }
-
-        $rankCacheList->set($ranksList, 0);
-    }
-
-    /**
      * Expires the known ranks
      * @TODO: This should be called only in the grader->frontend callback and only IFF
      * verdict = AC (and not test run)
      */
     public static function deleteProblemsSolvedRankCacheList() {
-        $rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, '');
-        $ranksList = $rankCacheList->get();
-
-        if (!is_null($ranksList)) {
-            $rankCacheList->delete();
-
-            foreach ($ranksList as $key => $value) {
-                Cache::deleteFromCache(Cache::PROBLEMS_SOLVED_RANK, $key);
-            }
-        }
+        Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
     }
 
     /**
