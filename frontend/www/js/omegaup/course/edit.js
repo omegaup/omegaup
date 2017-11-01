@@ -6,6 +6,11 @@ import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
+import Sortable from 'sortablejs';
+
+Vue.directive('Sortable', {
+  inserted: function(el, binding) { new Sortable(el, binding.value || {}); }
+});
 
 OmegaUp.on('ready', function() {
   let vuePath = [];
@@ -336,6 +341,20 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(omegaup.UI.apiError);
           },
+          'sort': function(assignment, assignmentProblems) {
+            var index = 1;
+            for (var problem of assignmentProblems) {
+              problem.order = index;
+              index++;
+            }
+            omegaup.API.Course.addProblem({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                                problem_alias: assignmentProblems,
+                              })
+                .then(function(response) { refreshProblemList(assignment); })
+                .fail(omegaup.UI.apiError);
+          },
           tags: function(tags) {
             omegaup.API.Problem.list({tag: tags})
                 .then(function(data) {
@@ -444,6 +463,7 @@ OmegaUp.on('ready', function() {
   }
 
   function refreshProblemList(assignment) {
+    problemList.assignmentProblems = [];
     omegaup.API.Course.getAssignment(
                           {assignment: assignment.alias, course: courseAlias})
         .then(function(response) {

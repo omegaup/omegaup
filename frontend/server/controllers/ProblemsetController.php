@@ -15,7 +15,7 @@ class ProblemsetController extends Controller {
         }
     }
 
-    public static function addProblem($problemset_id, Problems $problem, $current_user_id, $points, $order_in_contest = 1) {
+    public static function addProblem($problemset_id, Problems $problem, $current_user_id, $points = null, $order_in_contest = 1) {
         ProblemsetController::validateAddProblemToProblemset(
             $problemset_id,
             $problem,
@@ -28,6 +28,24 @@ class ProblemsetController extends Controller {
                 'problem_id' => $problem->problem_id,
                 'points' => $points,
                 'order' => $order_in_contest,
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
+
+    public static function updateProblemsOrder($problemset_id, Problems $problem, $current_user_id, $order = 1) {
+        ProblemsetController::validateAddProblemToProblemset(
+            $problemset_id,
+            $problem,
+            $current_user_id
+        );
+
+        try {
+            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
+                'problemset_id' => $problemset_id,
+                'problem_id' => $problem->problem_id,
+                'order' => $order,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

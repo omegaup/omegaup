@@ -376,31 +376,58 @@ class CourseController extends Controller {
             throw new NotFoundException('problemsetNotFound');
         }
 
-        // Get this problem
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
-        }
+        if (!is_array($r['problem_alias'])) {
+            // Get this problem
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+            if (is_null($problem)) {
+                throw new NotFoundException('problemNotFound');
+            }
 
-        $points = 100;
-        if (is_numeric($r['points'])) {
-            $points = (int)$r['points'];
-        }
+            $points = 100;
+            if (is_numeric($r['points'])) {
+                $points = (int)$r['points'];
+            }
 
-        ProblemsetController::addProblem(
-            $problemSet->problemset_id,
-            $problem,
-            $r['current_user_id'],
-            $points
-        );
+            $order = 1;
+            if (is_numeric($r['order'])) {
+                $order = (int)$r['order'];
+            }
 
-        try {
-            CoursesDAO::updateAssignmentMaxPoints(
-                $r['course'],
-                $r['assignment_alias']
+            ProblemsetController::addProblem(
+                $problemSet->problemset_id,
+                $problem,
+                $r['current_user_id'],
+                $points,
+                $order
             );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+
+            try {
+                CoursesDAO::updateAssignmentMaxPoints(
+                    $r['course'],
+                    $r['assignment_alias']
+                );
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        } else { // Update problems order
+            $problems = $r['problem_alias'];
+            foreach ($problems as $item) {
+                $problem = ProblemsDAO::getByAlias($item['alias']);
+                if (is_null($problem)) {
+                    throw new NotFoundException('problemNotFound');
+                }
+
+                $order = 1;
+                if (is_numeric($r['order'])) {
+                    $order = (int)$r['order'];
+                }
+                ProblemsetController::updateProblemsOrder(
+                    $problemSet->problemset_id,
+                    $problem,
+                    $r['current_user_id'],
+                    $item['order']
+                );
+            }
         }
 
         return ['status' => 'ok'];
