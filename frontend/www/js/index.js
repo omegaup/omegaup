@@ -1,3 +1,6 @@
+import omegaup_Carousel from './omegaup/components/Carousel.vue'
+import Vue from 'vue';
+
 (function() {
   function OnLoad() {
     if (typeof omegaup === 'undefined' || typeof omegaup.API === 'undefined' ||
@@ -28,6 +31,40 @@
           }
         })
         .fail(omegaup.UI.apiError);
+
+    let carouselPayload = document.getElementById('carousel-payload');
+    let initialSlides = carouselPayload ? JSON.parse(carouselPayload.innerText) : {};
+    let carousel = new Vue({
+      el: '#carousel-container',
+      render: function(createElement) {
+        return createElement('omegaup-carousel', {
+          props: {
+            json: this.slides,
+          }
+        });
+      },
+      data: {
+        slides: initialSlides,
+      },
+      components: {
+        'omegaup-carousel': omegaup_Carousel,
+      }
+    });
+    Vue.nextTick(() => {
+      $('.carousel').carousel({
+        interval: 5000
+      });
+    });
+
+    $.getJSON('https://raw.githubusercontent.com/omegaup/omegaup/master/frontend/www/carousel.json').then(slides => {
+      carousel.slides = slides;
+      // Start animating after slides have been mounted by Vue.
+      Vue.nextTick(() => {
+        $('.carousel').carousel({
+          interval: 5000
+        });
+      });
+    });
   }
 
   function createChart(series) {

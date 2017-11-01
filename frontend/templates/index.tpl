@@ -3,58 +3,8 @@
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 <div class="row"> <!-- General information -->
-	<div class="col-md-8"> <!--Carrusel -->
-		<div class="panel panel-default">
-			<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-			<!-- Indicators -->
-			<ol class="carousel-indicators">
-				<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-				<li data-target="#carousel-example-generic" data-slide-to="1"></li>
-				<li data-target="#carousel-example-generic" data-slide-to="2"></li>
-				<li data-target="#carousel-example-generic" data-slide-to="3"></li>
-			</ol>
-
-			<!-- Wrapper for slides -->
-			<div class="carousel-inner" >
-				<div class="item active">
-					<img src="/media/carusel-mentores.jpg" alt="...">
-					<div class="carousel-caption">
-						<h3>Bienvenidos</h3>
-						<p></p>
-					</div>
-				</div>
-				<div class="item">
-					<img src="/media/carusel-mentores.jpg" alt="...">
-					<div class="carousel-caption">
-						<h3>Mentors</h3>
-					</div>
-				</div>
-				<div class="item">
-					<img src="/media/carusel-mentores.jpg" alt="...">
-					<div class="carousel-caption">
-						<h3>Schools</h3>
-						<p></p>
-					</div>
-				</div>
-				<div class="item">
-					<img src="/media/carusel-mentores.jpg" alt="...">
-					<div class="carousel-caption">
-						<h3>omegaUp org</h3>
-						<p></p>
-					</div>
-				</div>
-			</div>
-			<!-- Controls -->
-			<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-			<span class="icon-prev"></span>
-			</a>
-			<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-				<span class="icon-next"></span>
-			</a>
-			</div>
-		</div>
-	</div> <!-- Carrusel -->
-	
+	<script type="text/json" id="carousel-payload">{$carouselPayload|json_encode}</script>
+	<div id="carousel-container"></div>
 	<div class="col-md-4">
 			<div class="row">
 				<div class="panel panel-info">
@@ -68,11 +18,10 @@
 									<img src="/media/usuariosMes.png" alt="...">
 									</a>
 								</div>
-							</div> 
+							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="panel panel-default">
-				
 							</div>
 						</div>
 					</div>
@@ -85,17 +34,16 @@
 						<div class="col-md-6">
 							<div class="panel panel-default">
 								<img src="/media/schoolMonth.png" alt="...">
-							</div> 
+							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="panel panel-default">
-								
-							</div> 
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-	</div> 
+	</div>
 </div>  <!-- General information -->
 
 <div class="row"> <!-- Educational series -->
@@ -116,7 +64,7 @@
 				<span>Breve descripción</span>
 				<div><a href="https://omegaup.com/course/omegaup-101/">Ir al curso</a></div>
 			</div>
-		</div> 
+		</div>
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel panel-success">
@@ -125,7 +73,7 @@
 				<span>Breve descripción</span>
 				<div><a href="https://omegaup.com/course/omegaup-101/">Ir al curso</a></div>
 			</div>
-		</div> 
+		</div>
 	</div>
 </div>  <!-- Educational series -->
 
@@ -136,7 +84,7 @@
 		 y el número de problemas distintos resueltos se usará como criterio de desempate</span><span>Participa</span>
 		 </div>
 	</div>
-	<div class="col-md-6"> 
+	<div class="col-md-6">
 		<div class="panel panel-default">
 			{include file='rank.table.tpl' length=5 is_index=true}
 		</div>
@@ -144,7 +92,7 @@
 </div>  <!-- Top users -->
 
 <div class="row"> <!-- Top schools -->
-	<div class="col-md-6"> 
+	<div class="col-md-6">
 		<div class="panel panel-default">
 			<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
 			<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
@@ -164,13 +112,10 @@
 	</div>
 </div>  <!-- Top schools -->
 
-<script type="text/javascript" src="{version_hash src="/js/index.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/dist/index.js"}"></script>
 
 <hr style="width: 100%; color: black; height: 1px; background-color:black;" />
 
 {include file='footer.tpl'}
 
 </div>
-	
-
-
