@@ -43,8 +43,7 @@
           </td>
           <td>{{ problem.title }}</td>
           <td class="button-column">
-            <a v-bind:title="T.courseAssignmentProblemRemove"
-                v-on:click="onRemove(problem)"><span aria-hidden="true"
+            <a v-on:click="onRemove(problem)"><span aria-hidden="true"
                   class="glyphicon glyphicon-remove"></span></a>
           </td>
         </tr>

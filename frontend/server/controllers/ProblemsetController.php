@@ -15,7 +15,7 @@ class ProblemsetController extends Controller {
         }
     }
 
-    public static function addProblem($problemset_id, Problems $problem, $current_user_id, $points = null, $order_in_contest = 1) {
+    public static function addProblem($problemset_id, Problems $problem, $current_user_id, $points, $order_in_contest = 1) {
         ProblemsetController::validateAddProblemToProblemset(
             $problemset_id,
             $problem,
