@@ -95,6 +95,9 @@ class Users extends VO {
         if (isset($data['in_mailing_list'])) {
             $this->in_mailing_list = $data['in_mailing_list'];
         }
+        if (isset($data['preferred_language'])) {
+            $this->preferred_language = $data['preferred_language'];
+        }
     }
 
     /**
@@ -270,4 +273,11 @@ class Users extends VO {
       * @var tinyint(1)
       */
     public $in_mailing_list;
+
+    /**
+      * El lenguaje de programación de preferencia de este usuario
+      * @access public
+      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
+      */
+    public $preferred_language;
 }

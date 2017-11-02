@@ -414,16 +414,16 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
+        // Get information from the original problem.
+        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        // Adding in the response object a flag to know whether the user is a reviewer
+        $response['reviewer'] = $currentUserReviewer;
+
         if ($response['nomination'] == 'promotion') {
-            // Get information from the original problem.
-            $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
-            if (is_null($problem)) {
-                throw new NotFoundException('problemNotFound');
-            }
-
-            // Adding in the response object a flag to know whether the user is a reviewer
-            $response['reviewer'] = $currentUserReviewer;
-
             $response['original_contents'] = [
                 'statements' => [],
                 'source' => $problem->source,
