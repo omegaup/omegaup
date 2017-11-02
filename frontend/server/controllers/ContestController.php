@@ -600,7 +600,7 @@ class ContestController extends Controller {
 
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
-
+            $result['languages'] = explode(',', $result['languages']);
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -804,7 +804,6 @@ class ContestController extends Controller {
 
         // Create and populate a new Contests object
         $contest = new Contests();
-
         $contest->public = $r['public'];
         $contest->title = $r['title'];
         $contest->description = $r['description'];
@@ -821,7 +820,7 @@ class ContestController extends Controller {
         $contest->penalty = max(0, intval($r['penalty']));
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
-        $contest->languages = empty($r['languages']) ? null : $r['languages'];
+        $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
         $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
@@ -1029,6 +1028,11 @@ class ContestController extends Controller {
 
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
+
+        // languages is always optional
+        foreach ($r['languages'] as $language) {
+            Validators::isInEnum($language, 'languages', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs', 'lua'], false);
+        }
 
         if ($is_update) {
             // Prevent date changes if a contest already has runs
@@ -2090,6 +2094,9 @@ class ContestController extends Controller {
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after',
+            'languages' => ['transform' => function ($value) {
+                return join(',', $value);
+            }],
             'contestant_must_register',
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
