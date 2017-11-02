@@ -84,13 +84,23 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#markdown form')
       .submit(function() {
-        var promise = [];
+        var promises = [];
         for (var lang in statements) {
           if (!statements.hasOwnProperty(lang)) continue;
           if (typeof statements[lang].current === 'undefined') continue;
           if (statements[lang].current === statements[lang].original) continue;
-          promise.push(updateStatement(statements[lang].current, lang));
+          promises.push(new Promise(function(resolve, reject) {
+            omegaup.API.Problem.updateStatement({
+                                 problem_alias: problemAlias,
+                                 statement: statements[lang].current,
+                                 message: $('#markdown-message').val(),
+                                 lang: lang
+                               })
+                .then(function(response) { resolve(response); })
+                .fail(omegaup.T.editFieldRequired);
+          }));
         }
+
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
           omegaup.UI.error(omegaup.T.editFieldRequired);
@@ -98,19 +108,12 @@ omegaup.OmegaUp.on('ready', function() {
           return false;
         }
 
-        Promise.all(promise)
+        Promise.all(promises)
             .then(function(results) {
               omegaup.UI.success(omegaup.T.problemEditUpdatedSuccessfully);
-              statements = {};
-
-              omegaup.API.Problem.details({
-                                   problem_alias: problemAlias,
-                                   statement_type: 'markdown',
-                                   show_solvers: false,
-                                   lang: chosenLanguage
-                                 })
-                  .then(problemCallback)
-                  .fail(omegaup.UI.apiError);
+              for (var lang in statements) {
+                statements[lang].original = statements[lang].current;
+              }
             })
             .fail(omegaup.UI.apiError);
         return false;
@@ -338,14 +341,12 @@ omegaup.OmegaUp.on('ready', function() {
         chosenLanguage == problem.problem_statement_language) {
       chosenLanguage = problem.problem_statement_language;
       if (typeof statements[chosenLanguage] == 'undefined') {
-        statements[chosenLanguage] =
-            $.extend({}, {original: problem.problem_statement});
+        statements[chosenLanguage] = $.extend({}, {
+          original: problem.problem_statement,
+          current: problem.problem_statement
+        });
       }
-      if (typeof statements[chosenLanguage].current != 'undefined') {
-        $('#wmd-input-statement').val(statements[chosenLanguage].current);
-      } else {
-        $('#wmd-input-statement').val(problem.problem_statement);
-      }
+      $('#wmd-input-statement').val(statements[chosenLanguage].current);
       $('#statement-language').val(problem.problem_statement_language);
     } else {
       $('#wmd-input-statement').val('');
@@ -362,11 +363,6 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('#statement-language')
-      .on('focus',
-          function(e) {
-            statements[$('#statement-language').val()].current =
-                $('#wmd-input-statement').val();
-          })
       .on('change', function(e) {
         chosenLanguage = $('#statement-language').val();
         omegaup.API.Problem.details({
