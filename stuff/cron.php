@@ -1,4 +1,4 @@
-#/usr/bin/php -d max_execution_time=720
+#/usr/bin/php -d max_execution_time=7200
 <?php
 /**
 * This script is to be called by crontab.
@@ -6,4 +6,4 @@
 **/
 
 require_once('../frontend/server/bootstrap.php');
-QualityNominationsDAO::aggregateFeedback(new Request([]));
+QualityNominationsDAO::aggregateFeedback();

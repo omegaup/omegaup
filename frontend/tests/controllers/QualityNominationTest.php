@@ -119,7 +119,6 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $response = QualityNominationController::apiMyList(new Request([
             'auth_token' => $login->auth_token,
-            'types' => ['suggestion'],
         ]));
         $this->assertEquals(1, count($response['nominations']));
         $nomination = $response['nominations'][0];
@@ -541,7 +540,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        QualityNominationsDAO::aggregateFeedback(new Request([]));
+        QualityNominationsDAO::aggregateFeedback();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
