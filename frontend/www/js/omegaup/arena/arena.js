@@ -1252,6 +1252,21 @@ export class Arena {
           self.elements.submitForm.code.val('');
           self.hideOverlay();
           self.clearInputFile();
+
+          let countDown = 60;
+          let x = setInterval(function() {
+            countDown--;
+            $('#submit input[type=submit]')
+                .attr('disabled', 'disabled')
+                .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
+                                     {submissionGap: countDown}));
+            if (countDown < 0) {
+              clearInterval(x);
+              $('#submit input[type=submit]')
+                  .removeAttr('value')
+                  .removeAttr('disabled');
+            }
+          }, 1000);
         })
         .fail(function(run) {
           alert(run.error);
