@@ -1,7 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
   var chosenLanguage = null;
-  var language = null;
-  var statements = new Object();
+  var statements = {};
 
   if (window.location.hash) {
     $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
@@ -85,23 +84,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#markdown form')
       .submit(function() {
+        var promise = [];
         for (var lang in statements) {
-          if (typeof statements[lang].current != 'undefined') {
-            if (statements[lang].current !== statements[lang].original) {
-              omegaup.API.Problem.updateStatement({
-                                   problem_alias: problemAlias,
-                                   statement: statements[lang].current,
-                                   message: $('#markdown-message').val(),
-                                   lang: lang
-                                 })
-                  .then(function(response) {
-                    omegaup.UI.success(
-                        omegaup.T.problemEditUpdatedSuccessfully);
-                    statements = new Object();
-                  })
-                  .fail(omegaup.T.editFieldRequired);
-            }
-          }
+          if (!statements.hasOwnProperty(lang)) continue;
+          if (typeof statements[lang].current === 'undefined') continue;
+          if (statements[lang].current === statements[lang].original) continue;
+          promise.push(updateStatement(statements[lang].current, lang));
         }
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
@@ -109,8 +97,37 @@ omegaup.OmegaUp.on('ready', function() {
           $('#markdown-message-group').addClass('has-error');
           return false;
         }
+
+        Promise.all(promise)
+            .then(function(results) {
+              omegaup.UI.success(omegaup.T.problemEditUpdatedSuccessfully);
+              statements = {};
+
+              omegaup.API.Problem.details({
+                                   problem_alias: problemAlias,
+                                   statement_type: 'markdown',
+                                   show_solvers: false,
+                                   lang: chosenLanguage
+                                 })
+                  .then(problemCallback)
+                  .fail(omegaup.UI.apiError);
+            })
+            .fail(omegaup.UI.apiError);
         return false;
       });
+
+  function updateStatement(currentStatement, lang) {
+    return new Promise(function(resolve, reject) {
+      omegaup.API.Problem.updateStatement({
+                           problem_alias: problemAlias,
+                           statement: currentStatement,
+                           message: $('#markdown-message').val(),
+                           lang: lang
+                         })
+          .then(function(response) { resolve(response); })
+          .fail(omegaup.T.editFieldRequired);
+    });
+  }
 
   function refreshProblemAdmins() {
     omegaup.API.Problem.admins({problem_alias: problemAlias})
@@ -321,8 +338,8 @@ omegaup.OmegaUp.on('ready', function() {
         chosenLanguage == problem.problem_statement_language) {
       chosenLanguage = problem.problem_statement_language;
       if (typeof statements[chosenLanguage] == 'undefined') {
-        var original = {original: problem.problem_statement};
-        statements[chosenLanguage] = $.extend({}, original);
+        statements[chosenLanguage] =
+            $.extend({}, {original: problem.problem_statement});
       }
       if (typeof statements[chosenLanguage].current != 'undefined') {
         $('#wmd-input-statement').val(statements[chosenLanguage].current);
@@ -347,8 +364,8 @@ omegaup.OmegaUp.on('ready', function() {
   $('#statement-language')
       .on('focus',
           function(e) {
-            language = $('#statement-language').val();
-            statements[language].current = $('#wmd-input-statement').val();
+            statements[$('#statement-language').val()].current =
+                $('#wmd-input-statement').val();
           })
       .on('change', function(e) {
         chosenLanguage = $('#statement-language').val();
@@ -364,7 +381,6 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#wmd-input-statement')
       .on('blur', function(e) {
-        language = $('#statement-language').val();
-        statements[language].current = $(this).val();
+        statements[$('#statement-language').val()].current = $(this).val();
       });
 });
