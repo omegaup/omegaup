@@ -341,10 +341,10 @@ omegaup.OmegaUp.on('ready', function() {
         chosenLanguage == problem.problem_statement_language) {
       chosenLanguage = problem.problem_statement_language;
       if (typeof statements[chosenLanguage] == 'undefined') {
-        statements[chosenLanguage] = $.extend({}, {
+        statements[chosenLanguage] = {
           original: problem.problem_statement,
           current: problem.problem_statement
-        });
+        };
       }
       $('#wmd-input-statement').val(statements[chosenLanguage].current);
       $('#statement-language').val(problem.problem_statement_language);
