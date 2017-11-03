@@ -376,58 +376,83 @@ class CourseController extends Controller {
             throw new NotFoundException('problemsetNotFound');
         }
 
-        if (!is_array($r['problem_alias'])) {
-            // Get this problem
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        // Get this problem
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $points = 100;
+        if (is_numeric($r['points'])) {
+            $points = (int)$r['points'];
+        }
+
+        ProblemsetController::addProblem(
+            $problemSet->problemset_id,
+            $problem,
+            $r['current_user_id'],
+            $points
+        );
+
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $r['course'],
+                $r['assignment_alias']
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateProblemsOrder(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        // Update problems order
+        $problems = $r['problem_alias'];
+        foreach ($problems as $problem) {
+            $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
             if (is_null($problem)) {
                 throw new NotFoundException('problemNotFound');
-            }
-
-            $points = 100;
-            if (is_numeric($r['points'])) {
-                $points = (int)$r['points'];
             }
 
             $order = 1;
             if (is_numeric($r['order'])) {
                 $order = (int)$r['order'];
             }
-
-            ProblemsetController::addProblem(
+            ProblemsetController::updateProblemsOrder(
                 $problemSet->problemset_id,
-                $problem,
+                $currentProblem,
                 $r['current_user_id'],
-                $points,
-                $order
+                $problem['order']
             );
-
-            try {
-                CoursesDAO::updateAssignmentMaxPoints(
-                    $r['course'],
-                    $r['assignment_alias']
-                );
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        } else { // Update problems order
-            $problems = $r['problem_alias'];
-            foreach ($problems as $item) {
-                $problem = ProblemsDAO::getByAlias($item['alias']);
-                if (is_null($problem)) {
-                    throw new NotFoundException('problemNotFound');
-                }
-
-                $order = 1;
-                if (is_numeric($r['order'])) {
-                    $order = (int)$r['order'];
-                }
-                ProblemsetController::updateProblemsOrder(
-                    $problemSet->problemset_id,
-                    $problem,
-                    $r['current_user_id'],
-                    $item['order']
-                );
-            }
         }
 
         return ['status' => 'ok'];

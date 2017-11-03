@@ -30,7 +30,7 @@
            v-else="">
       <thead>
         <tr>
-          <th>{{ T.wordsMode }}</th>
+          <th>{{ T.contestAddproblemProblemOrder }}</th>
           <th>{{ T.contestAddproblemProblemName }}</th>
           <th>{{ T.contestAddproblemProblemRemove }}</th>
         </tr>
@@ -38,12 +38,13 @@
       <tbody v-sortable="{ onUpdate: sort }">
         <tr v-for="problem in assignmentProblems">
           <td>
-            <a v-bind:title="T.courseAssignmentProblemRemove"><span aria-hidden="true"
+            <a v-bind:title="T.courseAssignmentProblemReorder"><span aria-hidden="true"
                   class="glyphicon glyphicon-move handle"></span></a>
           </td>
           <td>{{ problem.title }}</td>
           <td class="button-column">
-            <a v-on:click="onRemove(problem)"><span aria-hidden="true"
+            <a v-bind:title="T.courseAssignmentProblemRemove"
+                v-on:click="onRemove(problem)"><span aria-hidden="true"
                   class="glyphicon glyphicon-remove"></span></a>
           </td>
         </tr>

@@ -342,12 +342,12 @@ OmegaUp.on('ready', function() {
                 .fail(omegaup.UI.apiError);
           },
           'sort': function(assignment, assignmentProblems) {
-            var index = 1;
-            for (var problem of assignmentProblems) {
+            let index = 1;
+            for (let problem of assignmentProblems) {
               problem.order = index;
               index++;
             }
-            omegaup.API.Course.addProblem({
+            omegaup.API.Course.updateProblemsOrder({
                                 course_alias: courseAlias,
                                 assignment_alias: assignment.alias,
                                 problem_alias: assignmentProblems,
