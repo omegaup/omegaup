@@ -1030,8 +1030,10 @@ class ContestController extends Controller {
         Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
 
         // languages is always optional
-        foreach ($r['languages'] as $language) {
-            Validators::isInEnum($language, 'languages', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs', 'lua'], false);
+        if (!empty($r['languages'])) {
+            foreach ($r['languages'] as $language) {
+                Validators::isInEnum($language, 'languages', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs', 'lua'], false);
+            }
         }
 
         if ($is_update) {
