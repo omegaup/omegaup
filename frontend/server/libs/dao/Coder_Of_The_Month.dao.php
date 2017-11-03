@@ -86,4 +86,31 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         return ['totalCount' => $totalCount, 'user' => $user, 'score' => $score];
     }
+
+    /**
+     * Get all Coders of the month
+     *
+     * @static
+     * @param $page
+     * @param $cols_per_page
+     * @param $order
+     * @param $order_type 'ASC' or 'DESC' default is 'ASC'
+     * @return Array
+     */
+    final public static function getCodersOfTheMonth($page = null, $cols_per_page = null, $order = null, $order_type = 'ASC') {
+        $sql = 'SELECT `cm`.`time`, `u`.`username`, `u`.`country_id`, `e`.`email` FROM Coder_Of_The_Month cm INNER JOIN Users u ON `u`.`user_id` = `cm`.`user_id` LEFT JOIN Emails e ON `e`.`user_id` = `u`.`user_id`';
+        global $conn;
+        if (!is_null($order)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+        }
+        if (!is_null($page)) {
+            $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
+        }
+        $rs = $conn->Execute($sql);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = $row;
+        }
+        return $allData;
+    }
 }
