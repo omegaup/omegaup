@@ -9,7 +9,7 @@
 <script>
 import {T, API} from '../../omegaup.js';
 import UI from '../../ui.js';
-import {codemirror} from 'vue-codemirror';
+import {codemirror} from 'vue-codemirror-lite';
 
 const languageModeMap = {
   'c': 'text/x-csrc',
@@ -40,10 +40,12 @@ export default {
     value: String,
   },
   data: function() {
-    return {
-      editorOptions: {
-        tabSize: 2, lineNumbers: true, mode: languageModeMap[this.language],
-            readOnly: this.readOnly
+    return { mode: languageModeMap[this.language] }
+  },
+  computed: {
+    editorOptions: function() {
+      return {
+        tabSize: 2, lineNumbers: true, mode: this.mode, readOnly: this.readOnly
       }
     }
   },
@@ -52,9 +54,7 @@ export default {
     onInput: function(value) { this.$emit('input', value);},
   },
   watch: {
-    language: function(newLanguage) {
-      this.editorOptions.mode = languageModeMap[newLanguage];
-    }
+    language: function(newLanguage) { this.mode = languageModeMap[newLanguage];}
   },
   components: {
     "omegaup-arena-codemirror": codemirror,
