@@ -76,4 +76,18 @@ class UsersDAO extends UsersDAOBase {
             ];
         }
     }
+
+    public static function getCountryUser($user_id) {
+        global  $conn;
+        $sql = 'select u.country_id from Users u where u.user_id = ?';
+        $args = [$user_id];
+
+        $rs = $conn->Execute($sql, $args);
+        $ar = [];
+        foreach ($rs as $foo) {
+            $bar =  $foo;
+            array_push($ar, $bar);
+        }
+        return $ar[0]['country_id'];
+    }
 }

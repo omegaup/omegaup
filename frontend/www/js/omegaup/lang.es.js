@@ -55,6 +55,7 @@ omegaup.OmegaUp.loadTranslations({
 	coderOfTheMonthFullList: "Ver listado completo",
 	coderOfTheMonthNotice: "\u00a1Hola %(username)! \u00a1Felicidades por ser el ganador Coder del Mes! Tenemos un premio para t\u00ed, por favor cont\u00e1ctanos en mentores@omegaup.org",
 	codersOfTheMonth: "Coders del Mes",
+	codersOfTheMonthCountry: "Pa\u00eds",
 	codersOfTheMonthDate: "Fecha",
 	codersOfTheMonthUser: "Usuario",
 	contestActivityReport: "Reporte de actividades",

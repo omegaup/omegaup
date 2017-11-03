@@ -9,6 +9,7 @@
 			<thead>
 				<tr>
 					<th></th>
+					<th>{#codersOfTheMonthCountry#}</th>
 					<th>{#codersOfTheMonthUser#}</th>
 					<th>{#codersOfTheMonthDate#}</th>
 				</tr>
@@ -17,6 +18,7 @@
 				{foreach from=$coders item=data}
 					<tr>
 						<td><img src="{$data.gravatar_32}"/></td>
+						<td><img src="/media/flags/{$data.country_id|lower}.png"/></td>
 						<td><b><a href='/profile/{$data.username|htmlspecialchars}'>{$data.username|htmlspecialchars}</a></b></td>
 						<td>{$data.date}</td>
 					</tr>

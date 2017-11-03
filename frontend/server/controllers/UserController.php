@@ -1249,17 +1249,17 @@ class UserController extends Controller {
         $response['coders'] = [];
         try {
             $coders = CoderOfTheMonthDAO::getAll(null, null, 'time', 'DESC');
-
             foreach ($coders as $c) {
                 $user = UsersDAO::getByPK($c->user_id);
                 $email = EmailsDAO::getByPK($user->main_email_id);
                 $response['coders'][] = [
                     'username' => $user->username,
+                    'country_id' => UsersDAO::getCountryUser($c->user_id),
                     'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($email->email) . '?s=32',
                     'date' => $c->time
                 ];
             }
-        } catch (Exception $ex) {
+        } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
