@@ -86,6 +86,9 @@ class Problems extends VO {
         if (isset($data['difficulty'])) {
             $this->difficulty = $data['difficulty'];
         }
+        if (isset($data['quality'])) {
+            $this->quality = $data['quality'];
+        }
         if (isset($data['creation_date'])) {
             $this->creation_date = $data['creation_date'];
         }
@@ -261,6 +264,13 @@ class Problems extends VO {
       * @var double
       */
     public $difficulty;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var double
+      */
+    public $quality;
 
     /**
       *  [Campo no documentado]

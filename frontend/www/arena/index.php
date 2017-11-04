@@ -5,8 +5,12 @@ UITools::setProfile($smarty);
 
 // Fetch contests
 try {
-    $myContestsListPayload  = ContestController::apiListParticipating(new Request([]));
-    $smarty->assign('myContestsListPayload', $myContestsListPayload);
+    $query = '';
+    if (!empty($_REQUEST['query']) && strlen($_REQUEST['query']) > 0) {
+        $query = substr($_REQUEST['query'], 0, 256);
+        $r['query'] = $query;
+    }
+    $smarty->assign('query', $query);
 } catch (Exception $e) {
     // Oh, well...
 }
