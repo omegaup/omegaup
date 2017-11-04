@@ -383,6 +383,8 @@ export default {
     tags: _call('/api/problem/tags/'),
 
     update: _call('/api/problem/update/'),
+
+    updateStatement: _call('/api/problem/updateStatement/'),
   },
 
   QualityNomination: {
