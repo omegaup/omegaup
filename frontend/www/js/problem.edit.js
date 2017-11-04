@@ -119,19 +119,6 @@ omegaup.OmegaUp.on('ready', function() {
         return false;
       });
 
-  function updateStatement(currentStatement, lang) {
-    return new Promise(function(resolve, reject) {
-      omegaup.API.Problem.updateStatement({
-                           problem_alias: problemAlias,
-                           statement: currentStatement,
-                           message: $('#markdown-message').val(),
-                           lang: lang
-                         })
-          .then(function(response) { resolve(response); })
-          .fail(omegaup.T.editFieldRequired);
-    });
-  }
-
   function refreshProblemAdmins() {
     omegaup.API.Problem.admins({problem_alias: problemAlias})
         .then(function(admins) {
