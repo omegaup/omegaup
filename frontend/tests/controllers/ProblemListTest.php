@@ -183,14 +183,17 @@ class ProblemList extends OmegaupTestCase {
         }
 
         $login = self::login(UserFactory::createUser());
-        $response = ProblemController::apiList(new Request([
-            'auth_token' => $login->auth_token,
-            'rowcount' => 1,
-            'offset' => 1,
-        ]));
+        for ($i = 0; $i < count($problemData); $i++) {
+            $response = ProblemController::apiList(new Request([
+                'auth_token' => $login->auth_token,
+                'rowcount' => 1,
+                'offset' => $i,
+                'order_by' => 'problem_id',
+            ]));
 
-        $this->assertCount(1, $response['results']);
-        $this->assertEquals($problemData[1]['request']['alias'], $response['results'][0]['alias']);
+            $this->assertCount(1, $response['results']);
+            $this->assertEquals($problemData[count($problemData) - 1 - $i]['request']['alias'], $response['results'][0]['alias']);
+        }
     }
 
     /**

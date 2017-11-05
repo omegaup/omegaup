@@ -1563,7 +1563,7 @@ class ProblemController extends Controller {
 
         // Sort results
         $order = 'quality'; // Order by quality by default.
-        $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score'];
+        $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'problem_id'];
         // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
         if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
             $order = $r['order_by'];
