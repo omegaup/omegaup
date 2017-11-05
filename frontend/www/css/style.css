@@ -566,6 +566,12 @@ td.numericColumn, th.numericColumn {
 	text-align: right;
 }
 
+td.tooltip_column, th.tooltip_column {
+	text-align: right;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+}
+
 td.flagColumn {
 	width: 16px;
 }

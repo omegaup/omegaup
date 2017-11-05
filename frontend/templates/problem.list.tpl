@@ -45,20 +45,24 @@
 					</div>
 					{/if}
 				</td>
-				<td class="tooltipColumn">
-					{if empty($problem.quality)}
-						NA
-					{else}
-						{$qualityTags[$problem.quality|intval]}
-  						<span class="tooltiptext">{$problem.quality|string_format:"%.1f"} {#wordsOutOf4#}</span></td>
-					{/if}
-				<td class="tooltipColumn">
-  					{if empty($problem.difficulty)}
-  						NA
-  					{else}
-  						{$difficultyTags[$problem.difficulty|intval]}
-  						<span class="tooltiptext">{$problem.difficulty|string_format:"%.1f"} {#wordsOutOf4#}</span></td>
-  					{/if}
+				{if empty($problem.quality)}
+					<td class="numericColumn">NA</td>
+				{else}
+					<td class="tooltip_column">
+						<span data-wenk="{$problem.quality|string_format:"%.1f"} {#wordsOutOf4#}" data-wenk-pos="right">
+							{$qualityTags[$problem.quality|intval]}
+						</span>
+					</td>
+				{/if}
+  				{if empty($problem.difficulty)}
+					<td class="numericColumn">NA</td>
+  				{else}
+					<td class="tooltip_column">
+						<span data-wenk="{$problem.difficulty|string_format:"%.1f"} {#wordsOutOf4#}" data-wenk-pos="right">
+							{$difficultyTags[$problem.difficulty|intval]}
+						</span>
+					</td>
+  				{/if}
 				<td class="numericColumn">{100 * $problem.ratio}%</td>
 				<td class="numericColumn">{$problem.points}</td>
 				<td class="numericColumn">{$problem.score}</td>

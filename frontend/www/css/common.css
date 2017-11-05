@@ -118,30 +118,3 @@ de 166px de contenido para mostrar.  */
 	height: 51px;
 	margin: -51px 0 0;
 }
-
-/* Tooltip container */
-td.tooltipColumn, th.tooltipColumn {
-	text-align: right;
-}
-
-/* Tooltip text */
-.tooltipColumn .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    opacity: 0.75;
-    filter: alpha(opacity=75); /* For IE8 and earlier */
-
-    /* Position the tooltip text - see examples below! */
-    position: absolute;
-    z-index: 1;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltipColumn:hover .tooltiptext {
-    visibility: visible;
-}
