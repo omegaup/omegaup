@@ -31,6 +31,8 @@
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>
 				<select class="form-control" id="problem-search-order" name="order_by">
 					<option {if $ORDER_BY == 'title'}		selected="selected"{/if}	value="title">{#wordsTitle#}</option>
+					<option {if $ORDER_BY == 'quality'}	selected="selected"{/if}	value="quality">{#wordsQuality#}</option>
+					<option {if $ORDER_BY == 'difficulty'}	selected="selected"{/if}	value="difficulty">{#wordsDifficulty#}</option>
 					<option {if $ORDER_BY == 'submissions'}	selected="selected"{/if}	value="submissions">{#wordsRuns#}</option>
 					<option {if $ORDER_BY == 'accepted'}	selected="selected"{/if}	value="accepted">{#wordsAccepted#}</option>
 					<option {if $ORDER_BY == 'ratio'}		selected="selected"{/if}	value="ratio">{#wordsRatio#}</option>
