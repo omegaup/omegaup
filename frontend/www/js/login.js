@@ -10,12 +10,12 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-/*    if (typeof(grecaptcha) === 'undefined' ||
+    /*    if (typeof(grecaptcha) === 'undefined' ||
         grecaptcha.getResponse().length == 0) {
       omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
       return false;
     }
-*/
+    */
     omegaup.API.User.create({
                       email: $('#reg_email').val(),
                       username: $('#reg_username').val(),

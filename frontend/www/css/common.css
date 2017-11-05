@@ -135,7 +135,7 @@ td.tooltipColumn, th.tooltipColumn {
     border-radius: 6px;
     opacity: 0.75;
     filter: alpha(opacity=75); /* For IE8 and earlier */
- 
+
     /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
