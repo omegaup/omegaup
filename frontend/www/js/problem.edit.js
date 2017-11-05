@@ -1,5 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
   var chosenLanguage = null;
+  var statements = {};
 
   if (window.location.hash) {
     $('#sections').find('a[href="' + window.location.hash + '"]').tab('show');
@@ -92,12 +93,39 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#markdown form')
       .submit(function() {
+        var promises = [];
+        for (var lang in statements) {
+          if (!statements.hasOwnProperty(lang)) continue;
+          if (typeof statements[lang].current === 'undefined') continue;
+          if (statements[lang].current === statements[lang].original) continue;
+          promises.push(new Promise(function(resolve, reject) {
+            omegaup.API.Problem.updateStatement({
+                                 problem_alias: problemAlias,
+                                 statement: statements[lang].current,
+                                 message: $('#markdown-message').val(),
+                                 lang: lang
+                               })
+                .then(function(response) { resolve(response); })
+                .fail(omegaup.T.editFieldRequired);
+          }));
+        }
+
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
           omegaup.UI.error(omegaup.T.editFieldRequired);
           $('#markdown-message-group').addClass('has-error');
           return false;
         }
+
+        Promise.all(promises)
+            .then(function(results) {
+              omegaup.UI.success(omegaup.T.problemEditUpdatedSuccessfully);
+              for (var lang in statements) {
+                statements[lang].original = statements[lang].current;
+              }
+            })
+            .fail(omegaup.UI.apiError);
+        return false;
       });
 
   function refreshProblemAdmins() {
@@ -309,10 +337,17 @@ omegaup.OmegaUp.on('ready', function() {
     }
     $('#languages').val(problem.languages);
     $('input[name=alias]').val(problemAlias);
+
     if (chosenLanguage == null ||
         chosenLanguage == problem.problem_statement_language) {
       chosenLanguage = problem.problem_statement_language;
-      $('#wmd-input-statement').val(problem.problem_statement);
+      if (typeof statements[chosenLanguage] == 'undefined') {
+        statements[chosenLanguage] = {
+          original: problem.problem_statement,
+          current: problem.problem_statement
+        };
+      }
+      $('#wmd-input-statement').val(statements[chosenLanguage].current);
       $('#statement-language').val(problem.problem_statement_language);
     } else {
       $('#wmd-input-statement').val('');
@@ -339,5 +374,10 @@ omegaup.OmegaUp.on('ready', function() {
                            })
             .then(problemCallback)
             .fail(omegaup.UI.apiError);
+      });
+
+  $('#wmd-input-statement')
+      .on('blur', function(e) {
+        statements[$('#statement-language').val()].current = $(this).val();
       });
 });
