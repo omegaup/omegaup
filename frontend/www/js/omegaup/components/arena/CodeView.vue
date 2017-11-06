@@ -1,6 +1,5 @@
 <template>
-  <omegaup-arena-codemirror ref="cm-wrapper"
-        v-bind:options="editorOptions"
+  <omegaup-arena-codemirror v-bind:options="editorOptions"
         v-bind:value="value"
         v-on:change="onChange"
         v-on:input="onInput"></omegaup-arena-codemirror>
@@ -9,9 +8,9 @@
 <script>
 import {T, API} from '../../omegaup.js';
 import UI from '../../ui.js';
-import {codemirror} from 'vue-codemirror-lite';
+import {codemirror} from 'vue-codemirror';
 
-const languageModeMap = {
+let languageModeMap = {
   'c': 'text/x-csrc',
   'cpp': 'text/x-c++src',
   'java': 'text/x-java',
@@ -26,13 +25,6 @@ const languageModeMap = {
   'lua': 'text/x-lua',
 };
 
-// Preload all language modes.
-const modeList =
-    ['clike', 'python', 'ruby', 'perl', 'pascal', 'haskell', 'lua'];
-for (const mode of modeList) {
-  require('codemirror/mode/' + mode + '/' + mode + '.js');
-}
-
 export default {
   props: {
     language: String,
@@ -40,12 +32,10 @@ export default {
     value: String,
   },
   data: function() {
-    return { mode: languageModeMap[this.language] }
-  },
-  computed: {
-    editorOptions: function() {
-      return {
-        tabSize: 2, lineNumbers: true, mode: this.mode, readOnly: this.readOnly
+    return {
+      editorOptions: {
+        tabSize: 2, lineNumbers: true, mode: languageModeMap[this.language],
+            readOnly: this.readOnly,
       }
     }
   },
@@ -54,11 +44,12 @@ export default {
     onInput: function(value) { this.$emit('input', value);},
   },
   watch: {
-    language: function(newLanguage) { this.mode = languageModeMap[newLanguage];}
+    language: function(newLanguage) {
+      this.editorOptions.mode = languageModeMap[newLanguage];
+    }
   },
   components: {
     "omegaup-arena-codemirror": codemirror,
   }
 };
-
 </script>
