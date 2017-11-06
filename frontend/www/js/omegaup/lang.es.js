@@ -835,7 +835,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsProgress: "Progreso",
 	wordsPublic: "P\u00fablico",
 	wordsPublished: "Publicado",
-	wordsQuality: "C\u00e1lidad",
+	wordsQuality: "Calidad",
 	wordsRanking: "Ranking",
 	wordsRatio: "Ratio",
 	wordsReadAgain: "Vuelve a leer",
