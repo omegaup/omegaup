@@ -367,6 +367,12 @@ class RunController extends Controller {
         }
 
         // Happy ending
+        $response['nextSubmissionTimestamp'] = RunsDAO::nextSubmissionTimestamp(
+            $problemset_id,
+            isset($r['contest']) ? $r['contest'] : null,
+            $r['problem']->problem_id,
+            $r['current_user_id']
+        );
         $response['guid'] = $run->guid;
         $response['status'] = 'ok';
 

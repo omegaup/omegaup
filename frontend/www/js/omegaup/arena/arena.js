@@ -278,6 +278,8 @@ export class Arena {
       scoreboardCutoff: ko.observable(),
       attached: false,
     };
+
+    self.submissionGapInterval = 0;
   }
 
   installLibinteractiveHooks() {
@@ -1022,6 +1024,7 @@ export class Arena {
 
         MathJax.Hub.Queue(
             ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
+        self.initCountDown();
       }
 
       if (problemChanged) {
@@ -1130,6 +1133,49 @@ export class Arena {
     self.elements.submitForm.file.val(null);
   }
 
+  initCountDown() {
+    let self = this;
+    let countDown = 0;
+    let currentTimestamp = parseInt(Date.now() / 1000);
+    clearInterval(self.submissionGapInterval);
+    $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
+    if (typeof(self.problems[self.currentProblem.alias]
+                   .nextSubmissionTimestamp) !== 'undefined') {
+      countDown =
+          self.problems[self.currentProblem.alias].nextSubmissionTimestamp -
+          currentTimestamp;
+      self.startCountDown(currentTimestamp, countDown);
+    } else {
+      let lastSubmission = parseInt(
+          self.problems[self.currentProblem.alias]
+              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
+              .time.getTime() /
+          1000);
+      countDown = (lastSubmission - currentTimestamp) +
+                  parseInt(self.currentContest.submissions_gap);
+      if (countDown >= 0) {
+        self.startCountDown(currentTimestamp, countDown);
+      }
+    }
+  }
+
+  startCountDown(currentTimestamp, countDown) {
+    let self = this;
+    self.submissionGapInterval = setInterval(function() {
+      countDown--;
+      $('#submit input[type=submit]')
+          .attr('disabled', 'disabled')
+          .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
+                               {submissionGap: countDown}));
+      if (countDown < 0) {
+        clearInterval(self.submissionGapInterval);
+        $('#submit input[type=submit]')
+            .removeAttr('value')
+            .removeAttr('disabled');
+      }
+    }, 1000);
+  }
+
   onLanguageSelect(e) {
     var self = this;
     var lang = $(e.target).val();
@@ -1235,8 +1281,9 @@ export class Arena {
           if (!self.options.isOnlyProblem) {
             self.problems[self.currentProblem.alias].last_submission =
                 Date.now();
+            self.problems[self.currentProblem.alias].nextSubmissionTimestamp =
+                run.nextSubmissionTimestamp;
           }
-
           run.username = OmegaUp.username;
           run.status = 'new';
           run.alias = self.currentProblem.alias;
@@ -1252,21 +1299,7 @@ export class Arena {
           self.elements.submitForm.code.val('');
           self.hideOverlay();
           self.clearInputFile();
-
-          let countDown = 60;
-          let x = setInterval(function() {
-            countDown--;
-            $('#submit input[type=submit]')
-                .attr('disabled', 'disabled')
-                .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
-                                     {submissionGap: countDown}));
-            if (countDown < 0) {
-              clearInterval(x);
-              $('#submit input[type=submit]')
-                  .removeAttr('value')
-                  .removeAttr('disabled');
-            }
-          }, 1000);
+          self.initCountDown();
         })
         .fail(function(run) {
           alert(run.error);
