@@ -1248,7 +1248,7 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth(null, null, 'time', 'DESC');
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             foreach ($coders as $c) {
                 $response['coders'][] = [
                     'username' => $c['username'],
