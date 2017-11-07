@@ -26,6 +26,28 @@ omegaup.OmegaUp.on('ready', function() {
                        });
 
   refreshProblemTags();
+
+  omegaup.API.Tag.list({query: ''})
+      .then(function(response) {
+        var tags = new Array();
+        $('#problem-tags a')
+            .each(function(index) { tags[index] = $(this).html(); });
+        response.forEach(function(e) {
+          if (tags.indexOf(e.name) === -1) {
+            $('.tag-list')
+                .append('<a href="#tags" class="tag pull-left">' + e.name +
+                        '</a>');
+          }
+        });
+        $(document)
+            .on('click', '.tag', function(event) {
+              $('#tag-name').val($(this).html());
+              $(this).remove();
+              $('#add-tag-form').trigger('submit');
+            });
+      })
+      .fail(omegaup.UI.apiError);
+
   $('#tag-name')
       .typeahead(
           {
@@ -247,11 +269,12 @@ omegaup.OmegaUp.on('ready', function() {
             $('#problem-tags')
                 .append(
                     $('<tr></tr>')
-                        .append($('<td></td>')
-                                    .append($('<a></a>')
-                                                .attr('href', '/problem/?tag=' +
-                                                                  tag.name)
-                                                .text(tag.name)))
+                        .append(
+                            $('<td></td>')
+                                .append($('<a></a>')
+                                            .attr('href',
+                                                  '/problem/?tag[]=' + tag.name)
+                                            .text(tag.name)))
                         .append($('<td></td>').text(tag.public))
                         .append($('<td><button type="button" class="close">' +
                                   '&times;</button></td>')
@@ -268,6 +291,12 @@ omegaup.OmegaUp.on('ready', function() {
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
+                                              $('.tag-list')
+                                                  .append(
+                                                      '<a href="#tags" ' +
+                                                      'class="tag pull-left">' +
+                                                      $(tr).find('a').html() +
+                                                      '</a>');
                                               $(tr).remove();
                                             })
                                             .fail(omegaup.UI.apiError);
