@@ -81,10 +81,13 @@ export default {
     markResolution: function(banProblem) {
       let newStatus = banProblem ? 'approved' : 'denied';
       API.QualityNomination.resolve({
-                             problem: this.problem.alias,
+                             problem_alias: this.problem.alias,
                              status: newStatus,
                              qualitynomination_id: this.qualitynomination_id
                            })
+          .then(function() {
+            omegaup.UI.success(T.qualityNominationResolutionSuccess);
+          })
           .fail(UI.apiError);
     },
   }

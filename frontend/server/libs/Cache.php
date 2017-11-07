@@ -120,7 +120,6 @@ class Cache {
     const RUN_COUNTS = 'run-counts-';
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
-    const PROBLEMS_SOLVED_RANK_LIST = 'problems-solved-rank-list';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
