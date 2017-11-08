@@ -279,6 +279,7 @@ export class Arena {
       attached: false,
     };
 
+    // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
   }
 
@@ -1135,45 +1136,40 @@ export class Arena {
 
   initCountDown() {
     let self = this;
+    let nextSubmissionTimestamp = 0;
     let countDown = 0;
-    let currentTimestamp = parseInt(Date.now() / 1000);
-    clearInterval(self.submissionGapInterval);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
     if (typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
-      countDown =
-          self.problems[self.currentProblem.alias].nextSubmissionTimestamp -
-          currentTimestamp;
-      self.startCountDown(currentTimestamp, countDown);
-    } else {
-      let lastSubmission = parseInt(
-          self.problems[self.currentProblem.alias]
-              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
-              .time.getTime() /
-          1000);
-      countDown = (lastSubmission - currentTimestamp) +
-                  parseInt(self.currentContest.submissions_gap);
-      if (countDown >= 0) {
-        self.startCountDown(currentTimestamp, countDown);
-      }
+      nextSubmissionTimestamp = parseInt(
+          self.problems[self.currentProblem.alias].nextSubmissionTimestamp);
+    } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
+      nextSubmissionTimestamp =
+          parseInt(
+              self.problems[self.currentProblem.alias]
+                  .runs[self.problems[self.currentProblem.alias].runs.length -
+                        1]
+                  .time.getTime() /
+              1000) +
+          parseInt(self.currentContest.submissions_gap);
     }
-  }
-
-  startCountDown(currentTimestamp, countDown) {
-    let self = this;
-    self.submissionGapInterval = setInterval(function() {
-      countDown--;
-      $('#submit input[type=submit]')
-          .attr('disabled', 'disabled')
-          .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
-                               {submissionGap: countDown}));
-      if (countDown < 0) {
+    clearInterval(self.submissionGapInterval);
+    if (nextSubmissionTimestamp > (Date.now() / 1000)) {
+      self.submissionGapInterval = setInterval(function() {
+        countDown = nextSubmissionTimestamp - parseInt(Date.now() / 1000);
+        $('#submit input[type=submit]')
+            .attr('disabled', 'disabled')
+            .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
+                                 {submissionGap: countDown}));
+        if (countDown > 0) {
+          return;
+        }
         clearInterval(self.submissionGapInterval);
         $('#submit input[type=submit]')
             .removeAttr('value')
             .removeAttr('disabled');
-      }
-    }, 1000);
+      }, 1000);
+    }
   }
 
   onLanguageSelect(e) {

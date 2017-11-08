@@ -565,19 +565,10 @@ class RunsDAO extends RunsDAOBase {
         return Time::get() >= (strtotime($lastrun->time) + $submission_gap);
     }
 
-    final public static function nextSubmissionTimestamp(
-        $problemset_id,
-        $contest,
-        $problem_id,
-        $user_id
-    ) {
-        // Get last run
-        $lastrun = self::GetLastRun($problemset_id, $problem_id, $user_id);
-
-        if (is_null($lastrun)) {
-            return true;
-        }
-
+    /**
+     * Returns the time of the next submission to the current problem
+     */
+    final public static function nextSubmissionTimestamp($contest) {
         $submission_gap = RunController::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
@@ -586,7 +577,7 @@ class RunsDAO extends RunsDAOBase {
                 (int)$contest->submissions_gap
             );
         }
-        return (strtotime($lastrun->time) + $submission_gap);
+        return (Time::get() + $submission_gap);
     }
 
     public static function GetRunCountsToDate($date) {
