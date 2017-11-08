@@ -528,13 +528,15 @@ class QualityNominationTest extends OmegaupTestCase {
         $list = QualityNominationController::apiList(new Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
-        $this->assertEquals('ok', $list['status'], "Status of apiList call is not ok");
+        $this->assertEquals('ok', $list['status'], 'Status of apiList call is not ok');
         $this->assertGreaterThanOrEqual(2, count($list['nominations']), "List didn't return enough nominations");
         foreach ($list['nominations'] as $nomination) {
             $isPromotion = ($nomination['nomination'] == 'promotion');
             $isDemotion = ($nomination['nomination'] == 'demotion');
-            $this->assertTrue($isPromotion || $isDemotion,
-                    "Found a nomination of type " + $nomination['nomination'] + ". Only promotion and demotion should be shown.");
+            $this->assertTrue(
+                $isPromotion || $isDemotion,
+                'Found a nomination of type ' + $nomination['nomination'] + '. Only promotion and demotion should be shown.'
+            );
         }
     }
 

@@ -183,19 +183,19 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             $conditions = [];
             if (!empty($types)) {
                 global $conn;
-                $connectionID = $conn->_connectionID;		
-                $escapeFunc = function ($type) use ($connectionID) {		
-                    return mysqli_real_escape_string($connectionID, $type);		
-                };		
-                $conditions[] =		
-                    ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';		
-            }		
-            if (!is_null($nominator)) {		
-                $conditions[] = ' qn.user_id = ?';		
-                $params[] = $nominator;		
-            }		
-            if (!empty($conditions)) {		
-                $sql .= ' WHERE ' . implode(' AND ', $conditions);		
+                $connectionID = $conn->_connectionID;
+                $escapeFunc = function ($type) use ($connectionID) {
+                    return mysqli_real_escape_string($connectionID, $type);
+                };
+                $conditions[] =
+                    ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
+            }
+            if (!is_null($nominator)) {
+                $conditions[] = ' qn.user_id = ?';
+                $params[] = $nominator;
+            }
+            if (!empty($conditions)) {
+                $sql .= ' WHERE ' . implode(' AND ', $conditions);
             }
         } elseif (!is_null($assignee)) {
             $sql .= '
