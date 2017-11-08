@@ -152,13 +152,10 @@ class QualityNominationTest extends OmegaupTestCase {
 
         RunsFactory::gradeRun($runData);
 
-        QualityNominationController::apiCreate($r);
+        $response = QualityNominationController::apiCreate($r);
 
-        $response = QualityNominationController::apiMyList(new Request([
-            'auth_token' => $login->auth_token,
-        ]));
-        $this->assertEquals(1, count($response['nominations']));
-        $nomination = $response['nominations'][0];
+        $r['qualitynomination_id'] = $response['qualitynomination_id'];
+        $nomination = QualityNominationController::apiDetails($r);
         $this->assertEquals(
             $problemData['request']['alias'],
             $nomination['problem']['alias']
@@ -469,6 +466,76 @@ class QualityNominationTest extends OmegaupTestCase {
                 return $nomination['problem']['alias'] == $problemData['request']['alias'];
             }
         );
+    }
+
+    /**
+     * Test that nomination list by default only shows promotions or demotions.
+     * All other nomination types should not appear on this list.
+     */
+    public function testNominationListDoesntShowSuggestionsOrDismisssal() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        // Create promotion nomination.
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'promotion',
+            'contents' => json_encode([
+                'rationale' => 'cool!',
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'source' => 'omegaUp',
+                'tags' => ['ez-pz'],
+            ]),
+        ]));
+
+        // Create demotion nomination.
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        // Create dismissal nomination.
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([]),
+        ]));
+
+        // Create dismissal nomination.
+        QualityNominationFactory::createSuggestion(
+            $login,
+            $problemData['request']['alias'],
+            null,
+            1,
+            ['DP', 'Math']
+        );
+
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $list = QualityNominationController::apiList(new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+        ]));
+        $this->assertEquals('ok', $list['status'], "Status of apiList call is not ok");
+        $this->assertGreaterThanOrEqual(2, count($list['nominations']), "List didn't return enough nominations");
+        foreach ($list['nominations'] as $nomination) {
+            $isPromotion = ($nomination['nomination'] == 'promotion');
+            $isDemotion = ($nomination['nomination'] == 'demotion');
+            $this->assertTrue($isPromotion || $isDemotion,
+                    "Found a nomination of type " + $nomination['nomination'] + ". Only promotion and demotion should be shown.");
+        }
     }
 
     /**
