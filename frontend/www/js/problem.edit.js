@@ -29,21 +29,40 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.Tag.list({query: ''})
       .then(function(response) {
-        var tags = new Array();
+        var tags = {};
         $('#problem-tags a')
-            .each(function(index) { tags[index] = $(this).html(); });
+            .each(function(index) { tags[$(this).html()] = true; });
         response.forEach(function(e) {
-          if (tags.indexOf(e.name) === -1) {
-            $('.tag-list')
-                .append('<a href="#tags" class="tag pull-left">' + e.name +
-                        '</a>');
+          if (tags.hasOwnProperty(e.name)) {
+            return;
           }
+          $('.tag-list')
+              .append('<a></a>')
+              .children()
+              .last()
+              .attr('href', '#tags')
+              .addClass('tag')
+              .addClass('pull-left')
+              .text(e.name);
         });
         $(document)
             .on('click', '.tag', function(event) {
-              $('#tag-name').val($(this).html());
+              var tagname = $(this).html();
+              var public = $('#tag-public').val();
               $(this).remove();
-              $('#add-tag-form').trigger('submit');
+              omegaup.API.Problem.addTag({
+                                   problem_alias: problemAlias,
+                                   name: tagname, public: public,
+                                 })
+                  .then(function(response) {
+                    omegaup.UI.success('Tag successfully added!');
+                    $('div.post.footer').show();
+
+                    refreshProblemTags();
+                  })
+                  .fail(omegaup.UI.apiError);
+
+              return false;  // Prevent refresh
             });
       })
       .fail(omegaup.UI.apiError);
