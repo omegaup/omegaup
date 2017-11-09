@@ -1136,27 +1136,31 @@ export class Arena {
 
   initCountDown() {
     let self = this;
-    let nextSubmissionTimestamp = 0;
+    let nextSubmissionTimestamp = new Date(0);
+    let currentTime = new Date();
     let countDown = 0;
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
     if (typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
-      nextSubmissionTimestamp = parseInt(
-          self.problems[self.currentProblem.alias].nextSubmissionTimestamp);
+      nextSubmissionTimestamp = new Date(
+          self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
+          1000);
     } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
-      nextSubmissionTimestamp =
-          parseInt(
-              self.problems[self.currentProblem.alias]
-                  .runs[self.problems[self.currentProblem.alias].runs.length -
-                        1]
-                  .time.getTime() /
-              1000) +
-          parseInt(self.currentContest.submissions_gap);
+      nextSubmissionTimestamp = new Date(
+          self.problems[self.currentProblem.alias]
+              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
+              .time);
+      nextSubmissionTimestamp.setSeconds(
+          nextSubmissionTimestamp.getSeconds() +
+          parseInt(self.currentContest.submissions_gap));
     }
-    clearInterval(self.submissionGapInterval);
-    if (nextSubmissionTimestamp > (Date.now() / 1000)) {
+    if (self.submissionGapInterval) {
+      clearInterval(self.submissionGapInterval);
+      self.submissionGapInterval = 0;
+    }
+    if (nextSubmissionTimestamp.getTime() > currentTime.getTime()) {
       self.submissionGapInterval = setInterval(function() {
-        countDown = nextSubmissionTimestamp - parseInt(Date.now() / 1000);
+        countDown = parseInt((nextSubmissionTimestamp - Date.now()) / 1000);
         $('#submit input[type=submit]')
             .attr('disabled', 'disabled')
             .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
