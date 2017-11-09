@@ -258,6 +258,7 @@ class QualityNominationController extends Controller {
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
+            self::sendDemotionEmail($r, $qualitynomination);
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
@@ -266,6 +267,35 @@ class QualityNominationController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Send a mail with demotion notification to the original creator
+     *
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+        try {
+            $r['email'] = ProblemsDAO::getProblemAdminEmail($r['problem']);
+            $username = EmailsDAO::getUserNameByEmail($r['email']->email);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        global $smarty;
+        $reason = json_decode($qualitynomination->contents);
+        $r['mail_subject'] = sprintf(
+            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            $r['problem']->title
+        );
+        $r['mail_body'] = sprintf(
+            $smarty->getConfigVars('demotionProblemEmailBody'),
+            $username,
+            $r['problem']->title,
+            $reason->rationale
+        );
+
+        UserController::sendEmail($r);
     }
 
     /**

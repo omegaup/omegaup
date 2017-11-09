@@ -18,4 +18,31 @@ require_once('base/Emails.vo.base.php');
   *
   */
 class EmailsDAO extends EmailsDAOBase {
+  /**
+   * @param $email
+   * @return $name
+   */
+    public static function getUserNameByEmail($email) {
+        $sql = 'SELECT
+              name
+            FROM
+              Users u
+            INNER JOIN
+              Emails e
+            ON
+              e.user_id = u.user_id
+            WHERE
+              email = ?;';
+
+        $params = [$email];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $result = [];
+        foreach ($rs as $r) {
+            $result[] = $r['name'];
+        }
+        return $result[0];
+    }
 }

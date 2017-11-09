@@ -415,6 +415,41 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
+    public static function getProblemAdminEmail(Problems $problem) {
+        global $conn;
+        $sql = '
+            SELECT DISTINCT
+                e.email
+            FROM
+                (
+                    SELECT
+                        p.problem_id, a.owner_id AS user_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
+                        ACLs AS a
+                    ON
+                        a.acl_id = p.acl_id
+                    WHERE p.problem_id = ?
+                ) AS a
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = a.user_id
+            INNER JOIN
+                Emails e
+            ON
+                e.user_id = u.main_email_id;
+        ';
+
+        $params = [$problem->problem_id];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Emails($rs);
+    }
+
     /**
      * Returns all problems that a user can manage.
      */

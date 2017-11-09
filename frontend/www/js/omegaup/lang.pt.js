@@ -251,6 +251,8 @@ omegaup.OmegaUp.loadTranslations({
 	courseViewProgress: "Ver o progresso",
 	createSchoolFailed: "Cria\u00e7\u00e3o da escola falhou.",
 	currentStatus: "situa\u00e7\u00e3o atual",
+	demotionProblemEmailBody: "Prezado <strong>%1$s</strong>:<br><br>O acesso ao seu problema <strong>%2$s</strong> no omegaUp foi restrito porque foi relatado como inadequado. A equipe omegaUp analisou este relat\u00f3rio e confirmou que o problema n\u00e3o \u00e9 apropriado porque <em>%3$s<em>.<br><br><br>Para desbloquear o problema e exibi-lo novamente na lista de problemas, siga as etapas abaixo:<br><br>Revise e edite seu problema: certifique-se de descrever um problema, n\u00e3o \u00e9 ofensivo ou spam.<br>Depois de ter resolvido o motivo de por que seu problema foi bloqueado, envie um email <a href='mailto:omegaup@omegaup.com' target='_top'>omegaup@omegaup.com</a> para ser revisado e reativado.<br><br>Se as etapas mencionadas acima n\u00e3o forem seguidas, o problema n\u00e3o ser\u00e1 mostrado novamente na lista de problemas, nem pode ser usado em competi\u00e7\u00f5es. Em caso de reca\u00edda em tr\u00eas ocasi\u00f5es, omegaUp reserva-se o direito de suspender sua conta de usu\u00e1rio.<br><br>omegaUp \u00e9 uma plataforma para ajudar os usu\u00e1rios a melhorar suas habilidades de engenharia de software, resolvendo problemas de c\u00f3digo e competindo em concursos de programa\u00e7\u00e3o. OmegaUp congratula-se com todos os problemas que ajudam a atingir esse objetivo.<br><br>Obrigado,<br>Equipe omegaUp",
+	demotionProblemEmailSubject: "O problema %1$s foi relatado como inadequado",
 	editFieldRequired: "Um valor necess\u00e1rio est\u00e1 faltando",
 	email: "Email",
 	emailInUse: "Email j\u00e1 existe",
