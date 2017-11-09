@@ -1032,7 +1032,7 @@ class ContestController extends Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                Validators::isInEnum($language, 'languages', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs', 'lua'], false);
+                Validators::isInEnum($language, 'languages', RunController::$kSupportedLanguages, false);
             }
         }
 
@@ -2271,7 +2271,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj'], false);
+        Validators::isInEnum($r['language'], 'language', RunController::$kSupportedLanguages, false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {

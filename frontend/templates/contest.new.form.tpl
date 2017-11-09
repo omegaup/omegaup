@@ -129,20 +129,9 @@
 						<label for="languages">{#wordsLanguage#}s</label>
 						<br>
 						<select id="languages" name="languages" class="form-control" multiple="multiple">
-							<option value='c'>c</option>
-							<option value='cpp'>cpp</option>
-							<option value='cpp11'>cpp11</option>
-							<option value='java'>java</option>
-							<option value='py'>py</option>
-							<option value='rb'>rb</option>
-							<option value='pl'>pl</option>
-							<option value='cs'>cs</option>
-							<option value='pas'>pas</option>
-							<option value='kp'>kp</option>
-							<option value='kj'>kj</option>
-							<option value='cat'>cat</option>
-							<option value='hs'>hs</option>
-							<option value='lua'>lua</option>
+							{foreach item=language from=$LANGUAGES}
+							<option value='{$language}'>{$language}</option>
+							{/foreach}
 						</select>
 						<p class="help-block">Set languages to the current contest</p>
 					</div>
