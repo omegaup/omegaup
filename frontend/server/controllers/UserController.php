@@ -278,6 +278,7 @@ class UserController extends Controller {
     private static function sendVerificationEmail(Request $r) {
         try {
             $r['email'] = EmailsDAO::getByPK($r['user']->main_email_id);
+            $r['email'] = $r['email']->email;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -303,7 +304,7 @@ class UserController extends Controller {
 
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
             self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
-            self::$log->info('     to = ' . $r['email']->email);
+            self::$log->info('     to = ' . $r['email']);
             self::$log->info('subject = ' . $r['mail_subject']);
             self::$log->info('   body = ' . $r['mail_body']);
             return;
@@ -323,7 +324,7 @@ class UserController extends Controller {
         $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
 
         $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->AddAddress($r['email']->email);
+        $mail->AddAddress($r['email']);
         $mail->isHTML(true);
         $mail->Subject = $r['mail_subject'];
         $mail->Body = $r['mail_body'];

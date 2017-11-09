@@ -177,6 +177,7 @@ class InterviewController extends Controller {
 
         try {
             $r['email'] = EmailsDAO::getByPK($r['user']->main_email_id);
+            $r['email'] = $r['email']->email;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

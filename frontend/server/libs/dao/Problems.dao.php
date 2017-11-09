@@ -415,39 +415,42 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
-    public static function getProblemAdminEmail(Problems $problem) {
+    public static function getAdminUser(Problems $problem) {
         global $conn;
         $sql = '
             SELECT DISTINCT
-                e.email
+                e.email,
+                u.name
             FROM
-                (
-                    SELECT
-                        p.problem_id, a.owner_id AS user_id
-                    FROM
-                        Problems AS p
-                    INNER JOIN
-                        ACLs AS a
-                    ON
-                        a.acl_id = p.acl_id
-                    WHERE p.problem_id = ?
-                ) AS a
+                Emails e
             INNER JOIN
                 Users u
             ON
-                u.user_id = a.user_id
+                e.email_id = u.main_email_id
             INNER JOIN
-                Emails e
+                ACLs a
             ON
-                e.user_id = u.main_email_id;
+                a.owner_id = u.user_id
+            INNER JOIN
+                Problems p
+            ON
+                a.acl_id = p.acl_id
+            WHERE
+               p.problem_id = ?
+            LIMIT
+               1;
         ';
 
         $params = [$problem->problem_id];
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
-            return null;
+        $rs = $conn->Execute($sql, $params);
+        if (count($rs)==0) {
+                return null;
         }
-        return new Emails($rs);
+
+        return [
+            'name' => $rs->fields['name'],
+            'email' => $rs->fields['email']
+        ];
     }
 
     /**

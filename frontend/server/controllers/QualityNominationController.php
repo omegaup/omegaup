@@ -258,7 +258,9 @@ class QualityNominationController extends Controller {
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
-            self::sendDemotionEmail($r, $qualitynomination);
+            if ($newProblemVisibility == ProblemController::VISIBILITY_BANNED) {
+                self::sendDemotionEmail($r, $qualitynomination);
+            }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
@@ -276,26 +278,30 @@ class QualityNominationController extends Controller {
      */
     private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
         try {
-            $r['email'] = ProblemsDAO::getProblemAdminEmail($r['problem']);
-            $username = EmailsDAO::getUserNameByEmail($r['email']->email);
+            $adminuser = ProblemsDAO::getAdminUser($r['problem']);
+            $request['email'] = $adminuser['email'];
+            $username = $adminuser['name'];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        global $smarty;
         $reason = json_decode($qualitynomination->contents);
-        $r['mail_subject'] = sprintf(
+        $email_params = [
+            'reason' => $reason->rationale,
+            'problem_name' => htmlspecialchars($r['problem']->title),
+            'user_name' => $username
+        ];
+        global $smarty;
+        $request['mail_subject'] = ApiUtils::FormatString(
             $smarty->getConfigVars('demotionProblemEmailSubject'),
-            $r['problem']->title
+            $email_params
         );
-        $r['mail_body'] = sprintf(
+        $request['mail_body'] = ApiUtils::FormatString(
             $smarty->getConfigVars('demotionProblemEmailBody'),
-            $username,
-            $r['problem']->title,
-            $reason->rationale
+            $email_params
         );
 
-        UserController::sendEmail($r);
+        UserController::sendEmail($request);
     }
 
     /**
