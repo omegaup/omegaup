@@ -37,13 +37,11 @@ omegaup.OmegaUp.on('ready', function() {
             return;
           }
           $('.tag-list')
-              .append('<a></a>')
-              .children()
-              .last()
-              .attr('href', '#tags')
-              .addClass('tag')
-              .addClass('pull-left')
-              .text(e.name);
+              .append($('<a></a>')
+                          .attr('href', '#tags')
+                          .addClass('tag')
+                          .addClass('pull-left')
+                          .text(e.name));
         });
         $(document)
             .on('click', '.tag', function(event) {
