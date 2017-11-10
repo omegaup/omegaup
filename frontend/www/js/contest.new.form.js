@@ -80,4 +80,6 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #penalty-type').val('contest_start');
         $('.new_contest_form #show-scoreboard-after').val('1');
       });
+
+  $('#languages').multiselect();
 });
