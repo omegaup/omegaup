@@ -86,4 +86,33 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         return ['totalCount' => $totalCount, 'user' => $user, 'score' => $score];
     }
+
+    /**
+     * Get all Coders of the month
+     *
+     * @static
+     * @return Array
+     */
+    final public static function getCodersOfTheMonth() {
+        $sql = '
+          SELECT
+            cm.time, u.username, u.country_id, e.email
+          FROM
+            Coder_Of_The_Month cm
+          INNER JOIN
+            Users u ON u.user_id = cm.user_id
+          LEFT JOIN
+            Emails e ON e.user_id = u.user_id
+          ORDER BY
+            cm.time DESC
+        ';
+
+        global $conn;
+        $rs = $conn->Execute($sql);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = $row;
+        }
+        return $allData;
+    }
 }
