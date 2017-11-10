@@ -6,14 +6,14 @@ $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $order_by = isset($_GET['order_by']) ? $_GET['order_by'] : 'title';
 $language = isset($_GET['language']) ? $_GET['language'] : null;
+$tags = isset($_GET['tag']) ? array_unique($_GET['tag']) : null;
 
 $r['page'] = $page;
 $r['language'] = $language;
 $r['order_by'] = $order_by;
 $r['mode'] = $mode;
-if (!empty($_GET['tag'])) {
-    $r['tag'] = $_GET['tag'];
-}
+$r['tag'] = $tags;
+
 $keyword = '';
 if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
     $keyword = substr($_GET['query'], 0, 256);
@@ -21,10 +21,8 @@ if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
 }
 $response = ProblemController::apiList($r);
 
-$params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode];
-if (!empty($_GET['tag'])) {
-    $params['tag'] = $_GET['tag'];
-}
+$params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode, 'tag' => $tags];
+
 $pager_items = Pager::paginate(
     $response['total'],
     $page,
@@ -38,5 +36,6 @@ $smarty->assign('MODE', $mode);
 $smarty->assign('ORDER_BY', $order_by);
 $smarty->assign('LANGUAGE', $language);
 $smarty->assign('problems', $response['results']);
+$smarty->assign('current_tags', $tags);
 $smarty->assign('pager_items', $pager_items);
 $smarty->display('../templates/problems.tpl');

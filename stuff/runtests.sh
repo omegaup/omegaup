@@ -19,7 +19,7 @@ else
 	$OMEGAUP_ROOT/stuff/git-hooks/pre-push $REF
 fi
 
-hhvm /usr/bin/phpunit \
+/usr/bin/phpunit \
 	--bootstrap $OMEGAUP_ROOT/frontend/tests/bootstrap.php \
 	--configuration $OMEGAUP_ROOT/frontend/tests/phpunit.xml \
 	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/controllers

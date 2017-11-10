@@ -28,7 +28,6 @@ class ContestController extends Controller {
 
         try {
             $contests = [];
-
             Validators::isNumber($r['page'], 'page', false);
             Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -48,6 +47,11 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
+            if (is_null($participating)) {
+                throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
+            $query = $r['query'];
+            Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -55,27 +59,27 @@ class ContestController extends Controller {
                     Cache::CONTESTS_LIST_PUBLIC,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
-                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size);
+                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
                     $cache_key,
                     $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
-                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended);
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
                     },
                     $contests
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended);
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -177,7 +181,7 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
+        $query = $r['query'];
         // Create array of relevant columns
         $relevant_columns = [
             'title',
@@ -194,7 +198,8 @@ class ContestController extends Controller {
                 $callback_user_function,
                 $r['current_user_id'],
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -595,7 +600,7 @@ class ContestController extends Controller {
 
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
-
+            $result['languages'] = explode(',', $result['languages']);
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -799,7 +804,6 @@ class ContestController extends Controller {
 
         // Create and populate a new Contests object
         $contest = new Contests();
-
         $contest->public = $r['public'];
         $contest->title = $r['title'];
         $contest->description = $r['description'];
@@ -816,7 +820,7 @@ class ContestController extends Controller {
         $contest->penalty = max(0, intval($r['penalty']));
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
-        $contest->languages = empty($r['languages']) ? null : $r['languages'];
+        $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
         $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
@@ -1024,6 +1028,13 @@ class ContestController extends Controller {
 
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
+
+        // languages is always optional
+        if (!empty($r['languages'])) {
+            foreach ($r['languages'] as $language) {
+                Validators::isInEnum($language, 'languages', RunController::$kSupportedLanguages, false);
+            }
+        }
 
         if ($is_update) {
             // Prevent date changes if a contest already has runs
@@ -2085,6 +2096,9 @@ class ContestController extends Controller {
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after',
+            'languages' => ['transform' => function ($value) {
+                return join(',', $value);
+            }],
             'contestant_must_register',
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
@@ -2257,7 +2271,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj'], false);
+        Validators::isInEnum($r['language'], 'language', RunController::$kSupportedLanguages, false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
@@ -2591,13 +2605,6 @@ class ContestController extends Controller {
         }
 
         $zip->add_file('summary.csv', $table);
-
-        // Add problem cases to zip
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $contest_problems = ProblemsetProblemsDAO::GetRelevantProblems($problemset);
-        foreach ($contest_problems as $problem) {
-            $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
-        }
 
         // Return zip
         $zip->finish();

@@ -35,8 +35,8 @@
           <div class="col-sm-3">
             <strong>{{ T.wordsDetails }}</strong>
           </div>
-          <div class="col-sm-4">
-            {{ this.contents }}
+          <div class="col-sm-8">
+            <pre>{{ this.contents | pretty }}</pre>
           </div>
         </div>
         <div class="row"
@@ -81,10 +81,13 @@ export default {
     markResolution: function(banProblem) {
       let newStatus = banProblem ? 'approved' : 'denied';
       API.QualityNomination.resolve({
-                             problem: this.problem.alias,
+                             problem_alias: this.problem.alias,
                              status: newStatus,
                              qualitynomination_id: this.qualitynomination_id
                            })
+          .then(function() {
+            omegaup.UI.success(T.qualityNominationResolutionSuccess);
+          })
           .fail(UI.apiError);
     },
   }
