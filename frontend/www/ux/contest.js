@@ -11,7 +11,7 @@ omegaup.OmegaUp.on('ready', function() {
     if (!arena.myRuns.attached) {
       arena.myRuns.attach($('#problem .runs'));
     }
-
+    arena.mountEditor(problem);
     MathJax.Hub.Queue(
         ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
 
@@ -33,6 +33,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     var language_array = problem.languages.split(',');
     arena.updateAllowedLanguages(language_array);
+    arena.selectDefaultLanguage();
 
     if (problem.user.logged_in) {
       omegaup.API.Problem.runs({problem_alias: problem.alias})
@@ -95,7 +96,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('#submit input').show();
         $('#submit').show();
         $('#overlay').show();
-        $('#submit textarea[name="code"]').val('');
+        arena.codeEditor.code = arena.currentProblem.template;
+        arena.codeEditor.refresh();
       }
     }
     arena.detectShowRun();
