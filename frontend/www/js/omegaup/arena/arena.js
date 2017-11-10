@@ -508,8 +508,12 @@ export class Arena {
     } else {
       clock = FormatDelta(countdownTime.getTime() - now);
     }
-
     self.elements.clock.text(clock);
+    if (self.options.isLockdownMode === true) {
+      UI.warning(T.lockdownMessageWarning);
+    } else {
+      UI.dismissNotifications();
+    }
   }
 
   updateRunFallback(guid) {
@@ -1291,7 +1295,7 @@ export class Arena {
       self.hideOverlay();
       return;
     }
-
+    self.options.isLockdownMode = false;
     if (data.compile_error) {
       $('#run-details .compile_error pre').html(UI.escape(data.compile_error));
       $('#run-details .compile_error').show();
@@ -1311,6 +1315,7 @@ export class Arena {
           .html('<a href="' + data.source + '" download="data.zip">' +
                 T.wordsDownload + '</a>');
     } else if (data.source == 'lockdownDetailsDisabled') {
+      self.options.isLockdownMode = true;
       $('#run-details .source')
           .html(UI.escape((typeof(sessionStorage) !== 'undefined' &&
                            sessionStorage.getItem('run:' + guid)) ||
