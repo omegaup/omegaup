@@ -391,7 +391,10 @@ class UserController extends Controller {
                 'status' => 'ok',
                 'auth_token' => $auth_token];
         } else {
-            throw new InvalidCredentialsException();
+            return [
+                'status' => 'error',
+                'errorcode' => 403
+            ];
         }
     }
 

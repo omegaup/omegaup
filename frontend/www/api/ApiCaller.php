@@ -30,6 +30,7 @@ class ApiCaller {
         try {
             $response = $request->execute();
         } catch (ApiException $e) {
+            self::$log->error($e);
             $response = $e->asResponseArray();
         } catch (Exception $e) {
             self::$log->error($e);
