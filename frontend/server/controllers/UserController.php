@@ -307,7 +307,7 @@ class UserController extends Controller {
             self::$log->info('     to = ' . $r['email']);
             self::$log->info('subject = ' . $r['mail_subject']);
             self::$log->info('   body = ' . $r['mail_body']);
-            return;
+            return $r;
         }
 
         self::$log->info('Really sending email to user.');
@@ -333,6 +333,7 @@ class UserController extends Controller {
             self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
             throw new EmailVerificationSendException();
         }
+        return $r;
     }
 
     /**

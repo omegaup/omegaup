@@ -255,11 +255,12 @@ class QualityNominationController extends Controller {
 
         QualityNominationsDAO::transBegin();
         try {
+            $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_BANNED) {
-                self::sendDemotionEmail($r, $qualitynomination);
+                $response = self::sendDemotionEmail($r, $qualitynomination);
             }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
@@ -268,7 +269,7 @@ class QualityNominationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok'];
+        return ['status' => 'ok', 'email' => $response];
     }
 
     /**
@@ -277,6 +278,7 @@ class QualityNominationController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+        $request = [];
         try {
             $adminuser = ProblemsDAO::getAdminUser($r['problem']);
             $request['email'] = $adminuser['email'];
@@ -301,7 +303,7 @@ class QualityNominationController extends Controller {
             $email_params
         );
 
-        UserController::sendEmail($request);
+        return UserController::sendEmail($request);
     }
 
     /**

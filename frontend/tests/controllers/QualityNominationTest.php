@@ -268,6 +268,41 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion approved by a reviewer sends an email to the problem creator.
+     */
+    public function testDemotionApprovedAndByReviewerAndSendMail() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $this->assertContains($problemData['problem']->title, $response['email']['mail_subject']);
+        $this->assertContains($problemData['author']->name, $response['email']['mail_body']);
+    }
+
+    /**
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {

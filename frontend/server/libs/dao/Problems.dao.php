@@ -422,19 +422,19 @@ class ProblemsDAO extends ProblemsDAOBase {
                 e.email,
                 u.name
             FROM
-                Emails e
-            INNER JOIN
-                Users u
-            ON
-                e.email_id = u.main_email_id
+                Problems p
             INNER JOIN
                 ACLs a
             ON
+                a.acl_id = p.acl_id
+            INNER JOIN
+                Users u
+            ON
                 a.owner_id = u.user_id
             INNER JOIN
-                Problems p
+                Emails e
             ON
-                a.acl_id = p.acl_id
+                e.email_id = u.main_email_id
             WHERE
                p.problem_id = ?
             LIMIT
