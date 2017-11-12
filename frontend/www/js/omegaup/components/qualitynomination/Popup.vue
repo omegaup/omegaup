@@ -32,15 +32,13 @@
             </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormTags }}
-                    <ul class="tag-select">
-                        <li class="tag-select" v-for="problemTopic in sortedProblemTopics">
-                            <label class="tag-select">
-                                <input type="checkbox" id="problemTopic.text" v-model="tags" :value = "problemTopic.text">
-                                    {{ problemTopic.text }}
-                            </label>
-                        </li>
-                    </ul>
-                </label>
+              <ul class="tag-select">
+                <li class="tag-select"
+                    v-for="problemTopic in sortedProblemTopics"><label class="tag-select"><input id=
+                    "problemTopic.text"
+                       type="checkbox"
+                       v-model="tags"> {{ problemTopic.text }}</label></li>
+              </ul></label>
             </div>
             <div class="formGroup">
               <label class="control-label">{{ T.qualityFormQuality }}</label><br>
