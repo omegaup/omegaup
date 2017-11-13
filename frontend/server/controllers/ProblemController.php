@@ -11,8 +11,7 @@ class ProblemController extends Controller {
     public static $grader = null;
 
     // Constants for problem visibility.
-    const VISIBILITY_PUBLIC_BANNED = -2;
-    const VISIBILITY_PRIVATE_BANNED = -1;
+    const VISIBILITY_BANNED = -1;
     const VISIBILITY_PRIVATE = 0;
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
@@ -63,8 +62,7 @@ class ProblemController extends Controller {
             }
 
             // Only reviewers can revert bans.
-            if (($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
-                  $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
+            if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED
                     && array_key_exists('visibility', $r)
                     && $r['problem']->visibility != $r['visibility']
                     && !Authorization::isQualityReviewer($r['current_user_id'])) {
@@ -82,12 +80,7 @@ class ProblemController extends Controller {
                     Validators::isInEnum(
                         $r['visibility'],
                         'visibility',
-                        [
-                            ProblemController::VISIBILITY_PRIVATE,
-                            ProblemController::VISIBILITY_PUBLIC,
-                            ProblemController::VISIBILITY_PUBLIC_BANNED,
-                            ProblemController::VISIBILITY_PRIVATE_BANNED
-                        ]
+                        [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC, ProblemController::VISIBILITY_BANNED]
                     );
                 }
             }

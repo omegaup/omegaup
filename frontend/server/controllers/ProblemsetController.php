@@ -5,8 +5,7 @@ require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
     public static function validateAddProblemToProblemset($problemset_id, Problems $problem, $current_user_id) {
-        if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
-            $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+        if ($problem->visibility == ProblemController::VISIBILITY_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)

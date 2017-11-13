@@ -1176,8 +1176,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if ($problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+        if ($problem->visibility == ProblemController::VISIBILITY_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
