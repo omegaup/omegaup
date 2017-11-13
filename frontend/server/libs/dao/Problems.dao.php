@@ -422,11 +422,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 e.email,
                 u.name
             FROM
-                Problems p
-            INNER JOIN
                 ACLs a
-            ON
-                a.acl_id = p.acl_id
             INNER JOIN
                 Users u
             ON
@@ -436,12 +432,11 @@ class ProblemsDAO extends ProblemsDAOBase {
             ON
                 e.email_id = u.main_email_id
             WHERE
-               p.problem_id = ?
+               a.acl_id = ?
             LIMIT
                1;
         ';
-
-        $params = [$problem->problem_id];
+        $params = [$problem->acl_id];
         $rs = $conn->Execute($sql, $params);
         if (count($rs)==0) {
                 return null;
