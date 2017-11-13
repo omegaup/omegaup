@@ -11,14 +11,6 @@ class ZipHandler {
         $zip = new ZipArchive();
         $zipResource = $zip->open($pathToZip);
 
-        // Workaround for https://github.com/facebook/hhvm/issues/1804
-        foreach ($filesArray as $file) {
-            $dir = dirname("$extractToDir/$file");
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-        }
-
         if ($zipResource === true) {
             if (!$zip->extractTo($extractToDir, $filesArray)) {
                 throw new Exception('Error extracting zip.');
