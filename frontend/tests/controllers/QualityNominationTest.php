@@ -247,7 +247,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Revert ban.
         $request = new Request([
@@ -261,7 +261,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been made private');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been made public');
     }
 
     /**
@@ -337,7 +337,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Reopen demotion request.
         $request = new Request([
@@ -351,7 +351,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have remained banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have remained public banned');
     }
 
     /**
