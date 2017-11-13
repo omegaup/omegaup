@@ -78,6 +78,8 @@ export default {
         // expects that hint to be used when trying to add someone, instead
         // of what they've actually typed so far.
         this.studentUsername = hint;
+      } else {
+        this.studentUsername = $(this.$el).find('.tt-input').val();
       }
       this.$emit('add-student', this.studentUsername);
     },
