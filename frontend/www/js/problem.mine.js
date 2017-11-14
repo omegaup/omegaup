@@ -20,7 +20,7 @@
                 if (problem.tags && problem.tags.length > 0) {
                   var tags = $('.tag-list', row).removeClass('hidden');
                   for (var j = 0; j < problem.tags.length; j++) {
-                    tags.append($('<a class="tag"></a>')
+                    tags.append($('<a class="tag pull-left"></a>')
                                     .attr('href', '/problem/?tag=' +
                                                       omegaup.UI.escape(
                                                           problem.tags[j]))

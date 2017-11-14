@@ -163,13 +163,9 @@ $conn = null;
 
 try {
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
-    // HHVM doesn't like ADOdb's default value of 'false' for port and socket.
-    $conn->port = null;
-    $conn->socket = null;
     $conn->debug = OMEGAUP_DB_DEBUG;
     $conn->SetFetchMode(ADODB_FETCH_ASSOC);
-    // HHVM also doesn't like PConnect. It leaks.
-    $conn->Connect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
     $log->error($databaseConectionException);
 
