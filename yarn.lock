@@ -893,7 +893,7 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-codemirror@^5.22.0, codemirror@^5.28.0:
+codemirror@^5.28.0:
   version "5.29.0"
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.29.0.tgz#e68de1350e2f0ce804a3930576d0ae318736e967"
 
@@ -3710,11 +3710,11 @@ vue-async-computed@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/vue-async-computed/-/vue-async-computed-3.0.0.tgz#c7b436b1281d1f12ae6482864005dcba546b05c3"
 
-vue-codemirror-lite@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/vue-codemirror-lite/-/vue-codemirror-lite-1.0.2.tgz#ee6c679689b723b3af380342846fc4fdce6b7fb6"
+vue-codemirror@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/vue-codemirror/-/vue-codemirror-3.1.4.tgz#daf5f567d1f7532ee45bae48b863f9b621f42958"
   dependencies:
-    codemirror "^5.22.0"
+    codemirror "^5.28.0"
 
 vue-hot-reload-api@^2.0.1:
   version "2.0.8"
@@ -3743,6 +3743,13 @@ vue-style-loader@^2.0.0:
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^0.2.7"
+
+vue-style-loader@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-3.0.3.tgz#623658f81506aef9d121cdc113a4f5c9cac32df7"
+  dependencies:
+    hash-sum "^1.0.2"
+    loader-utils "^1.0.2"
 
 vue-template-compiler@^2.1.10:
   version "2.1.10"

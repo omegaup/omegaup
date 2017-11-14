@@ -55,6 +55,7 @@ omegaup.OmegaUp.loadTranslations({
 	coderOfTheMonthFullList: "(S33 fu11 1i57)",
 	coderOfTheMonthNotice: "(Hi %(username)! C0ngra7u1a7i0n5 0n winning 7h3 C0d3r 0f 7h3 M0n7h! W3 hav3 a priz3 f0r y0u, p13a53 c0n7ac7 u5 a7 m3n70r35@0m3gaup.0rg)",
 	codersOfTheMonth: "(C0d3r5 0f 7h3 M0n7h)",
+	codersOfTheMonthCountry: "(C0un7ry)",
 	codersOfTheMonthDate: "(Da73)",
 	codersOfTheMonthUser: "(U53rnam3)",
 	contestActivityReport: "(Ac7ivi7y r3p0r7)",
