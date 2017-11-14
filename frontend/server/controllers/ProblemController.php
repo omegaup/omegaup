@@ -11,8 +11,8 @@ class ProblemController extends Controller {
     public static $grader = null;
 
     // Constants for problem visibility.
-    const VISIBILITY_PUBLIC_BANNED = -2;
-    const VISIBILITY_PRIVATE_BANNED = -1;
+    const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
+    const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
     const VISIBILITY_PRIVATE = 0;
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;

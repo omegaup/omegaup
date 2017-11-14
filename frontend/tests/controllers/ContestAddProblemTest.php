@@ -187,9 +187,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $problem = $problemData['problem'];
 
         // Ban the problem.
-        $problem->visibility = ProblemController::VISIBILITY_PUBLIC
-          ? ProblemController::VISIBILITY_PUBLIC_BANNED
-          : ProblemController::VISIBILITY_PRIVATE_BANNED;
+        $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
         ProblemsDAO::save($problem);
 
         $directorLogin = self::login($contestData['director']);

@@ -242,11 +242,11 @@ class QualityNominationController extends Controller {
                 }
                 break;
             case 'denied':
-                // If banning is reverted, problem will become private.
-                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                    // If banning is reverted, problem will become private.
                     $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
                 } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+                    // If banning is reverted, problem will become public.
                     $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC;
                 }
                 break;
