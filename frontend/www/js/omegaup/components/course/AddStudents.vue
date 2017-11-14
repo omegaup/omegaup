@@ -79,7 +79,7 @@ export default {
         // of what they've actually typed so far.
         this.studentUsername = hint;
       } else {
-        this.studentUsername = $(this.$el).find('.tt-input').val();
+        this.studentUsername = $('input.typeahead.tt-input', this.$el).val();
       }
       this.$emit('add-student', this.studentUsername);
     },
