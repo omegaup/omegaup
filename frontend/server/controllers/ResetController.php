@@ -18,6 +18,7 @@ class ResetController extends Controller {
         $mail = new PHPMailer();
         $mail->IsSMTP();
         $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+        $mail->CharSet = 'utf-8';
         $mail->SMTPAuth = true;
         $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
         $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
