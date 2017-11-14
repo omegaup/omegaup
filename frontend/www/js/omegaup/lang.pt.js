@@ -635,6 +635,8 @@ omegaup.OmegaUp.loadTranslations({
 	submittingUnOpenedProblem: "Usu\u00e1rio est\u00e1 enviando uma execu\u00e7\u00e3o a um problema que ele nem siquer abriu.",
 	successfulAddUser: "Usu\u00e1rio adicionado com sucesso!",
 	successfulOperation: "Opera\u00e7\u00e3o com sucesso",
+	tagAdded: "Tag adicionado com sucesso!",
+	tagRemoved: "Tag exclu\u00eddo com sucesso!",
 	titleInUse: "T\u00edtulo j\u00e1 existe. Por favor, escolha um t\u00edtulo diferente. ",
 	totalRuns: "Execu\u00e7\u00f5es totais: %(numRuns)",
 	unableToVerifyCaptcha: "N\u00e3o pudemos verificar o captcha. Recarregue a p\u00e1gina e tente novamente",

@@ -20,7 +20,8 @@
 					</select>
 				</div>
 				<div>{#arenaRunSubmitFilename#} <tt>Main<span class="submit-filename-extension"></span></tt></div>
-				<label>{#arenaRunSubmitPaste#} <textarea name="code"></textarea></label><br/>
+				<label for="editor">{#arenaRunSubmitPaste#}</label>
+				<textarea id="editor" name="code"></textarea><br/>
 				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
 				<input type="submit" />
 			</form>
