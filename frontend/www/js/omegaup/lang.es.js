@@ -834,7 +834,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsReadAgain: "Vuelve a leer",
 	wordsRejudge: "Rejuecear",
 	wordsReportProblem: "Reportar contenido inapropiado en este problema.",
-	wordsReset: "OmegaUp: Restablecer contrase\u00f1a.",
+	wordsReset: "omegaUp: Restablecer contrase\u00f1a.",
 	wordsResetMessage: "Da clic en el siguiente enlace para restablecer tu contrase\u00f1a: <a href='[link]'>[link]</a><br><br>Si tu no solicitaste esta operaci\u00f3n no hagas clic y verifica que tu cuenta este a salvo.",
 	wordsResult: "Respuesta",
 	wordsReviewingProblem: "Revisando problema",
