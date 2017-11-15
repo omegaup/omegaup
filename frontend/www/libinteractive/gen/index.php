@@ -18,7 +18,7 @@ if ($_POST) {
         $dirname = FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
         try {
             file_put_contents("{$dirname}/{$_POST['name']}.idl", $_POST['idl']);
-            $args = ['/usr/bin/java', '-jar', '/opt/omegaup/bin/libinteractive.jar',
+            $args = ['/usr/bin/java', '-jar', '/usr/share/java/libinteractive.jar',
                 'generate', "{$_POST['name']}.idl", $_POST['language'], $_POST['language'],
                 '--makefile', "--{$_POST['os']}"];
             $descriptorspec = [

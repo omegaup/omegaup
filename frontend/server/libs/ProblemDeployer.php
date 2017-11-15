@@ -681,7 +681,7 @@ class ProblemDeployer {
      */
     private function handleInteractive($idlPath, $target) {
         try {
-            $cmd = '/usr/bin/java -Xmx64M -jar ' . BIN_PATH . '/libinteractive.jar generate-all ' .
+            $cmd = '/usr/bin/java -Xmx64M -jar /usr/share/java/libinteractive.jar generate-all ' .
                 escapeshellarg($idlPath) . ' --package-directory ' . escapeshellarg($target) .
                 ' --package-prefix ' . escapeshellarg($this->alias . '_') . ' --shift-time-for-zip';
             return $this->execute($cmd, $target);
