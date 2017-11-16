@@ -34,6 +34,7 @@
 	<div class="panel">
 		<div class="panel-header">
 			<div class="pull-right" data-bind="if: isAdmin">
+				<a class="btn btn-primary" data-bind="attr: { href: cloneUrl }">{#wordsCloneCourse#}</a>
 				<a class="btn btn-primary" data-bind="attr: { href: editUrl }">{#wordsEditCourse#}</a>
 			</div>
 			<div class="">

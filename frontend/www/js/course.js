@@ -37,6 +37,7 @@ omegaup.OmegaUp.on('ready', function() {
         course.addAssignmentUrl =
             '/course/' + courseAlias + '/edit/#assignments/new/';
         course.editUrl = '/course/' + courseAlias + '/edit/';
+        course.cloneUrl = '/course/' + courseAlias + '/clone/';
         course.scoreboardUrl = '/course/' + courseAlias + '/students/';
         course.addStudentsUrl = '/course/' + courseAlias + '/edit/#students';
 

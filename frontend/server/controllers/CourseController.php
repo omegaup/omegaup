@@ -166,6 +166,75 @@ class CourseController extends Controller {
     }
 
     /**
+     * Clone a course
+     *
+     * @return Array
+     */
+    public static function apiClone(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        // Truncate alias string and add timestamp to avoid duplicate
+        $courseAlias = substr($course->alias, 0, 25) . '-' . substr(Time::get(), -6);
+
+        $request = new Request([
+            'name' => $course->name . ' (clon)',
+            'description' => $course->description,
+            'alias' => $courseAlias,
+            'start_time' => strtotime($course->start_time),
+            'finish_time' => strtotime($course->finish_time),
+            'public' => $course->public,
+            'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+        ]);
+        // Create the course (and group)
+        $course_clone = self::apiCreate($request);
+
+        $assignments = self::apiListAssignments($r);
+        foreach ($assignments['assignments'] as $assignment) {
+            // Create and assign homeworks and tests to new course
+            self::apiCreateAssignment(new Request([
+                'course_alias' => $courseAlias,
+                'name' => $assignment['name'],
+                'description' => $assignment['description'],
+                'start_time' => $assignment['start_time'],
+                'finish_time' => $assignment['finish_time'],
+                'alias' => $assignment['alias'],
+                'assignment_type' => $assignment['assignment_type'],
+                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+            ]));
+
+            $problems = self::apiAssignmentDetails(new Request([
+                'assignment' => $assignment['alias'],
+                'course' => $course->alias,
+                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+            ]));
+            foreach ($problems['problems'] as $problem) {
+                // Create and assign problems to new course
+                self::apiAddProblem(new Request([
+                    'course_alias' => $courseAlias,
+                    'assignment_alias' => $assignment['alias'],
+                    'problem_alias' => $problem['alias'],
+                    'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+                ]));
+            }
+        }
+
+        $students = self::apiListStudents($r);
+        foreach ($students['students'] as $student) {
+            // Assign students to new course
+            self::apiAddStudent(new Request([
+                'course_alias' => $courseAlias,
+                'usernameOrEmail' => $student['username'],
+                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+            ]));
+        }
+
+        return ['status' => 'ok', 'alias' => $request['alias']];
+    }
+
+    /**
      * Create new course
      *
      * @throws InvalidDatabaseOperationException
@@ -177,7 +246,6 @@ class CourseController extends Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
-
         $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);

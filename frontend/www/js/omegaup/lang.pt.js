@@ -743,6 +743,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsCase: "Caso",
 	wordsCases: "Casos",
 	wordsClarifications: "Esclarecimentos",
+	wordsCloneCourse: "Curso de clone",
 	wordsCompilerOutput: "Sa\u00edda do compilador",
 	wordsConsole: "Console",
 	wordsContest: "Concurso",

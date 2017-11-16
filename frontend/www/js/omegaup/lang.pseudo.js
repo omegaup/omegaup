@@ -743,6 +743,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsCase: "(Ca53)",
 	wordsCases: "(Ca535)",
 	wordsClarifications: "(C1arifica7i0n)",
+	wordsCloneCourse: "(C10n3 c0ur53)",
 	wordsCompilerOutput: "(C0mpi13r 0u7pu7)",
 	wordsConsole: "(C0n5013)",
 	wordsContest: "(C0n7357)",
