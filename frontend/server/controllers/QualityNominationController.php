@@ -288,6 +288,7 @@ class QualityNominationController extends Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
         $types = (isset($r['types']) ? $r['types'] : ['promotion', 'demotion']);
+        print_r($types);
 
         $nominations = null;
         try {

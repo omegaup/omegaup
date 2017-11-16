@@ -171,7 +171,6 @@ class ProblemList extends OmegaupTestCase {
             $this->assertCount($tag_ac_results[$i], $response['results']);
         }
     }
-
     /**
      * Limit the output to one problem we know
      */
@@ -181,19 +180,14 @@ class ProblemList extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PROMOTED);
         }
-
         $login = self::login(UserFactory::createUser());
-        for ($i = 0; $i < count($problemData); $i++) {
-            $response = ProblemController::apiList(new Request([
-                'auth_token' => $login->auth_token,
-                'rowcount' => 1,
-                'offset' => $i,
-                'order_by' => 'problem_id',
-            ]));
-
-            $this->assertCount(1, $response['results']);
-            $this->assertEquals($problemData[count($problemData) - 1 - $i]['request']['alias'], $response['results'][0]['alias']);
-        }
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login->auth_token,
+            'rowcount' => 1,
+            'offset' => 1,
+        ]));
+        $this->assertCount(1, $response['results']);
+        $this->assertEquals($problemData[1]['request']['alias'], $response['results'][0]['alias']);
     }
 
     /**

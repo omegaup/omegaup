@@ -815,7 +815,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsOnly: "Somente",
 	wordsOrderBy: "Ordenar por",
 	wordsOther: "Outro",
-	wordsOutOf4: "out of 4",
+	wordsOutOf4: "%(Score) de 4",
 	wordsOverallWallTimeLimit: "Prazo (total)",
 	wordsPartial: "parcial",
 	wordsPenalty: "Penaliza\u00e7\u00e3o",

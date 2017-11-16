@@ -46,19 +46,19 @@
 					{/if}
 				</td>
 				{if empty($problem.quality)}
-					<td class="numericColumn">NA</td>
+					<td class="numericColumn">&mdash;</td>
 				{else}
 					<td class="tooltip_column">
-						<span data-wenk="{$problem.quality|string_format:"%.1f"} {#wordsOutOf4#}" data-wenk-pos="right">
+						<span data-wenk="{#wordsOutOf4#|replace:'%(Score)':{$problem.quality|string_format:"%.1f"}}" data-wenk-pos="right">
 							{$qualityTags[$problem.quality|intval]}
 						</span>
 					</td>
 				{/if}
   				{if empty($problem.difficulty)}
-					<td class="numericColumn">NA</td>
+					<td class="numericColumn">&mdash;</td>
   				{else}
 					<td class="tooltip_column">
-						<span data-wenk="{$problem.difficulty|string_format:"%.1f"} {#wordsOutOf4#}" data-wenk-pos="right">
+						<span data-wenk="{#wordsOutOf4#|replace:'%(Score)':{$problem.difficulty|string_format:"%.1f"}}" data-wenk-pos="right">
 							{$difficultyTags[$problem.difficulty|intval]}
 						</span>
 					</td>

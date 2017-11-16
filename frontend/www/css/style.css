@@ -568,8 +568,8 @@ td.numericColumn, th.numericColumn {
 
 td.tooltip_column, th.tooltip_column {
 	text-align: right;
-    text-decoration-line: underline;
-    text-decoration-style: dotted;
+	text-decoration-line: underline;
+	text-decoration-style: dotted;
 }
 
 td.flagColumn {
