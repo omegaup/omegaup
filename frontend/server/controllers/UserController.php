@@ -1248,18 +1248,16 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getAll(null, null, 'time', 'DESC');
-
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             foreach ($coders as $c) {
-                $user = UsersDAO::getByPK($c->user_id);
-                $email = EmailsDAO::getByPK($user->main_email_id);
                 $response['coders'][] = [
-                    'username' => $user->username,
-                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($email->email) . '?s=32',
-                    'date' => $c->time
+                    'username' => $c['username'],
+                    'country_id' => $c['country_id'],
+                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
+                    'date' => $c['time']
                 ];
             }
-        } catch (Exception $ex) {
+        } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
