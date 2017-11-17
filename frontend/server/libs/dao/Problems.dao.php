@@ -384,13 +384,6 @@ class ProblemsDAO extends ProblemsDAOBase {
                     ON
                         a.acl_id = p.acl_id
                     WHERE p.problem_id = ?
-                    UNION
-                    SELECT
-                        ur.contest_id AS problem_id, ur.user_id
-                    FROM
-                        User_Roles ur
-                    WHERE
-                        role_id = ? AND ur.contest_id = ?
                 ) AS a
             INNER JOIN
                 Users u
@@ -402,9 +395,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 e.user_id = u.main_email_id;
         ';
 
-        $params = [$problem->problem_id,
-            PROBLEM_ADMIN_ROLE,
-            $problem->problem_id];
+        $params = [$problem->problem_id];
         $rs = $conn->Execute($sql, $params);
 
         $result = [];
