@@ -178,7 +178,6 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id';
         $params = [];
-
         if (!empty($types) || !is_null($nominator)) {
             $conditions = [];
             if (!empty($types)) {
@@ -210,13 +209,11 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql .= ' LIMIT ?, ?;';
         $params[] = $page * $pageSize;
         $params[] = ($page + 1) * $pageSize;
-
         global $conn;
         $nominations = [];
         foreach ($conn->Execute($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
-
         return $nominations;
     }
 
