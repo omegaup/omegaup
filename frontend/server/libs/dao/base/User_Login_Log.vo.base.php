@@ -58,7 +58,7 @@ class UserLoginLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int
+      * @var int(10)
       */
     public $ip;
 

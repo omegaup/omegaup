@@ -132,14 +132,14 @@ class Assignments extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11),
+      * @var int(11)
       */
     public $publish_time_delay;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('homework',
+      * @var enum('homework','test')
       */
     public $assignment_type;
 
@@ -167,7 +167,11 @@ class Assignments extends VO {
     /**
       * Define el orden de aparición de los problemas/tareas
       * @access public
+<<<<<<< HEAD
       * @var int
+=======
+      * @var int(11)
+>>>>>>> upstream/master
       */
     public $order;
 }

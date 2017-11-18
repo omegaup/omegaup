@@ -22,6 +22,7 @@ if ($show_intro) {
     $smarty->assign('jsfile', '/js/interviews.arena.contest.js');
     $smarty->assign('admin', false);
     $smarty->assign('showDeadlines', false);
+    $smarty->assign('showClarifications', true);
     $smarty->assign('showNavigation', false);
     $smarty->assign('showPoints', true);
     $smarty->assign('showRanking', false);

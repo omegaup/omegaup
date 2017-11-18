@@ -97,7 +97,7 @@ class ProblemsetUserRequest extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var text,
+      * @var mediumtext,
       */
     public $extra_note;
 }

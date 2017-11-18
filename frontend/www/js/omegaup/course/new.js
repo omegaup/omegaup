@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
                         finish_time:
                             new Date(ev.finishTime).setHours(23, 59, 59, 999) /
                                 1000,
-                        alias: ev.alias, 'public': ev.showScoreboard,
+                        alias: ev.alias,
                         show_scoreboard: ev.showScoreboard,
                       })
                 .then(function(data) {

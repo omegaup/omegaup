@@ -32,9 +32,6 @@ class ProblemsLanguages extends VO {
         if (isset($data['language_id'])) {
             $this->language_id = $data['language_id'];
         }
-        if (isset($data['translator_id'])) {
-            $this->translator_id = $data['translator_id'];
-        }
     }
 
     /**
@@ -63,11 +60,4 @@ class ProblemsLanguages extends VO {
       * @var int(11)
       */
     public $language_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $translator_id;
 }

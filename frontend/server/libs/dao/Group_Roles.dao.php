@@ -88,6 +88,10 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return self::getAdmins($contest->acl_id);
     }
 
+    public static function getCourseAdmins(Courses $course) {
+        return self::getAdmins($course->acl_id);
+    }
+
     public static function getProblemAdmins(Problems $problem) {
         return self::getAdmins($problem->acl_id);
     }

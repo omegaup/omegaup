@@ -95,7 +95,7 @@ class QualityNominationComments extends VO {
     public $vote;
 
     /**
-      * El contenido del comentario
+      * El contenido de el comentario
       * @access public
       * @var text
       */

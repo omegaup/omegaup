@@ -67,6 +67,7 @@ require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
 require_once('libs/SessionManager.php');
+require_once('libs/Time.php');
 require_once('libs/UITools.php');
 require_once('libs/UrlHelper.php');
 require_once('libs/Validators.php');
@@ -132,6 +133,7 @@ $log = Logger::getLogger('bootstrap');
  * */
 require_once('controllers/Controller.php');
 require_once('controllers/UserController.php');
+require_once('controllers/ACLController.php');
 require_once('controllers/SessionController.php');
 require_once('controllers/ContestController.php');
 require_once('controllers/InterviewController.php');
@@ -161,13 +163,9 @@ $conn = null;
 
 try {
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
-    // HHVM doesn't like ADOdb's default value of 'false' for port and socket.
-    $conn->port = null;
-    $conn->socket = null;
     $conn->debug = OMEGAUP_DB_DEBUG;
     $conn->SetFetchMode(ADODB_FETCH_ASSOC);
-    // HHVM also doesn't like PConnect. It leaks.
-    $conn->Connect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
     $log->error($databaseConectionException);
 

@@ -1,6 +1,7 @@
 <?php
 
 require_once 'libs/FileHandler.php';
+require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ZipHandler.php';
 require_once 'libs/third_party/Markdown/markdown.php';
 /**
@@ -10,7 +11,8 @@ class ProblemController extends Controller {
     public static $grader = null;
 
     // Constants for problem visibility.
-    const VISIBILITY_BANNED = -1;
+    const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
+    const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
     const VISIBILITY_PRIVATE = 0;
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
@@ -60,6 +62,15 @@ class ProblemController extends Controller {
                 throw new ForbiddenAccessException();
             }
 
+            // Only reviewers can revert bans.
+            if (($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
+                  $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
+                    && array_key_exists('visibility', $r)
+                    && $r['problem']->visibility != $r['visibility']
+                    && !Authorization::isQualityReviewer($r['current_user_id'])) {
+                throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
+            }
+
             if ($r['problem']->deprecated) {
                 throw new PreconditionFailedException('problemDeprecated');
             }
@@ -67,13 +78,16 @@ class ProblemController extends Controller {
             if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
-                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
-                    throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
                 } else {
                     Validators::isInEnum(
                         $r['visibility'],
                         'visibility',
-                        [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+                        [
+                            ProblemController::VISIBILITY_PRIVATE,
+                            ProblemController::VISIBILITY_PUBLIC,
+                            ProblemController::VISIBILITY_PUBLIC_BANNED,
+                            ProblemController::VISIBILITY_PRIVATE_BANNED
+                        ]
                     );
                 }
             }
@@ -151,6 +165,7 @@ class ProblemController extends Controller {
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
+<<<<<<< HEAD
         $acceptsSubmissions = $r['languages'] !== '';
 
         if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
@@ -158,6 +173,9 @@ class ProblemController extends Controller {
         }
 
         $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
+=======
+        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
+>>>>>>> upstream/master
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -218,6 +236,8 @@ class ProblemController extends Controller {
         $result['status'] = 'ok';
         $result['alias'] = $r['alias'];
 
+        self::updateLanguages($problem);
+
         return $result;
     }
 
@@ -261,6 +281,10 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -280,24 +304,12 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
+        // Only an admin can add other problem admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the contest to the DB
-        try {
-            UserRolesDAO::save($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -311,6 +323,10 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -330,24 +346,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only an admin can add other problem group admins
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Save the role
-        try {
-            GroupRolesDAO::save($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to save user roles');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::addGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -420,7 +424,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Removes an admin from a contest
+     * Removes an admin from a problem
      *
      * @param Request $r
      * @return array
@@ -431,7 +435,7 @@ class ProblemController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        // Check whether problem exists
+        // Check problem_alias
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
@@ -443,6 +447,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
@@ -452,18 +457,7 @@ class ProblemController extends Controller {
             throw new NotFoundException();
         }
 
-        $user_role = new UserRoles();
-        $user_role->acl_id = $problem->acl_id;
-        $user_role->user_id = $user->user_id;
-        $user_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            UserRolesDAO::delete($user_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -480,7 +474,7 @@ class ProblemController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        // Check whether problem exists
+        // Check problem_alias
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
@@ -496,22 +490,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $problem->acl_id;
-        $group_role->group_id = $group->group_id;
-        $group_role->role_id = Authorization::ADMIN_ROLE;
-
-        // Delete the role
-        try {
-            GroupRolesDAO::delete($group_role);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ACLController::removeGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -587,12 +571,11 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
-        $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
-        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'admins' => UserRolesDAO::getProblemAdmins($problem),
+            'group_admins' => GroupRolesDAO::getProblemAdmins($problem)
+        ];
     }
 
     /**
@@ -785,6 +768,8 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
+        self::updateLanguages($problem);
+
         // All clear
         $response['status'] = 'ok';
 
@@ -853,6 +838,9 @@ class ProblemController extends Controller {
         } finally {
             $problemDeployer->cleanup();
         }
+
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        self::updateLanguages($problem);
 
         // All clear
         $response['status'] = 'ok';
@@ -933,28 +921,13 @@ class ProblemController extends Controller {
      * @return The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl($sourcePath) {
+    public static function getProblemStatementImpl($params) {
+        list($problemArtifacts, $sourcePath) = $params;
         try {
-            return FileHandler::ReadFile($sourcePath);
+            return $problemArtifacts->get($sourcePath);
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException('statementNotFound');
         }
-    }
-
-    /**
-     * Gets the filesystem path for a problem statement.
-     *
-     * @param string $problemAlias    The alias of the problem.
-     * @param string $language        The language of the problem.
-     * @param string $statementFormat The format in which the statement will be
-     *                                displayed.
-     *
-     * @return The path of the file.
-     */
-    private static function getSourcePath($problemAlias, $language, $statementFormat) {
-        return PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemAlias .
-            DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR .
-            $language . '.' . $statementFormat;
     }
 
     /**
@@ -974,29 +947,22 @@ class ProblemController extends Controller {
         &$language,
         $statementFormat = 'markdown'
     ) {
-        $sourcePath = self::getSourcePath(
-            $problemAlias,
-            $language,
-            $statementFormat
-        );
+        $problemArtifacts = new ProblemArtifacts($problemAlias);
+        $sourcePath = "statements/{$language}.{$statementFormat}";
 
         // Read the file that contains the source
-        if (!file_exists($sourcePath)) {
+        if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
             $language = 'es';
-            $sourcePath = self::getSourcePath(
-                $problemAlias,
-                $language,
-                $statementFormat
-            );
+            $sourcePath = "statements/{$language}.{$statementFormat}";
         }
 
         $fileContents = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
             $problemAlias . '-' . $language . '-' . $statementFormat,
-            $sourcePath,
+            [$problemArtifacts, $sourcePath],
             'ProblemController::getProblemStatementImpl',
             $fileContents,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -1012,10 +978,10 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getSampleInput(Request $r) {
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
+        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
 
         try {
-            $file_content = FileHandler::ReadFile($source_path);
+            $file_content = $problemArtifacts->get('examples/sample.in');
         } catch (Exception $e) {
             // Most problems won't have a sample input.
             $file_content = '';
@@ -1282,6 +1248,7 @@ class ProblemController extends Controller {
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset_id,
                         'problem_id' => $r['problem']->problem_id,
+                        'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'user_id' => $r['current_user_id']
                     ]));
                 } catch (Exception $e) {
@@ -1300,6 +1267,7 @@ class ProblemController extends Controller {
             );
         }
 
+        $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
         $response['score'] = self::bestScore($r);
         $response['status'] = 'ok';
         return $response;
@@ -1499,34 +1467,20 @@ class ProblemController extends Controller {
             // Array to count AC stats per case.
             // Let's try to get the last snapshot from cache.
             $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
-            $cases_stats = $problemStatsCache->get();
-            if (is_null($cases_stats)) {
+            $casesStats = $problemStatsCache->get();
+            if (is_null($casesStats)) {
                 // Initialize the array at counts = 0
-                $cases_stats = [];
-                $cases_stats['counts'] = [];
+                $casesStats = [];
+                $casesStats['counts'] = [];
 
                 // We need to save the last_id that we processed, so next time we do not repeat this
-                $cases_stats['last_id'] = 0;
-
-                // Build problem dir
-                $problem_dir = PROBLEMS_PATH . '/' . $r['problem']->alias . '/cases/';
-
-                // Get list of cases
-                $dir = opendir($problem_dir);
-                if (is_dir($problem_dir)) {
-                    while (($file = readdir($dir)) !== false) {
-                        // If we have an input
-                        if (strstr($file, '.in')) {
-                            // Initialize it to 0
-                            $cases_stats['counts'][str_replace('.in', '', $file)] = 0;
-                        }
-                    }
-                    closedir($dir);
-                }
+                $casesStats['last_id'] = 0;
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(['problem_id' => $r['problem']->problem_id]), $cases_stats['last_id'], 'run_id');
+            $runs = RunsDAO::searchRunIdGreaterThan(new Runs([
+                'problem_id' => $r['problem']->problem_id
+            ]), $casesStats['last_id'], 'run_id');
 
             // For each run we got
             foreach ($runs as $run) {
@@ -1543,9 +1497,13 @@ class ProblemController extends Controller {
                     $details = json_decode(file_get_contents("$grade_dir/details.json"));
                     foreach ($details as $group) {
                         foreach ($group->cases as $case) {
-                            if ($case->score > 0) {
-                                $cases_stats['counts'][$case->name]++;
+                            if (!array_key_exists($case->name, $casesStats['counts'])) {
+                                $casesStats['counts'][$case->name] = 0;
                             }
+                            if ($case->score == 0) {
+                                continue;
+                            }
+                            $casesStats['counts'][$case->name]++;
                         }
                     }
                 }
@@ -1556,17 +1514,17 @@ class ProblemController extends Controller {
 
         // Save the last id we saw in case we saw something
         if (!is_null($runs) && count($runs) > 0) {
-            $cases_stats['last_id'] = $runs[count($runs) - 1]->run_id;
+            $casesStats['last_id'] = $runs[count($runs) - 1]->run_id;
         }
 
         // Save in cache what we got
-        $problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
+        $problemStatsCache->set($casesStats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
 
         return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
             'verdict_counts' => $verdict_counts,
-            'cases_stats' => $cases_stats['counts'],
+            'cases_stats' => $casesStats['counts'],
             'status' => 'ok'
         ];
     }
@@ -1608,6 +1566,14 @@ class ProblemController extends Controller {
         }
 
         self::validateList($r);
+
+        // Filter results
+        $language = null; // Filter by language, all by default.
+        $valid_languages = ['en', 'es', 'pt'];
+        // "language" may be one of the allowed options, otherwise the default filter will be used.
+        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+            $language = $r['language'];
+        }
 
         // Sort results
         $order = 'problem_id'; // Order by problem_id by default.
@@ -1665,6 +1631,7 @@ class ProblemController extends Controller {
         $total = 0;
         $response['results'] = ProblemsDAO::byUserType(
             $user_type,
+            $language,
             $order,
             $mode,
             $offset,
@@ -1826,5 +1793,38 @@ class ProblemController extends Controller {
         }
 
         return $score;
+    }
+
+    /**
+     * Save language data for a problem.
+     * @param Request $r
+     * @return Array
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function updateLanguages(Problems $problem) {
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        try {
+            ProblemsLanguagesDAO::transBegin();
+
+            // Removing existing data
+            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
+                'problem_id' => $problem->problem_id,
+            ]));
+
+            foreach (LanguagesDAO::getAll() as $lang) {
+                if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
+                    continue;
+                }
+                ProblemsLanguagesDAO::save(new ProblemsLanguages([
+                    'problem_id' => $problem->problem_id,
+                    'language_id' => $lang->language_id,
+                ]));
+            }
+            ProblemsLanguagesDAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in something we know it could fail, rollback transaction
+            ProblemsLanguagesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
     }
 }

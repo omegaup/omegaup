@@ -18,7 +18,9 @@
 {if $admin}
 				<li><a href="#runs">{#wordsRuns#}</a></li>
 {/if}
+{if $showClarifications}
 				<li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
+{/if}
 			</ul>
 {/if}
 			<div id="problems" class="tab navleft">
@@ -86,6 +88,10 @@
 							<td class="time_limit"></td>
 							<td>{#arenaCommonOverallWallTimeLimit#}</td>
 							<td class="overall_wall_time_limit"></td>
+						</tr>
+						<tr>
+							<td>{#wordsInOut#}</td>
+							<td>{#wordsConsole#}</td>
 						</tr>
 					</table>
 {if $admin}

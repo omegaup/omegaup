@@ -13,6 +13,7 @@
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
 		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
 		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
+		<li><a href="#admins" data-toggle="tab">{#courseEditAdmins#}</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="edit">
@@ -27,6 +28,9 @@
 			<div class="form"></div>
 		</div>
 		<div class="tab-pane" id="students">
+			<div></div>
+		</div>
+		<div class="tab-pane" id="admins">
 			<div></div>
 		</div>
 	</div>

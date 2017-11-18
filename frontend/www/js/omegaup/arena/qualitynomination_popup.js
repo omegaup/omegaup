@@ -7,36 +7,37 @@ OmegaUp.on('ready', function() {
       JSON.parse(document.getElementById('quality-payload').innerText);
   let problemStatement =
       document.getElementsByClassName('statement')[0].innerText;
-  let sourceNode = document.getElementsByClassName('source-data');
-  let source = (sourceNode.length > 0) ? sourceNode[0].innerText : '';
 
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
     render: function(createElement) {
       return createElement('qualitynomination-popup', {
-        props: {
-          solved: this.solved,
-          nominated: this.nominated,
-          originalSource: source
-        },
+        props: {nominated: this.nominated, solved: this.solved},
         on: {
           submit: function(ev) {
-            let contents = {
-              'rationale': ev.rationale,
-            };
+            let contents = {};
 
             if (typeof(ev.difficulty) !== 'undefined') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
             }
-            if (ev.source !== source) {
-              contents.source = ev.source;
-            }
             if (ev.tags.length > 0) {
               contents.tags = ev.tags;
+            }
+            if (typeof(ev.quality) !== 'undefined') {
+              contents.quality = Number.parseInt(ev.quality, 10);
             }
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,
                                    nomination: 'suggestion',
+                                   contents: JSON.stringify(contents),
+                                 })
+                .fail(UI.apiError);
+          },
+          dismiss: function() {
+            let contents = {};
+            API.QualityNomination.create({
+                                   problem_alias: qualityPayload.problem_alias,
+                                   nomination: 'dismissal',
                                    contents: JSON.stringify(contents),
                                  })
                 .fail(UI.apiError);

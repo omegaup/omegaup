@@ -69,7 +69,7 @@ export default {
         return this.nominations;
       } else {
         return this.nominations.filter(function(nomination) {
-          return nomination.nominator.username == self.currentUser;
+          return nomination.status == 'open';
         });
       }
     },

@@ -1,4 +1,4 @@
-function generateAlias(title) {
+function generateAlias(title, aliasLength) {
   // Remove accents
   title = title.latinize();
 
@@ -8,6 +8,8 @@ function generateAlias(title) {
   // Remove invalid characters
   title = title.replace(/[^a-zA-Z0-9_-]/g, '');
 
+  title = title.substring(0, aliasLength);
+
   return title;
 }
 
@@ -15,6 +17,7 @@ omegaup.OmegaUp.on('ready', function() {
   var formData = $('#form-data');
   var formName = formData.attr('data-name');
   var existsFn = null;
+  var aliasLength = 0;
 
   function onAliasExists() {
     omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
@@ -31,6 +34,7 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 32;
       break;
 
     case 'groups':
@@ -39,6 +43,7 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 50;
       break;
 
     case 'interviews':
@@ -47,12 +52,13 @@ omegaup.OmegaUp.on('ready', function() {
             .then(onAliasExists)
             .fail(onAliasNew);
       };
+      aliasLength = 32;
       break;
   }
 
   $('#title')
       .blur(function() {
-        $('#alias').val(generateAlias($(this).val())).change();
+        $('#alias').val(generateAlias($(this).val(), aliasLength)).change();
       });
 
   $('#alias').change(function() { existsFn($('#alias').val()); });

@@ -71,6 +71,9 @@ class Users extends VO {
         if (isset($data['birth_date'])) {
             $this->birth_date = $data['birth_date'];
         }
+        if (isset($data['gender'])) {
+            $this->gender = $data['gender'];
+        }
         if (isset($data['last_access'])) {
             $this->last_access = $data['last_access'];
         }
@@ -91,6 +94,9 @@ class Users extends VO {
         }
         if (isset($data['in_mailing_list'])) {
             $this->in_mailing_list = $data['in_mailing_list'];
+        }
+        if (isset($data['preferred_language'])) {
+            $this->preferred_language = $data['preferred_language'];
         }
     }
 
@@ -215,6 +221,13 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
+      * @var enum('female','male','other','decline')
+      */
+    public $gender;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
       * @var timestamp
       */
     public $last_access;
@@ -222,14 +235,14 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $verified;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(
+      * @var varchar(50)
       */
     public $verification_id;
 
@@ -257,7 +270,14 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var boolean
+      * @var tinyint(1)
       */
     public $in_mailing_list;
+
+    /**
+      * El lenguaje de programación de preferencia de este usuario
+      * @access public
+      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
+      */
+    public $preferred_language;
 }
