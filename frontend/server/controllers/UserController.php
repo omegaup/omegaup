@@ -1065,7 +1065,7 @@ class UserController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    private static function getProfileImpl(Users $user) {
+    public static function getProfileImpl(Users $user) {
         $response = [];
         $response['userinfo'] = [];
         $response['problems'] = [];
