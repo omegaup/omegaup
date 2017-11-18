@@ -101,18 +101,11 @@
 
 				<div class="form-group col-md-6">
 					<label for="languages">{#problemEditFormLanguages#}</label>
-<<<<<<< HEAD
-					<select name="languages[]" id="languages" class="form-control">
-						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua">C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
-						<option value="kp,kj">Karel</option>
-						<option value="cat">{#wordsJustOutput#}</option>
-						<option value="">{#wordsNoSubmissions#}</option>
-=======
 					<select name="languages" id="languages" class="form-control">
 						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua" {if $IS_UPDATE eq 0 && $LANGUAGES eq "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
 						<option value="kp,kj" {if $IS_UPDATE eq 0 && $LANGUAGES eq "kp,kj"}selected{/if}>Karel</option>
 						<option value="cat" {if $IS_UPDATE eq 0 && $LANGUAGES eq "cat"}selected{/if}>{#wordsJustOutput#}</option>
->>>>>>> upstream/master
+						<option value="" {if $IS_UPDATE eq 0 && $LANGUAGES eq ""}selected{/if}>{#wordsNoSubmissions#}</option>
 					</select>
 				</div>
 

@@ -65,7 +65,7 @@ class Languages extends VO {
     public $name;
 
     /**
-      * Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido.
+      * Se guarda la relación con el país para defaultear más rápido.
       * @access public
       * @var char(3)
       */

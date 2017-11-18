@@ -78,7 +78,7 @@ class CoderOfTheMonth extends VO {
     public $description;
 
     /**
-      * Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes.
+      * Fecha no es UNIQUE por si hay más de 1 coder de mes.
       * @access public
       * @var date
       */

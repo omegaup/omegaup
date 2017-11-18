@@ -8,7 +8,7 @@ require_once 'libs/third_party/Markdown/markdown.php';
  * ProblemsController
  */
 class ProblemController extends Controller {
-public static $grader = null;
+    public static $grader = null;
 
     // Constants for problem visibility.
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
@@ -20,12 +20,12 @@ public static $grader = null;
     /**
      * Creates an instance of Grader if not already created
      */
-private static function initializeGrader() {
-    if (is_null(self::$grader)) {
-        // Create new grader
-        self::$grader = new Grader();
+    private static function initializeGrader() {
+        if (is_null(self::$grader)) {
+            // Create new grader
+            self::$grader = new Grader();
+        }
     }
-}
 
     /**
      * Validates a Create or Update Problem API request
@@ -33,102 +33,102 @@ private static function initializeGrader() {
      * @param Request $r
      * @throws NotFoundException
      */
-private static function validateCreateOrUpdate(Request $r, $is_update = false) {
-    $is_required = true;
-    // https://github.com/omegaup/omegaup/issues/739
-    if ($r['current_user']->username == 'omi') {
-        throw new ForbiddenAccessException();
-    }
-
-    // In case of update, params are optional
-    if ($is_update) {
-        $is_required = false;
-
-        // We need to check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-
-        try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($r['problem'])) {
-            throw new NotFoundException('Problem not found');
-        }
-
-        // We need to check that the user can actually edit the problem
-        if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
+    private static function validateCreateOrUpdate(Request $r, $is_update = false) {
+        $is_required = true;
+        // https://github.com/omegaup/omegaup/issues/739
+        if ($r['current_user']->username == 'omi') {
             throw new ForbiddenAccessException();
         }
 
-        // Only reviewers can revert bans.
-        if (($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
-              $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
-                && array_key_exists('visibility', $r)
-                && $r['problem']->visibility != $r['visibility']
-                && !Authorization::isQualityReviewer($r['current_user_id'])) {
-            throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
-        }
+        // In case of update, params are optional
+        if ($is_update) {
+            $is_required = false;
 
-        if ($r['problem']->deprecated) {
-            throw new PreconditionFailedException('problemDeprecated');
-        }
+            // We need to check problem_alias
+            Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
-            if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
-                throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
-            } else {
-                Validators::isInEnum(
-                    $r['visibility'],
-                    'visibility',
-                    [
-                    ProblemController::VISIBILITY_PRIVATE,
-                    ProblemController::VISIBILITY_PUBLIC,
-                    ProblemController::VISIBILITY_PUBLIC_BANNED,
-                    ProblemController::VISIBILITY_PRIVATE_BANNED
-                    ]
-                );
+            try {
+                $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
             }
+
+            if (is_null($r['problem'])) {
+                throw new NotFoundException('Problem not found');
+            }
+
+            // We need to check that the user can actually edit the problem
+            if (!Authorization::canEditProblem($r['current_user_id'], $r['problem'])) {
+                throw new ForbiddenAccessException();
+            }
+
+            // Only reviewers can revert bans.
+            if (($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
+                  $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
+                    && array_key_exists('visibility', $r)
+                    && $r['problem']->visibility != $r['visibility']
+                    && !Authorization::isQualityReviewer($r['current_user_id'])) {
+                throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
+            }
+
+            if ($r['problem']->deprecated) {
+                throw new PreconditionFailedException('problemDeprecated');
+            }
+
+            if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
+                    throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
+                } else {
+                    Validators::isInEnum(
+                        $r['visibility'],
+                        'visibility',
+                        [
+                            ProblemController::VISIBILITY_PRIVATE,
+                            ProblemController::VISIBILITY_PUBLIC,
+                            ProblemController::VISIBILITY_PUBLIC_BANNED,
+                            ProblemController::VISIBILITY_PRIVATE_BANNED
+                        ]
+                    );
+                }
+            }
+        } else {
+            Validators::isValidAlias($r['alias'], 'alias');
+            Validators::isInEnum(
+                $r['visibility'],
+                'visibility',
+                [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+            );
         }
-    } else {
-        Validators::isValidAlias($r['alias'], 'alias');
+
+        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::isStringNonEmpty($r['source'], 'source', $is_required);
         Validators::isInEnum(
-            $r['visibility'],
-            'visibility',
-            [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+            $r['validator'],
+            'validator',
+            ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
+            $is_required
+        );
+        Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
+        Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
+        Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
+
+        // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
+        // on it already, so I'll just leave this here for now...
+        if (!isset($r['languages']) && isset($_REQUEST['languages'])) {
+            $r['languages'] = implode(',', $_REQUEST['languages']);
+        } elseif (isset($r['languages']) && is_array($r['languages'])) {
+            $r['languages'] = implode(',', $r['languages']);
+        }
+        Validators::isValidSubset(
+            $r['languages'],
+            'languages',
+            RunController::$kSupportedLanguages,
+            $is_required
         );
     }
-
-    Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-    Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-    Validators::isInEnum(
-        $r['validator'],
-        'validator',
-        ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
-        $is_required
-    );
-    Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
-    Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
-    Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
-    Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
-    Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
-    Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
-
-    // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
-    // on it already, so I'll just leave this here for now...
-    if (!isset($r['languages']) && isset($_REQUEST['languages'])) {
-        $r['languages'] = implode(',', $_REQUEST['languages']);
-    } elseif (isset($r['languages']) && is_array($r['languages'])) {
-        $r['languages'] = implode(',', $r['languages']);
-    }
-    Validators::isValidSubset(
-        $r['languages'],
-        'languages',
-        RunController::$kSupportedLanguages,
-        $is_required
-    );
-}
 
     /**
      * Create a new problem
@@ -137,7 +137,7 @@ private static function validateCreateOrUpdate(Request $r, $is_update = false) {
      * @throws DuplicatedEntryInDatabaseException
      * @throws InvalidDatabaseOperationException
      */
-public static function apiCreate(Request $r) {
+    public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
         // Validates request
@@ -165,17 +165,8 @@ public static function apiCreate(Request $r) {
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
-<<<<<<< HEAD
         $acceptsSubmissions = $r['languages'] !== '';
-
-        if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
-            throw new DuplicatedEntryInDatabaseException('problemExists');
-        }
-
         $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
-=======
-        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
->>>>>>> upstream/master
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -697,8 +688,7 @@ public static function apiCreate(Request $r) {
             'rejudged' => false
         ];
 
-        $acceptsSubmissions = $problem->languages === '';
-
+        $acceptsSubmissions = $problem->languages !== '';
         $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
 
         // Insert new problem

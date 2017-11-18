@@ -71,7 +71,7 @@ class ProblemsetUsers extends VO {
     public $problemset_id;
 
     /**
-      * Hora a la que entrÃ³ el usuario al concurso
+      * Hora a la que entró el usuario al concurso
       * @access public
       * @var datetime
       */

@@ -20,7 +20,7 @@ abstract class ProblemsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality`';
+    const FIELDS = '`Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`quality`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsDAOBase extends DAO {
         if (is_null($problem_id)) {
             return null;
         }
-        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality` FROM Problems WHERE (problem_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`quality`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications` FROM Problems WHERE (problem_id = ?) LIMIT 1;';
         $params = [$problem_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Problems}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality` from Problems';
+        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`quality`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications` from Problems';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -207,6 +207,10 @@ abstract class ProblemsDAOBase extends DAO {
             $clauses[] = '`difficulty` = ?';
             $params[] = $Problems->difficulty;
         }
+        if (!is_null($Problems->quality)) {
+            $clauses[] = '`quality` = ?';
+            $params[] = $Problems->quality;
+        }
         if (!is_null($Problems->creation_date)) {
             $clauses[] = '`creation_date` = ?';
             $params[] = $Problems->creation_date;
@@ -235,10 +239,6 @@ abstract class ProblemsDAOBase extends DAO {
             $clauses[] = '`email_clarifications` = ?';
             $params[] = $Problems->email_clarifications;
         }
-        if (!is_null($Problems->quality)) {
-            $clauses[] = '`quality` = ?';
-            $params[] = $Problems->quality;
-        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -249,7 +249,7 @@ abstract class ProblemsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality` FROM `Problems`';
+        $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`validator`, `Problems`.`languages`, `Problems`.`server`, `Problems`.`remote_id`, `Problems`.`time_limit`, `Problems`.`validator_time_limit`, `Problems`.`overall_wall_time_limit`, `Problems`.`extra_wall_time`, `Problems`.`memory_limit`, `Problems`.`output_limit`, `Problems`.`stack_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`quality`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`tolerance`, `Problems`.`slow`, `Problems`.`deprecated`, `Problems`.`email_clarifications` FROM `Problems`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -273,7 +273,7 @@ abstract class ProblemsDAOBase extends DAO {
       * @param Problems [$Problems] El objeto de tipo Problems a actualizar.
       */
     final private static function update(Problems $Problems) {
-        $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ?, `quality` = ? WHERE `problem_id` = ?;';
+        $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `quality` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ? WHERE `problem_id` = ?;';
         $params = [
             $Problems->acl_id,
             $Problems->visibility,
@@ -294,6 +294,7 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->submissions,
             $Problems->accepted,
             $Problems->difficulty,
+            $Problems->quality,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
@@ -301,7 +302,6 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->slow,
             $Problems->deprecated,
             $Problems->email_clarifications,
-            $Problems->quality,
             $Problems->problem_id,
         ];
         global $conn;
@@ -379,7 +379,7 @@ abstract class ProblemsDAOBase extends DAO {
         if (is_null($Problems->email_clarifications)) {
             $Problems->email_clarifications = '0';
         }
-        $sql = 'INSERT INTO Problems (`problem_id`, `acl_id`, `visibility`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications`, `quality`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problems (`problem_id`, `acl_id`, `visibility`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `quality`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Problems->problem_id,
             $Problems->acl_id,
@@ -401,6 +401,7 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->submissions,
             $Problems->accepted,
             $Problems->difficulty,
+            $Problems->quality,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
@@ -408,7 +409,6 @@ abstract class ProblemsDAOBase extends DAO {
             $Problems->slow,
             $Problems->deprecated,
             $Problems->email_clarifications,
-            $Problems->quality,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -676,6 +676,17 @@ abstract class ProblemsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
+        $a = $ProblemsA->quality;
+        $b = $ProblemsB->quality;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`quality` >= ? AND `quality` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`quality` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
         $a = $ProblemsA->creation_date;
         $b = $ProblemsB->creation_date;
         if (!is_null($a) && !is_null($b)) {
@@ -750,17 +761,6 @@ abstract class ProblemsDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`email_clarifications` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $ProblemsA->quality;
-        $b = $ProblemsB->quality;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`quality` >= ? AND `quality` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`quality` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

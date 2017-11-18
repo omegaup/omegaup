@@ -65,7 +65,7 @@ class Roles extends VO {
     public $name;
 
     /**
-      * La descripciÃ³n humana del rol.
+      * La descripción humana del rol.
       * @access public
       * @var varchar(100)
       */

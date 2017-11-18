@@ -70,7 +70,7 @@ class QualityNominations extends VO {
     public $qualitynomination_id;
 
     /**
-      * El usuario que nominÃ³ el problema
+      * El usuario que nominó el problema
       * @access public
       * @var int(11)
       */
@@ -84,28 +84,28 @@ class QualityNominations extends VO {
     public $problem_id;
 
     /**
-      * El tipo de nominaciÃ³n
+      * El tipo de nominación
       * @access public
       * @var enum('suggestion','promotion','demotion','dismissal')
       */
     public $nomination;
 
     /**
-      * Un blob json con el contenido de la nominaciÃ³n
+      * Un blob json con el contenido de la nominación
       * @access public
       * @var text
       */
     public $contents;
 
     /**
-      * Fecha de creacion de esta nominaciÃ³n
+      * Fecha de creacion de esta nominación
       * @access public
       * @var timestamp
       */
     public $time;
 
     /**
-      * El estado de la nominaciÃ³n
+      * El estado de la nominación
       * @access public
       * @var enum('open','approved','denied')
       */

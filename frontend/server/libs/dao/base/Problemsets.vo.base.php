@@ -52,7 +52,7 @@ class Problemsets extends VO {
     }
 
     /**
-      * El identificador Ãºnico para cada conjunto de problemas
+      * El identificador único para cada conjunto de problemas
       * Llave Primaria
       * Auto Incremento
       * @access public
@@ -75,7 +75,7 @@ class Problemsets extends VO {
     public $access_mode;
 
     /**
-      * Un filtro (opcional) de quÃ© lenguajes se pueden usar para resolver los problemas
+      * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
       * @access public
       * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */

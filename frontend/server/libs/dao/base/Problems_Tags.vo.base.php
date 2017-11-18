@@ -75,7 +75,7 @@ class ProblemsTags extends VO {
     public $public;
 
     /**
-      * Indica si la etiqueta fue generada automaticamente a partir de votos de los usuarios
+      *  [Campo no documentado]
       * @access public
       * @var tinyint(1)
       */
