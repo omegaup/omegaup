@@ -806,7 +806,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
-  `nomination` enum('suggestion', 'promotion', 'demotion') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
+  `nomination` enum('suggestion', 'promotion', 'demotion', 'dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
   `contents` TEXT NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
   `status` enum('open', 'approved', 'denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
