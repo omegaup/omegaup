@@ -165,13 +165,9 @@ class Assignments extends VO {
     public $max_points;
 
     /**
-      * Define el orden de aparición de los problemas/tareas
+      * Define el orden de apariciÃ³n de los problemas/tareas
       * @access public
-<<<<<<< HEAD
-      * @var int
-=======
       * @var int(11)
->>>>>>> upstream/master
       */
     public $order;
 }

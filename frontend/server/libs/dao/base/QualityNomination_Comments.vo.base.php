@@ -74,7 +74,7 @@ class QualityNominationComments extends VO {
     public $qualitynomination_id;
 
     /**
-      * El usuario que emitió el comentario
+      * El usuario que emitiÃ³ el comentario
       * @access public
       * @var int(11)
       */

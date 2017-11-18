@@ -73,7 +73,7 @@ class Clarifications extends VO {
     public $clarification_id;
 
     /**
-      * Autor de la clarificación.
+      * Autor de la clarificaciÃ³n.
       * @access public
       * @var int(11)
       */
@@ -115,7 +115,7 @@ class Clarifications extends VO {
     public $problemset_id;
 
     /**
-      * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
+      * SÃ³lo las clarificaciones que el problemsetter marque como publicables aparecerÃ¡n en la lista que todos pueden ver.
       * @access public
       * @var tinyint(1)
       */

@@ -65,7 +65,7 @@ class Permissions extends VO {
     public $name;
 
     /**
-      * La descripción humana del permiso.
+      * La descripciÃ³n humana del permiso.
       * @access public
       * @var varchar(100)
       */

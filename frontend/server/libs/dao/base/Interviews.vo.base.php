@@ -105,7 +105,7 @@ class Interviews extends VO {
     public $description;
 
     /**
-      * Indica el tiempo que tiene el usuario para envíar soluciones.
+      * Indica el tiempo que tiene el usuario para envÃ­ar soluciones.
       * @access public
       * @var int(11)
       */

@@ -54,7 +54,7 @@ class QualityNominationReviewers extends VO {
     public $qualitynomination_id;
 
     /**
-      * El revisor al que fue asignado esta nominación
+      * El revisor al que fue asignado esta nominaciÃ³n
       * Llave Primaria
       * @access public
       * @var int(11)

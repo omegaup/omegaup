@@ -169,14 +169,14 @@ class Contests extends VO {
     public $finish_time;
 
     /**
-      * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso
+      * Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso
       * @access public
       * @var int(11)
       */
     public $window_length;
 
     /**
-      * Este campo es para las repeticiones de algún concurso
+      * Este campo es para las repeticiones de algÃºn concurso
       * @access public
       * @var int(11)
       */
@@ -190,14 +190,14 @@ class Contests extends VO {
     public $public;
 
     /**
-      * Almacenará el token necesario para acceder al concurso
+      * AlmacenarÃ¡ el token necesario para acceder al concurso
       * @access public
       * @var varchar(32)
       */
     public $alias;
 
     /**
-      * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible
+      * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible
       * @access public
       * @var int(11)
       */
@@ -211,14 +211,14 @@ class Contests extends VO {
     public $points_decay_factor;
 
     /**
-      * Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos
+      * Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos
       * @access public
       * @var tinyint(1)
       */
     public $partial_score;
 
     /**
-      * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro
+      * Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro
       * @access public
       * @var int(11)
       */
@@ -232,14 +232,14 @@ class Contests extends VO {
     public $feedback;
 
     /**
-      * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
+      * Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted
       * @access public
       * @var int(11)
       */
     public $penalty;
 
     /**
-      * Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).
+      * Indica la polÃ­tica de cÃ¡lculo de penalty: minutos desde que iniciÃ³ el concurso, minutos desde que se abriÃ³ el problema, o tiempo de ejecuciÃ³n (en milisegundos).
       * @access public
       * @var enum('contest_start','problem_open','runtime','none')
       */
@@ -253,7 +253,7 @@ class Contests extends VO {
     public $penalty_calc_policy;
 
     /**
-      * Mostrar el scoreboard automáticamente después del concurso
+      * Mostrar el scoreboard automÃ¡ticamente despuÃ©s del concurso
       * @access public
       * @var tinyint(1)
       */
@@ -288,7 +288,7 @@ class Contests extends VO {
     public $contestant_must_register;
 
     /**
-      * Un filtro (opcional) de qué lenguajes se pueden usar en un concurso
+      * Un filtro (opcional) de quÃ© lenguajes se pueden usar en un concurso
       * @access public
       * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */

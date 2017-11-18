@@ -35,13 +35,13 @@ abstract class AssignmentsDAOBase extends DAO {
      * @param Assignments [$Assignments] El objeto de tipo Assignments
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-final public static function save(Assignments $Assignments) {
-    if (!is_null(self::getByPK($Assignments->assignment_id))) {
-        return AssignmentsDAOBase::update($Assignments);
-    } else {
-        return AssignmentsDAOBase::create($Assignments);
+    final public static function save(Assignments $Assignments) {
+        if (!is_null(self::getByPK($Assignments->assignment_id))) {
+            return AssignmentsDAOBase::update($Assignments);
+        } else {
+            return AssignmentsDAOBase::create($Assignments);
+        }
     }
-}
 
     /**
      * Obtener {@link Assignments} por llave primaria.
@@ -52,19 +52,19 @@ final public static function save(Assignments $Assignments) {
      * @static
      * @return @link Assignments Un objeto del tipo {@link Assignments}. NULL si no hay tal registro.
      */
-final public static function getByPK($assignment_id) {
-    if (is_null($assignment_id)) {
-        return null;
+    final public static function getByPK($assignment_id) {
+        if (is_null($assignment_id)) {
+            return null;
+        }
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
+        $params = [$assignment_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Assignments($rs);
     }
-    $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
-    $params = [$assignment_id];
-    global $conn;
-    $rs = $conn->GetRow($sql, $params);
-    if (count($rs) == 0) {
-        return null;
-    }
-    return new Assignments($rs);
-}
 
     /**
      * Obtener todas las filas.
@@ -81,22 +81,22 @@ final public static function getByPK($assignment_id) {
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Assignments}.
      */
-final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-    $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` from Assignments';
-    global $conn;
-    if (!is_null($orden)) {
-        $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
+    final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` from Assignments';
+        global $conn;
+        if (!is_null($orden)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
+        }
+        if (!is_null($pagina)) {
+            $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
+        }
+        $rs = $conn->Execute($sql);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = new Assignments($row);
+        }
+        return $allData;
     }
-    if (!is_null($pagina)) {
-        $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
-    }
-    $rs = $conn->Execute($sql);
-    $allData = [];
-    foreach ($rs as $row) {
-        $allData[] = new Assignments($row);
-    }
-    return $allData;
-}
 
     /**
       * Buscar registros.
@@ -120,91 +120,91 @@ final public static function getAll($pagina = null, $columnas_por_pagina = null,
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-final public static function search($Assignments, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-    if (!($Assignments instanceof Assignments)) {
-        $Assignments = new Assignments($Assignments);
-    }
-
-    $clauses = [];
-    $params = [];
-    if (!is_null($Assignments->assignment_id)) {
-        $clauses[] = '`assignment_id` = ?';
-        $params[] = $Assignments->assignment_id;
-    }
-    if (!is_null($Assignments->course_id)) {
-        $clauses[] = '`course_id` = ?';
-        $params[] = $Assignments->course_id;
-    }
-    if (!is_null($Assignments->problemset_id)) {
-        $clauses[] = '`problemset_id` = ?';
-        $params[] = $Assignments->problemset_id;
-    }
-    if (!is_null($Assignments->acl_id)) {
-        $clauses[] = '`acl_id` = ?';
-        $params[] = $Assignments->acl_id;
-    }
-    if (!is_null($Assignments->name)) {
-        $clauses[] = '`name` = ?';
-        $params[] = $Assignments->name;
-    }
-    if (!is_null($Assignments->description)) {
-        $clauses[] = '`description` = ?';
-        $params[] = $Assignments->description;
-    }
-    if (!is_null($Assignments->alias)) {
-        $clauses[] = '`alias` = ?';
-        $params[] = $Assignments->alias;
-    }
-    if (!is_null($Assignments->publish_time_delay)) {
-        $clauses[] = '`publish_time_delay` = ?';
-        $params[] = $Assignments->publish_time_delay;
-    }
-    if (!is_null($Assignments->assignment_type)) {
-        $clauses[] = '`assignment_type` = ?';
-        $params[] = $Assignments->assignment_type;
-    }
-    if (!is_null($Assignments->start_time)) {
-        $clauses[] = '`start_time` = ?';
-        $params[] = $Assignments->start_time;
-    }
-    if (!is_null($Assignments->finish_time)) {
-        $clauses[] = '`finish_time` = ?';
-        $params[] = $Assignments->finish_time;
-    }
-    if (!is_null($Assignments->max_points)) {
-        $clauses[] = '`max_points` = ?';
-        $params[] = $Assignments->max_points;
-    }
-    if (!is_null($Assignments->order)) {
-        $clauses[] = '`order` = ?';
-        $params[] = $Assignments->order;
-    }
-    global $conn;
-    if (!is_null($likeColumns)) {
-        foreach ($likeColumns as $column => $value) {
-            $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-            $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
+    final public static function search($Assignments, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Assignments instanceof Assignments)) {
+            $Assignments = new Assignments($Assignments);
         }
+
+        $clauses = [];
+        $params = [];
+        if (!is_null($Assignments->assignment_id)) {
+            $clauses[] = '`assignment_id` = ?';
+            $params[] = $Assignments->assignment_id;
+        }
+        if (!is_null($Assignments->course_id)) {
+            $clauses[] = '`course_id` = ?';
+            $params[] = $Assignments->course_id;
+        }
+        if (!is_null($Assignments->problemset_id)) {
+            $clauses[] = '`problemset_id` = ?';
+            $params[] = $Assignments->problemset_id;
+        }
+        if (!is_null($Assignments->acl_id)) {
+            $clauses[] = '`acl_id` = ?';
+            $params[] = $Assignments->acl_id;
+        }
+        if (!is_null($Assignments->name)) {
+            $clauses[] = '`name` = ?';
+            $params[] = $Assignments->name;
+        }
+        if (!is_null($Assignments->description)) {
+            $clauses[] = '`description` = ?';
+            $params[] = $Assignments->description;
+        }
+        if (!is_null($Assignments->alias)) {
+            $clauses[] = '`alias` = ?';
+            $params[] = $Assignments->alias;
+        }
+        if (!is_null($Assignments->publish_time_delay)) {
+            $clauses[] = '`publish_time_delay` = ?';
+            $params[] = $Assignments->publish_time_delay;
+        }
+        if (!is_null($Assignments->assignment_type)) {
+            $clauses[] = '`assignment_type` = ?';
+            $params[] = $Assignments->assignment_type;
+        }
+        if (!is_null($Assignments->start_time)) {
+            $clauses[] = '`start_time` = ?';
+            $params[] = $Assignments->start_time;
+        }
+        if (!is_null($Assignments->finish_time)) {
+            $clauses[] = '`finish_time` = ?';
+            $params[] = $Assignments->finish_time;
+        }
+        if (!is_null($Assignments->max_points)) {
+            $clauses[] = '`max_points` = ?';
+            $params[] = $Assignments->max_points;
+        }
+        if (!is_null($Assignments->order)) {
+            $clauses[] = '`order` = ?';
+            $params[] = $Assignments->order;
+        }
+        global $conn;
+        if (!is_null($likeColumns)) {
+            foreach ($likeColumns as $column => $value) {
+                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
+                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
+            }
+        }
+        if (sizeof($clauses) == 0) {
+            return self::getAll();
+        }
+        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM `Assignments`';
+        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
+        if (!is_null($orderBy)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
+        }
+        // Add LIMIT offset, rowcount if rowcount is set
+        if (!is_null($rowcount)) {
+            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
+        }
+        $rs = $conn->Execute($sql, $params);
+        $ar = [];
+        foreach ($rs as $row) {
+            $ar[] = new Assignments($row);
+        }
+        return $ar;
     }
-    if (sizeof($clauses) == 0) {
-        return self::getAll();
-    }
-    $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM `Assignments`';
-    $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-    if (!is_null($orderBy)) {
-        $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-    }
-    // Add LIMIT offset, rowcount if rowcount is set
-    if (!is_null($rowcount)) {
-        $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-    }
-    $rs = $conn->Execute($sql, $params);
-    $ar = [];
-    foreach ($rs as $row) {
-        $ar[] = new Assignments($row);
-    }
-    return $ar;
-}
 
     /**
       * Actualizar registros.
@@ -212,27 +212,27 @@ final public static function search($Assignments, $orderBy = null, $orden = 'ASC
       * @return Filas afectadas
       * @param Assignments [$Assignments] El objeto de tipo Assignments a actualizar.
       */
-final private static function update(Assignments $Assignments) {
-    $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
-    $params = [
-    $Assignments->course_id,
-    $Assignments->problemset_id,
-    $Assignments->acl_id,
-    $Assignments->name,
-    $Assignments->description,
-    $Assignments->alias,
-    $Assignments->publish_time_delay,
-    $Assignments->assignment_type,
-    $Assignments->start_time,
-    $Assignments->finish_time,
-    $Assignments->max_points,
-    $Assignments->order,
-    $Assignments->assignment_id,
-    ];
-    global $conn;
-    $conn->Execute($sql, $params);
-    return $conn->Affected_Rows();
-}
+    final private static function update(Assignments $Assignments) {
+        $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
+        $params = [
+            $Assignments->course_id,
+            $Assignments->problemset_id,
+            $Assignments->acl_id,
+            $Assignments->name,
+            $Assignments->description,
+            $Assignments->alias,
+            $Assignments->publish_time_delay,
+            $Assignments->assignment_type,
+            $Assignments->start_time,
+            $Assignments->finish_time,
+            $Assignments->max_points,
+            $Assignments->order,
+            $Assignments->assignment_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 
     /**
      * Crear registros.
@@ -246,22 +246,18 @@ final private static function update(Assignments $Assignments) {
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
      * @param Assignments [$Assignments] El objeto de tipo Assignments a crear.
      */
-final private static function create(Assignments $Assignments) {
-if (is_null($Assignments->start_time)) {
-    $Assignments->start_time = '2000-01-01 06:00:00';
-}
-if (is_null($Assignments->finish_time)) {
-    $Assignments->finish_time = '2000-01-01 06:00:00';
-}
-if (is_null($Assignments->max_points)) {
-    $Assignments->max_points = '0';
-}
-        if (is_null($Assignments->order)) { { { { { { { { { { { { { { { { { { { { { { { { { {
-<<<<<<< HEAD
-            $Assignments->order =  '1';
-=======
+    final private static function create(Assignments $Assignments) {
+        if (is_null($Assignments->start_time)) {
+            $Assignments->start_time = '2000-01-01 06:00:00';
+        }
+        if (is_null($Assignments->finish_time)) {
+            $Assignments->finish_time = '2000-01-01 06:00:00';
+        }
+        if (is_null($Assignments->max_points)) {
+            $Assignments->max_points = '0';
+        }
+        if (is_null($Assignments->order)) {
             $Assignments->order = '1';
->>>>>>> upstream/master
         }
         $sql = 'INSERT INTO Assignments (`assignment_id`, `course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
@@ -507,53 +503,3 @@ if (is_null($Assignments->max_points)) {
         return $conn->Affected_Rows();
     }
 }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
-; 
-        }
