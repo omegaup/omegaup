@@ -93,6 +93,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
         $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
         $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this::assertArrayHasKey('author', $details);
         $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
         $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
         $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
