@@ -114,10 +114,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
 
         $nomination['time'] = (int)$nomination['time'];
-        $nomination['nominator'] = [
-            'username' => $nomination['username'],
-            'name' => $nomination['name'],
-        ];
+        foreach (array('nominator', 'author') as $userRole) {
+            $nomination[$userRole] = [
+                'username' => $nomination[$userRole . '_username'],
+                'name' => $nomination[$userRole . '_name'],
+            ];
+        }
         unset($nomination['username']);
         unset($nomination['name']);
         $nomination['problem'] = [
@@ -163,10 +165,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.nomination,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -176,7 +180,15 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         INNER JOIN
             Users nominator
         ON
-            nominator.user_id = qn.user_id';
+            nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id';
         $params = [];
 
         if (!empty($types) || !is_null($nominator)) {
@@ -231,10 +243,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.contents,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -245,6 +259,14 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             Users nominator
         ON
             nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id
         WHERE
             qn.qualitynomination_id = ?;';
 

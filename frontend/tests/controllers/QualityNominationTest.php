@@ -20,6 +20,47 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
+    public static function testGetNominationsHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nominations = QualityNominationsDAO::getNominations(null, null);
+        self::assertArrayHasKey('author', $nominations[0]);
+        self::assertArrayHasKey('nominator', $nominations[0]);
+    }
+
+    public static function testGetByIdHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        $result = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        self::assertArrayHasKey('author', $nomination);
+        self::assertArrayHasKey('nominator', $nomination);
+        self::assertEquals($contestant->username, $nomination['nominator']['username']);
+    }
+
     public function testApiDetailsReturnsFieldsRequiredByUI() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();

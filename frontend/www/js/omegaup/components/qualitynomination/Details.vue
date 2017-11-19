@@ -15,7 +15,7 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.qualityUserThatNominated }}</strong>
+            <strong>{{ T.wordsNominator }}</strong>
           </div>
           <div class="col-sm-4">
             {{ this.nominator.name }} (<a v-bind:href="userUrl(this.nominator.username)">{{
@@ -29,6 +29,15 @@
           <div class="col-sm-4">
             {{ this.problem.title }} (<a v-bind:href="problemUrl(this.problem.alias)">{{
             this.problem.alias }}</a>)
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsAuthor }}</strong>
+          </div>
+          <div class="col-sm-4">
+            {{ this.author.name }} (<a v-bind:href="userUrl(this.author.username)">{{
+            this.author.username }}</a>)
           </div>
         </div>
         <div class="row">
@@ -65,6 +74,7 @@ export default {
     contents: Object,
     nomination: String,
     nominator: {username: String, name: String},
+    author: {username: String, name: String},
     problem: {alias: String, title: String},
     qualitynomination_id: Number,
     reviewer: Boolean,
