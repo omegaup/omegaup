@@ -114,7 +114,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
 
         $nomination['time'] = (int)$nomination['time'];
-        foreach (array('nominator', 'author') as $userRole) {
+        foreach (['nominator', 'author'] as $userRole) {
             $nomination[$userRole] = [
                 'username' => $nomination[$userRole . '_username'],
                 'name' => $nomination[$userRole . '_name'],
