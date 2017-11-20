@@ -14,9 +14,6 @@ export class Experiments {
       self.enabledExperiments[experimentList[i]] = true;
   }
 
-  // Current frontend-available experiments:
-  static get SCHOOLS() { return 'schools'; }
-
   // The list of all enabled experiments for a particular request should have
   // been injected into the DOM by Smarty.
   static loadGlobal() {
