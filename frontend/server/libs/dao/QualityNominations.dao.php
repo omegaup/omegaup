@@ -178,6 +178,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id';
         $params = [];
+	$conditions = [];
 
         if (!is_null($assignee)) {
             $sql .= '
@@ -185,10 +186,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 QualityNomination_Reviewers qnr
             ON
                 qnr.qualitynomination_id = qn.qualitynomination_id';
-        }
-
-        $conditions = [];
-        if (!is_null($assignee)) {
+            
             $conditions[] = ' qnr.user_id = ?';
             $params[] = $assignee;
         }
