@@ -178,7 +178,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id';
         $params = [];
-	$conditions = [];
+        $conditions = [];
 
         if (!is_null($assignee)) {
             $sql .= '
