@@ -25,7 +25,7 @@
                                        'tag pull-left';
                     tags.append($('<a></a>')
                                     .addClass(tagClass)
-                                    .attr('href', '/problem/?tag=' +
+                                    .attr('href', '/problem/?tag[]=' +
                                                       omegaup.UI.escape(
                                                           problem.tags[j].name))
                                     .text(problem.tags[j].name));
