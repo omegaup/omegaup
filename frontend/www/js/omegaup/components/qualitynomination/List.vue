@@ -30,12 +30,10 @@
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{ nomination.nominator.user
-              || nomination.nominator.username }}</a>
+              <a v-bind:href="userUrl(nomination.nominator.username)">{{ nomination.nominator.username }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{ nomination.author.user ||
-              nomination.author.username }}</a>
+              <a v-bind:href="userUrl(nomination.author.username)">{{ nomination.author.username }}</a>
             </td>
             <td>{{ nomination.time.format('long') }}</td>
             <td><!-- TODO: Judges aren't returned from the API yet --></td>
