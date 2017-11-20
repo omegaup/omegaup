@@ -14,7 +14,8 @@
           <tr>
             <td>{{ T.qualityNominationType }}</td>
             <td>{{ T.wordsAlias }}</td>
-            <td>{{ T.wordsUser }}</td>
+            <td>{{ T.wordsNominator }}</td>
+            <td>{{ T.wordsAuthor }}</td>
             <td>{{ T.wordsSubmissionDate }}</td>
             <td>{{ T.qualityNominationAssignedJudge }}</td>
             <td>{{ T.wordsStatus }}</td>
@@ -29,8 +30,12 @@
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{ nomination.nominator.user
-              || nomination.nominator.username }}</a>
+              <a v-bind:href="userUrl(nomination.nominator.username)">{{
+              nomination.nominator.username }}</a>
+            </td>
+            <td>
+              <a v-bind:href="userUrl(nomination.author.username)">{{ nomination.author.username
+              }}</a>
             </td>
             <td>{{ nomination.time.format('long') }}</td>
             <td><!-- TODO: Judges aren't returned from the API yet --></td>
