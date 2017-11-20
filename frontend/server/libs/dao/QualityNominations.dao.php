@@ -190,35 +190,35 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             author.user_id = acl.owner_id';
         $params = [];
+        $conditions = [];
 
-        if (!empty($types) || !is_null($nominator)) {
-            $conditions = [];
-            if (!empty($types)) {
-                global $conn;
-                $connectionID = $conn->_connectionID;
-                $escapeFunc = function ($type) use ($connectionID) {
-                    return mysqli_real_escape_string($connectionID, $type);
-                };
-                $conditions[] =
-                    ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
-            }
-            if (!is_null($nominator)) {
-                $conditions[] = ' qn.user_id = ?';
-                $params[] = $nominator;
-            }
-            if (!empty($conditions)) {
-                $sql .= ' WHERE ' . implode(' AND ', $conditions);
-            }
-        } elseif (!is_null($assignee)) {
+        if (!is_null($assignee)) {
             $sql .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
             ON
-                qnr.qualitynomination_id = qn.qualitynomination_id
-            WHERE
-                qnr.user_id = ?';
+                qnr.qualitynomination_id = qn.qualitynomination_id';
+
+            $conditions[] = ' qnr.user_id = ?';
             $params[] = $assignee;
         }
+        if (!empty($types)) {
+            global $conn;
+            $connectionID = $conn->_connectionID;
+            $escapeFunc = function ($type) use ($connectionID) {
+                return mysqli_real_escape_string($connectionID, $type);
+            };
+            $conditions[] =
+                ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
+        }
+        if (!is_null($nominator)) {
+            $conditions[] = ' qn.user_id = ?';
+            $params[] = $nominator;
+        }
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
         $sql .= ' LIMIT ?, ?;';
         $params[] = $page * $pageSize;
         $params[] = ($page + 1) * $pageSize;
