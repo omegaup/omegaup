@@ -1484,7 +1484,7 @@ class ProblemController extends Controller {
                 if (file_exists("$grade_dir/details.json")) {
                     $details = json_decode(file_get_contents("$grade_dir/details.json"));
                     foreach ($details as $group) {
-                        if (!is_object($group) || !isset($group->cases) || !is_array($group->cases)) {
+                        if (!isset($group->cases) || !is_array($group->cases)) {
                             continue;
                         }
                         foreach ($group->cases as $case) {
