@@ -186,7 +186,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 QualityNomination_Reviewers qnr
             ON
                 qnr.qualitynomination_id = qn.qualitynomination_id';
-            
+
             $conditions[] = ' qnr.user_id = ?';
             $params[] = $assignee;
         }
