@@ -10,7 +10,6 @@ if (!function_exists('try_define')) {
 # ####################################
 # EXPERIMENTS
 # ####################################
-try_define('EXPERIMENT_SCHOOLS', true);
 
 # ####################################
 # DATABASE CONFIG
