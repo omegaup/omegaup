@@ -1153,13 +1153,13 @@ class ProblemController extends Controller {
         }
         // Add preferred language of the user.
         $user_data = [];
-        $preferred_language = null;
+        $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
         Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
             $r['current_user']->username,
-            $r,
-            function (Request $r) {
-                    return UserController::getProfileImpl($r['current_user']);
+            $request,
+            function (Request $request) {
+                    return UserController::apiProfile($request);
             },
             $user_data
         );

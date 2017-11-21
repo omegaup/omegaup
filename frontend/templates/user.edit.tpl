@@ -88,12 +88,12 @@
 					</div>
 
 					<div class="form-group">
-						<label for="language" class="col-md-4 control-label">{#userEditPreferredProgrammingLanguage#}</label>
+						<label for="programming_language" class="col-md-4 control-label">{#userEditPreferredProgrammingLanguage#}</label>
 						<div class="col-md-7">
-						<select id="language" name='language' class="form-control" >
+						<select id="programming_language" name="programming_language" class="form-control" >
 							<option value=""></option>
-							{foreach from=$LANGUAGES item=language}
-							<option value="{$language}">{$language}</option>
+							{foreach from=$PROGRAMMING_LANGUAGES item=programming_language}
+							<option value="{$programming_language}">{$programming_language}</option>
 							{/foreach}
 						</select>
 						</div>

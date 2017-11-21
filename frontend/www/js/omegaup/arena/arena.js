@@ -227,7 +227,7 @@ export class Arena {
     self.submissionGap = 0;
 
     // Setup preferred language
-    self.preferred_language = null;
+    self.preferredLanguage = null;
 
     // UI elements
     self.elements = {
@@ -911,19 +911,16 @@ export class Arena {
   }
 
   selectDefaultLanguage() {
-    // TODO: Make this depend on a user setting.
-    //       See https://github.com/omegaup/omegaup/issues/1471
     let self = this;
     let langElement = self.elements.submitForm.language;
-    if (self.preferred_language) {
+    if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.val() == self.preferred_language) {
-              if (option.css('display') == 'none') return false;
-              option.prop('selected', true);
-              return false;
-            }
+            if (option.css('display') == 'none') return;
+            if (option.val() != self.preferredLanguage) return;
+            option.prop('selected', true);
+            return false;
           });
     }
     if (langElement.val()) return;
@@ -1134,7 +1131,7 @@ export class Arena {
                 problem.sample_input = problem_ext.sample_input;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
-                self.preferred_language = problem_ext.preferred_language;
+                self.preferredLanguage = problem_ext.preferred_language;
                 update(problem);
               })
               .fail(UI.apiError);

@@ -10,9 +10,7 @@ $ses = SessionController::apiCurrentSession()['session'];
 if (is_null($ses['user']->password)) {
     $smarty->display('../templates/user.basicedit.tpl');
 } else {
-    $languages = RunController::$kSupportedLanguages;
-    $countries = CountriesDAO::getAll();
-    $smarty->assign('LANGUAGES', $languages);
-    $smarty->assign('COUNTRIES', $countries);
+    $smarty->assign('PROGRAMMING_LANGUAGES', RunController::$kSupportedLanguages);
+    $smarty->assign('COUNTRIES', CountriesDAO::getAll());
     $smarty->display('../templates/user.edit.tpl');
 }
