@@ -1025,7 +1025,7 @@ export class Arena {
 
         MathJax.Hub.Queue(
             ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
-        self.initCountDown();
+        self.initSubmissionCountdown();
       }
 
       if (problemChanged) {
@@ -1134,11 +1134,9 @@ export class Arena {
     self.elements.submitForm.file.val(null);
   }
 
-  initCountDown() {
+  initSubmissionCountdown() {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
-    let currentTime = new Date();
-    let countDown = 0;
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
     if (typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
@@ -1158,22 +1156,25 @@ export class Arena {
       clearInterval(self.submissionGapInterval);
       self.submissionGapInterval = 0;
     }
-    if (nextSubmissionTimestamp.getTime() > currentTime.getTime()) {
-      self.submissionGapInterval = setInterval(function() {
-        countDown = parseInt((nextSubmissionTimestamp - Date.now()) / 1000);
+    let currentTime = new Date();
+    let submissionGapSecondsRemaining =
+        Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
+    self.submissionGapInterval = setInterval(function() {
+      submissionGapSecondsRemaining =
+          parseInt((nextSubmissionTimestamp - Date.now()) / 1000);
+      if (submissionGapSecondsRemaining > 0) {
         $('#submit input[type=submit]')
             .attr('disabled', 'disabled')
-            .val(UI.formatString(T.arenaRunSubmitWaitBetweenUploads,
-                                 {submissionGap: countDown}));
-        if (countDown > 0) {
-          return;
-        }
-        clearInterval(self.submissionGapInterval);
+            .val(UI.formatString(
+                T.arenaRunSubmitWaitBetweenUploads,
+                {submissionGap: submissionGapSecondsRemaining}));
+      } else {
         $('#submit input[type=submit]')
             .removeAttr('value')
             .removeAttr('disabled');
-      }, 1000);
-    }
+        clearInterval(self.submissionGapInterval);
+      }
+    }, 1000);
   }
 
   onLanguageSelect(e) {
@@ -1299,7 +1300,7 @@ export class Arena {
           self.elements.submitForm.code.val('');
           self.hideOverlay();
           self.clearInputFile();
-          self.initCountDown();
+          self.initSubmissionCountdown();
         })
         .fail(function(run) {
           alert(run.error);
