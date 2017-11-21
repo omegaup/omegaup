@@ -86,3 +86,7 @@ node_modules
 
 # Ignore JavaScript build files.
 frontend/www/js/dist/
+
+# Ignore C++ / Pascal docs
+frontend/www/docs/cpp
+frontend/www/docs/pas
