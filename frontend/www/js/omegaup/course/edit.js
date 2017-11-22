@@ -350,7 +350,7 @@ OmegaUp.on('ready', function() {
             omegaup.API.Course.updateProblemsOrder({
                                 course_alias: courseAlias,
                                 assignment_alias: assignment.alias,
-                                problem_alias: assignmentProblems,
+                                problems: assignmentProblems,
                               })
                 .then(function(response) { refreshProblemList(assignment); })
                 .fail(omegaup.UI.apiError);

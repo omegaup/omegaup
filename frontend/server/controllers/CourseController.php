@@ -436,7 +436,7 @@ class CourseController extends Controller {
         }
 
         // Update problems order
-        $problems = $r['problem_alias'];
+        $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
             if (is_null($problem)) {
@@ -447,12 +447,11 @@ class CourseController extends Controller {
             if (is_numeric($r['order'])) {
                 $order = (int)$r['order'];
             }
-            ProblemsetController::updateProblemsOrder(
-                $problemSet->problemset_id,
-                $currentProblem,
-                $r['current_user_id'],
-                $problem['order']
-            );
+            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
+                'problemset_id' => $problemSet->problemset_id,
+                'problem_id' => $currentProblem->problem_id,
+                'order' => $problem['order']
+            ]));
         }
 
         return ['status' => 'ok'];

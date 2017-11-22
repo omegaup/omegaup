@@ -89,7 +89,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         $sql = 'UPDATE `Problemset_Problems` SET `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
         $params = [
             $Problemset_Problems->order,
-            $Problemset_Problems->problemset_id,$Problemset_Problems->problem_id,
+            $Problemset_Problems->problemset_id,
+            $Problemset_Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

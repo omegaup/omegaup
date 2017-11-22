@@ -5,56 +5,23 @@ class CourseProblemsTest extends OmegaupTestCase {
         // Create a test course
         $user = UserFactory::createUser();
 
-        $courseAlias = Utils::CreateRandomString();
-
         $login = self::login($user);
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
-            'alias' => $courseAlias,
-            'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
-        ]);
 
-        // Call api
-        $course = CourseController::apiCreate($r);
-
-        // Create a test course
-        $login = self::login($user);
-        $assignment_alias = Utils::CreateRandomString();
-        $course = CourseController::apiCreateAssignment(new Request([
-            'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
-            'alias' => $assignment_alias,
-            'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
-            'course_alias' => $courseAlias,
-            'assignment_type' => 'homework'
-        ]));
-
-        $assignments = AssignmentsDAO::search([
-            'alias' => $assignment_alias,
-        ]);
-        $assignment = $assignments[0];
+        // Create a course with an assignment
+        $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
 
         // Add 3 problems to the assignment.
         $numberOfProblems = 3;
         for ($i=0; $i < $numberOfProblems; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
-
-            CourseController::apiAddProblem(new Request([
-                'auth_token' => $login->auth_token,
-                'course_alias' => $courseAlias,
-                'assignment_alias' => $assignment->alias,
-                'problem_alias' => $problemData[$i]['problem']->alias,
-            ]));
         }
+        CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, $problemData);
 
         $problems = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $login->auth_token,
-            'assignment' => $assignment->alias,
+            'assignment' => $assignmentAlias,
             'course' => $courseAlias
         ]));
 
@@ -65,17 +32,17 @@ class CourseProblemsTest extends OmegaupTestCase {
         CourseController::apiUpdateProblemsOrder(new Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
-            'assignment_alias' => $assignment->alias,
-            'problem_alias' => $problems['problems'],
+            'assignment_alias' => $assignmentAlias,
+            'problems' => $problems['problems'],
         ]));
 
         $problems = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $login->auth_token,
-            'assignment' => $assignment->alias,
+            'assignment' => $assignmentAlias,
             'course' => $courseAlias
         ]));
 
-        // Before disordering problems
+        // Before reordering problems
         for ($i=0; $i < $numberOfProblems; $i++) {
             $originalOrder[$i] = [
                 'alias' => $problems['problems'][$i]['alias'],
@@ -91,13 +58,13 @@ class CourseProblemsTest extends OmegaupTestCase {
         CourseController::apiUpdateProblemsOrder(new Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
-            'assignment_alias' => $assignment->alias,
-            'problem_alias' => $problems['problems'],
+            'assignment_alias' => $assignmentAlias,
+            'problems' => $problems['problems'],
         ]));
 
         $problems = CourseController::apiAssignmentDetails(new Request([
             'auth_token' => $login->auth_token,
-            'assignment' => $assignment->alias,
+            'assignment' => $assignmentAlias,
             'course' => $courseAlias
         ]));
 

@@ -33,22 +33,4 @@ class ProblemsetController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
-
-    public static function updateProblemsOrder($problemset_id, Problems $problem, $current_user_id, $order = 1) {
-        ProblemsetController::validateAddProblemToProblemset(
-            $problemset_id,
-            $problem,
-            $current_user_id
-        );
-
-        try {
-            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
-                'problemset_id' => $problemset_id,
-                'problem_id' => $problem->problem_id,
-                'order' => $order,
-            ]));
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-    }
 }
