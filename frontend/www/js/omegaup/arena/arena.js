@@ -1157,11 +1157,9 @@ export class Arena {
       self.submissionGapInterval = 0;
     }
     let currentTime = new Date();
-    let submissionGapSecondsRemaining =
-        Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
     self.submissionGapInterval = setInterval(function() {
-      submissionGapSecondsRemaining =
-          parseInt((nextSubmissionTimestamp - Date.now()) / 1000);
+      let submissionGapSecondsRemaining =
+          Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
       if (submissionGapSecondsRemaining > 0) {
         $('#submit input[type=submit]')
             .attr('disabled', 'disabled')
