@@ -1087,6 +1087,7 @@ class UserController extends Controller {
         $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
+        $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
 
         if (!is_null($user->language_id)) {
@@ -1603,6 +1604,7 @@ class UserController extends Controller {
             'state_id',
             'scholar_degree',
             'school_id',
+            'preferred_language',
             'graduation_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
