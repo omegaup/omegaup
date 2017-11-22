@@ -2,9 +2,6 @@
 class Email {
     public static $log;
 
-    public function __construct() {
-        $this->log = Logger::getLogger('Email');
-    }
     /**
      * @param $email
      * @param $subject
@@ -50,7 +47,6 @@ class Email {
             self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
             throw new EmailVerificationSendException();
         }
-        return ['status' => 'ok'];
     }
 }
 
