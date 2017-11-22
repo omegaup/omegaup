@@ -1734,7 +1734,6 @@ class UserController extends Controller {
      */
     public static function deleteProblemsSolvedRankCacheList() {
         Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
-        Cache::invalidateAllKeys(Cache::SCHOOL_RANK);
     }
 
     /**
