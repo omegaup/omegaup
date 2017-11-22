@@ -36,3 +36,6 @@
 [submodule "stuff/hook_tools"]
 	path = stuff/hook_tools
 	url = https://github.com/omegaup/hook_tools.git
+[submodule "tiaanduplessis/wenk"]
+	path = frontend/www/third_party/wenk
+	url = https://github.com/tiaanduplessis/wenk.git

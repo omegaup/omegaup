@@ -930,6 +930,15 @@ class UserController extends Controller {
                 'ROOP-18' => 300,
                 'ROOS-18' => 300,
             ];
+        } elseif ($r['contest_type'] == 'TEBAEV') {
+            if ($r['current_user']->username != 'lacj20'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'TEBAEV' => 250,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
