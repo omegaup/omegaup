@@ -4,7 +4,7 @@
       <div id="carousel-display" class="carousel slide" data-ride="carousel" data-interval="3000">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        <li v-for="(slide, key, index) of slides"
+        <li v-for="(slide, index) of slides"
                     data-target="#carousel-display"
                     v-bind:class="{active: !index}"
                     v-bind:data-slide-to="index"></li>
@@ -12,8 +12,8 @@
 
       <!-- Wrapper for slides -->
       <div class="carousel-inner">
-        <div class="item" v-for="(slide, key, index) of slides" v-bind:class="{active: !index}">
-          <img v-bind:src="slide.image" v-bind:alt="localized(slide.title)">
+        <div class="item" v-for="(slide, index) of slides" v-bind:class="{active: !index}">
+          <img v-bind:src="slide.image">
           <div class="carousel-caption">
             <h3>{{ localized(slide.title) }}</h3>
             <p>{{ localized(slide.description) }}</p>
@@ -41,10 +41,10 @@ export default {
   },
   computed: {
     slides: function() {
-      let filteredSlides = {};
-      Object.keys(this.json).forEach(key => {
-        if (key.indexOf('_') != 0) {
-          filteredSlides[key] = this.json[key];
+      let filteredSlides = [];
+      this.json.forEach(slide => {
+        if (slide._meta != 'comments') {
+          filteredSlides.push(slide);
         }
       });
       return filteredSlides;
