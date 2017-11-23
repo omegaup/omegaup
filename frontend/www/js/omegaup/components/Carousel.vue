@@ -23,7 +23,7 @@
             </div>
           </div>
         </div><!-- Controls -->
-         <a class="left carousel-control"
+        <a class="left carousel-control"
              data-slide="prev"
              href="#carousel-display"><span class="icon-prev"></span></a> <a class=
              "right carousel-control"
