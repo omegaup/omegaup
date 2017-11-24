@@ -31,9 +31,7 @@ def _expected_database_schema(*, dbname='omegaup', config_file=None,
     stderr = subprocess.DEVNULL
     if verbose:
         stderr = None
-    result = subprocess.run(args, stdout=subprocess.PIPE,
-                            stderr=stderr, check=True)
-    schema = result.stdout
+    schema = subprocess.check_output(args, stderr=subprocess.DEVNULL)
     return re.sub(br'AUTO_INCREMENT=\d+\s+', b'', schema)
 
 
