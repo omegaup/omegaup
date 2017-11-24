@@ -14,10 +14,26 @@ import sys
 import database_utils
 import hook_tools.git_tools as git_tools
 
+OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
-def _expected_database_schema(*, dbname='omegaup', auth=None):
+
+def _expected_database_schema(*, dbname='omegaup', config_file=None,
+                              username=None, password=None, verbose=False):
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
-    schema = database_utils.mysqldump(dbname=dbname, auth=auth)
+    args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
+    if config_file:
+        args.extend(['--mysql-config-file', config_file])
+    if username:
+        args.extend(['--username', username])
+    if password:
+        args.extend(['--password', password])
+    args.append('schema')
+    stderr = subprocess.DEVNULL
+    if verbose:
+        stderr = None
+    result = subprocess.run(args, stdout=subprocess.PIPE,
+                            stderr=stderr, check=True)
+    schema = result.stdout
     return re.sub(br'AUTO_INCREMENT=\d+\s+', b'', schema)
 
 
@@ -57,11 +73,12 @@ def main():
     if not filtered_files:
         return
 
-    auth = database_utils.authentication(config_file=args.mysql_config_file,
-                                         username=args.username,
-                                         password=args.password)
     root = git_tools.root_dir()
-    expected = _expected_database_schema(dbname=args.database, auth=auth)
+    expected = _expected_database_schema(dbname=args.database,
+                                         config_file=args.mysql_config_file,
+                                         username=args.username,
+                                         password=args.password,
+                                         verbose=args.verbose)
     actual = git_tools.file_contents(
             args, root, 'frontend/database/schema.sql')
 
