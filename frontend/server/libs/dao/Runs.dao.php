@@ -294,6 +294,88 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
+     * Gets the count of total runs sent to a given contest by verdict and by period of time
+     */
+    final public static function CountRunsOfUserByVerdictByPeriod($user_id, $period, $verdicts, $showAllRuns = false) {
+        switch ($period) {
+            case 'day':
+                $query = 'DATE(time)';
+                break;
+            case 'week':
+                $query = "CONCAT(
+                        DATE(DATE_SUB(time, INTERVAL (DAYOFWEEK(time) - 2) DAY)), ' - ' ,
+                        DATE(DATE_ADD(time, INTERVAL (8 - DAYOFWEEK(time)) DAY)))";
+                break;
+            case 'month':
+                $query = "CONCAT(Month(time), '-', Year(time))";
+                break;
+            case 'year':
+                $query = 'YEAR(time)';
+                break;
+            default:
+                $query = 'DATE(time)';
+        }
+        // Build SQL statement.
+        $sql = 'SELECT '
+                    . 'COUNT(1) as verdicts_by_period, '
+                    . 'verdict, '
+                    . $query . ' as period '
+                . 'FROM '
+                    . 'Runs '
+                . 'WHERE '
+                    . 'user_id = ? ';
+
+        if (!$showAllRuns) {
+            $sql .= 'AND test = 0 ';
+        }
+        $sql .= 'GROUP BY period, verdict';
+
+        $val = [$user_id];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $val);
+
+        $periods = [];
+        $delta_series = [];
+        $cumulative_series = [];
+        $ar = [];
+        $delta_data = [];
+        $cumulative_data = [];
+        // Fill periods array
+        foreach ($rs as $index => $row) {
+            $periods[] = $row['period'];
+            $ar[$row['period']][$row['verdict']] = $row['verdicts_by_period'];
+        }
+        // Remove duplicate periods
+        $periods = array_unique($periods);
+        $periods = array_values($periods);
+        // Fill delta_data and cumulate_data arrays
+        foreach ($verdicts as $key => $verdict) {
+            $cumulative = 0;
+            foreach ($periods as $index => $period) {
+                if (isset($ar[$period][$verdict])) {
+                    $delta_data[$verdict][$index] = (int)$ar[$period][$verdict];
+                    $cumulative_data[$verdict][$index] = (int)$ar[$period][$verdict] + $cumulative;
+                } else {
+                    $delta_data[$verdict][$index] = 0;
+                    $cumulative_data[$verdict][$index] = 0 + $cumulative;
+                }
+                $cumulative = $cumulative_data[$verdict][$index];
+            }
+        }
+        // Fill delta_series and cumulative_series array
+        foreach ($verdicts as $index => $verdict) {
+            $delta_series[$index] = ['name' => $verdict, 'data' => $delta_data[$verdict]];
+            $cumulative_series[$index] = ['name' => $verdict, 'data' => $cumulative_data[$verdict]];
+        }
+        return [
+            'periods' => $periods,
+            'delta_series' => $delta_series,
+            'cumulative_series' => $cumulative_series
+        ];
+    }
+
+    /*
 	 * Gets the count of total runs sent to a given contest by verdict
 	 */
 

@@ -1420,11 +1420,20 @@ class UserController extends Controller {
             foreach (self::$verdicts as $verdict) {
                 $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfUserByVerdict($user->user_id, $verdict);
             }
+            $periods = ['day', 'week', 'month', 'year'];
+            foreach ($periods as $period) {
+                $verdict_period_counts[$period] = RunsDAO::CountRunsOfUserByVerdictByPeriod(
+                    $user->user_id,
+                    $period,
+                    ['AC', 'PA', 'WA', 'TLE', 'RTE']
+                );
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         return [
+            'verdict_period_counts' => $verdict_period_counts,
             'verdict_counts' => $verdict_counts,
             'total_runs' => $totalRunsCount,
             'status' => 'ok'

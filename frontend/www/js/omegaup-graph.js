@@ -43,6 +43,79 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
   });
 };
 
+OmegaupGraph.prototype.verdictPeriodCounts = function(renderTo, title, stats,
+                                                      type, period) {
+  let group_data = null;
+  switch (period) {
+    case 'day':
+      group_data = stats.verdict_period_counts.day;
+      break;
+    case 'week':
+      group_data = stats.verdict_period_counts.week;
+      break;
+    case 'month':
+      group_data = stats.verdict_period_counts.month;
+      break;
+    case 'year':
+      group_data = stats.verdict_period_counts.year;
+      break;
+    default:
+      group_data = stats.verdict_period_counts.day;
+      break;
+  }
+  let data =
+      type == 'delta' ? group_data.delta_series : group_data.cumulative_series;
+  return new Highcharts.Chart({
+    chart: {type: 'column', renderTo: renderTo},
+    title: {text: 'veredictos de ' + title},
+    xAxis: {
+      categories: group_data.periods,
+      title: {text: 'Periodo'},
+      labels: {
+        rotation: -45,
+      }
+    },
+    yAxis: {
+      min: 0,
+      title: {text: 'Número de problemas resueltos'},
+      stackLabels: {
+        enabled: false,
+        style: {
+          fontWeight: 'bold',
+          color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+        }
+      }
+    },
+    legend: {
+      align: 'right',
+      x: -30,
+      verticalAlign: 'top',
+      y: 25,
+      floating: true,
+      backgroundColor:
+          (Highcharts.theme && Highcharts.theme.background2) || 'white',
+      borderColor: '#CCC',
+      borderWidth: 1,
+      shadow: false
+    },
+    tooltip: {
+      headerFormat: '<b>{point.x}</b><br/>',
+      pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+    plotOptions: {
+      column: {
+        stacking: 'normal',
+        dataLabels: {
+          enabled: false,
+          color:
+              (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+        }
+      }
+    },
+    series: data
+  });
+};
+
 OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
   return [
     ['WA', (stats.verdict_counts['WA'] / stats.total_runs) * 100],
