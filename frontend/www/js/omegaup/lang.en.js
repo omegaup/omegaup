@@ -846,7 +846,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsReadAgain: "Read again",
 	wordsRejudge: "Rejudge",
 	wordsReportProblem: "Report inappropriate content in this problem.",
-	wordsReset: "OmegaUp: Reset password.",
+	wordsReset: "omegaUp: Reset password.",
 	wordsResetMessage: "Click the following link to reset your password: <a href='[link]'>[link]</a><br><br>If you didn't request this operation please do not click the link and make sure your account is safe.",
 	wordsResult: "Answer",
 	wordsReviewingProblem: "Reviewing problem",

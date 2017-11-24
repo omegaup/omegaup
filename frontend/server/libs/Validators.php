@@ -28,7 +28,7 @@ class Validators {
     /**
      * Check if string is string and not empty
      *
-     * @param string $email
+     * @param string $parameter
      * @param string $parameterName Name of parameter that will appear en error message
      * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
      * @return boolean
