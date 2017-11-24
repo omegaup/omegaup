@@ -158,7 +158,8 @@ def purge(args, auth):
   '''
   for dbname in args.databases.split(','):
     database_utils.mysql('DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
-    database_utils.mysql('CREATE DATABASE `%s`;' % dbname, auth=auth)
+    database_utils.mysql('CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
+                         'utf8_general_ci;' % dbname, auth=auth)
 
 
 def main():
