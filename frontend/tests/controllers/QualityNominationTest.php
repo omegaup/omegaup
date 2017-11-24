@@ -20,6 +20,47 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
+    public static function testGetNominationsHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nominations = QualityNominationsDAO::getNominations(null, null);
+        self::assertArrayHasKey('author', $nominations[0]);
+        self::assertArrayHasKey('nominator', $nominations[0]);
+    }
+
+    public static function testGetByIdHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        $result = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        self::assertArrayHasKey('author', $nomination);
+        self::assertArrayHasKey('nominator', $nomination);
+        self::assertEquals($contestant->username, $nomination['nominator']['username']);
+    }
+
     public function testApiDetailsReturnsFieldsRequiredByUI() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
@@ -52,6 +93,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
         $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
         $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this::assertArrayHasKey('author', $details);
         $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
         $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
         $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
@@ -247,7 +289,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Revert ban.
         $request = new Request([
@@ -261,7 +303,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been made private');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been made public');
     }
 
     /**
@@ -337,7 +379,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Reopen demotion request.
         $request = new Request([
@@ -351,7 +393,60 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have remained banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have remained public banned');
+    }
+
+    /**
+     * Check that a demotion of a private problem can be approved and
+     * then denied, and it keeps its original visibility
+     */
+    public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
+        $problemData = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE);
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE_BANNED, $problem['visibility'], 'Problem should have been private banned');
+
+        // Reopen demotion request.
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been re-opened');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been private');
     }
 
     /**
