@@ -107,8 +107,12 @@ def driver():
     if _CI:
         firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX
         firefox_capabilities['marionette'] = True
+        options = webdriver.firefox.options.Options()
+        options.add_argument('-headless')
         browser = webdriver.Firefox(capabilities=firefox_capabilities,
-                                    firefox_binary='firefox', executable_path='geckodriver')
+                                    firefox_options=options,
+                                    firefox_binary='firefox',
+                                    executable_path='geckodriver')
     else:
         options = webdriver.ChromeOptions()
         options.binary_location = '/usr/bin/google-chrome'
