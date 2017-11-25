@@ -17,7 +17,7 @@ stage_before_script() {
 		mysql -e ';' && break || sleep 1
 	done
 
-	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
+	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup-test

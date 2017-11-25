@@ -28,10 +28,10 @@ stage_install() {
 	pip3 install --user selenium
 	pip3 install --user pytest
 
-	~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm \
-		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
-
 	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
+
+	"~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm" \
+		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
 }
 
 stage_before_script() {
@@ -40,7 +40,7 @@ stage_before_script() {
 		mysql -e ';' && break || sleep 1
 	done
 
-	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`'
+	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup
