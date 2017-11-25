@@ -28,12 +28,10 @@ stage_install() {
 	pip3 install --user selenium
 	pip3 install --user pytest
 
-	find "${OMEGAUP_ROOT}/stuff/travis"
-
-	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
-
 	"~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm" \
 		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
+
+	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
 }
 
 stage_before_script() {
