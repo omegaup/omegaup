@@ -57,7 +57,8 @@ class Driver(object):
         # Home page
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.browser.find_element_by_id('navbar-login').click()
+        self.browser.find_element_by_xpath(
+            '//a[contains(@href, "/login/")]').click()
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
