@@ -1,4 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
+  var payload = JSON.parse(document.getElementById('payload').innerText);
+
   function registerAndLogin() {
     if ($('#reg_pass').val() != $('#reg_pass2').val()) {
       omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
@@ -10,8 +12,8 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-    if (typeof(grecaptcha) === 'undefined' ||
-        grecaptcha.getResponse().length == 0) {
+    if (payload.validateRecaptcha && (typeof(grecaptcha) === 'undefined' ||
+                                      grecaptcha.getResponse().length == 0)) {
       omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
       return false;
     }
