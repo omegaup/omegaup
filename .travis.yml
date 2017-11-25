@@ -40,14 +40,13 @@ cache:
 git:
   submodules: false
 
-before_install:
-  - stuff/travis/run.sh "${TEST_SUITE}" before_install
+before_install: stuff/travis/run.sh "${TEST_SUITE}" before_install
 
-before_script:
-  - stuff/travis/run.sh "${TEST_SUITE}" before_script
+install: stuff/travis/run.sh "${TEST_SUITE}" install
 
-script:
-  - stuff/travis/run.sh "${TEST_SUITE}" script
+before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
+
+script: stuff/travis/run.sh "${TEST_SUITE}" script
 
 notifications:
   slack:
