@@ -1,6 +1,6 @@
 #!/bin/bash
 
-before_install() {
+stage_before_install() {
 	git submodule update --init --recursive \
 		stuff/hook_tools \
 		frontend/server/libs/third_party/smarty \
@@ -11,7 +11,7 @@ before_install() {
 		frontend/server/libs/third_party/google-api-php-client
 }
 
-before_script() {
+stage_before_script() {
 	# Workaround for Travis' flaky MySQL connection.
 	for _ in `seq 30`; do
 		mysql -e ';' && break || sleep 1
@@ -24,7 +24,7 @@ before_script() {
 	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
 }
 
-script() {
+stage_script() {
 	phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
 		frontend/tests/phpunit.xml frontend/tests/controllers
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-before_install() {
+stage_before_install() {
 	git submodule update --init --recursive \
 		stuff/hook_tools
 
@@ -17,13 +17,13 @@ before_install() {
 	npm install -g yarn
 }
 
-before_script() {
+stage_before_script() {
 	pear install pear/PHP_CodeSniffer-2.9.1
 	phpenv rehash
 	echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 }
 
-script() {
+stage_script() {
 	yarn install
 	yarn build
 	yarn test
