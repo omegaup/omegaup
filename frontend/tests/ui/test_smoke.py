@@ -3,7 +3,7 @@
 
 '''Run Selenium end-to-end tests.'''
 
-import random
+import time
 
 def test_create_user(driver):
     '''Tests basic functionality.'''
@@ -16,11 +16,11 @@ def test_create_user(driver):
 
     # Login screen
     driver.wait.until(lambda _: driver.browser.current_url != home_page_url)
-    username = 'unittest_user_' + ''.join(
-        random.choice('abcdefghijklmnopqrstuvwxyz_') for _ in range(8))
+    now = int(time.time())
+    username = 'unittest_user_%d' % now
     driver.browser.find_element_by_id('reg_username').send_keys(username)
     driver.browser.find_element_by_id('reg_email').send_keys(
-        '%s@localhost.localdomain' % username)
+        'email_%s@localhost.localdomain' % username)
     driver.browser.find_element_by_id('reg_pass').send_keys('p@ssw0rd')
     driver.browser.find_element_by_id('reg_pass2').send_keys('p@ssw0rd')
     driver.browser.find_element_by_id('register-form').submit()

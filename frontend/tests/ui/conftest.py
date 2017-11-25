@@ -82,27 +82,29 @@ def pytest_pyfunc_call(pyfuncitem):
         return
     if not 'driver' in pyfuncitem.funcargs:
         return
-    driver = pyfuncitem.funcargs['driver']
-    logs = driver.browser.get_log('browser')
-    if _CI:
-        print(pyfuncitem.nodeid, driver.browser.get_screenshot_as_base64(), logs,
-              file=sys.stderr)
-    else:
-        results_dir = os.path.join(_DIRNAME, 'results')
-        os.makedirs(results_dir, exist_ok=True)
-        driver.browser.get_screenshot_as_file(
-            os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
-        with open(os.path.join(results_dir, 'webdriver_%s.log' % pyfuncitem.name), 'w') as f:
-            json.dump(logs, f, indent=2)
+    try:
+        driver = pyfuncitem.funcargs['driver']
+        if _CI:
+            # geckodriver does not support getting logs:
+            # https://github.com/mozilla/geckodriver/issues/284
+            print(pyfuncitem.nodeid, driver.browser.get_screenshot_as_base64(),
+                  file=sys.stderr)
+        else:
+            logs = driver.browser.get_log('browser')
+            results_dir = os.path.join(_DIRNAME, 'results')
+            os.makedirs(results_dir, exist_ok=True)
+            driver.browser.get_screenshot_as_file(
+                os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
+            with open(os.path.join(results_dir, 'webdriver_%s.log' % pyfuncitem.name), 'w') as f:
+                json.dump(logs, f, indent=2)
+    except Exception as ex:
+        print(ex)
 
 @pytest.yield_fixture(scope='session')
 def driver():
     '''Run tests using the selenium webdriver.'''
 
     if _CI:
-        # TODO(lhchavez): Support firefox. Or saucelabs.
-        import builtins
-        builtins.file = open
         firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX
         firefox_capabilities['marionette'] = True
         browser = webdriver.Firefox(capabilities=firefox_capabilities,
