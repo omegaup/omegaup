@@ -66,7 +66,7 @@
 								</ul>
 							</li>
 						{else}
-							<li><a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}'>{#navLogIn#}</a></li>
+							<li><a id="navbar-login" href="/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}">{#navLogIn#}</a></li>
 						{/if}
 
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
