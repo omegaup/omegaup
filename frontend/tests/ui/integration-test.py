@@ -9,7 +9,6 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
 class OmegaUpTest:
   def __init__(self, driver, url):
     self.driver = driver
@@ -23,7 +22,7 @@ class OmegaUpTest:
     self.driver.get(self.url)
 
   def login(self, username, password):
-    login_link = self.driver.find_element_by_partial_link_text('Log in')
+    login_link = self.driver.find_element_by_xpath('//a[contains(@href, "/login/")]')
     login_link.click()
 
     username_input = self.driver.find_element_by_name('user')
@@ -33,7 +32,7 @@ class OmegaUpTest:
     username_input.submit()
 
   def create_user(self):
-    login_link = self.driver.find_element_by_partial_link_text('Sign up')
+    login_link = self.driver.find_element_by_xpath('//a[contains(@href, "/login/")]')
     login_link.click()
 
     # Data setup
@@ -80,10 +79,12 @@ class OmegaUpTest:
     self.driver.find_element_by_xpath('//span[text()="%s"]' % ('Edit problem %s' % self.problem_alias))
 
   def open_problem(self):
-    self.driver.find_element_by_link_text('Go to problem').click()
+    self.driver.find_element_by_xpath('//a[starts-with(@href, "/arena/problem/")]').click()
 
   def create_run(self):
-    self.driver.find_element_by_link_text('New submission').click()
+    self.driver.execute_script('arguments[0].scrollIntoView(true)',
+                               self.driver.find_element_by_css_selector('#new-run a'))
+    self.driver.find_element_by_css_selector('#new-run a').click()
     self.driver.find_element_by_css_selector('input[type="file"]').send_keys(self.resource('solution.cpp'))
     self.driver.find_element_by_css_selector('#submit input[type="submit"]').click()
 
@@ -121,18 +122,16 @@ class OmegaUpTest:
     problem_element.submit()
 
   def go_to_contest(self):
-    self.driver.find_element_by_link_text('Arena').click()
+    self.driver.find_element_by_xpath('//a[starts-with(@href, "/arena/")]').click()
     self.driver.find_element_by_link_text(self.contest_alias).click()
 
   def open_contest(self):
-    description_element = self.driver.find_element_by_css_selector('#description')
-    assert description_element.get_attribute('innerText') == self.contest_description
+    description_element = self.driver.find_element_by_xpath('//*[@id="description" and text()="%s"]' % self.contest_description)
     self.driver.find_element_by_css_selector('button[type="submit"]').click()
 
   def verify_contest_summary(self):
     assert self.driver.find_element_by_link_text(self.username), \
            "Should be able to find the username as the organizer"
-    
 
   def open_contest_problem(self):
     self.driver.find_element_by_link_text('A. %s' % self.problem_alias).click()
@@ -160,7 +159,6 @@ class OmegaUpTest:
     self.create_run_in_contest()
     self.verify_run_in_contest()
 
-
 def main():
   parser = argparse.ArgumentParser(description='Process some integers.')
   parser.add_argument('--url', help='the entry point URL',
@@ -184,7 +182,6 @@ def main():
     test_case.run()
   finally:
     driver.quit()
-
 
 if __name__ == "__main__":
   main()
