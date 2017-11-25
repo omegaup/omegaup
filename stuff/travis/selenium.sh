@@ -28,7 +28,7 @@ stage_install() {
 	pip3 install --user selenium
 	pip3 install --user pytest
 
-	"~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm" \
+	~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm \
 		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
 
 	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
