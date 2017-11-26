@@ -116,7 +116,7 @@ def driver():
             'screenResolution': '1920x1080',
         }
         hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
-            os.environ['SAUCE_USERNAME'],
+            os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
         browser = webdriver.Remote(desired_capabilities=capabilities,
