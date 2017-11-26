@@ -39,6 +39,8 @@ stage_install() {
 		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
 	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
 
+	mkdir -p /tmp/omegaup/{submissions,grade,problems.git}
+
 	# Install the PHP config
 	/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" \
 		"${OMEGAUP_ROOT}/stuff/travis/nginx/config.php.tpl" > \
@@ -53,12 +55,16 @@ stage_before_script() {
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
-	python3 stuff/db-migrate.py --username=travis --password= \
-		migrate --databases=omegaup
 	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
 
 	yarn install
 	yarn build-development
+
+	# Install the database schema
+	python3 stuff/db-migrate.py --username=travis --password= \
+		migrate --databases=omegaup --development-environment
+	# As well as installing some users and problems
+	python3 stuff/bootstrap-environment.py --root-url=http://localhost:8000
 }
 
 stage_script() {
