@@ -105,14 +105,22 @@ def driver():
     '''Run tests using the selenium webdriver.'''
 
     if _CI:
-        firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX
-        firefox_capabilities['marionette'] = True
-        options = webdriver.firefox.options.Options()
-        options.add_argument('-headless')
-        browser = webdriver.Firefox(capabilities=firefox_capabilities,
-                                    firefox_options=options,
-                                    firefox_binary='firefox',
-                                    executable_path='geckodriver')
+        capabilities = {
+            'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
+            'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
+            'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
+
+            'browserName': 'chrome',
+            'version': 'latest',
+            'platform': 'Windows 10',
+            'screenResolution': '1920x1080',
+        }
+        hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
+            os.environ['SAUCE_USERNAME'],
+            os.environ['SAUCE_ACCESS_KEY']
+        )
+        browser = webdriver.Remote(desired_capabilities=capabilities,
+                                   command_executor=hub_url)
     else:
         options = webdriver.ChromeOptions()
         options.binary_location = '/usr/bin/google-chrome'

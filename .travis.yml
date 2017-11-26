@@ -30,6 +30,10 @@ addons:
       - python-pip
       - python3-pip
       - clang-format-3.7
+  sauce_connect:
+    username: lhchavez
+    access_key:
+      secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
 
 cache:
   directories:
