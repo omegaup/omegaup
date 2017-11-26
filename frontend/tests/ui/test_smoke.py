@@ -38,6 +38,3 @@ def test_login(driver):
 
     with driver.login(username='omegaup', password='omegaup'):
         pass
-
-    # We have purposely made this fail, as a joke.
-    assert False
