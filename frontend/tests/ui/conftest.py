@@ -9,6 +9,7 @@ import os.path
 import pytest
 import re
 import sys
+import time
 import urllib
 
 from selenium import webdriver
@@ -27,6 +28,7 @@ class Driver(object):
         self.browser = browser
         self.wait = wait
         self._url = url
+        self.id = str(int(time.time()))
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -50,7 +52,21 @@ class Driver(object):
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def login(self, username='user', password='user'):
+    def login_user(self):
+        '''Logs in as a user, and logs out when out of scope.'''
+
+        with self.login('user', 'user'):
+            yield
+
+    @contextlib.contextmanager
+    def login_admin(self):
+        '''Logs in as an admin, and logs out when out of scope.'''
+
+        with self.login('omegaup', 'omegaup'):
+            yield
+
+    @contextlib.contextmanager
+    def login(self, username, password):
         '''Logs in as :username, and logs out when out of scope.'''
 
         # Home page
@@ -99,6 +115,15 @@ def pytest_pyfunc_call(pyfuncitem):
     except Exception as ex:
         print(ex)
 
+def pytest_addoption(parser):
+    '''Allow configuration of test invocation.'''
+
+    parser.addoption('--url', default=('http://localhost/' if not _CI else
+                                       'http://localhost:8000/'),
+                     help='The URL that the test will be run against')
+    parser.addoption('--disable-headless', action='store_false',
+                     dest='headless', help='Show the browser window')
+
 @pytest.yield_fixture(scope='session')
 def driver(request):
     '''Run tests using the selenium webdriver.'''
@@ -123,21 +148,20 @@ def driver(request):
         )
         browser = webdriver.Remote(desired_capabilities=capabilities,
                                    command_executor=hub_url)
-        url = 'http://localhost:8000/'
     else:
         options = webdriver.ChromeOptions()
         options.binary_location = '/usr/bin/google-chrome'
         options.add_experimental_option('prefs', {'intl.accept_languages': 'en_US'})
         options.add_argument('--lang=en-US')
         options.add_argument('--window-size=1920x1080')
-        options.add_argument('--headless')
+        if request.config.option.headless:
+            options.add_argument('--headless')
         browser = webdriver.Chrome(chrome_options=options)
-        url = 'http://localhost/'
 
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
 
-    yield Driver(browser, wait, url)
+    yield Driver(browser, wait, request.config.option.url)
 
     if _CI:
         print(('\n\nYou can see the report at '
