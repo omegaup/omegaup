@@ -12,13 +12,13 @@ import sys
 import urllib
 
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.wait import WebDriverWait
 
 _DEFAULT_TIMEOUT = 2  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
+_SUCCESS = True
 
 class Driver(object):
     '''Wraps the state needed to run a test.'''
@@ -73,30 +73,34 @@ class Driver(object):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
-    '''Takes a screenshot and grabs console logs on test faiures.'''
+    '''Takes a screenshot and grabs console logs on test failures.'''
+
+    global _SUCCESS
 
     outcome = yield
 
     if not outcome.excinfo:
         return
+    _SUCCESS = False
     if not 'driver' in pyfuncitem.funcargs:
+        return
+    if not _CI:
+        # When running in CI, we have movies, screenshots and logs in Sauce Labs.
         return
     try:
         driver = pyfuncitem.funcargs['driver']
-        if not _CI:
-            # When running in CI, we have movies, screenshots and logs in Sauce Labs.
-            logs = driver.browser.get_log('browser')
-            results_dir = os.path.join(_DIRNAME, 'results')
-            os.makedirs(results_dir, exist_ok=True)
-            driver.browser.get_screenshot_as_file(
-                os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
-            with open(os.path.join(results_dir, 'webdriver_%s.log' % pyfuncitem.name), 'w') as f:
-                json.dump(logs, f, indent=2)
+        logs = driver.browser.get_log('browser')
+        results_dir = os.path.join(_DIRNAME, 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        driver.browser.get_screenshot_as_file(
+            os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
+        with open(os.path.join(results_dir, 'webdriver_%s.log' % pyfuncitem.name), 'w') as f:
+            json.dump(logs, f, indent=2)
     except Exception as ex:
         print(ex)
 
 @pytest.yield_fixture(scope='session')
-def driver():
+def driver(request):
     '''Run tests using the selenium webdriver.'''
 
     if _CI:
@@ -135,4 +139,13 @@ def driver():
 
     yield Driver(browser, wait, url)
 
+    if _CI:
+        print(('You can see the report at '
+               'https://saucelabs.com/beta/tests/%s/commands') % browser.session_id,
+              file=sys.stderr)
+        try:
+            browser.execute_script("sauce:job-result=%s" % str(_SUCCESS).lower())
+        except WebDriverException:
+            # Test is done. Just ignore the error.
+            pass
     browser.quit()
