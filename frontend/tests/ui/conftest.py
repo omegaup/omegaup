@@ -140,7 +140,7 @@ def driver(request):
     yield Driver(browser, wait, url)
 
     if _CI:
-        print(('You can see the report at '
+        print(('\n\nYou can see the report at '
                'https://saucelabs.com/beta/tests/%s/commands') % browser.session_id,
               file=sys.stderr)
         try:
