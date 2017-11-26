@@ -25,13 +25,24 @@ stage_before_install() {
 }
 
 stage_install() {
+	# Install pre-dependencies
 	pip3 install --user selenium
 	pip3 install --user pytest
 
+	# Expand all templates
+	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do
+		/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" "${tpl}" > "${tpl%.tpl}"
+	done
+
+	# Start the servers
 	~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm \
 		--fpm-config "${OMEGAUP_ROOT}/stuff/travis/nginx/php-fpm.conf"
-
 	nginx -c "${OMEGAUP_ROOT}/stuff/travis/nginx/nginx.conf"
+
+	# Install the PHP config
+	/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" \
+		"${OMEGAUP_ROOT}/stuff/travis/nginx/config.php.tpl" > \
+		"${OMEGAUP_ROOT}/frontend/server/config.php"
 }
 
 stage_before_script() {

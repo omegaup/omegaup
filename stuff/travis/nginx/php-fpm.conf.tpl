@@ -1,4 +1,5 @@
 [global]
+error_log = /tmp/php-fpm.log
 
 [travis]
 listen = 9000

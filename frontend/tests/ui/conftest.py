@@ -17,17 +17,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
 _DEFAULT_TIMEOUT = 2  # seconds
-_HOME_PAGE_URL = 'http://localhost/'
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 
 class Driver(object):
     '''Wraps the state needed to run a test.'''
 
-    def __init__(self, browser, wait):
+    def __init__(self, browser, wait, url):
         self.browser = browser
         self.wait = wait
-        self._url = _HOME_PAGE_URL
+        self._url = url
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -84,12 +83,8 @@ def pytest_pyfunc_call(pyfuncitem):
         return
     try:
         driver = pyfuncitem.funcargs['driver']
-        if _CI:
-            # geckodriver does not support getting logs:
-            # https://github.com/mozilla/geckodriver/issues/284
-            print(pyfuncitem.nodeid, driver.browser.get_screenshot_as_base64(),
-                  file=sys.stderr)
-        else:
+        if not _CI:
+            # When running in CI, we have movies, screenshots and logs in Sauce Labs.
             logs = driver.browser.get_log('browser')
             results_dir = os.path.join(_DIRNAME, 'results')
             os.makedirs(results_dir, exist_ok=True)
@@ -107,20 +102,24 @@ def driver():
     if _CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
+            'name': 'Travis CI run %s' % os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
-
+        }
+        # Add browser configuration
+        capabilities.update({
             'browserName': 'chrome',
             'version': 'latest',
             'platform': 'Windows 10',
             'screenResolution': '1920x1080',
-        }
+        })
         hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
         browser = webdriver.Remote(desired_capabilities=capabilities,
                                    command_executor=hub_url)
+        url = 'http://localhost:8000/'
     else:
         options = webdriver.ChromeOptions()
         options.binary_location = '/usr/bin/google-chrome'
@@ -129,10 +128,11 @@ def driver():
         options.add_argument('--window-size=1920x1080')
         options.add_argument('--headless')
         browser = webdriver.Chrome(chrome_options=options)
+        url = 'http://localhost/'
 
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
 
-    yield Driver(browser, wait)
+    yield Driver(browser, wait, url)
 
     browser.quit()

@@ -17,6 +17,9 @@ tags
 # Ignore classes
 *.class
 
+# Ignore configuration files
+*.conf
+
 # NetBeans-related stuff
 build.xml
 nbproject/
