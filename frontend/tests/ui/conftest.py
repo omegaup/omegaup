@@ -84,7 +84,7 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if not 'driver' in pyfuncitem.funcargs:
         return
-    if not _CI:
+    if _CI:
         # When running in CI, we have movies, screenshots and logs in Sauce Labs.
         return
     try:
