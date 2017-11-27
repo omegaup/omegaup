@@ -1152,6 +1152,21 @@ class ProblemController extends Controller {
         if (!empty($sample_input)) {
             $response['sample_input'] = $sample_input;
         }
+        // Add preferred language of the user.
+        $user_data = [];
+        $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
+        Cache::getFromCacheOrSet(
+            Cache::USER_PROFILE,
+            $r['current_user']->username,
+            $request,
+            function (Request $request) {
+                    return UserController::apiProfile($request);
+            },
+            $user_data
+        );
+        if (!empty($user_data)) {
+            $response['preferred_language'] = $user_data['userinfo']['preferred_language'];
+        }
 
         // Add the problem the response
         $response = array_merge($response, $r['problem']->asFilteredArray($relevant_columns));
