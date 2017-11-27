@@ -352,7 +352,7 @@ OmegaUp.on('ready', function() {
                                 assignment_alias: assignment.alias,
                                 problems: assignmentProblems,
                               })
-                .then(function(response) { refreshProblemList(assignment); })
+                .then(function(response) {})
                 .fail(omegaup.UI.apiError);
           },
           tags: function(tags) {
@@ -463,7 +463,6 @@ OmegaUp.on('ready', function() {
   }
 
   function refreshProblemList(assignment) {
-    problemList.assignmentProblems = [];
     omegaup.API.Course.getAssignment(
                           {assignment: assignment.alias, course: courseAlias})
         .then(function(response) {
