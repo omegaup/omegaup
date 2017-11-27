@@ -28,6 +28,8 @@ def generate(alias):
             filename = str(filename, encoding='utf-8')
             if filename.endswith('.idl'):
                 idlname = filename
+            elif not filename.startswith('Main.') and not filename.startswith('examples/'):
+                continue
             outpath = os.path.join(dirname, filename)
             os.makedirs(os.path.dirname(outpath), exist_ok=True)
             with open(outpath, 'wb') as outfile:
