@@ -1144,16 +1144,11 @@ export class Arena {
           self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
           1000);
     } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
-      nextSubmissionTimestamp =
-          (new Date(
-               self.problems[self.currentProblem.alias]
-                   .runs[self.problems[self.currentProblem.alias].runs.length -
-                         1]
-                   .time)
-               .getTime() /
-           1000) +
-          self.currentContest.submissions_gap;
-      nextSubmissionTimestamp = new Date(nextSubmissionTimestamp * 1000);
+      nextSubmissionTimestamp = new Date(
+          self.problems[self.currentProblem.alias]
+              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
+              .time.getTime() +
+          self.currentContest.submissions_gap * 1000);
     }
     if (self.submissionGapInterval) {
       clearInterval(self.submissionGapInterval);
