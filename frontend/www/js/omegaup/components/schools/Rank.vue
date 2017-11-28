@@ -1,8 +1,8 @@
 <template>
   <div class="panel panel-default omegaup-schools-rank">
     <div class="panel-heading">
-      <h3 class="panel-title">{{ UI.formatString(T.schoolRankHeader, {count:
-      rank.rank?rank.rank.length:0}) }}</h3>
+      <h3 class="panel-title">{{ UI.formatString(T.schoolRankHeader, {count: rank?rank.length:0})
+      }}</h3>
     </div>
     <div class="panel-body no-padding">
       <div class="table-responsive">
@@ -38,14 +38,9 @@ import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 
 export default {
-  props: {
-    rank: Object,
-  },
-  computed: {
-    rankFiltered: function() {
-      return this.rank.rank.slice(0, this.rank.rowcount);
-    }
-  },
+  props: {rank: Array, rowCount: Number},
+  computed:
+      {rankFiltered: function() { return this.rank.slice(0, this.rowCount);}},
   data: function() { return {T: T, UI: UI};},
   components: {
     'omegaup-countryflag': CountryFlag,

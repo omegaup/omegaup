@@ -14,7 +14,7 @@ try {
 
     $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
     // Show top 5 schools rank
-    $smarty->assign('schoolRankPayload', ['rowcount' => 5, 'rank' => $schoolRankPayload['rank']]);
+    $smarty->assign('schoolRankPayload', ['rowCount' => 5, 'rank' => $schoolRankPayload['rank']]);
 } catch (Exception $e) {
     // Oh, well...
 }
