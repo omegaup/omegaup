@@ -111,7 +111,7 @@ class InterviewController extends Controller {
         }
 
         global $smarty;
-        $r['mail_subject'] = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+        $subject = $smarty->getConfigVariable('interviewInvitationEmailSubject');
 
         if (is_null($r['user'])) {
             // create a new user
@@ -126,13 +126,13 @@ class InterviewController extends Controller {
             UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . '<br>'
                            . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
                            . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
-            $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
+            $body .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
                             . '<br>'
                             . $smarty->getConfigVariable('profileUsername')
                             . ' : '
@@ -146,7 +146,7 @@ class InterviewController extends Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
                            . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }
@@ -176,13 +176,12 @@ class InterviewController extends Controller {
         }
 
         try {
-            $r['email'] = EmailsDAO::getByPK($r['user']->main_email_id);
-            $r['email'] = $r['email']->email;
+            $email = EmailsDAO::getByPK($r['user']->main_email_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        UserController::sendEmail($r);
+        Email::sendEmail($email, $subject, $body);
 
         self::$log->info('Added ' . $r['username'] . ' to interview.');
 

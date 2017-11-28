@@ -28,6 +28,7 @@ omegaup.OmegaUp.on('ready', function() {
               penalty_type: $('.new_contest_form #penalty-type').val(),
               show_scoreboard_after:
                   $('.new_contest_form #show-scoreboard-after').val(),
+              languages: $('.new_contest_form #languages').val(),
             })
             .then(function(data) {
               window.location.replace('/contest/' +
