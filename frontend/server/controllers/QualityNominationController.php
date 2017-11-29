@@ -265,7 +265,8 @@ class QualityNominationController extends Controller {
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
-            if ($newProblemVisibility == ProblemController::VISIBILITY_BANNED) {
+            if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
+              $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
                 $response = self::sendDemotionEmail($r, $qualitynomination);
             }
         } catch (Exception $e) {
@@ -287,7 +288,7 @@ class QualityNominationController extends Controller {
         $request = [];
         try {
             $adminuser = ProblemsDAO::getAdminUser($r['problem']);
-            $request['email'] = $adminuser['email'];
+            $email = $adminuser['email'];
             $username = $adminuser['name'];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -300,16 +301,18 @@ class QualityNominationController extends Controller {
             'user_name' => $username
         ];
         global $smarty;
-        $request['mail_subject'] = ApiUtils::FormatString(
+        $mail_subject = ApiUtils::FormatString(
             $smarty->getConfigVars('demotionProblemEmailSubject'),
             $email_params
         );
-        $request['mail_body'] = ApiUtils::FormatString(
+        $mail_body = ApiUtils::FormatString(
             $smarty->getConfigVars('demotionProblemEmailBody'),
             $email_params
         );
 
-        return UserController::sendEmail($request);
+        Email::sendEmail($email, $mail_subject, $mail_body);
+
+        return ['email' => $email, 'mail_subject' => $mail_subject, 'mail_body' => $mail_body];
     }
 
     /**
