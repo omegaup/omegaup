@@ -51,6 +51,10 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #penalty-type').val(contest.penalty_type);
         $('.new_contest_form #show-scoreboard-after')
             .val(contest.show_scoreboard_after);
+        contest.languages.each(function(lang) {
+          $('option[value="' + lang + '"]').prop('selected', true);
+        });
+        $('.new_contest_form #languages').multiselect('refresh');
 
         $('.contest-publish-form #public').val(contest.public);
 
@@ -119,6 +123,7 @@ omegaup.OmegaUp.on('ready', function() {
           penalty_type: $('.new_contest_form #penalty-type').val(),
           show_scoreboard_after:
               $('.new_contest_form #show-scoreboard-after').val(),
+          languages: $('.new_contest_form #languages').val(),
           contestant_must_register: $('.new_contest_form #register').val(),
         })
         .then(function(data) {

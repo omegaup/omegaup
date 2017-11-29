@@ -1,9 +1,5 @@
 <?php
 require_once('../server/bootstrap.php');
-if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
-    header('HTTP/1.1 404 Not Found');
-    die();
-}
 
 $course_alias = $_REQUEST['course'];
 $student_username = $_REQUEST['student'];

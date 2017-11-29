@@ -1,5 +1,15 @@
 location /api/ {
-    rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
+	rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
+}
+
+# questions2answers.
+location /preguntas/ {
+	index index.php;
+	autoindex off;
+	rewrite ^(.*)//(.*)$ /$1/$2 redirect;
+	if (!-e $request_filename) {
+		rewrite ^/preguntas/(.+)$ /preguntas/?qa-rewrite=$1&$query_string last;
+	}
 }
 
 # Backendv1 WebSockets endpoint.

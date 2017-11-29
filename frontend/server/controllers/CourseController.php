@@ -173,12 +173,10 @@ class CourseController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);
 
@@ -243,12 +241,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCreateAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateAssignment($r);
 
@@ -298,12 +294,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r, true /*is_required*/);
 
@@ -354,12 +348,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAddProblem(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -458,12 +450,10 @@ class CourseController extends Controller {
     }
 
     public static function apiGetProblemUsers(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -493,12 +483,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveProblem(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -558,12 +546,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssignments(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
@@ -624,12 +610,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -675,12 +659,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListCourses(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
 
         Validators::isNumber($r['page'], 'page', false);
@@ -740,12 +722,10 @@ class CourseController extends Controller {
      * @return Array response
      */
     public static function apiListStudents(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -770,12 +750,10 @@ class CourseController extends Controller {
     }
 
     public static function apiStudentProgress(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -851,12 +829,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiMyProgress(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -894,12 +870,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAddStudent(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -944,12 +918,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiRemoveStudent(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -1248,12 +1220,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAdminDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1300,12 +1270,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAssignmentDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r);
 
@@ -1346,12 +1314,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1402,12 +1368,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiUpdate(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true /* is update */);
 

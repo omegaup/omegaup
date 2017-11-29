@@ -15,6 +15,10 @@ OmegaUp.on('ready', function() {
             username: payload.nominator.username,
             name: payload.nominator.name,
           },
+          author: {
+            username: payload.author.username,
+            name: payload.author.name,
+          },
           problem: {alias: payload.problem.alias, title: payload.problem.title},
           qualitynomination_id: parseInt(payload.qualitynomination_id),
           reviewer: payload.reviewer,

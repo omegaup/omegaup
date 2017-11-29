@@ -127,7 +127,7 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testGetContestDetailsWithLanguageFilter() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => 'c,cpp,java']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => ['c','cpp','java']]));
 
         // Get some problems into the contest
         $problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp,java,py');

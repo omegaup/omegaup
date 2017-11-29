@@ -40,30 +40,14 @@ class Broadcaster {
         $this->sendClarificationEmail($r, $time);
     }
 
-    protected function sendClarificationEmail(Request $r, $time) {
-        if (!OMEGAUP_EMAIL_SEND_EMAILS ||
-                !is_null($r['clarification']->answer) ||
+    protected function sendClarificationEmail(Request $r) {
+        if (!is_null($r['clarification']->answer) ||
                 !$r['problem']->email_clarifications) {
             return;
         }
         try {
             $emails = ProblemsDAO::getExplicitAdminEmails($r['problem']);
 
-            $mail = new PHPMailer();
-            $mail->IsSMTP();
-            $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-            $mail->SMTPAuth = true;
-            $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-            $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->Port = 465;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
-
-            $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-            foreach ($emails as $email) {
-                $mail->AddAddress($email);
-            }
-            $mail->isHTML(true);
             global $smarty;
             $email_params = [
                 'clarification_id' => $r['clarification']->clarification_id,
@@ -75,18 +59,16 @@ class Broadcaster {
                     ('https://omegaup.com/arena/' . $r['contest']->alias . '#clarifications'),
                 'user_name' => $r['user']->username
             ];
-            $mail->Subject = ApiUtils::FormatString(
+            $subject = ApiUtils::FormatString(
                 $smarty->getConfigVars('clarificationEmailSubject'),
                 $email_params
             );
-            $mail->Body = ApiUtils::FormatString(
+            $body = ApiUtils::FormatString(
                 $smarty->getConfigVars('clarificationEmailBody'),
                 $email_params
             );
 
-            if (!$mail->Send()) {
-                $this->log->error('Failed to send mail: ' . $mail->ErrorInfo);
-            }
+            Email::sendEmail($emails, $subject, $body);
         } catch (Exception $e) {
             $this->log->error('Failed to send clarification email ' . $e->getMessage());
         }

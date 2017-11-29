@@ -49,6 +49,7 @@ function _convertTimes(item) {
 
 function _normalizeContestFields(contest) {
   omegaup.OmegaUp.convertTimes(contest);
+  contest.submissions_gap = parseInt(contest.submissions_gap);
   contest.show_penalty =
       (contest.penalty != 0 || contest.penalty_type != 'none');
   return contest;
@@ -385,6 +386,8 @@ export default {
     tags: _call('/api/problem/tags/'),
 
     update: _call('/api/problem/update/'),
+
+    updateStatement: _call('/api/problem/updateStatement/'),
   },
 
   QualityNomination: {
