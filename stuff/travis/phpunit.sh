@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. common.sh
+. "${OMEGAUP_ROOT}/stuff/travis/common.sh"
 
 stage_before_install() {
 	init_submodules
