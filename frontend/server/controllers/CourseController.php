@@ -410,7 +410,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
