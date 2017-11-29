@@ -211,23 +211,6 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent by an user
-	 */
-
-    final public static function CountTotalRunsOfUser($user_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? ';
-        $val = [$user_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
-
-        global $conn;
-        return $conn->GetOne($sql, $val);
-    }
-
-    /*
 	 * Gets the count of total runs sent to a given problem
 	 */
 
@@ -296,100 +279,53 @@ class RunsDAO extends RunsDAOBase {
     /*
      * Gets the count of total runs sent to a given contest by verdict and by period of time
      */
-    final public static function CountRunsOfUserByVerdictByPeriod($user_id, $period, $verdicts, $showAllRuns = false) {
-        switch ($period) {
-            case 'day':
-                $query = 'DATE(time)';
-                break;
-            case 'week':
-                $query = "CONCAT(
-                        DATE(DATE_SUB(time, INTERVAL (DAYOFWEEK(time) - 2) DAY)), ' - ' ,
-                        DATE(DATE_ADD(time, INTERVAL (8 - DAYOFWEEK(time)) DAY)))";
-                break;
-            case 'month':
-                $query = "CONCAT(Month(time), '-', Year(time))";
-                break;
-            case 'year':
-                $query = 'YEAR(time)';
-                break;
-            default:
-                $query = 'DATE(time)';
-        }
+    final public static function CountRunsOfUserPerDatePerVerdict($user_id) {
         // Build SQL statement.
-        $sql = 'SELECT '
-                    . 'COUNT(1) as verdicts_by_period, '
-                    . 'verdict, '
-                    . $query . ' as period '
-                . 'FROM '
-                    . 'Runs '
-                . 'WHERE '
-                    . 'user_id = ? ';
-
-        if (!$showAllRuns) {
-            $sql .= 'AND test = 0 ';
-        }
-        $sql .= 'GROUP BY period, verdict';
+        $sql = '
+                SELECT
+                    r.day,
+                    r.week,
+                    r.month,
+                    r.year,
+                    r.verdict,
+                    COUNT(1) runs
+                FROM (
+                    SELECT
+                        DATE(time) AS day,
+                        CONCAT(
+                          DATE(DATE_SUB(time, INTERVAL (DAYOFWEEK(time) - 2) DAY)), \' - \' ,
+                          DATE(DATE_ADD(time, INTERVAL (8 - DAYOFWEEK(time)) DAY))) as week,
+                        CONCAT(Month(time), \'-\', Year(time)) as month,
+                        YEAR(time) as year,
+                        verdict
+                    FROM
+                        Runs
+                    WHERE
+                        user_id = ? AND status = \'ready\'
+                ) AS r
+                GROUP BY
+                    r.day, r.verdict
+                ORDER BY
+                  day ASC;';
 
         $val = [$user_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
-        $periods = [];
-        $delta_series = [];
-        $cumulative_series = [];
         $ar = [];
-        $delta_data = [];
-        $cumulative_data = [];
-        // Fill periods array
-        foreach ($rs as $index => $row) {
-            $periods[] = $row['period'];
-            $ar[$row['period']][$row['verdict']] = $row['verdicts_by_period'];
-        }
-        // Remove duplicate periods
-        $periods = array_unique($periods);
-        $periods = array_values($periods);
-        // Fill delta_data and cumulate_data arrays
-        foreach ($verdicts as $key => $verdict) {
-            $cumulative = 0;
-            foreach ($periods as $index => $period) {
-                if (isset($ar[$period][$verdict])) {
-                    $delta_data[$verdict][$index] = (int)$ar[$period][$verdict];
-                    $cumulative_data[$verdict][$index] = (int)$ar[$period][$verdict] + $cumulative;
-                } else {
-                    $delta_data[$verdict][$index] = 0;
-                    $cumulative_data[$verdict][$index] = 0 + $cumulative;
-                }
-                $cumulative = $cumulative_data[$verdict][$index];
-            }
-        }
-        // Fill delta_series and cumulative_series array
-        foreach ($verdicts as $index => $verdict) {
-            $delta_series[$index] = ['name' => $verdict, 'data' => $delta_data[$verdict]];
-            $cumulative_series[$index] = ['name' => $verdict, 'data' => $cumulative_data[$verdict]];
-        }
-        return [
-            'periods' => $periods,
-            'delta_series' => $delta_series,
-            'cumulative_series' => $cumulative_series
-        ];
-    }
-
-    /*
-	 * Gets the count of total runs sent to a given contest by verdict
-	 */
-
-    final public static function CountTotalRunsOfUserByVerdict($user_id, $verdict, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? AND verdict = ? ';
-        $val = [$user_id, $verdict];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+        foreach ($rs as $row) {
+            array_push($ar, [
+                'day' => $row['day'],
+                'week' => $row['week'],
+                'month' => $row['month'],
+                'year' => $row['year'],
+                'verdict' => $row['verdict'],
+                'runs' => $row['runs']
+            ]);
         }
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return $ar;
     }
 
     /*

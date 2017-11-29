@@ -1412,30 +1412,13 @@ class UserController extends Controller {
         $user = self::resolveTargetUser($r);
 
         try {
-            $totalRunsCount = RunsDAO::CountTotalRunsOfUser($user->user_id);
-
-            // List of verdicts
-            $verdict_counts = [];
-
-            foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfUserByVerdict($user->user_id, $verdict);
-            }
-            $periods = ['day', 'week', 'month', 'year'];
-            foreach ($periods as $period) {
-                $verdict_period_counts[$period] = RunsDAO::CountRunsOfUserByVerdictByPeriod(
-                    $user->user_id,
-                    $period,
-                    ['AC', 'PA', 'WA', 'TLE', 'RTE']
-                );
-            }
+            $runsPerDatePerVeredict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         return [
-            'verdict_period_counts' => $verdict_period_counts,
-            'verdict_counts' => $verdict_counts,
-            'total_runs' => $totalRunsCount,
+            'runs' => $runsPerDatePerVeredict,
             'status' => 'ok'
         ];
     }

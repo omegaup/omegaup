@@ -1,5 +1,5 @@
 var username = $('#username').attr('data-username');
-let stats_data = null;
+var stats_data = null;
 omegaup.API.User.stats({username: username})
     .then(function(data) {
       stats_data = data;
@@ -54,7 +54,8 @@ omegaup.API.User.problemsSolved({username: username})
     })
     .fail(omegaup.UI.apiError);
 
-let period_selected = 'day';
+var period_selected = 'day';
+var type_selected = 'total';
 $('input[name=period]')
     .on('change', function(evt) {
       period_selected = $(this).prop('id');
@@ -63,7 +64,6 @@ $('input[name=period]')
                                      type_selected, period_selected);
     });
 
-let type_selected = 'total';
 $('input[name=type]')
     .on('change', function(evt) {
       type_selected = $(this).prop('id');

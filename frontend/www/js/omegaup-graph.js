@@ -4,6 +4,7 @@ function OmegaupGraph() {
 }
 
 OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
+  runs = this.normalizeRunCounts(stats);
   return new Highcharts.Chart({
     chart: {
       plotBackgroundColor: null,
@@ -11,10 +12,15 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
       plotShadow: false,
       renderTo: renderTo
     },
-    title: {text: 'veredictos de ' + title},
+    title: {
+      text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
+                                    {user: title})
+    },
     tooltip: {
       formatter: function() {
-        return '<b>Envíos</b>: ' + stats.verdict_counts[this.point.name];
+        return omegaup.UI.formatString(
+            omegaup.T.profileStatisticsRuns,
+            {runs: runs.runs[this.point.name].count});
       }
     },
     plotOptions: {
@@ -28,56 +34,35 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
           formatter: function() {
             return '<b>' + this.point.name + '</b>: ' +
                    this.percentage.toFixed(2) + ' % (' +
-                   stats.verdict_counts[this.point.name] + ')';
+                   runs.runs[this.point.name].count + ')';
           }
         }
       }
     },
-    series: [
-      {
-        type: 'pie',
-        name: 'Proporción',
-        data: this.normalizeRunCounts(stats)
-      }
-    ]
+    series: [{type: 'pie', name: 'Proporción', data: runs.percentage}]
   });
 };
 
 OmegaupGraph.prototype.verdictPeriodCounts = function(renderTo, title, stats,
                                                       type, period) {
-  let group_data = null;
-  switch (period) {
-    case 'day':
-      group_data = stats.verdict_period_counts.day;
-      break;
-    case 'week':
-      group_data = stats.verdict_period_counts.week;
-      break;
-    case 'month':
-      group_data = stats.verdict_period_counts.month;
-      break;
-    case 'year':
-      group_data = stats.verdict_period_counts.year;
-      break;
-    default:
-      group_data = stats.verdict_period_counts.day;
-      break;
-  }
-  let data =
-      type == 'delta' ? group_data.delta_series : group_data.cumulative_series;
+  runs = this.normalizePeriodRunCounts(stats, period);
+  var data = runs[type];
   return new Highcharts.Chart({
     chart: {type: 'column', renderTo: renderTo},
-    title: {text: 'veredictos de ' + title},
+    title: {
+      text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
+                                    {user: title})
+    },
     xAxis: {
-      categories: group_data.periods,
-      title: {text: 'Periodo'},
+      categories: runs.categories,
+      title: {text: omegaup.T.profileStatisticsPeriod},
       labels: {
         rotation: -45,
       }
     },
     yAxis: {
       min: 0,
-      title: {text: 'Número de problemas resueltos'},
+      title: {text: omegaup.T.profileStatisticsNumberOfSolvedProblems},
       stackLabels: {
         enabled: false,
         style: {
@@ -117,22 +102,71 @@ OmegaupGraph.prototype.verdictPeriodCounts = function(renderTo, title, stats,
 };
 
 OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
-  return [
-    ['WA', (stats.verdict_counts['WA'] / stats.total_runs) * 100],
-    ['PA', (stats.verdict_counts['PA'] / stats.total_runs) * 100],
-    {
-      name: 'AC',
-      y: (stats.verdict_counts['AC'] / stats.total_runs) * 100,
-      sliced: true,
-      selected: true
-    },
-    ['TLE', (stats.verdict_counts['TLE'] / stats.total_runs) * 100],
-    ['MLE', (stats.verdict_counts['MLE'] / stats.total_runs) * 100],
-    ['OLE', (stats.verdict_counts['OLE'] / stats.total_runs) * 100],
-    ['RTE', (stats.verdict_counts['RTE'] / stats.total_runs) * 100],
-    ['CE', (stats.verdict_counts['CE'] / stats.total_runs) * 100],
-    ['JE', (stats.verdict_counts['JE'] / stats.total_runs) * 100],
-  ];
+  var total = this.countRuns(stats.runs);
+  var runs = this.groupRuns(stats.runs, 'verdict');
+  var verdicts = ['WA', 'PA', 'AC', 'TLE', 'MLE', 'OLE', 'RTE', 'CE', 'JE'];
+  var response = {runs: {}, percentage: []};
+  for (var [index, verdict] of verdicts.entries()) {
+    num_runs = typeof runs[verdict] == 'undefined' ? 0 : runs[verdict][verdict];
+    response['runs'][verdict] = {name: verdict, count: num_runs};
+    if (verdict == 'AC') {
+      response['percentage'][index] = {
+        name: 'AC',
+        y: (num_runs / total) * 100,
+        sliced: true,
+        selected: true
+      };
+    } else {
+      response['percentage'][index] = [verdict, (num_runs / total) * 100];
+    }
+  }
+  return response;
+};
+
+OmegaupGraph.prototype.normalizePeriodRunCounts = function(stats, period) {
+  var runs = this.groupRuns(stats.runs, period);
+  var response = {categories: Object.keys(runs), delta: [], cumulative: []};
+  var verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+  for (var [index, verdict] of verdicts.entries()) {
+    runs[verdict] = 0;
+  }
+  for (var [index, verdict] of verdicts.entries()) {
+    response.delta[index] = {name: verdict, data: []};
+    response.cumulative[index] = {name: verdict, data: []};
+    for (var [ind, date] of response.categories.entries()) {
+      runs[verdict] += parseInt(runs[date][verdict]);
+      response.delta[index]['data'][ind] = parseInt(runs[date][verdict]);
+      response.cumulative[index]['data'][ind] = runs[verdict];
+    }
+  }
+  return response;
+};
+
+OmegaupGraph.prototype.countRuns = function(stats) {
+  var total = 0;
+  for (var runs of stats) {
+    total += parseInt(runs['runs']);
+  }
+  return total;
+};
+
+OmegaupGraph.prototype.groupRuns = function(stats, prop) {
+  return stats.reduce(function(groups, item) {
+    var val = item[prop];
+    groups[val] =
+        groups[val] ||
+        {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0};
+    if (item.verdict == 'WA') groups[val].WA += parseInt(item.runs);
+    if (item.verdict == 'PA') groups[val].PA += parseInt(item.runs);
+    if (item.verdict == 'AC') groups[val].AC += parseInt(item.runs);
+    if (item.verdict == 'TLE') groups[val].TLE += parseInt(item.runs);
+    if (item.verdict == 'MLE') groups[val].MLE += parseInt(item.runs);
+    if (item.verdict == 'OLE') groups[val].OLE += parseInt(item.runs);
+    if (item.verdict == 'RTE') groups[val].RTE += parseInt(item.runs);
+    if (item.verdict == 'CE') groups[val].CE += parseInt(item.runs);
+    if (item.verdict == 'JE') groups[val].JE += parseInt(item.runs);
+    return groups;
+  }, {});
 };
 
 OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
