@@ -543,7 +543,7 @@ class RunCreateTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => 'cpp']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['languages' => ['cpp']]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

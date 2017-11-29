@@ -20,6 +20,47 @@ class QualityNominationTest extends OmegaupTestCase {
         }
     }
 
+    public static function testGetNominationsHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nominations = QualityNominationsDAO::getNominations(null, null);
+        self::assertArrayHasKey('author', $nominations[0]);
+        self::assertArrayHasKey('nominator', $nominations[0]);
+    }
+
+    public static function testGetByIdHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        $result = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        self::assertArrayHasKey('author', $nomination);
+        self::assertArrayHasKey('nominator', $nomination);
+        self::assertEquals($contestant->username, $nomination['nominator']['username']);
+    }
+
     public function testApiDetailsReturnsFieldsRequiredByUI() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
@@ -52,6 +93,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
         $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
         $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this::assertArrayHasKey('author', $details);
         $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
         $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
         $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
@@ -138,28 +180,24 @@ class QualityNominationTest extends OmegaupTestCase {
             'nomination' => 'suggestion',
             'contents' => json_encode([
                 // No difficulty!
-                'source' => 'omegaUp',
+                'quality' => 3,
                 'tags' => [],
             ]),
         ]);
 
         try {
             QualityNominationController::apiCreate($r);
-            $this->fail('Should not have been able to nominate the problem');
+            $this->fail('Should not have been able to make suggestion about the problem');
         } catch (PreconditionFailedException $e) {
             // still expected.
         }
 
         RunsFactory::gradeRun($runData);
 
-        QualityNominationController::apiCreate($r);
+        $response = QualityNominationController::apiCreate($r);
 
-        $response = QualityNominationController::apiMyList(new Request([
-            'auth_token' => $login->auth_token,
-            'types' => ['suggestion'],
-        ]));
-        $this->assertEquals(1, count($response['nominations']));
-        $nomination = $response['nominations'][0];
+        $r['qualitynomination_id'] = $response['qualitynomination_id'];
+        $nomination = QualityNominationController::apiDetails($r);
         $this->assertEquals(
             $problemData['request']['alias'],
             $nomination['problem']['alias']
@@ -251,7 +289,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Revert ban.
         $request = new Request([
@@ -265,7 +303,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been made private');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been made public');
     }
 
     /**
@@ -341,7 +379,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have been banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
 
         // Reopen demotion request.
         $request = new Request([
@@ -355,7 +393,60 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
 
         $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_BANNED, $problem['visibility'], 'Problem should have remained banned');
+        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have remained public banned');
+    }
+
+    /**
+     * Check that a demotion of a private problem can be approved and
+     * then denied, and it keeps its original visibility
+     */
+    public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
+        $problemData = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE);
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE_BANNED, $problem['visibility'], 'Problem should have been private banned');
+
+        // Reopen demotion request.
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'denied',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $details = QualityNominationController::apiDetails($request);
+        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been re-opened');
+
+        $problem = ProblemController::apiDetails($request);
+        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been private');
     }
 
     /**
@@ -473,6 +564,78 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Test that nomination list by default only shows promotions or demotions.
+     * All other nomination types should not appear on this list.
+     */
+    public function testNominationListDoesntShowSuggestionsOrDismisssal() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        // Create promotion nomination.
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'promotion',
+            'contents' => json_encode([
+                'rationale' => 'cool!',
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'source' => 'omegaUp',
+                'tags' => ['ez-pz'],
+            ]),
+        ]));
+
+        // Create demotion nomination.
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        // Create dismissal nomination.
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([]),
+        ]));
+
+        // Create dismissal nomination.
+        QualityNominationFactory::createSuggestion(
+            $login,
+            $problemData['request']['alias'],
+            null,
+            1,
+            ['DP', 'Math']
+        );
+
+        $reviewerLogin = self::login(self::$reviewers[0]);
+        $list = QualityNominationController::apiList(new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+        ]));
+        $this->assertEquals('ok', $list['status'], 'Status of apiList call is not ok');
+        $this->assertGreaterThanOrEqual(2, count($list['nominations']), "List didn't return enough nominations");
+        foreach ($list['nominations'] as $nomination) {
+            $isPromotion = ($nomination['nomination'] == 'promotion');
+            $isDemotion = ($nomination['nomination'] == 'demotion');
+            $this->assertTrue(
+                $isPromotion || $isDemotion,
+                'Found a nomination of type ' + $nomination['nomination'] + '. Only promotion and demotion should be shown.'
+            );
+        }
+    }
+
+    /**
      * Check that before discard a problem, the user must
      * have solved it first.
      */
@@ -480,7 +643,6 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
@@ -488,13 +650,11 @@ class QualityNominationTest extends OmegaupTestCase {
             'nomination' => 'dismissal',
             'contents' => json_encode([]),
         ]);
-
         try {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
         }
-
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
@@ -506,20 +666,308 @@ class QualityNominationTest extends OmegaupTestCase {
             'contents' => json_encode([]), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-
         $problem_dismissed = QualityNominationsDAO::search($key);
         RunsFactory::gradeRun($runData);
-
         try {
             $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
         } catch (PreconditionFailedException $e) {
         }
-
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::search($key);
             $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
         } catch (PreconditionFailedException $e) {
         }
+    }
+
+    public function testGetGlobalDifficultyAndQuality() {
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        $actualGlobals = QualityNominationsDAO::getGlobalDifficultyAndQuality();
+        $expectedGlobals = [23/11 /*quality*/, 54/16 /*difficulty*/];
+
+        $this->assertEquals($expectedGlobals, $actualGlobals);
+    }
+
+    public function testGetSuggestionRowMap() {
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        $actualResult[0] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[0]['problem']->problem_id);
+        $actualResult[1] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[1]['problem']->problem_id);
+
+        $expectedResult[0] = [
+            'quality_sum' => 13,
+            'quality_n' => 5,
+            'difficulty_sum' => 25,
+            'difficulty_n' => 7,
+            'tags_n' => 15,
+            'tags' => [
+                'dp' => 6,
+                'math' => 6,
+                'matrices' => 1,
+                'greedy' => 2,
+                ]
+            ];
+        $expectedResult[1] = [
+            'quality_sum' => 10,
+            'quality_n' => 6,
+            'difficulty_sum' => 29,
+            'difficulty_n' => 9,
+            'tags_n' => 15,
+            'tags' => [
+                'search' => 6,
+                'geometry' => 4,
+                'matrices' => 1,
+                'math' => 2,
+                'dp' => 2,
+            ],
+        ];
+        $this->assertEquals($expectedResult, $actualResult);
+    }
+
+    public function testAggregateFeedback() {
+        TagsDAO::save(new Tags(['name' => 'dp']));
+        TagsDAO::save(new Tags(['name' => 'math']));
+        TagsDAO::save(new Tags(['name' => 'matrices']));
+        TagsDAO::save(new Tags(['name' => 'greedy']));
+        TagsDAO::save(new Tags(['name' => 'geometry']));
+        TagsDAO::save(new Tags(['name' => 'search']));
+
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        QualityNominationsDAO::aggregateFeedback();
+
+        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
+        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
+        $this->assertEquals(3.48958, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(2.34545, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $this->assertEquals(3.27678, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(1.8595, $newProblem[1]->quality, 'Wrong quality.', 0.001);
+    }
+
+    public function setUpSyntheticSuggestions($problemData) {
+        // First, remove all suggestions.
+        $filter = new QualityNominations([
+            'nomination' => 'suggestion',
+        ]);
+        $allNominations = QualityNominationsDAO::search($filter);
+        foreach ($allNominations as $nomination) {
+            QualityNominationsDAO::delete($nomination);
+        }
+
+        // Setup synthetic data.
+        $login = [];
+        for ($i = 0; $i < 10; $i++) {
+            $contestant = UserFactory::createUser();
+            for ($j = 0; $j < 2; $j++) {
+                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
+                RunsFactory::gradeRun($runData);
+            }
+            $login[] = self::login($contestant);
+        }
+
+        QualityNominationFactory::createSuggestion(
+            $login[0],
+            $problemData[0]['request']['alias'],
+            null,
+            1,
+            ['DP', 'Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[1],
+            $problemData[0]['request']['alias'],
+            3,
+            3,
+            ['Math', 'DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[2],
+            $problemData[0]['request']['alias'],
+            4,
+            0,
+            ['Matrices', 'Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[3],
+            $problemData[0]['request']['alias'],
+            null,
+            null,
+            ['Math']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[4],
+            $problemData[0]['request']['alias'],
+            3,
+            4,
+            ['DP', 'Math', 'Greedy']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[5],
+            $problemData[0]['request']['alias'],
+            3,
+            null,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[6],
+            $problemData[0]['request']['alias'],
+            null,
+            1,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[7],
+            $problemData[0]['request']['alias'],
+            4,
+            null,
+            ['Greedy', 'DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[8],
+            $problemData[0]['request']['alias'],
+            4,
+            0,
+            ['DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[9],
+            $problemData[0]['request']['alias'],
+            4,
+            4,
+            ['DP', 'Math']
+        );
+
+        QualityNominationFactory::createSuggestion(
+            $login[0],
+            $problemData[1]['request']['alias'],
+            4,
+            1,
+            ['Search', 'Geometry']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[1],
+            $problemData[1]['request']['alias'],
+            1,
+            1,
+            ['Search', 'Geometry']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[2],
+            $problemData[1]['request']['alias'],
+            4,
+            3,
+            ['Matrices', 'Search']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[3],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[4],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search', 'Math', 'Geometry']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[5],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[6],
+            $problemData[1]['request']['alias'],
+            null,
+            1,
+            []
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[7],
+            $problemData[1]['request']['alias'],
+            3,
+            null,
+            ['Search', 'DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[8],
+            $problemData[1]['request']['alias'],
+            4,
+            1,
+            ['DP']
+        );
+        QualityNominationFactory::createSuggestion(
+            $login[9],
+            $problemData[1]['request']['alias'],
+            4,
+            3,
+            ['Geometry', 'Math']
+        );
+    }
+
+    public function testMostVotedTags() {
+        $tags = [
+            'DP' => 15,
+            'Graph' => 10,
+            'Binary Search' => 5,
+            'Math' => 2,
+            'Greedy' => 1,
+        ];
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tags, 0.25),
+            ['DP', 'Graph', 'Binary Search']
+        );
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tags, 0.5),
+            ['DP', 'Graph']
+        );
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tags, 0.9),
+            ['DP']
+        );
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tags, 0.01),
+            ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
+        );
+
+        $tagsWithLittleVotes = [
+            'DP' => 2,
+            'Graph' => 1,
+        ];
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tagsWithLittleVotes, 0.25),
+            [],
+            'There must be at least 5 votes.'
+        );
+
+        $tooManyTagsWithMaxVotes = [
+            'T1' => 9, 'T2' => 9, 'T3' => 9, 'T4' => 9, 'T5' => 9, 'T6' => 9,
+            'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
+
+        $this->assertEquals(
+            QualityNominationsDAO::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            [],
+            'There must be a maximum number of tags to be assigned.'
+        );
     }
 }

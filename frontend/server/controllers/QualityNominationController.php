@@ -100,7 +100,9 @@ class QualityNominationController extends Controller {
                 if (!is_array($contents['tags'])) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
-                $atLeastOneFieldIsPresent = true;
+                if (!empty($contents['tags'])) {
+                    $atLeastOneFieldIsPresent = true;
+                }
             }
             if (isset($contents['quality'])) {
                 if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
@@ -112,11 +114,13 @@ class QualityNominationController extends Controller {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+            if (isset($contents['tags']) && is_array($contents['tags'])) {
+                foreach ($contents['tags'] as &$tag) {
+                    if (!is_string($tag)) {
+                        throw new InvalidParameterException('parameterInvalid', 'contents');
+                    }
+                    $tag = TagController::normalize($tag);
                 }
-                $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
@@ -173,17 +177,19 @@ class QualityNominationController extends Controller {
         ]);
         QualityNominationsDAO::save($nomination);
 
-        $qualityReviewerGroup = GroupsDAO::FindByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        foreach (GroupsDAO::sampleMembers(
-            $qualityReviewerGroup,
-            self::REVIEWERS_PER_NOMINATION
-        ) as $reviewer) {
-            QualityNominationReviewersDAO::save(new QualityNominationReviewers([
-                'qualitynomination_id' => $nomination->qualitynomination_id,
-                'user_id' => $reviewer->user_id,
-            ]));
+        if ($nomination->nomination == 'promotion') {
+            $qualityReviewerGroup = GroupsDAO::FindByAlias(
+                Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+            );
+            foreach (GroupsDAO::sampleMembers(
+                $qualityReviewerGroup,
+                self::REVIEWERS_PER_NOMINATION
+            ) as $reviewer) {
+                QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                    'qualitynomination_id' => $nomination->qualitynomination_id,
+                    'user_id' => $reviewer->user_id,
+                ]));
+            }
         }
 
         return [
@@ -229,13 +235,19 @@ class QualityNominationController extends Controller {
         $newProblemVisibility = $r['problem']->visibility;
         switch ($r['status']) {
             case 'approved':
-                $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
+                }
                 break;
             case 'denied':
-                // If banning is reverted, problem will become private.
-                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
-                if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                    // If banning is reverted, problem will become private.
                     $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
+                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+                    // If banning is reverted, problem will become public.
+                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC;
                 }
                 break;
             case 'open':

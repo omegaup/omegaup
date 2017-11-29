@@ -23,7 +23,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     }
 
     $triedToLogin = true;
-} elseif (isset($_POST['request']) && $_POST['request'] == 'register') {
+} elseif (OMEGAUP_VALIDATE_CAPTCHA && isset($_POST['request']) && $_POST['request'] == 'register') {
     // Something failed in the JavaScript side. This definitely will not have
     // ReCAPTCHA validation, so let's error out with that.
     $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
@@ -63,4 +63,5 @@ if ($c_Session->CurrentSessionAvailable()) {
 // Only generate Login URLs if we actually need them.
 $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
 $smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
+$smarty->assign('payload', ['validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA]);
 $smarty->display('../templates/login.tpl');

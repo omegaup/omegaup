@@ -125,7 +125,20 @@
 						<p class="help-block">{#contestNewFormScoreboardAtEndDesc#}</p>
 					</div>
 
-					{if $IS_UPDATE eq 1}
+					<div class="form-group col-md-6">
+						<label for="languages">{#wordsLanguage#}s</label>
+						<br>
+						<select id="languages" name="languages" class="form-control" multiple="multiple">
+							{foreach item=language from=$LANGUAGES}
+							<option value='{$language}'>{$language}</option>
+							{/foreach}
+						</select>
+						<p class="help-block">Set languages to the current contest</p>
+					</div>
+				</div>
+
+				{if $IS_UPDATE eq 1}
+				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="public">{#contestNewFormPublic#}</label>
 						<select name='public' id='public' class="form-control">
@@ -134,11 +147,7 @@
 						</select>
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
-					{/if}
-				</div>
 
-				{if $IS_UPDATE eq 1}
-				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="register">{#contestNewFormRegistration#}</label>
 						<select name='register' id='register' class="form-control">
@@ -160,4 +169,6 @@
 		</form>
 	</div>
 </div>
+<script type="text/javascript" src="/third_party/js/bootstrap-multiselect.js"></script>
 <script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}"></script>
+<link rel="stylesheet" href="/third_party/css/bootstrap-multiselect.css">
