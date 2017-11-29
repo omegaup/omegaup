@@ -20,6 +20,7 @@ _DEFAULT_TIMEOUT = 2  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
+_WINDOW_SIZE = (1920, 1080)
 
 class Driver(object):
     '''Wraps the state needed to run a test.'''
@@ -176,7 +177,7 @@ def driver(request, browser):
             'browserName': browser,
             'version': 'latest',
             'platform': 'Windows 10',
-            'screenResolution': '1920x1080',
+            'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
         hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
@@ -190,7 +191,6 @@ def driver(request, browser):
             options.binary_location = '/usr/bin/google-chrome'
             options.add_experimental_option('prefs', {'intl.accept_languages': 'en_US'})
             options.add_argument('--lang=en-US')
-            options.add_argument('--window-size=1920x1080')
             if request.config.option.headless:
                 options.add_argument('--headless')
             browser = webdriver.Chrome(chrome_options=options)
@@ -201,23 +201,23 @@ def driver(request, browser):
             if request.config.option.headless:
                 options.add_argument('-headless')
             browser = webdriver.Firefox(capabilities=firefox_capabilities,
-                                        firefox_options=options,
-                                        firefox_binary='firefox',
-                                        executable_path='geckodriver')
+                                        firefox_options=options)
+        browser.set_window_size(*_WINDOW_SIZE)
 
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
 
-    yield Driver(browser, wait, request.config.option.url)
-
-    if _CI:
-        print(('\n\nYou can see the report at '
-               'https://saucelabs.com/beta/tests/%s/commands') % browser.session_id,
-              file=sys.stderr)
-        try:
-            browser.execute_script("sauce:job-result=%s" % str(_SUCCESS).lower())
-        except WebDriverException:
-            # Test is done. Just ignore the error.
-            pass
-    browser.quit()
+    try:
+        yield Driver(browser, wait, request.config.option.url)
+    finally:
+        if _CI:
+            print(('\n\nYou can see the report at '
+                   'https://saucelabs.com/beta/tests/%s/commands') % browser.session_id,
+                  file=sys.stderr)
+            try:
+                browser.execute_script("sauce:job-result=%s" % str(_SUCCESS).lower())
+            except WebDriverException:
+                # Test is done. Just ignore the error.
+                pass
+        browser.quit()

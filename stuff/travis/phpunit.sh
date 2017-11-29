@@ -1,21 +1,13 @@
 #!/bin/bash
 
+. common.sh
+
 stage_before_install() {
-	git submodule update --init --recursive \
-		stuff/hook_tools \
-		frontend/server/libs/third_party/smarty \
-		frontend/server/libs/third_party/phpmailer \
-		frontend/server/libs/third_party/log4php \
-		frontend/server/libs/third_party/adodb \
-		frontend/server/libs/third_party/facebook-php-graph-sdk \
-		frontend/server/libs/third_party/google-api-php-client
+	init_submodules
 }
 
 stage_before_script() {
-	# Workaround for Travis' flaky MySQL connection.
-	for _ in `seq 30`; do
-		mysql -e ';' && break || sleep 1
-	done
+	wait_for_mysql
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"

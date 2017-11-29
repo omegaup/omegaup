@@ -1,27 +1,11 @@
 #!/bin/bash
 
+. common.sh
+
 stage_before_install() {
-	git submodule update --init --recursive \
-		stuff/hook_tools \
-		frontend/server/libs/third_party/smarty \
-		frontend/server/libs/third_party/phpmailer \
-		frontend/server/libs/third_party/log4php \
-		frontend/server/libs/third_party/adodb \
-		frontend/server/libs/third_party/facebook-php-graph-sdk \
-		frontend/server/libs/third_party/google-api-php-client
+	init_submodules
 
-	if [ -z "`which nvm`" ]; then
-		if [ ! -d ~/.nvm ]; then
-			git clone https://github.com/creationix/nvm.git ~/.nvm
-			(cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
-		fi
-		source ~/.nvm/nvm.sh
-	fi
-	nvm install 6.9.1
-	npm install -g yarn
-
-	phpenv rehash
-	echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+	install_yarn
 }
 
 stage_install() {
@@ -48,10 +32,9 @@ stage_install() {
 }
 
 stage_before_script() {
-	# Workaround for Travis' flaky MySQL connection.
-	for _ in `seq 30`; do
-		mysql -e ';' && break || sleep 1
-	done
+	wait_for_mysql
+
+	setup_phpenv
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"

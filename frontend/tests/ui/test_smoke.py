@@ -85,7 +85,8 @@ def test_create_problem(driver):
         search_box_element = driver.browser.find_element_by_id(
             'problem-search-box')
         search_box_element.send_keys(problem_alias)
-        search_box_element.submit()
+        with driver.ajax_page_transition():
+            search_box_element.submit()
 
         driver.browser.find_element_by_xpath(
             '//a[text() = "%s"]' % problem_alias).click()
