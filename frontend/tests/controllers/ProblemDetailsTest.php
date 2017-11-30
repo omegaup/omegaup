@@ -142,11 +142,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
     }
 
     /**
-     * User not invited to private contest can't see problem details
+     * User can't see problem details
      *
      * @expectedException ForbiddenAccessException
      */
-    public function testPrivateProblemDetailsNotInContest() {
+    public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
         $problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
 
@@ -157,6 +157,21 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+        ]));
+    }
+
+    /**
+     * Non-user can't see problem details
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
+        // Get 1 problem public
+        $problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
+
+        // Call api
+        $response = ProblemController::apiDetails(new Request([
             'problem_alias' => $problemData['request']['alias'],
         ]));
     }
