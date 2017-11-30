@@ -969,7 +969,7 @@ class ProblemController extends Controller {
         $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
 
         try {
-            $file_content = $problemArtifacts->get('examples/sample.in');
+            $file_content = $problemArtifacts->get('examples/sample.in', true /* quiet */);
         } catch (Exception $e) {
             // Most problems won't have a sample input.
             $file_content = '';
@@ -1155,15 +1155,17 @@ class ProblemController extends Controller {
         // Add preferred language of the user.
         $user_data = [];
         $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
-        Cache::getFromCacheOrSet(
-            Cache::USER_PROFILE,
-            $r['current_user']->username,
-            $request,
-            function (Request $request) {
-                    return UserController::apiProfile($request);
-            },
-            $user_data
-        );
+        if (!is_null($r['current_user'])) {
+            Cache::getFromCacheOrSet(
+                Cache::USER_PROFILE,
+                $r['current_user']->username,
+                $request,
+                function (Request $request) {
+                        return UserController::apiProfile($request);
+                },
+                $user_data
+            );
+        }
         if (!empty($user_data)) {
             $response['preferred_language'] = $user_data['userinfo']['preferred_language'];
         }

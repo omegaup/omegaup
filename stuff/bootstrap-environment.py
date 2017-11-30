@@ -51,7 +51,7 @@ class Session:
   '''
   def __init__(self, args, username, password):
     self.jar = requests.cookies.RequestsCookieJar()
-    self.host = args.host.rstrip('/')
+    self.url = args.root_url.rstrip('/')
     result = self.request('/user/login/',
                           {'usernameOrEmail': username, 'password': password})
     assert result['status'] == 'ok'
@@ -67,10 +67,10 @@ class Session:
     opened_files = None
     if data:
       with ScopedFiles(files) as f:
-        r = requests.post(self.host + '/api' + api, files=f.files,
+        r = requests.post(self.url + '/api' + api, files=f.files,
                           data=data, cookies=self.jar)
     else:
-      r = requests.get(self.host + '/api' + api, cookies=self.jar)
+      r = requests.get(self.url + '/api' + api, cookies=self.jar)
     for name, value in r.cookies.items():
       self.jar[name] = value
     if r.status_code == 404:
@@ -120,10 +120,14 @@ def _run_script(path, args, now):
 
 def main():
   parser = argparse.ArgumentParser()
-  parser.add_argument('--host', type=str, default='http://localhost')
+  parser.add_argument('--root-url', type=str, default='http://localhost')
   parser.add_argument('--verbose', action='store_true')
   parser.add_argument('--purge', action='store_true',
       help='Also purges and re-creates the database')
+  parser.add_argument('--mysql-config-file', default=None,
+      help='.my.cnf file that stores credentials')
+  parser.add_argument('--username', default=None, help='MySQL username')
+  parser.add_argument('--password', default=None, help='MySQL password')
   parser.add_argument('scripts', metavar='SCRIPT', type=str, nargs='*',
       default=[os.path.join(OMEGAUP_ROOT, 'stuff/bootstrap.json')],
       help='The JSON script with requests to pre-populate the database')
@@ -148,9 +152,14 @@ def main():
         else:
           subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf', path])
     logging.info('Purging database')
-    db_migrate = os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')
-    subprocess.check_call([db_migrate, 'purge'])
-    subprocess.check_call([db_migrate, 'migrate', '--development-environment'])
+    db_migrate_args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
+    for name, value in [('--username', args.username),
+                        ('--password', args.password),
+                        ('--mysql-config-file', args.mysql_config_file)]:
+      if value is not None:
+        db_migrate_args.extend([name, value])
+    subprocess.check_call(db_migrate_args + ['purge'])
+    subprocess.check_call(db_migrate_args + ['migrate', '--development-environment'])
 
   for path in args.scripts:
     _run_script(path, args, now)
