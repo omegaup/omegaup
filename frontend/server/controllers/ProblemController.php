@@ -969,7 +969,7 @@ class ProblemController extends Controller {
         $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
 
         try {
-            $file_content = $problemArtifacts->get('examples/sample.in');
+            $file_content = $problemArtifacts->get('examples/sample.in', true /* quiet */);
         } catch (Exception $e) {
             // Most problems won't have a sample input.
             $file_content = '';
