@@ -213,6 +213,8 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddStudentsTooltip: "Adicionar alunos usando seu nome de usu\u00e1rio omegaUp",
 	courseEditAdmins: "Administratores",
 	courseEditAdminsEmpty: "N\u00e3o hay administratores",
+	courseEditClone: "Clone",
+	courseEditCourseClonedSuccessfully: "Seu curso foi clonado com sucesso!",
 	courseEditCourseEdited: "O curso foi editado",
 	courseEditGoToCourse: "Ir para curso",
 	courseEditGroupAdminsEmpty: "N\u00e3o hay grupos de administratores",

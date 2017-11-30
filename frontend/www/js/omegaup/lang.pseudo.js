@@ -213,6 +213,8 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAddStudentsTooltip: "(Add 57ud3n75 u5ing 7h3ir 0m3gaUp u53rnam3)",
 	courseEditAdmins: "(Admini57ra70r5)",
 	courseEditAdminsEmpty: "(N0 admini57ra70r5)",
+	courseEditClone: "(C10n3)",
+	courseEditCourseClonedSuccessfully: "(Y0ur c0ur53 ha5 b33n c10n3d 5ucc355fu11y!)",
 	courseEditCourseEdited: "(Y0ur c0ur53 ha5 b33n 3di73d)",
 	courseEditGoToCourse: "(G0 70 c0ur53)",
 	courseEditGroupAdminsEmpty: "(N0 admini57ra70r gr0up5)",

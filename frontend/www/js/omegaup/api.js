@@ -187,6 +187,8 @@ export default {
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
 
+    clone: _call('/api/course/clone/'),
+
     create: _call('/api/course/create/'),
 
     details: _call('/api/course/details/', _convertTimes),

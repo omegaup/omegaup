@@ -210,6 +210,8 @@
 	"courseEditAddStudentsTooltip": "Add students using their omegaUp username",
 	"courseEditAdmins": "Administrators",
 	"courseEditAdminsEmpty": "No administrators",
+	"courseEditClone": "Clone",
+	"courseEditCourseClonedSuccessfully": "Your course has been cloned successfully!",
 	"courseEditCourseEdited": "Your course has been edited",
 	"courseEditGoToCourse": "Go to course",
 	"courseEditGroupAdminsEmpty": "No administrator groups",

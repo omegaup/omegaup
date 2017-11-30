@@ -174,61 +174,57 @@ class CourseController extends Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
+        $original_course = CoursesDAO::getByAlias($r['course_alias']);
+        $offset = round($r['start_time']) - strtotime($original_course->start_time);
+        $course_duration = strtotime($original_course->finish_time) - strtotime($original_course->start_time);
+        $course_finish_time = $course_duration + round($r['start_time']);
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
-        // Truncate alias string and add timestamp to avoid duplicate
-        $courseAlias = substr($course->alias, 0, 25) . '-' . substr(Time::get(), -6);
+        $original_course = CoursesDAO::getByAlias($r['course_alias']);
+        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
         $request = new Request([
-            'name' => $course->name . ' (clon)',
-            'description' => $course->description,
-            'alias' => $courseAlias,
-            'start_time' => strtotime($course->start_time),
-            'finish_time' => strtotime($course->finish_time),
-            'public' => $course->public,
-            'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+            'name' => $r['name'],
+            'description' => $original_course->description,
+            'alias' => $r['alias'],
+            'start_time' => $r['start_time'],
+            'finish_time' => $course_finish_time,
+            'public' => 0, // All cloned courses start in private mode
+            'auth_token' => $auth_token
         ]);
         // Create the course (and group)
-        $course_clone = self::apiCreate($request);
+        self::apiCreate($request);
 
         $assignments = self::apiListAssignments($r);
         foreach ($assignments['assignments'] as $assignment) {
             // Create and assign homeworks and tests to new course
+            $assignment_start_time = $assignment['start_time'] + $offset;
+            $assignment_duration = $assignment['finish_time'] - $assignment['start_time'];
+            $assignment_finish_time = $assignment_start_time + $assignment_duration;
             self::apiCreateAssignment(new Request([
-                'course_alias' => $courseAlias,
+                'course_alias' => $r['alias'],
                 'name' => $assignment['name'],
                 'description' => $assignment['description'],
-                'start_time' => $assignment['start_time'],
-                'finish_time' => $assignment['finish_time'],
+                'start_time' => $assignment_start_time,
+                'finish_time' => $assignment_finish_time,
                 'alias' => $assignment['alias'],
                 'assignment_type' => $assignment['assignment_type'],
-                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+                'auth_token' => $auth_token
             ]));
 
             $problems = self::apiAssignmentDetails(new Request([
                 'assignment' => $assignment['alias'],
-                'course' => $course->alias,
-                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+                'course' => $original_course->alias,
+                'auth_token' => $auth_token
             ]));
             foreach ($problems['problems'] as $problem) {
                 // Create and assign problems to new course
                 self::apiAddProblem(new Request([
-                    'course_alias' => $courseAlias,
+                    'course_alias' => $r['alias'],
                     'assignment_alias' => $assignment['alias'],
                     'problem_alias' => $problem['alias'],
-                    'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
+                    'auth_token' => $auth_token
                 ]));
             }
-        }
-
-        $students = self::apiListStudents($r);
-        foreach ($students['students'] as $student) {
-            // Assign students to new course
-            self::apiAddStudent(new Request([
-                'course_alias' => $courseAlias,
-                'usernameOrEmail' => $student['username'],
-                'auth_token' => isset($r['auth_token']) ? $r['auth_token'] : null
-            ]));
         }
 
         return ['status' => 'ok', 'alias' => $request['alias']];

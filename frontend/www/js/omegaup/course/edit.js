@@ -4,6 +4,7 @@ import course_AssignmentDetails from '../components/course/AssignmentDetails.vue
 import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
+import course_Clone from '../components/course/Clone.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
@@ -400,6 +401,41 @@ OmegaUp.on('ready', function() {
     },
     components: {
       'omegaup-course-addstudents': course_AddStudents,
+    },
+  });
+
+  var clone = new Vue({
+    el: '#clone div',
+    render: function(createElement) {
+      return createElement('omegaup-course-clone', {
+        props: {T: T},
+        on: {
+          'clone': function(ev) {
+            omegaup.API.Course.clone({
+                                course_alias: courseAlias,
+                                name: ev.name,
+                                alias: ev.alias,
+                                start_time: ev.startTime.getTime() / 1000,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(
+                      omegaup.T.courseEditCourseClonedSuccessfully +
+                      ' <a href="/course/' + ev.alias + '/edit/">' +
+                      T.omegaupTitleCourseEdit + '</a>');
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          }
+        },
+      });
+    },
+    data: {
+      assignments: [],
+    },
+    components: {
+      'omegaup-course-clone': course_Clone,
     },
   });
 

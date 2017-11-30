@@ -43,14 +43,18 @@ class CourseCloneTest extends OmegaupTestCase {
             $studentsUsername[] = $studentsData->username;
         }
 
+        $courseAlias = Utils::CreateRandomString();
+
         // Clone the course
         $adminLogin = self::login($courseData['admin']);
         $courseClonedData = CourseController::apiClone(new Request([
             'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
+            'course_alias' => $courseData['course_alias'],
+            'name' => Utils::CreateRandomString(),
+            'alias' => $courseAlias,
+            'start_time' => Time::get()
         ]));
 
-        $courseAlias = substr($courseData['course_alias'], 0, 25) . '-' . substr(Time::get(), -6);
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
 
         $assignments = CourseController::apiListAssignments(new Request([
@@ -68,13 +72,6 @@ class CourseCloneTest extends OmegaupTestCase {
                 $this->assertEquals($problemAssignmentsMap[$courseData[
                     'assignment_aliases'][$key]][$index]['problem']->alias, $problem['alias']);
             }
-        }
-        $students = CourseController::apiListStudents(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseAlias
-        ]));
-        foreach ($students['students'] as $index => $student) {
-            $this->assertContains($student['username'], $studentsUsername);
         }
     }
 }
