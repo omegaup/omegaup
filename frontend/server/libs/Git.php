@@ -9,7 +9,7 @@ class Git {
         $this->log = Logger::getLogger('Git');
     }
 
-    private function execute($args, $pipe_stdout, $cwd_override = null) {
+    private function execute($args, $pipe_stdout, $cwd_override, $quiet) {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
@@ -46,20 +46,22 @@ class Git {
 
         $retval = proc_close($proc);
         if ($retval != 0) {
-            $this->log->error("$cmd failed: $retval $output $err");
+            if (!$quiet) {
+                $this->log->error("$cmd failed: $retval $output $err");
+            }
             throw new Exception($err);
         }
 
         return $output;
     }
 
-    public function get($args, $cwd_override = null) {
+    public function get($args, $cwd_override = null, $quiet = false) {
         $args = array_merge(['/usr/bin/git'], $args);
-        return $this->execute($args, true, $cwd_override);
+        return $this->execute($args, true, $cwd_override, $quiet);
     }
 
-    public function exec($args, $cwd_override = null) {
+    public function exec($args, $cwd_override = null, $quiet = false) {
         $args = array_merge(['/usr/bin/git'], $args);
-        $this->execute($args, false, $cwd_override);
+        $this->execute($args, false, $cwd_override, $quiet);
     }
 }
