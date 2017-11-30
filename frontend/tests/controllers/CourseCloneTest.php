@@ -73,5 +73,10 @@ class CourseCloneTest extends OmegaupTestCase {
                     'assignment_aliases'][$key]][$index]['problem']->alias, $problem['alias']);
             }
         }
+        $students = CourseController::apiListStudents(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseAlias
+        ]));
+        $this->assertCount(0, $students['students']);
     }
 }
