@@ -13,6 +13,9 @@ phpunit)
 lint)
 	. "${OMEGAUP_ROOT}/stuff/travis/lint.sh"
 	;;
+selenium)
+	. "${OMEGAUP_ROOT}/stuff/travis/selenium.sh"
+	;;
 *)
 	echo "Could not load the test suite for '$1'." > /dev/stderr
 	exit 1
@@ -21,13 +24,24 @@ esac
 # Run the correct test stage.
 case "$2" in
 before_install)
-  before_install
+	if [ "`type -t stage_before_install`" = "function" ]; then
+		stage_before_install
+	fi
+	;;
+install)
+	if [ "`type -t stage_install`" = "function" ]; then
+		stage_install
+	fi
 	;;
 before_script)
-  before_script
+	if [ "`type -t stage_before_script`" = "function" ]; then
+		stage_before_script
+	fi
 	;;
 script)
-  script
+	if [ "`type -t stage_script`" = "function" ]; then
+		stage_script
+	fi
 	;;
 *)
 	echo "Could not execute the stage '$2'." > /dev/stderr

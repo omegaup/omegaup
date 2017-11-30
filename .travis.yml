@@ -16,6 +16,7 @@ php:
 env:
   - TEST_SUITE=phpunit
   - TEST_SUITE=lint
+  - TEST_SUITE=selenium
 
 addons:
   apt:
@@ -27,7 +28,12 @@ addons:
       - realpath
       - python3
       - python-pip
+      - python3-pip
       - clang-format-3.7
+  sauce_connect:
+    username: lhchavez
+  jwt:
+    secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
 
 cache:
   directories:
@@ -38,14 +44,13 @@ cache:
 git:
   submodules: false
 
-before_install:
-  - stuff/travis/run.sh "${TEST_SUITE}" before_install
+before_install: stuff/travis/run.sh "${TEST_SUITE}" before_install
 
-before_script:
-  - stuff/travis/run.sh "${TEST_SUITE}" before_script
+install: stuff/travis/run.sh "${TEST_SUITE}" install
 
-script:
-  - stuff/travis/run.sh "${TEST_SUITE}" script
+before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
+
+script: stuff/travis/run.sh "${TEST_SUITE}" script
 
 notifications:
   slack:
