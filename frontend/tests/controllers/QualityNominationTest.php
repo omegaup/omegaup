@@ -310,6 +310,7 @@ class QualityNominationTest extends OmegaupTestCase {
      * Check that a demotion approved by a reviewer sends an email to the problem creator.
      */
     public function testDemotionApprovedByReviewerAndSendMail() {
+        $emailSender = new ScopedEmailSender();
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
 
@@ -337,9 +338,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
-        $this->assertContains($problemData['problem']->title, $response['email']['mail_subject']);
-        $this->assertContains($problemData['author']->name, $response['email']['mail_body']);
-        $this->assertContains('qwert', $response['email']['mail_body']);
+        $this->assertContains($problemData['problem']->title, $response['email']['subject']);
+        $this->assertContains($problemData['author']->name, $response['email']['body']);
+        $this->assertContains('qwert', $response['email']['body']);
     }
 
     /**

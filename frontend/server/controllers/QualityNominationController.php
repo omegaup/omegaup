@@ -310,9 +310,7 @@ class QualityNominationController extends Controller {
             $email_params
         );
 
-        Email::sendEmail($email, $mail_subject, $mail_body);
-
-        return ['email' => $email, 'mail_subject' => $mail_subject, 'mail_body' => $mail_body];
+        return Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
     /**
