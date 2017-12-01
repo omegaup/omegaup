@@ -3,8 +3,8 @@ import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  var username = $('#username').attr('data-username');
-  var stats_data = null;
+  let username = $('#username').attr('data-username');
+  let stats_data = null;
   omegaup.API.User.stats({username: username})
       .then(function(data) {
         stats_data = data;
@@ -22,7 +22,7 @@ OmegaUp.on('ready', function() {
             if (type == 'total') {
               verdictCounts('verdict-chart', username, stats_data);
             } else {
-              var period_selected = 'day';
+              let period_selected = 'day';
               verdictPeriodCounts('verdict-chart', username, stats_data, type,
                                   period);
             }
@@ -40,7 +40,7 @@ OmegaUp.on('ready', function() {
   });
 
   function verdictCounts(renderTo, title, stats) {
-    var runs = normalizeRunCounts(stats);
+    let runs = normalizeRunCounts(stats);
     return new Highcharts.Chart({
       chart: {
         plotBackgroundColor: null,
@@ -81,7 +81,7 @@ OmegaUp.on('ready', function() {
 
   function verdictPeriodCounts(renderTo, title, stats, type, period) {
     let runs = normalizePeriodRunCounts(stats, period);
-    var data = runs[type];
+    let data = runs[type];
     return new Highcharts.Chart({
       chart: {type: 'column', renderTo: renderTo},
       title: {
@@ -137,12 +137,12 @@ OmegaUp.on('ready', function() {
   }
 
   function normalizeRunCounts(stats) {
-    var total = countRuns(stats.runs);
-    var runs = groupRuns(stats.runs, 'verdict');
-    var verdicts = ['WA', 'PA', 'AC', 'TLE', 'MLE', 'OLE', 'RTE', 'CE', 'JE'];
-    var response = {runs: {}, percentage: []};
-    for (var [index, verdict] of verdicts.entries()) {
-      var num_runs =
+    let total = countRuns(stats.runs);
+    let runs = groupRuns(stats.runs, 'verdict');
+    let verdicts = ['WA', 'PA', 'AC', 'TLE', 'MLE', 'OLE', 'RTE', 'CE', 'JE'];
+    let response = {runs: {}, percentage: []};
+    for (let[index, verdict] of verdicts.entries()) {
+      let num_runs =
           typeof runs[verdict] == 'undefined' ? 0 : runs[verdict][verdict];
       response['runs'][verdict] = {name: verdict, count: num_runs};
       if (verdict == 'AC') {
@@ -160,8 +160,8 @@ OmegaUp.on('ready', function() {
   }
 
   function countRuns(stats) {
-    var total = 0;
-    for (var runs of stats) {
+    let total = 0;
+    for (let runs of stats) {
       total += parseInt(runs['runs']);
     }
     return total;
@@ -169,34 +169,26 @@ OmegaUp.on('ready', function() {
 
   function groupRuns(stats, prop) {
     return stats.reduce(function(groups, item) {
-      var val = item[prop];
+      let val = item[prop];
       groups[val] =
           groups[val] ||
           {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0};
-      if (item.verdict == 'WA') groups[val].WA += parseInt(item.runs);
-      if (item.verdict == 'PA') groups[val].PA += parseInt(item.runs);
-      if (item.verdict == 'AC') groups[val].AC += parseInt(item.runs);
-      if (item.verdict == 'TLE') groups[val].TLE += parseInt(item.runs);
-      if (item.verdict == 'MLE') groups[val].MLE += parseInt(item.runs);
-      if (item.verdict == 'OLE') groups[val].OLE += parseInt(item.runs);
-      if (item.verdict == 'RTE') groups[val].RTE += parseInt(item.runs);
-      if (item.verdict == 'CE') groups[val].CE += parseInt(item.runs);
-      if (item.verdict == 'JE') groups[val].JE += parseInt(item.runs);
+      groups[val][item.verdict] += parseInt(item.runs);
       return groups;
     }, {});
   }
 
   function normalizePeriodRunCounts(stats, period) {
-    var runs = groupRuns(createPeriodGroup(stats.runs), period);
-    var response = {categories: Object.keys(runs), delta: [], cumulative: []};
-    var verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
-    for (verdict of verdicts) {
+    let runs = groupRuns(createPeriodGroup(stats.runs), period);
+    let response = {categories: Object.keys(runs), delta: [], cumulative: []};
+    let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+    for (let verdict of verdicts) {
       runs[verdict] = 0;
     }
-    for (var [index, verdict] of verdicts.entries()) {
+    for (let[index, verdict] of verdicts.entries()) {
       response.delta[index] = {name: verdict, data: []};
       response.cumulative[index] = {name: verdict, data: []};
-      for (var [ind, date] of response.categories.entries()) {
+      for (let[ind, date] of response.categories.entries()) {
         runs[verdict] += parseInt(runs[date][verdict]);
         response.delta[index]['data'][ind] = parseInt(runs[date][verdict]);
         response.cumulative[index]['data'][ind] = runs[verdict];
@@ -211,18 +203,18 @@ OmegaUp.on('ready', function() {
       if (typeof stats[index]['week'] != 'undefined') break;
       if (typeof stats[index]['month'] != 'undefined') break;
       if (typeof stats[index]['year'] != 'undefined') break;
-      var date = new Date(run.date);
-      var day = date.getDay();
+      let date = new Date(run.date);
+      let day = date.getDay();
       // group by days
       date.getDate() + 1;
-      stats[index]['day'] = date.toLocaleDateString('es-MX');
+      stats[index]['day'] = date.toLocaleDateString(T.locale);
       // group by weeks
-      var diff_monday = date.getDate() - day + (day == 0 ? -6 : 1);
-      var diff_sunday = date.getDate() + (7 - day);
-      var first_day = new Date(date.setDate(diff_monday));
-      var last_day = new Date(date.setDate(diff_sunday));
-      stats[index]['week'] = first_day.toLocaleDateString('es-MX') + ' - ' +
-                             last_day.toLocaleDateString('es-MX');
+      let diff_monday = date.getDate() - day + (day == 0 ? -6 : 1);
+      let diff_sunday = date.getDate() + (7 - day);
+      let first_day = new Date(date.setDate(diff_monday));
+      let last_day = new Date(date.setDate(diff_sunday));
+      stats[index]['week'] = first_day.toLocaleDateString(T.locale) + ' - ' +
+                             last_day.toLocaleDateString(T.locale);
       // group by month
       stats[index]['month'] = run.date.substring(0, 7);
       // group by year

@@ -1,16 +1,12 @@
 <template>
   <div class="panel-body">
-    <input id="delta"
-         type="radio"
-         v-model="type"
-         v-on:click="onSelectType"
-         value="delta"> <label for="delta">{{ T.profileStatisticsDelta }}</label> <input id=
-         "cumulative"
-         type="radio"
-         v-model="type"
-         v-on:click="onSelectType"
-         value="cumulative"> <label for="cumulative">{{ T.profileStatisticsCumulative }}</label>
-         <input id="total"
+    <label><input type="radio"
+           v-model="type"
+           v-on:click="onSelectType"
+           value="delta"> {{ T.profileStatisticsDelta }}</label> <label><input type="radio"
+           v-model="type"
+           v-on:click="onSelectType"
+           value="cumulative"> {{ T.profileStatisticsCumulative }}</label> <input id="total"
          type="radio"
          v-model="type"
          v-on:click="onSelectType"
