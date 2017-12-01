@@ -258,6 +258,8 @@ export default {
     update: _call('/api/course/update/'),
 
     updateAssignment: _call('/api/course/updateAssignment/'),
+
+    updateProblemsOrder: _call('/api/course/updateProblemsOrder/'),
   },
 
   Grader: {
