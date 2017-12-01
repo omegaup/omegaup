@@ -629,7 +629,7 @@ omegaup.OmegaUp.loadTranslations({
 	sortByMyScore: "Ordenar por mi puntuacion",
 	sortByPointsForRank: "Ordenar por puntos para ranking",
 	sortByRatio: "Ordenar por ratio",
-	sortByRuns: "Odernar por env\u00edos",
+	sortByRuns: "Ordenar por env\u00edos",
 	sortBySolved: "Ordenar por envios aceptados",
 	spanishStatementMissing: "El problema al menos debe contener una redacci\u00f3n en espa\u00f1ol",
 	startContest: "Iniciar concurso",

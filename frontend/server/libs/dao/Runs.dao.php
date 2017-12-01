@@ -283,20 +283,12 @@ class RunsDAO extends RunsDAOBase {
         // Build SQL statement.
         $sql = '
                 SELECT
-                    r.day,
-                    r.week,
-                    r.month,
-                    r.year,
+                    r.date,
                     r.verdict,
                     COUNT(1) runs
                 FROM (
                     SELECT
-                        DATE(time) AS day,
-                        CONCAT(
-                          DATE(DATE_SUB(time, INTERVAL (DAYOFWEEK(time) - 2) DAY)), \' - \' ,
-                          DATE(DATE_ADD(time, INTERVAL (8 - DAYOFWEEK(time)) DAY))) as week,
-                        CONCAT(Month(time), \'-\', Year(time)) as month,
-                        YEAR(time) as year,
+                        DATE(time) AS date,
                         verdict
                     FROM
                         Runs
@@ -304,9 +296,9 @@ class RunsDAO extends RunsDAOBase {
                         user_id = ? AND status = \'ready\'
                 ) AS r
                 GROUP BY
-                    r.day, r.verdict
+                    r.date, r.verdict
                 ORDER BY
-                  day ASC;';
+                  date ASC;';
 
         $val = [$user_id];
 
@@ -316,10 +308,7 @@ class RunsDAO extends RunsDAOBase {
         $ar = [];
         foreach ($rs as $row) {
             array_push($ar, [
-                'day' => $row['day'],
-                'week' => $row['week'],
-                'month' => $row['month'],
-                'year' => $row['year'],
+                'date' => $row['date'],
                 'verdict' => $row['verdict'],
                 'runs' => $row['runs']
             ]);

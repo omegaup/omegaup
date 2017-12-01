@@ -1,12 +1,5 @@
 var username = $('#username').attr('data-username');
 var stats_data = null;
-omegaup.API.User.stats({username: username})
-    .then(function(data) {
-      stats_data = data;
-      window.run_counts_chart =
-          oGraph.verdictCounts('verdict-chart', username, data);
-    })
-    .fail(omegaup.UI.apiError);
 
 omegaup.API.User.contestStats({username: username})
     .then(function(data) {
@@ -53,28 +46,3 @@ omegaup.API.User.problemsSolved({username: username})
       $('#problems-solved-total').text(data['problems'].length);
     })
     .fail(omegaup.UI.apiError);
-
-var period_selected = 'day';
-var type_selected = 'total';
-$('input[name=period]')
-    .on('change', function(evt) {
-      period_selected = $(this).prop('id');
-      window.run_counts_chart =
-          oGraph.verdictPeriodCounts('verdict-chart', username, stats_data,
-                                     type_selected, period_selected);
-    });
-
-$('input[name=type]')
-    .on('change', function(evt) {
-      type_selected = $(this).prop('id');
-      if (type_selected == 'total') {
-        $('.period_group').addClass('hide');
-        window.run_counts_chart =
-            oGraph.verdictCounts('verdict-chart', username, stats_data);
-      } else {
-        $('.period_group').removeClass('hide');
-        window.run_counts_chart =
-            oGraph.verdictPeriodCounts('verdict-chart', username, stats_data,
-                                       type_selected, period_selected);
-      }
-    });

@@ -64,25 +64,8 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
-			<div class="panel-body">
-				<input type="radio" name="type" id="delta" value="delta" />
-				<label for="delta">{#profileStatisticsDelta#}</label>
-				<input type="radio" name="type" id="cumulative" value="cumulative" />
-				<label for="cumulative">{#profileStatisticsCumulative#}</label>
-				<input type="radio" name="type" id="total" value="total" checked="" />
-				<label for="total">{#profileStatisticsTotal#}</label>
-				<div class="period_group text-center hide">
-					<input type="radio" name="period" id="day" value="day"  checked=""/>
-					<label for="day">{#profileStatisticsDay#}</label>
-					<input type="radio" name="period" id="week" value="week" />
-					<label for="week">{#profileStatisticsWeek#}</label>
-					<input type="radio" name="period" id="month" value="month" />
-					<label for="month">{#profileStatisticsMonth#}</label>
-					<input type="radio" name="period" id="year" value="year" />
-					<label for="year">{#profileStatisticsYear#}</label>
-				</div>
-				<div id="verdict-chart"><img src="/media/wait.gif" /></div>
-			</div>
+			<script type="text/javascript" src="{version_hash src="/js/dist/user_charts.js"}"></script>
+			<div id="omegaup-user-charts"></div>
 		</div>
 
 	</div>

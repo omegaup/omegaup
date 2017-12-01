@@ -1412,13 +1412,13 @@ class UserController extends Controller {
         $user = self::resolveTargetUser($r);
 
         try {
-            $runsPerDatePerVeredict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
+            $runsPerDatePerVerdict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         return [
-            'runs' => $runsPerDatePerVeredict,
+            'runs' => $runsPerDatePerVerdict,
             'status' => 'ok'
         ];
     }
