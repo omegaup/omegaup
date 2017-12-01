@@ -30,9 +30,7 @@
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary"
-               type="submit">{{ T.wordsCloneCourse }}</button> <button class="btn btn-secondary"
-               type="reset"
-               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+               type="submit">{{ T.wordsCloneCourse }}</button>
         </div>
       </form>
     </div>
@@ -40,22 +38,21 @@
 </template>
 
 <script>
+import {T} from '../../omegaup.js';
 import DatePicker from '../DatePicker.vue';
 
 export default {
-  props: {
-    T: Object,
-  },
+  props: {initialAlias: String, initialName: String},
   data: function() {
     return {
-      alias: '',  // this.course.alias,
+      T: T,
+      alias: this.initialAlias,
       startTime: new Date(),
-      name: ''  // this.course.name,
+      name: this.initialName
     };
   },
   methods: {
     onSubmit: function() { this.$emit('clone', this);},
-    onCancel: function() { this.$emit('cancel');},
   },
   components: {
     'omegaup-datepicker': DatePicker,

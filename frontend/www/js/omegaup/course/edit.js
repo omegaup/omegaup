@@ -408,7 +408,7 @@ OmegaUp.on('ready', function() {
     el: '#clone div',
     render: function(createElement) {
       return createElement('omegaup-course-clone', {
-        props: {T: T},
+        props: {initialAlias: courseAlias, initialName: this.initialName},
         on: {
           'clone': function(ev) {
             omegaup.API.Course.clone({
@@ -432,7 +432,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      assignments: [],
+      initialName: '',
     },
     components: {
       'omegaup-course-clone': course_Clone,
@@ -461,6 +461,7 @@ OmegaUp.on('ready', function() {
             .text(course.name)
             .attr('href', '/course/' + courseAlias + '/');
         details.course = course;
+        clone.initialName = course.name;
       })
       .fail(UI.apiError);
 
