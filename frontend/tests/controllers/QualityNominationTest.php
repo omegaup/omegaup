@@ -456,6 +456,17 @@ class QualityNominationTest extends OmegaupTestCase {
                 'original' => $originalProblemData['request']['alias'],
             ]),
         ]));
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'otro sumas',
+                'reason' => 'duplicate',
+                'original' => "https://omegaup.com/arena/problem/" . $originalProblemData['request']['alias'] . "#problems",
+            ]),
+        ]));
     }
 
     /**

@@ -26,10 +26,20 @@
             <option value="spam">
               {{ T.reportProblemFormSpam }}
             </option>
+            <option value="duplicate">
+              {{ T.reportProblemFormDuplicate }}
+            </option>
+            <option value="wrong-test-cases">
+              {{ T.reportProblemFormCases }}
+            </option>
             <option value="other">
               {{ T.reportProblemFormOtherReason }}
             </option>
           </select>
+        </div>
+        <div class="form-group" v-if="selectedReason == 'duplicate'">
+          <label class="control-label">{{ T.reportProblemFormLinkToOriginalProblem }}</label>
+          <input name="original" v-model="original" class="input-line">
         </div>
         <div class="form-group">
           <label class="control-label">{{ T.reportProblemFormAdditionalComments }}</label>
@@ -42,7 +52,7 @@
           <button class="col-md-4 btn btn-primary"
                type="submit"
                v-bind:disabled=
-               "!selectedReason || (!rationale &amp;&amp; selectedReason == 'other')"
+               "!selectedReason || (!rationale &amp;&amp; selectedReason == 'other') || (!original &amp;&amp; selectedReason == 'duplicate')"
                v-on:click.prevent="onSubmit">{{ T.wordsSend }}</button>
         </div>
       </template>
@@ -67,6 +77,7 @@ export default {
       T: T,
       UI: UI,
       rationale: '',
+      original: '',
       currentView: 'question',
       showReportDialog: false,
       selectedReason: undefined
@@ -80,6 +91,7 @@ export default {
       this.showReportDialog = true;
       this.currentView = 'question';
       this.rationale = '';
+      this.original = '';
       this.selectedReason = undefined;
     },
 
@@ -101,7 +113,7 @@ export default {
 	right: 4%;
 	z-index: 9999999 !important;
 	width: 420px;
-	height: 310px;
+	height: 370px;
 	margin: 2em auto 0 auto;
 	border: 2px solid #ccc;
 	padding: 1em;
@@ -125,6 +137,10 @@ export default {
 
 .qualitynomination-demotionpopup .input-text {
 	height: 100px;
+	width: 100%;
+}
+
+.qualitynomination-demotionpopup .input-line {
 	width: 100%;
 }
 

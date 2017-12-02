@@ -145,7 +145,10 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases'])) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            if ($contents['reason'] == 'other' && !isset($contents['rationale'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
@@ -155,7 +158,11 @@ class QualityNominationController extends Controller {
                 }
                 $original = ProblemsDAO::getByAlias($contents['original']);
                 if (is_null($original)) {
-                    throw new NotFoundException('problemNotFound');
+                    $contents['original'] = self::ExtractAliasFromProblemUrl($contents['original']);
+                    $original = ProblemsDAO::getByAlias($contents['original']);
+                    if (is_null($original)) {
+                        throw new NotFoundException('problemNotFound');
+                    }
                 }
             }
         } elseif ($r['nomination'] == 'dismissal') {
@@ -273,6 +280,20 @@ class QualityNominationController extends Controller {
 
         return ['status' => 'ok'];
     }
+
+    private static function ExtractAliasFromProblemUrl($problemUrl) {
+        $leftEnd = strrpos($problemUrl, '/');
+        if ($leftEnd == false) {
+            $leftEnd = 0;
+        } else {
+            $leftEnd ++;
+        }
+        $questionMark = strpos($problemUrl, '?') == false ? strlen($problemUrl) : strpos($problemUrl, '?');
+        $sharp = strpos($problemUrl, '#') == false ? strlen($problemUrl) : strpos($problemUrl, '#');
+        $rightEnd = min($questionMark, $sharp);
+        return substr($problemUrl, $leftEnd, $rightEnd - $leftEnd);
+    }
+
 
     /**
      * Returns the list of nominations made by $nominator (if non-null),
