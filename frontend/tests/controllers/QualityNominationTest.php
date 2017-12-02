@@ -464,7 +464,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'contents' => json_encode([
                 'rationale' => 'otro sumas',
                 'reason' => 'duplicate',
-                'original' => "https://omegaup.com/arena/problem/" . $originalProblemData['request']['alias'] . "#problems",
+                'original' => 'https://omegaup.com/arena/problem/' . $originalProblemData['request']['alias'] . '#problems',
             ]),
         ]));
     }

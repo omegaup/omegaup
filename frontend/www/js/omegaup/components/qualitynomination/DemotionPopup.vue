@@ -37,9 +37,12 @@
             </option>
           </select>
         </div>
-        <div class="form-group" v-if="selectedReason == 'duplicate'">
+        <div class="form-group"
+             v-if="selectedReason == 'duplicate'">
           <label class="control-label">{{ T.reportProblemFormLinkToOriginalProblem }}</label>
-          <input name="original" v-model="original" class="input-line">
+          <input class="input-line"
+               name="original"
+               v-model="original">
         </div>
         <div class="form-group">
           <label class="control-label">{{ T.reportProblemFormAdditionalComments }}</label>

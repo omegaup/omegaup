@@ -294,7 +294,6 @@ class QualityNominationController extends Controller {
         return substr($problemUrl, $leftEnd, $rightEnd - $leftEnd);
     }
 
-
     /**
      * Returns the list of nominations made by $nominator (if non-null),
      * assigned to $assignee (if non-null) or all nominations (if both
