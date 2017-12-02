@@ -20,7 +20,6 @@ automatically.
 
 import argparse
 import os.path
-import subprocess
 import sys
 
 import database_utils
@@ -81,14 +80,16 @@ def latest(args, auth):
     sys.exit(1)
 
 
-def migrate(args, auth):
+def migrate(args, auth, update_metadata=True):
   '''
   Performs the database schema migration.  This command applies all scripts
   that have not yet been applied in order, and records their application in the
   metadata database.  This command is idempotent and can be run any number of
   times.
   '''
-  latest_revision = _revision(args, auth)
+  latest_revision = 0
+  if update_metadata:
+    latest_revision = _revision(args, auth)
   for revision, name, path in _scripts(args):
     if latest_revision >= revision:
       continue
@@ -104,9 +105,10 @@ def migrate(args, auth):
         for dbname in args.databases.split(','):
           database_utils.mysql('source %s;' % database_utils.quote(path),
                                dbname=dbname, auth=auth)
-      database_utils.mysql(
-          'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
-          (revision, comment), dbname='_omegaup_metadata', auth=auth)
+      if update_metadata:
+        database_utils.mysql(
+            'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
+            (revision, comment), dbname='_omegaup_metadata', auth=auth)
 
 
 def ensure(args, auth):
@@ -158,7 +160,23 @@ def purge(args, auth):
   '''
   for dbname in args.databases.split(','):
     database_utils.mysql('DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
-    database_utils.mysql('CREATE DATABASE `%s`;' % dbname, auth=auth)
+    database_utils.mysql('CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
+                         'utf8_general_ci;' % dbname, auth=auth)
+
+def schema(args, auth):
+  '''
+  Prints the schema without modifying the usual database tables.
+
+  This does touch the database, but is restricted to a dummy database `_omegaup_schema`.
+  '''
+  _SCHEMA_DB = '_omegaup_schema'
+  args.databases = _SCHEMA_DB
+  args.noop = False
+  args.development_environment = False
+  purge(args, auth)
+  migrate(args, auth, update_metadata=False)
+  sys.stdout.buffer.write(database_utils.mysqldump(dbname=_SCHEMA_DB, auth=auth))
+  database_utils.mysql('DROP DATABASE `%s`;' % _SCHEMA_DB, auth=auth)
 
 
 def main():
@@ -213,6 +231,13 @@ def main():
   parser_purge.add_argument('--databases', default='omegaup,omegaup-test,_omegaup_metadata',
                             help='Comma-separated list of databases')
   parser_purge.set_defaults(func=purge)
+
+  parser_schema = subparsers.add_parser(
+      'schema', help=('Show the database schema. Does not actually read/write '
+                      'from the database'))
+  parser_schema.add_argument('--limit', type=int,
+                             help='Last revision to include')
+  parser_schema.set_defaults(func=schema)
 
   args = parser.parse_args()
   auth = database_utils.authentication(config_file=args.mysql_config_file,
