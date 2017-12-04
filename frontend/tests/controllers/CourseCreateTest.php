@@ -31,7 +31,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString()
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -58,7 +59,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'alias' => $sameAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString()
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -76,7 +78,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'alias' => $sameAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString()
         ]);
 
         CourseController::apiCreate($r);
@@ -95,7 +98,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString()
         ]);
 
         // Call api
@@ -243,6 +247,7 @@ class CourseCreateTest extends OmegaupTestCase {
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString(),
             'public' => 1,
         ]);
 
@@ -261,6 +266,7 @@ class CourseCreateTest extends OmegaupTestCase {
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'school_name' => Utils::CreateRandomString(),
             'public' => 1,
         ]);
 
