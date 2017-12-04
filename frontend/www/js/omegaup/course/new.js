@@ -26,6 +26,8 @@ OmegaUp.on('ready', function() {
                                 1000,
                         alias: ev.alias,
                         show_scoreboard: ev.showScoreboard,
+                        school_id: ev.school_id,
+                        school_name: ev.school_name
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + ev.alias +

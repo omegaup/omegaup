@@ -197,6 +197,20 @@ class CourseController extends Controller {
             $r['current_user_id']
         );
 
+        if (!isset($r['school_id'])) {
+            try {
+                $response = SchoolController::apiCreate(new Request([
+                    'name' => $r['school_name'],
+                    'country_id' => null,
+                    'state_id' => null,
+                    'auth_token' => $r['auth_token'],
+                ]));
+                $r['school_id'] = $response['school_id'];
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+
         try {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
             ACLsDAO::save($acl);
@@ -214,6 +228,7 @@ class CourseController extends Controller {
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
+                'school_id' => $r['school_id'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
@@ -1189,6 +1204,7 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
+                'school_id' => $r['course']->school_id,
                 'start_time' => strtotime($r['course']->start_time),
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
@@ -1208,6 +1224,10 @@ class CourseController extends Controller {
                     $group->group_id
                 );
             }
+
+            if (isset($r['school_name'])) {
+                $result['school_name'] = $r['school_name'];
+            }
         }
 
         return $result;
@@ -1222,7 +1242,6 @@ class CourseController extends Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
-
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1230,7 +1249,7 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
-
+        $r['school_name'] = SchoolsDAO::getByPK($r['course']->school_id)->name;
         return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
@@ -1388,12 +1407,40 @@ class CourseController extends Controller {
             'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
+            'school_id',
             'show_scoreboard',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
             }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
+        if (!is_null($r['school_id'])) {
+            if (is_numeric($r['school_id'])) {
+                try {
+                    $r['school'] = SchoolsDAO::getByPK($r['school_id']);
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
+                }
+
+                if (is_null($r['school'])) {
+                    throw new InvalidParameterException('parameterInvalid', 'school');
+                }
+            } elseif (empty($r['school_name'])) {
+                $r['school_id'] = null;
+            } else {
+                try {
+                    $response = SchoolController::apiCreate(new Request([
+                        'name' => $r['school_name'],
+                        'country_id' => null,
+                        'state_id' => null,
+                        'auth_token' => $r['auth_token'],
+                    ]));
+                    $r['course']->school_id = $response['school_id'];
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
+                }
+            }
+        }
 
         // Push changes
         try {
