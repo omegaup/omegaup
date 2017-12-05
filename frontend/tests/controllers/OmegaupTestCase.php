@@ -399,6 +399,7 @@ class ScopedScoreboardTestRun {
 }
 
 class ScopedEmailSender {
+    public static $listEmails = [];
     public function __construct() {
         Email::setEmailSenderForTesting($this);
     }
@@ -408,6 +409,6 @@ class ScopedEmailSender {
     }
 
     public function sendEmail($emails, $subject, $body) {
-        return ['email' => $emails, 'subject' => $subject, 'body' => $body];
+        self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
     }
 }

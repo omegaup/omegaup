@@ -11,8 +11,8 @@ class Email {
      */
     public static function sendEmail($emails, $subject, $body) {
         if (self::$emailSender != null) {
-            $response = self::$emailSender->sendEmail($emails, $subject, $body);
-            return $response;
+            self::$emailSender->sendEmail($emails, $subject, $body);
+            return;
         }
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
             self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');

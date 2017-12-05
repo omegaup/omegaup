@@ -276,7 +276,7 @@ class QualityNominationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok', 'email' => $response];
+        return ['status' => 'ok'];
     }
 
     /**
@@ -310,7 +310,7 @@ class QualityNominationController extends Controller {
             $email_params
         );
 
-        return Email::sendEmail($email, $mail_subject, $mail_body);
+        Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
     /**

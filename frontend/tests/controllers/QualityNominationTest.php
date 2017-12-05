@@ -338,9 +338,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
-        $this->assertContains($problemData['problem']->title, $response['email']['subject']);
-        $this->assertContains($problemData['author']->name, $response['email']['body']);
-        $this->assertContains('qwert', $response['email']['body']);
+        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
+        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
     }
 
     /**
