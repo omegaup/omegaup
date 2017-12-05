@@ -1,5 +1,4 @@
 var username = $('#username').attr('data-username');
-var stats_data = null;
 
 omegaup.API.User.contestStats({username: username})
     .then(function(data) {
