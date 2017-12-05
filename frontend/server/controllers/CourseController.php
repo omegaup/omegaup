@@ -197,20 +197,6 @@ class CourseController extends Controller {
             $r['current_user_id']
         );
 
-        if (!isset($r['school_id'])) {
-            try {
-                $response = SchoolController::apiCreate(new Request([
-                    'name' => $r['school_name'],
-                    'country_id' => null,
-                    'state_id' => null,
-                    'auth_token' => $r['auth_token'],
-                ]));
-                $r['school_id'] = $response['school_id'];
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
-
         try {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
             ACLsDAO::save($acl);
@@ -1249,7 +1235,9 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
-        $r['school_name'] = SchoolsDAO::getByPK($r['course']->school_id)->name;
+
+        $r['school_name'] = !is_null($r['course']->school_id) && $r['course']->school_id != 0
+          ? SchoolsDAO::getByPK($r['course']->school_id)->name : null;
         return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
@@ -1414,33 +1402,6 @@ class CourseController extends Controller {
             }],
         ];
         self::updateValueProperties($r, $r['course'], $valueProperties);
-        if (!is_null($r['school_id'])) {
-            if (is_numeric($r['school_id'])) {
-                try {
-                    $r['school'] = SchoolsDAO::getByPK($r['school_id']);
-                } catch (Exception $e) {
-                    throw new InvalidDatabaseOperationException($e);
-                }
-
-                if (is_null($r['school'])) {
-                    throw new InvalidParameterException('parameterInvalid', 'school');
-                }
-            } elseif (empty($r['school_name'])) {
-                $r['school_id'] = null;
-            } else {
-                try {
-                    $response = SchoolController::apiCreate(new Request([
-                        'name' => $r['school_name'],
-                        'country_id' => null,
-                        'state_id' => null,
-                        'auth_token' => $r['auth_token'],
-                    ]));
-                    $r['course']->school_id = $response['school_id'];
-                } catch (Exception $e) {
-                    throw new InvalidDatabaseOperationException($e);
-                }
-            }
-        }
 
         // Push changes
         try {

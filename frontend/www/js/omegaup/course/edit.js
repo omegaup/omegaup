@@ -14,7 +14,6 @@ Vue.directive('Sortable', {
 
 OmegaUp.on('ready', function() {
   var original_school = null;
-  var original_school_id = null;
   let vuePath = [];
   if (window.location.hash) {
     vuePath = window.location.hash.split('/');
@@ -264,31 +263,44 @@ OmegaUp.on('ready', function() {
         props: {T: T, update: true, course: this.course},
         on: {
           submit: function(ev) {
-            if (ev.school_id == original_school_id &&
-                ev.school_name != original_school) {
-              ev.school_id = null;
+            var schoolIdDeferred = $.Deferred();
+            ev.school_id = original_school == ev.school_name ? ev.school_id : 0;
+            if (ev.school_id) {
+              schoolIdDeferred.resolve(ev.school_id);
+            } else if (ev.school_name) {
+              API.School.create({name: ev.school_name})
+                  .then(function(data) {
+                    schoolIdDeferred.resolve(data.school_id);
+                  })
+                  .fail(UI.apiError);
+            } else {
+              schoolIdDeferred.resolve(null);
             }
-            API.Course.update({
-                        course_alias: courseAlias,
-                        name: ev.name,
-                        description: ev.description,
-                        start_time: ev.startTime.getTime() / 1000,
-                        finish_time:
-                            new Date(ev.finishTime).setHours(23, 59, 59, 999) /
-                                1000,
-                        alias: ev.alias,
-                        show_scoreboard: ev.showScoreboard,
-                        school_id: ev.school_id,
-                        school_name: ev.school_name
+            schoolIdDeferred
+                .then(function(school_id) {
+                  API.Course.update({
+                              course_alias: courseAlias,
+                              name: ev.name,
+                              description: ev.description,
+                              start_time: ev.startTime.getTime() / 1000,
+                              finish_time: new Date(ev.finishTime)
+                                                   .setHours(23, 59, 59, 999) /
+                                               1000,
+                              alias: ev.alias,
+                              show_scoreboard: ev.showScoreboard,
+                              school_id: school_id
+                            })
+                      .then(function(data) {
+                        UI.success(T.courseEditCourseEdited +
+                                   ' <a href="/course/' + ev.alias + '">' +
+                                   T.courseEditGoToCourse + '</a>');
+                        $('.course-header')
+                            .text(ev.alias)
+                            .attr('href', '/course/' + ev.alias + '/');
+                        $('div.post.footer').show();
+                        window.scrollTo(0, 0);
                       })
-                .then(function(data) {
-                  UI.success(T.courseEditCourseEdited + ' <a href="/course/' +
-                             ev.alias + '">' + T.courseEditGoToCourse + '</a>');
-                  $('.course-header')
-                      .text(ev.alias)
-                      .attr('href', '/course/' + ev.alias + '/');
-                  $('div.post.footer').show();
-                  window.scrollTo(0, 0);
+                      .fail(UI.apiError);
                 })
                 .fail(UI.apiError);
           },
@@ -453,7 +465,6 @@ OmegaUp.on('ready', function() {
             .attr('href', '/course/' + courseAlias + '/');
         details.course = course;
         original_school = course.school_name;
-        original_school_id = course.school_id;
       })
       .fail(UI.apiError);
 

@@ -136,16 +136,7 @@ export default {
       this.school_id = this.course.school_id;
       this.school_name = this.course.school_name;
     },
-    onSubmit: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        this.school = hint;
-      } else {
-        this.school = $('input.typeahead.tt-input', this.$el).val();
-      }
-      this.$emit('submit', this);
-    },
+    onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
       this.reset();
       this.$emit('cancel');
