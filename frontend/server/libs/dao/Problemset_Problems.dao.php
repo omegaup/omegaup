@@ -78,4 +78,22 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         }
         return $ar;
     }
+
+    /**
+      * Update problemset order.
+      *
+      * @return Affected Rows
+      * @param ProblemsetProblems [$Problemset_Problems]
+      */
+    final public static function updateProblemsOrder(ProblemsetProblems $Problemset_Problems) {
+        $sql = 'UPDATE `Problemset_Problems` SET `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
+        $params = [
+            $Problemset_Problems->order,
+            $Problemset_Problems->problemset_id,
+            $Problemset_Problems->problem_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }

@@ -11,13 +11,21 @@ class ProblemArtifacts {
         $this->git = new Git(PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $alias);
     }
 
-    public function get($path) {
-        return $this->git->get(['cat-file', 'blob', 'HEAD:' . $path]);
+    public function get($path, $quiet = false) {
+        return $this->git->get(
+            ['cat-file', 'blob', 'HEAD:' . $path],
+            null /* $cwd_override */,
+            $quiet
+        );
     }
 
     public function exists($path) {
         try {
-            $this->git->get(['cat-file', '-e', 'HEAD:' . $path]);
+            $this->git->get(
+                ['cat-file', '-e', 'HEAD:' . $path],
+                null /* cwd_override */,
+                true /* quiet */
+            );
             return true;
         } catch (Exception $e) {
             // This is expected to fail quite often.
@@ -38,7 +46,7 @@ class WorkingDirProblemArtifacts extends ProblemArtifacts {
         $this->path = $path;
     }
 
-    public function get($path) {
+    public function get($path, $quiet = false) {
         return file_get_contents("{$this->path}/$path");
     }
 

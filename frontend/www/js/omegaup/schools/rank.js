@@ -9,7 +9,7 @@ OmegaUp.on('ready', function() {
     el: '#omegaup-schools-rank',
     render: function(createElement) {
       return createElement('omegaup-schools-rank', {
-        props: {rank: payload},
+        props: payload,
       });
     },
     components: {
