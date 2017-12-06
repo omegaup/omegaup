@@ -1210,7 +1210,9 @@ class CourseController extends Controller {
                     $group->group_id
                 );
             }
-            $result['school_name'] = SchoolsDAO::getByPK($r['course']->school_id)->name;
+
+            $result['school_name'] = !is_null($r['course']->school_id) ?
+              SchoolsDAO::getByPK($r['course']->school_id)->name : null;
         }
 
         return $result;
