@@ -291,9 +291,10 @@ OmegaUp.on('ready', function() {
                               school_id: school_id
                             })
                       .then(function(data) {
-                        UI.success(T.courseEditCourseEdited +
-                                   ' <a href="/course/' + ev.alias + '">' +
-                                   T.courseEditGoToCourse + '</a>');
+                        UI.success(UI.formatString(
+                            T.courseEditCourseEditedAndGoToCourse, {
+                              alias: ev.alias,
+                            }));
                         $('.course-header')
                             .text(ev.alias)
                             .attr('href', '/course/' + ev.alias + '/');

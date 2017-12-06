@@ -1210,10 +1210,7 @@ class CourseController extends Controller {
                     $group->group_id
                 );
             }
-
-            if (isset($r['school_name'])) {
-                $result['school_name'] = $r['school_name'];
-            }
+            $result['school_name'] = SchoolsDAO::getByPK($r['course']->school_id)->name;
         }
 
         return $result;
@@ -1236,8 +1233,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $r['school_name'] = !is_null($r['course']->school_id) && $r['course']->school_id != 0
-          ? SchoolsDAO::getByPK($r['course']->school_id)->name : null;
         return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 

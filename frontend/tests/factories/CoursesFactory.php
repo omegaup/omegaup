@@ -28,7 +28,6 @@ class CoursesFactory {
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
-            'school_name' => Utils::CreateRandomString(),
             'public' => $public
         ]);
 
