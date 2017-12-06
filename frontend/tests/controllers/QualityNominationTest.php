@@ -311,7 +311,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -322,6 +322,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
         $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
+        $this->assertEquals(1, count($emailSender::$listEmails));
     }
 
     /**
