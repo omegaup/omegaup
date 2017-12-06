@@ -79,4 +79,59 @@ class CourseCloneTest extends OmegaupTestCase {
         ]));
         $this->assertCount(0, $students['students']);
     }
+
+    /**
+     * Creating a clone with the original course alias
+     *
+     * @expectedException DuplicatedEntryInDatabaseException
+     */
+    public function testCreateCourseCloneWithTheSameAlias() {
+        $homeworkCount = 2;
+        $testCount = 2;
+        $problemsPerAssignment = 2;
+        $studentCount = 2;
+        $problemAssignmentsMap = [];
+
+        // Create course with assignments
+        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+            'homework' => $homeworkCount,
+            'test' => $testCount
+        ]);
+
+        // Add problems to assignments
+        $adminLogin = self::login($courseData['admin']);
+        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
+            $assignmentAlias = $courseData['assignment_aliases'][$i];
+            $problemAssignmentsMap[$assignmentAlias] = [];
+
+            for ($j = 0; $j < $problemsPerAssignment; $j++) {
+                $problemData = ProblemsFactory::createProblem();
+                CourseController::apiAddProblem(new Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignmentAlias,
+                    'problem_alias' => $problemData['request']['alias'],
+                ]));
+                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+            }
+        }
+
+        // Create & add students to course
+        $studentsUsername = [];
+        $studentsData = null;
+        for ($i = 0; $i < $studentCount; $i++) {
+            $studentsData = CoursesFactory::addStudentToCourse($courseData);
+            $studentsUsername[] = $studentsData->username;
+        }
+
+        // Clone the course
+        $adminLogin = self::login($courseData['admin']);
+        $courseClonedData = CourseController::apiClone(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => Utils::CreateRandomString(),
+            'alias' => $courseData['course_alias'],
+            'start_time' => Time::get()
+        ]));
+    }
 }

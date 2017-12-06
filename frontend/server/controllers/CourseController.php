@@ -169,6 +169,9 @@ class CourseController extends Controller {
      * Clone a course
      *
      * @return Array
+     * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
      */
     public static function apiClone(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -191,39 +194,55 @@ class CourseController extends Controller {
             'public' => 0, // All cloned courses start in private mode
             'auth_token' => $auth_token
         ]);
-        // Create the course (and group)
-        self::apiCreate($request);
+        CoursesDAO::transBegin();
+        $response = [];
+        try {
+            // Create the course (and group)
+            $response[] = self::apiCreate($request);
 
-        $assignments = self::apiListAssignments($r);
-        foreach ($assignments['assignments'] as $assignment) {
-            // Create and assign homeworks and tests to new course
-            $assignment_start_time = $assignment['start_time'] + $offset;
-            $assignment_duration = $assignment['finish_time'] - $assignment['start_time'];
-            $assignment_finish_time = $assignment_start_time + $assignment_duration;
-            self::apiCreateAssignment(new Request([
-                'course_alias' => $r['alias'],
-                'name' => $assignment['name'],
-                'description' => $assignment['description'],
-                'start_time' => $assignment_start_time,
-                'finish_time' => $assignment_finish_time,
-                'alias' => $assignment['alias'],
-                'assignment_type' => $assignment['assignment_type'],
-                'auth_token' => $auth_token
-            ]));
-
-            $problems = self::apiAssignmentDetails(new Request([
-                'assignment' => $assignment['alias'],
-                'course' => $original_course->alias,
-                'auth_token' => $auth_token
-            ]));
-            foreach ($problems['problems'] as $problem) {
-                // Create and assign problems to new course
-                self::apiAddProblem(new Request([
-                    'course_alias' => $r['alias'],
-                    'assignment_alias' => $assignment['alias'],
-                    'problem_alias' => $problem['alias'],
+            $assignments = self::apiListAssignments($r);
+            foreach ($assignments['assignments'] as $assignment) {
+                $problems[$assignment['alias']] = self::apiAssignmentDetails(new Request([
+                    'assignment' => $assignment['alias'],
+                    'course' => $original_course->alias,
                     'auth_token' => $auth_token
                 ]));
+            }
+
+            foreach ($assignments['assignments'] as $assignment) {
+                // Create and assign homeworks and tests to new course
+                $assignment_start_time = $assignment['start_time'] + $offset;
+                $assignment_duration = $assignment['finish_time'] - $assignment['start_time'];
+                $assignment_finish_time = $assignment_start_time + $assignment_duration;
+                $response[] = self::apiCreateAssignment(new Request([
+                    'course_alias' => $r['alias'],
+                    'name' => $assignment['name'],
+                    'description' => $assignment['description'],
+                    'start_time' => $assignment_start_time,
+                    'finish_time' => $assignment_finish_time,
+                    'alias' => $assignment['alias'],
+                    'assignment_type' => $assignment['assignment_type'],
+                    'auth_token' => $auth_token
+                ]));
+                foreach ($problems[$assignment['alias']]['problems'] as $problem) {
+                    // Create and assign problems to new course
+                    $response[] = self::apiAddProblem(new Request([
+                        'course_alias' => $r['alias'],
+                        'assignment_alias' => $assignment['alias'],
+                        'problem_alias' => $problem['alias'],
+                        'auth_token' => $auth_token
+                    ]));
+                }
+            }
+            CoursesDAO::transEnd();
+        } catch (Exception $e) {
+            CoursesDAO::transRollback();
+            if ($e->getMessage() == 'parameterEmpty') {
+                throw new InvalidParameterException('parameterEmpty', $e->getTrace()[0]['args'][1]);
+            } elseif ($e->getMessage() == 'aliasInUse') {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                throw new InvalidDatabaseOperationException($e);
             }
         }
 
