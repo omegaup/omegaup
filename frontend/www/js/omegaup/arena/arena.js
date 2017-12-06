@@ -59,6 +59,11 @@ export function GetOptionsFromLocation(arenaLocation) {
 
   if ($('body').hasClass('lockdown')) {
     options.isLockdownMode = true;
+    window.onbeforeunload = function(e) {
+      var dialogText = T.lockdownMessageWarning;
+      e.returnValue = dialogText;
+      return e.returnValue;
+    };
   }
 
   if (arenaLocation.pathname.indexOf('/practice') !== -1) {
@@ -511,8 +516,6 @@ export class Arena {
     self.elements.clock.text(clock);
     if (self.options.isLockdownMode === true) {
       UI.warning(T.lockdownMessageWarning);
-    } else {
-      UI.dismissNotifications();
     }
   }
 
@@ -1295,7 +1298,7 @@ export class Arena {
       self.hideOverlay();
       return;
     }
-    self.options.isLockdownMode = false;
+
     if (data.compile_error) {
       $('#run-details .compile_error pre').html(UI.escape(data.compile_error));
       $('#run-details .compile_error').show();
@@ -1315,7 +1318,6 @@ export class Arena {
           .html('<a href="' + data.source + '" download="data.zip">' +
                 T.wordsDownload + '</a>');
     } else if (data.source == 'lockdownDetailsDisabled') {
-      self.options.isLockdownMode = true;
       $('#run-details .source')
           .html(UI.escape((typeof(sessionStorage) !== 'undefined' &&
                            sessionStorage.getItem('run:' + guid)) ||
