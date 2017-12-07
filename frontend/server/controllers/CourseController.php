@@ -1136,7 +1136,7 @@ class CourseController extends Controller {
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
      * @throws NotFoundException Course not found or trying to directly access a private course.
-     * @return mixed
+     * @return Object
      */
     public static function apiIntroDetails(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1148,7 +1148,7 @@ class CourseController extends Controller {
 
         // If canViewCourse is true, then user is already inside the course...
         if (Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
-            return false;
+            return null;
         }
 
         // If not previously registered and course is private, hide its existence
