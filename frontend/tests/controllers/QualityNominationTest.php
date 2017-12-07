@@ -288,6 +288,44 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion approved by a reviewer sends an email to the problem creator.
+     */
+    public function testDemotionApprovedByReviewerAndSendMail() {
+        $emailSender = new ScopedEmailSender();
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'qwert',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
+        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
+        $this->assertEquals(1, count($emailSender::$listEmails));
+    }
+
+    /**
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {
