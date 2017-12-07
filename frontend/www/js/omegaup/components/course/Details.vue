@@ -63,7 +63,8 @@
             <label>{{ T.profileSchool }} <input autocomplete="off"
                    class="form-control typeahead"
                    type="text"
-                   v-model="school_name"><input type="hidden"
+                   v-model="school_name"
+                   v-on:change="onChange"><input type="hidden"
                    v-model="school_id"></label>
           </div>
         </div>
@@ -141,6 +142,13 @@ export default {
       this.reset();
       this.$emit('cancel');
     },
+    onChange: function() {
+      if (this.course.school_id == this.school_id) {
+        this.school_id = null;
+      } else {
+        this.course.school_id = this.school_id;
+      }
+    }
   },
   components: {
     'omegaup-datepicker': DatePicker,

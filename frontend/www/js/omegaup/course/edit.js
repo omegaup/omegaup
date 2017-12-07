@@ -13,7 +13,6 @@ Vue.directive('Sortable', {
 });
 
 OmegaUp.on('ready', function() {
-  var original_school = null;
   let vuePath = [];
   if (window.location.hash) {
     vuePath = window.location.hash.split('/');
@@ -264,7 +263,6 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             var schoolIdDeferred = $.Deferred();
-            ev.school_id = original_school == ev.school_name ? ev.school_id : 0;
             if (ev.school_id) {
               schoolIdDeferred.resolve(ev.school_id);
             } else if (ev.school_name) {
@@ -465,7 +463,6 @@ OmegaUp.on('ready', function() {
             .text(course.name)
             .attr('href', '/course/' + courseAlias + '/');
         details.course = course;
-        original_school = course.school_name;
       })
       .fail(UI.apiError);
 
