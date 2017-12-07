@@ -398,6 +398,56 @@ class CourseController extends Controller {
         return ['status' => 'ok'];
     }
 
+    /**
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateProblemsOrder(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        // Update problems order
+        $problems = $r['problems'];
+        foreach ($problems as $problem) {
+            $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
+            if (is_null($problem)) {
+                throw new NotFoundException('problemNotFound');
+            }
+
+            $order = 1;
+            if (is_numeric($r['order'])) {
+                $order = (int)$r['order'];
+            }
+            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
+                'problemset_id' => $problemSet->problemset_id,
+                'problem_id' => $currentProblem->problem_id,
+                'order' => $problem['order']
+            ]));
+        }
+
+        return ['status' => 'ok'];
+    }
+
     public static function apiGetProblemUsers(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');

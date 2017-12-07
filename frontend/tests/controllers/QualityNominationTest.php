@@ -1,25 +1,6 @@
 <?php
 
 class QualityNominationTest extends OmegaupTestCase {
-    private static $reviewers = [];
-
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-
-        $qualityReviewerGroup = GroupsDAO::FindByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        for ($i = 0; $i < 5; $i++) {
-            $reviewer = UserFactory::createUser();
-            GroupsUsersDAO::save(new GroupsUsers([
-                'group_id' => $qualityReviewerGroup->group_id,
-                'user_id' => $reviewer->user_id,
-                'role_id' => Authorization::ADMIN_ROLE,
-            ]));
-            self::$reviewers[] = $reviewer;
-        }
-    }
-
     public static function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
@@ -84,7 +65,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
@@ -277,7 +258,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -307,6 +288,44 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion approved by a reviewer sends an email to the problem creator.
+     */
+    public function testDemotionApprovedByReviewerAndSendMail() {
+        $emailSender = new ScopedEmailSender();
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'qwert',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
+        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
+        $this->assertEquals(1, count($emailSender::$listEmails));
+    }
+
+    /**
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {
@@ -329,7 +348,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and deny ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
@@ -367,7 +386,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -420,7 +439,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -527,7 +546,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Login as an arbitrary reviewer.
-        $login = self::login(self::$reviewers[0]);
+        $login = self::login(QualityNominationFactory::$reviewers[0]);
         $response = QualityNominationController::apiList(new Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -545,7 +564,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
-            self::$reviewers,
+            QualityNominationFactory::$reviewers,
             function ($reviewer) use (&$nomination) {
                 return $reviewer->username == $nomination['votes'][0]['user']['username'];
             }
@@ -619,7 +638,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ['DP', 'Math']
         );
 
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $list = QualityNominationController::apiList(new Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));

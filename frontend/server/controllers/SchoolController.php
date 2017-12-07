@@ -101,7 +101,7 @@ class SchoolController extends Controller {
      */
     public static function apiRank(Request $r) {
         Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        Validators::isNumberInRange($r['rowcount'], 'rowcount', 100, 100, false);
         Validators::isNumber($r['start_time'], 'start_time', false); // Unix timestamp
         Validators::isNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
 
