@@ -121,7 +121,7 @@ class CourseController extends Controller {
      * Validates course exists. Expects $r[$column_name], returns
      * course found on $r['course']. Throws if not found.
      *
-     * @throws InvalidParameterException
+     * @throws NotFoundException
      */
     private static function validateCourseExists(Request $r, $column_name) {
         Validators::isStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
@@ -1136,28 +1136,24 @@ class CourseController extends Controller {
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
      * @throws NotFoundException Course not found or trying to directly access a private course.
-     * @return Object
+     * @throws ForbiddenAccessException
+     * @return array
      */
     public static function apiIntroDetails(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
         self::authenticateRequest($r);
-        self::validateCourseExists($r, 'alias');
+        self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
 
-        // If canViewCourse is true, then user is already inside the course...
-        if (Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
-            return null;
+        $shouldShowIntro = !Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group']);
+        if ($shouldShowIntro && !$r['course']->public) {
+            throw new ForbiddenAccessException();
         }
-
-        // If not previously registered and course is private, hide its existence
-        if (!$r['course']->public) {
-            throw new NotFoundException('courseNotFound');
-        }
-        // Details available for public courses, otherwise Either only Course Admins or
-        // Group Members (students) can see these results
-        return self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result['shouldShowResults'] = $shouldShowIntro;
+        return $result;
     }
 
     /**

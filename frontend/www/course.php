@@ -7,7 +7,7 @@ $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
 $show_assignment = false;
-$intro_details = null;
+$intro_details = [];
 
 try {
     $intro_details = CourseController::apiIntroDetails($r);
@@ -21,7 +21,7 @@ try {
     die();
 }
 
-if ($intro_details) {
+if ($intro_details['shouldShowResults']) {
     $smarty->assign('course_payload', [
         'name' => $intro_details['name'],
         'description' => $intro_details['description'],

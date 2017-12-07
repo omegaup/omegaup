@@ -175,9 +175,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
         try {
             CourseController::apiIntroDetails(new Request([
                 'auth_token' => $studentLogin->auth_token,
-                'alias' => $courseDataPrivate['course_alias']
+                'course_alias' => $courseDataPrivate['course_alias']
                 ]));
-        } catch (NotFoundException $e) {
+        } catch (ForbiddenAccessException $e) {
             // OK!
         }
 
@@ -190,16 +190,17 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         // Before or after adding student to private course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::apiIntroDetails(new Request([
+        $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
-            'alias' => $courseDataPrivate['course_alias']
-            ])));
+            'course_alias' => $courseDataPrivate['course_alias']
+            ]));
+        $this->assertEquals(false, $intro_details['shouldShowResults']);
 
         // Before adding student to public course, intro should show
         $studentLogin = OmegaupTestCase::login($student);
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
-            'alias' => $courseDataPublic['course_alias']
+            'course_alias' => $courseDataPublic['course_alias']
             ]));
         $this->assertEquals('ok', $intro_details['status']);
 
@@ -209,12 +210,12 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseDataPublic['course_alias']
             ]));
-
+        $intro_details = CourseController::apiIntroDetails(new Request([
+            'auth_token' => $studentLogin->auth_token,
+            'course_alias' => $courseDataPublic['course_alias']
+            ]));
         // After adding student to public course, intro should not show
         $studentLogin = OmegaupTestCase::login($student);
-        $this->assertEquals(false, CourseController::apiIntroDetails(new Request([
-            'auth_token' => $studentLogin->auth_token,
-            'alias' => $courseDataPublic['course_alias']
-            ])));
+        $this->assertEquals(false, $intro_details['shouldShowResults']);
     }
 }
