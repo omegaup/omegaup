@@ -7,6 +7,7 @@
 import os
 import shlex
 import subprocess
+import tempfile
 
 
 _MYSQL_BINARY = '/usr/bin/mysql'
@@ -55,6 +56,10 @@ def mysqldump(*, dbname=None, auth=None):
     args = [_MYSQLDUMP_BINARY] + auth
     if dbname:
         args.append(dbname)
-    args.extend(['--no-data', '--skip-comments', '--skip-opt',
-                 '--create-options', '--single-transaction', '--routines'])
-    return subprocess.check_output(args, universal_newlines=True)
+    with tempfile.NamedTemporaryFile() as outfile:
+        args.extend(['--no-data', '--skip-comments', '--skip-opt',
+                     '--create-options', '--single-transaction', '--routines',
+                     '--default-character-set=utf8',
+                     '--result-file', outfile.name])
+        subprocess.check_call(args)
+        return outfile.read()
