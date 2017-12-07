@@ -5,7 +5,6 @@ require_once('api/ApiCaller.php');
 
 $triedToLogin = false;
 $emailVerified = true;
-$invalidCredentials = false;
 $c_Session = new SessionController;
 
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
@@ -20,8 +19,6 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     if ($response['status'] === 'error') {
         if ($response['errorcode'] === 600 || $response['errorcode'] === 601) {
             $emailVerified = false;
-        } elseif ($response['errorcode'] === 403) {
-            $invalidCredentials = true;
         }
     }
 
@@ -57,9 +54,6 @@ if ($c_Session->CurrentSessionAvailable()) {
     if (isset($response['error'])) {
         $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
         $smarty->assign('ERROR_MESSAGE', $response['error']);
-    } elseif ($invalidCredentials) {
-        $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
-        $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('usernameOrPassIsWrong'));
     } else {
         $smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
         $smarty->assign('ERROR_MESSAGE', $smarty->getConfigVars('loginFederatedFailed'));

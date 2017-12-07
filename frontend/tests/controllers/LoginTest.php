@@ -60,6 +60,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with invalid credentials, username and password
      *
+     * @expectedException InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidPassword() {
         // Create an user in omegaup
@@ -73,14 +74,12 @@ class LoginTest extends OmegaupTestCase {
 
         // Call the API
         $response = UserController::apiLogin($r);
-
-        $this->assertEquals('error', $response['status']);
-        $this->assertEquals(403, $response['errorcode']);
     }
 
     /**
      * Test user login with invalid credentials, username and password
      *
+     * @expectedException InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
@@ -91,14 +90,12 @@ class LoginTest extends OmegaupTestCase {
 
         // Call the API
         $response = UserController::apiLogin($r);
-
-        $this->assertEquals('error', $response['status']);
-        $this->assertEquals(403, $response['errorcode']);
     }
 
     /**
      * Test user login with invalid credentials, email and password
      *
+     * @expectedException InvalidCredentialsException
      */
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
@@ -113,9 +110,6 @@ class LoginTest extends OmegaupTestCase {
 
         // Call the API
         $response = UserController::apiLogin($r);
-
-        $this->assertEquals('error', $response['status']);
-        $this->assertEquals(403, $response['errorcode']);
     }
 
     /**
@@ -176,6 +170,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with valid credentials, username and password
      *
+     * @expectedException InvalidCredentialsException
      */
     public function testNativeLoginWithOldPassword() {
         // Create an user in omegaup
@@ -197,9 +192,6 @@ class LoginTest extends OmegaupTestCase {
 
         // Call the API
         $response = UserController::apiLogin($r);
-
-        $this->assertEquals('error', $response['status']);
-        $this->assertEquals(403, $response['errorcode']);
     }
 
     public function testDeleteTokenExpired() {
