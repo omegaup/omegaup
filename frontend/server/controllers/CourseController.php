@@ -206,6 +206,7 @@ class CourseController extends Controller {
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
+                'school_id' => $r['school_id'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
@@ -1181,6 +1182,7 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
+                'school_id' => $r['course']->school_id,
                 'start_time' => strtotime($r['course']->start_time),
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
@@ -1200,6 +1202,13 @@ class CourseController extends Controller {
                     $group->group_id
                 );
             }
+            if (!is_null($r['course']->school_id)) {
+                $school = SchoolsDAO::getByPK($r['course']->school_id);
+                if ($school != null) {
+                    $result['school_name'] = $school->name;
+                    $result['school_id'] = $school->school_id;
+                }
+            }
         }
 
         return $result;
@@ -1214,7 +1223,6 @@ class CourseController extends Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
-
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1353,6 +1361,7 @@ class CourseController extends Controller {
             'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
+            'school_id',
             'show_scoreboard',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
