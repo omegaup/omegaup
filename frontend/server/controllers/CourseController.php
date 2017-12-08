@@ -1212,8 +1212,10 @@ class CourseController extends Controller {
             }
             if (!is_null($r['course']->school_id)) {
                 $school = SchoolsDAO::getByPK($r['course']->school_id);
-                $result['school_name'] = $school->name;
-                $result['school_id'] = $school->school_id;
+                if ($school != null) {
+                    $result['school_name'] = $school->name;
+                    $result['school_id'] = $school->school_id;
+                }
             }
         }
 
