@@ -560,7 +560,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileStatisticsMonth: "M\u00eas",
 	profileStatisticsNumberOfSolvedProblems: "N\u00famero de problemas resolvidos",
 	profileStatisticsPeriod: "Per\u00edodo",
-	profileStatisticsRuns: "<b>Execu\u00e7\u00f5es</b>: %(runs)",
+	profileStatisticsRuns: "<b>Execu\u00e7\u00f5es</b>",
 	profileStatisticsTotal: "Total",
 	profileStatisticsVerdictsOf: "Veredictos de %(user)",
 	profileStatisticsWeek: "Semana",

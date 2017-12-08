@@ -2,14 +2,11 @@
   <div class="panel-body">
     <label><input type="radio"
            v-model="type"
-           v-on:click="onSelectPeriod"
            value="delta"> {{ T.profileStatisticsDelta }}</label> <label><input type="radio"
            v-model="type"
-           v-on:click="onSelectPeriod"
            value="cumulative"> {{ T.profileStatisticsCumulative }}</label> <input id="total"
          type="radio"
          v-model="type"
-         v-on:click="onSelectTypeTotals"
          value="total"> <label for="total">{{ T.profileStatisticsTotal }}</label>
     <div class="period_group text-center"
          v-if="type != 'total' &amp;&amp; type != ''">
@@ -17,31 +14,22 @@
            name="period"
            type="radio"
            v-model="period"
-           v-on:click="onSelectPeriod"
            value="day"> <label for="day">{{ T.profileStatisticsDay }}</label> <input id="week"
            name="period"
            type="radio"
            v-model="period"
-           v-on:click="onSelectPeriod"
            value="week"> <label for="week">{{ T.profileStatisticsWeek }}</label> <input id="month"
            name="period"
            type="radio"
            v-model="period"
-           v-on:click="onSelectPeriod"
            value="month"> <label for="month">{{ T.profileStatisticsMonth }}</label> <input id=
            "year"
            name="period"
            type="radio"
            v-model="period"
-           v-on:click="onSelectPeriod"
            value="year"> <label for="year">{{ T.profileStatisticsYear }}</label>
     </div>
-    <div v-show="type == 'total'">
-      <div id="verdict-chart"></div>
-    </div>
-    <div v-show="type != 'total'">
-      <div id="verdict-period-chart"></div>
-    </div>
+    <div id="verdict-chart"></div>
   </div>
 </template>
 
@@ -51,17 +39,81 @@ import UI from '../../ui.js';
 
 export default {
   props: {data: Object, username: String},
-  data: function() { return {T: T, UI: UI, type: '', period: 'day'};},
+  data: function() { return {T: T, UI: UI, type: 'delta', period: 'day'};},
+  watch: {
+    type: function(val) {
+      if (val == 'total') {
+        this.verdictCounts;
+      } else {
+        this.verdictPeriodCounts;
+      }
+    },
+    period: function(val) { this.verdictPeriodCounts;},
+  },
+  mounted: function() {
+    let self = this;
+    let runs = self.normalizedPeriodRunCounts[self.period];
+    let data = runs[self.type];
+    self.chart = Highcharts.chart('verdict-chart', {
+      chart: {type: 'column'},
+      title: {
+        text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
+                                      {user: this.username})
+      },
+      xAxis: {
+        categories: runs.categories,
+        title: {text: omegaup.T.profileStatisticsPeriod},
+        labels: {
+          rotation: -45,
+        }
+      },
+      yAxis: {
+        min: 0,
+        title: {text: omegaup.T.profileStatisticsNumberOfSolvedProblems},
+        stackLabels: {
+          enabled: false,
+          style: {
+            fontWeight: 'bold',
+            color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+          }
+        }
+      },
+      legend: {
+        align: 'right',
+        x: -30,
+        verticalAlign: 'top',
+        y: 25,
+        floating: true,
+        backgroundColor:
+            (Highcharts.theme && Highcharts.theme.background2) || 'white',
+        borderColor: '#CCC',
+        borderWidth: 1,
+        shadow: false
+      },
+      tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: false,
+            color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) ||
+                       'white'
+          }
+        }
+      },
+      series: data
+    });
+  },
   computed: {
     verdictPeriodCounts: function() {
-      let runs = this.normalizePeriodRunCounts;
-      let data = runs[this.type];
-      return new Highcharts.Chart({
-        chart: {type: 'column', renderTo: 'verdict-period-chart'},
-        title: {
-          text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                        {user: this.username})
-        },
+      var self = this;
+      let runs = self.normalizedPeriodRunCounts[self.period];
+      let data = runs[self.type];
+      self.chart.update({
+        chart: {type: 'column'},
         xAxis: {
           categories: runs.categories,
           title: {text: omegaup.T.profileStatisticsPeriod},
@@ -106,30 +158,46 @@ export default {
             }
           }
         },
-        series: data
+        series: []
       });
+      // Removing old series
+      let n_series = self.chart.series.length;
+      for (let i = 0; i < n_series; i++) {
+        self.chart.series[0].remove(false);
+      }
+      self.chart.redraw();
+      // Adding new series
+      let num_series = data.length;
+      for (let i = 0; i < num_series; i++) {
+        self.chart.addSeries(data[i]);
+      }
     },
     verdictCounts: function() {
-      console.log('Entra a verdictCounts');
-      let runs = this.normalizeRunCounts;
-      return new Highcharts.Chart({
+      let self = this;
+      let runs = self.normalizedRunCounts;
+      let num_series = self.chart.series.length;
+      for (let i = 1; i < num_series; i++) {
+        self.chart.series[0].remove(false);
+      }
+      self.chart.redraw();
+      self.chart.update({
         chart: {
           plotBackgroundColor: null,
           plotBorderWidth: null,
           plotShadow: false,
-          renderTo: 'verdict-chart'
+          type: 'pie'
+        },
+        xAxis: {
+          title: {text: ''},
+        },
+        yAxis: {
+          title: {text: ''},
         },
         title: {
           text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                        {user: this.username})
+                                        {user: self.username})
         },
-        tooltip: {
-          formatter: function() {
-            return omegaup.UI.formatString(
-                omegaup.T.profileStatisticsRuns,
-                {runs: runs.runs[this.point.name].count});
-          }
-        },
+        tooltip: {pointFormat: '{series.name}: {point.y}'},
         plotOptions: {
           pie: {
             allowPointSelect: true,
@@ -138,89 +206,88 @@ export default {
               enabled: true,
               color: '#000000',
               connectorColor: '#000000',
-              formatter: function() {
-                return '<b>' + this.point.name + '</b>: ' +
-                       this.percentage.toFixed(2) + ' % (' +
-                       runs.runs[this.point.name].count + ')';
-              }
+              format:
+                  '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
             }
           }
         },
-        series: [{type: 'pie', name: 'Proporción', data: runs.percentage}]
+        series: [
+          {
+            name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
+            data: runs
+          }
+        ]
       });
     },
-    normalizeRunCounts: function() {
-      let total = this.countRuns(this.data.runs);
-      let runs = this.groupRuns(this.data.runs, 'verdict');
-      let verdicts = ['WA', 'PA', 'AC', 'TLE', 'MLE', 'OLE', 'RTE', 'CE', 'JE'];
-      let response = {runs: {}, percentage: []};
-      for (let[index, verdict] of verdicts.entries()) {
-        let num_runs =
-            typeof runs[verdict] == 'undefined' ? 0 : runs[verdict][verdict];
-        response['runs'][verdict] = {name: verdict, count: num_runs};
-        if (verdict == 'AC') {
-          response['percentage'][index] = {
-            name: 'AC',
-            y: (num_runs / total) * 100,
-            sliced: true,
-            selected: true
-          };
-        } else {
-          response['percentage'][index] = [verdict, (num_runs / total) * 100];
-        }
-      }
-      return response;
-    },
-    normalizePeriodRunCounts: function() {
-      let runs =
-          this.groupRuns(this.createPeriodGroup(this.data.runs), this.period);
-      let response = {categories: Object.keys(runs), delta: [], cumulative: []};
-      let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
-      for (let verdict of verdicts) {
-        runs[verdict] = 0;
-      }
-      for (let[index, verdict] of verdicts.entries()) {
-        response.delta[index] = {name: verdict, data: []};
-        response.cumulative[index] = {name: verdict, data: []};
-        for (let[ind, date] of response.categories.entries()) {
-          runs[verdict] += parseInt(runs[date][verdict]);
-          response.delta[index]['data'][ind] = parseInt(runs[date][verdict]);
-          response.cumulative[index]['data'][ind] = runs[verdict];
-        }
-      }
-      return response;
-    }
-  },
-  methods: {
-    onSelectTypeTotals: function() { this.verdictCounts;},
-    onSelectPeriod: function() { this.verdictPeriodCounts;},
-    countRuns: function(stats) {
+    totalRuns: function() {
+      let self = this;
       let total = 0;
-      for (let runs of stats) {
+      for (let runs of self.data.runs) {
         total += parseInt(runs['runs']);
       }
       return total;
     },
-    groupRuns: function(stats, prop) {
-      return stats.reduce(function(groups, item) {
-        let val = item[prop];
-        groups[val] =
-            groups[val] ||
-            {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0};
-        groups[val][item.verdict] += parseInt(item.runs);
-        return groups;
-      }, {});
+    normalizedRunCounts: function() {
+      let self = this;
+      let total = self.totalRuns;
+      let stats = self.data.runs;
+      let runs = stats.reduce((total, amount) => {
+        total[amount.verdict] += parseInt(amount.runs);
+        return total;
+      }, {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0});
+      let verdicts = Object.keys(runs);
+      let response = [];
+      for (let verdict of verdicts) {
+        let num_runs = runs[verdict];
+        if (verdict == 'AC') {
+          response.push(
+              {name: verdict, y: num_runs, sliced: true, selected: true});
+        } else {
+          response.push({name: verdict, y: num_runs});
+        }
+      }
+      return response;
     },
-    createPeriodGroup: function(stats) {
+    normalizedPeriodRunCounts: function() {
+      let self = this;
+      let runs = self.groupedPeriods;
+      let periods = Object.keys(runs);
+      let response = {};
+      for (let period of periods) {
+        response[period] = {
+          categories: Object.keys(runs[period]),
+          delta: [],
+          cumulative: []
+        };
+        let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+        for (let verdict of verdicts) {
+          runs[period][verdict] = 0;
+        }
+        for (let[index, verdict] of verdicts.entries()) {
+          response[period].delta[index] = {name: verdict, data: []};
+          response[period].cumulative[index] = {name: verdict, data: []};
+          for (let[ind, date] of response[period].categories.entries()) {
+            runs[period][verdict] += parseInt(runs[period][date][verdict]);
+            response[period].delta[index]['data'][ind] =
+                parseInt(runs[period][date][verdict]);
+            response[period].cumulative[index]['data'][ind] =
+                runs[period][verdict];
+          }
+        }
+      }
+      return response;
+    },
+    groupedPeriods: function() {
+      let self = this;
+      let stats = self.data.runs;
+      let periods = ['day', 'week', 'month', 'year'];
       for (let[index, run] of stats.entries()) {
-        if (typeof stats[index]['day'] != 'undefined') break;
-        if (typeof stats[index]['week'] != 'undefined') break;
-        if (typeof stats[index]['month'] != 'undefined') break;
-        if (typeof stats[index]['year'] != 'undefined') break;
+        for (let period of periods) {
+          if (typeof stats[index][period] != 'undefined') break;
+        }
         let date = new Date(run.date);
         let day = date.getDay();
         // group by days
-        date.getDate() + 1;
         stats[index]['day'] = date.toLocaleDateString(T.locale);
         // group by weeks
         let diff_monday = date.getDate() - day + (day == 0 ? -6 : 1);
@@ -234,9 +301,17 @@ export default {
         // group by year
         stats[index]['year'] = run.date.substring(0, 4);
       }
-      return stats;
+      let period_stats = {};
+      for (let period of periods) {
+        period_stats[period] = stats.reduce(function(groups, item) {
+          let val = item[period];
+          groups[val] = groups[val] || {WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0};
+          groups[val][item.verdict] += parseInt(item.runs);
+          return groups;
+        }, {});
+      }
+      return period_stats;
     },
   },
-  components: {},
 };
 </script>
