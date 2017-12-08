@@ -1,6 +1,7 @@
 <?php
 class Email {
     public static $log;
+    private static $emailSender = null;
 
     /**
      * @param $email
@@ -9,6 +10,10 @@ class Email {
      * @throws EmailVerificationSendException
      */
     public static function sendEmail($emails, $subject, $body) {
+        if (self::$emailSender != null) {
+            self::$emailSender->sendEmail($emails, $subject, $body);
+            return;
+        }
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
             self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
             $mail = is_array($emails) ? join(',', $emails) : $emails;
@@ -47,6 +52,10 @@ class Email {
             self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
             throw new EmailVerificationSendException();
         }
+    }
+
+    public static function setEmailSenderForTesting($emailSender) {
+        Email::$emailSender = $emailSender;
     }
 }
 
