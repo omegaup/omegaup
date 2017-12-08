@@ -215,7 +215,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseDataPublic['course_alias']
             ]));
         // After adding student to public course, intro should not show
-        $studentLogin = OmegaupTestCase::login($student);
         $this->assertEquals(false, $intro_details['shouldShowResults']);
     }
 }
