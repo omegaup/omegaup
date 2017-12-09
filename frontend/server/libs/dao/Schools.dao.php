@@ -95,4 +95,19 @@ class SchoolsDAO extends SchoolsDAOBase {
 
         return $result;
     }
+
+    /**
+      * Update logo of the school.
+      *
+      * @return Affected rows
+      * @param school_id.
+      * @param logo.
+      */
+    public static function updateLogo($school_id, $logo) {
+        $sql = 'UPDATE `Schools` SET `logo` = ? WHERE `school_id` = ?;';
+        $params = [$logo, $school_id];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }

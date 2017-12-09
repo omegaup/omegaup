@@ -38,6 +38,9 @@ class Schools extends VO {
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
+        if (isset($data['logo'])) {
+            $this->logo = $data['logo'];
+        }
     }
 
     /**
@@ -80,4 +83,11 @@ class Schools extends VO {
       * @var varchar(128)
       */
     public $name;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var mediumblob
+      */
+    public $logo;
 }

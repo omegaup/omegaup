@@ -655,6 +655,7 @@ CREATE TABLE `Schools` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
+  `logo` mediumblob,
   PRIMARY KEY (`school_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),

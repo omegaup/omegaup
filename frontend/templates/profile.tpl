@@ -6,7 +6,13 @@
 	<div class="col-md-2 no-right-padding" id="userbox">
 		<div class="panel panel-default" id="userbox-inner">
 			<div class="panel-body">
-				<div class="thumbnail bottom-margin"> <img src="{$profile.userinfo.gravatar_92}"/></div>
+				<div class="thumbnail bottom-margin">
+					<div>{$profile.userinfo.name}</div>
+					<img name="user_logo" src="{$profile.userinfo.gravatar_92}"/></div>
+				<div class="thumbnail bottom-margin">
+					<div>{$profile.userinfo.school}</div>
+					<img name="school_logo" src="{$profile.userinfo.school_logo}"/>
+				</div>
 				{if isset($profile.userinfo.email)}
 				<div id="profile-edit"><a href="/profile/edit/" class="btn btn-default">{#profileEdit#}</a></div>
 				{/if}

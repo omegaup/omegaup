@@ -6,23 +6,22 @@ omegaup.OmegaUp.on('ready', function() {
   $('#graduation_date').datepicker();
 
   $('#school_id').val('');
-  $('#school')
-      .typeahead(
-          {
-            minLength: 2,
-            highlight: true,
-          },
-          {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
-            displayKey: 'label',
-            templates: {
-              empty: omegaup.T.schoolToBeAdded,
-            }
-          })
-      .on('typeahead:selected', function(item, val, text) {
-        $('#school_id').val(val.id);
-        $('#school_name').val(val.label);
-      });
+  omegaup.UI.schoolTypeahead($('#school'), function(event, item) {
+    $('#school_id').val(item.id);
+    $('#school_name').val(item.label);
+    omegaup.API.School.list({query: item.label})
+        .then(function(response) {
+          $('img[name="school_logo"]').prev().html(item.label);
+          if (response[0]['logo'] != null && response[0]['logo'] != '') {
+            $('input[type="file"]').parent().addClass('hidden');
+            $('img[name="school_logo"]').attr('src', response[0]['logo']);
+          } else {
+            $('input[type="file"]').parent().removeClass('hidden');
+            $('img[name="school_logo"]').removeAttr('src');
+          }
+        })
+        .fail(omegaup.UI.apiError);
+  });
 
   $('#country_id')
       .change(function() {
@@ -95,28 +94,75 @@ omegaup.OmegaUp.on('ready', function() {
           omegaup.UI.error(omegaup.T.userEditNameTooLong);
           return;
         }
-
-        omegaup.API.User.update({
-                          name: $('#name').val(),
-                          birth_date: birth_date.getTime() / 1000,
-                          gender: $('#gender').val(),
-                          country_id: $('#country_id').val() || undefined,
-                          state_id: $('#state_id').val() || undefined,
-                          scholar_degree: $('#scholar_degree').val(),
-                          graduation_date: graduation_date.getTime() / 1000,
-                          school_id: $('#school_id').val(),
-                          school_name: $('#school').val(),
-                          locale: $('#locale').val(),
-                          preferred_language: $('#programming_language').val(),
-                          recruitment_optin:
-                              $('#recruitment_optin').prop('checked') ? 1 : 0
-                        })
-            .then(function(response) {
-              if (locale_changed) {
-                window.location.reload();
-              } else {
-                omegaup.UI.success(omegaup.T.userEditSuccess);
-              }
+        var logoSchoolDeferred = $.Deferred();
+        var elements = {submitForm: $('#user_profile_form')};
+        $.extend(elements.submitForm,
+                 {file: $('input[type="file"]', elements.submitForm)});
+        var file = elements.submitForm.file[0];
+        if (file && file.files && file.files.length > 0) {
+          file = file.files[0];
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var dataLogoURL = reader.result;
+            $('img[name="school_logo"]').attr('src', dataLogoURL);
+            logoSchoolDeferred.resolve(dataLogoURL);
+          };
+          var extension = file.name.split(/\./);
+          extension = extension[extension.length - 1];
+          if (extension == 'jpg' || extension == 'png' || extension == 'gif') {
+            if (file.size >= 64 * 1024) {
+              elements.submitForm.file.val(null);
+              alert(omegaup.UI.formatString(omegaup.T.arenaRunSubmitFilesize,
+                                            {limit: '64kB'}));
+              logoSchoolDeferred.resolve(null);
+            }
+            reader.readAsDataURL(file);
+          }
+        } else {
+          logoSchoolDeferred.resolve(null);
+        }
+        logoSchoolDeferred
+            .then(function(school_logo) {
+              omegaup.API.User
+                  .update({
+                    name: $('#name').val(),
+                    birth_date: birth_date.getTime() / 1000,
+                    gender: $('#gender').val(),
+                    country_id: $('#country_id').val() || undefined,
+                    state_id: $('#state_id').val() || undefined,
+                    scholar_degree: $('#scholar_degree').val(),
+                    graduation_date: graduation_date.getTime() / 1000,
+                    school_id: $('#school_id').val(),
+                    school_name: $('#school').val(),
+                    school_logo: school_logo,
+                    locale: $('#locale').val(),
+                    preferred_language: $('#programming_language').val(),
+                    recruitment_optin:
+                        $('#recruitment_optin').prop('checked') ? 1 : 0
+                  })
+                  .then(function(response) {
+                    $('img[name="school_logo"]')
+                        .prev()
+                        .html($('#school').val());
+                    $('img[name="school_logo"]')
+                        .attr('src', response['school_logo']);
+                    if (response['school_logo'] != null &&
+                        response['school_logo'] != '') {
+                      $('input[type="file"]').parent().addClass('hidden');
+                      $('img[name="school_logo"]')
+                          .attr('src', response['logo']);
+                    } else {
+                      $('input[type="file"]').parent().removeClass('hidden');
+                      $('img[name="school_logo"]').removeAttr('src');
+                    }
+                    elements.submitForm.file.val(null);
+                    if (locale_changed) {
+                      window.location.reload();
+                    } else {
+                      omegaup.UI.success(omegaup.T.userEditSuccess);
+                    }
+                  })
+                  .fail(omegaup.UI.apiError);
             })
             .fail(omegaup.UI.apiError);
       });

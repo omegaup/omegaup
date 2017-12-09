@@ -1080,6 +1080,7 @@ class UserController extends Controller {
             $school = SchoolsDAO::getByPK($user->school_id);
             $response['userinfo']['school_id'] = $user->school_id;
             $response['userinfo']['school'] = is_null($school) ? null : $school->name;
+            $response['userinfo']['school_logo'] = is_null($school) ? null : $school->logo;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1495,7 +1496,7 @@ class UserController extends Controller {
                 throw new InvalidParameterException('parameterInvalid', 'state_id');
             }
         }
-
+        $school_logo = null;
         if (!is_null($r['school_id'])) {
             if (is_numeric($r['school_id'])) {
                 try {
@@ -1503,9 +1504,14 @@ class UserController extends Controller {
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
-
                 if (is_null($r['school'])) {
                     throw new InvalidParameterException('parameterInvalid', 'school');
+                }
+                if ($r['school_logo'] != '') {
+                    SchoolsDAO::updateLogo($r['school_id'], $r['school_logo']);
+                    $school_logo = $r['school_logo'];
+                } else {
+                    $school_logo = $r['school']->logo;
                 }
             } elseif (empty($r['school_name'])) {
                 $r['school_id'] = null;
@@ -1515,9 +1521,11 @@ class UserController extends Controller {
                         'name' => $r['school_name'],
                         'country_id' => $state != null ? $state->country_id : null,
                         'state_id' => $state != null ? $state->state_id : null,
+                        'logo' => isset($r['school_logo']) ? $r['school_logo'] : null,
                         'auth_token' => $r['auth_token'],
                     ]));
                     $r['school_id'] = $response['school_id'];
+                    $school_logo = $r['school_logo'];
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -1591,7 +1599,7 @@ class UserController extends Controller {
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
-        return ['status' => 'ok'];
+        return ['status' => 'ok', 'school_logo' => $school_logo];
     }
 
     /**

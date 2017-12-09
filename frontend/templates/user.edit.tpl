@@ -2,6 +2,9 @@
 {block name="content"}
 	<div class="col-md-10">
 		<div class="panel panel-default">
+			<div class="panel-body hidden">
+				<div id="verdict-chart"><img src="/media/wait.gif" /></div>
+			</div>
 			<div class="panel-heading">
 				<h2 class="panel-title">{#userEditEditProfile#}</h2>
 			</div>
@@ -56,6 +59,9 @@
 						<label for="school" class="col-md-4 control-label">{#profileSchool#}</label>
 						<div class="col-md-7">
 							<input id='school' name='school' value='' type='text' size='20' class="form-control" />
+							<label title="{#profileUploadLogoSchool#}" {if $profile.userinfo.school_logo}class="hidden"{/if}>
+								<input type="file" accept="image/*"/>
+							</label>
 						</div>
 						<input id='school_id' name='school_id' value="" type='hidden'>
 					</div>

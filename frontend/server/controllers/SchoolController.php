@@ -31,7 +31,12 @@ class SchoolController extends Controller {
 
         $response = [];
         foreach ($schools as $school) {
-            $entry = ['label' => $school->name, 'value' => $school->name, 'id' => $school->school_id];
+            $entry = [
+                'label' => $school->name,
+                'value' => $school->name,
+                'id' => $school->school_id,
+                'logo' => $school->logo
+            ];
             array_push($response, $entry);
         }
 
@@ -72,6 +77,7 @@ class SchoolController extends Controller {
             'name' => $r['name'],
             'country_id' => $state != null ? $state->country_id : null,
             'state_id' => $state != null ? $state->state_id : null,
+            'logo' => $r['logo']
         ]);
 
         $school_id = 0;

@@ -555,6 +555,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileSolvedProblems: "Problemas resueltos",
 	profileState: "Estado",
 	profileStatistics: "Estad\u00edsticas",
+	profileUploadLogoSchool: "Carga el logo de tu escuela",
 	profileUsername: "Nombre de usuario",
 	publicContestMustHaveProb: "",
 	publish: "Publicar",
