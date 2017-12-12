@@ -196,6 +196,24 @@ let UI = {
         .on('typeahead:autocompleted', cb);
   },
 
+  schoolTypeahead: function(elem, cb) {
+    cb = cb || function(event, val) { $(event.target).val(val.value); };
+    elem.typeahead(
+            {
+              minLength: 2,
+              highlight: true,
+            },
+            {
+              source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
+              displayKey: 'label',
+              templates: {
+                empty: omegaup.T.schoolToBeAdded,
+              }
+            })
+        .on('typeahead:selected', cb)
+        .on('typeahead:autocompleted', cb);
+  },
+
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
 
   groupTypeahead: function(elem, cb) {

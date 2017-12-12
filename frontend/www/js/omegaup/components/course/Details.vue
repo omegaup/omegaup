@@ -59,6 +59,16 @@
           </div>
         </div>
         <div class="row">
+          <div class="form-group col-md-12">
+            <label>{{ T.profileSchool }} <input autocomplete="off"
+                   class="form-control typeahead"
+                   type="text"
+                   v-model="school_name"
+                   v-on:change="onChange"><input type="hidden"
+                   v-model="school_id"></label>
+          </div>
+        </div>
+        <div class="row">
           <div class="form-group container-fluid">
             <label>{{ T.courseNewFormDescription }}
             <textarea class="form-control"
@@ -85,6 +95,7 @@
 </template>
 
 <script>
+import UI from '../../ui.js';
 import DatePicker from '../DatePicker.vue';
 
 export default {
@@ -101,7 +112,16 @@ export default {
       showScoreboard: this.course.show_scoreboard || 0,
       startTime: this.course.start_time || new Date(),
       name: this.course.name,
+      school_id: this.course.school_id,
+      school_name: this.course.school_name
     };
+  },
+  mounted: function() {
+    let self = this;
+    UI.schoolTypeahead($('input.typeahead', self.$el), function(event, item) {
+      self.school_name = item.value;
+      self.school_id = item.id;
+    });
   },
   watch: {
     course: function(val) { this.reset();},
@@ -114,12 +134,21 @@ export default {
       this.showScoreboard = this.course.show_scoreboard || 0;
       this.startTime = this.course.start_time || new Date();
       this.name = this.course.name;
+      this.school_id = this.course.school_id;
+      this.school_name = this.course.school_name;
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
       this.reset();
       this.$emit('cancel');
     },
+    onChange: function() {
+      if (this.course.school_id == this.school_id) {
+        this.school_id = null;
+      } else {
+        this.course.school_id = this.school_id;
+      }
+    }
   },
   components: {
     'omegaup-datepicker': DatePicker,

@@ -216,6 +216,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAdmins: "Administradores",
 	courseEditAdminsEmpty: "No hay administradores",
 	courseEditCourseEdited: "Tu curso ha sido editado!",
+	courseEditCourseEditedAndGoToCourse: "\u00a1Tu curso ha sido editado! <a href='/course/%(alias)'>Ir al curso</a>",
 	courseEditGoToCourse: "Ir al curso",
 	courseEditGroupAdminsEmpty: "No hay grupos de administradores",
 	courseEditRegisteredAdminRole: "Rol",

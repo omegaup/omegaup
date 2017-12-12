@@ -212,6 +212,7 @@ courseEditAddStudentsTooltip = "Agrega estudiantes utilizando su nombre de usuar
 courseEditAdmins = "Administradores"
 courseEditAdminsEmpty = "No hay administradores"
 courseEditCourseEdited = "Tu curso ha sido editado!"
+courseEditCourseEditedAndGoToCourse = "¡Tu curso ha sido editado! <a href='/course/%(alias)'>Ir al curso</a>"
 courseEditGoToCourse = "Ir al curso"
 courseEditGroupAdminsEmpty = "No hay grupos de administradores"
 courseEditRegisteredAdminRole = "Rol"
