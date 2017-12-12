@@ -344,7 +344,6 @@ omegaup.OmegaUp.on('ready', function() {
         isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
                      .hasClass('user-add-bulk');
         if (isBulk) {
-          var usernames = $('textarea[name="usernames"]').val().split(',');
           omegaup.UI.bulkOperation(
               function(alias, resolve, reject) {
                 var username = $.trim(alias);
