@@ -100,7 +100,9 @@ class QualityNominationController extends Controller {
                 if (!is_array($contents['tags'])) {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
-                $atLeastOneFieldIsPresent = true;
+                if (!empty($contents['tags'])) {
+                    $atLeastOneFieldIsPresent = true;
+                }
             }
             if (isset($contents['quality'])) {
                 if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
@@ -112,11 +114,13 @@ class QualityNominationController extends Controller {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+            if (isset($contents['tags']) && is_array($contents['tags'])) {
+                foreach ($contents['tags'] as &$tag) {
+                    if (!is_string($tag)) {
+                        throw new InvalidParameterException('parameterInvalid', 'contents');
+                    }
+                    $tag = TagController::normalize($tag);
                 }
-                $tag = TagController::normalize($tag);
             }
         } elseif ($r['nomination'] == 'promotion') {
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
@@ -173,17 +177,19 @@ class QualityNominationController extends Controller {
         ]);
         QualityNominationsDAO::save($nomination);
 
-        $qualityReviewerGroup = GroupsDAO::FindByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        foreach (GroupsDAO::sampleMembers(
-            $qualityReviewerGroup,
-            self::REVIEWERS_PER_NOMINATION
-        ) as $reviewer) {
-            QualityNominationReviewersDAO::save(new QualityNominationReviewers([
-                'qualitynomination_id' => $nomination->qualitynomination_id,
-                'user_id' => $reviewer->user_id,
-            ]));
+        if ($nomination->nomination == 'promotion') {
+            $qualityReviewerGroup = GroupsDAO::FindByAlias(
+                Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+            );
+            foreach (GroupsDAO::sampleMembers(
+                $qualityReviewerGroup,
+                self::REVIEWERS_PER_NOMINATION
+            ) as $reviewer) {
+                QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                    'qualitynomination_id' => $nomination->qualitynomination_id,
+                    'user_id' => $reviewer->user_id,
+                ]));
+            }
         }
 
         return [
@@ -229,13 +235,19 @@ class QualityNominationController extends Controller {
         $newProblemVisibility = $r['problem']->visibility;
         switch ($r['status']) {
             case 'approved':
-                $newProblemVisibility = ProblemController::VISIBILITY_BANNED;
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC) {
+                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
+                }
                 break;
             case 'denied':
-                // If banning is reverted, problem will become private.
-                // TODO(heduenas): Store pre-ban visibility inside problem and restore it when quality nomination is made 'open'.
-                if ($r['problem']->visibility == ProblemController::VISIBILITY_BANNED) {
+                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                    // If banning is reverted, problem will become private.
                     $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
+                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+                    // If banning is reverted, problem will become public.
+                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC;
                 }
                 break;
             case 'open':
@@ -249,9 +261,14 @@ class QualityNominationController extends Controller {
 
         QualityNominationsDAO::transBegin();
         try {
+            $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
+            if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
+              $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                $response = self::sendDemotionEmail($r, $qualitynomination);
+            }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
@@ -260,6 +277,40 @@ class QualityNominationController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Send a mail with demotion notification to the original creator
+     *
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+        $request = [];
+        try {
+            $adminuser = ProblemsDAO::getAdminUser($r['problem']);
+            $email = $adminuser['email'];
+            $username = $adminuser['name'];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $reason = json_decode($qualitynomination->contents);
+        $email_params = [
+            'reason' => $reason->rationale,
+            'problem_name' => htmlspecialchars($r['problem']->title),
+            'user_name' => $username
+        ];
+        global $smarty;
+        $mail_subject = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            $email_params
+        );
+        $mail_body = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailBody'),
+            $email_params
+        );
+
+        Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
     /**
@@ -281,6 +332,7 @@ class QualityNominationController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $types = (isset($r['types']) ? $r['types'] : ['promotion', 'demotion']);
 
         $nominations = null;
         try {
@@ -288,7 +340,8 @@ class QualityNominationController extends Controller {
                 $nominator,
                 $assignee,
                 $page,
-                $pageSize
+                $pageSize,
+                $types
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -406,16 +459,16 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
+        // Get information from the original problem.
+        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        // Adding in the response object a flag to know whether the user is a reviewer
+        $response['reviewer'] = $currentUserReviewer;
+
         if ($response['nomination'] == 'promotion') {
-            // Get information from the original problem.
-            $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
-            if (is_null($problem)) {
-                throw new NotFoundException('problemNotFound');
-            }
-
-            // Adding in the response object a flag to know whether the user is a reviewer
-            $response['reviewer'] = $currentUserReviewer;
-
             $response['original_contents'] = [
                 'statements' => [],
                 'source' => $problem->source,

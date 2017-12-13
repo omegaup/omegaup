@@ -10,6 +10,15 @@ include_once('base/QualityNominations.vo.base.php');
   *
   */
 class QualityNominationsDAO extends QualityNominationsDAOBase {
+    /**
+     * If a problem has more than this number of problems, none will be assigned.
+     */
+    const MAX_NUM_TOPICS = 5;
+    /**
+     * Confidence parameter for bayesianAverage()
+     */
+    const CONFIDENCE = 5;
+
     public static function getNominationStatusForProblem(Problems $problem, Users $user) {
         $sql = '
             SELECT
@@ -105,10 +114,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
 
         $nomination['time'] = (int)$nomination['time'];
-        $nomination['nominator'] = [
-            'username' => $nomination['username'],
-            'name' => $nomination['name'],
-        ];
+        foreach (['nominator', 'author'] as $userRole) {
+            $nomination[$userRole] = [
+                'username' => $nomination[$userRole . '_username'],
+                'name' => $nomination[$userRole . '_name'],
+            ];
+        }
         unset($nomination['username']);
         unset($nomination['name']);
         $nomination['problem'] = [
@@ -144,7 +155,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $nominator,
         $assignee,
         $page = 1,
-        $pageSize = 1000
+        $pageSize = 1000,
+        $types = ['demotion', 'promotion']
     ) {
         $page = max(0, $page - 1);
         $sql = '
@@ -153,10 +165,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.nomination,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -166,22 +180,45 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         INNER JOIN
             Users nominator
         ON
-            nominator.user_id = qn.user_id';
+            nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id';
         $params = [];
+        $conditions = [];
 
-        if (!is_null($nominator)) {
-            $sql .= ' WHERE qn.user_id = ?';
-            $params[] = $nominator;
-        } elseif (!is_null($assignee)) {
+        if (!is_null($assignee)) {
             $sql .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
             ON
-                qnr.qualitynomination_id = qn.qualitynomination_id
-            WHERE
-                qnr.user_id = ?';
+                qnr.qualitynomination_id = qn.qualitynomination_id';
+
+            $conditions[] = ' qnr.user_id = ?';
             $params[] = $assignee;
         }
+        if (!empty($types)) {
+            global $conn;
+            $connectionID = $conn->_connectionID;
+            $escapeFunc = function ($type) use ($connectionID) {
+                return mysqli_real_escape_string($connectionID, $type);
+            };
+            $conditions[] =
+                ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
+        }
+        if (!is_null($nominator)) {
+            $conditions[] = ' qn.user_id = ?';
+            $params[] = $nominator;
+        }
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
         $sql .= ' LIMIT ?, ?;';
         $params[] = $page * $pageSize;
         $params[] = ($page + 1) * $pageSize;
@@ -206,10 +243,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.contents,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -220,10 +259,165 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             Users nominator
         ON
             nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id
         WHERE
             qn.qualitynomination_id = ?;';
 
         global $conn;
         return self::processNomination($conn->GetRow($sql, [$qualitynomination_id]));
+    }
+
+    /**
+     * This function computes the average difficulty and quality among all problems.
+     */
+    public static function getGlobalDifficultyAndQuality() {
+        $sql = 'SELECT `QualityNominations`.`contents` '
+            . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
+
+        $qualitySum = 0;
+        $qualityN = 0;
+        $difficultySum = 0;
+        $difficultyN = 0;
+
+        global $conn;
+        $result = $conn->Execute($sql);
+
+        foreach ($result as $nomination) {
+            $feedback = (array) json_decode($nomination['contents']);
+            if (isset($feedback['quality'])) {
+                $qualitySum += $feedback['quality'];
+                $qualityN++;
+            }
+            if (isset($feedback['difficulty'])) {
+                $difficultySum += $feedback['difficulty'];
+                $difficultyN++;
+            }
+        }
+
+        return [$qualitySum / $qualityN, $difficultySum / $difficultyN];
+    }
+
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
+    public static function getProblemSuggestionAggregates($problemId) {
+        $sql = 'SELECT `QualityNominations`.`contents` '
+            . 'FROM `QualityNominations` '
+            . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
+        global $conn;
+        $result = $conn->Execute($sql);
+
+        $problemAggregates = [
+            'quality_sum' => 0,
+            'quality_n' => 0,
+            'difficulty_sum' => 0,
+            'difficulty_n' => 0,
+            'tags_n' => 0,
+            'tags' => [],
+        ];
+
+        foreach ($result as $nomination) {
+            $feedback = (array) json_decode($nomination['contents']);
+
+            if (isset($feedback['quality'])) {
+                $problemAggregates['quality_sum'] += $feedback['quality'];
+                $problemAggregates['quality_n']++;
+            }
+
+            if (isset($feedback['difficulty'])) {
+                $problemAggregates['difficulty_sum'] += $feedback['difficulty'];
+                $problemAggregates['difficulty_n']++;
+            }
+
+            if (isset($feedback['tags'])) {
+                foreach ($feedback['tags'] as $tag) {
+                    if (!isset($problemAggregates['tags'][$tag])) {
+                        $problemAggregates['tags'][$tag] = 1;
+                    } else {
+                        $problemAggregates['tags'][$tag]++;
+                    }
+                    $problemAggregates['tags_n']++;
+                }
+            }
+        }
+
+        return $problemAggregates;
+    }
+
+    /**
+     * This function aggregates users' suggestions to generate difficulty,
+     * quality and subject tags for each problem in the platform.
+     * This function is to be called (only) by a cronjob.
+     */
+    public static function aggregateFeedback() {
+        list($globalQualityAverage, $globalDifficultyAverage)
+                = self::getGlobalDifficultyAndQuality();
+
+        $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
+            . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
+        global $conn;
+        foreach ($conn->Execute($sql) as $nomination) {
+            $problemId = $nomination['problem_id'];
+            $problemAggregates = self::getProblemSuggestionAggregates($problemId);
+
+            $problem = ProblemsDAO::getByPK($problemId);
+            $problem->quality = self::bayesianAverage(
+                $globalQualityAverage,
+                $problemAggregates['quality_sum'],
+                $problemAggregates['quality_n']
+            );
+            $problem->difficulty = self::bayesianAverage(
+                $globalDifficultyAverage,
+                $problemAggregates['difficulty_sum'],
+                $problemAggregates['difficulty_n']
+            );
+
+            if ($problem->quality != null || $problem->difficulty != null) {
+                ProblemsDAO::save($problem);
+            }
+            // TODO(heduenas): Get threshold parameter from DB for each problem independently.
+            $tags = self::mostVotedTags($problemAggregates['tags'], 0.25);
+            if (!empty($tags)) {
+                ProblemsTagsDAO::replaceAutogeneratedTags($problem, $tags);
+            }
+        }
+    }
+
+    private static function bayesianAverage($aprioriAverage, $sum, $n) {
+        if ($n < self::CONFIDENCE) {
+            return null;
+        }
+        return (self::CONFIDENCE * $aprioriAverage + $sum) / (self::CONFIDENCE + $n);
+    }
+
+    /**
+     * Algorithm that computes the list of tags to be assigned to a problem
+     * based on the number of votes each tag got for each problem.
+     */
+    public static function mostVotedTags($tags, $threshold) {
+        if (array_sum($tags) < 5) {
+            return [];
+        }
+
+        $max = max($tags);
+        $mostVoted = [];
+        foreach ($tags as $key => $value) {
+            if ($value < $max * $threshold) {
+                continue;
+            }
+            $mostVoted[] = $key;
+            if (count($mostVoted) > self::MAX_NUM_TOPICS) {
+                return [];
+            }
+        }
+        return $mostVoted;
     }
 }

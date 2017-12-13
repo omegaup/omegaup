@@ -1,6 +1,7 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleLogin#}"}
 
 <div id="login-page">
+	<script type="text/json" id="payload">{$payload|json_encode}</script>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h2 class="panel-title">{#loginHeader#}</h2>

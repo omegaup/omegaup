@@ -107,6 +107,9 @@ class Problems extends VO {
         if (isset($data['email_clarifications'])) {
             $this->email_clarifications = $data['email_clarifications'];
         }
+        if (isset($data['quality'])) {
+            $this->quality = $data['quality'];
+        }
     }
 
     /**
@@ -310,4 +313,11 @@ class Problems extends VO {
       * @var tinyint(1)
       */
     public $email_clarifications;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var double
+      */
+    public $quality;
 }

@@ -49,6 +49,7 @@ function _convertTimes(item) {
 
 function _normalizeContestFields(contest) {
   omegaup.OmegaUp.convertTimes(contest);
+  contest.submissions_gap = parseInt(contest.submissions_gap);
   contest.show_penalty =
       (contest.penalty != 0 || contest.penalty_type != 'none');
   return contest;
@@ -257,6 +258,8 @@ export default {
     update: _call('/api/course/update/'),
 
     updateAssignment: _call('/api/course/updateAssignment/'),
+
+    updateProblemsOrder: _call('/api/course/updateProblemsOrder/'),
   },
 
   Grader: {
@@ -383,6 +386,8 @@ export default {
     tags: _call('/api/problem/tags/'),
 
     update: _call('/api/problem/update/'),
+
+    updateStatement: _call('/api/problem/updateStatement/'),
   },
 
   QualityNomination: {
@@ -436,7 +441,10 @@ export default {
   },
 
   School: {
+    create: _call('/api/school/create/'),
+
     list: _call('/api/school/list/'),
+
     rank: _call('/api/school/rank/'),
   },
 

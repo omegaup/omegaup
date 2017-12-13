@@ -9,11 +9,15 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
-          contents: payload.original_contents,
+          contents: payload.contents,
           nomination: payload.nomination,
           nominator: {
             username: payload.nominator.username,
             name: payload.nominator.name,
+          },
+          author: {
+            username: payload.author.username,
+            name: payload.author.name,
           },
           problem: {alias: payload.problem.alias, title: payload.problem.title},
           qualitynomination_id: parseInt(payload.qualitynomination_id),

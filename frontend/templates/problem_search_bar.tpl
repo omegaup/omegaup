@@ -3,9 +3,11 @@
 		<div class="form-inline">
 			{if !empty($smarty.get.tag)}
 			<div class="form-group">
-				<input type="hidden" name="tag" value="{$smarty.get.tag|urlencode}" />
-				<span class="tag">{$smarty.get.tag|escape}</span>
-				<a href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
+				{foreach item=tag from=$smarty.get.tag}
+					<input type="hidden" name="tag[]" value="{$tag|urlencode}" />
+					<span class="tag">{$tag|escape}</span>
+				{/foreach}
+				<a class="remove-all-tags" href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
 			</div>
 			{/if}
 			<div class="form-group">
@@ -29,6 +31,8 @@
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>
 				<select class="form-control" id="problem-search-order" name="order_by">
 					<option {if $ORDER_BY == 'title'}		selected="selected"{/if}	value="title">{#wordsTitle#}</option>
+					<option {if $ORDER_BY == 'quality'}	selected="selected"{/if}	value="quality">{#wordsQuality#}</option>
+					<option {if $ORDER_BY == 'difficulty'}	selected="selected"{/if}	value="difficulty">{#wordsDifficulty#}</option>
 					<option {if $ORDER_BY == 'submissions'}	selected="selected"{/if}	value="submissions">{#wordsRuns#}</option>
 					<option {if $ORDER_BY == 'accepted'}	selected="selected"{/if}	value="accepted">{#wordsAccepted#}</option>
 					<option {if $ORDER_BY == 'ratio'}		selected="selected"{/if}	value="ratio">{#wordsRatio#}</option>
@@ -47,8 +51,6 @@
 			</div>
 
 			<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="problem-search-button"/>
-
-			<label class="control-label"><input type="checkbox" id="high-quality-filter"> {#wordsOnly#} <img src="/media/quality-badge-sm.png"></img></label>
 		</div>
 	</form>
 </div>

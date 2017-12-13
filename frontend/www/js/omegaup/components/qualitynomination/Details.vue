@@ -15,7 +15,7 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.qualityUserThatNominated }}</strong>
+            <strong>{{ T.wordsNominator }}</strong>
           </div>
           <div class="col-sm-4">
             {{ this.nominator.name }} (<a v-bind:href="userUrl(this.nominator.username)">{{
@@ -33,10 +33,19 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.wordsDetails }}</strong>
+            <strong>{{ T.wordsAuthor }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.contents }}
+            {{ this.author.name }} (<a v-bind:href="userUrl(this.author.username)">{{
+            this.author.username }}</a>)
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsDetails }}</strong>
+          </div>
+          <div class="col-sm-8">
+            <pre>{{ this.contents | pretty }}</pre>
           </div>
         </div>
         <div class="row"
@@ -65,6 +74,7 @@ export default {
     contents: Object,
     nomination: String,
     nominator: {username: String, name: String},
+    author: {username: String, name: String},
     problem: {alias: String, title: String},
     qualitynomination_id: Number,
     reviewer: Boolean,
@@ -81,10 +91,13 @@ export default {
     markResolution: function(banProblem) {
       let newStatus = banProblem ? 'approved' : 'denied';
       API.QualityNomination.resolve({
-                             problem: this.problem.alias,
+                             problem_alias: this.problem.alias,
                              status: newStatus,
                              qualitynomination_id: this.qualitynomination_id
                            })
+          .then(function() {
+            omegaup.UI.success(T.qualityNominationResolutionSuccess);
+          })
           .fail(UI.apiError);
     },
   }

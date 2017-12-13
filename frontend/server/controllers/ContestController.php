@@ -600,7 +600,7 @@ class ContestController extends Controller {
 
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
-
+            $result['languages'] = explode(',', $result['languages']);
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -804,7 +804,6 @@ class ContestController extends Controller {
 
         // Create and populate a new Contests object
         $contest = new Contests();
-
         $contest->public = $r['public'];
         $contest->title = $r['title'];
         $contest->description = $r['description'];
@@ -821,7 +820,7 @@ class ContestController extends Controller {
         $contest->penalty = max(0, intval($r['penalty']));
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
-        $contest->languages = empty($r['languages']) ? null : $r['languages'];
+        $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
         $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
@@ -1030,6 +1029,13 @@ class ContestController extends Controller {
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
 
+        // languages is always optional
+        if (!empty($r['languages'])) {
+            foreach ($r['languages'] as $language) {
+                Validators::isInEnum($language, 'languages', RunController::$kSupportedLanguages, false);
+            }
+        }
+
         if ($is_update) {
             // Prevent date changes if a contest already has runs
             if (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['contest']->start_time)) {
@@ -1170,7 +1176,8 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if ($problem->visibility == ProblemController::VISIBILITY_BANNED) {
+        if ($problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
+            || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
@@ -2090,6 +2097,9 @@ class ContestController extends Controller {
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after',
+            'languages' => ['transform' => function ($value) {
+                return join(',', $value);
+            }],
             'contestant_must_register',
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
@@ -2262,7 +2272,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', ['c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj'], false);
+        Validators::isInEnum($r['language'], 'language', RunController::$kSupportedLanguages, false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
@@ -2596,13 +2606,6 @@ class ContestController extends Controller {
         }
 
         $zip->add_file('summary.csv', $table);
-
-        // Add problem cases to zip
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $contest_problems = ProblemsetProblemsDAO::GetRelevantProblems($problemset);
-        foreach ($contest_problems as $problem) {
-            $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
-        }
 
         // Return zip
         $zip->finish();

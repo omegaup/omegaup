@@ -277,60 +277,23 @@ class UserController extends Controller {
      */
     private static function sendVerificationEmail(Request $r) {
         try {
-            $r['email'] = EmailsDAO::getByPK($r['user']->main_email_id);
+            $email = EmailsDAO::getByPK($r['user']->main_email_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         global $smarty;
-        $r['mail_subject'] = $smarty->getConfigVars('verificationEmailSubject');
-        $r['mail_body'] = sprintf(
+        $subject = $smarty->getConfigVars('verificationEmailSubject');
+        $body = sprintf(
             $smarty->getConfigVars('verificationEmailBody'),
             OMEGAUP_URL,
             $r['user']->verification_id
         );
 
         if (self::$sendEmailOnVerify) {
-            self::sendEmail($r);
+            Email::sendEmail($email->email, $subject, $body);
         } else {
             self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
-        }
-    }
-
-    public static function sendEmail($r) {
-        Validators::isStringNonEmpty($r['mail_subject'], 'mail_subject');
-        Validators::isStringNonEmpty($r['mail_body'], 'mail_body');
-
-        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
-            self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
-            self::$log->info('     to = ' . $r['email']->email);
-            self::$log->info('subject = ' . $r['mail_subject']);
-            self::$log->info('   body = ' . $r['mail_body']);
-            return;
-        }
-
-        self::$log->info('Really sending email to user.');
-
-        $mail = new PHPMailer();
-        $mail->IsSMTP();
-        $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-        $mail->CharSet = 'utf-8';
-        $mail->SMTPAuth = true;
-        $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-        $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->Port = 465;
-        $mail->SMTPSecure = 'ssl';
-        $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
-
-        $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->AddAddress($r['email']->email);
-        $mail->isHTML(true);
-        $mail->Subject = $r['mail_subject'];
-        $mail->Body = $r['mail_body'];
-
-        if (!$mail->Send()) {
-            self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
-            throw new EmailVerificationSendException();
         }
     }
 
@@ -930,6 +893,15 @@ class UserController extends Controller {
                 'ROOP-18' => 300,
                 'ROOS-18' => 300,
             ];
+        } elseif ($r['contest_type'] == 'TEBAEV') {
+            if ($r['current_user']->username != 'lacj20'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'TEBAEV' => 250,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
@@ -1078,6 +1050,7 @@ class UserController extends Controller {
         $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
+        $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
 
         if (!is_null($user->language_id)) {
@@ -1248,18 +1221,16 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getAll(null, null, 'time', 'DESC');
-
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             foreach ($coders as $c) {
-                $user = UsersDAO::getByPK($c->user_id);
-                $email = EmailsDAO::getByPK($user->main_email_id);
                 $response['coders'][] = [
-                    'username' => $user->username,
-                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($email->email) . '?s=32',
-                    'date' => $c->time
+                    'username' => $c['username'],
+                    'country_id' => $c['country_id'],
+                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
+                    'date' => $c['time']
                 ];
             }
-        } catch (Exception $ex) {
+        } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1596,6 +1567,7 @@ class UserController extends Controller {
             'state_id',
             'scholar_degree',
             'school_id',
+            'preferred_language',
             'graduation_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
@@ -1694,12 +1666,6 @@ class UserController extends Controller {
                 }
                 return $response;
             }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
-
-            // If cache was set, we need to maintain a list of different ranks in the cache
-            // (A different rankCacheName means different offset and rowcount params
-            if ($cacheUsed === false) {
-                self::setProblemsSolvedRankCacheList($rankCacheName);
-            }
         } else {
             $response = [];
 
@@ -1725,43 +1691,12 @@ class UserController extends Controller {
     }
 
     /**
-     * Adds the rank name to a list of stored ranks so we know we ranks to delete
-     * after
-     *
-     * @param string $rankCacheName
-     */
-    private static function setProblemsSolvedRankCacheList($rankCacheName) {
-        // Save the instance of the rankName in a key/value array, so we know all ranks to
-        // expire
-        $rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, '');
-        $ranksList = $rankCacheList->get();
-
-        if (is_null($ranksList)) {
-            // Simulating a set
-            $ranksList = [$rankCacheName => 1];
-        } else {
-            $ranksList[$rankCacheName] = 1;
-        }
-
-        $rankCacheList->set($ranksList, 0);
-    }
-
-    /**
      * Expires the known ranks
      * @TODO: This should be called only in the grader->frontend callback and only IFF
      * verdict = AC (and not test run)
      */
     public static function deleteProblemsSolvedRankCacheList() {
-        $rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, '');
-        $ranksList = $rankCacheList->get();
-
-        if (!is_null($ranksList)) {
-            $rankCacheList->delete();
-
-            foreach ($ranksList as $key => $value) {
-                Cache::deleteFromCache(Cache::PROBLEMS_SOLVED_RANK, $key);
-            }
-        }
+        Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
     }
 
     /**
