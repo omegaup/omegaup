@@ -19,17 +19,18 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="row">
 					<div class="col-md-6">
-						<h5><strong>Organization</strong></h5>
-						<h6><a href="https://omegaup.org/#about">About us</a></h6>
-						<h6><a href="https://omegaup.org/#team">Team</a></h6>
+						<h5><strong>{#frontPageFooterOrganization#}</strong></h5>
+						<h6><a href="https://omegaup.org/#about" target="_blank">{#frontPageFooterAboutUs#}</a></h6>
+						<h6><a href="https://omegaup.org/#team" target="_blank">{#frontPageFooterTeam#}</a></h6>
+						<h6><a href="https://blog.omegaup.com/privacy-policy/" target="_blank">{#frontPageFooterPrivacyPolicy#}</a></h6>
 					</div>
 					<div class="col-md-6">
-						<h5><strong>Developers</h5></strong>
-						<h6><a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar">Help us</a></h6>
-						<h6><a href="https://github.com/omegaup/omegaup">Github</a></h6>
+						<h5><strong>{#frontPageFooterDevelopers#}</h5></strong>
+						<h6><a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar" target="_blank">{#frontPageFooterHelpUs#}</a></h6>
+						<h6><a href="https://github.com/omegaup/omegaup" target="_blank">Github</a></h6>
 					</div>
 				</div>
 			</div>
