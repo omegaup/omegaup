@@ -514,9 +514,6 @@ export class Arena {
       clock = FormatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
-    if (self.options.isLockdownMode === true) {
-      UI.warning(T.lockdownMessageWarning);
-    }
   }
 
   updateRunFallback(guid) {
