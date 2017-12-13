@@ -2,6 +2,7 @@ import {OmegaUp, T} from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
+import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -230,6 +231,9 @@ export class Arena {
     self.clarifications = {};
     self.submissionGap = 0;
 
+    // Setup preferred language
+    self.preferredLanguage = null;
+
     // UI elements
     self.elements = {
       clarification: $('#clarification'),
@@ -283,6 +287,9 @@ export class Arena {
       scoreboardCutoff: ko.observable(),
       attached: false,
     };
+
+    // The interval of time that submissions button will be disabled
+    self.submissionGapInterval = 0;
   }
 
   installLibinteractiveHooks() {
@@ -910,6 +917,93 @@ export class Arena {
         });
   }
 
+  selectDefaultLanguage() {
+    let self = this;
+    let langElement = self.elements.submitForm.language;
+    if (self.preferredLanguage) {
+      $('option', langElement)
+          .each(function() {
+            let option = $(this);
+            if (option.css('display') == 'none') return;
+            if (option.val() != self.preferredLanguage) return;
+            option.prop('selected', true);
+            return false;
+          });
+    }
+    if (langElement.val()) return;
+
+    $('option', langElement)
+        .each(function() {
+          let option = $(this);
+          if (option.css('display') != 'none') {
+            option.prop('selected', true);
+            langElement.change();
+            return false;
+          }
+        });
+  }
+
+  mountEditor(problem) {
+    let self = this;
+    let lang = self.elements.submitForm.language.val();
+    let template = '';
+    if (problem.templates && lang && problem.templates[lang]) {
+      template = problem.templates[lang];
+    }
+    if (self.codeEditor) {
+      self.codeEditor.code = template;
+      return;
+    }
+
+    self.codeEditor = new Vue({
+      el: self.elements.submitForm.code[0],
+      data: {
+        language: lang,
+        code: template,
+      },
+      methods: {
+        refresh: function() {
+          // It's possible for codeMirror not to have been set yet
+          // if this method is used before the mounted event handler
+          // is called.
+          if (this.codeMirror) {
+            this.codeMirror.refresh();
+          }
+        }
+      },
+      mounted: function() {
+        let self = this;
+        // Wait for sub-components to be mounted...
+        this.$nextTick(() => {
+          // ... and then fish out a reference to the wrapped
+          // CodeMirror instance.
+          //
+          // The full path is:
+          // - self: this unnamed component
+          // - $children[0]: CodeView instance
+          // - $refs['cm-wrapper']: vue-codemirror instance
+          // - editor: the actual CodeMirror instance
+          self.codeMirror = self.$children[0].$refs['cm-wrapper'].editor;
+        });
+      },
+      render: function(createElement) {
+        return createElement('omegaup-arena-code-view', {
+          props: {
+            language: this.language,
+            value: this.code,
+          },
+          on: {
+            input: (value) => { this.code = value; },
+            change: (value) => { this.code = value; },
+          }
+        });
+      },
+      components: {
+        'omegaup-arena-code-view': arena_CodeView,
+      }
+    });
+  }
+
   onHashChanged() {
     var self = this;
     var tabChanged = false;
@@ -1006,6 +1100,7 @@ export class Arena {
         $('#problem tbody.added').remove();
 
         self.updateAllowedLanguages(language_array);
+        self.selectDefaultLanguage();
 
         function updateRuns(runs) {
           if (runs) {
@@ -1024,8 +1119,10 @@ export class Arena {
           updateRuns(problem.runs);
         }
 
+        self.mountEditor(problem);
         MathJax.Hub.Queue(
             ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
+        self.initSubmissionCountdown();
       }
 
       if (problemChanged) {
@@ -1041,6 +1138,8 @@ export class Arena {
                 problem.problem_statement = problem_ext.problem_statement;
                 problem.sample_input = problem_ext.sample_input;
                 problem.runs = problem_ext.runs;
+                problem.templates = problem_ext.templates;
+                self.preferredLanguage = problem_ext.preferred_language;
                 update(problem);
               })
               .fail(UI.apiError);
@@ -1052,7 +1151,15 @@ export class Arena {
         $('input', self.elements.submitForm).show();
         self.elements.submitForm.show();
         $('#overlay').show();
-        self.elements.submitForm.code.val('');
+        if (self.codeEditor) {
+          // It might not be mounted yet if we refresh directly onto
+          // a /new-run view. This code executes directly, whereas
+          // codeEditor is mounted after update() finishes.
+          //
+          // Luckily in this case we don't require the call to refresh
+          // for the display to update correctly!
+          self.codeEditor.refresh();
+        }
       }
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
@@ -1134,6 +1241,44 @@ export class Arena {
     self.elements.submitForm.file.val(null);
   }
 
+  initSubmissionCountdown() {
+    let self = this;
+    let nextSubmissionTimestamp = new Date(0);
+    $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
+    if (typeof(self.problems[self.currentProblem.alias]
+                   .nextSubmissionTimestamp) !== 'undefined') {
+      nextSubmissionTimestamp = new Date(
+          self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
+          1000);
+    } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
+      nextSubmissionTimestamp = new Date(
+          self.problems[self.currentProblem.alias]
+              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
+              .time.getTime() +
+          self.currentContest.submissions_gap * 1000);
+    }
+    if (self.submissionGapInterval) {
+      clearInterval(self.submissionGapInterval);
+      self.submissionGapInterval = 0;
+    }
+    self.submissionGapInterval = setInterval(function() {
+      let submissionGapSecondsRemaining =
+          Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
+      if (submissionGapSecondsRemaining > 0) {
+        $('#submit input[type=submit]')
+            .attr('disabled', 'disabled')
+            .val(UI.formatString(
+                T.arenaRunSubmitWaitBetweenUploads,
+                {submissionGap: submissionGapSecondsRemaining}));
+      } else {
+        $('#submit input[type=submit]')
+            .removeAttr('value')
+            .removeAttr('disabled');
+        clearInterval(self.submissionGapInterval);
+      }
+    }, 1000);
+  }
+
   onLanguageSelect(e) {
     var self = this;
     var lang = $(e.target).val();
@@ -1144,6 +1289,9 @@ export class Arena {
       ext.text('.' + lang);
     } else {
       ext.text('');
+    }
+    if (self.codeEditor) {
+      self.codeEditor.language = lang;
     }
   }
 
@@ -1198,12 +1346,11 @@ export class Arena {
       return false;
     }
 
-    var code = submitForm.code.val();
-    if (!code) {
+    if (!self.codeEditor.code) {
       alert(T.arenaRunSubmitEmptyCode);
       return false;
     }
-    self.submitRun(code);
+    self.submitRun(self.codeEditor.code);
 
     return false;
   }
@@ -1239,8 +1386,9 @@ export class Arena {
           if (!self.options.isOnlyProblem) {
             self.problems[self.currentProblem.alias].last_submission =
                 Date.now();
+            self.problems[self.currentProblem.alias].nextSubmissionTimestamp =
+                run.nextSubmissionTimestamp;
           }
-
           run.username = OmegaUp.username;
           run.status = 'new';
           run.alias = self.currentProblem.alias;
@@ -1253,9 +1401,9 @@ export class Arena {
           self.updateRun(run);
 
           $('input', self.elements.submitForm).removeAttr('disabled');
-          self.elements.submitForm.code.val('');
           self.hideOverlay();
           self.clearInputFile();
+          self.initSubmissionCountdown();
         })
         .fail(function(run) {
           alert(run.error);

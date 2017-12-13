@@ -15,20 +15,6 @@ class ResetController extends Controller {
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = ApiUtils::GetStringTime();
 
-        $mail = new PHPMailer();
-        $mail->IsSMTP();
-        $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-        $mail->SMTPAuth = true;
-        $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-        $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->Port = 465;
-        $mail->SMTPSecure = 'ssl';
-        $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
-
-        $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->AddAddress($email);
-        $mail->isHTML(true);
-
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
@@ -39,14 +25,16 @@ class ResetController extends Controller {
         }
 
         global $smarty;
-        $mail->Subject = $smarty->getConfigVariable('wordsReset');
+        $subject = $smarty->getConfigVariable('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
         $message = $smarty->getConfigVariable('wordsResetMessage');
-        $mail->Body = str_replace('[link]', $link, $message);
+        $body = str_replace('[link]', $link, $message);
 
-        if (!$mail->Send()) {
-            self::$log->error('Failed to send mail:'. $mail->ErrorInfo);
+        try {
+            Email::sendEmail($email, $subject, $body);
+        } catch (Exception $e) {
+            self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
             $user->reset_sent_at = null;
             UsersDAO::save($user);

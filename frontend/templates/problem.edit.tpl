@@ -144,6 +144,9 @@
 						<input id="tag-name" name="tag_name" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 					<div class="form-group">
+						<div class="tag-list pull-left"></div>
+					</div>
+					<div class="form-group">
 						<label for="tag-public">{#wordsPublic#}</label>
 						<select id="tag-public" name="tag_public" class="form-control">
 							<option value="0" selected="selected">{#wordsNo#}</option>

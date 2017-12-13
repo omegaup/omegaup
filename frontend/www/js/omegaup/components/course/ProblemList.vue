@@ -30,12 +30,18 @@
            v-else="">
       <thead>
         <tr>
+          <th>{{ T.contestAddproblemProblemOrder }}</th>
           <th>{{ T.contestAddproblemProblemName }}</th>
           <th>{{ T.contestAddproblemProblemRemove }}</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="problem in assignmentProblems">
+      <tbody v-sortable="{ onUpdate: sort }">
+        <tr v-bind:key="problem.letter"
+            v-for="problem in assignmentProblems">
+          <td>
+            <a v-bind:title="T.courseAssignmentProblemReorder"><span aria-hidden="true"
+                  class="glyphicon glyphicon-move handle"></span></a>
+          </td>
           <td>{{ problem.title }}</td>
           <td class="button-column">
             <a v-bind:title="T.courseAssignmentProblemRemove"
@@ -168,6 +174,12 @@ export default {
     onRemove: function(problem) {
       this.$emit('remove', this.assignment, problem);
     },
+    sort: function(event) {
+      this.assignmentProblems.splice(
+          event.newIndex, 0,
+          this.assignmentProblems.splice(event.oldIndex, 1)[0]);
+      this.$emit('sort', this.assignment, this.assignmentProblems);
+    }
   },
   watch: {
     assignment: function(val) { this.$emit('assignment', val);},
