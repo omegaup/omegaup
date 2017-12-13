@@ -32,6 +32,9 @@ class ApiCaller {
         } catch (InvalidCredentialsException $e) {
             // No log because the code that threw it already logged.
             $response = $e->asResponseArray();
+        } catch (ApiException $e) {
+            self::$log->error($e);
+            $response = $e->asResponseArray();
         } catch (Exception $e) {
             self::$log->error($e);
             $apiException = new InternalServerErrorException($e);
