@@ -69,11 +69,12 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
-    var usernames = $('textarea[name="usernames"]').val().split(',');
-    if (typeof usernames != 'undefined') {
-      usernames.each(function(event, index) {
-        operation(event, resolve, reject);
-      });
+    if (typeof options != 'undefined') {
+      if (options.hasOwnProperty('usernames')) {
+        options.usernames.each(function(event, index) {
+          operation(event, resolve, reject);
+        });
+      }
     }
 
     // Wait for all

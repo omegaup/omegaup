@@ -343,6 +343,7 @@ omegaup.OmegaUp.on('ready', function() {
         evt.preventDefault;
         isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
                      .hasClass('user-add-bulk');
+        var usernames = $('textarea[name="usernames"]').val().split(',');
         if (isBulk) {
           omegaup.UI.bulkOperation(
               function(alias, resolve, reject) {
@@ -357,7 +358,8 @@ omegaup.OmegaUp.on('ready', function() {
               function() { refreshContestContestants(); },
               {
                 errorTemplate: omegaup.T.bulkUserAddError,
-                successTemplate: omegaup.T.bulkUserAddSuccess
+                successTemplate: omegaup.T.bulkUserAddSuccess,
+                usernames: usernames
               });
           return false;
         } else {
