@@ -29,10 +29,8 @@ class ApiCaller {
     public static function call(Request $request) {
         try {
             $response = $request->execute();
-        } catch (ApiException $e) {
-            if ($e->getMessage() != 'usernameOrPassIsWrong') {
-                self::$log->error($e);
-            }
+        } catch (InvalidCredentialsException $e) {
+            // No log because the code that threw it already logged.
             $response = $e->asResponseArray();
         } catch (Exception $e) {
             self::$log->error($e);
