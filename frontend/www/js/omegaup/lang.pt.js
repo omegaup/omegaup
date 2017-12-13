@@ -328,6 +328,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveOs: "Sistema Operacional",
 	locale: "pt",
 	lockdownDetailsDisabled: "A visualiza\u00e7\u00e3o do c\u00f3digo-fonte foi desativada temporariamente.",
+	lockdownMessageWarning: "Aviso: no modo lockdown, Suas env\u00edos n\u00e3o ser\u00e3o mais acess\u00edveis se voc\u00ea sair da p\u00e1gina.",
 	loginDisabled: "O usu\u00e1rio \u00e9 muito antigo e para a sua seguran\u00e7a ele foi desativado. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail ou usu\u00e1rio",

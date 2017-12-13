@@ -328,6 +328,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveOs: "(Op3ra7ing Sy573m)",
 	locale: "pseudo",
 	lockdownDetailsDisabled: "(Vi3wing 50urc3 c0d3 ha5 b33n 73mp0rari1y di5ab13d.)",
+	lockdownMessageWarning: "(Warning: in 10ckd0wn m0d3, y0ur 5ubmi55i0n5 wi11 n0 10ng3r b3 acc355ib13 if y0u 13av3 7h3 pag3.)",
 	loginDisabled: "(Y0ur u53r i5 700 01d and f0r y0ur 53curi7y i7 ha5 b33n di5ab13d. P13a53 c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m 70 10gin again.)",
 	loginEmail: "(E-mai1)",
 	loginEmailUsername: "(E-mai1 0r u53r)",

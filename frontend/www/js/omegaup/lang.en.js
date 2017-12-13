@@ -328,6 +328,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveOs: "Operating System",
 	locale: "en",
 	lockdownDetailsDisabled: "Viewing source code has been temporarily disabled.",
+	lockdownMessageWarning: "Warning: in lockdown mode, your submissions will no longer be accessible if you leave the page.",
 	loginDisabled: "Your user is too old and for your security it has been disabled. Please contact omegaup-soporte@googlegroups.com to login again.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail or user",

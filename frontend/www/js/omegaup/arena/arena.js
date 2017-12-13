@@ -60,6 +60,11 @@ export function GetOptionsFromLocation(arenaLocation) {
 
   if ($('body').hasClass('lockdown')) {
     options.isLockdownMode = true;
+    window.onbeforeunload = function(e) {
+      var dialogText = T.lockdownMessageWarning;
+      e.returnValue = dialogText;
+      return e.returnValue;
+    };
   }
 
   if (arenaLocation.pathname.indexOf('/practice') !== -1) {
@@ -515,7 +520,6 @@ export class Arena {
     } else {
       clock = FormatDelta(countdownTime.getTime() - now);
     }
-
     self.elements.clock.text(clock);
   }
 
