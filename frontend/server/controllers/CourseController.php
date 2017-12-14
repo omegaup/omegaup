@@ -229,10 +229,10 @@ class CourseController extends Controller {
             CoursesDAO::transEnd();
         } catch (InvalidParameterException $e) {
             CoursesDAO::transRollback();
-            throw new InvalidParameterException('parameterEmpty', $e->getTrace()[0]['args'][1]);
+            throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
             CoursesDAO::transRollback();
-            throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            throw $e;
         } catch (Exception $e) {
             CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
