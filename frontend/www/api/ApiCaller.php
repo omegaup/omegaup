@@ -29,6 +29,9 @@ class ApiCaller {
     public static function call(Request $request) {
         try {
             $response = $request->execute();
+        } catch (InvalidCredentialsException $e) {
+            // No log because the code that threw it already logged.
+            $response = $e->asResponseArray();
         } catch (ApiException $e) {
             self::$log->error($e);
             $response = $e->asResponseArray();
