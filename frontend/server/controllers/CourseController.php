@@ -179,26 +179,21 @@ class CourseController extends Controller {
         }
         $original_course = CoursesDAO::getByAlias($r['course_alias']);
         $offset = round($r['start_time']) - strtotime($original_course->start_time);
-        $course_duration = strtotime($original_course->finish_time) - strtotime($original_course->start_time);
-        $course_finish_time = $course_duration + round($r['start_time']);
-
-        $original_course = CoursesDAO::getByAlias($r['course_alias']);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
-        $request = new Request([
-            'name' => $r['name'],
-            'description' => $original_course->description,
-            'alias' => $r['alias'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $course_finish_time,
-            'public' => 0, // All cloned courses start in private mode
-            'auth_token' => $auth_token
-        ]);
         CoursesDAO::transBegin();
         $response = [];
         try {
             // Create the course (and group)
-            $response[] = self::apiCreate($request);
+            $response[] = self::apiCreate(new Request([
+                'name' => $r['name'],
+                'description' => $original_course->description,
+                'alias' => $r['alias'],
+                'start_time' => $r['start_time'],
+                'finish_time' => strtotime($original_course->finish_time) + $offset,
+                'public' => 0, // All cloned courses start in private mode
+                'auth_token' => $auth_token
+            ]));
 
             $assignments = self::apiListAssignments($r);
             foreach ($assignments['assignments'] as $assignment) {
@@ -211,15 +206,12 @@ class CourseController extends Controller {
 
             foreach ($assignments['assignments'] as $assignment) {
                 // Create and assign homeworks and tests to new course
-                $assignment_start_time = $assignment['start_time'] + $offset;
-                $assignment_duration = $assignment['finish_time'] - $assignment['start_time'];
-                $assignment_finish_time = $assignment_start_time + $assignment_duration;
                 $response[] = self::apiCreateAssignment(new Request([
                     'course_alias' => $r['alias'],
                     'name' => $assignment['name'],
                     'description' => $assignment['description'],
-                    'start_time' => $assignment_start_time,
-                    'finish_time' => $assignment_finish_time,
+                    'start_time' => $assignment['start_time'] + $offset,
+                    'finish_time' => $assignment['finish_time'] + $offset,
                     'alias' => $assignment['alias'],
                     'assignment_type' => $assignment['assignment_type'],
                     'auth_token' => $auth_token
@@ -235,18 +227,18 @@ class CourseController extends Controller {
                 }
             }
             CoursesDAO::transEnd();
+        } catch (InvalidParameterException $e) {
+            CoursesDAO::transRollback();
+            throw new InvalidParameterException('parameterEmpty', $e->getTrace()[0]['args'][1]);
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            CoursesDAO::transRollback();
+            throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
         } catch (Exception $e) {
             CoursesDAO::transRollback();
-            if ($e->getMessage() == 'parameterEmpty') {
-                throw new InvalidParameterException('parameterEmpty', $e->getTrace()[0]['args'][1]);
-            } elseif ($e->getMessage() == 'aliasInUse') {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok', 'alias' => $request['alias']];
+        return ['status' => 'ok', 'alias' => $r['alias']];
     }
 
     /**

@@ -210,7 +210,7 @@ courseEditAddStudentsTooltip = "Adicionar alunos usando seu nome de usuário ome
 courseEditAdmins = "Administratores"
 courseEditAdminsEmpty = "Não hay administratores"
 courseEditClone = "Clone"
-courseEditCourseClonedSuccessfully = "Seu curso foi clonado com sucesso!"
+courseEditCourseClonedSuccessfully = "Seu curso foi clonado com sucesso! <a href='/course/%(course_alias)/edit/'>Editar curso</a>"
 courseEditCourseEdited = "O curso foi editado"
 courseEditGoToCourse = "Ir para curso"
 courseEditGroupAdminsEmpty = "Não hay grupos de administratores"

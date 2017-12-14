@@ -419,9 +419,9 @@ OmegaUp.on('ready', function() {
                               })
                 .then(function(data) {
                   omegaup.UI.success(
-                      omegaup.T.courseEditCourseClonedSuccessfully +
-                      ' <a href="/course/' + ev.alias + '/edit/">' +
-                      T.omegaupTitleCourseEdit + '</a>');
+                      UI.formatString(T.courseEditCourseClonedSuccessfully, {
+                        course_alias: ev.alias,
+                      }));
                 })
                 .fail(omegaup.UI.apiError);
           },

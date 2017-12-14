@@ -214,7 +214,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseEditAdmins: "Administradores",
 	courseEditAdminsEmpty: "No hay administradores",
 	courseEditClone: "Clonar",
-	courseEditCourseClonedSuccessfully: "\u00a1Tu curso ha sido clonado exitosamente!",
+	courseEditCourseClonedSuccessfully: "\u00a1Tu curso ha sido clonado exitosamente! <a href='/course/%(course_alias)/edit/'>Editar curso</a>",
 	courseEditCourseEdited: "Tu curso ha sido editado!",
 	courseEditGoToCourse: "Ir al curso",
 	courseEditGroupAdminsEmpty: "No hay grupos de administradores",
