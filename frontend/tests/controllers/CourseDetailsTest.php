@@ -128,7 +128,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $userLogin = self::login($user);
         $response = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
-            'alias' => $courseData['course_alias']
+            'course_alias' => $courseData['course_alias']
         ]));
 
         $this->assertEquals('ok', $response['status']);

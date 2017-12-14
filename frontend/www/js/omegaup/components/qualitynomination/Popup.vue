@@ -31,32 +31,32 @@
                      value="4"> {{ T.qualityFormDifficultyVeryHard }}</label>
             </div>
             <div class="form-group">
-              <label class="control-label">{{ T.qualityFormTags }} <select class=
-              "form-control tags-container"
-                      multiple
-                      v-model="tags">
-                <option v-for="problemTopic in sortedProblemTopics">
-                  {{ problemTopic.text }}
-                </option>
-              </select></label>
+              <label class="control-label">{{ T.qualityFormTags }}
+              <ul class="tag-select">
+                <li class="tag-select"
+                    v-for="problemTopic in sortedProblemTopics"><label class=
+                    "tag-select"><input type="checkbox"
+                       v-bind:value="problemTopic.text"
+                       v-model="tags"> {{ problemTopic.text }}</label></li>
+              </ul></label>
             </div>
             <div class="formGroup">
               <label class="control-label">{{ T.qualityFormQuality }}</label><br>
               <label class="radio-inline"><input type="radio"
                      v-model="quality"
-                     value="0"> {{ T.qualityFormQualityVeryUnlikely }}</label> <label class=
+                     value="0"> {{ T.qualityFormQualityVeryBad }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="1"> {{ T.qualityFormQualityNotLikely }}</label> <label class=
+                     value="1"> {{ T.qualityFormQualityBad }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="2"> {{ T.qualityFormQualityNeutral }}</label> <label class=
+                     value="2"> {{ T.qualityFormQualityFair }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="3"> {{ T.qualityFormQualityLikely }}</label> <label class=
+                     value="3"> {{ T.qualityFormQualityGood }}</label> <label class=
                      "radio-inline"><input type="radio"
                      v-model="quality"
-                     value="4"> {{ T.qualityFormQualityVeryLikely }}</label>
+                     value="4"> {{ T.qualityFormQualityVeryGood }}</label>
             </div>
             <div class="button-row">
               <div class="col-md-4"></div><button class="col-md-4 btn btn-primary"
@@ -174,9 +174,9 @@ export default {
 .qualitynomination-popup .popup {
   position: fixed;
   bottom: 10px;
-  right: 20%;
+  right: 4%;
   z-index: 9999999 !important;
-  width: 632px;
+  width: 550px;
   height: 408px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
@@ -224,5 +224,38 @@ export default {
 	font-weight: bold;
 	padding-left: 140px;
 	padding-top: 148px;
+}
+
+ul.tag-select {
+    height: 150px;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+ul.tag-select {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+li.tag-select {
+    margin: 0;
+    padding: 0;
+}
+
+label.tag-select {
+    font-weight: normal;
+    display: block;
+    color: WindowText;
+    background-color: Window;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+label.tag-select:hover {
+    background-color: Highlight;
+    color: HighlightText;
 }
 </style>

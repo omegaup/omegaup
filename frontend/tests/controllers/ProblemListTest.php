@@ -171,7 +171,6 @@ class ProblemList extends OmegaupTestCase {
             $this->assertCount($tag_ac_results[$i], $response['results']);
         }
     }
-
     /**
      * Limit the output to one problem we know
      */
@@ -181,14 +180,12 @@ class ProblemList extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PROMOTED);
         }
-
         $login = self::login(UserFactory::createUser());
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login->auth_token,
             'rowcount' => 1,
             'offset' => 1,
         ]));
-
         $this->assertCount(1, $response['results']);
         $this->assertEquals($problemData[1]['request']['alias'], $response['results'][0]['alias']);
     }
@@ -534,7 +531,7 @@ class ProblemList extends OmegaupTestCase {
         // order by column and order mode: Call apiList() with and without
         // pagination, for each allowed ordering and each possible order mode.
         $modes = ['asc', 'desc'];
-        $columns = ['title', 'submissions', 'accepted', 'ratio', 'points', 'score'];
+        $columns = ['title', 'quality', 'difficulty', 'ratio', 'points', 'score'];
         $counter = 0;
         for ($paging = 0; $paging <= 1; $paging++) {
             foreach ($columns as $col) {

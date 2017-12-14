@@ -65,6 +65,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#scholar_degree').val(data.userinfo.scholar_degree);
         $('#school_id').val(data.userinfo.school_id);
         $('#school').val(data.userinfo.school);
+        $('#programming_language').val(data.userinfo.preferred_language);
         $('#recruitment_optin')
             .prop('checked', data.userinfo.recruitment_optin == 1);
 
@@ -106,6 +107,7 @@ omegaup.OmegaUp.on('ready', function() {
                           school_id: $('#school_id').val(),
                           school_name: $('#school').val(),
                           locale: $('#locale').val(),
+                          preferred_language: $('#programming_language').val(),
                           recruitment_optin:
                               $('#recruitment_optin').prop('checked') ? 1 : 0
                         })

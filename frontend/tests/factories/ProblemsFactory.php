@@ -117,7 +117,8 @@ class ProblemsFactory {
         ProblemController::apiCreate($r);
         $problem = ProblemsDAO::getByAlias($r['alias']);
 
-        if ($visibility == ProblemController::VISIBILITY_BANNED
+        if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
+            || $visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
             || $visibility == ProblemController::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;

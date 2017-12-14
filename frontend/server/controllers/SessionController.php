@@ -383,8 +383,6 @@ class SessionController extends Controller {
      * @return boolean
      */
     public function NativeLogin(Request $r) {
-        self::$log->info('Testing native login for ' . $r['usernameOrEmail']);
-
         $c_Users = new UserController();
         $vo_User = null;
 

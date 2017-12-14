@@ -14,16 +14,30 @@ import sys
 import database_utils
 import hook_tools.git_tools as git_tools
 
+OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
-def _expected_database_schema(*, dbname='omegaup', auth=None):
+
+def _expected_database_schema(*, dbname='omegaup', config_file=None,
+                              username=None, password=None, verbose=False):
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
-    schema = database_utils.mysqldump(dbname=dbname, auth=auth)
-    return re.sub(r'AUTO_INCREMENT=\d+\s+', '', schema)
+    args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
+    if config_file:
+        args.extend(['--mysql-config-file', config_file])
+    if username:
+        args.extend(['--username', username])
+    if password:
+        args.extend(['--password', password])
+    args.append('schema')
+    stderr = subprocess.DEVNULL
+    if verbose:
+        stderr = None
+    schema = subprocess.check_output(args, stderr=subprocess.DEVNULL)
+    return re.sub(br'AUTO_INCREMENT=\d+\s+', b'', schema)
 
 
 def strip_mysql_extensions(sql):
     '''Strips MySQL extension comments.'''
-    return re.sub(r'/\*!([^*]|\*[^/])*\*/', '', sql,
+    return re.sub(br'/\*!([^*]|\*[^/])*\*/', b'', sql,
                   flags=re.MULTILINE|re.DOTALL)
 
 
@@ -57,13 +71,14 @@ def main():
     if not filtered_files:
         return
 
-    auth = database_utils.authentication(config_file=args.mysql_config_file,
-                                         username=args.username,
-                                         password=args.password)
     root = git_tools.root_dir()
-    expected = _expected_database_schema(dbname=args.database, auth=auth)
+    expected = _expected_database_schema(dbname=args.database,
+                                         config_file=args.mysql_config_file,
+                                         username=args.username,
+                                         password=args.password,
+                                         verbose=args.verbose)
     actual = git_tools.file_contents(
-            args, root, 'frontend/database/schema.sql').decode('utf-8')
+            args, root, 'frontend/database/schema.sql')
 
     if (strip_mysql_extensions(expected.strip()) !=
         strip_mysql_extensions(actual.strip())):
@@ -79,7 +94,7 @@ def main():
                   file=sys.stderr)
         else:
             with open(os.path.join(root,
-                                   'frontend/database/schema.sql'), 'w') as f:
+                                   'frontend/database/schema.sql'), 'wb') as f:
                 f.write(expected)
             print('Files written to working directory. '
                   '%sPlease commit them before pushing.%s' % (
