@@ -38,8 +38,8 @@ def getProblemAggregates(db, problemId):
     cur = db.cursor()
     cur.execute("""SELECT `QualityNominations`.`contents`
                    FROM `QualityNominations` 
-                   WHERE `nomination` = 'suggestion' 
-                     AND `QualityNominations`.`problem_id` = %s;""" % problemId)
+                   WHERE `nomination` = 'suggestion' AND `QualityNominations`.`problem_id` = %s;"""
+                           % problemId)
     qualitySum = 0
     qualityN = 0
     difficultySum = 0
