@@ -1,3 +1,4 @@
+#/usr/bin/php -d max_execution_time=7200
 #!/usr/bin/python3
 
 import argparse
