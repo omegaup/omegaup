@@ -27,9 +27,10 @@ addons:
       - nginx
       - realpath
       - python3
-      - python-pip
       - python3-pip
       - clang-format-3.7
+      - python-mysqldb
+      - python-pip
   sauce_connect:
     username: lhchavez
   jwt:
