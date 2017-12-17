@@ -2,6 +2,7 @@
   var problemsSolved = $('#rank-by-problems-solved');
   var length = parseInt(problemsSolved.attr('data-length'));
   var page = parseInt(problemsSolved.attr('data-page'));
+  var filter = problemsSolved.attr('data-filter');
   var isIndex = (problemsSolved.attr('is-index') === '1');
   var rowTemplate = '<tr>' +
                     '<td>%(rank)</td><td class="flagColumn">%(flag)</td>' +
@@ -11,7 +12,8 @@
                     '<td class="numericColumn">%(score)</td>' +
                     '%(problemsSolvedRow)' +
                     '</tr>';
-  omegaup.API.User.rankByProblemsSolved({offset: page, rowcount: length})
+  omegaup.API.User.rankByProblemsSolved(
+                      {offset: page, rowcount: length, filter: filter})
       .then(function(result) {
         var html = '';
         for (var i = 0; i < result.rank.length; ++i) {
@@ -34,4 +36,17 @@
         $('#rank-by-problems-solved>tbody').append(html);
       })
       .fail(omegaup.UI.apiError);
+
+  $('.filter')
+      .on('change', function(evt) {
+        // change url parameters with jquery
+        // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
+        var queryParameters = {}, queryString = location.search.substring(1),
+            re = /([^&=]+)=([^&]*)/g, m;
+        while (m = re.exec(queryString)) {
+          queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+        }
+        queryParameters['filter'] = $(this).val();
+        window.location.search = $.param(queryParameters);
+      });
 })();

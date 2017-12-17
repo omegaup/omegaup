@@ -2,6 +2,10 @@
 	{$page = 1}
 {/if}
 
+{if !isset($filter)}
+	{$filter = null}
+{/if}
+
 {if !isset($length)}
 	{$length = 100}
 {/if}
@@ -12,17 +16,33 @@
 
 <div class=" panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
-		{if !$is_index}
-			{if $page > 1}
-				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
+		<div>
+			<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
+			{if !$is_index}
+				{if $page > 1}
+					<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
+				{/if}
+				<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
 			{/if}
-			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
-		{/if}
+		</div>
+		<div>
+			{if !$is_index}
+			    {if count($filters) > 0}
+			        <select class="filter">
+			        	<option value="">{#wordsSelectFilter#}</option>
+			        	{foreach key=key item=item from=$filters}
+			        	<option id="{$key}" value="{$item}" {if $filter == $key}selected="selected"{/if}>
+			        		{#wordsFilterBy#} {$key}
+			        	</option>
+			        	{/foreach}
+			        </select>
+			    {/if}
+			{/if}
+		</div>
 	</div>
 	<div class="panel-body no-padding">
 		<div class="table-responsive">
-			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" is-index="{$is_index}">
+			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" data-filter="{$filter}" is-index="{$is_index}">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -43,9 +63,9 @@
 				<a href='/rank/'>{#rankViewFull#}</a>
 				{else}
 					{if $page > 1}
-					<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
+					<a href="/rank/?page={$page-1}&filter={$filter}">{#wordsPrevPage#}</a> |
 					{/if}
-					<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+					<a href="/rank/?page={$page+1}&filter={$filter}">{#wordsNextPage#}</a>
 				{/if}
 				<br/>
 			</div>

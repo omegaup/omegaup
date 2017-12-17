@@ -120,4 +120,55 @@ class UserRankTest extends OmegaupTestCase {
         $this->assertEquals($response['problems_solved'], 0);
         $this->assertEquals($response['rank'], 0);
     }
+
+    /**
+     * Tests apiRankByProblemsSolved filters
+     */
+    public function testUserRankFiltered() {
+        // Create a school
+        $school = SchoolsFactory::createSchool();
+        // Create a user with no country, state and school
+        $contestantWithNoCountry = UserFactory::createUser();
+        $problemData = ProblemsFactory::createProblem();
+        $runDataContestantWithNoCountry = RunsFactory::createRunToProblem($problemData, $contestantWithNoCountry);
+        RunsFactory::gradeRun($runDataContestantWithNoCountry);
+
+        // Create a user with country, state and school
+        $contestant = UserFactory::createUser();
+        $login = self::login($contestant);
+
+        $states = StatesDAO::search(['country_id' => 'MX']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'school_id' => $school['school']->school_id
+        ]);
+
+        UserController::apiUpdate($r);
+
+        // create runs
+        $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runDataContestant);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $runDataContestant['request']['auth_token'],
+            'filter' => 'country'
+        ]));
+        $this->assertCount(1, $response['rank']);
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $runDataContestant['request']['auth_token'],
+            'filter' => 'state'
+        ]));
+        $this->assertCount(1, $response['rank']);
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $runDataContestant['request']['auth_token'],
+            'filter' => 'school'
+        ]));
+        $this->assertCount(1, $response['rank']);
+    }
 }

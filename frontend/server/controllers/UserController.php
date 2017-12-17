@@ -1621,6 +1621,11 @@ class UserController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
+        if (!empty($r['filter'])) {
+            Validators::isInEnum($r['filter'], 'filter', ['country', 'state', 'school'], true /*is_required*/);
+        } else {
+            $r['filter'] = null;
+        }
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -1642,13 +1647,31 @@ class UserController extends Controller {
      */
     private static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
-            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'];
-
+            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'];
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
+                $session = SessionController::apiCurrentSession($r)['session'];
+                $filteredBy = null;
+                $value = null;
+                if ($session['auth_token']) {
+                    $filteredBy = !is_null($r['filter']) ? $r['filter'] . '_id' : null;
+                    switch ($r['filter']) {
+                        case 'country':
+                            $value = $session['user']->country_id;
+                            break;
+                        case 'state':
+                            $value = $session['user']->state_id;
+                            break;
+                        case 'school':
+                            $value = $session['user']->school_id;
+                            break;
+                        default:
+                            $value = null;
+                    }
+                }
                 $response = [];
                 $response['rank'] = [];
                 try {
-                    $userRankEntries = UserRankDAO::getAll($r['offset'], $r['rowcount'], 'Rank', 'ASC');
+                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $filteredBy, $value);
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
