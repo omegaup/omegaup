@@ -761,6 +761,7 @@ class QualityNominationTest extends OmegaupTestCase {
         self::setUpSyntheticSuggestions($problemData);
 
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate-feedback.py' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
                  ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
                  ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
