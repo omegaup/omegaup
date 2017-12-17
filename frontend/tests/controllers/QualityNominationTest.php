@@ -760,10 +760,10 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        shell_exec('python ' . OMEGAUP_ROOT . '/../stuff/cron/aggregate-feedback.py' .
-                 ' --user ' . OMEGAUP_DB_USER .
-                 ' --database ' . OMEGAUP_DB_NAME .
-                 ' --password ' . OMEGAUP_DB_PASS);
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate-feedback.py' .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);

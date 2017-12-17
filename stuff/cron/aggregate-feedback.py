@@ -74,7 +74,7 @@ def mostVotedTags(problemTagVotes, problemTagVotesN):
     if problemTagVotesN < 5:
         return None
     maximum = problemTagVotes[max(problemTagVotes, key=problemTagVotes.get)]
-    finalTags = [tag for (tag, votes) in problemTagVotes.iteritems() if (votes >= 0.25 * maximum)]
+    finalTags = [tag for (tag, votes) in problemTagVotes.items() if (votes >= 0.25 * maximum)]
     if len(finalTags) >= MAX_NUM_TOPICS:
         return None
     else:
