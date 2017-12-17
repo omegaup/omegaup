@@ -85,9 +85,6 @@ OmegaUp.on('ready', function() {
               finish_time: defaultFinishTime,
             };
           },
-          cancel: function(ev) {
-            window.location = '/course/' + courseAlias + '/';
-          },
           'removeAdmin': function(admin) {
             API.Course.removeAdmin({
                         course_alias: courseAlias,
