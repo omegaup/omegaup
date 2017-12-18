@@ -6,6 +6,10 @@ stage_before_install() {
 	init_submodules
 }
 
+stage_install() {
+	pip3 install --user mysqlclient
+}
+
 stage_before_script() {
 	wait_for_mysql
 
