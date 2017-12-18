@@ -260,6 +260,8 @@ export default {
     update: _call('/api/course/update/'),
 
     updateAssignment: _call('/api/course/updateAssignment/'),
+
+    updateProblemsOrder: _call('/api/course/updateProblemsOrder/'),
   },
 
   Grader: {
@@ -441,7 +443,10 @@ export default {
   },
 
   School: {
+    create: _call('/api/school/create/'),
+
     list: _call('/api/school/list/'),
+
     rank: _call('/api/school/rank/'),
   },
 

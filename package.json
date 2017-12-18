@@ -25,12 +25,14 @@
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
     "dev": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "build-development": "cross-env NODE_ENV=development webpack --hide-modules",
     "refactor": "cross-env ./stuff/refactor.js"
   },
   "dependencies": {
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "codemirror": "^5.28.0",
     "jszip": "^3.1.3",
+    "sortablejs": "^1.7.0",
     "vue": "^2.1.10",
     "vue-async-computed": "^3.0.0",
     "vue-codemirror-lite": "^1.0.2"

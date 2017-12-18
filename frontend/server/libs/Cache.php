@@ -8,7 +8,7 @@ abstract class CacheAdapter {
 
     public static function getInstance() {
         if (CacheAdapter::$sInstance == null) {
-            if (function_exists('apc_clear_cache')) {
+            if (function_exists('apcu_clear_cache')) {
                 CacheAdapter::$sInstance = new APCCacheAdapter();
             } else {
                 CacheAdapter::$sInstance = new InProcessCacheAdapter();
@@ -30,27 +30,27 @@ abstract class CacheAdapter {
  */
 class APCCacheAdapter extends CacheAdapter {
     public function add($key, $var, $ttl = 0) {
-        return apc_add($key, $var, $ttl);
+        return apcu_add($key, $var, $ttl);
     }
 
     public function cas($key, $old, $new) {
-        return apc_cas($key, $old, $new);
+        return apcu_cas($key, $old, $new);
     }
 
     public function clear() {
-        apc_clear_cache('user');
+        apcu_clear_cache('user');
     }
 
     public function delete($key) {
-        return apc_delete($key);
+        return apcu_delete($key);
     }
 
     public function fetch($key) {
-        return apc_fetch($key);
+        return apcu_fetch($key);
     }
 
     public function store($key, $var, $ttl = 0) {
-        return apc_store($key, $var, $ttl);
+        return apcu_store($key, $var, $ttl);
     }
 }
 
