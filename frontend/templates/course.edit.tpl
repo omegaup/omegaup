@@ -14,6 +14,7 @@
 		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
 		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
 		<li><a href="#admins" data-toggle="tab">{#courseEditAdmins#}</a></li>
+		<li><a href="#clone" data-toggle="tab">{#courseEditClone#}</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="edit">
@@ -31,6 +32,9 @@
 			<div></div>
 		</div>
 		<div class="tab-pane" id="admins">
+			<div></div>
+		</div>
+		<div class="tab-pane" id="clone">
 			<div></div>
 		</div>
 	</div>
