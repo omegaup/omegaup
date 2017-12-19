@@ -3,7 +3,7 @@
 {/if}
 
 {if !isset($filter)}
-	{$filter = null}
+	{$filter = false}
 {/if}
 
 {if !isset($length)}
@@ -16,29 +16,27 @@
 
 <div class=" panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<div>
-			<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
-			{if !$is_index}
-				{if $page > 1}
-					<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
-				{/if}
-				<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
+		{if !$is_index}
+			{if $page > 1}
+				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
-		</div>
-		<div>
-			{if !$is_index}
-			    {if count($filters) > 0}
-			        <select class="filter">
-			        	<option value="">{#wordsSelectFilter#}</option>
-			        	{foreach key=key item=item from=$filters}
-			        	<option id="{$key}" value="{$item}" {if $filter == $key}selected="selected"{/if}>
-			        		{#wordsFilterBy#} {$key}
-			        	</option>
-			        	{/foreach}
-			        </select>
-			    {/if}
-			{/if}
-		</div>
+			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+		{/if}
+		{if !$is_index}
+		    {if count($availableFilters) > 0}
+		        <select class="filter">
+		        	<option value="">{#wordsSelectFilter#}</option>
+		        	{foreach key=key item=item from=$availableFilters}
+		        	<option id="{$key}" value="{$item}" {if $filter == $key}selected="selected"{/if}>
+		        		{if $key == 'country'}{#wordsFilterByCountry#} {/if}
+		        		{if $key == 'state'}{#wordsFilterByState#} {/if}
+		        		{if $key == 'school'}{#wordsFilterBySchool#} {/if}
+		        	</option>
+		        	{/foreach}
+		        </select>
+		    {/if}
+		{/if}
 	</div>
 	<div class="panel-body no-padding">
 		<div class="table-responsive">

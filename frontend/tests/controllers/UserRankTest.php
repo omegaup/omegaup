@@ -171,4 +171,92 @@ class UserRankTest extends OmegaupTestCase {
         ]));
         $this->assertCount(1, $response['rank']);
     }
+
+    /**
+     * Tests apiRankByProblemsSolved with state collision
+     */
+    public function testUserRankWithStateCollision() {
+        // Create two problems
+        $problemData[] = ProblemsFactory::createProblem();
+        $problemData[] = ProblemsFactory::createProblem();
+
+        // Create two users from Maranhao, Brasil
+        $contestantFromMaranhao1 = UserFactory::createUser();
+        $login = self::login($contestantFromMaranhao1);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'country_id' => 'BR',
+            'state_id' => 'MA'
+        ]);
+
+        UserController::apiUpdate($r);
+
+        // Create two runs of different problems
+        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao1);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao);
+        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[1], $contestantFromMaranhao1);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao);
+
+        $contestantFromMaranhao2 = UserFactory::createUser();
+        $login = self::login($contestantFromMaranhao2);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'country_id' => 'BR',
+            'state_id' => 'MA'
+        ]);
+
+        UserController::apiUpdate($r);
+
+        // Create o run of one problem
+        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao2);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao);
+
+        // Create a user from Massachusetts, USA
+        $contestantFromMassachusetts = UserFactory::createUser();
+        $login = self::login($contestantFromMassachusetts);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'country_id' => 'US',
+            'state_id' => 'MA'
+        ]);
+
+        UserController::apiUpdate($r);
+
+        // create a run of one problem
+        $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem($problemData[0], $contestantFromMassachusetts);
+        RunsFactory::gradeRun($runDataContestantFromMassachusetts);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        $login = self::login($contestantFromMaranhao1);
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $login->auth_token,
+            'filter' => 'state'
+        ]));
+        $this->assertCount(2, $response['rank']);
+
+        $login = self::login($contestantFromMaranhao2);
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $login->auth_token,
+            'filter' => 'state'
+        ]));
+        $this->assertCount(2, $response['rank']);
+
+        $login = self::login($contestantFromMassachusetts);
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request([
+            'auth_token' => $login->auth_token,
+            'filter' => 'state'
+        ]));
+        $this->assertCount(1, $response['rank']);
+    }
 }
