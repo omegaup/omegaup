@@ -21,7 +21,6 @@
 						<li><a href="#" class="sourcecode">{#wordsDownloadCode#}</a></li>
 						<li><a href="#" class="output">{#wordsDownloadOutput#}</a></li>
 						<li><a href="#" class="details">{#wordsDownloadDetails#}</a></li>
-						<li><a href="#" class="code">{#wordsDownloadCode#}</a></li>
 					</ul>
 				</div>
 				<div class="judged_by">
