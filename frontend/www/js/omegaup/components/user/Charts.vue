@@ -4,30 +4,25 @@
            v-model="type"
            value="delta"> {{ T.profileStatisticsDelta }}</label> <label><input type="radio"
            v-model="type"
-           value="cumulative"> {{ T.profileStatisticsCumulative }}</label> <input id="total"
-         type="radio"
-         v-model="type"
-         value="total"> <label for="total">{{ T.profileStatisticsTotal }}</label>
-    <div class="period_group text-center"
+           value="cumulative"> {{ T.profileStatisticsCumulative }}</label> <label><input type=
+           "radio"
+           v-model="type"
+           value="total"> {{ T.profileStatisticsTotal }}</label>
+    <div class="period-group text-center"
          v-if="type != 'total' &amp;&amp; type != ''">
-      <input id="day"
-           name="period"
-           type="radio"
-           v-model="period"
-           value="day"> <label for="day">{{ T.profileStatisticsDay }}</label> <input id="week"
-           name="period"
-           type="radio"
-           v-model="period"
-           value="week"> <label for="week">{{ T.profileStatisticsWeek }}</label> <input id="month"
-           name="period"
-           type="radio"
-           v-model="period"
-           value="month"> <label for="month">{{ T.profileStatisticsMonth }}</label> <input id=
-           "year"
-           name="period"
-           type="radio"
-           v-model="period"
-           value="year"> <label for="year">{{ T.profileStatisticsYear }}</label>
+      <label><input name="period"
+             type="radio"
+             v-model="period"
+             value="day"> {{ T.profileStatisticsDay }}</label> <label><input name="period"
+             type="radio"
+             v-model="period"
+             value="week"> {{ T.profileStatisticsWeek }}</label> <label><input name="period"
+             type="radio"
+             v-model="period"
+             value="month"> {{ T.profileStatisticsMonth }}</label> <label><input name="period"
+             type="radio"
+             v-model="period"
+             value="year"> {{ T.profileStatisticsYear }}</label>
     </div>
     <div id="verdict-chart"></div>
   </div>
@@ -43,7 +38,51 @@ export default {
   watch: {
     type: function(val) {
       if (val == 'total') {
-        this.verdictCounts;
+        let self = this;
+        let runs = self.normalizedRunCounts;
+        let num_series = self.chart.series.length;
+        for (let i = 1; i < num_series; i++) {
+          self.chart.series[0].remove(false);
+        }
+        self.chart.update({
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+          },
+          xAxis: {
+            title: {text: ''},
+          },
+          yAxis: {
+            title: {text: ''},
+          },
+          title: {
+            text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
+                                          {user: self.username})
+          },
+          tooltip: {pointFormat: '{series.name}: {point.y}'},
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                color: '#000000',
+                connectorColor: '#000000',
+                format:
+                    '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
+              }
+            }
+          },
+          series: [
+            {
+              name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
+              data: runs
+            }
+          ]
+        });
+        self.chart.redraw();
       } else {
         this.verdictPeriodCounts;
       }
@@ -52,7 +91,7 @@ export default {
   },
   mounted: function() {
     let self = this;
-    let runs = self.normalizedPeriodRunCounts[self.period];
+    let runs = self.normalizedRunCountsForPeriod;
     let data = runs[self.type];
     self.chart = Highcharts.chart('verdict-chart', {
       chart: {type: 'column'},
@@ -109,8 +148,8 @@ export default {
   },
   computed: {
     verdictPeriodCounts: function() {
-      var self = this;
-      let runs = self.normalizedPeriodRunCounts[self.period];
+      let self = this;
+      let runs = self.normalizedRunCountsForPeriod;
       let data = runs[self.type];
       self.chart.update({
         chart: {type: 'column'},
@@ -165,59 +204,12 @@ export default {
       for (let i = 0; i < n_series; i++) {
         self.chart.series[0].remove(false);
       }
-      self.chart.redraw();
       // Adding new series
       let num_series = data.length;
       for (let i = 0; i < num_series; i++) {
         self.chart.addSeries(data[i]);
       }
-    },
-    verdictCounts: function() {
-      let self = this;
-      let runs = self.normalizedRunCounts;
-      let num_series = self.chart.series.length;
-      for (let i = 1; i < num_series; i++) {
-        self.chart.series[0].remove(false);
-      }
       self.chart.redraw();
-      self.chart.update({
-        chart: {
-          plotBackgroundColor: null,
-          plotBorderWidth: null,
-          plotShadow: false,
-          type: 'pie'
-        },
-        xAxis: {
-          title: {text: ''},
-        },
-        yAxis: {
-          title: {text: ''},
-        },
-        title: {
-          text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                        {user: self.username})
-        },
-        tooltip: {pointFormat: '{series.name}: {point.y}'},
-        plotOptions: {
-          pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-              enabled: true,
-              color: '#000000',
-              connectorColor: '#000000',
-              format:
-                  '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-            }
-          }
-        },
-        series: [
-          {
-            name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
-            data: runs
-          }
-        ]
-      });
     },
     totalRuns: function() {
       let self = this;
@@ -312,6 +304,10 @@ export default {
       }
       return period_stats;
     },
+    normalizedRunCountsForPeriod: function() {
+      let self = this;
+      return self.normalizedPeriodRunCounts[self.period];
+    }
   },
 };
 </script>
