@@ -69,11 +69,6 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
-    if (typeof usernames != 'undefined') {
-      usernames.each(function(event, index) {
-        operation(event, resolve, reject);
-      });
-    }
 
     // Wait for all
     $(document)
@@ -92,9 +87,7 @@ let UI = {
                                            omegaup.T.bulkOperationError,
                                        error));
             } else {
-              UI.success((typeof usernames != 'undefined') ?
-                             omegaup.T.bulkUserAddSuccess :
-                             omegaup.T.updateItemsSuccess);
+              UI.success(omegaup.T.updateItemsSuccess);
             }
           }
         });
