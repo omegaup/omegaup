@@ -40,10 +40,9 @@ export default {
       if (val == 'total') {
         let self = this;
         let runs = self.normalizedRunCounts;
-        let num_series = self.chart.series.length;
-        for (let i = 1; i < num_series; i++) {
-          self.chart.series[0].remove(false);
-        }
+        // Removing all series, except last one, because here is where the
+        // data will be placed. Otherwise, the chart will not be shown
+        while (self.chart.series.length > 1) self.chart.series[0].remove(false);
         self.chart.update({
           chart: {
             plotBackgroundColor: null,
@@ -84,10 +83,10 @@ export default {
         });
         self.chart.redraw();
       } else {
-        this.verdictPeriodCounts;
+        this.verdictPeriodCounts();
       }
     },
-    period: function(val) { this.verdictPeriodCounts;},
+    period: function(val) { this.verdictPeriodCounts();},
   },
   mounted: function() {
     let self = this;
@@ -147,6 +146,105 @@ export default {
     });
   },
   computed: {
+    totalRuns: function() {
+      let self = this;
+      let total = 0;
+      for (let runs of self.data.runs) {
+        total += parseInt(runs['runs']);
+      }
+      return total;
+    },
+    normalizedRunCounts: function() {
+      let self = this;
+      let total = self.totalRuns;
+      let stats = self.data.runs;
+      let runs = stats.reduce((total, amount) => {
+        total[amount.verdict] += parseInt(amount.runs);
+        return total;
+      }, {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0});
+      let verdicts = Object.keys(runs);
+      let response = [];
+      for (let verdict of verdicts) {
+        let numRuns = runs[verdict];
+        if (verdict == 'AC') {
+          response.push(
+              {name: verdict, y: numRuns, sliced: true, selected: true});
+        } else {
+          response.push({name: verdict, y: numRuns});
+        }
+      }
+      return response;
+    },
+    normalizedPeriodRunCounts: function() {
+      let self = this;
+      let runs = self.groupedPeriods;
+      let periods = Object.keys(runs);
+      let response = {};
+      for (let period of periods) {
+        response[period] = {
+          categories: Object.keys(runs[period]),
+          delta: [],
+          cumulative: []
+        };
+        let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+        for (let verdict of verdicts) {
+          runs[period][verdict] = 0;
+        }
+        for (let[index, verdict] of verdicts.entries()) {
+          response[period].delta[index] = {name: verdict, data: []};
+          response[period].cumulative[index] = {name: verdict, data: []};
+          for (let[ind, date] of response[period].categories.entries()) {
+            runs[period][verdict] += parseInt(runs[period][date][verdict]);
+            response[period].delta[index]['data'][ind] =
+                parseInt(runs[period][date][verdict]);
+            response[period].cumulative[index]['data'][ind] =
+                runs[period][verdict];
+          }
+        }
+      }
+      return response;
+    },
+    groupedPeriods: function() {
+      let self = this;
+      let stats = self.data.runs;
+      let periods = ['day', 'week', 'month', 'year'];
+      for (let[index, run] of stats.entries()) {
+        for (let period of periods) {
+          if (typeof stats[index][period] != 'undefined') break;
+        }
+        let date = new Date(run.date);
+        let day = date.getDay();
+        // group by days
+        stats[index]['day'] = date.toLocaleDateString(T.locale);
+        // group by weeks
+        let diffMonday = date.getDate() - day + (day == 0 ? -6 : 1);
+        let diffSunday = date.getDate() + (7 - day);
+        let firstDay = new Date(date.setDate(diffMonday));
+        let lastDay = new Date(date.setDate(diffSunday));
+        stats[index]['week'] = firstDay.toLocaleDateString(T.locale) + ' - ' +
+                               lastDay.toLocaleDateString(T.locale);
+        // group by month
+        stats[index]['month'] = run.date.substring(0, 7);
+        // group by year
+        stats[index]['year'] = run.date.substring(0, 4);
+      }
+      let periodStats = {};
+      for (let period of periods) {
+        periodStats[period] = stats.reduce(function(groups, item) {
+          let val = item[period];
+          groups[val] = groups[val] || {WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0};
+          groups[val][item.verdict] += parseInt(item.runs);
+          return groups;
+        }, {});
+      }
+      return periodStats;
+    },
+    normalizedRunCountsForPeriod: function() {
+      let self = this;
+      return self.normalizedPeriodRunCounts[self.period];
+    }
+  },
+  methods: {
     verdictPeriodCounts: function() {
       let self = this;
       let runs = self.normalizedRunCountsForPeriod;
@@ -200,114 +298,14 @@ export default {
         series: []
       });
       // Removing old series
-      let n_series = self.chart.series.length;
-      for (let i = 0; i < n_series; i++) {
-        self.chart.series[0].remove(false);
-      }
+      while (self.chart.series.length) self.chart.series[0].remove(false);
       // Adding new series
-      let num_series = data.length;
-      for (let i = 0; i < num_series; i++) {
+      let numSeries = data.length;
+      for (let i = 0; i < numSeries; i++) {
         self.chart.addSeries(data[i]);
       }
       self.chart.redraw();
     },
-    totalRuns: function() {
-      let self = this;
-      let total = 0;
-      for (let runs of self.data.runs) {
-        total += parseInt(runs['runs']);
-      }
-      return total;
-    },
-    normalizedRunCounts: function() {
-      let self = this;
-      let total = self.totalRuns;
-      let stats = self.data.runs;
-      let runs = stats.reduce((total, amount) => {
-        total[amount.verdict] += parseInt(amount.runs);
-        return total;
-      }, {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0});
-      let verdicts = Object.keys(runs);
-      let response = [];
-      for (let verdict of verdicts) {
-        let num_runs = runs[verdict];
-        if (verdict == 'AC') {
-          response.push(
-              {name: verdict, y: num_runs, sliced: true, selected: true});
-        } else {
-          response.push({name: verdict, y: num_runs});
-        }
-      }
-      return response;
-    },
-    normalizedPeriodRunCounts: function() {
-      let self = this;
-      let runs = self.groupedPeriods;
-      let periods = Object.keys(runs);
-      let response = {};
-      for (let period of periods) {
-        response[period] = {
-          categories: Object.keys(runs[period]),
-          delta: [],
-          cumulative: []
-        };
-        let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
-        for (let verdict of verdicts) {
-          runs[period][verdict] = 0;
-        }
-        for (let[index, verdict] of verdicts.entries()) {
-          response[period].delta[index] = {name: verdict, data: []};
-          response[period].cumulative[index] = {name: verdict, data: []};
-          for (let[ind, date] of response[period].categories.entries()) {
-            runs[period][verdict] += parseInt(runs[period][date][verdict]);
-            response[period].delta[index]['data'][ind] =
-                parseInt(runs[period][date][verdict]);
-            response[period].cumulative[index]['data'][ind] =
-                runs[period][verdict];
-          }
-        }
-      }
-      return response;
-    },
-    groupedPeriods: function() {
-      let self = this;
-      let stats = self.data.runs;
-      let periods = ['day', 'week', 'month', 'year'];
-      for (let[index, run] of stats.entries()) {
-        for (let period of periods) {
-          if (typeof stats[index][period] != 'undefined') break;
-        }
-        let date = new Date(run.date);
-        let day = date.getDay();
-        // group by days
-        stats[index]['day'] = date.toLocaleDateString(T.locale);
-        // group by weeks
-        let diff_monday = date.getDate() - day + (day == 0 ? -6 : 1);
-        let diff_sunday = date.getDate() + (7 - day);
-        let first_day = new Date(date.setDate(diff_monday));
-        let last_day = new Date(date.setDate(diff_sunday));
-        stats[index]['week'] = first_day.toLocaleDateString(T.locale) + ' - ' +
-                               last_day.toLocaleDateString(T.locale);
-        // group by month
-        stats[index]['month'] = run.date.substring(0, 7);
-        // group by year
-        stats[index]['year'] = run.date.substring(0, 4);
-      }
-      let period_stats = {};
-      for (let period of periods) {
-        period_stats[period] = stats.reduce(function(groups, item) {
-          let val = item[period];
-          groups[val] = groups[val] || {WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0};
-          groups[val][item.verdict] += parseInt(item.runs);
-          return groups;
-        }, {});
-      }
-      return period_stats;
-    },
-    normalizedRunCountsForPeriod: function() {
-      let self = this;
-      return self.normalizedPeriodRunCounts[self.period];
-    }
-  },
+  }
 };
 </script>
