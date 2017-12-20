@@ -23,9 +23,7 @@
 		        	<option value="">{#wordsSelectFilter#}</option>
 		        	{foreach key=key item=item from=$availableFilters}
 		        	<option value="{$key}" {if isset($filter) && $filter == $key}selected="selected"{/if}>
-		        		{if $key == 'country'}{#wordsFilterByCountry#} {/if}
-		        		{if $key == 'state'}{#wordsFilterByState#} {/if}
-		        		{if $key == 'school'}{#wordsFilterBySchool#} {/if}
+		        		{$item}
 		        	</option>
 		        	{/foreach}
 		        </select>

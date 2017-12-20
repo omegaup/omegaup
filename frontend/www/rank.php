@@ -10,13 +10,13 @@ $availableFilters = [];
 $session = SessionController::apiCurrentSession($r)['session'];
 if ($session['auth_token']) {
     if (!is_null($session['user']->country_id)) {
-        $availableFilters['country'] = 'country';
+        $availableFilters['country'] = $smarty->getConfigVars('wordsFilterByCountry');
     }
     if (!is_null($session['user']->state_id)) {
-        $availableFilters['state'] = 'state';
+        $availableFilters['state'] = $smarty->getConfigVars('wordsFilterByState');
     }
     if (!is_null($session['user']->school_id)) {
-        $availableFilters['school'] = 'school';
+        $availableFilters['school'] = $smarty->getConfigVars('wordsFilterBySchool');
     }
 }
 

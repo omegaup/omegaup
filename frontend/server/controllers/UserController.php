@@ -1621,7 +1621,7 @@ class UserController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
-        Validators::isInEnum($r['filter'], 'filter', ['country', 'state', 'school'], false);
+        Validators::isInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -2058,6 +2058,7 @@ class UserController extends Controller {
         if ($filteredBy == 'school') {
             return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
         }
+        return;
     }
 }
 

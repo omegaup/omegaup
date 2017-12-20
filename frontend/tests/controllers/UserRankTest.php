@@ -223,23 +223,26 @@ class UserRankTest extends OmegaupTestCase {
         // Refresh Rank
         $this->refreshUserRank();
 
+        $maranhao1Login = self::login($contestantFromMaranhao1);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestantFromMaranhao1['request']['auth_token'],
+            'auth_token' => $maranhao1Login->auth_token,
             'filter' => 'state'
         ]));
         $this->assertCount(2, $response['rank']);
 
+        $maranhao2Login = self::login($contestantFromMaranhao2);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestantFromMaranhao2['request']['auth_token'],
+            'auth_token' => $maranhao2Login->auth_token,
             'filter' => 'state'
         ]));
         $this->assertCount(2, $response['rank']);
 
+        $massachusettsLogin = self::login($contestantFromMassachusetts);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestantFromMassachusetts['request']['auth_token'],
+            'auth_token' => $massachusettsLogin->auth_token,
             'filter' => 'state'
         ]));
         $this->assertCount(1, $response['rank']);
