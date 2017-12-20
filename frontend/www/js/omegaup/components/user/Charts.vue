@@ -37,113 +37,27 @@ export default {
   data: function() { return {T: T, UI: UI, type: 'delta', period: 'day'};},
   watch: {
     type: function(val) {
+      let self = this;
       if (val == 'total') {
-        let self = this;
-        let runs = self.normalizedRunCounts;
-        // Removing all series, except last one, because here is where the
-        // data will be placed. Otherwise, the chart will not be shown
-        while (self.chart.series.length > 1) self.chart.series[0].remove(false);
-        self.chart.update({
-          chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-          },
-          xAxis: {
-            title: {text: ''},
-          },
-          yAxis: {
-            title: {text: ''},
-          },
-          title: {
-            text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                          {user: self.username})
-          },
-          tooltip: {pointFormat: '{series.name}: {point.y}'},
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                color: '#000000',
-                connectorColor: '#000000',
-                format:
-                    '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-              }
-            }
-          },
-          series: [
-            {
-              name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
-              data: runs
-            }
-          ]
-        });
-        self.chart.redraw();
+        self.renderAggregateStatistics();
       } else {
-        this.verdictPeriodCounts();
+        self.renderPeriodStatistics();
       }
     },
-    period: function(val) { this.verdictPeriodCounts();},
+    period: function(val) {
+      let self = this;
+      self.renderPeriodStatistics();
+    },
   },
   mounted: function() {
     let self = this;
-    let runs = self.normalizedRunCountsForPeriod;
-    let data = runs[self.type];
     self.chart = Highcharts.chart('verdict-chart', {
-      chart: {type: 'column'},
       title: {
         text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
                                       {user: this.username})
       },
-      xAxis: {
-        categories: runs.categories,
-        title: {text: omegaup.T.profileStatisticsPeriod},
-        labels: {
-          rotation: -45,
-        }
-      },
-      yAxis: {
-        min: 0,
-        title: {text: omegaup.T.profileStatisticsNumberOfSolvedProblems},
-        stackLabels: {
-          enabled: false,
-          style: {
-            fontWeight: 'bold',
-            color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-          }
-        }
-      },
-      legend: {
-        align: 'right',
-        x: -30,
-        verticalAlign: 'top',
-        y: 25,
-        floating: true,
-        backgroundColor:
-            (Highcharts.theme && Highcharts.theme.background2) || 'white',
-        borderColor: '#CCC',
-        borderWidth: 1,
-        shadow: false
-      },
-      tooltip: {
-        headerFormat: '<b>{point.x}</b><br/>',
-        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-      },
-      plotOptions: {
-        column: {
-          stacking: 'normal',
-          dataLabels: {
-            enabled: false,
-            color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) ||
-                       'white'
-          }
-        }
-      },
-      series: data
     });
+    self.renderPeriodStatistics();
   },
   computed: {
     totalRuns: function() {
@@ -245,7 +159,7 @@ export default {
     }
   },
   methods: {
-    verdictPeriodCounts: function() {
+    renderPeriodStatistics: function() {
       let self = this;
       let runs = self.normalizedRunCountsForPeriod;
       let data = runs[self.type];
@@ -304,6 +218,52 @@ export default {
       for (let i = 0; i < numSeries; i++) {
         self.chart.addSeries(data[i]);
       }
+      self.chart.redraw();
+    },
+    renderAggregateStatistics: function() {
+      let self = this;
+      let runs = self.normalizedRunCounts;
+      // Removing all series, except last one, because here is where the
+      // data will be placed. Otherwise, the chart will not be shown
+      while (self.chart.series.length > 1) self.chart.series[0].remove(false);
+      self.chart.update({
+        chart: {
+          plotBackgroundColor: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          type: 'pie'
+        },
+        xAxis: {
+          title: {text: ''},
+        },
+        yAxis: {
+          title: {text: ''},
+        },
+        title: {
+          text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
+                                        {user: self.username})
+        },
+        tooltip: {pointFormat: '{series.name}: {point.y}'},
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              color: '#000000',
+              connectorColor: '#000000',
+              format:
+                  '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
+            }
+          }
+        },
+        series: [
+          {
+            name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
+            data: runs
+          }
+        ]
+      });
       self.chart.redraw();
     },
   }
