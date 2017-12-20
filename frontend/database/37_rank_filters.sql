@@ -102,3 +102,5 @@ DO BEGIN
     CALL Refresh_User_Rank();
 END$$
 DELIMITER ;
+
+CALL Refresh_User_Rank();
