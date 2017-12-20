@@ -5,10 +5,9 @@ class UserRankTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $adminLogin = self::login($admin);
-        $r = new Request([
+        UserController::apiRefreshUserRank(new Request([
             'auth_token' => $adminLogin->auth_token,
-        ]);
-        UserController::apiRefreshUserRank($r);
+        ]));
     }
 
     /**
@@ -138,14 +137,12 @@ class UserRankTest extends OmegaupTestCase {
         $login = self::login($contestant);
 
         $states = StatesDAO::search(['country_id' => 'MX']);
-        $r = new Request([
+        UserController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
             'school_id' => $school['school']->school_id
-        ]);
-
-        UserController::apiUpdate($r);
+        ]));
 
         // create runs
         $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -182,48 +179,42 @@ class UserRankTest extends OmegaupTestCase {
 
         // Create two users from Maranhao, Brasil
         $contestantFromMaranhao1 = UserFactory::createUser();
-        $login = self::login($contestantFromMaranhao1);
+        $maranhao1Login = self::login($contestantFromMaranhao1);
 
-        $r = new Request([
-            'auth_token' => $login->auth_token,
+        UserController::apiUpdate(new Request([
+            'auth_token' => $maranhao1Login->auth_token,
             'country_id' => 'BR',
             'state_id' => 'MA'
-        ]);
-
-        UserController::apiUpdate($r);
+        ]));
 
         // Create two runs of different problems
-        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao1);
-        RunsFactory::gradeRun($runDataContestantFromMaranhao);
-        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[1], $contestantFromMaranhao1);
-        RunsFactory::gradeRun($runDataContestantFromMaranhao);
+        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao1);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
+        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem($problemData[1], $contestantFromMaranhao1);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
 
         $contestantFromMaranhao2 = UserFactory::createUser();
-        $login = self::login($contestantFromMaranhao2);
+        $maranhao2Login = self::login($contestantFromMaranhao2);
 
-        $r = new Request([
-            'auth_token' => $login->auth_token,
+        UserController::apiUpdate(new Request([
+            'auth_token' => $maranhao2Login->auth_token,
             'country_id' => 'BR',
             'state_id' => 'MA'
-        ]);
-
-        UserController::apiUpdate($r);
+        ]));
 
         // Create o run of one problem
-        $runDataContestantFromMaranhao = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao2);
-        RunsFactory::gradeRun($runDataContestantFromMaranhao);
+        $runDataContestantFromMaranhao2 = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao2);
+        RunsFactory::gradeRun($runDataContestantFromMaranhao2);
 
         // Create a user from Massachusetts, USA
         $contestantFromMassachusetts = UserFactory::createUser();
-        $login = self::login($contestantFromMassachusetts);
+        $massachusettsLogin = self::login($contestantFromMassachusetts);
 
-        $r = new Request([
-            'auth_token' => $login->auth_token,
+        UserController::apiUpdate(new Request([
+            'auth_token' => $massachusettsLogin->auth_token,
             'country_id' => 'US',
             'state_id' => 'MA'
-        ]);
-
-        UserController::apiUpdate($r);
+        ]));
 
         // create a run of one problem
         $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem($problemData[0], $contestantFromMassachusetts);
@@ -232,29 +223,23 @@ class UserRankTest extends OmegaupTestCase {
         // Refresh Rank
         $this->refreshUserRank();
 
-        $login = self::login($contestantFromMaranhao1);
-
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $runDataContestantFromMaranhao1['request']['auth_token'],
             'filter' => 'state'
         ]));
         $this->assertCount(2, $response['rank']);
 
-        $login = self::login($contestantFromMaranhao2);
-
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $runDataContestantFromMaranhao2['request']['auth_token'],
             'filter' => 'state'
         ]));
         $this->assertCount(2, $response['rank']);
 
-        $login = self::login($contestantFromMassachusetts);
-
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $runDataContestantFromMassachusetts['request']['auth_token'],
             'filter' => 'state'
         ]));
         $this->assertCount(1, $response['rank']);

@@ -2,10 +2,6 @@
 	{$page = 1}
 {/if}
 
-{if !isset($filter)}
-	{$filter = false}
-{/if}
-
 {if !isset($length)}
 	{$length = 100}
 {/if}
@@ -22,13 +18,11 @@
 				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
 			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
-		{/if}
-		{if !$is_index}
 		    {if count($availableFilters) > 0}
 		        <select class="filter">
 		        	<option value="">{#wordsSelectFilter#}</option>
 		        	{foreach key=key item=item from=$availableFilters}
-		        	<option id="{$key}" value="{$item}" {if $filter == $key}selected="selected"{/if}>
+		        	<option value="{$key}" {if isset($filter) && $filter == $key}selected="selected"{/if}>
 		        		{if $key == 'country'}{#wordsFilterByCountry#} {/if}
 		        		{if $key == 'state'}{#wordsFilterByState#} {/if}
 		        		{if $key == 'school'}{#wordsFilterBySchool#} {/if}
@@ -61,9 +55,9 @@
 				<a href='/rank/'>{#rankViewFull#}</a>
 				{else}
 					{if $page > 1}
-					<a href="/rank/?page={$page-1}&filter={$filter}">{#wordsPrevPage#}</a> |
+					<a href="/rank/?page={$page-1}{if isset($filter)}&filter={$filter}{/if}">{#wordsPrevPage#}</a> |
 					{/if}
-					<a href="/rank/?page={$page+1}&filter={$filter}">{#wordsNextPage#}</a>
+					<a href="/rank/?page={$page+1}{if isset($filter)}&filter={$filter}{/if}">{#wordsNextPage#}</a>
 				{/if}
 				<br/>
 			</div>

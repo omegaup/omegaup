@@ -36,8 +36,7 @@ class UserRankDAO extends UserRankDAOBase {
                   User_Rank ';
         global $conn;
         $params = [];
-        $offset = (($page - 1) * $colsPerPage);
-        if (!is_null($filteredBy)) {
+        if (!empty($filteredBy)) {
             if ($filteredBy == 'state') {
                 $values = explode('-', $value);
                 $params[] = $values[0];
@@ -52,7 +51,7 @@ class UserRankDAO extends UserRankDAOBase {
             $sql .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
-            $params[] = $offset;
+            $params[] = (($page - 1) * $colsPerPage); // Offset
             $params[] = (int)$colsPerPage;
             $sql .= ' LIMIT ?, ?';
         }

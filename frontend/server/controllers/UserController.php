@@ -1606,7 +1606,6 @@ class UserController extends Controller {
     public static function apiRankByProblemsSolved(Request $r) {
         Validators::isNumber($r['offset'], 'offset', false);
         Validators::isNumber($r['rowcount'], 'rowcount', false);
-        $r['filter'] = $r['filter'] != '' ? $r['filter'] : null;
 
         $r['user'] = null;
         if (!is_null($r['username'])) {
@@ -2045,25 +2044,20 @@ class UserController extends Controller {
 
     private static function getFilters($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
-        $filteredBy = null;
-        $value = null;
-        if ($session['auth_token']) {
-            $filteredBy = !is_null($r['filter']) ? $r['filter'] : null;
-            switch ($r['filter']) {
-                case 'country':
-                    $value = $session['user']->country_id;
-                    break;
-                case 'state':
-                    $value = $session['user']->country_id . '-' . $session['user']->state_id;
-                    break;
-                case 'school':
-                    $value = $session['user']->school_id;
-                    break;
-                default:
-                    $value = null;
-            }
+        if (!$session['valid']) {
+            return ['filteredBy' => null, 'value' => null];
         }
-        return ['filteredBy' => $filteredBy, 'value' => $value];
+        $user = $session['user'];
+        $filteredBy = $r['filter'];
+        if ($filteredBy == 'country') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->country_id];
+        }
+        if ($filteredBy == 'state') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->country_id . '-' . $user->state_id];
+        }
+        if ($filteredBy == 'school') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
+        }
     }
 }
 

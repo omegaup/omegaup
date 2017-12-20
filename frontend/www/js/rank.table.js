@@ -46,7 +46,11 @@
         while (m = re.exec(queryString)) {
           queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
         }
-        queryParameters['filter'] = $(this).val();
+        if ($(this).val() != '') {
+          queryParameters['filter'] = $(this).val();
+        } else {
+          delete queryParameters['filter'];
+        }
         window.location.search = $.param(queryParameters);
       });
 })();
