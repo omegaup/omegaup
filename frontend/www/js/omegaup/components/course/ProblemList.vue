@@ -36,7 +36,8 @@
         </tr>
       </thead>
       <tbody v-sortable="{ onUpdate: sort }">
-        <tr v-for="problem in assignmentProblems">
+        <tr v-bind:key="problem.letter"
+            v-for="problem in assignmentProblems">
           <td>
             <a v-bind:title="T.courseAssignmentProblemReorder"><span aria-hidden="true"
                   class="glyphicon glyphicon-move handle"></span></a>

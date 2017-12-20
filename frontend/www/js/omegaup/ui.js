@@ -69,11 +69,6 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
-    if (typeof usernames != 'undefined') {
-      usernames.each(function(event, index) {
-        operation(event, resolve, reject);
-      });
-    }
 
     // Wait for all
     $(document)
@@ -92,9 +87,7 @@ let UI = {
                                            omegaup.T.bulkOperationError,
                                        error));
             } else {
-              UI.success((typeof usernames != 'undefined') ?
-                             omegaup.T.bulkUserAddSuccess :
-                             omegaup.T.updateItemsSuccess);
+              UI.success(omegaup.T.updateItemsSuccess);
             }
           }
         });
@@ -190,6 +183,24 @@ let UI = {
                   return UI.formatString('<strong>%(title)</strong> (%(alias))',
                                          val);
                 }
+              }
+            })
+        .on('typeahead:selected', cb)
+        .on('typeahead:autocompleted', cb);
+  },
+
+  schoolTypeahead: function(elem, cb) {
+    cb = cb || function(event, val) { $(event.target).val(val.value); };
+    elem.typeahead(
+            {
+              minLength: 2,
+              highlight: true,
+            },
+            {
+              source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
+              displayKey: 'label',
+              templates: {
+                empty: omegaup.T.schoolToBeAdded,
               }
             })
         .on('typeahead:selected', cb)
