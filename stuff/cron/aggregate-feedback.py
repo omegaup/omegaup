@@ -136,7 +136,7 @@ def main():
 
     args = parser.parse_args()
     password = args.password
-    if not password: 
+    if password is None:
 	    password = getpass.getpass()
 
     db = MySQLdb.connect(
