@@ -277,7 +277,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     /**
      * This function gets the contents of QualityNomination table
      */
-    public static function getGlobalDifficultyAndQuality() {
+    public static function getAllNominations() {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
@@ -310,9 +310,9 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function gets contents os QualityNomination table
+     * This function gets contents of QualityNomination table
      */
-    public static function getProblemSuggestionAggregates($problemId) {
+    public static function getAllSuggestionsPerProblem($problemId) {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
@@ -368,7 +368,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      * This function is to be called (only) by a cronjob.
      */
     public static function aggregateFeedback() {
-        $globalContents = self::getGlobalDifficultyAndQuality();
+        $globalContents = self::getAllNominations();
         list($globalQualityAverage, $globalDifficultyAverage)
           = self::calculateGlobalDifficultyAndQuality($globalContents);
 
@@ -377,7 +377,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         global $conn;
         foreach ($conn->Execute($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
-            $contents = self::getProblemSuggestionAggregates($problemId);
+            $contents = self::getAllSuggestionsPerProblem($problemId);
             $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
 
             $problem = ProblemsDAO::getByPK($problemId);
