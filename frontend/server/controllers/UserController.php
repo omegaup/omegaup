@@ -1643,14 +1643,14 @@ class UserController extends Controller {
      */
     private static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
-            $filterSelected = self::getFilters($r);
-            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'] . '-' . $filterSelected['value'];
+            $selectedFilter = self::getSelectedFilter($r);
+            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'] . '-' . $selectedFilter['value'];
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
-                $filterSelected = self::getFilters($r);
+                $selectedFilter = self::getSelectedFilter($r);
                 try {
-                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $filterSelected['filteredBy'], $filterSelected['value']);
+                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $selectedFilter['filteredBy'], $selectedFilter['value']);
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -2042,7 +2042,7 @@ class UserController extends Controller {
         ];
     }
 
-    private static function getFilters($r) {
+    private static function getSelectedFilter($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
@@ -2058,7 +2058,7 @@ class UserController extends Controller {
         if ($filteredBy == 'school') {
             return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
         }
-        return;
+        return ['filteredBy' => null, 'value' => null];
     }
 }
 

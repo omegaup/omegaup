@@ -36,16 +36,14 @@ class UserRankDAO extends UserRankDAOBase {
                   User_Rank ';
         global $conn;
         $params = [];
-        if (!empty($filteredBy)) {
-            if ($filteredBy == 'state') {
-                $values = explode('-', $value);
-                $params[] = $values[0];
-                $params[] = $values[1];
-                $sql .= ' WHERE country_id = ? AND state_id = ?';
-            } else {
-                $params[] = $value;
-                $sql .= ' WHERE ' . mysqli_real_escape_string($conn->_connectionID, $filteredBy) . '_id = ?';
-            }
+        if ($filteredBy == 'state') {
+            $values = explode('-', $value);
+            $params[] = $values[0];
+            $params[] = $values[1];
+            $sql .= ' WHERE country_id = ? AND state_id = ?';
+        } elseif (!empty($filteredBy)) {
+            $params[] = $value;
+            $sql .= ' WHERE ' . mysqli_real_escape_string($conn->_connectionID, $filteredBy) . '_id = ?';
         }
         if (!is_null($order)) {
             $sql .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');

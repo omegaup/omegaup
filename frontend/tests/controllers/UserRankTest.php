@@ -145,7 +145,7 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // create runs
-        $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant, $login);
         RunsFactory::gradeRun($runDataContestant);
 
         // Refresh Rank
@@ -153,17 +153,17 @@ class UserRankTest extends OmegaupTestCase {
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestant['request']['auth_token'],
+            'auth_token' => $login->auth_token,
             'filter' => 'country'
         ]));
         $this->assertCount(1, $response['rank']);
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestant['request']['auth_token'],
+            'auth_token' => $login->auth_token,
             'filter' => 'state'
         ]));
         $this->assertCount(1, $response['rank']);
         $response = UserController::apiRankByProblemsSolved(new Request([
-            'auth_token' => $runDataContestant['request']['auth_token'],
+            'auth_token' => $login->auth_token,
             'filter' => 'school'
         ]));
         $this->assertCount(1, $response['rank']);
@@ -188,9 +188,17 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // Create two runs of different problems
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao1);
+        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $contestantFromMaranhao1,
+            $maranhao1Login
+        );
         RunsFactory::gradeRun($runDataContestantFromMaranhao1);
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem($problemData[1], $contestantFromMaranhao1);
+        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+            $problemData[1],
+            $contestantFromMaranhao1,
+            $maranhao1Login
+        );
         RunsFactory::gradeRun($runDataContestantFromMaranhao1);
 
         $contestantFromMaranhao2 = UserFactory::createUser();
@@ -203,7 +211,11 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // Create o run of one problem
-        $runDataContestantFromMaranhao2 = RunsFactory::createRunToProblem($problemData[0], $contestantFromMaranhao2);
+        $runDataContestantFromMaranhao2 = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $contestantFromMaranhao2,
+            $maranhao2Login
+        );
         RunsFactory::gradeRun($runDataContestantFromMaranhao2);
 
         // Create a user from Massachusetts, USA
@@ -217,13 +229,16 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // create a run of one problem
-        $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem($problemData[0], $contestantFromMassachusetts);
+        $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $contestantFromMassachusetts,
+            $massachusettsLogin
+        );
         RunsFactory::gradeRun($runDataContestantFromMassachusetts);
 
         // Refresh Rank
         $this->refreshUserRank();
 
-        $maranhao1Login = self::login($contestantFromMaranhao1);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
             'auth_token' => $maranhao1Login->auth_token,
@@ -231,7 +246,6 @@ class UserRankTest extends OmegaupTestCase {
         ]));
         $this->assertCount(2, $response['rank']);
 
-        $maranhao2Login = self::login($contestantFromMaranhao2);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
             'auth_token' => $maranhao2Login->auth_token,
@@ -239,7 +253,6 @@ class UserRankTest extends OmegaupTestCase {
         ]));
         $this->assertCount(2, $response['rank']);
 
-        $massachusettsLogin = self::login($contestantFromMassachusetts);
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
             'auth_token' => $massachusettsLogin->auth_token,
