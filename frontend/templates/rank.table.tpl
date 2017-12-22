@@ -18,11 +18,21 @@
 				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
 			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+		    {if count($availableFilters) > 0}
+		        <select class="filter">
+		        	<option value="">{#wordsSelectFilter#}</option>
+		        	{foreach key=key item=item from=$availableFilters}
+		        	<option value="{$key}" {if isset($filter) && $filter == $key}selected="selected"{/if}>
+		        		{$item}
+		        	</option>
+		        	{/foreach}
+		        </select>
+		    {/if}
 		{/if}
 	</div>
 	<div class="panel-body no-padding">
 		<div class="table-responsive">
-			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" is-index="{$is_index}">
+			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" data-filter="{$filter}" is-index="{$is_index}">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -43,9 +53,9 @@
 				<a href='/rank/'>{#rankViewFull#}</a>
 				{else}
 					{if $page > 1}
-					<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
+					<a href="/rank/?page={$page-1}{if isset($filter)}&filter={$filter}{/if}">{#wordsPrevPage#}</a> |
 					{/if}
-					<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+					<a href="/rank/?page={$page+1}{if isset($filter)}&filter={$filter}{/if}">{#wordsNextPage#}</a>
 				{/if}
 				<br/>
 			</div>

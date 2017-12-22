@@ -1613,6 +1613,7 @@ class UserController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
+        Validators::isInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -1634,13 +1635,14 @@ class UserController extends Controller {
      */
     private static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
-            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'];
-
+            $selectedFilter = self::getSelectedFilter($r);
+            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'] . '-' . $selectedFilter['value'];
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
+                $selectedFilter = self::getSelectedFilter($r);
                 try {
-                    $userRankEntries = UserRankDAO::getAll($r['offset'], $r['rowcount'], 'Rank', 'ASC');
+                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $selectedFilter['filteredBy'], $selectedFilter['value']);
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -2030,6 +2032,25 @@ class UserController extends Controller {
         return [
             'status' => 'ok',
         ];
+    }
+
+    private static function getSelectedFilter($r) {
+        $session = SessionController::apiCurrentSession($r)['session'];
+        if (!$session['valid']) {
+            return ['filteredBy' => null, 'value' => null];
+        }
+        $user = $session['user'];
+        $filteredBy = $r['filter'];
+        if ($filteredBy == 'country') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->country_id];
+        }
+        if ($filteredBy == 'state') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->country_id . '-' . $user->state_id];
+        }
+        if ($filteredBy == 'school') {
+            return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
+        }
+        return ['filteredBy' => null, 'value' => null];
     }
 }
 
