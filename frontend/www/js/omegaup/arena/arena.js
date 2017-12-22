@@ -552,7 +552,6 @@ export class Arena {
 
   refreshRanking() {
     var self = this;
-
     if (self.options.contestAlias) {
       API.Contest.scoreboard({contest_alias: self.options.contestAlias})
           .then(self.rankingChange.bind(self))
@@ -620,9 +619,10 @@ export class Arena {
 
         if (self.problems[alias]) {
           if (rank.username == OmegaUp.username) {
+            let maxScore = self.getMaxScore(alias, problem.points);
             $('#problems .problem_' + alias + ' .solved')
-                .html('(' + problem.points + ' / ' +
-                      self.problems[alias].points + ')');
+                .html('(' + maxScore + ' / ' + self.problems[alias].points +
+                      ')');
           }
         }
       }
@@ -655,6 +655,29 @@ export class Arena {
     self.removeRecentEventClassTimeout = setTimeout(function() {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
+  }
+
+  getMaxScore(alias, points) {
+    let self = this;
+    let savedPoints =
+        $('#problems .problem_' + alias + ' .solved').html().split('/');
+    let scoreMax = 0;
+    if (typeof self.currentProblem != 'undefined') {
+      if (self.currentProblem.alias == alias) {
+        $('.runs tbody tr .points')
+            .each(function() {
+              if (parseInt($(this).html()) > scoreMax) {
+                scoreMax = parseInt($(this).html());
+              }
+            });
+      }
+    }
+
+    let score = savedPoints[0].substring(1);
+    if (isNaN(parseInt(score))) {
+      return points;
+    }
+    return Math.max(score, scoreMax);
   }
 
   onRankingEvents(data) {
@@ -1104,9 +1127,25 @@ export class Arena {
 
         function updateRuns(runs) {
           if (runs) {
+            let maxScore = 0;
+            let totalScore = 0;
+            let currentScore =
+                parseInt($('.problem_' + problem.alias + ' .solved')
+                             .html()
+                             .split('/')[0]
+                             .substring(1));
             for (var i = 0; i < runs.length; i++) {
+              let score = parseInt(runs[i].contest_score);
+              if (score > maxScore) {
+                maxScore = score;
+              }
+              totalScore += score;
               self.trackRun(runs[i]);
             }
+            let totalPoints = self.problems[problem.alias].points;
+            $('.problem_' + problem.alias + ' .solved')
+                .html('(' + Math.max(maxScore, currentScore) + ' / ' +
+                      totalPoints + ')');
           }
           self.myRuns.filter_problem(problem.alias);
         }
@@ -1652,7 +1691,6 @@ export class Arena {
 class RunView {
   constructor(arena) {
     var self = this;
-
     self.arena = arena;
     self.row_count = 100;
     self.filter_verdict = ko.observable();
