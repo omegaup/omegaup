@@ -710,6 +710,7 @@ class RunCreateTest extends OmegaupTestCase {
             'course' => $this->courseData['course_alias'],
             'assignment' => $this->courseData['assignment_alias'],
             'start_time' => Utils::GetPhpUnixTimestamp() + 10,
+            'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
         ]));
 
         $login = self::login($this->student);

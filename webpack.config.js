@@ -20,6 +20,7 @@ module.exports = {
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
     qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
+    user_charts: './frontend/www/js/omegaup/user/charts.js'
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

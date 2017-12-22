@@ -1,7 +1,9 @@
 omegaup.OmegaUp.on('ready', function() {
   var payload = JSON.parse(document.getElementById('payload').innerText);
 
-  function registerAndLogin() {
+  function registerAndLogin(ev) {
+    ev.preventDefault();
+
     if ($('#reg_pass').val() != $('#reg_pass2').val()) {
       omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
       return false;
@@ -12,17 +14,21 @@ omegaup.OmegaUp.on('ready', function() {
       return false;
     }
 
-    if (payload.validateRecaptcha && (typeof(grecaptcha) === 'undefined' ||
-                                      grecaptcha.getResponse().length == 0)) {
-      omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
-      return false;
+    var recaptchaResponse = null;
+    if (payload.validateRecaptcha) {
+      if (typeof(grecaptcha) === 'undefined' ||
+          grecaptcha.getResponse().length == 0) {
+        omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
+        return false;
+      }
+      recaptchaResponse = grecaptcha.getResponse();
     }
 
     omegaup.API.User.create({
                       email: $('#reg_email').val(),
                       username: $('#reg_username').val(),
                       password: $('#reg_pass').val(),
-                      recaptcha: grecaptcha.getResponse()
+                      recaptcha: recaptchaResponse,
                     })
         .then(function(data) {
           // registration callback

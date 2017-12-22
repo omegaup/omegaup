@@ -394,8 +394,8 @@ class ContestListTest extends OmegaupTestCase {
         $futureContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'public' => 0,
-                'finish_time' => ($currentContestData['request']['finish_time'] + (60 * 60 * 49)),
-                'start_time' => ($currentContestData['request']['finish_time'] + (60 * 60 * 48)),
+                'finish_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                'start_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
             ]
         ));
 
@@ -429,8 +429,8 @@ class ContestListTest extends OmegaupTestCase {
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
-            $isPublic = ($i === 0) ? true : false;
-            $contestData[$i] = ContestsFactory::createContest(null, $isPublic);
+            $isPublic = ($i === 0);
+            $contestData[$i] = ContestsFactory::createContest(new ContestParams(['public' => $isPublic]));
         }
 
         // Get a user for our scenario
