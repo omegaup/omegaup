@@ -760,6 +760,9 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate-feedback.py' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -954,6 +957,11 @@ class QualityNominationTest extends OmegaupTestCase {
             3,
             ['Geometry', 'Math']
         );
+    }
+
+    private static function commit() {
+        global $conn;
+        $conn->Execute('COMMIT');
     }
 
     public function testMostVotedTags() {
