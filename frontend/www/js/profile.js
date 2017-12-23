@@ -1,12 +1,5 @@
 var username = $('#username').attr('data-username');
 
-omegaup.API.User.stats({username: username})
-    .then(function(data) {
-      window.run_counts_chart =
-          oGraph.verdictCounts('verdict-chart', username, data);
-    })
-    .fail(omegaup.UI.apiError);
-
 omegaup.API.User.contestStats({username: username})
     .then(function(data) {
       $('#contest-results-wait').hide();

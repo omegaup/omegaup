@@ -718,9 +718,16 @@ CREATE TABLE `User_Rank` (
   `username` varchar(50) NOT NULL,
   `name` varchar(256) DEFAULT NULL,
   `country_id` char(3) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  KEY `rank` (`rank`)
+  KEY `rank` (`rank`),
+  KEY `fk_ur_state_id` (`country_id`,`state_id`),
+  KEY `fk_ur_school_id` (`school_id`),
+  CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -827,7 +834,7 @@ BEGIN
     SET @ties_count = 0;
 
     INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id)
+        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id, state_id, school_id)
     SELECT
         user_id,
         rank,
@@ -835,7 +842,9 @@ BEGIN
         score,
         username,
         name,
-        country_id
+        country_id,
+        state_id,
+        school_id
     FROM
     (
         SELECT
@@ -844,6 +853,8 @@ BEGIN
             score,
             name,
             country_id,
+            state_id,
+            school_id,
             user_id,
             @prev_ties_count := @ties_count as previous_ties_count,
         CASE
@@ -860,6 +871,8 @@ BEGIN
                 username,
                 name,
                 country_id,
+                state_id,
+                school_id,
                 up.user_id,
                 COUNT(ps.problem_id) problems_solved_count,
                 SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score

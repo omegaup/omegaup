@@ -40,7 +40,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   function drawCharts() {
     $('#total-runs')
-        .text(omeagup.UI.formatString(omegaup.T.totalRuns,
+        .text(omegaup.UI.formatString(omegaup.T.totalRuns,
                                       {numRuns: stats.total_runs}));
 
     if (window.run_counts_chart != null) {
