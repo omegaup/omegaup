@@ -70,7 +70,7 @@ def getProblemAggregates(db, problemId):
     return (qualitySum, qualityN, difficultySum, difficultyN, tagVotes, tagVotesN)
 
 def bayesianAverage(aprioriAverage, sum, n):
-    if n < CONFIDENCE:
+    if n < CONFIDENCE or aprioriAverage is None:
         return None
     return (CONFIDENCE * aprioriAverage + sum) / (CONFIDENCE + n)
 
