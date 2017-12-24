@@ -285,8 +285,8 @@ class QualityNominationController extends Controller {
     }
 
     public static function extractAliasFromArgument($problemUrl) {
-        $aliasrRegex = '/.*[#\/]problem[s]?[#\/]([a-zA-Z0-9-_]+)[\/#$]*/';
-        preg_match($aliasrRegex, $problemUrl, $matches);
+        $aliasRegex = '/.*[#\/]problem[s]?[#\/]([a-zA-Z0-9-_]+)[\/#$]*/';
+        preg_match($aliasRegex, $problemUrl, $matches);
         if (sizeof($matches) < 2) {
             return null;
         }
