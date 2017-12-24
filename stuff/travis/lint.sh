@@ -8,6 +8,8 @@ stage_before_install() {
 
 	pip install --user six
 	pip install --user https://github.com/google/closure-linter/zipball/master
+	pip3 install --user pylint
+	pip3 install --user pep8
 
 	install_yarn
 }
