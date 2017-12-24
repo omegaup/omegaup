@@ -158,7 +158,10 @@ class QualityNominationController extends Controller {
                 }
                 $original = ProblemsDAO::getByAlias($contents['original']);
                 if (is_null($original)) {
-                    $contents['original'] = self::ExtractAliasFromProblemUrl($contents['original']);
+                    $contents['original'] = self::extractAliasFromArgument($contents['original']);
+                    if (is_null($contents['original'])) {
+                        throw new NotFoundException('problemNotFound');
+                    }
                     $original = ProblemsDAO::getByAlias($contents['original']);
                     if (is_null($original)) {
                         throw new NotFoundException('problemNotFound');
@@ -281,17 +284,13 @@ class QualityNominationController extends Controller {
         return ['status' => 'ok'];
     }
 
-    private static function ExtractAliasFromProblemUrl($problemUrl) {
-        $leftEnd = strrpos($problemUrl, '/');
-        if ($leftEnd == false) {
-            $leftEnd = 0;
-        } else {
-            $leftEnd ++;
+    public static function extractAliasFromArgument($problemUrl) {
+        $aliasrRegex = '/.*[#\/]problem[s]?[#\/]([a-zA-Z0-9-_]+)[\/#$]*/';
+        preg_match($aliasrRegex, $problemUrl, $matches);
+        if (sizeof($matches) < 2) {
+            return null;
         }
-        $questionMark = strpos($problemUrl, '?') == false ? strlen($problemUrl) : strpos($problemUrl, '?');
-        $sharp = strpos($problemUrl, '#') == false ? strlen($problemUrl) : strpos($problemUrl, '#');
-        $rightEnd = min($questionMark, $sharp);
-        return substr($problemUrl, $leftEnd, $rightEnd - $leftEnd);
+        return $matches[1];
     }
 
     /**
