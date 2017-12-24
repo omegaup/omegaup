@@ -407,6 +407,39 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
+    public static function getAdminUser(Problems $problem) {
+        global $conn;
+        $sql = '
+            SELECT DISTINCT
+                e.email,
+                u.name
+            FROM
+                ACLs a
+            INNER JOIN
+                Users u
+            ON
+                a.owner_id = u.user_id
+            INNER JOIN
+                Emails e
+            ON
+                e.email_id = u.main_email_id
+            WHERE
+               a.acl_id = ?
+            LIMIT
+               1;
+        ';
+        $params = [$problem->acl_id];
+        $rs = $conn->Execute($sql, $params);
+        if (count($rs)==0) {
+                return null;
+        }
+
+        return [
+            'name' => $rs->fields['name'],
+            'email' => $rs->fields['email']
+        ];
+    }
+
     /**
      * Returns all problems that a user can manage.
      */

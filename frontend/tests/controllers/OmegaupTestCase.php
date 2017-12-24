@@ -397,3 +397,18 @@ class ScopedScoreboardTestRun {
         Scoreboard::setIsTestRunForTesting(false);
     }
 }
+
+class ScopedEmailSender {
+    public static $listEmails = [];
+    public function __construct() {
+        Email::setEmailSenderForTesting($this);
+    }
+
+    public function __destruct() {
+        Email::setEmailSenderForTesting(null);
+    }
+
+    public function sendEmail($emails, $subject, $body) {
+        self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
+    }
+}

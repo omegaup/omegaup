@@ -31,7 +31,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   function drawCharts() {
     $('#total-runs')
-        .text(omeagup.UI.formatString(omegaup.T.totalRuns,
+        .text(omegaup.UI.formatString(omegaup.T.totalRuns,
                                       {numRuns: stats.total_runs}));
 
     // This function is called after we call getStats multiple times. We

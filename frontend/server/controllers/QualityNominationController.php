@@ -271,9 +271,14 @@ class QualityNominationController extends Controller {
 
         QualityNominationsDAO::transBegin();
         try {
+            $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
+            if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
+              $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                $response = self::sendDemotionEmail($r, $qualitynomination);
+            }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
@@ -291,6 +296,40 @@ class QualityNominationController extends Controller {
             return null;
         }
         return $matches[1];
+    }
+
+    /**
+     * Send a mail with demotion notification to the original creator
+     *
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+        $request = [];
+        try {
+            $adminuser = ProblemsDAO::getAdminUser($r['problem']);
+            $email = $adminuser['email'];
+            $username = $adminuser['name'];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $reason = json_decode($qualitynomination->contents);
+        $email_params = [
+            'reason' => $reason->rationale,
+            'problem_name' => htmlspecialchars($r['problem']->title),
+            'user_name' => $username
+        ];
+        global $smarty;
+        $mail_subject = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            $email_params
+        );
+        $mail_body = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailBody'),
+            $email_params
+        );
+
+        Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
     /**

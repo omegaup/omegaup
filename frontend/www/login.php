@@ -63,5 +63,6 @@ if ($c_Session->CurrentSessionAvailable()) {
 // Only generate Login URLs if we actually need them.
 $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
 $smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
+$smarty->assign('VALIDATE_RECAPTCHA', OMEGAUP_VALIDATE_CAPTCHA);
 $smarty->assign('payload', ['validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA]);
 $smarty->display('../templates/login.tpl');

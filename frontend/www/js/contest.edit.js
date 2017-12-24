@@ -344,22 +344,23 @@ omegaup.OmegaUp.on('ready', function() {
         isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
                      .hasClass('user-add-bulk');
         if (isBulk) {
-          var usernames = $('textarea[name="usernames"]').val().split(',');
-          omegaup.UI.bulkOperation(
-              function(alias, resolve, reject) {
-                var username = $.trim(alias);
-                omegaup.API.Contest.addUser({
-                                     contest_alias: contestAlias,
-                                     usernameOrEmail: username,
-                                   })
-                    .then(resolve)
-                    .fail(reject);
-              },
-              function() { refreshContestContestants(); },
-              {
-                errorTemplate: omegaup.T.bulkUserAddError,
-                successTemplate: omegaup.T.bulkUserAddSuccess
-              });
+          var promises = $('textarea[name="usernames"]')
+                             .val()
+                             .split(',')
+                             .map(function(username) {
+                               return omegaup.API.Contest.addUser({
+                                 contest_alias: contestAlias,
+                                 usernameOrEmail: $.trim(username),
+                               });
+                             });
+          $.when.apply(promises)
+              .then(function() {
+                omegaup.UI.success(omegaup.T.bulkUserAddSuccess);
+              })
+              .fail(function() {
+                omegaup.UI.error(omegaup.T.bulkUserAddError);
+              })
+              .always(refreshContestContestants);
           return false;
         } else {
           var username = $('#username-contestant').val();

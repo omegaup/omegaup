@@ -20,7 +20,7 @@ abstract class UserRankDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`';
+    const FIELDS = '`User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class UserRankDAOBase extends DAO {
         if (is_null($user_id)) {
             return null;
         }
-        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id` FROM User_Rank WHERE (user_id = ?) LIMIT 1;';
+        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` FROM User_Rank WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class UserRankDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link UserRank}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id` from User_Rank';
+        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` from User_Rank';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -155,6 +155,14 @@ abstract class UserRankDAOBase extends DAO {
             $clauses[] = '`country_id` = ?';
             $params[] = $User_Rank->country_id;
         }
+        if (!is_null($User_Rank->state_id)) {
+            $clauses[] = '`state_id` = ?';
+            $params[] = $User_Rank->state_id;
+        }
+        if (!is_null($User_Rank->school_id)) {
+            $clauses[] = '`school_id` = ?';
+            $params[] = $User_Rank->school_id;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -165,7 +173,7 @@ abstract class UserRankDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id` FROM `User_Rank`';
+        $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` FROM `User_Rank`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -189,7 +197,7 @@ abstract class UserRankDAOBase extends DAO {
       * @param UserRank [$User_Rank] El objeto de tipo UserRank a actualizar.
       */
     final private static function update(UserRank $User_Rank) {
-        $sql = 'UPDATE `User_Rank` SET `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ? WHERE `user_id` = ?;';
+        $sql = 'UPDATE `User_Rank` SET `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ? WHERE `user_id` = ?;';
         $params = [
             $User_Rank->rank,
             $User_Rank->problems_solved_count,
@@ -197,6 +205,8 @@ abstract class UserRankDAOBase extends DAO {
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
+            $User_Rank->state_id,
+            $User_Rank->school_id,
             $User_Rank->user_id,
         ];
         global $conn;
@@ -223,7 +233,7 @@ abstract class UserRankDAOBase extends DAO {
         if (is_null($User_Rank->score)) {
             $User_Rank->score = '0';
         }
-        $sql = 'INSERT INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`, `state_id`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $User_Rank->user_id,
             $User_Rank->rank,
@@ -232,6 +242,8 @@ abstract class UserRankDAOBase extends DAO {
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
+            $User_Rank->state_id,
+            $User_Rank->school_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -352,6 +364,28 @@ abstract class UserRankDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`country_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $User_RankA->state_id;
+        $b = $User_RankB->state_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`state_id` >= ? AND `state_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`state_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $User_RankA->school_id;
+        $b = $User_RankB->school_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`school_id` >= ? AND `school_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`school_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

@@ -24,12 +24,13 @@ addons:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.7
     packages:
-      - nginx
-      - realpath
-      - python3
-      - python-pip
-      - python3-pip
       - clang-format-3.7
+      - libmysqlclient-dev
+      - nginx
+      - python-pip
+      - python3
+      - python3-pip
+      - realpath
   sauce_connect:
     username: lhchavez
   jwt:

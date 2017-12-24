@@ -167,12 +167,15 @@ CREATE TABLE `Courses` (
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
   `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
   KEY `fk_cg_student_group_id` (`group_id`),
+  KEY `school_id` (`school_id`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -715,9 +718,16 @@ CREATE TABLE `User_Rank` (
   `username` varchar(50) NOT NULL,
   `name` varchar(256) DEFAULT NULL,
   `country_id` char(3) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  KEY `rank` (`rank`)
+  KEY `rank` (`rank`),
+  KEY `fk_ur_state_id` (`country_id`,`state_id`),
+  KEY `fk_ur_school_id` (`school_id`),
+  CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -806,7 +816,7 @@ CREATE TABLE `Users_Experiments` (
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Refresh_User_Rank`()
 BEGIN
@@ -824,7 +834,7 @@ BEGIN
     SET @ties_count = 0;
 
     INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id)
+        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id, state_id, school_id)
     SELECT
         user_id,
         rank,
@@ -832,7 +842,9 @@ BEGIN
         score,
         username,
         name,
-        country_id
+        country_id,
+        state_id,
+        school_id
     FROM
     (
         SELECT
@@ -841,6 +853,8 @@ BEGIN
             score,
             name,
             country_id,
+            state_id,
+            school_id,
             user_id,
             @prev_ties_count := @ties_count as previous_ties_count,
         CASE
@@ -857,6 +871,8 @@ BEGIN
                 username,
                 name,
                 country_id,
+                state_id,
+                school_id,
                 up.user_id,
                 COUNT(ps.problem_id) problems_solved_count,
                 SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
