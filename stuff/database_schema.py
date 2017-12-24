@@ -5,7 +5,6 @@
 
 from __future__ import print_function
 
-import logging
 import os.path
 import re
 import subprocess
@@ -17,8 +16,8 @@ import hook_tools.git_tools as git_tools
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _expected_database_schema(*, dbname='omegaup', config_file=None,
-                              username=None, password=None, verbose=False):
+def _expected_database_schema(*, config_file=None, username=None,
+                              password=None, verbose=False):
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
     args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
     if config_file:
@@ -31,32 +30,32 @@ def _expected_database_schema(*, dbname='omegaup', config_file=None,
     stderr = subprocess.DEVNULL
     if verbose:
         stderr = None
-    schema = subprocess.check_output(args, stderr=subprocess.DEVNULL)
+    schema = subprocess.check_output(args, stderr=stderr)
     return re.sub(br'AUTO_INCREMENT=\d+\s+', b'', schema)
 
 
 def strip_mysql_extensions(sql):
     '''Strips MySQL extension comments.'''
     return re.sub(br'/\*!([^*]|\*[^/])*\*/', b'', sql,
-                  flags=re.MULTILINE|re.DOTALL)
+                  flags=re.MULTILINE | re.DOTALL)
 
 
 def main():
     '''Runs the linters against the chosen files.'''
 
     args = git_tools.parse_arguments(
-            tool_description='validates schema.sql',
-            extra_arguments=[
-                git_tools.Argument(
-                    '--mysql-config-file',
-                    default=database_utils.default_config_file(),
-                    help='.my.cnf file that stores credentials'),
-                git_tools.Argument(
-                    '--database', default='omegaup', help='MySQL database'),
-                git_tools.Argument(
-                    '--username', default='root', help='MySQL root username'),
-                git_tools.Argument(
-                    '--password', default='omegaup', help='MySQL password')])
+        tool_description='validates schema.sql',
+        extra_arguments=[
+            git_tools.Argument(
+                '--mysql-config-file',
+                default=database_utils.default_config_file(),
+                help='.my.cnf file that stores credentials'),
+            git_tools.Argument(
+                '--database', default='omegaup', help='MySQL database'),
+            git_tools.Argument(
+                '--username', default='root', help='MySQL root username'),
+            git_tools.Argument(
+                '--password', default='omegaup', help='MySQL password')])
 
     # If running in an automated environment, we can close stdin.
     # This will disable all prompts.
@@ -72,16 +71,15 @@ def main():
         return
 
     root = git_tools.root_dir()
-    expected = _expected_database_schema(dbname=args.database,
-                                         config_file=args.mysql_config_file,
+    expected = _expected_database_schema(config_file=args.mysql_config_file,
                                          username=args.username,
                                          password=args.password,
                                          verbose=args.verbose)
     actual = git_tools.file_contents(
-            args, root, 'frontend/database/schema.sql')
+        args, root, 'frontend/database/schema.sql')
 
     if (strip_mysql_extensions(expected.strip()) !=
-        strip_mysql_extensions(actual.strip())):
+            strip_mysql_extensions(actual.strip())):
         if validate_only:
             if git_tools.attempt_automatic_fixes(sys.argv[0], args,
                                                  filtered_files):

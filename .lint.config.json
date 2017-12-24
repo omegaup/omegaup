@@ -5,7 +5,8 @@
 				"^frontend/.*\\.(php|css|js|sql|tpl|py|vue)$"
 			],
 			"blacklist": [
-				".*third_party.*"
+				".*third_party.*",
+				".*\\.py$"
 			]
 		},
 		"php": {
@@ -34,6 +35,16 @@
 			],
 			"whitelist": [
 				"frontend/www/.*\\.vue$"
+			]
+		},
+		"python": {
+			"pep8_config": "setup.cfg",
+			"whitelist": [
+				".*\\.py$"
+			],
+			"blacklist": [
+				"bin/karel_mdo_convert.py",
+				"frontend/tests/ui/integration-test.py"
 			]
 		}
 	}

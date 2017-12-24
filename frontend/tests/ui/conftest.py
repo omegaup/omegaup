@@ -6,11 +6,11 @@
 import contextlib
 import json
 import os.path
-import pytest
-import re
 import sys
 import time
 import urllib
+
+import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -21,6 +21,7 @@ _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
+
 
 class Driver(object):
     '''Wraps the state needed to run a test.'''
@@ -45,7 +46,7 @@ class Driver(object):
         '''Asserts that evaluating the JavaScript |script| returns true.'''
 
         assert self.browser.execute_script('return !!(%s);' % script), \
-               'Evaluation of `%s` returned false' % script
+            'Evaluation of `%s` returned false' % script
 
     def assert_script_equal(self, script, value):
         '''Asserts that evaluating the JavaScript |script| returns true.'''
@@ -106,38 +107,43 @@ class Driver(object):
         self.wait.until(lambda _: self.browser.current_url == home_page_url)
         self.wait_for_page_loaded()
 
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
     '''Takes a screenshot and grabs console logs on test failures.'''
 
-    global _SUCCESS
+    global _SUCCESS  # pylint: disable=global-statement
 
     outcome = yield
 
     if not outcome.excinfo:
         return
     _SUCCESS = False
-    if not 'driver' in pyfuncitem.funcargs:
+    if 'driver' not in pyfuncitem.funcargs:
         return
     if _CI:
-        # When running in CI, we have movies, screenshots and logs in Sauce Labs.
+        # When running in CI, we have movies, screenshots and logs in
+        # Sauce Labs.
         return
     try:
-        driver = pyfuncitem.funcargs['driver']
+        current_driver = pyfuncitem.funcargs['driver']
         try:
-            logs = driver.browser.get_log('browser')
-        except:
+            logs = current_driver.browser.get_log('browser')
+        except:  # pylint: disable=bare-except
             # geckodriver does not support getting logs:
             # https://github.com/mozilla/geckodriver/issues/284
             logs = []
         results_dir = os.path.join(_DIRNAME, 'results')
         os.makedirs(results_dir, exist_ok=True)
-        driver.browser.get_screenshot_as_file(
+        current_driver.browser.get_screenshot_as_file(
             os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
-        with open(os.path.join(results_dir, 'webdriver_%s.log' % pyfuncitem.name), 'w') as f:
-            json.dump(logs, f, indent=2)
-    except Exception as ex:
+        logpath = os.path.join(results_dir,
+                               'webdriver_%s.log' % pyfuncitem.name)
+        with open(logpath, 'w') as logfile:
+            json.dump(logs, logfile, indent=2)
+    except Exception as ex:  # pylint: disable=broad-except
         print(ex)
+
 
 def pytest_addoption(parser):
     '''Allow configuration of test invocation.'''
@@ -150,6 +156,7 @@ def pytest_addoption(parser):
     parser.addoption('--disable-headless', action='store_false',
                      dest='headless', help='Show the browser window')
 
+
 def pytest_generate_tests(metafunc):
     '''Parameterize the tests with the browsers.'''
 
@@ -157,24 +164,24 @@ def pytest_generate_tests(metafunc):
         metafunc.config.option.browsers = ['chrome', 'firefox']
 
     if 'driver' in metafunc.fixturenames:
-        metafunc.parametrize('browser', metafunc.config.option.browsers,
+        metafunc.parametrize('browser_name', metafunc.config.option.browsers,
                              scope='session')
 
-@pytest.yield_fixture(scope='session')
-def driver(request, browser):
-    '''Run tests using the selenium webdriver.'''
+
+def _get_browser(request, browser_name):
+    '''Gets a browser object from the request parameters.'''
 
     if _CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
-                os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser),
+                os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
         }
         # Add browser configuration
         capabilities.update({
-            'browserName': browser,
+            'browserName': browser_name,
             'version': 'latest',
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
@@ -183,27 +190,36 @@ def driver(request, browser):
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
-        browser = webdriver.Remote(desired_capabilities=capabilities,
-                                   command_executor=hub_url)
-    else:
-        if browser == 'chrome':
-            options = webdriver.ChromeOptions()
-            options.binary_location = '/usr/bin/google-chrome'
-            options.add_experimental_option('prefs', {'intl.accept_languages': 'en_US'})
-            options.add_argument('--lang=en-US')
-            if request.config.option.headless:
-                options.add_argument('--headless')
-            browser = webdriver.Chrome(chrome_options=options)
-        else:
-            firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX
-            firefox_capabilities['marionette'] = True
-            options = webdriver.firefox.options.Options()
-            if request.config.option.headless:
-                options.add_argument('-headless')
-            browser = webdriver.Firefox(capabilities=firefox_capabilities,
-                                        firefox_options=options)
-        browser.set_window_size(*_WINDOW_SIZE)
+        return webdriver.Remote(desired_capabilities=capabilities,
+                                command_executor=hub_url)
+    if browser_name == 'chrome':
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = '/usr/bin/google-chrome'
+        chrome_options.add_experimental_option(
+            'prefs', {'intl.accept_languages': 'en_US'})
+        chrome_options.add_argument('--lang=en-US')
+        if request.config.option.headless:
+            chrome_options.add_argument('--headless')
+        chrome_browser = webdriver.Chrome(chrome_options=chrome_options)
+        chrome_browser.set_window_size(*_WINDOW_SIZE)
+        return chrome_browser
+    # pylint: disable=line-too-long
+    firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX  # NOQA
+    firefox_capabilities['marionette'] = True
+    firefox_options = webdriver.firefox.options.Options()
+    if request.config.option.headless:
+        firefox_options.add_argument('-headless')
+    firefox_browser = webdriver.Firefox(
+        capabilities=firefox_capabilities, firefox_options=firefox_options)
+    firefox_browser.set_window_size(*_WINDOW_SIZE)
+    return firefox_browser
 
+
+@pytest.yield_fixture(scope='session')
+def driver(request, browser_name):
+    '''Run tests using the selenium webdriver.'''
+
+    browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
@@ -213,10 +229,11 @@ def driver(request, browser):
     finally:
         if _CI:
             print(('\n\nYou can see the report at '
-                   'https://saucelabs.com/beta/tests/%s/commands') % browser.session_id,
-                  file=sys.stderr)
+                   'https://saucelabs.com/beta/tests/%s/commands') %
+                  browser.session_id, file=sys.stderr)
             try:
-                browser.execute_script("sauce:job-result=%s" % str(_SUCCESS).lower())
+                browser.execute_script("sauce:job-result=%s" %
+                                       str(_SUCCESS).lower())
             except WebDriverException:
                 # Test is done. Just ignore the error.
                 pass
