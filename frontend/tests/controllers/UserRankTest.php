@@ -1,13 +1,22 @@
 <?php
 
 class UserRankTest extends OmegaupTestCase {
-    private function refreshUserRank() {
-        $admin = UserFactory::createAdminUser();
+    private static function commit() {
+        global $conn;
+        $conn->Execute('COMMIT');
+    }
 
-        $adminLogin = self::login($admin);
-        UserController::apiRefreshUserRank(new Request([
-            'auth_token' => $adminLogin->auth_token,
-        ]));
+    private function refreshUserRank() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+
+        UserController::deleteProblemsSolvedRankCacheList();
     }
 
     /**

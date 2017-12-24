@@ -10,19 +10,6 @@ include('base/User_Rank.vo.base.php');
   *
   */
 class UserRankDAO extends UserRankDAOBase {
-    /**
-     * Actualiza la tabla User_Rank
-     *
-     * @return boolean
-     */
-    public static function refreshUserRank() {
-        global $conn;
-        $sql = 'CALL Refresh_User_Rank();';
-        $conn->Execute($sql);
-
-        return true;
-    }
-
     public static function getFilteredRank($page = null, $colsPerPage = null, $order = null, $orderType = 'ASC', $filteredBy = null, $value = null) {
         $sql = '
                 SELECT

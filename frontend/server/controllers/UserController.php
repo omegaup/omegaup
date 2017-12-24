@@ -1694,33 +1694,6 @@ class UserController extends Controller {
     }
 
     /**
-     * Forza un refresh de la tabla User_Rank. SysAdmin only.
-     *
-     * @param Request $r
-     * @return array
-     * @throws UnauthorizedException
-     */
-    public static function apiRefreshUserRank(Request $r) {
-        self::authenticateRequest($r);
-
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
-            throw new UnauthorizedException();
-        }
-
-        // Actualizar tabla User_Rank
-        try {
-            UserRankDAO::refreshUserRank();
-        } catch (Exception $ex) {
-            throw new InvalidDatabaseOperationException($ex);
-        }
-
-        // Borrar todos los ranks cacheados
-        self::deleteProblemsSolvedRankCacheList();
-
-        return ['status' => 'ok'];
-    }
-
-    /**
      * Updates the main email of the current user
      *
      * @param Request $r
