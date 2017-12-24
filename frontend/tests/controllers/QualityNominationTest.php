@@ -205,6 +205,23 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
     }
 
+    public function testExtractAliasFromArgument() {
+        $inputAndExpectedOutput =
+                ['http://localhost:8080/arena/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/prueba/practice/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/problem/sumas#problems' => 'sumas',
+                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/prueba/#problems/sumas29187' => 'sumas29187',
+                 'http://localhost:8080/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
+                 'http://localhost:8080/arena/problem/_sumas29187-#problems' => '_sumas29187-',
+                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
+
+        foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
+            $actualOutput = QualityNominationController::extractAliasFromArgument($input);
+            $this->assertEquals($expectedOutput, $actualOutput, 'Incorrect alias was extracted from URL.');
+        }
+    }
+
     /**
      * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
      */
@@ -515,6 +532,17 @@ class QualityNominationTest extends OmegaupTestCase {
                 'rationale' => 'otro sumas',
                 'reason' => 'duplicate',
                 'original' => $originalProblemData['request']['alias'],
+            ]),
+        ]));
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'otro sumas',
+                'reason' => 'duplicate',
+                'original' => 'https://omegaup.com/arena/problem/' . $originalProblemData['request']['alias'] . '#problems',
             ]),
         ]));
     }
