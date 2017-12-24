@@ -26,5 +26,5 @@ stage_script() {
 	yarn test
 
 	python3 stuff/i18n.py --validate < /dev/null
-	python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
+	python3.5 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 }
