@@ -35,6 +35,8 @@ class RemoteRunner:
         if capture:
             std = subprocess.PIPE
         logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
+        # Travis uses Python <3.5, which does not yet have subprocess.run.
+        # pylint: disable=no-member
         return subprocess.run(['/usr/bin/ssh', self._hostname] + args,
                               stdout=std, stderr=std, universal_newlines=True,
                               input=input, shell=False, check=check)

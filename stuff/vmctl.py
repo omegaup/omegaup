@@ -16,6 +16,8 @@ def _run(args, check=True):
     '''A small subprocess.run wrapper with logging.'''
 
     logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
+    # Travis uses Python <3.5, which does not yet have subprocess.run.
+    # pylint: disable=no-member
     result = subprocess.run(['azure'] + args,
                             stdin=subprocess.DEVNULL,
                             stdout=subprocess.PIPE,

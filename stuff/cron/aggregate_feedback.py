@@ -41,7 +41,9 @@ def get_global_quality_and_difficulty_average(dbconn):
         for row in cur:
             try:
                 contents = json.loads(row[0])
-            except json.JSONDecodeError:
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                # Travis uses Python <3.5, which does not yet have
+                # json.JSONDecodeError.
                 logging.exception('Failed to parse contents')
                 continue
 
