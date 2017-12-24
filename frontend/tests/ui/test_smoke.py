@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 _OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
+
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
@@ -38,6 +39,7 @@ def test_create_user(driver):
     with driver.login(username, password):
         pass
 
+
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
@@ -46,6 +48,7 @@ def test_login(driver):
 
     with driver.login_admin():
         pass
+
 
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
@@ -57,7 +60,8 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//li[@id = "nav-problems"]//a[@href = "/problem/new/"]'))).click()
+                 ('//li[@id = "nav-problems"]'
+                  '//a[@href = "/problem/new/"]')))).click()
 
         driver.browser.find_element_by_name('title').send_keys(problem_alias)
         # Alias should be set automatically
@@ -80,7 +84,8 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//li[@id = "nav-problems"]//a[@href = "/problem/"]'))).click()
+                 ('//li[@id = "nav-problems"]'
+                  '//a[@href = "/problem/"]')))).click()
 
         search_box_element = driver.browser.find_element_by_id(
             'problem-search-box')
