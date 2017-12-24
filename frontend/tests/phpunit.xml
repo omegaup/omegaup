@@ -15,15 +15,7 @@
 				<file>../server/config.php</file>
 				<file>../server/libs/PasswordHashCmd.php</file>
 				<file>../server/libs/ExperimentHashCmd.php</file>
-				<directory>../server/libs/Mailchimp/</directory>
-				<directory>../server/libs/Markdown/</directory>
-				<directory>../server/libs/adodb/</directory>
-				<directory>../server/libs/dao/base/</directory>
-				<directory>../server/libs/facebook-php-sdk/</directory>
-				<directory>../server/libs/google-api-php-client/</directory>
-				<directory>../server/libs/log4php/</directory>
-				<directory>../server/libs/phpmailer/</directory>
-				<directory>../server/libs/smarty/</directory>
+				<directory>../server/libs/third_party/</directory>
 			</exclude>
 		</whitelist>
 	</filter>
