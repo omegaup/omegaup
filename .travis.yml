@@ -54,6 +54,8 @@ before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
 
 script: stuff/travis/run.sh "${TEST_SUITE}" script
 
+after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
+
 notifications:
   slack:
     secure: Dw6yE/lCYGuAvZDthzUAxqYMzn6CxPvNaCt1RheZPs9Na7gq/LWbfPz1g7vigwvNzBDd8+NFHAo4HEZ5ajWyoXeL2b83P7+sn6sZZcpO3ZG2kjNqkroW84Aum5l3KHqi8aIvAfNXZyQm5WUABKktEza7vGUeWZs1PAu8OJuLdIU=
