@@ -43,6 +43,11 @@ script)
 		stage_script
 	fi
 	;;
+after_success)
+	if [ "`type -t stage_after_success`" = "function" ]; then
+		stage_after_success
+	fi
+	;;
 *)
 	echo "Could not execute the stage '$2'." > /dev/stderr
 	exit 1
