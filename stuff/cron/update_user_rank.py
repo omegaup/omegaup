@@ -16,6 +16,19 @@ def update_user_rank(cur):
 
     cur.execute('TRUNCATE TABLE `User_Rank`;')
     cur.execute('''
+        UPDATE
+            Problems p
+        SET
+            p.accepted = (
+                SELECT
+                    COUNT(DISTINCT r.user_id)
+                FROM
+                    Runs r
+                WHERE
+                    r.problem_id = p.problem_id AND r.verdict = 'AC'
+            );
+    ''')
+    cur.execute('''
         SELECT
             username,
             name,
@@ -42,7 +55,8 @@ def update_user_rank(cur):
         GROUP BY
             user_id
         ORDER BY
-            score DESC;''')
+            score DESC;
+    ''')
     rank = 0
     prev_score = None
     for row in cur:
