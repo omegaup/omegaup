@@ -86,7 +86,7 @@ def get_problem_aggregates(dbconn, problem_id):
             if 'difficulty' in contents:
                 difficulty_sum += contents['difficulty']
                 difficulty_n += 1
-            if 'tags' in contents:
+            if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += 1
                     problem_tag_votes_n += 1
