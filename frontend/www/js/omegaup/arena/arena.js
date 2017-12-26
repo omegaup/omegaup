@@ -33,7 +33,7 @@ export function FormatDelta(delta) {
   return clock;
 }
 
-let ScoreboardColors = [
+var ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
   '#FFA240',
@@ -619,10 +619,11 @@ export class Arena {
 
         if (self.problems[alias]) {
           if (rank.username == OmegaUp.username) {
-            let maxScore = self.getMaxScore(alias, problem.points);
             $('#problems .problem_' + alias + ' .solved')
-                .html('(' + maxScore + ' / ' + self.problems[alias].points +
-                      ')');
+                .html('(' + problem.points + ' / ' +
+                      self.problems[alias].points + ')');
+            self.myRuns.getMaxScore(alias, self.problems[alias].points,
+                                    problem.points);
           }
         }
       }
@@ -655,29 +656,6 @@ export class Arena {
     self.removeRecentEventClassTimeout = setTimeout(function() {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
-  }
-
-  getMaxScore(alias, points) {
-    let self = this;
-    let savedPoints =
-        $('#problems .problem_' + alias + ' .solved').html().split('/');
-    let scoreMax = 0;
-    if (typeof self.currentProblem != 'undefined') {
-      if (self.currentProblem.alias == alias) {
-        $('.runs tbody tr .points')
-            .each(function() {
-              if (parseInt($(this).html()) > scoreMax) {
-                scoreMax = parseInt($(this).html());
-              }
-            });
-      }
-    }
-
-    let score = savedPoints[0].substring(1);
-    if (isNaN(parseInt(score))) {
-      return points;
-    }
-    return Math.max(score, scoreMax);
   }
 
   onRankingEvents(data) {
@@ -941,12 +919,12 @@ export class Arena {
   }
 
   selectDefaultLanguage() {
-    let self = this;
-    let langElement = self.elements.submitForm.language;
+    var self = this;
+    var langElement = self.elements.submitForm.language;
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
-            let option = $(this);
+            var option = $(this);
             if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
@@ -957,7 +935,7 @@ export class Arena {
 
     $('option', langElement)
         .each(function() {
-          let option = $(this);
+          var option = $(this);
           if (option.css('display') != 'none') {
             option.prop('selected', true);
             langElement.change();
@@ -967,9 +945,9 @@ export class Arena {
   }
 
   mountEditor(problem) {
-    let self = this;
-    let lang = self.elements.submitForm.language.val();
-    let template = '';
+    var self = this;
+    var lang = self.elements.submitForm.language.val();
+    var template = '';
     if (problem.templates && lang && problem.templates[lang]) {
       template = problem.templates[lang];
     }
@@ -995,7 +973,7 @@ export class Arena {
         }
       },
       mounted: function() {
-        let self = this;
+        var self = this;
         // Wait for sub-components to be mounted...
         this.$nextTick(() => {
           // ... and then fish out a reference to the wrapped
@@ -1051,7 +1029,7 @@ export class Arena {
     var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
     // Check if we were already viewing this problem to avoid reloading
     // it and repainting the screen.
-    let problemChanged = true;
+    var problemChanged = true;
     if (self.previousHash == window.location.hash + '/new-run' ||
         window.location.hash == self.previousHash + '/new-run') {
       problemChanged = false;
@@ -1127,25 +1105,9 @@ export class Arena {
 
         function updateRuns(runs) {
           if (runs) {
-            let maxScore = 0;
-            let totalScore = 0;
-            let currentScore =
-                parseInt($('.problem_' + problem.alias + ' .solved')
-                             .html()
-                             .split('/')[0]
-                             .substring(1));
             for (var i = 0; i < runs.length; i++) {
-              let score = parseInt(runs[i].contest_score);
-              if (score > maxScore) {
-                maxScore = score;
-              }
-              totalScore += score;
               self.trackRun(runs[i]);
             }
-            let totalPoints = self.problems[problem.alias].points;
-            $('.problem_' + problem.alias + ' .solved')
-                .html('(' + Math.max(maxScore, currentScore) + ' / ' +
-                      totalPoints + ')');
           }
           self.myRuns.filter_problem(problem.alias);
         }
@@ -1281,8 +1243,8 @@ export class Arena {
   }
 
   initSubmissionCountdown() {
-    let self = this;
-    let nextSubmissionTimestamp = new Date(0);
+    var self = this;
+    var nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
     if (typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
@@ -1301,7 +1263,7 @@ export class Arena {
       self.submissionGapInterval = 0;
     }
     self.submissionGapInterval = setInterval(function() {
-      let submissionGapSecondsRemaining =
+      var submissionGapSecondsRemaining =
           Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
       if (submissionGapSecondsRemaining > 0) {
         $('#submit input[type=submit]')
@@ -1683,6 +1645,9 @@ export class Arena {
     self.runs.trackRun(run);
     if (run.username == OmegaUp.username) {
       self.myRuns.trackRun(run);
+      if (typeof self.problems[run.alias] != 'undefined') {
+        self.myRuns.getMaxScore(run.alias, self.problems[run.alias].points, 0);
+      }
     }
   }
 }
@@ -1749,6 +1714,22 @@ class RunView {
     self.attached = false;
   }
 
+  getMaxScore(alias, total, points) {
+    var self = this;
+    var runs = self.runs();
+    var maxScore = 0;
+    for (var i = 0; i < runs.length; i++) {
+      var score = parseInt(runs[i].contest_score());
+      if (alias == runs[i].alias()) {
+        if (score > maxScore) {
+          maxScore = score;
+        }
+      }
+    }
+    $('.problem_' + alias + ' .solved')
+        .html('(' + Math.max(maxScore, points) + ' / ' + total + ')');
+  }
+
   attach(elm) {
     var self = this;
 
@@ -1811,7 +1792,6 @@ class RunView {
 
   trackRun(run) {
     var self = this;
-
     if (!self.observableRunsIndex[run.guid]) {
       self.observableRunsIndex[run.guid] = new ObservableRun(self.arena, run);
       self.runs.push(self.observableRunsIndex[run.guid]);
