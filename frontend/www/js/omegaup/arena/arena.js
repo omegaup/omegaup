@@ -10,15 +10,15 @@ import Vue from 'vue';
 export {ArenaAdmin};
 
 export function FormatDelta(delta) {
-  var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
   delta -= days * (24 * 60 * 60 * 1000);
-  var hours = Math.floor(delta / (60 * 60 * 1000));
+  let hours = Math.floor(delta / (60 * 60 * 1000));
   delta -= hours * (60 * 60 * 1000);
-  var minutes = Math.floor(delta / (60 * 1000));
+  let minutes = Math.floor(delta / (60 * 1000));
   delta -= minutes * (60 * 1000);
-  var seconds = Math.floor(delta / 1000);
+  let seconds = Math.floor(delta / 1000);
 
-  var clock = '';
+  let clock = '';
 
   if (days > 0) {
     clock += days + ':';
@@ -33,7 +33,7 @@ export function FormatDelta(delta) {
   return clock;
 }
 
-var ScoreboardColors = [
+let ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
   '#FFA240',
@@ -47,7 +47,7 @@ var ScoreboardColors = [
 ];
 
 export function GetOptionsFromLocation(arenaLocation) {
-  var options = {
+  let options = {
     isLockdownMode: false,
     isInterview: false,
     isPractice: false,
@@ -61,7 +61,7 @@ export function GetOptionsFromLocation(arenaLocation) {
   if ($('body').hasClass('lockdown')) {
     options.isLockdownMode = true;
     window.onbeforeunload = function(e) {
-      var dialogText = T.lockdownMessageWarning;
+      let dialogText = T.lockdownMessageWarning;
       e.returnValue = dialogText;
       return e.returnValue;
     };
@@ -76,7 +76,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.onlyProblemAlias =
         /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
   } else {
-    var match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    let match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
     }
@@ -91,7 +91,7 @@ export function GetOptionsFromLocation(arenaLocation) {
 
 class EventsSocket {
   constructor(uri, arena) {
-    var self = this;
+    let self = this;
 
     self.uri = uri;
     self.arena = arena;
@@ -102,7 +102,7 @@ class EventsSocket {
   }
 
   connect() {
-    var self = this;
+    let self = this;
 
     self.shouldRetry = false;
     try {
@@ -120,8 +120,8 @@ class EventsSocket {
   }
 
   onmessage(message) {
-    var self = this;
-    var data = JSON.parse(message.data);
+    let self = this;
+    let data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
       data.run.time = OmegaUp.remoteTime(data.run.time * 1000);
@@ -139,7 +139,7 @@ class EventsSocket {
   }
 
   onopen() {
-    var self = this;
+    let self = this;
     self.shouldRetry = true;
     self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
     self.socketKeepalive =
@@ -147,7 +147,7 @@ class EventsSocket {
   }
 
   onclose(e) {
-    var self = this;
+    let self = this;
     self.socket = null;
     if (self.socketKeepalive) {
       clearInterval(self.socketKeepalive);
@@ -168,7 +168,7 @@ class EventsSocket {
 
 export class Arena {
   constructor(options) {
-    var self = this;
+    let self = this;
 
     self.options = options;
 
@@ -293,14 +293,14 @@ export class Arena {
   }
 
   installLibinteractiveHooks() {
-    var self = this;
+    let self = this;
     $('#libinteractive-download')
         .submit(function(e) {
-          var form = $(e.target);
-          var alias = e.target.attributes['data-alias'].value;
-          var os = form.find('.download-os').val();
-          var lang = form.find('.download-lang').val();
-          var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
+          let form = $(e.target);
+          let alias = e.target.attributes['data-alias'].value;
+          let os = form.find('.download-os').val();
+          let lang = form.find('.download-lang').val();
+          let extension = (os == 'unix' ? '.tar.bz2' : '.zip');
 
           UI.navigateTo(window.location.protocol + '//' + window.location.host +
                         '/templates/' + alias + '/' + alias + '_' + os + '_' +
@@ -311,22 +311,22 @@ export class Arena {
 
     $('#libinteractive-download .download-lang')
         .change(function(e) {
-          var form = $('#libinteractive-download');
+          let form = $('#libinteractive-download');
           form.find('.libinteractive-extension')
               .html(form.find('.download-lang').val());
         });
   }
 
   connectSocket() {
-    var self = this;
+    let self = this;
     if (self.options.isPractice || self.options.disableSockets ||
         self.options.contestAlias == 'admin') {
       self.elements.socketStatus.html('✗').css('color', '#800');
       return false;
     }
 
-    var protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
-    var uris = [];
+    let protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
+    let uris = [];
     // Backendv2 uri
     uris.push(protocol + window.location.host + '/events/?filter=/contest/' +
               self.options.contestAlias +
@@ -362,7 +362,7 @@ export class Arena {
   }
 
   setupPolls() {
-    var self = this;
+    let self = this;
     self.refreshRanking();
     if (!self.options.contestAlias) {
       return;
@@ -381,7 +381,7 @@ export class Arena {
   }
 
   initClock(start, finish, deadline) {
-    var self = this;
+    let self = this;
 
     self.startTime = start;
     self.finishTime = finish;
@@ -397,14 +397,14 @@ export class Arena {
   }
 
   contestLoaded(contest) {
-    var self = this;
+    let self = this;
     if (contest.status == 'error') {
       if (!OmegaUp.loggedIn) {
         window.location = '/login/?redirect=' + escape(window.location);
       } else if (contest.start_time) {
-        var f = (function(x, y) {
+        let f = (function(x, y) {
           return function() {
-            var t = new Date();
+            let t = new Date();
             self.elements.loadingOverlay.html(
                 x + ' ' + FormatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
@@ -442,13 +442,13 @@ export class Arena {
                    contest.submission_deadline);
     self.initProblems(contest);
 
-    var problemSelect = $('select', self.elements.clarification);
-    var problemTemplate = $('#problem-list .template');
-    for (var idx in contest.problems) {
-      var problem = contest.problems[idx];
-      var problemName = problem.letter + '. ' + UI.escape(problem.title);
+    let problemSelect = $('select', self.elements.clarification);
+    let problemTemplate = $('#problem-list .template');
+    for (let idx in contest.problems) {
+      let problem = contest.problems[idx];
+      let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      var prob = problemTemplate.clone()
+      let prob = problemTemplate.clone()
                      .removeClass('template')
                      .addClass('problem_' + problem.alias);
       $('.name', prob)
@@ -474,13 +474,13 @@ export class Arena {
   }
 
   initProblems(contest) {
-    var self = this;
+    let self = this;
     self.currentContest = contest;
     self.contestAdmin = contest.admin;
-    var problems = contest.problems;
-    for (var i = 0; i < problems.length; i++) {
-      var problem = problems[i];
-      var alias = problem.alias;
+    let problems = contest.problems;
+    for (let i = 0; i < problems.length; i++) {
+      let problem = problems[i];
+      let alias = problem.alias;
       self.problems[alias] = problem;
     }
     self.elements.rankingTable.problems = problems;
@@ -488,14 +488,14 @@ export class Arena {
   }
 
   updateClock() {
-    var self = this;
-    var countdownTime = self.submissionDeadline || self.finishTime;
+    let self = this;
+    let countdownTime = self.submissionDeadline || self.finishTime;
     if (self.startTime === null || countdownTime === null || !OmegaUp.ready) {
       return;
     }
 
-    var now = Date.now();
-    var clock = '';
+    let now = Date.now();
+    let clock = '';
 
     if (now < self.startTime.getTime()) {
       clock = '-' + FormatDelta(self.startTime.getTime() - now);
@@ -524,7 +524,7 @@ export class Arena {
   }
 
   updateRunFallback(guid) {
-    var self = this;
+    let self = this;
     if (self.socket != null) return;
     setTimeout(function() {
       API.Run.status({run_alias: guid})
@@ -534,7 +534,7 @@ export class Arena {
   }
 
   updateRun(run) {
-    var self = this;
+    let self = this;
 
     self.trackRun(run);
 
@@ -551,7 +551,7 @@ export class Arena {
   }
 
   refreshRanking() {
-    var self = this;
+    let self = this;
     if (self.options.contestAlias) {
       API.Contest.scoreboard({contest_alias: self.options.contestAlias})
           .then(self.rankingChange.bind(self))
@@ -567,10 +567,10 @@ export class Arena {
   }
 
   rankingChange(data) {
-    var self = this;
+    let self = this;
     self.onRankingChanged(data);
 
-    var params = {
+    let params = {
       contest_alias: self.options.contestAlias,
     };
     if (self.options.scoreboardToken) {
@@ -582,7 +582,7 @@ export class Arena {
   }
 
   onRankingChanged(data) {
-    var self = this;
+    let self = this;
     $('tbody.inserted', self.elements.miniRanking).remove();
 
     if (self.removeRecentEventClassTimeout) {
@@ -590,31 +590,31 @@ export class Arena {
       self.removeRecentEventClassTimeout = null;
     }
 
-    var ranking = data.ranking || [];
-    var newRanking = {};
-    var order = {};
-    var currentRankingState = {};
+    let ranking = data.ranking || [];
+    let newRanking = {};
+    let order = {};
+    let currentRankingState = {};
 
-    for (var i = 0; i < data.problems.length; i++) {
+    for (let i = 0; i < data.problems.length; i++) {
       order[data.problems[i].alias] = i;
     }
 
     // Push data to ranking table
-    for (var i = 0; i < ranking.length; i++) {
-      var rank = ranking[i];
+    for (let i = 0; i < ranking.length; i++) {
+      let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      var username = rank.username + ((rank.name == rank.username) ?
+      let username = rank.username + ((rank.name == rank.username) ?
                                           '' :
                                           (' (' + UI.escape(rank.name) + ')'));
 
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
       // Update problem scores.
-      var totalRuns = 0;
-      for (var alias in order) {
+      let totalRuns = 0;
+      for (let alias in order) {
         if (!order.hasOwnProperty(alias)) continue;
-        var problem = rank.problems[order[alias]];
+        let problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
         if (self.problems[alias]) {
@@ -622,7 +622,7 @@ export class Arena {
             $('#problems .problem_' + alias + ' .solved')
                 .html('(' + problem.points + ' / ' +
                       self.problems[alias].points + ')');
-            self.myRuns.getMaxScore(alias, self.problems[alias].points,
+            self.updateProblemScore(alias, self.problems[alias].points,
                                     problem.points);
           }
         }
@@ -630,7 +630,7 @@ export class Arena {
 
       // update miniranking
       if (i < 10) {
-        var r = $('tbody.user-list-template', self.elements.miniRanking)
+        let r = $('tbody.user-list-template', self.elements.miniRanking)
                     .clone()
                     .removeClass('user-list-template')
                     .addClass('inserted');
@@ -659,15 +659,15 @@ export class Arena {
   }
 
   onRankingEvents(data) {
-    var dataInSeries = {};
-    var navigatorData = [[this.startTime.getTime(), 0]];
-    var series = [];
-    var usernames = {};
+    let dataInSeries = {};
+    let navigatorData = [[this.startTime.getTime(), 0]];
+    let series = [];
+    let usernames = {};
     this.currentEvents = data;
 
     // group points by person
-    for (var i = 0, l = data.events.length; i < l; i++) {
-      var curr = data.events[i];
+    for (let i = 0, l = data.events.length; i < l; i++) {
+      let curr = data.events[i];
 
       // limit chart to top n users
       if (this.currentRanking[curr.username] > ScoreboardColors.length - 1)
@@ -692,7 +692,7 @@ export class Arena {
     }
 
     // convert datas to series
-    for (var i in dataInSeries) {
+    for (let i in dataInSeries) {
       if (dataInSeries.hasOwnProperty(i)) {
         dataInSeries[i].push([
           Math.min(this.finishTime.getTime(), Date.now()),
@@ -717,7 +717,7 @@ export class Arena {
   }
 
   createChart(series, navigatorSeries) {
-    var self = this;
+    let self = this;
     if (series.length == 0) return;
 
     Highcharts.setOptions({colors: ScoreboardColors});
@@ -736,8 +736,8 @@ export class Arena {
         showFirstLabel: false,
         min: 0,
         max: (function(problems) {
-          var total = 0;
-          for (var prob in problems) {
+          let total = 0;
+          for (let prob in problems) {
             if (!problems.hasOwnProperty(prob)) continue;
             total += parseInt(problems[prob].points, 10);
           }
@@ -771,7 +771,7 @@ export class Arena {
   }
 
   refreshClarifications() {
-    var self = this;
+    let self = this;
     API.Contest.clarifications({
                  contest_alias: self.options.contestAlias,
                  offset: self.clarificationsOffset,
@@ -782,9 +782,9 @@ export class Arena {
   }
 
   updateClarification(clarification) {
-    var self = this;
-    var r = null;
-    var anchor =
+    let self = this;
+    let r = null;
+    let anchor =
         'clarifications/clarification-' + clarification.clarification_id;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
@@ -807,9 +807,9 @@ export class Arena {
 
       if (self.contestAdmin) {
         (function(id, answerNode) {
-          var responseFormNode =
+          let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
-          var cannedResponse = $('#create-response-canned', answerNode);
+          let cannedResponse = $('#create-response-canned', answerNode);
           cannedResponse.change(function() {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
@@ -822,7 +822,7 @@ export class Arena {
                 .attr('checked', 'checked');
           }
           responseFormNode.submit(function() {
-            var responseText = null;
+            let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
             } else {
@@ -883,7 +883,7 @@ export class Arena {
   }
 
   clarificationsChange(data) {
-    var self = this;
+    let self = this;
     if (data.status != 'ok') {
       return;
     }
@@ -895,11 +895,11 @@ export class Arena {
       $('#clarifications-count').html('(' + data.clarifications.length + '+)');
     }
 
-    var previouslyAnswered = self.answeredClarifications;
+    let previouslyAnswered = self.answeredClarifications;
     self.answeredClarifications = 0;
     self.clarifications = {};
 
-    for (var i = data.clarifications.length - 1; i >= 0; i--) {
+    for (let i = data.clarifications.length - 1; i >= 0; i--) {
       self.updateClarification(data.clarifications[i]);
     }
 
@@ -910,7 +910,7 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
-    var self = this;
+    let self = this;
     $('option', self.elements.submitForm.language)
         .each(function(index, item) {
           item = $(item);
@@ -919,12 +919,12 @@ export class Arena {
   }
 
   selectDefaultLanguage() {
-    var self = this;
-    var langElement = self.elements.submitForm.language;
+    let self = this;
+    let langElement = self.elements.submitForm.language;
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
-            var option = $(this);
+            let option = $(this);
             if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
@@ -935,7 +935,7 @@ export class Arena {
 
     $('option', langElement)
         .each(function() {
-          var option = $(this);
+          let option = $(this);
           if (option.css('display') != 'none') {
             option.prop('selected', true);
             langElement.change();
@@ -945,9 +945,9 @@ export class Arena {
   }
 
   mountEditor(problem) {
-    var self = this;
-    var lang = self.elements.submitForm.language.val();
-    var template = '';
+    let self = this;
+    let lang = self.elements.submitForm.language.val();
+    let template = '';
     if (problem.templates && lang && problem.templates[lang]) {
       template = problem.templates[lang];
     }
@@ -973,7 +973,7 @@ export class Arena {
         }
       },
       mounted: function() {
-        var self = this;
+        let self = this;
         // Wait for sub-components to be mounted...
         this.$nextTick(() => {
           // ... and then fish out a reference to the wrapped
@@ -1006,12 +1006,12 @@ export class Arena {
   }
 
   onHashChanged() {
-    var self = this;
-    var tabChanged = false;
-    var foundHash = false;
-    var tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
+    let self = this;
+    let tabChanged = false;
+    let foundHash = false;
+    let tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
 
-    for (var i = 0; i < tabs.length; i++) {
+    for (let i = 0; i < tabs.length; i++) {
       if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
         tabChanged = self.activeTab != tabs[i];
         self.activeTab = tabs[i];
@@ -1026,10 +1026,10 @@ export class Arena {
       window.history.replaceState({}, '', '#' + self.activeTab);
     }
 
-    var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
+    let problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
     // Check if we were already viewing this problem to avoid reloading
     // it and repainting the screen.
-    var problemChanged = true;
+    let problemChanged = true;
     if (self.previousHash == window.location.hash + '/new-run' ||
         window.location.hash == self.previousHash + '/new-run') {
       problemChanged = false;
@@ -1037,7 +1037,7 @@ export class Arena {
     self.previousHash = window.location.hash;
 
     if (problem && self.problems[problem[1]]) {
-      var newRun = problem[2];
+      let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
 
       $('.active', self.elements.problemList).removeClass('active');
@@ -1059,13 +1059,13 @@ export class Arena {
         if (!self.myRuns.attached) {
           self.myRuns.attach($('#problem .runs'));
         }
-        var karel_langs = ['kp', 'kj'];
-        var language_array = problem.languages.split(',');
+        let karel_langs = ['kp', 'kj'];
+        let language_array = problem.languages.split(',');
         if (karel_langs.every(function(x) {
               return language_array.indexOf(x) != -1;
             })) {
-          var original_href = $('#problem .karel-js-link a').attr('href');
-          var hash_index = original_href.indexOf('#');
+          let original_href = $('#problem .karel-js-link a').attr('href');
+          let hash_index = original_href.indexOf('#');
           if (hash_index != -1) {
             original_href = original_href.substring(0, hash_index);
           }
@@ -1105,7 +1105,7 @@ export class Arena {
 
         function updateRuns(runs) {
           if (runs) {
-            for (var i = 0; i < runs.length; i++) {
+            for (let i = 0; i < runs.length; i++) {
               self.trackRun(runs[i]);
             }
           }
@@ -1130,7 +1130,7 @@ export class Arena {
         if (problem.problem_statement) {
           update(problem);
         } else {
-          var problemset = self.computeProblemsetArg();
+          let problemset = self.computeProblemsetArg();
           API.Problem.details(
                          $.extend(problemset, {problem_alias: problem.alias}))
               .then(function(problem_ext) {
@@ -1192,9 +1192,9 @@ export class Arena {
   }
 
   detectShowRun() {
-    var self = this;
-    var showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    var showRunMatch = window.location.hash.match(showRunRegex);
+    let self = this;
+    let showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+    let showRunMatch = window.location.hash.match(showRunRegex);
     if (showRunMatch) {
       $('#overlay form').hide();
       $('#overlay').show();
@@ -1213,14 +1213,14 @@ export class Arena {
   }
 
   bindGlobalHandlers() {
-    var self = this;
+    let self = this;
     $('#overlay, .close').click(self.onCloseSubmit.bind(self));
     self.elements.submitForm.language.change(self.onLanguageSelect.bind(self));
     self.elements.submitForm.submit(self.onSubmit.bind(self));
   }
 
   onCloseSubmit(e) {
-    var self = this;
+    let self = this;
     if (e.target.id === 'overlay' || e.target.className === 'close') {
       $('#clarification', self.elements.submitForm).hide();
       self.hideOverlay();
@@ -1230,7 +1230,7 @@ export class Arena {
   }
 
   clearInputFile() {
-    var self = this;
+    let self = this;
     // This worked, nay, was required, on older browsers.
     // It stopped working sometime in 2017, and now .val(null)
     // is enough to clear the input field.
@@ -1243,8 +1243,8 @@ export class Arena {
   }
 
   initSubmissionCountdown() {
-    var self = this;
-    var nextSubmissionTimestamp = new Date(0);
+    let self = this;
+    let nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
     if (typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
@@ -1263,7 +1263,7 @@ export class Arena {
       self.submissionGapInterval = 0;
     }
     self.submissionGapInterval = setInterval(function() {
-      var submissionGapSecondsRemaining =
+      let submissionGapSecondsRemaining =
           Math.ceil((nextSubmissionTimestamp - Date.now()) / 1000);
       if (submissionGapSecondsRemaining > 0) {
         $('#submit input[type=submit]')
@@ -1281,9 +1281,9 @@ export class Arena {
   }
 
   onLanguageSelect(e) {
-    var self = this;
-    var lang = $(e.target).val();
-    var ext = $('.submit-filename-extension', self.elements.submitForm);
+    let self = this;
+    let lang = $(e.target).val();
+    let ext = $('.submit-filename-extension', self.elements.submitForm);
     if (lang == 'cpp11') {
       ext.text('.cpp');
     } else if (lang && lang != 'cat') {
@@ -1297,7 +1297,7 @@ export class Arena {
   }
 
   onSubmit(e) {
-    var self = this;
+    let self = this;
     if (!self.options.isOnlyProblem &&
         (self.problems[self.currentProblem.alias].last_submission +
              self.submissionGap * 1000 >
@@ -1307,21 +1307,21 @@ export class Arena {
       return false;
     }
 
-    var submitForm = self.elements.submitForm;
-    var langSelect = self.elements.submitForm.language;
+    let submitForm = self.elements.submitForm;
+    let langSelect = self.elements.submitForm.language;
     if (!langSelect.val()) {
       alert(T.arenaRunSubmitMissingLanguage);
       return false;
     }
 
-    var file = self.elements.submitForm.file[0];
+    let file = self.elements.submitForm.file[0];
     if (file && file.files && file.files.length > 0) {
       file = file.files[0];
-      var reader = new FileReader();
+      let reader = new FileReader();
 
       reader.onload = function(e) { self.submitRun(e.target.result); };
 
-      var extension = file.name.split(/\./);
+      let extension = file.name.split(/\./);
       extension = extension[extension.length - 1];
 
       if (langSelect.val() != 'cat' || file.type.indexOf('text/') === 0 ||
@@ -1357,7 +1357,7 @@ export class Arena {
   }
 
   computeProblemsetArg() {
-    var self = this;
+    let self = this;
     if (self.options.isOnlyProblem) {
       return {};
     }
@@ -1368,9 +1368,9 @@ export class Arena {
   }
 
   submitRun(code) {
-    var self = this;
-    var problemset = self.options.isPractice ? {} : self.computeProblemsetArg();
-    var lang = self.elements.submitForm.language.val();
+    let self = this;
+    let problemset = self.options.isPractice ? {} : self.computeProblemsetArg();
+    let lang = self.elements.submitForm.language.val();
 
     $('input', self.elements.submitForm).attr('disabled', 'disabled');
     API.Run.create($.extend(problemset,
@@ -1415,15 +1415,15 @@ export class Arena {
   }
 
   updateSummary(contest) {
-    var self = this;
+    let self = this;
     if (!self.summaryView.attached) {
-      var summary = $('#summary');
+      let summary = $('#summary');
       ko.applyBindings(self.summaryView, summary[0]);
       self.summaryView.attached = true;
     }
     self.summaryView.title(contest.title);
     self.summaryView.description(contest.description);
-    var duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(
         FormatDelta((contest.window_length * 60000) || duration));
     self.summaryView.contestOrganizer(contest.director);
@@ -1437,8 +1437,8 @@ export class Arena {
   }
 
   displayRunDetails(guid, data) {
-    var self = this;
-    var problemAdmin = data.admin;
+    let self = this;
+    let problemAdmin = data.admin;
 
     if (data.status == 'error') {
       self.hideOverlay();
@@ -1502,10 +1502,10 @@ export class Arena {
       function isDigit(x) { return '0' <= x && x <= '9'; }
 
       return function(x, y) {
-        var i = 0, j = 0;
+        let i = 0, j = 0;
         for (; i < x[key].length && j < y[key].length; i++, j++) {
           if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-            var nx = 0, ny = 0;
+            let nx = 0, ny = 0;
             while (i < x[key].length && isDigit(x[key][i]))
               nx = (nx * 10) + parseInt(x[key][i++]);
             while (j < y[key].length && isDigit(y[key][j]))
@@ -1524,17 +1524,17 @@ export class Arena {
     }
 
     // TODO(lhchavez): Use only data.details once backendv1 is deprecated.
-    var detailsGroups = data.groups;
+    let detailsGroups = data.groups;
     if (data.details) {
       detailsGroups = data.details.groups;
     }
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
-      for (var i = 0; i < detailsGroups.length; i++) {
+      for (let i = 0; i < detailsGroups.length; i++) {
         detailsGroups[i].cases.sort(numericSort('name'));
       }
 
-      var groups =
+      let groups =
           $('<table></table>')
               .append($('<thead></thead>')
                           .append($('<tr></tr>')
@@ -1545,9 +1545,9 @@ export class Arena {
                                               '</th>')
                                       .append('<th width="1"></th>')));
 
-      for (var i = 0; i < detailsGroups.length; i++) {
-        var g = detailsGroups[i];
-        var cases = $('<tbody></tbody>').hide();
+      for (let i = 0; i < detailsGroups.length; i++) {
+        let g = detailsGroups[i];
+        let cases = $('<tbody></tbody>').hide();
         groups.append(
             $('<tbody></tbody>')
                 .append(
@@ -1573,7 +1573,7 @@ export class Arena {
                                       'glyphicon-collapse-down"></span>')
                                         .click((function(cases) {
                                           return function(ev) {
-                                            var target = $(ev.target);
+                                            let target = $(ev.target);
                                             if (target.hasClass(
                                                     'glyphicon-collapse-down')) {
                                               target.removeClass(
@@ -1590,9 +1590,9 @@ export class Arena {
                                             return false;
                                           };
                                         })(cases))))));
-        for (var j = 0; j < g.cases.length; j++) {
-          var c = g.cases[j];
-          var caseRow =
+        for (let j = 0; j < g.cases.length; j++) {
+          let c = g.cases[j];
+          let caseRow =
               $('<tr></tr>')
                   .append('<td></td>')
                   .append('<td class="center">' + c.name + '</td>')
@@ -1609,7 +1609,7 @@ export class Arena {
                           '</td>');
           cases.append(caseRow);
           if (problemAdmin && c.meta) {
-            var metaRow =
+            let metaRow =
                 $('<tr class="meta"></tr>')
                     .append('<td colspan="6"><pre>' +
                             JSON.stringify(c.meta, null, 2) + '</pre></td>')
@@ -1641,21 +1641,28 @@ export class Arena {
   }
 
   trackRun(run) {
-    var self = this;
+    let self = this;
     self.runs.trackRun(run);
     if (run.username == OmegaUp.username) {
       self.myRuns.trackRun(run);
       if (typeof self.problems[run.alias] != 'undefined') {
-        self.myRuns.getMaxScore(run.alias, self.problems[run.alias].points, 0);
+        self.updateProblemScore(run.alias, self.problems[run.alias].points, 0);
       }
     }
+  }
+
+  updateProblemScore(alias, maxScore, previousScore) {
+    let self = this;
+    $('.problem_' + alias + ' .solved')
+        .html('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
+              maxScore + ')');
   }
 }
 ;
 
 class RunView {
   constructor(arena) {
-    var self = this;
+    let self = this;
     self.arena = arena;
     self.row_count = 100;
     self.filter_verdict = ko.observable();
@@ -1667,11 +1674,11 @@ class RunView {
     self.runs = ko.observableArray().extend({deferred: true});
     self.filtered_runs =
         ko.pureComputed(function() {
-            var cached_verdict = self.filter_verdict();
-            var cached_status = self.filter_status();
-            var cached_language = self.filter_language();
-            var cached_problem = self.filter_problem();
-            var cached_username = self.filter_username();
+            let cached_verdict = self.filter_verdict();
+            let cached_status = self.filter_status();
+            let cached_language = self.filter_language();
+            let cached_problem = self.filter_problem();
+            let cached_username = self.filter_username();
             if (!cached_verdict && !cached_status && !cached_language &&
                 !cached_problem && !cached_username) {
               return self.runs();
@@ -1707,31 +1714,31 @@ class RunView {
           }, self).extend({deferred: true});
     self.display_runs =
         ko.pureComputed(function() {
-            var offset = self.filter_offset();
+            let offset = self.filter_offset();
             return self.sorted_runs().slice(offset, offset + self.row_count);
           }, self).extend({deferred: true});
     self.observableRunsIndex = {};
     self.attached = false;
   }
 
-  getMaxScore(alias, total, points) {
-    var self = this;
-    var runs = self.runs();
-    var maxScore = 0;
-    for (var i = 0; i < runs.length; i++) {
-      var score = parseInt(runs[i].contest_score());
-      if (alias == runs[i].alias()) {
-        if (score > maxScore) {
-          maxScore = score;
-        }
+  getMaxScore(alias, previousScore) {
+    let self = this;
+    let runs = self.runs();
+    let maxScore = previousScore;
+    for (let i = 0; i < runs.length; i++) {
+      if (alias != runs[i].alias()) {
+        continue;
+      }
+      let score = runs[i].contest_score();
+      if (score > maxScore) {
+        maxScore = score;
       }
     }
-    $('.problem_' + alias + ' .solved')
-        .html('(' + Math.max(maxScore, points) + ' / ' + total + ')');
+    return maxScore;
   }
 
   attach(elm) {
-    var self = this;
+    let self = this;
 
     $('.runspager .runspagerprev', elm)
         .click(function() {
@@ -1791,7 +1798,7 @@ class RunView {
   }
 
   trackRun(run) {
-    var self = this;
+    let self = this;
     if (!self.observableRunsIndex[run.guid]) {
       self.observableRunsIndex[run.guid] = new ObservableRun(self.arena, run);
       self.runs.push(self.observableRunsIndex[run.guid]);
@@ -1801,7 +1808,7 @@ class RunView {
   }
 
   clear(run) {
-    var self = this;
+    let self = this;
 
     self.runs.removeAll();
     self.observableRunsIndex = {};
@@ -1811,7 +1818,7 @@ class RunView {
 
 class ObservableRun {
   constructor(arena, run) {
-    var self = this;
+    let self = this;
 
     self.arena = arena;
     self.guid = run.guid;
@@ -1849,8 +1856,8 @@ class ObservableRun {
   }
 
   update(run) {
-    var self = this;
-    for (var p in run) {
+    let self = this;
+    for (let p in run) {
       if (!run.hasOwnProperty(p) || !self.hasOwnProperty(p) ||
           !(self[p] instanceof Function)) {
         continue;
@@ -1862,37 +1869,37 @@ class ObservableRun {
   }
 
   showVerdictHelp(elm, ev) {
-    var self = this;
+    let self = this;
     $(ev.target).popover('show');
   }
 
   $problem_url() {
-    var self = this;
+    let self = this;
     return '/arena/problem/' + self.alias() + '/';
   }
 
   $contest_alias_url() {
-    var self = this;
+    let self = this;
     return (self.contest_alias() === null) ?
                '' :
                '/arena/' + self.contest_alias() + '/';
   }
 
   $user_html() {
-    var self = this;
+    let self = this;
     return UI.getProfileLink(self.username()) + UI.getFlag(self.country_id());
   }
 
   $time_text() {
-    var self = this;
+    let self = this;
     return Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', self.time().getTime());
   }
 
   $runtime_text() {
-    var self = this;
+    let self = this;
     if (self.status() == 'ready' && self.verdict() != 'JE' &&
         self.verdict() != 'CE') {
-      var prefix = '';
+      let prefix = '';
       if (self.verdict() == 'TLE') {
         prefix = '>';
       }
@@ -1904,10 +1911,10 @@ class ObservableRun {
   }
 
   $memory_text() {
-    var self = this;
+    let self = this;
     if (self.status() == 'ready' && self.verdict() != 'JE' &&
         self.verdict() != 'CE') {
-      var prefix = '';
+      let prefix = '';
       if (self.verdict() == 'MLE') {
         prefix = '>';
       }
@@ -1919,7 +1926,7 @@ class ObservableRun {
   }
 
   $penalty_text() {
-    var self = this;
+    let self = this;
 
     if (self.status() == 'ready' && self.verdict() != 'JE' &&
         self.verdict() != 'CE') {
@@ -1930,14 +1937,14 @@ class ObservableRun {
   }
 
   $status_text() {
-    var self = this;
+    let self = this;
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
   }
 
   $status_help() {
-    var self = this;
+    let self = this;
 
     if (self.status() != 'ready' || self.verdict() == 'AC') {
       return null;
@@ -1955,7 +1962,7 @@ class ObservableRun {
   }
 
   $status_color() {
-    var self = this;
+    let self = this;
 
     if (self.status() != 'ready') return '';
 
@@ -1971,7 +1978,7 @@ class ObservableRun {
   }
 
   $points() {
-    var self = this;
+    let self = this;
     if (self.contest_score() != null && self.status() == 'ready' &&
         self.verdict() != 'JE' && self.verdict() != 'CE') {
       return parseFloat(self.contest_score() || '0').toFixed(2);
@@ -1981,7 +1988,7 @@ class ObservableRun {
   }
 
   $percentage() {
-    var self = this;
+    let self = this;
     if (self.status() == 'ready' && self.verdict() != 'JE' &&
         self.verdict() != 'CE') {
       return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';
@@ -1991,12 +1998,12 @@ class ObservableRun {
   }
 
   details() {
-    var self = this;
+    let self = this;
     window.location.hash += '/show-run:' + self.guid;
   }
 
   rejudge() {
-    var self = this;
+    let self = this;
     API.Run.rejudge({run_alias: self.guid, debug: false})
         .then(function(data) {
           self.status('rejudging');
@@ -2006,7 +2013,7 @@ class ObservableRun {
   }
 
   debug_rejudge() {
-    var self = this;
+    let self = this;
     API.Run.rejudge({run_alias: self.guid, debug: true})
         .then(function(data) {
           self.status('rejudging');
