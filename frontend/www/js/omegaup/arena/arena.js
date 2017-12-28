@@ -1105,8 +1105,8 @@ export class Arena {
 
         function updateRuns(runs) {
           if (runs) {
-            for (let run of i = 0; i < runs.length; i++) {
-              self.trackRun(runs[i]);
+            for (let run of runs) {
+              self.trackRun(run);
             }
           }
           self.myRuns.filter_problem(problem.alias);
