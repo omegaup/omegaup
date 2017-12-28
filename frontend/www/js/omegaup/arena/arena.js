@@ -1105,7 +1105,7 @@ export class Arena {
 
         function updateRuns(runs) {
           if (runs) {
-            for (let i = 0; i < runs.length; i++) {
+            for (let run of i = 0; i < runs.length; i++) {
               self.trackRun(runs[i]);
             }
           }
@@ -1725,11 +1725,11 @@ class RunView {
     let self = this;
     let runs = self.runs();
     let maxScore = previousScore;
-    for (let i = 0; i < runs.length; i++) {
-      if (alias != runs[i].alias()) {
+    for (let run of runs.length) {
+      if (alias != run.alias()) {
         continue;
       }
-      let score = runs[i].contest_score();
+      let score = run.contest_score();
       if (score > maxScore) {
         maxScore = score;
       }
