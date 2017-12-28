@@ -1220,6 +1220,7 @@ class ProblemController extends Controller {
                     $filtered['alias'] = $r['problem']->alias;
                     $filtered['username'] = $r['current_user']->username;
                     $filtered['time'] = strtotime($filtered['time']);
+                    $filtered['contest_score'] = (float)$filtered['contest_score'];
                     array_push($runs_filtered_array, $filtered);
                 }
             }
