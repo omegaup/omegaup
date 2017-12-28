@@ -145,7 +145,10 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases'])) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            if ($contents['reason'] == 'other' && !isset($contents['rationale'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
@@ -155,7 +158,14 @@ class QualityNominationController extends Controller {
                 }
                 $original = ProblemsDAO::getByAlias($contents['original']);
                 if (is_null($original)) {
-                    throw new NotFoundException('problemNotFound');
+                    $contents['original'] = self::extractAliasFromArgument($contents['original']);
+                    if (is_null($contents['original'])) {
+                        throw new NotFoundException('problemNotFound');
+                    }
+                    $original = ProblemsDAO::getByAlias($contents['original']);
+                    if (is_null($original)) {
+                        throw new NotFoundException('problemNotFound');
+                    }
                 }
             }
         } elseif ($r['nomination'] == 'dismissal') {
@@ -277,6 +287,15 @@ class QualityNominationController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    public static function extractAliasFromArgument($problemUrl) {
+        $aliasRegex = '/.*[#\/]problem[s]?[#\/]([a-zA-Z0-9-_]+)[\/#$]*/';
+        preg_match($aliasRegex, $problemUrl, $matches);
+        if (sizeof($matches) < 2) {
+            return null;
+        }
+        return $matches[1];
     }
 
     /**

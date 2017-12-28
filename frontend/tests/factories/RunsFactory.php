@@ -34,12 +34,14 @@ class RunsFactory {
      * @param type $contestant
      * @return Request
      */
-    private static function createRequestCommon($problemData, $contestData, $contestant) {
+    private static function createRequestCommon($problemData, $contestData, $contestant, ScopedLoginToken $login = null) {
         // Create an empty request
         $r = new Request();
 
-        // Log in as contestant
-        $login = OmegaupTestCase::login($contestant);
+        if ($login == null) {
+            // Login as contestant
+            $login = OmegaupTestCase::login($contestant);
+        }
         $r['auth_token'] = $login->auth_token;
 
         // Build request
@@ -91,8 +93,8 @@ class RunsFactory {
      * @param type $problemData
      * @param type $contestant
      */
-    public static function createRunToProblem($problemData, $contestant) {
-        $r = self::createRequestCommon($problemData, null, $contestant);
+    public static function createRunToProblem($problemData, $contestant, ScopedLoginToken $login = null) {
+        $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
         RunController::$grader = new GraderMock();

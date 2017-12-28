@@ -622,32 +622,6 @@ CREATE TABLE `Runs` (
   CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs`
-FOR EACH ROW BEGIN
-	IF (OLD.verdict = 'AC' OR NEW.verdict = 'AC') THEN
-		UPDATE  `Problems` SET  `Problems`.`accepted` = (
-			SELECT COUNT( DISTINCT user_id )
-				FROM  `Runs`
-				WHERE  `Runs`.`verdict` =  'AC'
-				AND NEW.`problem_id` =  `Runs`.`problem_id`
-			)
-		WHERE NEW.problem_id =  `Problems`.`problem_id`;
-	END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Schools` (
@@ -718,9 +692,16 @@ CREATE TABLE `User_Rank` (
   `username` varchar(50) NOT NULL,
   `name` varchar(256) DEFAULT NULL,
   `country_id` char(3) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  KEY `rank` (`rank`)
+  KEY `rank` (`rank`),
+  KEY `fk_ur_state_id` (`country_id`,`state_id`),
+  KEY `fk_ur_school_id` (`school_id`),
+  CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -802,94 +783,6 @@ CREATE TABLE `Users_Experiments` (
   CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los experimentos habilitados para un usuario.';
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Refresh_User_Rank`()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
-    DECLARE EXIT HANDLER FOR NOT FOUND ROLLBACK;
-    DECLARE EXIT HANDLER FOR SQLWARNING ROLLBACK;
-
-    START TRANSACTION;
-    TRUNCATE TABLE `User_Rank`;
-
-    SET @prev_value = NULL;
-    SET @rank_count = 0;
-    SET @prev_value_ties = NULL;
-    SET @prev_ties_count = 0;
-    SET @ties_count = 0;
-
-    INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id)
-    SELECT
-        user_id,
-        rank,
-        problems_solved_count,
-        score,
-        username,
-        name,
-        country_id
-    FROM
-    (
-        SELECT
-            problems_solved_count,
-            username,
-            score,
-            name,
-            country_id,
-            user_id,
-            @prev_ties_count := @ties_count as previous_ties_count,
-        CASE
-            WHEN @prev_value_ties = score THEN @ties_count := @ties_count + 1
-            WHEN @prev_value_ties := score THEN @ties_count := 0
-        END AS ties_count,
-        CASE
-            WHEN @prev_value = score THEN @rank_count
-            WHEN @prev_value := score THEN @rank_count := @rank_count + 1 + @prev_ties_count
-        END AS rank
-        FROM
-        (
-            SELECT
-                username,
-                name,
-                country_id,
-                up.user_id,
-                COUNT(ps.problem_id) problems_solved_count,
-                SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
-            FROM
-            (
-                SELECT DISTINCT
-                  r.user_id,
-                  r.problem_id
-                FROM
-                  Runs r
-                WHERE
-                  r.verdict = 'AC' AND r.test = 0
-            ) AS up
-            INNER JOIN
-                Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
-            INNER JOIN
-                Users u ON u.user_id = up.user_id
-            GROUP BY
-                user_id
-            ORDER BY
-                score DESC
-        ) AS UsersProblemsSolved
-    ) AS Rank;
-    COMMIT;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

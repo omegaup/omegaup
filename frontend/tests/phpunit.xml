@@ -1,12 +1,22 @@
 <phpunit 
-    backupGlobals="false"
-    bootstrap="bootstrap.php"
-    backupStaticAttributes="true"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnFailure="false"
-    syntaxCheck="false"
->  
+	backupGlobals="false"
+	bootstrap="bootstrap.php"
+	backupStaticAttributes="true"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	stopOnFailure="false"
+	syntaxCheck="false">
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">../server/</directory>
+			<exclude>
+				<file>../server/config.php</file>
+				<file>../server/libs/PasswordHashCmd.php</file>
+				<file>../server/libs/ExperimentHashCmd.php</file>
+				<directory>../server/libs/third_party/</directory>
+			</exclude>
+		</whitelist>
+	</filter>
 </phpunit>

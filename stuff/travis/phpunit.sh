@@ -6,6 +6,10 @@ stage_before_install() {
 	init_submodules
 }
 
+stage_install() {
+	pip3 install --user mysqlclient
+}
+
 stage_before_script() {
 	wait_for_mysql
 
@@ -17,7 +21,13 @@ stage_before_script() {
 }
 
 stage_script() {
-	phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
-		frontend/tests/phpunit.xml frontend/tests/controllers
+	phpunit --bootstrap frontend/tests/bootstrap.php \
+		--configuration=frontend/tests/phpunit.xml \
+		--coverage-clover=coverage.xml \
+		frontend/tests/controllers
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
+}
+
+stage_after_success() {
+	bash <(curl -s https://codecov.io/bash)
 }
