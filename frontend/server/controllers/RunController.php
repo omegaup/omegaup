@@ -772,7 +772,7 @@ class RunController extends Controller {
             2 => ['pipe', 'w']
         ];
         $proc = proc_open(
-            "/usr/bin/aws s3 cp s3://omegaup-runs/${guid}.zip -",
+            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}.zip -",
             $descriptorspec,
             $pipes,
             '/tmp',
