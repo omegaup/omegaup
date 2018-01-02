@@ -1725,7 +1725,7 @@ class RunView {
     let self = this;
     let runs = self.runs();
     let maxScore = previousScore;
-    for (let run of runs.length) {
+    for (let run of runs) {
       if (alias != run.alias()) {
         continue;
       }
