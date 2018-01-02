@@ -32,7 +32,7 @@
 	</div>
 	<div class="panel-body no-padding">
 		<div class="table-responsive">
-			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" data-filter="{$filter}" is-index="{$is_index}">
+			<table class="table table-striped table-hover no-margin" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" {if isset($filter)}data-filter="{$filter}" {/if}is-index="{$is_index}">
 				<thead>
 					<tr>
 						<th>#</th>
