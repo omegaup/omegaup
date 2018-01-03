@@ -96,6 +96,10 @@ Logger::configure([
                 'appenders' => ['csp'],
                 'additivity' => false,
             ],
+            'jserror' => [
+                'appenders' => ['jserror'],
+                'additivity' => false,
+            ],
         ],
         'appenders' => [
             'default' => [
@@ -121,6 +125,19 @@ Logger::configure([
                 ],
                 'params' => [
                     'file' => OMEGAUP_CSP_LOG_FILE,
+                    'append' => true,
+                ],
+            ],
+            'jserror' => [
+                'class' => 'LoggerAppenderFile',
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => '%date: %message %newline',
+                    ],
+                ],
+                'params' => [
+                    'file' => OMEGAUP_JSERROR_LOG_FILE,
                     'append' => true,
                 ],
             ]
