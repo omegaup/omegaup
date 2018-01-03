@@ -17,7 +17,7 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
 
     public $filesToUnzip;
-    private $imageHashes;
+    private $imageHashes = [];
     private $casesFiles;
     private $log;
     private $current_markdown_file_contents;

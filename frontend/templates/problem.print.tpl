@@ -17,7 +17,7 @@
 		<table class="data">
 			<tr>
 				<td>{#wordsPoints#}</td>
-				<td class="points">&mdash;</div>
+				<td class="points">&mdash;</td>
 				<td>{#arenaCommonMemoryLimit#}</td>
 				<td class="memory_limit">{$memory_limit}</td>
 			</tr>
