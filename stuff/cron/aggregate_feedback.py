@@ -21,7 +21,7 @@ MIN_NUM_VOTES = 5
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 
-# Berfore this id the questions were distinct
+# Before this id the questions were different
 QUALITY_ID_AFTER_QUESTIONS_CHANGE = 18663
 
 
@@ -38,7 +38,6 @@ def get_global_quality_and_difficulty_average(dbconn):
                        WHERE `nomination` = 'suggestion'
                         AND qn.`qualitynomination_id` > %s;""",
                     (QUALITY_ID_AFTER_QUESTIONS_CHANGE,))
-        # The format of the question changed from this id
         quality_sum = 0
         quality_n = 0
         difficulty_sum = 0
@@ -79,7 +78,6 @@ def get_problem_aggregates(dbconn, problem_id):
                          AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
                     (QUALITY_ID_AFTER_QUESTIONS_CHANGE, problem_id,))
-        # The format of the question changed from this id
         quality_sum = 0
         quality_n = 0
         difficulty_sum = 0
@@ -182,7 +180,6 @@ def aggregate_feedback(dbconn):
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITY_ID_AFTER_QUESTIONS_CHANGE,))
-        # The format of the question changed from this id
         for row in cur:
             problem_id = row[0]
             logging.debug('Aggregating feedback for problem %d', problem_id)
