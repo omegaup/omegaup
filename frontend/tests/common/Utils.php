@@ -138,9 +138,11 @@ class Utils {
 
             // Tables with special entries.
             $conn->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
+
+            // The format of the question changed from this id
+            $conn->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
-            var_dump($sql);
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
