@@ -21,6 +21,9 @@ MIN_NUM_VOTES = 5
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 
+# Before this id the questions were different
+QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
+
 
 def get_global_quality_and_difficulty_average(dbconn):
     '''Gets the global quality and difficulty average based on user feedback.
@@ -32,7 +35,9 @@ def get_global_quality_and_difficulty_average(dbconn):
     with dbconn.cursor() as cur:
         cur.execute("""SELECT qn.`contents`
                        FROM `QualityNominations` as qn
-                       WHERE `nomination` = 'suggestion';""")
+                       WHERE `nomination` = 'suggestion'
+                        AND qn.`qualitynomination_id` > %s;""",
+                    (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
         quality_sum = 0
         quality_n = 0
         difficulty_sum = 0
@@ -70,8 +75,9 @@ def get_problem_aggregates(dbconn, problem_id):
         cur.execute("""SELECT qn.`contents`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'suggestion'
+                         AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
-                    (problem_id,))
+                    (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
         quality_sum = 0
         quality_n = 0
         difficulty_sum = 0
@@ -171,7 +177,9 @@ def aggregate_feedback(dbconn):
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
-                       WHERE qn.`nomination` = 'suggestion';""")
+                       WHERE qn.`nomination` = 'suggestion'
+                         AND qn.`qualitynomination_id` > %s;""",
+                    (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
         for row in cur:
             problem_id = row[0]
             logging.debug('Aggregating feedback for problem %d', problem_id)
