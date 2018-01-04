@@ -8,6 +8,7 @@
 {else}
 		<meta name="google-signin-client_id" content="{$GOOGLECLIENTID}">
 {/if}
+		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
