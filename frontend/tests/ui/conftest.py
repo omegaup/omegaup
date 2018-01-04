@@ -223,8 +223,8 @@ def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
     extra_timeout = 0
-    if browser_name == 'firefox':
-        extra_timeout = 1
+    if _CI:
+        extra_timeout = 2
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT + extra_timeout)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT + extra_timeout,
