@@ -46,31 +46,14 @@ class ProblemsetController extends Controller {
         );
         if (!is_null($problem)) {
             if ($problem->points != $Problemset_Problems->points) {
-                self::recalculateScore($Problemset_Problems, $problem->points);
+                RunsDAO::recalculateScore(
+                    $Problemset_Problems->problemset_id,
+                    $Problemset_Problems->problem_id,
+                    $Problemset_Problems->points,
+                    $problem->points
+                );
             }
         }
         ProblemsetProblemsDAOBase::save($Problemset_Problems);
-    }
-
-    /**
-     * Recalculate the contest_score of all problemset and problem Runs
-     */
-    private static function recalculateScore(ProblemsetProblems $Problemset_Problems, $original_points) {
-        $runs = RunsDAO::GetAllRuns(
-            $Problemset_Problems->problemset_id,
-            null,
-            null,
-            $Problemset_Problems->problem_id,
-            null,
-            null,
-            null,
-            null
-        );
-        foreach ($runs as $run) {
-            $exsistingRun = RunsDAOBase::getByPK($run['run_id']);
-            $exsistingRun->contest_score = round((
-                (int)$run['contest_score'] / (int)$original_points) * (int)$Problemset_Problems->points);
-            RunsDAOBase::save($exsistingRun);
-        }
     }
 }
