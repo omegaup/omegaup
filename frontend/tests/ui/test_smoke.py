@@ -17,13 +17,11 @@ def test_create_user(driver):
     # Home page
     home_page_url = driver.url('/')
     driver.browser.get(home_page_url)
-    driver.wait_for_page_loaded()
     driver.browser.find_element_by_xpath(
         '//a[contains(@href, "/login/")]').click()
 
     # Login screen
     driver.wait.until(lambda _: driver.browser.current_url != home_page_url)
-    driver.wait_for_page_loaded()
     username = 'unittest_user_%s' % driver.id
     password = 'p@ssw0rd'
     driver.browser.find_element_by_id('reg_username').send_keys(username)
@@ -37,7 +35,6 @@ def test_create_user(driver):
     # Home screen
     driver.browser.get(driver.url('/logout/?redirect=/'))
     driver.wait.until(lambda _: driver.browser.current_url == home_page_url)
-    driver.wait_for_page_loaded()
 
     with driver.login(username, password):
         pass
