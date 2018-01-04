@@ -68,6 +68,8 @@ class Driver(object):
         self.wait.until(
             lambda _: self.browser.execute_script(
                 'return document.readyState;') == 'complete')
+        self.wait.until(
+            lambda _: self.browser.execute_script('return !jQuery.active;'))
 
     @contextlib.contextmanager
     def login_user(self):
@@ -96,6 +98,7 @@ class Driver(object):
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
+        self.wait_for_page_loaded()
         self.browser.find_element_by_id('user').send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
         with self.ajax_page_transition():
@@ -219,9 +222,12 @@ def _get_browser(request, browser_name):
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
+    extra_timeout = 0
+    if browser_name == 'firefox':
+        extra_timeout = 1
     browser = _get_browser(request, browser_name)
-    browser.implicitly_wait(_DEFAULT_TIMEOUT)
-    wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
+    browser.implicitly_wait(_DEFAULT_TIMEOUT + extra_timeout)
+    wait = WebDriverWait(browser, _DEFAULT_TIMEOUT + extra_timeout,
                          poll_frequency=0.1)
 
     try:
