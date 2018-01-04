@@ -10,7 +10,9 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.2.1.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-migrate-3.0.1.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
