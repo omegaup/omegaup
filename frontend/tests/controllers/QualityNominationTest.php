@@ -732,7 +732,8 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $actualGlobals = QualityNominationsDAO::getGlobalDifficultyAndQuality();
+        $globalContents = QualityNominationsDAO::getAllNominations();
+        $actualGlobals = QualityNominationsDAO::calculateGlobalDifficultyAndQuality($globalContents);
         $expectedGlobals = [23/11 /*quality*/, 54/16 /*difficulty*/];
 
         $this->assertEquals($expectedGlobals, $actualGlobals);
@@ -742,9 +743,10 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
-
-        $actualResult[0] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[0]['problem']->problem_id);
-        $actualResult[1] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[1]['problem']->problem_id);
+        $contents[0] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
+        $actualResult[0] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[0]);
+        $contents[1] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
+        $actualResult[1] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[1]);
 
         $expectedResult[0] = [
             'quality_sum' => 13,
