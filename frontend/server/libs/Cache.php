@@ -17,6 +17,7 @@ abstract class CacheAdapter {
         return CacheAdapter::$sInstance;
     }
 
+    abstract public function entry($key, $default_var, $ttl = 0);
     abstract public function add($key, $var, $ttl = 0);
     abstract public function cas($key, $old, $new);
     abstract public function clear();
@@ -29,6 +30,12 @@ abstract class CacheAdapter {
  * Implementation of CacheAdapter that uses the real APC functions.
  */
 class APCCacheAdapter extends CacheAdapter {
+    public function entry($key, $default_var, $ttl = 0) {
+        return apcu_entry($key, function ($key) use ($default_var) {
+            return $default_var;
+        }, $ttl);
+    }
+
     public function add($key, $var, $ttl = 0) {
         return apcu_add($key, $var, $ttl);
     }
@@ -38,7 +45,7 @@ class APCCacheAdapter extends CacheAdapter {
     }
 
     public function clear() {
-        apcu_clear_cache('user');
+        apcu_clear_cache();
     }
 
     public function delete($key) {
@@ -46,7 +53,7 @@ class APCCacheAdapter extends CacheAdapter {
     }
 
     public function fetch($key) {
-        return apcu_fetch($key);
+        return apcu_fetch($key, $success);
     }
 
     public function store($key, $var, $ttl = 0) {
@@ -60,6 +67,13 @@ class APCCacheAdapter extends CacheAdapter {
  */
 class InProcessCacheAdapter extends CacheAdapter {
     private $cache = [];
+
+    public function entry($key, $default_var, $ttl = 0) {
+        if (!array_key_exists($key, $this->cache)) {
+            $this->cache[$key] = $default_var;
+        }
+        return $this->cache[$key];
+    }
 
     public function add($key, $var, $ttl = 0) {
         if (array_key_exists($key, $this->cache)) {
@@ -270,15 +284,8 @@ class Cache {
      * @param string $prefix
      */
     private static function getVersion($prefix) {
-        $version = false;
         $key = 'v'.$prefix;
-        while (($version = CacheAdapter::getInstance()->fetch($key)) === false) {
-            if (CacheAdapter::getInstance()->add($key, 0)) {
-                $version = 0;
-                break;
-            }
-        }
-        return $version;
+        return (int) CacheAdapter::getInstance()->entry($key, 0);
     }
 
     /**

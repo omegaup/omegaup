@@ -23,13 +23,15 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.7
+      - deadsnakes
     packages:
-      - nginx
-      - realpath
-      - python3
-      - python-pip
-      - python3-pip
       - clang-format-3.7
+      - libmysqlclient-dev
+      - nginx
+      - python-pip
+      - python3.5
+      - python3-pip
+      - realpath
   sauce_connect:
     username: lhchavez
   jwt:
@@ -51,6 +53,8 @@ install: stuff/travis/run.sh "${TEST_SUITE}" install
 before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
 
 script: stuff/travis/run.sh "${TEST_SUITE}" script
+
+after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
 
 notifications:
   slack:

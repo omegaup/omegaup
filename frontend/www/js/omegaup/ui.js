@@ -45,7 +45,7 @@ let UI = {
   warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
 
   apiError: function(response) {
-    UI.error((response.error || 'error').toString());
+    UI.error(((response && response.error) || 'error').toString());
   },
 
   ignoreError: function(response) {},
@@ -256,7 +256,11 @@ export {UI as default};
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {
       try {
-        var response = jQuery.parseJSON(xhr.responseText);
+        var responseText = xhr.responseText;
+        var response = {};
+        if (responseText) {
+          response = JSON.parse(responseText);
+        }
         console.error(settings.url, xhr.status, response.error, response);
       } catch (e) {
         console.error(settings.url, xhr.status, xhr.responseText);

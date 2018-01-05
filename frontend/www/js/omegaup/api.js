@@ -21,7 +21,11 @@ function _call(url, transform, defaultParams) {
         .fail(function(jqXHR) {
           var errorData;
           try {
-            errorData = JSON.parse(jqXHR.responseText);
+            if (jqXHR.responseText) {
+              errorData = JSON.parse(jqXHR.responseText);
+            } else {
+              errorData = {status: 'error', error: null};
+            }
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
@@ -187,6 +191,8 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
+
+    clone: _call('/api/course/clone/'),
 
     create: _call('/api/course/create/'),
 

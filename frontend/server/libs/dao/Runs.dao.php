@@ -211,23 +211,6 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent by an user
-	 */
-
-    final public static function CountTotalRunsOfUser($user_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? ';
-        $val = [$user_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
-
-        global $conn;
-        return $conn->GetOne($sql, $val);
-    }
-
-    /*
 	 * Gets the count of total runs sent to a given problem
 	 */
 
@@ -294,20 +277,44 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given contest by verdict
-	 */
-
-    final public static function CountTotalRunsOfUserByVerdict($user_id, $verdict, $showAllRuns = false) {
+     * Gets the count of total runs sent to a given contest by verdict and by period of time
+     */
+    final public static function CountRunsOfUserPerDatePerVerdict($user_id) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? AND verdict = ? ';
-        $val = [$user_id, $verdict];
+        $sql = '
+                SELECT
+                    r.date,
+                    r.verdict,
+                    COUNT(1) runs
+                FROM (
+                    SELECT
+                        DATE(time) AS date,
+                        verdict
+                    FROM
+                        Runs
+                    WHERE
+                        user_id = ? AND status = \'ready\'
+                ) AS r
+                GROUP BY
+                    r.date, r.verdict
+                ORDER BY
+                  date ASC;';
 
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
+        $val = [$user_id];
 
         global $conn;
-        return $conn->GetOne($sql, $val);
+        $rs = $conn->Execute($sql, $val);
+
+        $ar = [];
+        foreach ($rs as $row) {
+            array_push($ar, [
+                'date' => $row['date'],
+                'verdict' => $row['verdict'],
+                'runs' => $row['runs']
+            ]);
+        }
+
+        return $ar;
     }
 
     /*

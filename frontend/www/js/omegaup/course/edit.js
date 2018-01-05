@@ -4,6 +4,7 @@ import course_AssignmentDetails from '../components/course/AssignmentDetails.vue
 import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Details from '../components/course/Details.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
+import course_Clone from '../components/course/Clone.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 import Sortable from 'sortablejs';
@@ -88,9 +89,6 @@ OmegaUp.on('ready', function() {
               start_time: defaultStartTime,
               finish_time: defaultFinishTime,
             };
-          },
-          cancel: function(ev) {
-            window.location = '/course/' + courseAlias + '/';
           },
           'removeAdmin': function(admin) {
             API.Course.removeAdmin({
@@ -441,6 +439,41 @@ OmegaUp.on('ready', function() {
     },
   });
 
+  var clone = new Vue({
+    el: '#clone div',
+    render: function(createElement) {
+      return createElement('omegaup-course-clone', {
+        props: {initialAlias: courseAlias, initialName: this.initialName},
+        on: {
+          'clone': function(ev) {
+            omegaup.API.Course.clone({
+                                course_alias: courseAlias,
+                                name: ev.name,
+                                alias: ev.alias,
+                                start_time: ev.startTime.getTime() / 1000,
+                              })
+                .then(function(data) {
+                  omegaup.UI.success(
+                      UI.formatString(T.courseEditCourseClonedSuccessfully, {
+                        course_alias: ev.alias,
+                      }));
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          cancel: function(ev) {
+            window.location = '/course/' + courseAlias + '/';
+          }
+        },
+      });
+    },
+    data: {
+      initialName: '',
+    },
+    components: {
+      'omegaup-course-clone': course_Clone,
+    },
+  });
+
   let functionMap = {
     '#assignments': {
       'new': onNewAssignment,
@@ -463,6 +496,7 @@ OmegaUp.on('ready', function() {
             .text(course.name)
             .attr('href', '/course/' + courseAlias + '/');
         details.course = course;
+        clone.initialName = course.name;
       })
       .fail(UI.apiError);
 

@@ -2098,6 +2098,9 @@ class ContestController extends Controller {
             'penalty_calc_policy',
             'show_scoreboard_after',
             'languages' => ['transform' => function ($value) {
+                if (!is_array($value)) {
+                    return $value;
+                }
                 return join(',', $value);
             }],
             'contestant_must_register',

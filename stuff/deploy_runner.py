@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
+'''Deploys one runner.'''
+
 import argparse
-import hashlib
 import logging
 import os.path
 import shlex
@@ -9,40 +10,60 @@ import subprocess
 import tempfile
 
 DOWNLOAD_FILES = {
-    'omegajail-xenial-distrib-x86_64.tar.bz2': 'https://s3.amazonaws.com/omegaup-omegajail/omegajail-xenial-distrib-x86_64.tar.bz2',
-    'omegaup-runner.tar.bz2': 'https://s3.amazonaws.com/omegaup-dist/omegaup-runner.tar.bz2',
+    'omegajail-xenial-distrib-x86_64.tar.bz2':
+        'https://s3.amazonaws.com/omegaup-omegajail/'
+        'omegajail-xenial-distrib-x86_64.tar.bz2',
+    'omegaup-runner.tar.bz2':
+        'https://s3.amazonaws.com/omegaup-dist/omegaup-runner.tar.bz2',
 }
 
 NULL_HASH = '0000000000000000000000000000000000000000'
 
+
 class RemoteRunner:
+    '''Runs commands in the runner machine through ssh.'''
+
     def __init__(self, hostname):
         self._hostname = hostname
 
     def run(self, args, input=None, capture=True, check=False):
+        '''Wrapper around subprocess.run through ssh.'''
+        # pylint: disable=redefined-builtin
+        # We're redefining input because that's what subprocess.run uses.
+
         std = None
         if capture:
             std = subprocess.PIPE
         logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
+        # Travis uses Python <3.5, which does not yet have subprocess.run.
+        # pylint: disable=no-member
         return subprocess.run(['/usr/bin/ssh', self._hostname] + args,
                               stdout=std, stderr=std, universal_newlines=True,
                               input=input, shell=False, check=check)
 
     def sudo(self, args, **kwargs):
+        '''Wrapper to run a command under sudo through ssh.'''
+
         return self.run(['/usr/bin/sudo'] + args, **kwargs)
 
     def scp(self, src, dest, mode=None, owner=None, group=None):
+        '''Copies a file to the remote machine.'''
+        # pylint: disable=too-many-arguments
+
         subprocess.check_call(['/usr/bin/scp', src,
                                '%s:.tmp' % self._hostname])
-        if mode != None:
+        if mode is not None:
             self.sudo(['/bin/chmod', '0%o' % mode, '.tmp'])
-        if owner != None:
+        if owner is not None:
             self.sudo(['/bin/chown', owner, '.tmp'])
-        if group != None:
+        if group is not None:
             self.sudo(['/bin/chgrp', group, '.tmp'])
         return self.sudo(['/bin/mv', '.tmp', dest])
 
+
 def hash_for(filename):
+    '''Returns the hash for the specified file.'''
+
     sha1sum_filename = '%s.SHA1SUM' % filename
     if not os.path.exists(sha1sum_filename):
         logging.info('%s not found, returning null hash for %s',
@@ -51,7 +72,10 @@ def hash_for(filename):
     with open(sha1sum_filename) as f:
         return f.read().strip()
 
+
 def main():
+    '''Main entrypoint.'''
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('--upgrade', action='store_true')
@@ -85,15 +109,18 @@ def main():
 
     for path, url in DOWNLOAD_FILES.items():
         if runner.run(['[[ -f %s && "`sha1sum -b %s`" == "%s" ]]' %
-                      (shlex.quote(path), shlex.quote(path), hash_for(path))]).returncode != 0:
+                       (shlex.quote(path), shlex.quote(path),
+                        hash_for(path))]).returncode != 0:
             logging.info('Downloading %s...', url)
-            runner.run(['[ -f %s ] && rm %s' % (shlex.quote(path), shlex.quote(path))])
+            runner.run(['[ -f %s ] && rm %s' %
+                        (shlex.quote(path), shlex.quote(path))])
             runner.run(['/usr/bin/curl', '--remote-time', '--output', path,
                         '--url', url])
             logging.info('Extracting %s...', url)
             runner.sudo(['/bin/tar', '-xf', path, '-C', '/'])
 
-    if runner.run(['[', '-f', '/etc/omegaup/runner/key.pem', ']']).returncode != 0:
+    if runner.run(['[', '-f',
+                   '/etc/omegaup/runner/key.pem', ']']).returncode != 0:
         with tempfile.TemporaryDirectory() as tmpdirname:
             subprocess.check_call([
                 '/usr/bin/certmanager', 'cert',
@@ -109,9 +136,10 @@ def main():
                        owner='omegaup', group='omegaup')
 
     if runner.run([
-        '[', '-h',
-        '/etc/systemd/system/multi-user.target.wants/omegaup-runner.service',
-        ']']).returncode != 0:
+            '[', '-h',
+            ('/etc/systemd/system/multi-user.target.wants/'
+             'omegaup-runner.service'),
+            ']']).returncode != 0:
         runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
 
     runner.sudo(['/bin/rm', '-f', '/var/lib/minijail'], check=True)
@@ -119,5 +147,8 @@ def main():
     runner.sudo(['/bin/systemctl', 'daemon-reload'], check=True)
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
 
+
 if __name__ == '__main__':
     main()
+
+# vim: expandtab shiftwidth=4 tabstop=4

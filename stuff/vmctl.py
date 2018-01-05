@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+'''Manages virtual machines.'''
+
 import argparse
 import getpass
 import json
@@ -9,33 +11,46 @@ import shlex
 import subprocess
 import sys
 
+
+def _run(args, check=True):
+    '''A small subprocess.run wrapper with logging.'''
+
+    logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
+    # Travis uses Python <3.5, which does not yet have subprocess.run.
+    # pylint: disable=no-member
+    result = subprocess.run(['azure'] + args,
+                            stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE,
+                            universal_newlines=True, shell=False,
+                            check=check)
+    logging.debug('Result %d: %s', result.returncode, result.stdout)
+    return result
+
+
 class Azure:
+    '''Abstracts away the Azure CLI API.'''
+
     def __init__(self, subscription, resource_group, location):
         self._subscription = subscription
         self._resource_group = resource_group
         self._location = location
 
     def _nsg_name(self):
+        '''Returns the network security group name.'''
         return '%s-%s-nsg' % (self._resource_group, self._location)
 
     def _vnet_name(self):
+        '''Returns the virtual network name.'''
         return '%s-%s-vnet' % (self._resource_group, self._location)
 
-    def nic_name(self, vm_name):
+    def _nic_name(self, vm_name):
+        '''Returns the network interface card name.'''
+        # pylint: disable=no-self-use
         return '%s-nic' % vm_name
 
-    def _run(self, args, check=True):
-        logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
-        result = subprocess.run(['azure'] + args,
-                                stdin=subprocess.DEVNULL,
-                                stdout=subprocess.PIPE,
-                                universal_newlines=True, shell=False,
-                                check=check)
-        logging.debug('Result %d: %s', result.returncode, result.stdout)
-        return result
-
     def network_nsg_show(self):
-        result = self._run([
+        '''Returns the network security group information.'''
+        result = _run([
             'network', 'nsg', 'show', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -45,7 +60,8 @@ class Azure:
         return json.loads(result.stdout)
 
     def network_nsg_create(self):
-        return json.loads(self._run([
+        '''Creates a network security group.'''
+        return json.loads(_run([
             'network', 'nsg', 'create', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -53,7 +69,8 @@ class Azure:
             '--name', self._nsg_name()]).stdout)
 
     def network_nsg_rule_create(self, protocol, port, priority):
-        return json.loads(self._run([
+        '''Creates a network security group rule.'''
+        return json.loads(_run([
             'network', 'nsg', 'rule', 'create', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -63,7 +80,8 @@ class Azure:
             '--priority', str(priority)]).stdout)
 
     def network_vnet_show(self):
-        result = self._run([
+        '''Returns the virtual network information.'''
+        result = _run([
             'network', 'vnet', 'show', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -73,7 +91,8 @@ class Azure:
         return json.loads(result.stdout)
 
     def network_vnet_create(self):
-        return json.loads(self._run([
+        '''Creates a virtual network.'''
+        return json.loads(_run([
             'network', 'vnet', 'create', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -81,7 +100,8 @@ class Azure:
             '--name', self._vnet_name()]).stdout)
 
     def network_vnet_subnet_create(self):
-        return json.loads(self._run([
+        '''Creates a virtual network subnet.'''
+        return json.loads(_run([
             'network', 'vnet', 'subnet', 'create', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
@@ -89,49 +109,56 @@ class Azure:
             '--name', 'default', '--address-prefix', '10.0.0.0/24']).stdout)
 
     def network_nic_show(self, vm_name):
-        return json.loads(self._run([
+        '''Returns the network interface card information.'''
+        return json.loads(_run([
             'network', 'nic', 'show', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
             '--name', '%s-nic' % vm_name]).stdout)
 
     def network_nic_create(self, vm_name):
-        return json.loads(self._run([
+        '''Creates a network interface card.'''
+        return json.loads(_run([
             'network', 'nic', 'create', '--json',
             '--subscription', self._subscription,
             '--resource-group', self._resource_group,
-            '--location', self._location, '--name', self.nic_name(vm_name),
+            '--location', self._location, '--name', self._nic_name(vm_name),
             '--subnet-vnet-name', self._vnet_name(),
             '--subnet-name', 'default',
             '--network-security-group-name', self._nsg_name()]).stdout)
 
     def vm_list(self):
-        return json.loads(self._run([
+        '''Lists the virtual machines.'''
+        return json.loads(_run([
             'vm', 'list', '--json',
             '--subscription', self._subscription]).stdout)
 
     def vm_show(self, vm_name):
-        return json.loads(self._run([
+        '''Returns the virtual machine information.'''
+        return json.loads(_run([
             'vm', 'show', '--json', '--subscription', self._subscription,
             '--resource-group', self._resource_group,
             '--name', vm_name]).stdout)
 
+    # pylint: disable=too-many-arguments
     def vm_create(self, vm_name, admin_username, ssh_publickey_file,
-            os_type='Linux',
-            image_urn='Canonical:UbuntuServer:16.04-LTS:latest',
-            vm_size='Standard_A1_v2'):
-        self._run([
+                  os_type='Linux',
+                  image_urn='Canonical:UbuntuServer:16.04-LTS:latest',
+                  vm_size='Standard_A1_v2'):
+        '''Createa a virtual machine.'''
+        _run([
             'vm', 'create', '--json', '--subscription', self._subscription,
             '--resource-group', self._resource_group,
             '--location', self._location, '--name', vm_name,
             '--admin-username', admin_username,
             '--ssh-publickey-file', ssh_publickey_file,
-            '--nic-name', self.nic_name(vm_name), '--public-ip-name', vm_name,
+            '--nic-name', self._nic_name(vm_name), '--public-ip-name', vm_name,
             '--public-ip-domain-name', vm_name, '--os-type', os_type,
             '--image-urn', image_urn, '--vm-size', vm_size], check=True)
 
     def vm_destroy(self, vm_name):
-        self._run([
+        '''Destroys a virtual machine.'''
+        _run([
             'vm', 'destroy', '--json', '--subscription', self._subscription,
             '--resource-group', self._resource_group,
             '--location', self._location, '--name', vm_name], check=True)
@@ -196,6 +223,8 @@ def _destroy(azure, args):
 
 
 def main():
+    '''Main entrypoint.'''
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('--subscription', required=True)
@@ -233,3 +262,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: expandtab shiftwidth=4 tabstop=4

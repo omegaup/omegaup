@@ -21,7 +21,7 @@
 					<table class="data">
 						<tr>
 							<td>{#wordsPoints#}</td>
-							<td class="points">{$points|escape}</div>
+							<td class="points">{$points|escape}</td>
 							<td>{#wordsMemoryLimit#}</td>
 							<td class="memory_limit">{$memory_limit|escape}</td>
 						</tr>

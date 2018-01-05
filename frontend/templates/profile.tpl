@@ -64,9 +64,8 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
-			<div class="panel-body">
-				<div id="verdict-chart"><img src="/media/wait.gif" /></div>
-			</div>
+			<script type="text/javascript" src="{version_hash src="/js/dist/user_charts.js"}"></script>
+			<div id="omegaup-user-charts"></div>
 		</div>
 
 	</div>
