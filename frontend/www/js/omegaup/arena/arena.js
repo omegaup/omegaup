@@ -1246,7 +1246,8 @@ export class Arena {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
-    if (typeof(self.problems[self.currentProblem.alias]
+    if (typeof(self.problems[self.currentProblem.alias]) !== 'undefined' &&
+        typeof(self.problems[self.currentProblem.alias]
                    .nextSubmissionTimestamp) !== 'undefined') {
       nextSubmissionTimestamp = new Date(
           self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
