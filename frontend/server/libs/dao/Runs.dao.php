@@ -731,13 +731,12 @@ class RunsDAO extends RunsDAOBase {
         $sql = 'UPDATE
                   `Runs`
                 SET
-                  `contest_score` = ROUND((`contest_score` / ?) * ?)
+                  `contest_score` = `score` * ?
                 WHERE
                   `problemset_id` = ?
                   AND `problem_id` = ?;';
 
         $params = [
-            $original_points,
             $current_points,
             $problemset_id,
             $problem_id
