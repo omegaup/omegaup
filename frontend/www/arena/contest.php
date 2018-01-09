@@ -15,6 +15,11 @@ try {
 }
 
 if ($show_intro) {
+    $user = UserController::apiProfile(new Request());
+    $smarty->assign(
+        'hasBasicInformation',
+        $user['userinfo']['country_id'] && $user['userinfo']['state_id'] && $user['userinfo']['school_id']
+    );
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');

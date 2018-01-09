@@ -18,8 +18,13 @@
 			<!------------------- Click to proceed -------------------------->
 			<div id="click-to-proceed" class="hidden" >
 				<form id="start-contest-form" method="POST" action="/">
-					<p>{#aboutToStart#}</p>
-					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg">{#startContest#}</button>
+					{if $hasBasicInformation}
+					    <p>{#aboutToStart#}</p>
+					{else}
+					    <p>{#courseBasicInformationNeeded#}</p>
+					{/if}
+					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
+					{if !$hasBasicInformation} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 

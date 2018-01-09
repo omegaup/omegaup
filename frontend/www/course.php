@@ -11,7 +11,6 @@ $intro_details = [];
 
 try {
     $intro_details = CourseController::apiIntroDetails($r);
-
     if (isset($_REQUEST['assignment_alias'])) {
         $show_assignment = true;
     }
@@ -22,11 +21,17 @@ try {
 }
 
 if ($intro_details['shouldShowResults']) {
+    $user = UserController::apiProfile(new Request());
+    error_log(print_r($user, true));
     $smarty->assign('course_payload', [
         'name' => $intro_details['name'],
         'description' => $intro_details['description'],
         'alias' => $intro_details['alias'],
         'currentUsername' => $session['user']->username,
+        'hasBasicInformation' =>
+           $user['userinfo']['country_id'] &&
+           $user['userinfo']['state_id'] &&
+           $user['userinfo']['school_id']
     ]);
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
