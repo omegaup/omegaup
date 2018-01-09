@@ -40,12 +40,12 @@ class ProblemsetController extends Controller {
      * the contest_score for all the problemset and problem runs
      */
     public static function updateProblemsetProblem(ProblemsetProblems $updatedProblemsetProblem) {
-        $newProblemset = ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
         $problem = ProblemsetProblemsDAOBase::getByPK(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
         );
-        if (is_null($problem) && $problem->points == $updatedProblemsetProblem->points) {
+        $newProblemset = ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
+        if (is_null($problem) || $problem->points == $updatedProblemsetProblem->points) {
             return;
         }
         RunsDAO::recalculateScore(
