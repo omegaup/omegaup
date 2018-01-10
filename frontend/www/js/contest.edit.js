@@ -56,6 +56,9 @@ omegaup.OmegaUp.on('ready', function() {
         });
         $('.new_contest_form #languages').multiselect('refresh');
 
+        $('.new_contest_form #basic-information-required')
+            .prop('checked', contest.needs_basic_information);
+
         $('.contest-publish-form #public').val(contest.public);
 
         if (contest.contestant_must_register == null ||
@@ -125,6 +128,10 @@ omegaup.OmegaUp.on('ready', function() {
               $('.new_contest_form #show-scoreboard-after').val(),
           languages: $('.new_contest_form #languages').val(),
           contestant_must_register: $('.new_contest_form #register').val(),
+          basic_information: $('.new_contest_form #basic-information-required')
+                                     .is(':checked') ?
+                                 '1' :
+                                 '0',
         })
         .then(function(data) {
           if (data.status == 'ok') {

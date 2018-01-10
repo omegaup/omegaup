@@ -7,7 +7,7 @@
       <h2 id="name">{{ name }}</h2>
       <p id="description">{{ description }}</p>
       <p v-html="T.courseBasicInformationNeeded"
-         v-if="!hasBasicInformation"></p>
+         v-if="needsBasicInformation"></p>
       <div class="text-center">
         <form id="start-course-form"
               name="start-course-form"
@@ -15,7 +15,7 @@
           <button class="btn btn-primary btn-lg"
                 id="start-course-submit"
                 type="button"
-                v-bind:disabled="hasBasicInformation == 0"
+                v-bind:disabled="needsBasicInformation"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
@@ -27,7 +27,7 @@
 import {T} from '../../omegaup.js';
 
 export default {
-  props: {name: String, description: String, hasBasicInformation: Boolean},
+  props: {name: String, description: String, needsBasicInformation: Boolean},
   data: function() {
     return { T: T, }
   },

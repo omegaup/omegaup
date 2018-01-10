@@ -133,7 +133,19 @@
 							<option value='{$language}'>{$language}</option>
 							{/foreach}
 						</select>
-						<p class="help-block">Set languages to the current contest</p>
+						<p class="help-block">{#contestNewFormLanguages#}</p>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="basic-information-required">{#contestNewFormBasicInformationRequired#}</label>
+						<div class="checkbox">
+							<label>
+								<input type='checkbox' id='basic-information-required' name='basic_information_required'>	{#wordsEnable#}
+							</label>
+						</div>
+						<p class="help-block">{#contestNewFormBasicInformationRequiredDesc#}</p>
 					</div>
 				</div>
 

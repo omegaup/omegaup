@@ -1230,6 +1230,9 @@ class CourseController extends Controller {
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
         $result['shouldShowResults'] = $shouldShowIntro;
+        $problemset = new Problemsets(['acl_id' => $r['course']->acl_id]);
+        $problemsetData = ProblemsetsDAO::search($problemset);
+        $result['needsBasicInformation'] = count($problemsetData) ? $problemsetData[0]->needs_basic_information : 0;
         return $result;
     }
 

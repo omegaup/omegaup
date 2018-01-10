@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
         props: {
           name: coursePayload.name,
           description: coursePayload.description,
-          hasBasicInformation: coursePayload.hasBasicInformation
+          needsBasicInformation: coursePayload.needsBasicInformation
         },
         on: {
           submit: function(ev) {

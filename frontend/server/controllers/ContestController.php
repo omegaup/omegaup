@@ -378,6 +378,20 @@ class ContestController extends Controller {
     }
 
     /**
+     * Get the basic information value of Problemsets
+     */
+    public static function needsBasicInformation(Request $r) {
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+            $problemset = new Problemsets(['acl_id' => $contest->acl_id]);
+            $problemsetData = ProblemsetsDAO::search($problemset);
+        } catch (Exception $e) {
+            throw new NotFoundException('contestNotFound');
+        }
+        return (int)$problemsetData[0]->needs_basic_information;
+    }
+
+    /**
      * Validate request of a details contest
      *
      * @param Request $r
@@ -601,6 +615,9 @@ class ContestController extends Controller {
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
             $result['languages'] = explode(',', $result['languages']);
+            $result['needs_basic_information'] = self::needsBasicInformation(new Request([
+                'contest_alias' => $r['contest']->alias
+            ]));
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -846,7 +863,8 @@ class ContestController extends Controller {
             $contest->acl_id = $acl->acl_id;
 
             $problemset = new Problemsets([
-                'acl_id' => $acl->acl_id
+                'acl_id' => $acl->acl_id,
+                'needs_basic_information' => $r['basic_information']
             ]);
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
@@ -2114,6 +2132,12 @@ class ContestController extends Controller {
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($r['contest']);
+
+            // Save the problemset object with data sent by user to the database
+            $problemsetData = ProblemsetsDAO::search(new Problemsets(['acl_id' => $r['contest']->acl_id]));
+            $problemsetData[0]->needs_basic_information = is_null($r['basic_information'])
+              ? 0 : $r['basic_information'];
+            ProblemsetsDAO::save($problemsetData[0]);
 
             // If the contest is private, add the list of allowed users
             if (!is_null($r['public']) && $r['public'] != 1 && $r['hasPrivateUsers']) {

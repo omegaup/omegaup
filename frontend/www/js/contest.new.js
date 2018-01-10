@@ -29,6 +29,11 @@ omegaup.OmegaUp.on('ready', function() {
               show_scoreboard_after:
                   $('.new_contest_form #show-scoreboard-after').val(),
               languages: $('.new_contest_form #languages').val(),
+              basic_information:
+                  $('.new_contest_form #basic-information-required')
+                          .is(':checked') ?
+                      '1' :
+                      '0',
             })
             .then(function(data) {
               window.location.replace('/contest/' +

@@ -16,9 +16,12 @@ try {
 
 if ($show_intro) {
     $user = UserController::apiProfile(new Request());
+    $needs_basic_info = ContestController::needsBasicInformation($r);
     $smarty->assign(
-        'hasBasicInformation',
-        $user['userinfo']['country_id'] && $user['userinfo']['state_id'] && $user['userinfo']['school_id']
+        'needsBasicInformation',
+        $needs_basic_info && (
+            !$user['userinfo']['country_id'] || !$user['userinfo']['state_id'] || !$user['userinfo']['school_id']
+        )
     );
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {

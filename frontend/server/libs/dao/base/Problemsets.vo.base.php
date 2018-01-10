@@ -38,6 +38,9 @@ class Problemsets extends VO {
         if (isset($data['languages'])) {
             $this->languages = $data['languages'];
         }
+        if (isset($data['needs_basic_information'])) {
+            $this->needs_basic_information = $data['needs_basic_information'];
+        }
     }
 
     /**
@@ -80,4 +83,11 @@ class Problemsets extends VO {
       * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $languages;
+
+    /**
+      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso o concurso sólo si ya llenó su información de perfil
+      * @access public
+      * @var tinyint(1)
+      */
+    public $needs_basic_information;
 }
