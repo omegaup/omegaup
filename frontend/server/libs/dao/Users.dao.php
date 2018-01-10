@@ -76,4 +76,23 @@ class UsersDAO extends UsersDAOBase {
             ];
         }
     }
+
+    public static function savePassword(Users $Users) {
+        $sql = '
+            UPDATE
+                `Users`
+            SET
+                `password` = ?,
+                `username` = ?
+            WHERE
+                `user_id` = ?;';
+        $params = [
+            $Users->password,
+            $Users->username,
+            $Users->user_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }

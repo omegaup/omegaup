@@ -42,12 +42,29 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!is_null($userByEmail)) {
-            throw new DuplicatedEntryInDatabaseException('mailInUse');
-        }
-
         if (!is_null($user)) {
             throw new DuplicatedEntryInDatabaseException('usernameInUse');
+        }
+
+        if (!is_null($userByEmail)) {
+            if (!is_null($userByEmail->password)) {
+                throw new DuplicatedEntryInDatabaseException('mailInUse');
+            } else {
+                $user_data = [
+                    'user_id' => $userByEmail->user_id,
+                    'username' => $r['username'],
+                    'password' => $hashedPassword
+                ];
+
+                $user = new Users($user_data);
+
+                UsersDAO::savePassword($user);
+
+                return [
+                    'status' => 'ok',
+                    'user_id' => $user->user_id
+                ];
+            }
         }
 
         // Prepare DAOs
