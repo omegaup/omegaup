@@ -44,7 +44,7 @@ class ProblemsetController extends Controller {
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
         );
-        $newProblemset = ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
+        ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
         if (is_null($problem) || $problem->points == $updatedProblemsetProblem->points) {
             return;
         }
