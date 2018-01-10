@@ -260,6 +260,8 @@ def main():
                         help='.my.cnf file that stores credentials')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Enables verbose logging')
+    parser.add_argument('--logfile', type=str, default=None,
+                        help='Enables logging to a file')
     parser.add_argument('--host', type=str, help='MySQL host',
                         default='localhost')
     parser.add_argument('--user', type=str, help='MySQL username')
@@ -268,11 +270,19 @@ def main():
                         default='omegaup')
 
     args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    logging.basicConfig(filename=args.logfile,
+                        format='%%(asctime)s:%s:%%(message)s' % parser.prog,
+                        level=logging.DEBUG if args.verbose else logging.INFO)
 
+    logging.info('Started')
     dbconn = mysql_connect(args)
-    aggregate_feedback(dbconn)
-    dbconn.close()
+    try:
+        aggregate_feedback(dbconn)
+    except:  # pylint: disable=bare-except
+        logging.exception('Failed to update user ranking')
+    finally:
+        dbconn.close()
+        logging.info('Done')
 
 
 if __name__ == '__main__':

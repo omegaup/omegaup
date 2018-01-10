@@ -19,7 +19,7 @@ class TagController extends Controller {
      *
      * @param Request $r
      */
-    public function apiList(Request $r) {
+    public static function apiList(Request $r) {
         self::authenticateRequest($r);
 
         $param = '';
