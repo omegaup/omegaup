@@ -230,60 +230,13 @@ class RunController extends Controller {
             $problemset_id = null;
             $test = 0;
         } else {
-            //check the kind of penalty_type for this contest
-            $start = null;
             $problemset_id = $r['problemset']->problemset_id;
-            if (isset($r['contest'])) {
-                $penalty_type = $r['contest']->penalty_type;
-
-                switch ($penalty_type) {
-                    case 'contest_start':
-                        // submit_delay is calculated from the start
-                        // of the contest
-                        $start = $r['contest']->start_time;
-                        break;
-
-                    case 'problem_open':
-                        // submit delay is calculated from the
-                        // time the user opened the problem
-                        $opened = ProblemsetProblemOpenedDAO::getByPK(
-                            $problemset_id,
-                            $r['problem']->problem_id,
-                            $r['current_user_id']
-                        );
-
-                        if (is_null($opened)) {
-                            //holy moly, he is submitting a run
-                            //and he hasnt even opened the problem
-                            //what should be done here?
-                            throw new NotAllowedToSubmitException('runEvenOpened');
-                        }
-
-                        $start = $opened->open_time;
-                        break;
-
-                    case 'none':
-                    case 'runtime':
-                        //we dont care
-                        $start = null;
-                        break;
-
-                    default:
-                        self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
-                        $start = null;
-                }
-            }
-
-            if (!is_null($start)) {
-                //ok, what time is it now?
-                $c_time = Time::get();
-                $start = strtotime($start);
-
-                //asuming submit_delay is in minutes
-                $submit_delay = (int) (( $c_time - $start ) / 60);
-            } else {
-                $submit_delay = 0;
-            }
+            $submit_delay = self::calculateSubmitDelay(
+                $r['contest'] ?? null,
+                $r['problemset']->problemset_id,
+                $r['problem']->problem_id,
+                $r['current_user_id']
+            );
 
             $test = Authorization::isAdmin($r['current_user_id'], $r['problemset']) ? 1 : 0;
         }
@@ -377,6 +330,75 @@ class RunController extends Controller {
         UserController::deleteProblemsSolvedRankCacheList();
 
         return $response;
+    }
+
+    /**
+     * Calculates the submit delay
+     *
+     * @param Contest $contest
+     * @param $problemset_id
+     * @param $problem_id
+     * @param $corrent_user_id
+     * @return $submit_delay
+     * @throws NotAllowedToSubmitException
+     */
+    public static function calculateSubmitDelay($contest, $problemset_id, $problem_id, $current_user_id) {
+        //check the kind of penalty_type for this contest
+        $start = null;
+
+        if (!is_null($contest)) {
+            $penalty_type = $contest->penalty_type;
+
+            switch ($penalty_type) {
+                case 'contest_start':
+                    // submit_delay is calculated from the start
+                    // of the contest
+                    $start = $contest->start_time;
+                    break;
+
+                case 'problem_open':
+                    // submit delay is calculated from the
+                    // time the user opened the problem
+                    $opened = ProblemsetProblemOpenedDAO::getByPK(
+                        $problemset_id,
+                        $problem_id,
+                        $current_user_id
+                    );
+
+                    if (is_null($opened)) {
+                        //holy moly, he is submitting a run
+                        //and he hasnt even opened the problem
+                        //what should be done here?
+                        throw new NotAllowedToSubmitException('runEvenOpened');
+                    }
+
+                    $start = $opened->open_time;
+                    break;
+
+                case 'none':
+                case 'runtime':
+                    //we dont care
+                    $start = null;
+                    break;
+
+                default:
+                    self::$log->error('penalty_type for this contests is not a valid option, asuming `none`.');
+                    $start = null;
+            }
+        }
+
+        if (!is_null($start)) {
+            //ok, what time is it now?
+            $c_time = Time::get();
+            $start = strtotime($start);
+
+            //asuming submit_delay is in minutes
+            $submit_delay = (int) (( $c_time - $start ) / 60);
+        } else {
+            $submit_delay = 0;
+        }
+
+        return $submit_delay;
     }
 
     /**

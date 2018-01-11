@@ -746,4 +746,45 @@ class RunsDAO extends RunsDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+
+    /**
+     * Recalculate contest runs when penalty_type is runtime
+     */
+    public static function recalculateRunsToRuntime($problemset_id) {
+        $sql = 'UPDATE
+                  `Runs`
+                SET
+                  `penalty` = `runtime`
+                WHERE
+                  `problemset_id` = ?;';
+
+        $params = [
+            $problemset_id
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    /**
+     * Recalculate contest runs when penalty_type is not runtime
+     */
+    public static function recalculateRuns($run_id, $submit_delay) {
+        $sql = 'UPDATE
+                  `Runs`
+                SET
+                  `penalty` = ?
+                WHERE
+                  `run_id` = ?;';
+
+        $params = [
+            $submit_delay,
+            $run_id
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }

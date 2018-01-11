@@ -2113,7 +2113,7 @@ class ContestController extends Controller {
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            ContestsDAO::save($r['contest']);
+            self::updateContest($r['contest']);
 
             // If the contest is private, add the list of allowed users
             if (!is_null($r['public']) && $r['public'] != 1 && $r['hasPrivateUsers']) {
@@ -2218,6 +2218,43 @@ class ContestController extends Controller {
         self::$log->info('Contest updated (alias): ' . $r['contest_alias']);
 
         return $response;
+    }
+
+    /**
+     *
+     */
+    private static function updateContest(Contests $contest) {
+        $original_contest = ContestsDAO::getByPK($contest->contest_id);
+        ContestsDAO::save($contest);
+        if ($original_contest->penalty_type == $contest->penalty_type) {
+            return;
+        }
+
+        if ($contest->penalty_type == 'runtime') {
+            RunsDAO::recalculateRunsToRuntime($contest->problemset_id);
+        } else {
+            $runsFromContest = RunsDAO::GetAllRuns(
+                $contest->problemset_id,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+            foreach ($runsFromContest as $run) {
+                $runDetails = RunsDAO::getByPK($run['run_id']);
+
+                $submit_delay = RunController::calculateSubmitDelay(
+                    $contest,
+                    $runDetails->problemset_id,
+                    $runDetails->problem_id,
+                    $runDetails->user_id
+                );
+                RunsDAO::recalculateRuns($run['run_id'], $submit_delay);
+            }
+        }
     }
 
     /**
