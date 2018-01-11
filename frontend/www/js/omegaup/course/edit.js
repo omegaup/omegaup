@@ -284,6 +284,7 @@ OmegaUp.on('ready', function() {
                                                1000,
                               alias: ev.alias,
                               show_scoreboard: ev.showScoreboard,
+                              basic_information: ev.basic_information_required,
                               school_id: school_id
                             })
                       .then(function(data) {

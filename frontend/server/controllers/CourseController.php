@@ -275,12 +275,19 @@ class CourseController extends Controller {
                 'role_id' => Authorization::CONTESTANT_ROLE,
             ]));
 
+            $problemset = new Problemsets([
+                'acl_id' => $acl->acl_id,
+                'needs_basic_information' => $r['basic_information']
+            ]);
+            ProblemsetsDAO::save($problemset);
+
             // Create the actual course
             CoursesDAO::save(new Courses([
                 'name' => $r['name'],
                 'description' => $r['description'],
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
+                'problemset_id' => $problemset->problemset_id,
                 'acl_id' => $acl->acl_id,
                 'school_id' => $r['school_id'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
@@ -1230,9 +1237,6 @@ class CourseController extends Controller {
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
         $result['shouldShowResults'] = $shouldShowIntro;
-        $problemset = new Problemsets(['acl_id' => $r['course']->acl_id]);
-        $problemsetData = ProblemsetsDAO::search($problemset);
-        $result['needsBasicInformation'] = count($problemsetData) ? $problemsetData[0]->needs_basic_information : 0;
         return $result;
     }
 
@@ -1288,6 +1292,13 @@ class CourseController extends Controller {
                     $result['school_id'] = $school->school_id;
                 }
             }
+        }
+        $problemsetData = ProblemsetsDAO::search(new Problemsets([
+            'acl_id' => $r['course']->acl_id
+        ]));
+        $result['needs_basic_information'] = 0;
+        if (count($problemsetData)) {
+            $result['basic_information_required'] = $problemsetData[0]->needs_basic_information;
         }
 
         return $result;
@@ -1450,8 +1461,21 @@ class CourseController extends Controller {
 
         // Push changes
         try {
+            CoursesDAO::transBegin();
+
             CoursesDAO::save($r['course']);
+
+            // Save the problemset object with data sent by user to the database
+            $problemsetData = ProblemsetsDAO::search(new Problemsets([
+                'acl_id' => $r['course']->acl_id
+            ]));
+            $problemsetData[0]->needs_basic_information = is_null($r['basic_information'])
+              ? 0 : $r['basic_information'];
+            ProblemsetsDAO::save($problemsetData[0]);
+
+            CoursesDAO::transEnd();
         } catch (Exception $e) {
+            CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 

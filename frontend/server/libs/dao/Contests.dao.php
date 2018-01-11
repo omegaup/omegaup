@@ -654,6 +654,29 @@ class ContestsDAO extends ContestsDAOBase {
         return null;
     }
 
+    public static function getNeedsBasicInformation($contest_alias) {
+        $sql = '
+                SELECT
+                    ps.needs_basic_information
+                FROM
+                    Problemsets ps
+                JOIN
+                    Contests c ON c.problemset_id = ps.problemset_id
+                WHERE
+                    c.alias = ?
+                LIMIT 1
+                ';
+
+        global $conn;
+        $params = [$contest_alias];
+
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return null;
+        }
+        return $rs['needs_basic_information'] == '1';
+    }
+
     /**
      * @param $query
      * @return Array [type, query]

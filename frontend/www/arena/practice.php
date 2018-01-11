@@ -14,7 +14,7 @@ try {
     die(file_get_contents('../404.html'));
 }
 
-if ($show_intro) {
+if ($show_intro['shouldShowResults']) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.practice.tpl');

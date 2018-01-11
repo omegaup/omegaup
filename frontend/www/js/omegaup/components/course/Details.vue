@@ -59,13 +59,29 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-12">
+          <div class="form-group col-md-8">
             <label>{{ T.profileSchool }} <input autocomplete="off"
                    class="form-control typeahead"
                    type="text"
                    v-model="school_name"
                    v-on:change="onChange"><input type="hidden"
                    v-model="school_id"></label>
+          </div>
+          <div class="form-group col-md-4">
+            <span class="faux-label">{{ T.courseNewFormBasicInformationRequired }}
+            <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormBasicInformationRequiredDesc"></span></span>
+            <div class="form-control container-fluid">
+              <label class="radio-inline"><input type="radio"
+                     v-model="basic_information_required"
+                     value="1">{{ T.wordsYes }}</label> <label class="radio-inline"><input type=
+                     "radio"
+                     v-model="basic_information_required"
+                     value="0">{{ T.wordsNo }}</label>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -113,7 +129,8 @@ export default {
       startTime: this.course.start_time || new Date(),
       name: this.course.name,
       school_id: this.course.school_id,
-      school_name: this.course.school_name
+      school_name: this.course.school_name,
+      basic_information_required: this.course.basic_information_required || 0
     };
   },
   mounted: function() {
@@ -135,7 +152,9 @@ export default {
       this.startTime = this.course.start_time || new Date();
       this.name = this.course.name;
       this.school_id = this.course.school_id;
-      this.school_name = this.course.school_name;
+      this.school_name = this.course.school_name,
+      this.basic_information_required =
+          this.course.basic_information_required || 0;
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {

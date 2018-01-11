@@ -14,13 +14,12 @@ try {
     die(file_get_contents('../404.html'));
 }
 
-if ($show_intro) {
-    $user = UserController::apiProfile(new Request());
-    $needs_basic_info = ContestController::needsBasicInformation($r);
+if ($show_intro['shouldShowResults']) {
+    $user = SessionController::getCurrentSession($r)['user'];
     $smarty->assign(
         'needsBasicInformation',
-        $needs_basic_info && (
-            !$user['userinfo']['country_id'] || !$user['userinfo']['state_id'] || !$user['userinfo']['school_id']
+        $show_intro['needsBasicInformation'] && (
+            !$user['country_id'] || !$user['state_id'] || !$user['school_id']
         )
     );
     $smarty->display('../../templates/arena.contest.intro.tpl');

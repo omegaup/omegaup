@@ -159,6 +159,7 @@ CREATE TABLE `Countries` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Courses` (
   `course_id` int(11) NOT NULL AUTO_INCREMENT,
+  `problemset_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
@@ -173,8 +174,10 @@ CREATE TABLE `Courses` (
   KEY `fk_ca_acl_id` (`acl_id`),
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
+  KEY `fk_cup_problemset_id` (`problemset_id`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_cup_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
 /*!40101 SET character_set_client = @saved_cs_client */;

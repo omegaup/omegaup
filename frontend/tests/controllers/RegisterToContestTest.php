@@ -40,7 +40,7 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowResults'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
@@ -53,7 +53,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowResults'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
@@ -66,7 +66,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowResults'];
         $this->assertEquals($show_intro, !ContestController::SHOW_INTRO);
     }
 

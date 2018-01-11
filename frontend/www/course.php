@@ -21,14 +21,14 @@ try {
 }
 
 if ($intro_details['shouldShowResults']) {
-    $user = UserController::apiProfile(new Request());
+    $user = SessionController::getCurrentSession($r)['user'];
     $smarty->assign('course_payload', [
         'name' => $intro_details['name'],
         'description' => $intro_details['description'],
         'alias' => $intro_details['alias'],
         'currentUsername' => $session['user']->username,
-        'needsBasicInformation' => $intro_details['needsBasicInformation'] && (
-            !$user['userinfo']['country_id'] || !$user['userinfo']['state_id'] || !$user['userinfo']['school_id']
+        'needsBasicInformation' => $intro_details['basic_information_required'] && (
+            !$user['country_id'] || !$user['state_id'] || !$user['school_id']
         )
     ]);
     $smarty->display('../templates/arena.course.intro.tpl');

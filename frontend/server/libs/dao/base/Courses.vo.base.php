@@ -29,6 +29,9 @@ class Courses extends VO {
         if (isset($data['course_id'])) {
             $this->course_id = $data['course_id'];
         }
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
+        }
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
@@ -77,6 +80,13 @@ class Courses extends VO {
       * @var int(11)
       */
     public $course_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $problemset_id;
 
     /**
       *  [Campo no documentado]

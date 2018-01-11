@@ -340,6 +340,7 @@ class ContestController extends Controller {
         if (is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
+        $needs_basic_information = ContestsDAO::getNeedsBasicInformation($r['contest_alias']);
 
         try {
             // Half-authenticate, in case there is no session in place.
@@ -349,7 +350,11 @@ class ContestController extends Controller {
                 $r['current_user_id'] = $session['user']->user_id;
             } else {
                 // No session, show the intro (if public), so that they can login.
-                return $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+                return [
+                    'shouldShowResults' =>
+                        $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO,
+                    'needsBasicInformation' => $needs_basic_information
+                ];
             }
             self::canAccessContest($r);
         } catch (Exception $e) {
@@ -359,7 +364,10 @@ class ContestController extends Controller {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
-            return ContestController::SHOW_INTRO;
+            return [
+                'shouldShowResults' => ContestController::SHOW_INTRO,
+                'needsBasicInformation' => $needs_basic_information
+            ];
         }
 
         $cs = SessionController::apiCurrentSession()['session'];
@@ -371,24 +379,16 @@ class ContestController extends Controller {
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
-            return !ContestController::SHOW_INTRO;
+            return [
+                'shouldShowResults' => !ContestController::SHOW_INTRO,
+                'needsBasicInformation' => $needs_basic_information
+            ];
         }
 
-        return ContestController::SHOW_INTRO;
-    }
-
-    /**
-     * Get the basic information value of Problemsets
-     */
-    public static function needsBasicInformation(Request $r) {
-        try {
-            $contest = ContestsDAO::getByAlias($r['contest_alias']);
-            $problemset = new Problemsets(['acl_id' => $contest->acl_id]);
-            $problemsetData = ProblemsetsDAO::search($problemset);
-        } catch (Exception $e) {
-            throw new NotFoundException('contestNotFound');
-        }
-        return (int)$problemsetData[0]->needs_basic_information;
+        return [
+            'shouldShowResults' => ContestController::SHOW_INTRO,
+            'needsBasicInformation' => $needs_basic_information
+        ];
     }
 
     /**
@@ -615,9 +615,7 @@ class ContestController extends Controller {
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
             $result['languages'] = explode(',', $result['languages']);
-            $result['needs_basic_information'] = self::needsBasicInformation(new Request([
-                'contest_alias' => $r['contest']->alias
-            ]));
+            $result['needs_basic_information'] = ContestsDAO::getNeedsBasicInformation($r['contest']->alias);
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -862,6 +860,7 @@ class ContestController extends Controller {
             ACLsDAO::save($acl);
             $contest->acl_id = $acl->acl_id;
 
+            // Save the problemset object with data sent by user to the database
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
                 'needs_basic_information' => $r['basic_information']
@@ -2134,7 +2133,9 @@ class ContestController extends Controller {
             ContestsDAO::save($r['contest']);
 
             // Save the problemset object with data sent by user to the database
-            $problemsetData = ProblemsetsDAO::search(new Problemsets(['acl_id' => $r['contest']->acl_id]));
+            $problemsetData = ProblemsetsDAO::search(new Problemsets([
+                'acl_id' => $r['contest']->acl_id
+            ]));
             $problemsetData[0]->needs_basic_information = is_null($r['basic_information'])
               ? 0 : $r['basic_information'];
             ProblemsetsDAO::save($problemsetData[0]);
