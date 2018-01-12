@@ -64,7 +64,7 @@
       </table>
     </div>
     <div class="panel-footer">
-      <form>
+      <form class="new">
         <div class="row">
           <div class="form-group col-md-12">
             <div class="pull-right">
