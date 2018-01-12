@@ -723,4 +723,27 @@ class RunsDAO extends RunsDAOBase {
         }
         return $ar;
     }
+
+    /**
+     * Recalculate the contest_score of all problemset and problem Runs
+     */
+    public static function recalculateScore($problemset_id, $problem_id, $current_points, $original_points) {
+        $sql = 'UPDATE
+                  `Runs`
+                SET
+                  `contest_score` = `score` * ?
+                WHERE
+                  `problemset_id` = ?
+                  AND `problem_id` = ?;';
+
+        $params = [
+            $current_points,
+            $problemset_id,
+            $problem_id
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }
