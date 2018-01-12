@@ -74,7 +74,8 @@ UserController::$sendEmailOnVerify = true;
 // Globally disable run wait gap.
 RunController::$defaultSubmissionGap = 0;
 
-QualityNominationFactory::InitQualityReviewers();
+QualityNominationFactory::initQualityReviewers();
+QualityNominationFactory::initTags();
 
 // Mock time
 $current_time = time();
