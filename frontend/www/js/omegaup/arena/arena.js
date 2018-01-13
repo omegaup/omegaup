@@ -481,6 +481,9 @@ export class Arena {
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
+      if (typeof(problem.runs) === 'undefined') {
+        problem.runs = [];
+      }
       self.problems[alias] = problem;
     }
     self.elements.rankingTable.problems = problems;
@@ -1246,18 +1249,17 @@ export class Arena {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
-    if (typeof(self.problems[self.currentProblem.alias]) !== 'undefined' &&
-        typeof(self.problems[self.currentProblem.alias]
-                   .nextSubmissionTimestamp) !== 'undefined') {
-      nextSubmissionTimestamp = new Date(
-          self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
-          1000);
-    } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
-      nextSubmissionTimestamp = new Date(
-          self.problems[self.currentProblem.alias]
-              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
-              .time.getTime() +
-          self.currentContest.submissions_gap * 1000);
+    let problem = self.problems[self.currentProblem.alias];
+    if (typeof(problem) !== 'undefined') {
+      if (typeof(problem.nextSubmissionTimestamp) !== 'undefined') {
+        nextSubmissionTimestamp =
+            new Date(problem.nextSubmissionTimestamp * 1000);
+      } else if (typeof(problem.runs) !== 'undefined' &&
+                 problem.runs.length > 0) {
+        nextSubmissionTimestamp =
+            new Date(problem.runs[problem.runs.length - 1].time.getTime() +
+                     self.currentContest.submissions_gap * 1000);
+      }
     }
     if (self.submissionGapInterval) {
       clearInterval(self.submissionGapInterval);
