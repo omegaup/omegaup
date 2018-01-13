@@ -3360,6 +3360,10 @@ sort-keys@^1.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
+sortablejs@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.7.0.tgz#80a2b2370abd568e1cec8c271131ef30a904fa28"
+
 source-list-map@^0.1.4, source-list-map@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-0.1.8.tgz#c550b2ab5427f6b3f21f5afead88c4f5587b2106"
@@ -3710,9 +3714,9 @@ vue-async-computed@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/vue-async-computed/-/vue-async-computed-3.0.0.tgz#c7b436b1281d1f12ae6482864005dcba546b05c3"
 
-vue-codemirror-lite@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/vue-codemirror-lite/-/vue-codemirror-lite-1.0.2.tgz#ee6c679689b723b3af380342846fc4fdce6b7fb6"
+vue-codemirror-lite@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/vue-codemirror-lite/-/vue-codemirror-lite-1.0.3.tgz#41313265fe92e62646aab22f3c991dd6f84f4807"
   dependencies:
     codemirror "^5.22.0"
 
