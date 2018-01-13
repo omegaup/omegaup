@@ -1,5 +1,5 @@
 $('#forgot-password-form')
-    .submit(function(ev) {
+    .on('submit', function(ev) {
       ev.preventDefault();
       $('#submit').prop('disabled', true);
       omegaup.UI.dismissNotifications();
@@ -12,7 +12,7 @@ $('#forgot-password-form')
     });
 
 $('#reset-password-form')
-    .submit(function(ev) {
+    .on('submit', function(ev) {
       ev.preventDefault();
       $('#submit').prop('disabled', true);
       omegaup.UI.dismissNotifications();

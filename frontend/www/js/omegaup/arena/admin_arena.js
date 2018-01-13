@@ -23,7 +23,7 @@ export default class ArenaAdmin {
     self.arena.runs.filter_offset.subscribe(self.refreshRuns.bind(self));
 
     $('.clarifpager .clarifpagerprev')
-        .click(function() {
+        .on('click', function() {
           if (self.arena.clarificationsOffset > 0) {
             self.arena.clarificationsOffset -=
                 self.arena.clarificationsRowcount;
@@ -36,7 +36,7 @@ export default class ArenaAdmin {
         });
 
     $('.clarifpager .clarifpagernext')
-        .click(function() {
+        .on('click', function() {
           self.arena.clarificationsOffset += self.arena.clarificationsRowcount;
           if (self.arena.clarificationsOffset < 0) {
             self.arena.clarificationsOffset = 0;

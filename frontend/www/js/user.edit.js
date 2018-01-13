@@ -12,7 +12,7 @@ omegaup.OmegaUp.on('ready', function() {
   });
 
   $('#country_id')
-      .change(function() {
+      .on('change', function() {
         // Clear select
         $('#state_id option').remove();
         $('#state_id').val('');
@@ -63,7 +63,7 @@ omegaup.OmegaUp.on('ready', function() {
       .fail(omegaup.UI.apiError);
 
   $('form#user_profile_form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         var birth_date = new Date($('#birth_date').val());
         birth_date.setHours(23);
@@ -109,7 +109,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('form#change-password-form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         var newPassword = $('#new-password-1').val();
         var newPassword2 = $('#new-password-2').val();

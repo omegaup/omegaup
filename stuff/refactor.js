@@ -54,8 +54,54 @@ const promiseVisitor = {
     }
   },
 };
-
 traverse(ast, promiseVisitor);
+
+// From https://github.com/jquery/jquery/blob/305f193aa57014dc7d8fa0739a3fefd47166cd44/src/event/alias.js
+const jQueryDeprecatedFunctions = [
+  'blur',      'focus',      'focusin',  'focusout',   'resize',
+  'scroll',    'click',      'dblclick', 'mousedown',  'mouseup',
+  'mousemove', 'mouseover',  'mouseout', 'mouseenter', 'mouseleave',
+  'change',    'select',     'submit',   'keydown',    'keypress',
+  'keyup',     'contextmenu'
+];
+const jQueryVisitor = {
+  CallExpression(path) {
+    let callee = path.node.callee;
+    if (callee.type != 'MemberExpression') {
+      return;
+    }
+    const identifier = callee.property;
+    if (jQueryDeprecatedFunctions.indexOf(identifier.name) == -1) {
+      return;
+    }
+    if (path.node.arguments.length == 0) {
+      // This is a trigger.
+      fixes.push({
+        start: identifier.start,
+        end: path.node.end,
+        contents: 'trigger(\'' + identifier.name + '\')',
+      });
+      return;
+    }
+    // This is an event handler.
+    while (callee.object && callee.object.type == 'CallExpression') {
+      callee = callee.object.callee;
+      if (callee.type != 'Identifier') {
+        continue;
+      }
+      if (callee.name != '$' && callee.name != 'jQuery') {
+        continue;
+      }
+      fixes.push({
+        start: identifier.start,
+        end: identifier.end + 1,
+        contents: 'on(\'' + identifier.name + '\', ',
+      });
+      return;
+    }
+  },
+};
+traverse(ast, jQueryVisitor);
 
 fixes.sort(function(a, b) { return a.start - b.start; });
 

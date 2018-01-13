@@ -25,5 +25,5 @@ $('document')
         return false;  // Prevent page refresh on submit
       };
 
-      $('form#user_profile_form').submit(formSubmit);
+      $('form#user_profile_form').on('submit', formSubmit);
     });

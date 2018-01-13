@@ -28,7 +28,7 @@ export default {
           defaultDate: self.value,
           language: T.locale,
         })
-        .change(function(e) {
+        .on('change', function(e) {
           self.$emit('input', $(self.$el).data('datetimepicker').getDate());
         });
     $(this.$el).data('datetimepicker').setDate(this.value);
