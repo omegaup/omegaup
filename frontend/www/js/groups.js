@@ -8,7 +8,7 @@ var formAlias = formData.attr('data-alias');
 $(function() {
   if (formPage === 'new') {
     $('.new_group_form')
-        .submit(function() {
+        .on('submit', function() {
           omegaup.API.Group.create({
                              alias: $('.new_group_form #alias').val(),
                              name: $('.new_group_form #title').val(),
@@ -45,7 +45,7 @@ $(function() {
     omegaup.UI.userTypeahead($('#member-username'));
 
     $('#add-member-form')
-        .submit(function() {
+        .on('submit', function() {
           var username = $('#member-username').val();
 
           omegaup.API.Group.addUser({
@@ -83,32 +83,32 @@ $(function() {
                           .append(
                               $('<td><button type="button" class="close">' +
                                 '&times;</button></td>')
-                                  .click((function(username) {
-                                    return function(e) {
-                                      omegaup.API.Group.removeUser({
-                                                         group_alias:
-                                                             groupAlias,
-                                                         usernameOrEmail:
-                                                             username,
-                                                       })
-                                          .then(function(response) {
-                                            omegaup.UI.success(
-                                                'Member successfully removed!');
-                                            $('div.post.footer').show();
-                                            var tr = e.target.parentElement
-                                                         .parentElement;
-                                            $(tr).remove();
-                                          })
-                                          .fail(omegaup.UI.apiError);
-                                    };
-                                  })(user.username))));
+                                  .on('click', (function(username) {
+                                        return function(e) {
+                                          omegaup.API.Group.removeUser({
+                                                             group_alias:
+                                                                 groupAlias,
+                                                             usernameOrEmail:
+                                                                 username,
+                                                           })
+                                              .then(function(response) {
+                                                omegaup.UI.success(
+                                                    'Member successfully removed!');
+                                                $('div.post.footer').show();
+                                                var tr = e.target.parentElement
+                                                             .parentElement;
+                                                $(tr).remove();
+                                              })
+                                              .fail(omegaup.UI.apiError);
+                                        };
+                                      })(user.username))));
             }
           })
           .fail(omegaup.UI.apiError);
     }
 
     $('#add-scoreboard-form')
-        .submit(function() {
+        .on('submit', function() {
           omegaup.API.Group.createScoreboard({
                              group_alias: groupAlias,
                              alias: $('#alias').val(),
