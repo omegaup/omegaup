@@ -95,14 +95,6 @@ def test_create_course(driver):
         driver.browser.find_element_by_css_selector(
             '#problems .problemlist button').click()
 
-        driver.browser.find_element_by_css_selector(
-            '.problems-dropdown.tt-hint').send_keys('triangulos')
-        driver.browser.find_element_by_css_selector(
-            '.problems-dropdown.tt-input').send_keys('triangulos')
-
-        driver.browser.find_element_by_css_selector(
-            '.omegaup-course-problemlist form button[type=submit]').click()
-
     with driver.login_user():
         driver.browser.find_element_by_xpath(
             '//a[contains(@href, "/schools/")]').click()
