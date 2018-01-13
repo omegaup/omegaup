@@ -73,9 +73,10 @@ omegaup.OmegaUp.on('ready', function() {
           },
           {
             source: omegaup.UI.typeaheadWrapper(omegaup.API.Tag.list),
-            displayKey: 'name',
+            async: true,
+            display: 'name',
           })
-      .on('typeahead:selected', function(event, val) {
+      .on('typeahead:select', function(event, val) {
         $(event.target).val(val.name);
       });
 
