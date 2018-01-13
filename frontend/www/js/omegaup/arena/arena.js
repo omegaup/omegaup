@@ -1301,6 +1301,8 @@ export class Arena {
 
   onSubmit(e) {
     let self = this;
+    e.preventDefault();
+
     if (!self.options.isOnlyProblem &&
         (self.problems[self.currentProblem.alias].last_submission +
              self.submissionGap * 1000 >
@@ -1334,14 +1336,14 @@ export class Arena {
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
         if (file.size >= 10 * 1024) {
-          alert(UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');
       } else {
         // 100kB _must_ be enough for anybody.
         if (file.size >= 100 * 1024) {
-          alert(UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '100kB'}));
           return false;
         }
         reader.readAsDataURL(file);
