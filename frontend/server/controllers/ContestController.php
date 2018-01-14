@@ -2107,13 +2107,20 @@ class ContestController extends Controller {
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
 
+        Validators::isInEnum(
+            $r['original_penalty_type'],
+            'original_penalty_type',
+            ['contest_start', 'problem_open', 'runtime', 'none'],
+            false
+        );
+
         // Push changes
         try {
             // Begin a new transaction
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($r['contest']);
+            self::updateContest($r['contest'], $r['original_penalty_type']);
 
             // If the contest is private, add the list of allowed users
             if (!is_null($r['public']) && $r['public'] != 1 && $r['hasPrivateUsers']) {
@@ -2221,40 +2228,14 @@ class ContestController extends Controller {
     }
 
     /**
-     *
+     * This function reviews changes in penalty type
      */
-    private static function updateContest(Contests $contest) {
-        $original_contest = ContestsDAO::getByPK($contest->contest_id);
+    private static function updateContest(Contests $contest, $original_penalty_type) {
         ContestsDAO::save($contest);
-        if ($original_contest->penalty_type == $contest->penalty_type) {
+        if ($original_penalty_type == $contest->penalty_type) {
             return;
         }
-
-        if ($contest->penalty_type == 'runtime') {
-            RunsDAO::recalculateRunsToRuntime($contest->problemset_id);
-        } else {
-            $runsFromContest = RunsDAO::GetAllRuns(
-                $contest->problemset_id,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            );
-            foreach ($runsFromContest as $run) {
-                $runDetails = RunsDAO::getByPK($run['run_id']);
-
-                $submit_delay = RunController::calculateSubmitDelay(
-                    $contest,
-                    $runDetails->problemset_id,
-                    $runDetails->problem_id,
-                    $runDetails->user_id
-                );
-                RunsDAO::recalculateRuns($run['run_id'], $submit_delay);
-            }
-        }
+        RunsDAO::recalculatePenalty($contest);
     }
 
     /**

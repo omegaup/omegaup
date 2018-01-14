@@ -748,41 +748,47 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /**
-     * Recalculate contest runs when penalty_type is runtime
+     * Recalculate contest runs with the following rules:
+     *
+     * + If penalty_type is runtime then:
+     *   - penalty = runtime.
+     * + If penalty_type is anything else then:
+     *   - penalty = submit_delay
      */
-    public static function recalculateRunsToRuntime($problemset_id) {
-        $sql = 'UPDATE
-                  `Runs`
-                SET
-                  `penalty` = `runtime`
-                WHERE
-                  `problemset_id` = ?;';
-
-        $params = [
-            $problemset_id
-        ];
-
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
-    }
-
-    /**
-     * Recalculate contest runs when penalty_type is not runtime
-     */
-    public static function recalculateRuns($run_id, $submit_delay) {
-        $sql = 'UPDATE
-                  `Runs`
-                SET
-                  `penalty` = ?
-                WHERE
-                  `run_id` = ?;';
-
-        $params = [
-            $submit_delay,
-            $run_id
-        ];
-
+    public static function recalculatePenalty(Contests $contest) {
+        if (!is_null($contest)) {
+            $penalty_type = $contest->penalty_type;
+            switch ($penalty_type) {
+                case 'none':
+                case 'runtime':
+                    $penalty_value = $penalty_type == 'none' ? '0' : '`runtime`';
+                    $sql = 'UPDATE
+                                `Runs`
+                            SET
+                                `penalty` = ' . $penalty_value . '
+                            WHERE
+                                `problemset_id` = ?;';
+                    break;
+                case 'problem_open':
+                case 'contest_start':
+                    $time_compare = $penalty_type == 'contest_start' ? 'c.start_time' : 'ppo.open_time';
+                    $sql = 'UPDATE
+                                `Runs` r
+                            INNER JOIN
+                                `Problemset_Problem_Opened` ppo
+                                ON (ppo.problemset_id = r.problemset_id
+                                    AND r.user_id = ppo.user_id
+                                    AND r.problem_id = ppo.problem_id)
+                            INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                            SET
+                                r.penalty = CEIL(TIME_TO_SEC(TIMEDIFF(r.time, ' . $time_compare . '))/60)
+                            WHERE
+                                r.problemset_id = ?;';
+                    break;
+                default:
+            }
+        }
+        $params = [$contest->problemset_id];
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
