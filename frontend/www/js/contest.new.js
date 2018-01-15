@@ -31,9 +31,7 @@ omegaup.OmegaUp.on('ready', function() {
               languages: $('.new_contest_form #languages').val(),
               basic_information:
                   $('.new_contest_form #basic-information-required')
-                          .is(':checked') ?
-                      '1' :
-                      '0',
+                      .is(':checked'),
             })
             .then(function(data) {
               window.location.replace('/contest/' +

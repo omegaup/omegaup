@@ -15,11 +15,11 @@ try {
 }
 
 if ($show_intro['shouldShowResults']) {
-    $user = SessionController::getCurrentSession($r)['user'];
+    $session = SessionController::apiCurrentSession($r)['session'];
     $smarty->assign(
         'needsBasicInformation',
-        $show_intro['needsBasicInformation'] && (
-            !$user['country_id'] || !$user['state_id'] || !$user['school_id']
+        $show_intro['needsBasicInformation'] && !is_null($session['user']) && (
+            !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         )
     );
     $smarty->display('../../templates/arena.contest.intro.tpl');

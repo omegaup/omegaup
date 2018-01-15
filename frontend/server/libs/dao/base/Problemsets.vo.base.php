@@ -85,7 +85,7 @@ class Problemsets extends VO {
     public $languages;
 
     /**
-      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso o concurso sólo si ya llenó su información de perfil
+      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil
       * @access public
       * @var tinyint(1)
       */

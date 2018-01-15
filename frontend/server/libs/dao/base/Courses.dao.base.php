@@ -20,7 +20,7 @@ abstract class CoursesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Courses`.`course_id`, `Courses`.`problemset_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`';
+    const FIELDS = '`Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class CoursesDAOBase extends DAO {
         if (is_null($course_id)) {
             return null;
         }
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`problemset_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id` FROM Courses WHERE (course_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` FROM Courses WHERE (course_id = ?) LIMIT 1;';
         $params = [$course_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class CoursesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Courses}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`problemset_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id` from Courses';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` from Courses';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -131,10 +131,6 @@ abstract class CoursesDAOBase extends DAO {
             $clauses[] = '`course_id` = ?';
             $params[] = $Courses->course_id;
         }
-        if (!is_null($Courses->problemset_id)) {
-            $clauses[] = '`problemset_id` = ?';
-            $params[] = $Courses->problemset_id;
-        }
         if (!is_null($Courses->name)) {
             $clauses[] = '`name` = ?';
             $params[] = $Courses->name;
@@ -171,6 +167,10 @@ abstract class CoursesDAOBase extends DAO {
             $clauses[] = '`school_id` = ?';
             $params[] = $Courses->school_id;
         }
+        if (!is_null($Courses->needs_basic_information)) {
+            $clauses[] = '`needs_basic_information` = ?';
+            $params[] = $Courses->needs_basic_information;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -181,7 +181,7 @@ abstract class CoursesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`problemset_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id` FROM `Courses`';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` FROM `Courses`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -205,9 +205,8 @@ abstract class CoursesDAOBase extends DAO {
       * @param Courses [$Courses] El objeto de tipo Courses a actualizar.
       */
     final private static function update(Courses $Courses) {
-        $sql = 'UPDATE `Courses` SET `problemset_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ? WHERE `course_id` = ?;';
+        $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ? WHERE `course_id` = ?;';
         $params = [
-            $Courses->problemset_id,
             $Courses->name,
             $Courses->description,
             $Courses->alias,
@@ -217,6 +216,7 @@ abstract class CoursesDAOBase extends DAO {
             $Courses->finish_time,
             $Courses->public,
             $Courses->school_id,
+            $Courses->needs_basic_information,
             $Courses->course_id,
         ];
         global $conn;
@@ -246,10 +246,12 @@ abstract class CoursesDAOBase extends DAO {
         if (is_null($Courses->public)) {
             $Courses->public = '0';
         }
-        $sql = 'INSERT INTO Courses (`course_id`, `problemset_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        if (is_null($Courses->needs_basic_information)) {
+            $Courses->needs_basic_information = '0';
+        }
+        $sql = 'INSERT INTO Courses (`course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Courses->course_id,
-            $Courses->problemset_id,
             $Courses->name,
             $Courses->description,
             $Courses->alias,
@@ -259,6 +261,7 @@ abstract class CoursesDAOBase extends DAO {
             $Courses->finish_time,
             $Courses->public,
             $Courses->school_id,
+            $Courses->needs_basic_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -314,17 +317,6 @@ abstract class CoursesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`course_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->problemset_id;
-        $b = $CoursesB->problemset_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problemset_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -424,6 +416,17 @@ abstract class CoursesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`school_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $CoursesA->needs_basic_information;
+        $b = $CoursesB->needs_basic_information;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`needs_basic_information` >= ? AND `needs_basic_information` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`needs_basic_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

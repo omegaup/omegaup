@@ -39,7 +39,8 @@ OmegaUp.on('ready', function() {
                                                    .setHours(23, 59, 59, 999) /
                                                1000,
                               show_scoreboard: ev.showScoreboard,
-                              basic_information: ev.basic_information_required,
+                              needs_basic_information:
+                                  ev.basic_information_required,
                               school_id: school_id
                             })
                       .then(function(data) {

@@ -76,11 +76,11 @@
                   v-bind:title="T.courseNewFormBasicInformationRequiredDesc"></span></span>
             <div class="form-control container-fluid">
               <label class="radio-inline"><input type="radio"
-                     v-model="basic_information_required"
-                     value="1">{{ T.wordsYes }}</label> <label class="radio-inline"><input type=
-                     "radio"
-                     v-model="basic_information_required"
-                     value="0">{{ T.wordsNo }}</label>
+                     v-bind:value="true"
+                     v-model="basic_information_required">{{ T.wordsYes }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-bind:value="false"
+                     v-model="basic_information_required">{{ T.wordsNo }}</label>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default {
       name: this.course.name,
       school_id: this.course.school_id,
       school_name: this.course.school_name,
-      basic_information_required: this.course.basic_information_required || 0
+      basic_information_required: !!this.course.basic_information_required
     };
   },
   mounted: function() {
@@ -154,7 +154,7 @@ export default {
       this.school_id = this.course.school_id;
       this.school_name = this.course.school_name,
       this.basic_information_required =
-          this.course.basic_information_required || 0;
+          !!this.course.basic_information_required;
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
