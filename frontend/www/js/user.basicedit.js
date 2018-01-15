@@ -3,7 +3,7 @@ $('document')
       omegaup.API.User.profile()
           .then(function(data) {
             $('#username').val(data.userinfo.username);
-            $('#name').val(data.userinfo.name);
+            $('#pass-name').val(data.userinfo.name);
           })
           .fail(omegaup.UI.apiError);
 
@@ -17,13 +17,13 @@ $('document')
 
         omegaup.API.User.updateBasicInfo({
                           username: $('#username').val(),
-                          name: $('#name').val(),
+                          name: $('#pass-name').val(),
                           password: $('#new-password-1').val(),
                         })
-            .then(function(response) { window.location = '/profile/'; })
+            .then(function(response) { window.location = '/profile/edit/'; })
             .fail(omegaup.UI.apiError);
         return false;  // Prevent page refresh on submit
       };
 
-      $('form#user_profile_form').submit(formSubmit);
+      $('form#add-password-form').submit(formSubmit);
     });

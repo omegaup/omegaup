@@ -130,7 +130,7 @@
 			</div>
 
 		</div>
-
+		{if !$IS_SOCIAL_LOGIN}
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2 class="panel-title">{#userEditChangePassword#}</h2>
@@ -164,6 +164,9 @@
 				</form>
 			</div>
 		</div>
+		{else}
+		    {include file='user.basicedit.tpl'}
+		{/if}
 	</div>
 
 	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}"></script>

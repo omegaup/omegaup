@@ -670,6 +670,7 @@ omegaup.OmegaUp.loadTranslations({
 	unverifiedUser: "Usu\u00e1rio n\u00e3o confirmado.",
 	updateItemsError: "Ocorreu um erro ao atualizar itens",
 	updateItemsSuccess: "Todos os itens selecionados foram atualizados",
+	userEditAddPassword: "Adicionar senha",
 	userEditBachelors: "Grau",
 	userEditBirthDate: "Data de nascimento",
 	userEditChangePassword: "Alterar senha",
