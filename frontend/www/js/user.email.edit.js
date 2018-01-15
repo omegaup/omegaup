@@ -1,7 +1,7 @@
 $('document')
     .ready(function() {
       $('form#user_edit_email_form')
-          .submit(function() {
+          .on('submit', function() {
             $('#wait').show();
 
             omegaup.API.User.updateMainEmail({email: $('#email').val()})
