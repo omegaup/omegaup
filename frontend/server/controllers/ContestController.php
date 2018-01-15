@@ -2107,12 +2107,7 @@ class ContestController extends Controller {
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
 
-        Validators::isInEnum(
-            $r['original_penalty_type'],
-            'original_penalty_type',
-            ['contest_start', 'problem_open', 'runtime', 'none'],
-            false
-        );
+        $original_contest = ContestsDAO::getByPK($r['contest']->contest_id);
 
         // Push changes
         try {
@@ -2120,7 +2115,7 @@ class ContestController extends Controller {
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($r['contest'], $r['original_penalty_type']);
+            self::updateContest($r['contest'], $original_contest->penalty_type);
 
             // If the contest is private, add the list of allowed users
             if (!is_null($r['public']) && $r['public'] != 1 && $r['hasPrivateUsers']) {
@@ -2235,7 +2230,9 @@ class ContestController extends Controller {
         if ($original_penalty_type == $contest->penalty_type) {
             return;
         }
-        RunsDAO::recalculatePenalty($contest);
+        if (!is_null($contest)) {
+            RunsDAO::recalculatePenaltyForContest($contest);
+        }
     }
 
     /**

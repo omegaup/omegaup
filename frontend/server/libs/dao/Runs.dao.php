@@ -750,43 +750,57 @@ class RunsDAO extends RunsDAOBase {
     /**
      * Recalculate contest runs with the following rules:
      *
+     * + If penalty_type is none then:
+     *   - penalty = 0.
      * + If penalty_type is runtime then:
      *   - penalty = runtime.
      * + If penalty_type is anything else then:
      *   - penalty = submit_delay
      */
-    public static function recalculatePenalty(Contests $contest) {
-        if (!is_null($contest)) {
-            $penalty_type = $contest->penalty_type;
-            switch ($penalty_type) {
-                case 'none':
-                case 'runtime':
-                    $penalty_value = $penalty_type == 'none' ? '0' : '`runtime`';
-                    $sql = 'UPDATE
-                                `Runs`
-                            SET
-                                `penalty` = ' . $penalty_value . '
-                            WHERE
-                                `problemset_id` = ?;';
-                    break;
-                case 'problem_open':
-                case 'contest_start':
-                    $time_compare = $penalty_type == 'contest_start' ? 'c.start_time' : 'ppo.open_time';
-                    $sql = 'UPDATE
-                                `Runs` r
-                            INNER JOIN
-                                `Problemset_Problem_Opened` ppo
-                                ON (ppo.problemset_id = r.problemset_id
-                                    AND r.user_id = ppo.user_id
-                                    AND r.problem_id = ppo.problem_id)
-                            INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
-                            SET
-                                r.penalty = CEIL(TIME_TO_SEC(TIMEDIFF(r.time, ' . $time_compare . '))/60)
-                            WHERE
-                                r.problemset_id = ?;';
-                    break;
-                default:
-            }
+    public static function recalculatePenaltyForContest(Contests $contest) {
+        $penalty_type = $contest->penalty_type;
+        if ($penalty_type == 'none') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = 0
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'runtime') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = `runtime`
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'contest_start') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } elseif ($penalty_type == 'problem_open') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } else {
+            return 0;
         }
         $params = [$contest->problemset_id];
         global $conn;

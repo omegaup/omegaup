@@ -13,11 +13,9 @@ omegaup.OmegaUp.on('ready', function() {
 
   var contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
-  var original_penalty_type = 'none';
 
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
-        original_penalty_type = contest.penalty_type;
         $('.page-header h1 span')
             .html(omegaup.T.contestEdit + ' ' + contest.title);
         $('.page-header h1 small')
@@ -127,11 +125,9 @@ omegaup.OmegaUp.on('ready', function() {
               $('.new_contest_form #show-scoreboard-after').val(),
           languages: $('.new_contest_form #languages').val(),
           contestant_must_register: $('.new_contest_form #register').val(),
-          original_penalty_type: original_penalty_type,
         })
         .then(function(data) {
           if (data.status == 'ok') {
-            original_penalty_type = $('.new_contest_form #penalty-type').val();
             omegaup.UI.success(omegaup.T.contestEditContestEdited +
                                ' <a href="/arena/' +
                                $('.new_contest_form #alias').val() + '">' +
