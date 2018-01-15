@@ -1059,9 +1059,7 @@ export class Arena {
         $('#problem .overall_wall_time_limit')
             .html(problem.overall_wall_time_limit / 1000 + 's');
         $('#problem .statement').html(problem.problem_statement);
-        if (!self.myRuns.attached) {
-          self.myRuns.attach($('#problem .runs'));
-        }
+        self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         let language_array = problem.languages.split(',');
         if (karel_langs.every(function(x) {
@@ -1746,6 +1744,8 @@ class RunView {
   attach(elm) {
     let self = this;
 
+    if (self.attached) return;
+
     $('.runspager .runspagerprev', elm)
         .on('click', function() {
           if (self.filter_offset() < self.row_count) {
@@ -1799,7 +1799,7 @@ class RunView {
           self.filter_problem('');
         });
 
-    ko.applyBindings(self, elm[0]);
+    if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
   }
 

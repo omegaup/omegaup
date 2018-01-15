@@ -8,9 +8,7 @@ omegaup.OmegaUp.on('ready', function() {
   function onlyProblemLoaded(problem) {
     arena.currentProblem = problem;
     arena.myRuns.filter_problem(problem.alias);
-    if (!arena.myRuns.attached) {
-      arena.myRuns.attach($('#problem .runs'));
-    }
+    arena.myRuns.attach($('#problem .runs'));
 
     arena.mountEditor(problem);
     MathJax.Hub.Queue(
