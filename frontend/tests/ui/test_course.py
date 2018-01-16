@@ -28,7 +28,7 @@ def test_create_course(driver):
 
         add_problem_to_assignment(driver, assignment_alias, problem)
 
-    with driver.login('contestant', 'contestant'):
+    with driver.login('user', 'user'):
         enter_to_course(driver, course_alias, assignment_alias)
 
 
