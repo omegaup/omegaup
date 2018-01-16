@@ -813,7 +813,7 @@ export class Arena {
           let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
           let cannedResponse = $('#create-response-canned', answerNode);
-          cannedResponse.change(function() {
+          cannedResponse.on('change', function() {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
             } else {
@@ -824,7 +824,7 @@ export class Arena {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
           }
-          responseFormNode.submit(function() {
+          responseFormNode.on('submit', function() {
             let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
@@ -1059,9 +1059,7 @@ export class Arena {
         $('#problem .overall_wall_time_limit')
             .html(problem.overall_wall_time_limit / 1000 + 's');
         $('#problem .statement').html(problem.problem_statement);
-        if (!self.myRuns.attached) {
-          self.myRuns.attach($('#problem .runs'));
-        }
+        self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         let language_array = problem.languages.split(',');
         if (karel_langs.every(function(x) {
@@ -1218,8 +1216,9 @@ export class Arena {
   bindGlobalHandlers() {
     let self = this;
     $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
-    self.elements.submitForm.language.change(self.onLanguageSelect.bind(self));
-    self.elements.submitForm.submit(self.onSubmit.bind(self));
+    self.elements.submitForm.language.on('change',
+                                         self.onLanguageSelect.bind(self));
+    self.elements.submitForm.on('submit', self.onSubmit.bind(self));
   }
 
   onCloseSubmit(e) {
@@ -1745,6 +1744,8 @@ class RunView {
   attach(elm) {
     let self = this;
 
+    if (self.attached) return;
+
     $('.runspager .runspagerprev', elm)
         .on('click', function() {
           if (self.filter_offset() < self.row_count) {
@@ -1799,7 +1800,7 @@ class RunView {
           self.filter_problem('');
         });
 
-    ko.applyBindings(self, elm[0]);
+    if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
   }
 
