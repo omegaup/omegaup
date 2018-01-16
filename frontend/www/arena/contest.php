@@ -14,7 +14,7 @@ try {
     die(file_get_contents('../404.html'));
 }
 
-if ($show_intro['shouldShowResults']) {
+if ($show_intro['shouldShowIntro']) {
     $session = SessionController::apiCurrentSession($r)['session'];
     $smarty->assign(
         'needsBasicInformation',

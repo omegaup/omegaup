@@ -275,18 +275,12 @@ class CourseController extends Controller {
                 'role_id' => Authorization::CONTESTANT_ROLE,
             ]));
 
-            $problemset = new Problemsets([
-                'acl_id' => $acl->acl_id
-            ]);
-            ProblemsetsDAO::save($problemset);
-
             // Create the actual course
             CoursesDAO::save(new Courses([
                 'name' => $r['name'],
                 'description' => $r['description'],
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
-                'problemset_id' => $problemset->problemset_id,
                 'acl_id' => $acl->acl_id,
                 'school_id' => $r['school_id'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
@@ -1449,7 +1443,7 @@ class CourseController extends Controller {
             'school_id',
             'show_scoreboard',
             'needs_basic_information' => ['transform' => function ($value) {
-                return $value == 'true' ? '1' : '0';
+                return $value == 'true' ? 1 : 0;
             }],
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
@@ -1459,13 +1453,8 @@ class CourseController extends Controller {
 
         // Push changes
         try {
-            CoursesDAO::transBegin();
-
             CoursesDAO::save($r['course']);
-
-            CoursesDAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 

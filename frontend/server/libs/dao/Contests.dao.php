@@ -141,7 +141,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (count($rs) == 0) {
             return null;
         }
 
@@ -654,25 +654,23 @@ class ContestsDAO extends ContestsDAOBase {
         return null;
     }
 
-    public static function getNeedsBasicInformation($contest_alias) {
+    public static function getNeedsBasicInformation($problemset_id) {
         $sql = '
                 SELECT
-                    ps.needs_basic_information
+                    needs_basic_information
                 FROM
-                    Problemsets ps
-                JOIN
-                    Contests c ON c.problemset_id = ps.problemset_id
+                    Problemsets
                 WHERE
-                    c.alias = ?
+                    problemset_id = ?
                 LIMIT 1
                 ';
 
         global $conn;
-        $params = [$contest_alias];
+        $params = [$problemset_id];
 
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
-            return null;
+        if (count($rs) == 0) {
+            throw new InvalidDatabaseOperationException();
         }
         return $rs['needs_basic_information'] == '1';
     }

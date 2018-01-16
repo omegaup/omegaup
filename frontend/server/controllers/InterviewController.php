@@ -262,6 +262,6 @@ class InterviewController extends Controller {
     }
 
     public static function showIntro(Request $r) {
-        return ContestController::showContestIntro($r)['shouldShowResults'];
+        return ContestController::showContestIntro($r)['shouldShowIntro'];
     }
 }
