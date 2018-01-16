@@ -2230,9 +2230,7 @@ class ContestController extends Controller {
         if ($original_penalty_type == $contest->penalty_type) {
             return;
         }
-        if (!is_null($contest)) {
-            RunsDAO::recalculatePenaltyForContest($contest);
-        }
+        RunsDAO::recalculatePenaltyForContest($contest);
     }
 
     /**
