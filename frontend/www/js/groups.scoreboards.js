@@ -21,7 +21,7 @@ $(function() {
         .fail(omegaup.UI.apiError);
 
     $('#scoreboard-add-contest-form')
-        .submit(function() {
+        .on('submit', function() {
           omegaup.API.GroupScoreboard.addContest({
                                        group_alias: groupAlias,
                                        scoreboard_alias: scoreboardAlias,
@@ -65,9 +65,10 @@ $(function() {
                                                   omegaup.T.wordsYes :
                                                   omegaup.T.wordsNo))
                           .append($('<td></td>').append(contest.weight))
-                          .append($('<td><button type="button" class="close">' +
-                                    '&times;</button></td>')
-                                      .click((function(contestAlias) {
+                          .append(
+                              $('<td><button type="button" class="close">' +
+                                '&times;</button></td>')
+                                  .on('click', (function(contestAlias) {
                                         return function(e) {
                                           omegaup.API.GroupScoreboard
                                               .removeContest({

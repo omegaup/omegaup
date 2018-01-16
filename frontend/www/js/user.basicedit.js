@@ -22,5 +22,5 @@ $('document')
         return false;  // Prevent page refresh on submit
       };
 
-      $('form#add-password-form').submit(formSubmit);
+      $('form#user_profile_form').on('submit', formSubmit);
     });

@@ -295,7 +295,7 @@ export class Arena {
   installLibinteractiveHooks() {
     let self = this;
     $('#libinteractive-download')
-        .submit(function(e) {
+        .on('submit', function(e) {
           let form = $(e.target);
           let alias = e.target.attributes['data-alias'].value;
           let os = form.find('.download-os').val();
@@ -310,7 +310,7 @@ export class Arena {
         });
 
     $('#libinteractive-download .download-lang')
-        .change(function(e) {
+        .on('change', function(e) {
           let form = $('#libinteractive-download');
           form.find('.libinteractive-extension')
               .html(form.find('.download-lang').val());
@@ -813,7 +813,7 @@ export class Arena {
           let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
           let cannedResponse = $('#create-response-canned', answerNode);
-          cannedResponse.change(function() {
+          cannedResponse.on('change', function() {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
             } else {
@@ -824,7 +824,7 @@ export class Arena {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
           }
-          responseFormNode.submit(function() {
+          responseFormNode.on('submit', function() {
             let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
@@ -941,7 +941,7 @@ export class Arena {
           let option = $(this);
           if (option.css('display') != 'none') {
             option.prop('selected', true);
-            langElement.change();
+            langElement.trigger('change');
             return false;
           }
         });
@@ -1059,9 +1059,7 @@ export class Arena {
         $('#problem .overall_wall_time_limit')
             .html(problem.overall_wall_time_limit / 1000 + 's');
         $('#problem .statement').html(problem.problem_statement);
-        if (!self.myRuns.attached) {
-          self.myRuns.attach($('#problem .runs'));
-        }
+        self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         let language_array = problem.languages.split(',');
         if (karel_langs.every(function(x) {
@@ -1217,9 +1215,10 @@ export class Arena {
 
   bindGlobalHandlers() {
     let self = this;
-    $('#overlay, .close').click(self.onCloseSubmit.bind(self));
-    self.elements.submitForm.language.change(self.onLanguageSelect.bind(self));
-    self.elements.submitForm.submit(self.onSubmit.bind(self));
+    $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
+    self.elements.submitForm.language.on('change',
+                                         self.onLanguageSelect.bind(self));
+    self.elements.submitForm.on('submit', self.onSubmit.bind(self));
   }
 
   onCloseSubmit(e) {
@@ -1576,25 +1575,25 @@ export class Arena {
                                 .append(
                                     $('<span class="collapse glyphicon ' +
                                       'glyphicon-collapse-down"></span>')
-                                        .click((function(cases) {
-                                          return function(ev) {
-                                            let target = $(ev.target);
-                                            if (target.hasClass(
-                                                    'glyphicon-collapse-down')) {
-                                              target.removeClass(
-                                                  'glyphicon-collapse-down');
-                                              target.addClass(
-                                                  'glyphicon-collapse-up');
-                                            } else {
-                                              target.addClass(
-                                                  'glyphicon-collapse-down');
-                                              target.removeClass(
-                                                  'glyphicon-collapse-up');
-                                            }
-                                            cases.toggle();
-                                            return false;
-                                          };
-                                        })(cases))))));
+                                        .on('click', (function(cases) {
+                                              return function(ev) {
+                                                let target = $(ev.target);
+                                                if (target.hasClass(
+                                                        'glyphicon-collapse-down')) {
+                                                  target.removeClass(
+                                                      'glyphicon-collapse-down');
+                                                  target.addClass(
+                                                      'glyphicon-collapse-up');
+                                                } else {
+                                                  target.addClass(
+                                                      'glyphicon-collapse-down');
+                                                  target.removeClass(
+                                                      'glyphicon-collapse-up');
+                                                }
+                                                cases.toggle();
+                                                return false;
+                                              };
+                                            })(cases))))));
         for (let j = 0; j < g.cases.length; j++) {
           let c = g.cases[j];
           let caseRow =
@@ -1624,12 +1623,12 @@ export class Arena {
                     .append(
                         $('<span class="collapse glyphicon glyphicon-list-alt">' +
                           '</span>')
-                            .click((function(metaRow) {
-                              return function(ev) {
-                                metaRow.toggle();
-                                return false;
-                              };
-                            })(metaRow))));
+                            .on('click', (function(metaRow) {
+                                  return function(ev) {
+                                    metaRow.toggle();
+                                    return false;
+                                  };
+                                })(metaRow))));
             cases.append(metaRow);
           }
         }
@@ -1745,8 +1744,10 @@ class RunView {
   attach(elm) {
     let self = this;
 
+    if (self.attached) return;
+
     $('.runspager .runspagerprev', elm)
-        .click(function() {
+        .on('click', function() {
           if (self.filter_offset() < self.row_count) {
             self.filter_offset(0);
           } else {
@@ -1755,7 +1756,7 @@ class RunView {
         });
 
     $('.runspager .runspagernext', elm)
-        .click(function() {
+        .on('click', function() {
           self.filter_offset(self.filter_offset() + self.row_count);
         });
 
@@ -1764,7 +1765,7 @@ class RunView {
     });
 
     $('.runsusername-clear', elm)
-        .click(function() {
+        .on('click', function() {
           $('.runsusername', elm).val('');
           self.filter_username('');
         });
@@ -1793,12 +1794,12 @@ class RunView {
             function(elm, item) { self.filter_problem(item.alias); });
 
     $('.runsproblem-clear', elm)
-        .click(function() {
+        .on('click', function() {
           $('.runsproblem', elm).val('');
           self.filter_problem('');
         });
 
-    ko.applyBindings(self, elm[0]);
+    if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
   }
 
