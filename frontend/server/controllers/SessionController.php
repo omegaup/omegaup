@@ -438,16 +438,21 @@ class SessionController extends Controller {
             return ['status' => 'error'];
         }
 
-        $li = self::getLinkedInInstance();
-        $auth_token = $li->getAuthToken($_GET['code'], $_GET['state']);
-        $profile = $li->getProfileInfo($auth_token);
-        $li->maybeResetRedirect($_GET['state']);
+        try {
+            $li = self::getLinkedInInstance();
+            $auth_token = $li->getAuthToken($_GET['code'], $_GET['state']);
+            $profile = $li->getProfileInfo($auth_token);
+            $li->maybeResetRedirect($_GET['state']);
 
-        return $this->ThirdPartyLogin(
-            'LinkedIn',
-            $profile['emailAddress'],
-            $profile['firstName'] . ' ' . $profile['lastName']
-        );
+            return $this->ThirdPartyLogin(
+                'LinkedIn',
+                $profile['emailAddress'],
+                $profile['firstName'] . ' ' . $profile['lastName']
+            );
+        } catch (ApiException $e) {
+            self::$log->error("Unable to login via LinkedIn: $e");
+            return $e->asResponseArray();
+        }
     }
 
     private function ThirdPartyLogin($provider, $email, $name = null) {
@@ -485,7 +490,7 @@ class SessionController extends Controller {
                 $res = UserController::apiCreate($r);
             } catch (ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
-                return ['status' => 'error'];
+                return $e->asResponseArray();
             }
             $vo_User = UsersDAO::getByPK($res['user_id']);
         }

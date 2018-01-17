@@ -16,7 +16,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#window-length-enabled')
-      .change(function() {
+      .on('change', function() {
         if ($(this).is(':checked')) {
           $('#window-length').removeAttr('disabled');
         } else {
@@ -26,7 +26,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Defaults for OMI
   $('#omi')
-      .click(function() {
+      .on('click', function() {
         $('.new_contest_form #title')
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderOmiStyle);
@@ -45,7 +45,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Defaults for preselectivos IOI
   $('#preioi')
-      .click(function() {
+      .on('click', function() {
         $('.new_contest_form #title')
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderIoiStyle);
@@ -64,7 +64,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Defaults for CONACUP
   $('#conacup')
-      .click(function() {
+      .on('click', function() {
         $('.new_contest_form #title')
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderConacupStyle);

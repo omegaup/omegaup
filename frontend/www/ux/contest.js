@@ -8,9 +8,7 @@ omegaup.OmegaUp.on('ready', function() {
   function onlyProblemLoaded(problem) {
     arena.currentProblem = problem;
     arena.myRuns.filter_problem(problem.alias);
-    if (!arena.myRuns.attached) {
-      arena.myRuns.attach($('#problem .runs'));
-    }
+    arena.myRuns.attach($('#problem .runs'));
 
     arena.mountEditor(problem);
     MathJax.Hub.Queue(
@@ -125,7 +123,7 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.ignoreError);
 
     $('.clarifpager .clarifpagerprev')
-        .click(function() {
+        .on('click', function() {
           if (arena.clarificationsOffset > 0) {
             arena.clarificationsOffset -= arena.clarificationsRowcount;
             if (arena.clarificationsOffset < 0) {
@@ -138,7 +136,7 @@ omegaup.OmegaUp.on('ready', function() {
         });
 
     $('.clarifpager .clarifpagernext')
-        .click(function() {
+        .on('click', function() {
           arena.clarificationsOffset += arena.clarificationsRowcount;
           if (arena.clarificationsOffset < 0) {
             arena.clarificationsOffset = 0;
@@ -150,7 +148,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#clarification')
-      .submit(function(e) {
+      .on('submit', function(e) {
         $('#clarification input').attr('disabled', 'disabled');
         omegaup.API.Clarification
             .create({

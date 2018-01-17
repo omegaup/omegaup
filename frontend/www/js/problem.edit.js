@@ -80,7 +80,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('#add-admin-form')
-      .submit(function() {
+      .on('submit', function() {
         var username = $('#username-admin').val();
 
         omegaup.API.Problem.addAdmin({
@@ -107,7 +107,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('#add-group-admin-form')
-      .submit(function() {
+      .on('submit', function() {
         omegaup.API.Problem.addGroupAdmin({
                              problem_alias: problemAlias,
                              group: $('#groupalias-admin').attr('data-alias'),
@@ -124,14 +124,14 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('#download form')
-      .submit(function() {
+      .on('submit', function() {
         window.location = '/api/problem/download/problem_alias/' +
                           omegaup.UI.escape(problemAlias) + '/';
         return false;
       });
 
   $('#markdown form')
-      .submit(function() {
+      .on('submit', function() {
         var promises = [];
         for (var lang in statements) {
           if (!statements.hasOwnProperty(lang)) continue;
@@ -191,25 +191,25 @@ omegaup.OmegaUp.on('ready', function() {
                                 $('<td></td>') :
                                 $('<td><button type="button" class="close">' +
                                   '&times;</button></td>')
-                                    .click((function(username) {
-                                      return function(e) {
-                                        omegaup.API.Problem.removeAdmin({
-                                                             problem_alias:
-                                                                 problemAlias,
-                                                             usernameOrEmail:
-                                                                 username,
-                                                           })
-                                            .then(function(response) {
-                                              omegaup.UI.success(
-                                                  omegaup.T.adminRemoved);
-                                              $('div.post.footer').show();
-                                              var tr = e.target.parentElement
-                                                           .parentElement;
-                                              $(tr).remove();
-                                            })
-                                            .fail(omegaup.UI.apiError);
-                                      };
-                                    })(admin.username))));
+                                    .on('click', (function(username) {
+                                          return function(e) {
+                                            omegaup.API.Problem
+                                                .removeAdmin({
+                                                  problem_alias: problemAlias,
+                                                  usernameOrEmail: username,
+                                                })
+                                                .then(function(response) {
+                                                  omegaup.UI.success(
+                                                      omegaup.T.adminRemoved);
+                                                  $('div.post.footer').show();
+                                                  var tr =
+                                                      e.target.parentElement
+                                                          .parentElement;
+                                                  $(tr).remove();
+                                                })
+                                                .fail(omegaup.UI.apiError);
+                                          };
+                                        })(admin.username))));
           }
           $('#problem-group-admins').empty();
           // Got the contests, lets populate the dropdown with them
@@ -231,24 +231,26 @@ omegaup.OmegaUp.on('ready', function() {
                                 $('<td></td>') :
                                 $('<td><button type="button" class="close">' +
                                   '&times;</button></td>')
-                                    .click((function(alias) {
-                                      return function(e) {
-                                        omegaup.API.Problem.removeGroupAdmin({
-                                                             problem_alias:
-                                                                 problemAlias,
-                                                             group: alias,
-                                                           })
-                                            .then(function(response) {
-                                              omegaup.UI.success(
-                                                  omegaup.T.groupAdminRemoved);
-                                              $('div.post.footer').show();
-                                              var tr = e.target.parentElement
-                                                           .parentElement;
-                                              $(tr).remove();
-                                            })
-                                            .fail(omegaup.UI.apiError);
-                                      };
-                                    })(group_admin.alias))));
+                                    .on('click', (function(alias) {
+                                          return function(e) {
+                                            omegaup.API.Problem
+                                                .removeGroupAdmin({
+                                                  problem_alias: problemAlias,
+                                                  group: alias,
+                                                })
+                                                .then(function(response) {
+                                                  omegaup.UI.success(
+                                                      omegaup.T
+                                                          .groupAdminRemoved);
+                                                  $('div.post.footer').show();
+                                                  var tr =
+                                                      e.target.parentElement
+                                                          .parentElement;
+                                                  $(tr).remove();
+                                                })
+                                                .fail(omegaup.UI.apiError);
+                                          };
+                                        })(group_admin.alias))));
           }
 
           $('#problem-admins .site-admin').hide();
@@ -257,7 +259,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#add-tag-form')
-      .submit(function() {
+      .on('submit', function() {
         var tagname = $('#tag-name').val();
         var public = $('#tag-public').val();
 
@@ -294,9 +296,10 @@ omegaup.OmegaUp.on('ready', function() {
                                                   '/problem/?tag[]=' + tag.name)
                                             .text(tag.name)))
                         .append($('<td></td>').text(tag.public))
-                        .append($('<td><button type="button" class="close">' +
-                                  '&times;</button></td>')
-                                    .click((function(tagname) {
+                        .append(
+                            $('<td><button type="button" class="close">' +
+                              '&times;</button></td>')
+                                .on('click', (function(tagname) {
                                       return function(e) {
                                         omegaup.API.Problem.removeTag({
                                                              problem_alias:

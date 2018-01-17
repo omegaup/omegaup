@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
       .fail(omegaup.UI.apiError);
 
   $('#get-merged-scoreboard')
-      .click(function() {
+      .on('click', function() {
         contestAliases = $('select.contests option:selected')
                              .map(function() { return this.value })
                              .get();

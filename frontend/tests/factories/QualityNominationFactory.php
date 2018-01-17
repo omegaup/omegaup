@@ -23,6 +23,15 @@ class QualityNominationFactory {
         }
     }
 
+    public static function initTags() {
+        TagsDAO::save(new Tags(['name' => 'dp']));
+        TagsDAO::save(new Tags(['name' => 'math']));
+        TagsDAO::save(new Tags(['name' => 'matrices']));
+        TagsDAO::save(new Tags(['name' => 'greedy']));
+        TagsDAO::save(new Tags(['name' => 'geometry']));
+        TagsDAO::save(new Tags(['name' => 'search']));
+    }
+
     public static function createSuggestion($login, $problemAlias, $difficulty, $quality, $tags) {
         $contents = [];
         if ($difficulty != null) {

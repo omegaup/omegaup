@@ -22,7 +22,7 @@ omegaup.OmegaUp.on('ready', function() {
   function onAliasExists() {
     omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
                      '" ya existe. Elige otro nombre');
-    $('#alias').focus();
+    $('#alias').trigger('focus');
   }
 
   function onAliasNew() { omegaup.UI.dismissNotifications(); }
@@ -57,9 +57,11 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#title')
-      .blur(function() {
-        $('#alias').val(generateAlias($(this).val(), aliasLength)).change();
+      .on('blur', function() {
+        $('#alias')
+            .val(generateAlias($(this).val(), aliasLength))
+            .trigger('change');
       });
 
-  $('#alias').change(function() { existsFn($('#alias').val()); });
+  $('#alias').on('change', function() { existsFn($('#alias').val()); });
 });
