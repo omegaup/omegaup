@@ -208,7 +208,7 @@ class RegisterToContestTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        // Contestant will try to open the contes, this should fail
+        // Contestant will try to open the contest, it should fail
         $contestant = UserFactory::createUser();
 
         $contestantLogin = self::login($contestant);

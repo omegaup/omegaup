@@ -670,7 +670,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
-            throw new InvalidDatabaseOperationException();
+            throw new NotFoundException('problemsetNotFound');
         }
         return $rs['needs_basic_information'] == '1';
     }
