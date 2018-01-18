@@ -23,7 +23,7 @@ export default class ArenaAdmin {
     self.arena.runs.filter_offset.subscribe(self.refreshRuns.bind(self));
 
     $('.clarifpager .clarifpagerprev')
-        .click(function() {
+        .on('click', function() {
           if (self.arena.clarificationsOffset > 0) {
             self.arena.clarificationsOffset -=
                 self.arena.clarificationsRowcount;
@@ -36,7 +36,7 @@ export default class ArenaAdmin {
         });
 
     $('.clarifpager .clarifpagernext')
-        .click(function() {
+        .on('click', function() {
           self.arena.clarificationsOffset += self.arena.clarificationsRowcount;
           if (self.arena.clarificationsOffset < 0) {
             self.arena.clarificationsOffset = 0;
@@ -45,7 +45,7 @@ export default class ArenaAdmin {
           self.refreshClarifications();
         });
 
-    self.arena.elements.clarification.submit(function(e) {
+    self.arena.elements.clarification.on('submit', function(e) {
       $('input', self.arena.elements.clarification)
           .attr('disabled', 'disabled');
       API.Clarification.create({

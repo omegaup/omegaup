@@ -34,13 +34,13 @@ omegaup.OmegaUp.on('ready', function() {
           // registration callback
           $('#user').val($('#reg_email').val());
           $('#pass').val($('#reg_pass').val());
-          $('#login_form').submit();
+          $('#login_form').trigger('submit');
         })
         .fail(omegaup.UI.apiError);
     return false;  // Prevent form submission
   }
 
-  $('#register-form').submit(registerAndLogin);
+  $('#register-form').on('submit', registerAndLogin);
 });
 
 var logmeoutOnce = window.location.href.endsWith('?logout');

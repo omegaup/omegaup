@@ -34,7 +34,7 @@ export default class {
     var self = this;
 
     self.button = $('.notification-button', element);
-    self.button.click(function() { self.unread(false); });
+    self.button.on('click', function() { self.unread(false); });
 
     self.onMarkAllAsRead = function() {
       self.notifications.removeAll();
