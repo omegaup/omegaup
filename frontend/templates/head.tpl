@@ -42,9 +42,6 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/js/bootstrap.min.js"}"></script>
-		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
-		<link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">
-		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-select.min.js"}"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}"></script>
