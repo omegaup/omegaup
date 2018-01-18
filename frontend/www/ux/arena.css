@@ -465,6 +465,12 @@ table.clarifications {
 	padding-left: 7px;
 }
 
+.clarifications tbody tr.resolved {
+	color: rgb(70, 136, 71);
+	background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%);
+	background-color: rgb(223, 240, 216);
+}
+
 .clarifications tfoot td a {
 	display: block;
 	padding: 0.5em;

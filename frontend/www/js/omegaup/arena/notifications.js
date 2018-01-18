@@ -92,4 +92,10 @@ export default class {
     var audio = document.getElementById('notification-audio');
     if (audio != null) audio.play();
   }
+
+  remove(data) {
+    var self = this;
+    localStorage.setItem(data.id, Date.now());
+    self.notifications.remove(data);
+  }
 }
