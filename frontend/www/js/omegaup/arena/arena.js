@@ -1782,7 +1782,8 @@ class RunView {
                     .then(function(data) { cb(data.results); })
                     .fail(UI.apiError);
               }),
-              displayKey: 'title',
+              async: true,
+              display: 'title',
               templates: {
                 suggestion: function(elm) {
                   return '<strong>' + elm.title + '</strong> (' + elm.alias +
@@ -1790,7 +1791,7 @@ class RunView {
                 }
               }
             })
-        .on('typeahead:selected',
+        .on('typeahead:select',
             function(elm, item) { self.filter_problem(item.alias); });
 
     $('.runsproblem-clear', elm)
