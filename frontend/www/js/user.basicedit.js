@@ -17,7 +17,7 @@ $('document')
                           username: $('#username').val(),
                           password: $('#new-password-1').val(),
                         })
-            .then(function(response) { window.location = '/profile/edit/'; })
+            .then(function(response) { window.location = '/profile/'; })
             .fail(omegaup.UI.apiError);
         return false;  // Prevent page refresh on submit
       };
