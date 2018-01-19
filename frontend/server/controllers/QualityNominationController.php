@@ -221,7 +221,9 @@ class QualityNominationController extends Controller {
         }
 
         Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-
+        if ($r['status'] == 'approved') {
+            Validators::isStringNonEmpty($r['rationale'], 'rationale');
+        }
         // Validate request
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
@@ -265,7 +267,15 @@ class QualityNominationController extends Controller {
                 break;
         }
 
-        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        if ($r['status'] == 'approved') {
+            $r['message'] = 'banningProblemDueToReport';
+            $contents = json_decode($qualitynomination->contents, true /*assoc*/);
+            $contents['rationale'] = $r['rationale'];
+            $qualitynomination->contents = json_encode($contents);
+        } else {
+            $r['message'] = 'banningDeclinedByReviewer';
+        }
+
         $r['visibility'] = $newProblemVisibility;
         $qualitynomination->status = $r['status'];
 
@@ -286,7 +296,7 @@ class QualityNominationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok'];
+        return ['status' => 'ok', 'contents' => $qualitynomination->contents];
     }
 
     public static function extractAliasFromArgument($problemUrl) {

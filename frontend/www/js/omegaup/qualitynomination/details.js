@@ -22,7 +22,8 @@ OmegaUp.on('ready', function() {
           problem: {alias: payload.problem.alias, title: payload.problem.title},
           qualitynomination_id: parseInt(payload.qualitynomination_id),
           reviewer: payload.reviewer,
-          votes: payload.votes
+          votes: payload.votes,
+          rationale: payload.contents.rationale
         },
       });
     },
