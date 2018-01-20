@@ -9,7 +9,7 @@
             v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-8">
-            <label>{{ T.wordsName }} <input class="form-control"
+            <label>{{ T.wordsName }} <input class="form-control name"
                    type="text"
                    v-model="name"></label>
           </div>
@@ -19,7 +19,7 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseNewFormShortTitle_alias_Desc"></span> <input class=
-                  "form-control"
+                  "form-control alias"
                    type="text"
                    v-bind:disabled="update"
                    v-model="alias"></label>
@@ -61,10 +61,11 @@
         <div class="row">
           <div class="form-group col-md-12">
             <label>{{ T.profileSchool }} <input autocomplete="off"
-                   class="form-control typeahead"
+                   class="form-control typeahead school"
                    type="text"
                    v-model="school_name"
-                   v-on:change="onChange"><input type="hidden"
+                   v-on:change="onChange"><input class="school_id"
+                   type="hidden"
                    v-model="school_id"></label>
           </div>
         </div>
@@ -78,7 +79,7 @@
           </div>
         </div>
         <div class="form-group pull-right">
-          <button class="btn btn-primary"
+          <button class="btn btn-primary submit"
                type="submit">
           <template v-if="update">
             {{ T.courseNewFormUpdateCourse }}
