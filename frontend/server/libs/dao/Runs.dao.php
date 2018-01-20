@@ -723,4 +723,88 @@ class RunsDAO extends RunsDAOBase {
         }
         return $ar;
     }
+
+    /**
+     * Recalculate the contest_score of all problemset and problem Runs
+     */
+    public static function recalculateScore($problemset_id, $problem_id, $current_points, $original_points) {
+        $sql = 'UPDATE
+                  `Runs`
+                SET
+                  `contest_score` = `score` * ?
+                WHERE
+                  `problemset_id` = ?
+                  AND `problem_id` = ?;';
+
+        $params = [
+            $current_points,
+            $problemset_id,
+            $problem_id
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    /**
+     * Recalculate contest runs with the following rules:
+     *
+     * + If penalty_type is none then:
+     *   - penalty = 0.
+     * + If penalty_type is runtime then:
+     *   - penalty = runtime.
+     * + If penalty_type is anything else then:
+     *   - penalty = submit_delay
+     */
+    public static function recalculatePenaltyForContest(Contests $contest) {
+        $penalty_type = $contest->penalty_type;
+        if ($penalty_type == 'none') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = 0
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'runtime') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = `runtime`
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'contest_start') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } elseif ($penalty_type == 'problem_open') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } else {
+            return 0;
+        }
+        $params = [$contest->problemset_id];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
 }

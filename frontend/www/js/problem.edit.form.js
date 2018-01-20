@@ -8,7 +8,7 @@ omegaup.OmegaUp.on('ready', function() {
   requiredFields.each(addRemoveErrorClass);
 
   $('#problem-form')
-      .submit(function() {
+      .on('submit', function() {
         $('.has-error').removeClass('has-error');
         var errors = false;
 

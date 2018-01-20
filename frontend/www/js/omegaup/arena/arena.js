@@ -295,7 +295,7 @@ export class Arena {
   installLibinteractiveHooks() {
     let self = this;
     $('#libinteractive-download')
-        .submit(function(e) {
+        .on('submit', function(e) {
           let form = $(e.target);
           let alias = e.target.attributes['data-alias'].value;
           let os = form.find('.download-os').val();
@@ -310,7 +310,7 @@ export class Arena {
         });
 
     $('#libinteractive-download .download-lang')
-        .change(function(e) {
+        .on('change', function(e) {
           let form = $('#libinteractive-download');
           form.find('.libinteractive-extension')
               .html(form.find('.download-lang').val());
@@ -481,6 +481,9 @@ export class Arena {
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
+      if (typeof(problem.runs) === 'undefined') {
+        problem.runs = [];
+      }
       self.problems[alias] = problem;
     }
     self.elements.rankingTable.problems = problems;
@@ -810,7 +813,7 @@ export class Arena {
           let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
           let cannedResponse = $('#create-response-canned', answerNode);
-          cannedResponse.change(function() {
+          cannedResponse.on('change', function() {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
             } else {
@@ -821,7 +824,7 @@ export class Arena {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
           }
-          responseFormNode.submit(function() {
+          responseFormNode.on('submit', function() {
             let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
@@ -938,7 +941,7 @@ export class Arena {
           let option = $(this);
           if (option.css('display') != 'none') {
             option.prop('selected', true);
-            langElement.change();
+            langElement.trigger('change');
             return false;
           }
         });
@@ -1056,9 +1059,7 @@ export class Arena {
         $('#problem .overall_wall_time_limit')
             .html(problem.overall_wall_time_limit / 1000 + 's');
         $('#problem .statement').html(problem.problem_statement);
-        if (!self.myRuns.attached) {
-          self.myRuns.attach($('#problem .runs'));
-        }
+        self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         let language_array = problem.languages.split(',');
         if (karel_langs.every(function(x) {
@@ -1214,9 +1215,10 @@ export class Arena {
 
   bindGlobalHandlers() {
     let self = this;
-    $('#overlay, .close').click(self.onCloseSubmit.bind(self));
-    self.elements.submitForm.language.change(self.onLanguageSelect.bind(self));
-    self.elements.submitForm.submit(self.onSubmit.bind(self));
+    $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
+    self.elements.submitForm.language.on('change',
+                                         self.onLanguageSelect.bind(self));
+    self.elements.submitForm.on('submit', self.onSubmit.bind(self));
   }
 
   onCloseSubmit(e) {
@@ -1246,17 +1248,17 @@ export class Arena {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
-    if (typeof(self.problems[self.currentProblem.alias]
-                   .nextSubmissionTimestamp) !== 'undefined') {
-      nextSubmissionTimestamp = new Date(
-          self.problems[self.currentProblem.alias].nextSubmissionTimestamp *
-          1000);
-    } else if (self.problems[self.currentProblem.alias].runs.length > 0) {
-      nextSubmissionTimestamp = new Date(
-          self.problems[self.currentProblem.alias]
-              .runs[self.problems[self.currentProblem.alias].runs.length - 1]
-              .time.getTime() +
-          self.currentContest.submissions_gap * 1000);
+    let problem = self.problems[self.currentProblem.alias];
+    if (typeof(problem) !== 'undefined') {
+      if (typeof(problem.nextSubmissionTimestamp) !== 'undefined') {
+        nextSubmissionTimestamp =
+            new Date(problem.nextSubmissionTimestamp * 1000);
+      } else if (typeof(problem.runs) !== 'undefined' &&
+                 problem.runs.length > 0) {
+        nextSubmissionTimestamp =
+            new Date(problem.runs[problem.runs.length - 1].time.getTime() +
+                     self.currentContest.submissions_gap * 1000);
+      }
     }
     if (self.submissionGapInterval) {
       clearInterval(self.submissionGapInterval);
@@ -1298,6 +1300,8 @@ export class Arena {
 
   onSubmit(e) {
     let self = this;
+    e.preventDefault();
+
     if (!self.options.isOnlyProblem &&
         (self.problems[self.currentProblem.alias].last_submission +
              self.submissionGap * 1000 >
@@ -1331,14 +1335,14 @@ export class Arena {
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
         if (file.size >= 10 * 1024) {
-          alert(UI.formatString(arenaRunSubmitFilesize, {limit: '10kB'}));
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');
       } else {
         // 100kB _must_ be enough for anybody.
         if (file.size >= 100 * 1024) {
-          alert(UI.formatString(arenaRunSubmitFilesize, {limit: '100kB'}));
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '100kB'}));
           return false;
         }
         reader.readAsDataURL(file);
@@ -1571,25 +1575,25 @@ export class Arena {
                                 .append(
                                     $('<span class="collapse glyphicon ' +
                                       'glyphicon-collapse-down"></span>')
-                                        .click((function(cases) {
-                                          return function(ev) {
-                                            let target = $(ev.target);
-                                            if (target.hasClass(
-                                                    'glyphicon-collapse-down')) {
-                                              target.removeClass(
-                                                  'glyphicon-collapse-down');
-                                              target.addClass(
-                                                  'glyphicon-collapse-up');
-                                            } else {
-                                              target.addClass(
-                                                  'glyphicon-collapse-down');
-                                              target.removeClass(
-                                                  'glyphicon-collapse-up');
-                                            }
-                                            cases.toggle();
-                                            return false;
-                                          };
-                                        })(cases))))));
+                                        .on('click', (function(cases) {
+                                              return function(ev) {
+                                                let target = $(ev.target);
+                                                if (target.hasClass(
+                                                        'glyphicon-collapse-down')) {
+                                                  target.removeClass(
+                                                      'glyphicon-collapse-down');
+                                                  target.addClass(
+                                                      'glyphicon-collapse-up');
+                                                } else {
+                                                  target.addClass(
+                                                      'glyphicon-collapse-down');
+                                                  target.removeClass(
+                                                      'glyphicon-collapse-up');
+                                                }
+                                                cases.toggle();
+                                                return false;
+                                              };
+                                            })(cases))))));
         for (let j = 0; j < g.cases.length; j++) {
           let c = g.cases[j];
           let caseRow =
@@ -1619,12 +1623,12 @@ export class Arena {
                     .append(
                         $('<span class="collapse glyphicon glyphicon-list-alt">' +
                           '</span>')
-                            .click((function(metaRow) {
-                              return function(ev) {
-                                metaRow.toggle();
-                                return false;
-                              };
-                            })(metaRow))));
+                            .on('click', (function(metaRow) {
+                                  return function(ev) {
+                                    metaRow.toggle();
+                                    return false;
+                                  };
+                                })(metaRow))));
             cases.append(metaRow);
           }
         }
@@ -1725,7 +1729,7 @@ class RunView {
     let self = this;
     let runs = self.runs();
     let maxScore = previousScore;
-    for (let run of runs.length) {
+    for (let run of runs) {
       if (alias != run.alias()) {
         continue;
       }
@@ -1740,8 +1744,10 @@ class RunView {
   attach(elm) {
     let self = this;
 
+    if (self.attached) return;
+
     $('.runspager .runspagerprev', elm)
-        .click(function() {
+        .on('click', function() {
           if (self.filter_offset() < self.row_count) {
             self.filter_offset(0);
           } else {
@@ -1750,7 +1756,7 @@ class RunView {
         });
 
     $('.runspager .runspagernext', elm)
-        .click(function() {
+        .on('click', function() {
           self.filter_offset(self.filter_offset() + self.row_count);
         });
 
@@ -1759,7 +1765,7 @@ class RunView {
     });
 
     $('.runsusername-clear', elm)
-        .click(function() {
+        .on('click', function() {
           $('.runsusername', elm).val('');
           self.filter_username('');
         });
@@ -1776,7 +1782,8 @@ class RunView {
                     .then(function(data) { cb(data.results); })
                     .fail(UI.apiError);
               }),
-              displayKey: 'title',
+              async: true,
+              display: 'title',
               templates: {
                 suggestion: function(elm) {
                   return '<strong>' + elm.title + '</strong> (' + elm.alias +
@@ -1784,16 +1791,16 @@ class RunView {
                 }
               }
             })
-        .on('typeahead:selected',
+        .on('typeahead:select',
             function(elm, item) { self.filter_problem(item.alias); });
 
     $('.runsproblem-clear', elm)
-        .click(function() {
+        .on('click', function() {
           $('.runsproblem', elm).val('');
           self.filter_problem('');
         });
 
-    ko.applyBindings(self, elm[0]);
+    if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
   }
 

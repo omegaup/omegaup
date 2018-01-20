@@ -1,6 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
   $('form#new_interview_form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         omegaup.API.Interview.create({
                                alias: $('#alias').val(),

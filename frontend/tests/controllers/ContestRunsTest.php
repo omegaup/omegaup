@@ -58,4 +58,58 @@ class ContestRunsTest extends OmegaupTestCase {
 
         $this->assertEquals($runData['request']['source'], $response['source']);
     }
+
+    /**
+     * Contestant submits runs and admin edits the points of a problem
+     * while the contest is active
+     */
+    public function testEditProblemsetPointsDuringAContest() {
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create our contestant
+        $contestant = UserFactory::createUser();
+
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        // Grade the run
+        RunsFactory::gradeRun($runData);
+
+        // Build request
+        $directorLogin = self::login($contestData['director']);
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertEquals(100, $response['runs'][0]['contest_score']);
+
+        $r = new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+            'points' => 80,
+            'order_in_contest' => 1,
+        ]);
+
+        // Call API with different points value
+        ContestController::apiAddProblem($r);
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertEquals(80, $response['runs'][0]['contest_score']);
+    }
 }

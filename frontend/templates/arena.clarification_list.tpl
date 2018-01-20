@@ -28,7 +28,7 @@
 					<tbody class="clarification-list">
 						<tr class="template">
 {if $contest}
-							<td class="problem"></th>
+							<td class="problem"></td>
 {else}
 							<td class="contest"></td>
 {/if}

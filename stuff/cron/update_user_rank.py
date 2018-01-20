@@ -14,7 +14,8 @@ import MySQLdb
 def update_user_rank(cur):
     '''Updates the user ranking.'''
 
-    cur.execute('TRUNCATE TABLE `User_Rank`;')
+    cur.execute('DELETE FROM `User_Rank`;')
+    logging.info('Updating accepted stats for problems...')
     cur.execute('''
         UPDATE
             Problems p
@@ -28,6 +29,7 @@ def update_user_rank(cur):
                     r.problem_id = p.problem_id AND r.verdict = 'AC'
             );
     ''')
+    logging.info('Updating user rank...')
     cur.execute('''
         SELECT
             username,
@@ -112,8 +114,12 @@ def main():
                         default=os.path.join(os.getenv('HOME') or '.',
                                              '.my.cnf'),
                         help='.my.cnf file that stores credentials')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Disables logging')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Enables verbose logging')
+    parser.add_argument('--logfile', type=str, default=None,
+                        help='Enables logging to a file')
     parser.add_argument('--host', type=str, help='MySQL host',
                         default='localhost')
     parser.add_argument('--user', type=str, help='MySQL username')
@@ -122,15 +128,23 @@ def main():
                         default='omegaup')
 
     args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    logging.basicConfig(filename=args.logfile,
+                        format='%%(asctime)s:%s:%%(message)s' % parser.prog,
+                        level=(logging.DEBUG if args.verbose else
+                               logging.INFO if not args.quiet else
+                               logging.ERROR))
 
+    logging.info('Started')
     dbconn = mysql_connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_user_rank(cur)
         dbconn.commit()
+    except:  # pylint: disable=bare-except
+        logging.exception('Failed to update user ranking')
     finally:
         dbconn.close()
+        logging.info('Done')
 
 
 if __name__ == '__main__':

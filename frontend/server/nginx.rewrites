@@ -39,6 +39,12 @@ location ^~ /events/ {
 	proxy_http_version 1.1;
 }
 
+# Backendv2 grader web interface.
+location /grader/ {
+	rewrite    ^/grader/(.*) /$1 break;
+	proxy_pass http://localhost:36663;
+}
+
 rewrite ^/admin/user/([a-zA-Z0-9_-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
@@ -53,7 +59,7 @@ rewrite ^/coderofthemonth/?$ /coderofthemonth.php last;
 rewrite ^/contest/?$ /contests.php last;
 rewrite ^/contest/mine/?$ /contestmine.php last;
 rewrite ^/contest/new/?$ /contestnew.php last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /arena/contest.php?contest_alias=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /arena/$1/ permanent;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contestactivity.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contestedit.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;

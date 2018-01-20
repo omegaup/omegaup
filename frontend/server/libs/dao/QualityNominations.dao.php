@@ -275,21 +275,26 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function computes the average difficulty and quality among all problems.
+     * This function gets the contents of QualityNomination table
      */
-    public static function getGlobalDifficultyAndQuality() {
+    public static function getAllNominations() {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
+        global $conn;
+        return $conn->Execute($sql);
+    }
+
+    /**
+     * This function computes the average difficulty and quality among all problems.
+     */
+    public static function calculateGlobalDifficultyAndQuality($contents) {
         $qualitySum = 0;
         $qualityN = 0;
         $difficultySum = 0;
         $difficultyN = 0;
 
-        global $conn;
-        $result = $conn->Execute($sql);
-
-        foreach ($result as $nomination) {
+        foreach ($contents as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
             if (isset($feedback['quality'])) {
                 $qualitySum += $feedback['quality'];
@@ -305,16 +310,21 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function computes sums of difficulty, quality, and tag votes for
-     * each problem and returns that in the form of a table.
+     * This function gets contents of QualityNomination table
      */
-    public static function getProblemSuggestionAggregates($problemId) {
+    public static function getAllSuggestionsPerProblem($problemId) {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
         global $conn;
-        $result = $conn->Execute($sql);
+        return $conn->Execute($sql);
+    }
 
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
+    public static function calculateProblemSuggestionAggregates($contents) {
         $problemAggregates = [
             'quality_sum' => 0,
             'quality_n' => 0,
@@ -324,7 +334,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             'tags' => [],
         ];
 
-        foreach ($result as $nomination) {
+        foreach ($contents as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
 
             if (isset($feedback['quality'])) {
@@ -358,15 +368,17 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      * This function is to be called (only) by a cronjob.
      */
     public static function aggregateFeedback() {
+        $globalContents = self::getAllNominations();
         list($globalQualityAverage, $globalDifficultyAverage)
-                = self::getGlobalDifficultyAndQuality();
+          = self::calculateGlobalDifficultyAndQuality($globalContents);
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
         global $conn;
         foreach ($conn->Execute($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
-            $problemAggregates = self::getProblemSuggestionAggregates($problemId);
+            $contents = self::getAllSuggestionsPerProblem($problemId);
+            $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
 
             $problem = ProblemsDAO::getByPK($problemId);
             $problem->quality = self::bayesianAverage(

@@ -24,7 +24,7 @@ class ProblemsetController extends Controller {
         );
 
         try {
-            ProblemsetProblemsDAO::save(new ProblemsetProblems([
+            self::updateProblemsetProblem(new ProblemsetProblems([
                 'problemset_id' => $problemset_id,
                 'problem_id' => $problem->problem_id,
                 'points' => $points,
@@ -33,5 +33,26 @@ class ProblemsetController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * When problem is already in the problemset, it must recalculate
+     * the contest_score for all the problemset and problem runs
+     */
+    public static function updateProblemsetProblem(ProblemsetProblems $updatedProblemsetProblem) {
+        $problem = ProblemsetProblemsDAOBase::getByPK(
+            $updatedProblemsetProblem->problemset_id,
+            $updatedProblemsetProblem->problem_id
+        );
+        ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
+        if (is_null($problem) || $problem->points == $updatedProblemsetProblem->points) {
+            return;
+        }
+        RunsDAO::recalculateScore(
+            $updatedProblemsetProblem->problemset_id,
+            $updatedProblemsetProblem->problem_id,
+            $updatedProblemsetProblem->points,
+            $problem->points
+        );
     }
 }
