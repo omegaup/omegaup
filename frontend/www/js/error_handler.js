@@ -39,6 +39,7 @@ function sendError(message, filename, lineno, colno, error) {
     httpRequest.setRequestHeader('Content-Type', 'application/jserror-report');
     var report = {
       userAgent: navigator.userAgent,
+      location: window.location.href,
     };
     if (error.stack) report.stack = error.stack;
     if (typeof message !== 'undefined') report.message = message;

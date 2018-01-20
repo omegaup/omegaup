@@ -114,6 +114,8 @@ def main():
                         default=os.path.join(os.getenv('HOME') or '.',
                                              '.my.cnf'),
                         help='.my.cnf file that stores credentials')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Disables logging')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Enables verbose logging')
     parser.add_argument('--logfile', type=str, default=None,
@@ -128,7 +130,9 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(filename=args.logfile,
                         format='%%(asctime)s:%s:%%(message)s' % parser.prog,
-                        level=logging.DEBUG if args.verbose else logging.INFO)
+                        level=(logging.DEBUG if args.verbose else
+                               logging.INFO if not args.quiet else
+                               logging.ERROR))
 
     logging.info('Started')
     dbconn = mysql_connect(args)

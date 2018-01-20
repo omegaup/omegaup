@@ -43,7 +43,21 @@ class UserController extends Controller {
         }
 
         if (!is_null($userByEmail)) {
-            throw new DuplicatedEntryInDatabaseException('mailInUse');
+            if (!is_null($userByEmail->password)) {
+                throw new DuplicatedEntryInDatabaseException('mailInUse');
+            }
+
+            $user = new Users([
+                'user_id' => $userByEmail->user_id,
+                'username' => $r['username'],
+                'password' => $hashedPassword
+            ]);
+            UsersDAO::savePassword($user);
+
+            return [
+                'status' => 'ok',
+                'user_id' => $user->user_id
+            ];
         }
 
         if (!is_null($user)) {
@@ -852,7 +866,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'OVI17' => 100
+                'OVI18' => 155
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'

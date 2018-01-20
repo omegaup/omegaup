@@ -316,6 +316,7 @@ omegaup.OmegaUp.loadTranslations({
 	interviewResultsFor: "Resultados de ",
 	interviews: "Entrevistas",
 	invalidContestType: "Tipo de concurso invalido",
+	invalidCsrfToken: "Token CSRF inv\u00e1lido",
 	invalidLanguage: "Languaje invalido",
 	invalidParameters: "Parametros inv\u00e1lidos.",
 	invalidResetToken: "Token invalido.",
