@@ -37,7 +37,7 @@ class ProblemDeployer {
     private $updatedLanguages = [];
     private $acceptsSubmissions = true;
 
-    public function __construct($alias, $operation, $acceptsSubmissions) {
+    public function __construct($alias, $operation, $acceptsSubmissions = true) {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
