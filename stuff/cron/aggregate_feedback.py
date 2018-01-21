@@ -218,7 +218,6 @@ def aggregate_feedback(dbconn):
                 logging.debug('Not enough information for problem %d',
                               problem_id)
 
-            # pylint: disable=fixme
             # TODO(heduenas): Get threshold parameter from DB for each problem
             # independently.
             problem_tags = get_most_voted_tags(problem_tag_votes,

@@ -1,10 +1,11 @@
 <template>
   <div class="omegaup-course-problemlist panel">
     <div class="panel-heading">
-      <form>
+      <form class="problemlist">
         <div class="row">
           <div class="form-group col-md-8">
             <label>{{ T.wordsAssignments }} <select class="form-control"
+                    name="assignments"
                     v-model="assignment">
               <option v-bind:value="a"
                       v-for="a in assignments">
