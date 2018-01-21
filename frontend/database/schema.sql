@@ -558,6 +558,8 @@ CREATE TABLE `QualityNominations` (
   PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
+  KEY `idx_nomination` (`nomination`),
+  KEY `idx_nomination_problem` (`nomination`,`problem_id`),
   CONSTRAINT `fk_qn_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominación a promoción / democión de problemas';
