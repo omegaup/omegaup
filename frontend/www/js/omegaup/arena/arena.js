@@ -1069,7 +1069,7 @@ export class Arena {
         $('#problem .statement').html(problem.problem_statement);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
-        let language_array = problem.languages.split(',');
+        let language_array = problem.languages;
         if (karel_langs.every(function(x) {
               return language_array.indexOf(x) != -1;
             })) {

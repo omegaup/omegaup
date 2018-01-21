@@ -1276,6 +1276,10 @@ class ProblemController extends Controller {
             );
         }
 
+        // send the supported languages as a JSON array instead of csv
+        // array_filter is needed to handle when $response['languages'] is empty
+        $response['languages'] = array_filter(explode(',', $response['languages']));
+
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
         $response['score'] = self::bestScore($r);
         $response['status'] = 'ok';

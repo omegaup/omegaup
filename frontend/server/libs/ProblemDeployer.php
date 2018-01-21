@@ -247,17 +247,15 @@ class ProblemDeployer {
             ZipHandler::DeflateZip($this->zipPath, $this->tmpDir, $this->filesToUnzip);
 
             // Move all .in and .out files to their folder.
-            if ($this->acceptsSubmissions) {
-                $dh = opendir("$this->tmpDir/cases/");
-                while (($file = readdir($dh)) !== false) {
-                    if (ProblemDeployer::endsWith($file, '.out', true)) {
-                        rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
-                    } elseif (ProblemDeployer::endsWith($file, '.in', true)) {
-                        rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
-                    }
+            $dh = opendir("$this->tmpDir/cases/");
+            while (($file = readdir($dh)) !== false) {
+                if (ProblemDeployer::endsWith($file, '.out', true)) {
+                    rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
+                } elseif (ProblemDeployer::endsWith($file, '.in', true)) {
+                    rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
                 }
-                closedir($dh);
             }
+            closedir($dh);
 
             if ($this->isInteractive) {
                 $target = "$this->tmpDir/interactive/generated/";
@@ -437,12 +435,7 @@ class ProblemDeployer {
     private function checkCases(ZipArchive $zip, array $zipFilesArray) {
         $this->log->info('Validating /cases');
 
-        if (!$this->acceptsSubmissions) {
-            $this->log->info('This problem doesn\'t accept anything. Skipping.');
-            return true;
-        }
-
-        // We need to have at least one test case
+        // Count how many test cases were found
         $cases = 0;
 
         // Add all files in cases/ that end either in .in or .out
@@ -472,7 +465,8 @@ class ProblemDeployer {
             }
         }
 
-        if ($cases === 0) {
+        // if the problem accepts submissions it must have at least one test case
+        if ($this->acceptsSubmissions && $cases === 0) {
             throw new InvalidParameterException('problemDeployerNoCases');
         }
 

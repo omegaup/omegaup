@@ -30,7 +30,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('.solver-list').append(prob);
     }
 
-    var language_array = problem.languages.split(',');
+    var language_array = problem.languages;
     arena.updateAllowedLanguages(language_array);
     arena.selectDefaultLanguage();
 

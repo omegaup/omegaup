@@ -385,7 +385,7 @@ omegaup.OmegaUp.on('ready', function() {
       // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
     }
-    $('#languages').val(problem.languages);
+    $('#languages').val(problem.languages.join());
     $('input[name=alias]').val(problemAlias);
 
     if (chosenLanguage == null ||
