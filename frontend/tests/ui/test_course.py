@@ -3,10 +3,12 @@
 
 '''Run Selenium course tests.'''
 
+from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 
+@flaky
 def test_create_course(driver):
     '''Tests creating an course and retrieving it.'''
 
@@ -108,7 +110,7 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "#problems")]')))).click()
+            (By.XPATH, '//a[contains(@href, "#problems")]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

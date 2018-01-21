@@ -18,7 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-_DEFAULT_TIMEOUT = 3  # seconds
+_DEFAULT_TIMEOUT = 4  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
@@ -114,8 +114,10 @@ class Driver(object):
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
         self.wait_for_page_loaded()
-        self.browser.find_element_by_xpath(
-            '//a[contains(@href, "/login/")]').click()
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
