@@ -31,8 +31,14 @@ class Driver(object):
     def __init__(self, browser, wait, url):
         self.browser = browser
         self.wait = wait
+        self._next_id = 0
         self._url = url
-        self.id = str(int(time.time()))
+
+    def generate_id(self):
+        '''Generates a relatively unique id.'''
+
+        self._next_id += 1
+        return '%d_%d' % (int(time.time()), self._next_id)
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -117,7 +123,7 @@ class Driver(object):
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//a[contains(@href, "/login/")]'))).click()
+                 '//a[starts-with(@href, "/login/")]'))).click()
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
@@ -130,11 +136,13 @@ class Driver(object):
         with self.ajax_page_transition():
             self.browser.find_element_by_id('login_form').submit()
 
-        yield
-
-        self.browser.get(self.url('/logout/?redirect=/'))
-        self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self.wait_for_page_loaded()
+        try:
+            yield
+        finally:
+            self.browser.get(self.url('/logout/?redirect=/'))
+            self.wait.until(lambda _: self.browser.current_url ==
+                            home_page_url)
+            self.wait_for_page_loaded()
 
 
 @pytest.hookimpl(hookwrapper=True)

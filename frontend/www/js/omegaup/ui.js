@@ -120,8 +120,8 @@ let UI = {
   },
 
   typeaheadWrapper: function(f) {
-    var lastRequest = null;
-    var pending = false;
+    let lastRequest = null;
+    let pending = false;
     function wrappedCall(query, syncResults, asyncResults) {
       if (pending) {
         lastRequest = arguments;
@@ -134,11 +134,11 @@ let UI = {
               // Typeahead will ignore any stale callbacks. Given that we
               // will start a new request ASAP, let's do a best-effort
               // asyncResults to the current request with the old data.
-              lastRequest[2](data);
+              lastRequest[2](data.results || data);
               pending = false;
               let request = lastRequest;
               lastRequest = null;
-              wrappedCall.apply(request);
+              wrappedCall.apply(null, request);
               return;
             }
             asyncResults(data.results || data);

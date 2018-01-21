@@ -27,7 +27,7 @@ def test_create_user(driver):
 
     # Login screen
     driver.wait.until(lambda _: driver.browser.current_url != home_page_url)
-    username = 'unittest_user_%s' % driver.id
+    username = 'unittest_user_%s' % driver.generate_id()
     password = 'p@ssw0rd'
     driver.browser.find_element_by_id('reg_username').send_keys(username)
     driver.browser.find_element_by_id('reg_email').send_keys(
@@ -61,7 +61,7 @@ def test_login(driver):
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
-    problem_alias = 'unittest_problem_%s' % driver.id
+    problem_alias = 'unittest_problem_%s' % driver.generate_id()
 
     with driver.login_admin():
         driver.wait.until(
@@ -105,7 +105,7 @@ def test_create_problem(driver):
         driver.wait_for_page_loaded()
 
         search_box_element = driver.wait.until(
-            EC.element_to_be_clickable(
+            EC.visibility_of_element_located(
                 (By.ID, 'problem-search-box')))
         search_box_element.send_keys(problem_alias)
         with driver.ajax_page_transition():

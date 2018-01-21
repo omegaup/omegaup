@@ -12,9 +12,10 @@ from selenium.webdriver.support import expected_conditions as EC
 def test_create_course(driver):
     '''Tests creating an course and retrieving it.'''
 
-    course_alias = 'unittest_course_%s' % driver.id
-    school_name = 'unittest_school_%s' % driver.id
-    assignment_alias = 'unittest_homework_%s' % driver.id
+    run_id = driver.generate_id()
+    course_alias = 'unittest_course_%s' % run_id
+    school_name = 'unittest_school_%s' % run_id
+    assignment_alias = 'unittest_homework_%s' % run_id
     user = 'user'
     problem = 'sumas'
 
@@ -30,23 +31,27 @@ def test_create_course(driver):
 
         add_problem_to_assignment(driver, assignment_alias, problem)
 
-    with driver.login('user', 'user'):
+    with driver.login_user():
         enter_to_course(driver, course_alias, assignment_alias)
 
 
 def create_course(driver, course_alias, school_name):
     '''Creates one course with a new school.'''
 
-    driver.browser.find_element_by_xpath(
-        '//a[contains(@href, "/schools/")]').click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "/schools/"]'))).click()
+    driver.wait_for_page_loaded()
 
     driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH, ('//a[contains(@href, "/course/")]')))).click()
+        EC.element_to_be_clickable(
+            (By.XPATH, ('//a[@href = "/course/"]')))).click()
+    driver.wait_for_page_loaded()
 
     driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH, ('//a[contains(@href, "/course/new/")]')))).click()
+        EC.element_to_be_clickable(
+            (By.XPATH, ('//a[@href = "/course/new/"]')))).click()
+    driver.wait_for_page_loaded()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -74,18 +79,19 @@ def add_students(driver, users):
 
         driver.browser.find_element_by_css_selector(
             '.omegaup-course-addstudent form button[type=submit]').click()
+        driver.wait_for_page_loaded()
 
 
 def add_assignment(driver, assignment_alias):
     '''Add assignments to a recently created course.'''
 
     driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.XPATH, (
-                '//a[contains(@href, "assignments")]')))).click()
+                '//a[contains(@href, "#assignments")]')))).click()
 
     driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.CSS_SELECTOR, ('.tab-pane.active .new button')))).click()
 
     driver.wait.until(
@@ -103,6 +109,7 @@ def add_assignment(driver, assignment_alias):
 
     new_assignment_form.find_element_by_css_selector(
         'button[type=submit]').click()
+    driver.wait_for_page_loaded()
 
 
 def add_problem_to_assignment(driver, assignment_alias, problem):
@@ -110,43 +117,57 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "#problems")]'))).click()
-
+            (By.XPATH, '//a[@href = "#problems"]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//select[@name = "assignments"]'))).click()
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
              ('//select[@name="assignments"]/option[contains(text(), %s)]'
               % assignment_alias)))).click()
-
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, (
-                '.tab-pane.active .problemlist button')))).click()
+            (By.CSS_SELECTOR,
+             '.tab-pane.active .problemlist button'))).click()
+    driver.wait_for_page_loaded()
 
-    driver.typeahead_helper('.omegaup-course-problemlist', problem,
-                            select_suggestion=False)
-
-    driver.browser.find_element_by_css_selector(
-        '.omegaup-course-problemlist form button[type=submit]').click()
+    driver.typeahead_helper('.omegaup-course-problemlist', problem)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             '.omegaup-course-problemlist form button[type=submit]'))).click()
+    driver.wait_for_page_loaded()
 
 
 def enter_to_course(driver, course_alias, assignment_alias):
     '''Enter to course previously created.'''
 
-    driver.browser.find_element_by_xpath(
-        '//a[contains(@href, "/schools/")]').click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "/schools/"]'))).click()
+    driver.wait_for_page_loaded()
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "/course/")]')))).click()
+            (By.XPATH, ('//a[@href = "/course/"]')))).click()
+    driver.wait_for_page_loaded()
 
+    course_url = '/course/%s' % course_alias
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             ('//a[contains(@href, %s)]' % course_alias)))).click()
+             '//a[starts-with(@href, "%s")]' % course_url))).click()
+    driver.wait_for_page_loaded()
+    assert (course_url in
+            driver.browser.current_url), driver.browser.current_url
 
+    assignment_url = '/course/%s/assignment/%s' % (course_alias,
+                                                   assignment_alias)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             ('//a[contains(@href, %s)]' % assignment_alias)))).click()
+             ('//a[starts-with(@href, "%s")]' % assignment_url)))).click()
+    driver.wait_for_page_loaded()
+    assert (assignment_url in
+            driver.browser.current_url), driver.browser.current_url
