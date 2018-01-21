@@ -915,8 +915,6 @@ export class Arena {
   updateAllowedLanguages(lang_array) {
     let self = this;
 
-    lang_array = lang_array.filter(function(x) { return x; });
-
     var can_submit = lang_array != false;
 
     $('.runs').toggle(can_submit);
