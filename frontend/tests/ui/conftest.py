@@ -121,7 +121,11 @@ class Driver(object):
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
-        self.browser.find_element_by_id('user').send_keys(username)
+        self.wait_for_page_loaded()
+
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.ID, 'user'))).send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
         with self.ajax_page_transition():
             self.browser.find_element_by_id('login_form').submit()
