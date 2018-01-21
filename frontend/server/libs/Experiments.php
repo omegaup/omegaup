@@ -36,15 +36,9 @@
  */
 class Experiments {
     /**
-     * Constant for the omegaUp for Schools experiment.
-     */
-    const SCHOOLS = 'schools';
-
-    /**
      * An array with all the known experiments.
      */
     private static $kKnownExperiments = [
-        self::SCHOOLS,
     ];
 
     /**

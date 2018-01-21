@@ -198,7 +198,7 @@ class Authorization {
     }
 
     public static function isGroupMember($user_id, Groups $group) {
-        if (is_null($group)) {
+        if (is_null($user_id) || is_null($group)) {
             return false;
         }
 

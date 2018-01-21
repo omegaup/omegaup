@@ -1,0 +1,21 @@
+[MESSAGES CONTROL]
+
+# We are locally disabling something because we don't want to hear about it.
+#  I0011 = Locally disabling
+#
+# Too few public methods is bad for context managers.
+#  R0903 = Too few public methods
+#
+# TODOs are useful to locally indicate that something is not (yet) working.
+#  fixme = (warning notes in code comments; message varies).
+disable=I0011,R0903,fixme
+
+[BASIC]
+
+# We allow variables to be two characters.
+attr-rgx=[a-z_][a-z0-9_]{1,64}$
+function-rgx=[a-z_][a-z0-9_]{1,64}$
+variable-rgx=[a-z_][a-z0-9_]{1,64}$
+
+# We also allow 's' (for strings) and 'f' (for files)
+good-names=i,j,k,ex,Run,_,s,f

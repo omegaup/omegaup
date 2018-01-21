@@ -133,6 +133,10 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(0, $run->score);
         $this->assertEquals(0, $run->contest_score);
 
+        // Validate next submission timestamp
+        $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
+        $this->assertEquals(Utils::GetPhpUnixTimestamp() + $submission_gap, $response['nextSubmissionTimestamp']);
+
         $logs = SubmissionLogDAO::search([
             'run_id' => $run->run_id
         ]);
@@ -706,6 +710,7 @@ class RunCreateTest extends OmegaupTestCase {
             'course' => $this->courseData['course_alias'],
             'assignment' => $this->courseData['assignment_alias'],
             'start_time' => Utils::GetPhpUnixTimestamp() + 10,
+            'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
         ]));
 
         $login = self::login($this->student);

@@ -6,6 +6,32 @@
  * @author heduenas
  */
 class QualityNominationFactory {
+    public static $reviewers = [];
+
+    public static function initQualityReviewers() {
+        $qualityReviewerGroup = GroupsDAO::FindByAlias(
+            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        for ($i = 0; $i < 5; $i++) {
+            $reviewer = UserFactory::createUser();
+            GroupsUsersDAO::save(new GroupsUsers([
+                'group_id' => $qualityReviewerGroup->group_id,
+                'user_id' => $reviewer->user_id,
+                'role_id' => Authorization::ADMIN_ROLE,
+            ]));
+            self::$reviewers[] = $reviewer;
+        }
+    }
+
+    public static function initTags() {
+        TagsDAO::save(new Tags(['name' => 'dp']));
+        TagsDAO::save(new Tags(['name' => 'math']));
+        TagsDAO::save(new Tags(['name' => 'matrices']));
+        TagsDAO::save(new Tags(['name' => 'greedy']));
+        TagsDAO::save(new Tags(['name' => 'geometry']));
+        TagsDAO::save(new Tags(['name' => 'search']));
+    }
+
     public static function createSuggestion($login, $problemAlias, $difficulty, $quality, $tags) {
         $contents = [];
         if ($difficulty != null) {

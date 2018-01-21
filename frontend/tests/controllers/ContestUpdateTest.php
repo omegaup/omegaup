@@ -287,4 +287,85 @@ class UpdateContestTest extends OmegaupTestCase {
         $contestData['request']['title'] = $r['title'];
         $this->assertContest($contestData['request']);
     }
+
+    /**
+     * Contestant submits runs and admin edits the penalty type of an
+     * active contest
+     */
+    public function testUpdatePenaltyTypeFromAContest() {
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create our contestant
+        $contestant = UserFactory::createUser();
+
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        // Grade the run
+        RunsFactory::gradeRun($runData);
+
+        // Build request
+        $directorLogin = self::login($contestData['director']);
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+        $penalty_contestant_start = $response['runs'][0]['penalty'];
+
+        $this->assertEquals(100, $response['runs'][0]['contest_score']);
+
+        // Update penalty type to runtime
+        ContestController::apiUpdate(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'penalty_type' => 'runtime',
+        ]));
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertEquals($response['runs'][0]['penalty'], $response['runs'][0]['runtime']);
+
+        // Update penalty type to none
+        ContestController::apiUpdate(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'penalty_type' => 'none',
+        ]));
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertEquals(0, $response['runs'][0]['penalty']);
+
+        // Update penalty type to contest start
+        ContestController::apiUpdate(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'penalty_type' => 'contest_start',
+        ]));
+
+        // Call API
+        $response = ContestController::apiRuns(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertEquals($penalty_contestant_start, $response['runs'][0]['penalty']);
+    }
 }

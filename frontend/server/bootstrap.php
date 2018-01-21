@@ -57,6 +57,7 @@ require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');
+require_once('libs/Email.php');
 require_once('libs/Experiments.php');
 require_once('libs/Git.php');
 require_once('libs/Grader.php');
@@ -95,6 +96,10 @@ Logger::configure([
                 'appenders' => ['csp'],
                 'additivity' => false,
             ],
+            'jserror' => [
+                'appenders' => ['jserror'],
+                'additivity' => false,
+            ],
         ],
         'appenders' => [
             'default' => [
@@ -120,6 +125,19 @@ Logger::configure([
                 ],
                 'params' => [
                     'file' => OMEGAUP_CSP_LOG_FILE,
+                    'append' => true,
+                ],
+            ],
+            'jserror' => [
+                'class' => 'LoggerAppenderFile',
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => '%date: %message %newline',
+                    ],
+                ],
+                'params' => [
+                    'file' => OMEGAUP_JSERROR_LOG_FILE,
                     'append' => true,
                 ],
             ]

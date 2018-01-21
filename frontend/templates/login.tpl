@@ -1,6 +1,7 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleLogin#}"}
 
 <div id="login-page">
+	<script type="text/json" id="payload">{$payload|json_encode}</script>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h2 class="panel-title">{#loginHeader#}</h2>
@@ -48,7 +49,7 @@
 						<input id='pass' name='pass' value='' type='password' class='form-control' tabindex="2" />
 					</div>
 
-					<input id='' name='request' value='login' type='hidden' />
+					<input name="request" value="login" type="hidden" />
 
 					<div class="form-group">
 						<button class="btn btn-primary form-control" type='submit'>{#loginLogIn#}</button>
@@ -100,14 +101,16 @@
 						{#privacyPolicyNotice#}
 					</div>
 					<div class="col-md-4">
+						{if $VALIDATE_RECAPTCHA}
 						<div class="g-recaptcha" data-sitekey="6LfMqdoSAAAAALS8h-PB_sqY7V4nJjFpGK2jAokS"></div>
+						{/if}
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-4 col-md-offset-6">
 						<div class="form-group">
 							<button class="btn btn-primary form-control" type='submit'>{#loginSignUp#}</button>
-							<input id='' name='request' value='register' type='hidden'>
+							<input name="request" value="register" type="hidden">
 						</div>
 					</div>
 				</div>

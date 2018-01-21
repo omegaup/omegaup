@@ -47,6 +47,12 @@ class UserRank extends VO {
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
         }
+        if (isset($data['state_id'])) {
+            $this->state_id = $data['state_id'];
+        }
+        if (isset($data['school_id'])) {
+            $this->school_id = $data['school_id'];
+        }
     }
 
     /**
@@ -109,4 +115,18 @@ class UserRank extends VO {
       * @var char(3)
       */
     public $country_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var char(3)
+      */
+    public $state_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $school_id;
 }

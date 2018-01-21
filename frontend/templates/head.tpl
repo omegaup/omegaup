@@ -8,6 +8,7 @@
 {else}
 		<meta name="google-signin-client_id" content="{$GOOGLECLIENTID}">
 {/if}
+		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
@@ -41,9 +42,6 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/js/bootstrap.min.js"}"></script>
-		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
-		<link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">
-		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-select.min.js"}"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}"></script>
@@ -64,6 +62,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 {/if}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/common.css"}" />
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}

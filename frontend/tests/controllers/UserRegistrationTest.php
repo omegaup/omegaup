@@ -6,14 +6,14 @@
  * @author alanboy@omegaup.com
  */
 class UserRegistrationTest extends OmegaupTestCase {
-    /*
-	 *  Scenario:
-	 *		user A creates a new native account :
-	 *			username=A email=A@example.com
-	 *
-	 *		user B logs in with fb/google:
-	 *			email=A@gmail.com
-	 */
+    /**
+     *  Scenario:
+     *      user A creates a new native account :
+     *          username=A email=A@example.com
+     *
+     *      user B logs in with fb/google:
+     *          email=A@gmail.com
+     */
     public function testUserNameCollision() {
         $salt = Utils::GetPhpUnixTimestamp();
 
@@ -31,5 +31,74 @@ class UserRegistrationTest extends OmegaupTestCase {
         $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt));
         $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt.'1'));
         $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt.'2'));
+    }
+
+    /**
+     * User logged via google, try log in with native mode
+     */
+    public function testUserLoggedViaGoogleAndThenNativeMode() {
+        $username = 'X'.Utils::GetPhpUnixTimestamp();
+        $password = Utils::CreateRandomString();
+
+        $c = new SessionController();
+        $c->LoginViaGoogle($username.'@isp.com');
+        $user = UsersDAO::FindByUsername($username);
+
+        // Users logged via google, facebook, linkedin does not have password
+        $this->assertNull($user->password);
+
+        // Inflate request
+        UserController::$permissionKey = uniqid();
+        $r = new Request([
+            'username' => $username,
+            'password' => $password,
+            'email' => $username.'@isp.com',
+            'permission_key' => UserController::$permissionKey
+        ]);
+
+        // Call API
+        $response = UserController::apiCreate($r);
+
+        $user = UsersDAO::FindByUsername($username);
+
+        // Users logged in native mode must have password
+        $this->assertNotNull($user->password);
+    }
+
+    /**
+     * User logged via google, try log in with native mode, and
+     * different username
+     */
+    public function testUserLoggedViaGoogleAndThenNativeModeWithDifferentUsername() {
+        $username = 'Y'.Utils::GetPhpUnixTimestamp();
+        $email = $username.'@isp.com';
+
+        $c = new SessionController();
+        $c->LoginViaGoogle($email);
+        $user = UsersDAO::FindByUsername($username);
+        $email_user = EmailsDAO::getByPK($user->main_email_id);
+
+        // Asserts that user has the initial username and email
+        $this->assertEquals($user->username, $username);
+        $this->assertEquals($email, $email_user->email);
+
+        // Inflate request
+        UserController::$permissionKey = uniqid();
+        $r = new Request([
+            'username' => 'Z'.$username,
+            'password' => Utils::CreateRandomString(),
+            'email' => $email,
+            'permission_key' => UserController::$permissionKey
+        ]);
+
+        // Call API
+        $response = UserController::apiCreate($r);
+
+        $user = UsersDAO::FindByUsername('Z'.$username);
+        $email_user = EmailsDAO::getByPK($user->main_email_id);
+
+        // Asserts that user has different username but the same email
+        $this->assertNotEquals($user->username, $username);
+        $this->assertEquals($email, $email_user->email);
     }
 }

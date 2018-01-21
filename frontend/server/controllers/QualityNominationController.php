@@ -145,7 +145,10 @@ class QualityNominationController extends Controller {
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
-            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam'])) {
+            if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases'])) {
+                throw new InvalidParameterException('parameterInvalid', 'contents');
+            }
+            if ($contents['reason'] == 'other' && !isset($contents['rationale'])) {
                 throw new InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
@@ -155,7 +158,14 @@ class QualityNominationController extends Controller {
                 }
                 $original = ProblemsDAO::getByAlias($contents['original']);
                 if (is_null($original)) {
-                    throw new NotFoundException('problemNotFound');
+                    $contents['original'] = self::extractAliasFromArgument($contents['original']);
+                    if (is_null($contents['original'])) {
+                        throw new NotFoundException('problemNotFound');
+                    }
+                    $original = ProblemsDAO::getByAlias($contents['original']);
+                    if (is_null($original)) {
+                        throw new NotFoundException('problemNotFound');
+                    }
                 }
             }
         } elseif ($r['nomination'] == 'dismissal') {
@@ -261,9 +271,14 @@ class QualityNominationController extends Controller {
 
         QualityNominationsDAO::transBegin();
         try {
+            $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationsDAO::transEnd();
+            if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
+              $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                $response = self::sendDemotionEmail($r, $qualitynomination);
+            }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
@@ -272,6 +287,49 @@ class QualityNominationController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    public static function extractAliasFromArgument($problemUrl) {
+        $aliasRegex = '/.*[#\/]problem[s]?[#\/]([a-zA-Z0-9-_]+)[\/#$]*/';
+        preg_match($aliasRegex, $problemUrl, $matches);
+        if (sizeof($matches) < 2) {
+            return null;
+        }
+        return $matches[1];
+    }
+
+    /**
+     * Send a mail with demotion notification to the original creator
+     *
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+        $request = [];
+        try {
+            $adminuser = ProblemsDAO::getAdminUser($r['problem']);
+            $email = $adminuser['email'];
+            $username = $adminuser['name'];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $reason = json_decode($qualitynomination->contents);
+        $email_params = [
+            'reason' => $reason->rationale,
+            'problem_name' => htmlspecialchars($r['problem']->title),
+            'user_name' => $username
+        ];
+        global $smarty;
+        $mail_subject = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            $email_params
+        );
+        $mail_body = ApiUtils::FormatString(
+            $smarty->getConfigVars('demotionProblemEmailBody'),
+            $email_params
+        );
+
+        Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
     /**

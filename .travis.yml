@@ -12,87 +12,49 @@ branches:
 
 php:
   - 7.0.7
-  - 7.1
 
 env:
-  - DB=mysql
+  - TEST_SUITE=phpunit
+  - TEST_SUITE=lint
+  - TEST_SUITE=selenium
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.7
+      - deadsnakes
     packages:
-      - python3
-      - python-pip
       - clang-format-3.7
+      - libmysqlclient-dev
+      - nginx
+      - python-pip
+      - python3.5
+      - python3-pip
+      - realpath
+  sauce_connect:
+    username: lhchavez
+  jwt:
+    secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
+
+cache:
+  directories:
+    - $HOME/.yarn-cache
 
 # Disables default git submodules.
 # This is done to only download the modules required for testing.
 git:
   submodules: false
 
-before_install:
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || git submodule update --init \
-         frontend/server/libs/third_party/smarty \
-         frontend/server/libs/third_party/phpmailer \
-         frontend/server/libs/third_party/log4php \
-         frontend/server/libs/third_party/adodb \
-         frontend/server/libs/third_party/facebook-php-graph-sdk \
-         frontend/server/libs/third_party/google-api-php-client
-  - git submodule update --init stuff/hook_tools
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || pip install --user six
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || pip install --user \
-         https://github.com/google/closure-linter/zipball/master
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || nvm install 6.9.1
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || npm install -g yarn
+before_install: stuff/travis/run.sh "${TEST_SUITE}" before_install
 
-cache:
-  directories:
-  - $HOME/.yarn-cache
+install: stuff/travis/run.sh "${TEST_SUITE}" install
 
-before_script:
-  # Workaround for Travis' flaky MySQL connection.
-  - for _ in `seq 30`; do mysql -e ';' && break || sleep 1 ; done
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         python3 stuff/db-migrate.py --username=travis --password= \
-         migrate --databases=omegaup-test
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
-         (pear install pear/PHP_CodeSniffer-2.9.1 && phpenv rehash && \
-          echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini)
+before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
 
-script:
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
-         frontend/tests/phpunit.xml frontend/tests/controllers
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" != 7.1* ]] || \
-         python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || (yarn install && yarn build && yarn test)
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
-         python3 stuff/i18n.py --validate < /dev/null
-  - |
-      ! [[ "${TRAVIS_PHP_VERSION}" == 7.1* ]] || \
-         python3 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
+script: stuff/travis/run.sh "${TEST_SUITE}" script
+
+after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
 
 notifications:
   slack:

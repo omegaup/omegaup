@@ -1,12 +1,27 @@
 <?php
 
+function getTagList() {
+    if (!isset($_GET['tag'])) {
+        return null;
+    }
+    $tags = $_GET['tag'];
+    // Still allow strings to be sent to avoid breaking permalinks.
+    if ($tags === '') {
+        $tags = [];
+    }
+    if (!is_array($tags)) {
+        $tags = explode(',', (string)$tags);
+    }
+    return array_unique($tags);
+}
+
 require_once('../server/bootstrap.php');
 $r = new Request();
 $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $order_by = isset($_GET['order_by']) ? $_GET['order_by'] : 'title';
 $language = isset($_GET['language']) ? $_GET['language'] : null;
-$tags = isset($_GET['tag']) ? array_unique($_GET['tag']) : null;
+$tags = getTagList();
 
 $r['page'] = $page;
 $r['language'] = $language;

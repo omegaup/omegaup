@@ -9,6 +9,7 @@ bin/mysql-connector-java-5.1.29.jar
 *~
 *.swp
 *.pyc
+.cache
 tags
 nohup.out
 tags
@@ -54,6 +55,7 @@ frontend/log/omegaup.log
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
 frontend/tests/controllers/img/
+frontend/tests/ui/results/
 omegaup_test.log
 
 # Ignore runtime and test stuff
@@ -62,6 +64,7 @@ templates_c
 /omegaup/
 bin/grader.sh
 frontend/www/runner-distrib.sh
+geckodriver.log
 
 # Ignore Mac crap :P
 frontend/.DS_Store
@@ -86,3 +89,7 @@ node_modules
 
 # Ignore JavaScript build files.
 frontend/www/js/dist/
+
+# Ignore C++ / Pascal docs
+frontend/www/docs/cpp
+frontend/www/docs/pas

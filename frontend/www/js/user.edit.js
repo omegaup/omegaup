@@ -6,26 +6,13 @@ omegaup.OmegaUp.on('ready', function() {
   $('#graduation_date').datepicker();
 
   $('#school_id').val('');
-  $('#school')
-      .typeahead(
-          {
-            minLength: 2,
-            highlight: true,
-          },
-          {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
-            displayKey: 'label',
-            templates: {
-              empty: omegaup.T.schoolToBeAdded,
-            }
-          })
-      .on('typeahead:selected', function(item, val, text) {
-        $('#school_id').val(val.id);
-        $('#school_name').val(val.label);
-      });
+  omegaup.UI.schoolTypeahead($('#school'), function(item, val, text) {
+    $('#school_id').val(val.id);
+    $('#school_name').val(val.label);
+  });
 
   $('#country_id')
-      .change(function() {
+      .on('change', function() {
         // Clear select
         $('#state_id option').remove();
         $('#state_id').val('');
@@ -65,6 +52,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#scholar_degree').val(data.userinfo.scholar_degree);
         $('#school_id').val(data.userinfo.school_id);
         $('#school').val(data.userinfo.school);
+        $('#programming_language').val(data.userinfo.preferred_language);
         $('#recruitment_optin')
             .prop('checked', data.userinfo.recruitment_optin == 1);
 
@@ -75,7 +63,7 @@ omegaup.OmegaUp.on('ready', function() {
       .fail(omegaup.UI.apiError);
 
   $('form#user_profile_form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         var birth_date = new Date($('#birth_date').val());
         birth_date.setHours(23);
@@ -106,6 +94,7 @@ omegaup.OmegaUp.on('ready', function() {
                           school_id: $('#school_id').val(),
                           school_name: $('#school').val(),
                           locale: $('#locale').val(),
+                          preferred_language: $('#programming_language').val(),
                           recruitment_optin:
                               $('#recruitment_optin').prop('checked') ? 1 : 0
                         })
@@ -120,7 +109,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('form#change-password-form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         var newPassword = $('#new-password-1').val();
         var newPassword2 = $('#new-password-2').val();

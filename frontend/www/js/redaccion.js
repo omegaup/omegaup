@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   $('#wmd-input')
-      .keyup(function() {
+      .on('keyup', function() {
         localStorage.setItem('wmdinput', $('#wmd-input').val());
       });
 });

@@ -211,23 +211,6 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent by an user
-	 */
-
-    final public static function CountTotalRunsOfUser($user_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? ';
-        $val = [$user_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
-
-        global $conn;
-        return $conn->GetOne($sql, $val);
-    }
-
-    /*
 	 * Gets the count of total runs sent to a given problem
 	 */
 
@@ -294,20 +277,44 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given contest by verdict
-	 */
-
-    final public static function CountTotalRunsOfUserByVerdict($user_id, $verdict, $showAllRuns = false) {
+     * Gets the count of total runs sent to a given contest by verdict and by period of time
+     */
+    final public static function CountRunsOfUserPerDatePerVerdict($user_id) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE user_id = ? AND verdict = ? ';
-        $val = [$user_id, $verdict];
+        $sql = '
+                SELECT
+                    r.date,
+                    r.verdict,
+                    COUNT(1) runs
+                FROM (
+                    SELECT
+                        DATE(time) AS date,
+                        verdict
+                    FROM
+                        Runs
+                    WHERE
+                        user_id = ? AND status = \'ready\'
+                ) AS r
+                GROUP BY
+                    r.date, r.verdict
+                ORDER BY
+                  date ASC;';
 
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
+        $val = [$user_id];
 
         global $conn;
-        return $conn->GetOne($sql, $val);
+        $rs = $conn->Execute($sql, $val);
+
+        $ar = [];
+        foreach ($rs as $row) {
+            array_push($ar, [
+                'date' => $row['date'],
+                'verdict' => $row['verdict'],
+                'runs' => $row['runs']
+            ]);
+        }
+
+        return $ar;
     }
 
     /*
@@ -565,6 +572,21 @@ class RunsDAO extends RunsDAOBase {
         return Time::get() >= (strtotime($lastrun->time) + $submission_gap);
     }
 
+    /**
+     * Returns the time of the next submission to the current problem
+     */
+    final public static function nextSubmissionTimestamp($contest) {
+        $submission_gap = RunController::$defaultSubmissionGap;
+        if (!is_null($contest)) {
+            // Get submissions gap
+            $submission_gap = max(
+                $submission_gap,
+                (int)$contest->submissions_gap
+            );
+        }
+        return (Time::get() + $submission_gap);
+    }
+
     public static function GetRunCountsToDate($date) {
         $sql = 'select count(*) as total from Runs where time <= ?';
         $val = [$date];
@@ -700,5 +722,89 @@ class RunsDAO extends RunsDAOBase {
             array_push($ar, $bar);
         }
         return $ar;
+    }
+
+    /**
+     * Recalculate the contest_score of all problemset and problem Runs
+     */
+    public static function recalculateScore($problemset_id, $problem_id, $current_points, $original_points) {
+        $sql = 'UPDATE
+                  `Runs`
+                SET
+                  `contest_score` = `score` * ?
+                WHERE
+                  `problemset_id` = ?
+                  AND `problem_id` = ?;';
+
+        $params = [
+            $current_points,
+            $problemset_id,
+            $problem_id
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    /**
+     * Recalculate contest runs with the following rules:
+     *
+     * + If penalty_type is none then:
+     *   - penalty = 0.
+     * + If penalty_type is runtime then:
+     *   - penalty = runtime.
+     * + If penalty_type is anything else then:
+     *   - penalty = submit_delay
+     */
+    public static function recalculatePenaltyForContest(Contests $contest) {
+        $penalty_type = $contest->penalty_type;
+        if ($penalty_type == 'none') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = 0
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'runtime') {
+            $sql = 'UPDATE
+                        `Runs`
+                    SET
+                        `penalty` = `runtime`
+                    WHERE
+                        `problemset_id` = ?;';
+        } elseif ($penalty_type == 'contest_start') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } elseif ($penalty_type == 'problem_open') {
+            $sql = 'UPDATE
+                        `Runs` r
+                    INNER JOIN
+                        `Problemset_Problem_Opened` ppo
+                        ON (ppo.problemset_id = r.problemset_id
+                            AND r.user_id = ppo.user_id
+                            AND r.problem_id = ppo.problem_id)
+                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
+                    SET
+                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)
+                    WHERE
+                        r.problemset_id = ?;';
+        } else {
+            return 0;
+        }
+        $params = [$contest->problemset_id];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 }

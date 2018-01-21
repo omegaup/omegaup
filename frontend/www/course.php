@@ -1,25 +1,16 @@
 <?php
 require_once('../server/bootstrap.php');
-if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
-    header('HTTP/1.1 404 Not Found');
-    die();
-}
 
 UITools::redirectToLoginIfNotLoggedIn();
 
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
-$show_intro = false;
 $show_assignment = false;
-$result = [];
+$intro_details = [];
 
 try {
-    $show_intro = CourseController::shouldShowIntro($r);
-
-    if ($show_intro) {
-        $result = CourseController::apiIntroDetails($r);
-    }
+    $intro_details = CourseController::apiIntroDetails($r);
 
     if (isset($_REQUEST['assignment_alias'])) {
         $show_assignment = true;
@@ -30,11 +21,11 @@ try {
     die();
 }
 
-if ($show_intro) {
+if ($intro_details['shouldShowResults']) {
     $smarty->assign('course_payload', [
-        'name' => $result['name'],
-        'description' => $result['description'],
-        'alias' => $result['alias'],
+        'name' => $intro_details['name'],
+        'description' => $intro_details['description'],
+        'alias' => $intro_details['alias'],
         'currentUsername' => $session['user']->username,
     ]);
     $smarty->display('../templates/arena.course.intro.tpl');

@@ -121,17 +121,9 @@ class CourseController extends Controller {
      * Validates course exists. Expects $r[$column_name], returns
      * course found on $r['course']. Throws if not found.
      *
-     * @throws InvalidParameterException
+     * @throws NotFoundException
      */
     private static function validateCourseExists(Request $r, $column_name) {
-        /*
-         * TODO: This is used by the many calls of course.php. Could be removed.
-         * https://github.com/omegaup/omegaup/issues/1401
-         */
-        if (!is_null($r['course']) && is_a($r['course'], 'Courses')) {
-            return;
-        }
-
         Validators::isStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
         $r['course'] = CoursesDAO::getByAlias($r[$column_name]);
         if (is_null($r['course'])) {
@@ -166,6 +158,82 @@ class CourseController extends Controller {
     }
 
     /**
+     * Clone a course
+     *
+     * @return Array
+     * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiClone(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+        $original_course = CoursesDAO::getByAlias($r['course_alias']);
+        $offset = round($r['start_time']) - strtotime($original_course->start_time);
+        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+
+        CoursesDAO::transBegin();
+        $response = [];
+        try {
+            // Create the course (and group)
+            $response[] = self::apiCreate(new Request([
+                'name' => $r['name'],
+                'description' => $original_course->description,
+                'alias' => $r['alias'],
+                'start_time' => $r['start_time'],
+                'finish_time' => strtotime($original_course->finish_time) + $offset,
+                'public' => 0, // All cloned courses start in private mode
+                'auth_token' => $auth_token
+            ]));
+
+            $assignments = self::apiListAssignments($r);
+            foreach ($assignments['assignments'] as $assignment) {
+                $problems[$assignment['alias']] = self::apiAssignmentDetails(new Request([
+                    'assignment' => $assignment['alias'],
+                    'course' => $original_course->alias,
+                    'auth_token' => $auth_token
+                ]));
+            }
+
+            foreach ($assignments['assignments'] as $assignment) {
+                // Create and assign homeworks and tests to new course
+                $response[] = self::apiCreateAssignment(new Request([
+                    'course_alias' => $r['alias'],
+                    'name' => $assignment['name'],
+                    'description' => $assignment['description'],
+                    'start_time' => $assignment['start_time'] + $offset,
+                    'finish_time' => $assignment['finish_time'] + $offset,
+                    'alias' => $assignment['alias'],
+                    'assignment_type' => $assignment['assignment_type'],
+                    'auth_token' => $auth_token
+                ]));
+                foreach ($problems[$assignment['alias']]['problems'] as $problem) {
+                    // Create and assign problems to new course
+                    $response[] = self::apiAddProblem(new Request([
+                        'course_alias' => $r['alias'],
+                        'assignment_alias' => $assignment['alias'],
+                        'problem_alias' => $problem['alias'],
+                        'auth_token' => $auth_token
+                    ]));
+                }
+            }
+            CoursesDAO::transEnd();
+        } catch (InvalidParameterException $e) {
+            CoursesDAO::transRollback();
+            throw $e;
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            CoursesDAO::transRollback();
+            throw $e;
+        } catch (Exception $e) {
+            CoursesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok', 'alias' => $r['alias']];
+    }
+
+    /**
      * Create new course
      *
      * @throws InvalidDatabaseOperationException
@@ -173,12 +241,10 @@ class CourseController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);
 
@@ -216,6 +282,7 @@ class CourseController extends Controller {
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
+                'school_id' => $r['school_id'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
@@ -243,12 +310,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCreateAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateAssignment($r);
 
@@ -298,12 +363,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r, true /*is_required*/);
 
@@ -354,12 +417,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAddProblem(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -406,13 +467,61 @@ class CourseController extends Controller {
         return ['status' => 'ok'];
     }
 
-    public static function apiGetProblemUsers(Request $r) {
+    /**
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateProblemsOrder(Request $r) {
         global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset(
+            $r['course']->course_id,
+            $r['assignment_alias']
+        );
+        if (is_null($problemSet)) {
+            throw new NotFoundException('problemsetNotFound');
+        }
+
+        // Update problems order
+        $problems = $r['problems'];
+        foreach ($problems as $problem) {
+            $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
+            if (is_null($problem)) {
+                throw new NotFoundException('problemNotFound');
+            }
+
+            $order = 1;
+            if (is_numeric($r['order'])) {
+                $order = (int)$r['order'];
+            }
+            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
+                'problemset_id' => $problemSet->problemset_id,
+                'problem_id' => $currentProblem->problem_id,
+                'order' => $problem['order']
+            ]));
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    public static function apiGetProblemUsers(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -442,12 +551,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveProblem(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -507,12 +614,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssignments(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
@@ -573,12 +678,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveAssignment(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -624,12 +727,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListCourses(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
 
         Validators::isNumber($r['page'], 'page', false);
@@ -689,12 +790,10 @@ class CourseController extends Controller {
      * @return Array response
      */
     public static function apiListStudents(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -719,12 +818,10 @@ class CourseController extends Controller {
     }
 
     public static function apiStudentProgress(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -800,12 +897,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiMyProgress(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -843,12 +938,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAddStudent(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -893,12 +986,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiRemoveStudent(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
@@ -1122,24 +1213,24 @@ class CourseController extends Controller {
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
      * @throws NotFoundException Course not found or trying to directly access a private course.
-     * @return Boolean
+     * @throws ForbiddenAccessException
+     * @return array
      */
-    public static function shouldShowIntro(Request $r) {
+    public static function apiIntroDetails(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
         self::resolveGroup($r);
 
-        // If canViewCourse is true, then user is already inside the course...
-        if (Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
-            return false;
+        $shouldShowIntro = !Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group']);
+        if ($shouldShowIntro && !$r['course']->public) {
+            throw new ForbiddenAccessException();
         }
-
-        // If not previously registered and course is private, hide its existence
-        if (!$r['course']->public) {
-            throw new NotFoundException('courseNotFound');
-        }
-
-        return true;
+        $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result['shouldShowResults'] = $shouldShowIntro;
+        return $result;
     }
 
     /**
@@ -1167,6 +1258,7 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
+                'school_id' => $r['course']->school_id,
                 'start_time' => strtotime($r['course']->start_time),
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
@@ -1186,6 +1278,13 @@ class CourseController extends Controller {
                     $group->group_id
                 );
             }
+            if (!is_null($r['course']->school_id)) {
+                $school = SchoolsDAO::getByPK($r['course']->school_id);
+                if ($school != null) {
+                    $result['school_name'] = $school->name;
+                    $result['school_id'] = $school->school_id;
+                }
+            }
         }
 
         return $result;
@@ -1197,12 +1296,9 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAdminDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
-
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1249,12 +1345,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAssignmentDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateAssignmentDetails($r);
 
@@ -1295,12 +1389,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiDetails(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'alias');
         self::resolveGroup($r);
@@ -1318,45 +1410,16 @@ class CourseController extends Controller {
     }
 
     /**
-     * Returns public details of a given course
-     * @param  Request $r
-     * @return array
-     */
-    public static function apiIntroDetails(Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
-        }
-
-        self::authenticateRequest($r);
-        self::validateCourseExists($r, 'alias');
-        self::resolveGroup($r);
-
-        // Details available for public courses, otherwise Either only Course Admins or
-        // Group Members (students) can see these results
-        if (!Authorization::canViewCourse(
-            $r['current_user_id'],
-            $r['course'],
-            $r['group']
-        ) && !$r['course']->public) {
-            throw new ForbiddenAccessException();
-        }
-
-        return self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
-    }
-
-    /**
      * Edit Course contents
      *
      * @param  Request $r
      * @return array
      */
     public static function apiUpdate(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true /* is update */);
 
@@ -1374,6 +1437,7 @@ class CourseController extends Controller {
             'finish_time' => ['transform' => function ($value) {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
+            'school_id',
             'show_scoreboard',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;

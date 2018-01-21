@@ -19,7 +19,8 @@ OmegaUp.on('ready', function() {
                                    nomination: 'demotion',
                                    contents: JSON.stringify({
                                      'rationale': ev.rationale || 'N/A',
-                                     'reason': ev.selectedReason
+                                     'reason': ev.selectedReason,
+                                     'original': ev.original
                                    })
                                  })
                 .fail(UI.apiError);

@@ -45,7 +45,7 @@ let UI = {
   warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
 
   apiError: function(response) {
-    UI.error((response.error || 'error').toString());
+    UI.error(((response && response.error) || 'error').toString());
   },
 
   ignoreError: function(response) {},
@@ -69,11 +69,6 @@ let UI = {
             operation(this.id, resolve, reject);
           }
         });
-    if (typeof usernames != 'undefined') {
-      usernames.each(function(event, index) {
-        operation(event, resolve, reject);
-      });
-    }
 
     // Wait for all
     $(document)
@@ -92,9 +87,7 @@ let UI = {
                                            omegaup.T.bulkOperationError,
                                        error));
             } else {
-              UI.success((typeof usernames != 'undefined') ?
-                             omegaup.T.bulkUserAddSuccess :
-                             omegaup.T.updateItemsSuccess);
+              UI.success(omegaup.T.updateItemsSuccess);
             }
           }
         });
@@ -129,9 +122,9 @@ let UI = {
   typeaheadWrapper: function(f) {
     var lastRequest = null;
     var pending = false;
-    function wrappedCall(query, callback) {
+    function wrappedCall(query, syncResults, asyncResults) {
       if (pending) {
-        lastRequest = [query, callback];
+        lastRequest = [query, asyncResults];
       } else {
         pending = true;
         f({query: query})
@@ -139,7 +132,7 @@ let UI = {
               if (lastRequest != null) {
                 // Typeahead will ignore any stale callbacks. Given that we
                 // will start a new request ASAP, let's do a best-effort
-                // callback to the current request with the old data.
+                // asyncResults to the current request with the old data.
                 lastRequest[1](data);
                 pending = false;
                 var request = lastRequest;
@@ -147,9 +140,9 @@ let UI = {
                 wrappedCall(request[0], request[1]);
               } else {
                 if (data.results) {
-                  callback(data.results);
+                  asyncResults(data.results);
                 } else {
-                  callback(data);
+                  asyncResults(data);
                 }
               }
             })
@@ -169,10 +162,11 @@ let UI = {
             },
             {
               source: UI.typeaheadWrapper(searchFn),
-              displayKey: 'label',
+              async: true,
+              display: 'label',
             })
-        .on('typeahead:selected', cb)
-        .on('typeahead:autocompleted', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   problemTypeahead: function(elem, cb) {
@@ -184,7 +178,8 @@ let UI = {
             },
             {
               source: UI.typeaheadWrapper(API.Problem.list),
-              displayKey: 'alias',
+              async: true,
+              display: 'alias',
               templates: {
                 suggestion: function(val) {
                   return UI.formatString('<strong>%(title)</strong> (%(alias))',
@@ -192,8 +187,27 @@ let UI = {
                 }
               }
             })
-        .on('typeahead:selected', cb)
-        .on('typeahead:autocompleted', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
+  },
+
+  schoolTypeahead: function(elem, cb) {
+    cb = cb || function(event, val) { $(event.target).val(val.value); };
+    elem.typeahead(
+            {
+              minLength: 2,
+              highlight: true,
+            },
+            {
+              source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
+              async: true,
+              display: 'label',
+              templates: {
+                empty: omegaup.T.schoolToBeAdded,
+              }
+            })
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
@@ -245,7 +259,11 @@ export {UI as default};
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {
       try {
-        var response = jQuery.parseJSON(xhr.responseText);
+        var responseText = xhr.responseText;
+        var response = {};
+        if (responseText) {
+          response = JSON.parse(responseText);
+        }
         console.error(settings.url, xhr.status, response.error, response);
       } catch (e) {
         console.error(settings.url, xhr.status, xhr.responseText);

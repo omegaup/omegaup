@@ -16,7 +16,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(school, index) in rank">
+            <tr v-for="(school, index) in rankFiltered">
               <td>{{index + 1}}</td>
               <td class="cell-school-name"
                   colspan="2"
@@ -38,9 +38,9 @@ import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 
 export default {
-  props: {
-    rank: Array,
-  },
+  props: {rank: Array, rowCount: Number},
+  computed:
+      {rankFiltered: function() { return this.rank.slice(0, this.rowCount);}},
   data: function() { return {T: T, UI: UI};},
   components: {
     'omegaup-countryflag': CountryFlag,

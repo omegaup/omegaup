@@ -1,23 +1,45 @@
 <?php
 
 class QualityNominationTest extends OmegaupTestCase {
-    private static $reviewers = [];
+    public static function testGetNominationsHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
 
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
+        $login = self::login($contestant);
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
 
-        $qualityReviewerGroup = GroupsDAO::FindByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-        );
-        for ($i = 0; $i < 5; $i++) {
-            $reviewer = UserFactory::createUser();
-            GroupsUsersDAO::save(new GroupsUsers([
-                'group_id' => $qualityReviewerGroup->group_id,
-                'user_id' => $reviewer->user_id,
-                'role_id' => Authorization::ADMIN_ROLE,
-            ]));
-            self::$reviewers[] = $reviewer;
-        }
+        $nominations = QualityNominationsDAO::getNominations(null, null);
+        self::assertArrayHasKey('author', $nominations[0]);
+        self::assertArrayHasKey('nominator', $nominations[0]);
+    }
+
+    public static function testGetByIdHasAuthorAndNominatorSet() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        $result = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'ew',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        self::assertArrayHasKey('author', $nomination);
+        self::assertArrayHasKey('nominator', $nomination);
+        self::assertEquals($contestant->username, $nomination['nominator']['username']);
     }
 
     public function testApiDetailsReturnsFieldsRequiredByUI() {
@@ -43,7 +65,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
@@ -52,6 +74,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
         $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
         $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this::assertArrayHasKey('author', $details);
         $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
         $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
         $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
@@ -182,6 +205,23 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
     }
 
+    public function testExtractAliasFromArgument() {
+        $inputAndExpectedOutput =
+                ['http://localhost:8080/arena/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/prueba/practice/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/problem/sumas#problems' => 'sumas',
+                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8080/arena/prueba/#problems/sumas29187' => 'sumas29187',
+                 'http://localhost:8080/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
+                 'http://localhost:8080/arena/problem/_sumas29187-#problems' => '_sumas29187-',
+                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
+
+        foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
+            $actualOutput = QualityNominationController::extractAliasFromArgument($input);
+            $this->assertEquals($expectedOutput, $actualOutput, 'Incorrect alias was extracted from URL.');
+        }
+    }
+
     /**
      * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
      */
@@ -235,7 +275,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -265,6 +305,44 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Check that a demotion approved by a reviewer sends an email to the problem creator.
+     */
+    public function testDemotionApprovedByReviewerAndSendMail() {
+        $emailSender = new ScopedEmailSender();
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $qualitynomination = QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'qwert',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $request = new Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'approved',
+            'problem_alias' => $problemData['request']['alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+        $response = QualityNominationController::apiResolve($request);
+
+        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
+        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
+        $this->assertEquals(1, count($emailSender::$listEmails));
+    }
+
+    /**
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {
@@ -287,7 +365,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and deny ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
@@ -325,7 +403,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -378,7 +456,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -456,6 +534,17 @@ class QualityNominationTest extends OmegaupTestCase {
                 'original' => $originalProblemData['request']['alias'],
             ]),
         ]));
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'rationale' => 'otro sumas',
+                'reason' => 'duplicate',
+                'original' => 'https://omegaup.com/arena/problem/' . $originalProblemData['request']['alias'] . '#problems',
+            ]),
+        ]));
     }
 
     /**
@@ -485,7 +574,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Login as an arbitrary reviewer.
-        $login = self::login(self::$reviewers[0]);
+        $login = self::login(QualityNominationFactory::$reviewers[0]);
         $response = QualityNominationController::apiList(new Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -503,7 +592,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
-            self::$reviewers,
+            QualityNominationFactory::$reviewers,
             function ($reviewer) use (&$nomination) {
                 return $reviewer->username == $nomination['votes'][0]['user']['username'];
             }
@@ -577,7 +666,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ['DP', 'Math']
         );
 
-        $reviewerLogin = self::login(self::$reviewers[0]);
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         $list = QualityNominationController::apiList(new Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
@@ -643,7 +732,8 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $actualGlobals = QualityNominationsDAO::getGlobalDifficultyAndQuality();
+        $globalContents = QualityNominationsDAO::getAllNominations();
+        $actualGlobals = QualityNominationsDAO::calculateGlobalDifficultyAndQuality($globalContents);
         $expectedGlobals = [23/11 /*quality*/, 54/16 /*difficulty*/];
 
         $this->assertEquals($expectedGlobals, $actualGlobals);
@@ -653,9 +743,10 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
-
-        $actualResult[0] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[0]['problem']->problem_id);
-        $actualResult[1] = QualityNominationsDAO::getProblemSuggestionAggregates($problemData[1]['problem']->problem_id);
+        $contents[0] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
+        $actualResult[0] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[0]);
+        $contents[1] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
+        $actualResult[1] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[1]);
 
         $expectedResult[0] = [
             'quality_sum' => 13,
@@ -688,18 +779,19 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function testAggregateFeedback() {
-        TagsDAO::save(new Tags(['name' => 'dp']));
-        TagsDAO::save(new Tags(['name' => 'math']));
-        TagsDAO::save(new Tags(['name' => 'matrices']));
-        TagsDAO::save(new Tags(['name' => 'greedy']));
-        TagsDAO::save(new Tags(['name' => 'geometry']));
-        TagsDAO::save(new Tags(['name' => 'search']));
-
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        QualityNominationsDAO::aggregateFeedback();
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
@@ -707,6 +799,60 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals(2.34545, $newProblem[0]->quality, 'Wrong quality.', 0.001);
         $this->assertEquals(3.27678, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(1.8595, $newProblem[1]->quality, 'Wrong quality.', 0.001);
+
+        $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
+            $newProblem[0],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        );
+        $tagArrayForProblem2 = ProblemsTagsDAO::getProblemTags(
+            $newProblem[1],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        );
+        $extractName = function ($tag) {
+            return $tag['name'];
+        };
+        $tags1 = array_map($extractName, $tagArrayForProblem1);
+        $tags2 = array_map($extractName, $tagArrayForProblem2);
+        $this->assertEquals($tags1, ['dp', 'math', 'greedy']);
+        $this->assertEquals($tags2, ['dp', 'math', 'geometry', 'search']);
+    }
+
+    public function testAutogeneratedTagsWithConflicts() {
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        // Manually add one tag.
+        ProblemsFactory::addTag($problemData[0], 'dp', 1 /* public */);
+        $tags = array_map(function ($tag) {
+            return $tag['name'];
+        }, ProblemsTagsDAO::getProblemTags(
+            $problemData[0]['problem'],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        ));
+        $this->assertEquals($tags, ['dp']);
+
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+
+        $tags = array_map(function ($tag) {
+            return $tag['name'];
+        }, ProblemsTagsDAO::getProblemTags(
+            $problemData[0]['problem'],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        ));
+        $this->assertEquals($tags, ['dp', 'math', 'greedy']);
     }
 
     public function setUpSyntheticSuggestions($problemData) {
@@ -871,6 +1017,11 @@ class QualityNominationTest extends OmegaupTestCase {
             3,
             ['Geometry', 'Math']
         );
+    }
+
+    private static function commit() {
+        global $conn;
+        $conn->Execute('COMMIT');
     }
 
     public function testMostVotedTags() {

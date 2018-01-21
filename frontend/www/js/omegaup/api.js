@@ -21,7 +21,11 @@ function _call(url, transform, defaultParams) {
         .fail(function(jqXHR) {
           var errorData;
           try {
-            errorData = JSON.parse(jqXHR.responseText);
+            if (jqXHR.responseText) {
+              errorData = JSON.parse(jqXHR.responseText);
+            } else {
+              errorData = {status: 'error', error: null};
+            }
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
@@ -49,6 +53,7 @@ function _convertTimes(item) {
 
 function _normalizeContestFields(contest) {
   omegaup.OmegaUp.convertTimes(contest);
+  contest.submissions_gap = parseInt(contest.submissions_gap);
   contest.show_penalty =
       (contest.penalty != 0 || contest.penalty_type != 'none');
   return contest;
@@ -187,6 +192,8 @@ export default {
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
 
+    clone: _call('/api/course/clone/'),
+
     create: _call('/api/course/create/'),
 
     details: _call('/api/course/details/', _convertTimes),
@@ -257,6 +264,8 @@ export default {
     update: _call('/api/course/update/'),
 
     updateAssignment: _call('/api/course/updateAssignment/'),
+
+    updateProblemsOrder: _call('/api/course/updateProblemsOrder/'),
   },
 
   Grader: {
@@ -438,7 +447,10 @@ export default {
   },
 
   School: {
+    create: _call('/api/school/create/'),
+
     list: _call('/api/school/list/'),
+
     rank: _call('/api/school/rank/'),
   },
 

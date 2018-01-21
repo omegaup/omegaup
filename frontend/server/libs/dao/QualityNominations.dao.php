@@ -114,10 +114,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
 
         $nomination['time'] = (int)$nomination['time'];
-        $nomination['nominator'] = [
-            'username' => $nomination['username'],
-            'name' => $nomination['name'],
-        ];
+        foreach (['nominator', 'author'] as $userRole) {
+            $nomination[$userRole] = [
+                'username' => $nomination[$userRole . '_username'],
+                'name' => $nomination[$userRole . '_name'],
+            ];
+        }
         unset($nomination['username']);
         unset($nomination['name']);
         $nomination['problem'] = [
@@ -163,10 +165,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.nomination,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -176,37 +180,45 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         INNER JOIN
             Users nominator
         ON
-            nominator.user_id = qn.user_id';
+            nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id';
         $params = [];
+        $conditions = [];
 
-        if (!empty($types) || !is_null($nominator)) {
-            $conditions = [];
-            if (!empty($types)) {
-                global $conn;
-                $connectionID = $conn->_connectionID;
-                $escapeFunc = function ($type) use ($connectionID) {
-                    return mysqli_real_escape_string($connectionID, $type);
-                };
-                $conditions[] =
-                    ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
-            }
-            if (!is_null($nominator)) {
-                $conditions[] = ' qn.user_id = ?';
-                $params[] = $nominator;
-            }
-            if (!empty($conditions)) {
-                $sql .= ' WHERE ' . implode(' AND ', $conditions);
-            }
-        } elseif (!is_null($assignee)) {
+        if (!is_null($assignee)) {
             $sql .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
             ON
-                qnr.qualitynomination_id = qn.qualitynomination_id
-            WHERE
-                qnr.user_id = ?';
+                qnr.qualitynomination_id = qn.qualitynomination_id';
+
+            $conditions[] = ' qnr.user_id = ?';
             $params[] = $assignee;
         }
+        if (!empty($types)) {
+            global $conn;
+            $connectionID = $conn->_connectionID;
+            $escapeFunc = function ($type) use ($connectionID) {
+                return mysqli_real_escape_string($connectionID, $type);
+            };
+            $conditions[] =
+                ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
+        }
+        if (!is_null($nominator)) {
+            $conditions[] = ' qn.user_id = ?';
+            $params[] = $nominator;
+        }
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
         $sql .= ' LIMIT ?, ?;';
         $params[] = $page * $pageSize;
         $params[] = ($page + 1) * $pageSize;
@@ -231,10 +243,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qn.contents,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username,
-            nominator.name,
+            nominator.username as nominator_username,
+            nominator.name as nominator_name,
             p.alias,
-            p.title
+            p.title,
+            author.username as author_username,
+            author.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -245,6 +259,14 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             Users nominator
         ON
             nominator.user_id = qn.user_id
+        INNER JOIN
+            ACLs acl
+        ON
+            acl.acl_id = p.acl_id
+        INNER JOIN
+            Users author
+        ON
+            author.user_id = acl.owner_id
         WHERE
             qn.qualitynomination_id = ?;';
 
@@ -253,21 +275,26 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function computes the average difficulty and quality among all problems.
+     * This function gets the contents of QualityNomination table
      */
-    public static function getGlobalDifficultyAndQuality() {
+    public static function getAllNominations() {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
+        global $conn;
+        return $conn->Execute($sql);
+    }
+
+    /**
+     * This function computes the average difficulty and quality among all problems.
+     */
+    public static function calculateGlobalDifficultyAndQuality($contents) {
         $qualitySum = 0;
         $qualityN = 0;
         $difficultySum = 0;
         $difficultyN = 0;
 
-        global $conn;
-        $result = $conn->Execute($sql);
-
-        foreach ($result as $nomination) {
+        foreach ($contents as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
             if (isset($feedback['quality'])) {
                 $qualitySum += $feedback['quality'];
@@ -283,16 +310,21 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     /**
-     * This function computes sums of difficulty, quality, and tag votes for
-     * each problem and returns that in the form of a table.
+     * This function gets contents of QualityNomination table
      */
-    public static function getProblemSuggestionAggregates($problemId) {
+    public static function getAllSuggestionsPerProblem($problemId) {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
         global $conn;
-        $result = $conn->Execute($sql);
+        return $conn->Execute($sql);
+    }
 
+    /**
+     * This function computes sums of difficulty, quality, and tag votes for
+     * each problem and returns that in the form of a table.
+     */
+    public static function calculateProblemSuggestionAggregates($contents) {
         $problemAggregates = [
             'quality_sum' => 0,
             'quality_n' => 0,
@@ -302,7 +334,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             'tags' => [],
         ];
 
-        foreach ($result as $nomination) {
+        foreach ($contents as $nomination) {
             $feedback = (array) json_decode($nomination['contents']);
 
             if (isset($feedback['quality'])) {
@@ -336,15 +368,17 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      * This function is to be called (only) by a cronjob.
      */
     public static function aggregateFeedback() {
+        $globalContents = self::getAllNominations();
         list($globalQualityAverage, $globalDifficultyAverage)
-                = self::getGlobalDifficultyAndQuality();
+          = self::calculateGlobalDifficultyAndQuality($globalContents);
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
         global $conn;
         foreach ($conn->Execute($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
-            $problemAggregates = self::getProblemSuggestionAggregates($problemId);
+            $contents = self::getAllSuggestionsPerProblem($problemId);
+            $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
 
             $problem = ProblemsDAO::getByPK($problemId);
             $problem->quality = self::bayesianAverage(

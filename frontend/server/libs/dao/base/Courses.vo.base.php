@@ -53,6 +53,9 @@ class Courses extends VO {
         if (isset($data['public'])) {
             $this->public = $data['public'];
         }
+        if (isset($data['school_id'])) {
+            $this->school_id = $data['school_id'];
+        }
     }
 
     /**
@@ -130,4 +133,11 @@ class Courses extends VO {
       * @var tinyint(1)
       */
     public $public;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $school_id;
 }
