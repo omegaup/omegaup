@@ -22,7 +22,7 @@ def test_create_course(driver):
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-        add_students(driver, user)
+        add_students(driver, [user])
 
         add_assignment(driver, assignment_alias)
 
@@ -51,10 +51,8 @@ def create_course(driver, course_alias, school_name):
             (By.CLASS_NAME, ('name')))).send_keys(course_alias)
     driver.browser.find_element_by_class_name('alias').send_keys(
         course_alias)
-    driver.browser.find_element_by_class_name('tt-hint').send_keys(
-        school_name)
-    driver.browser.find_element_by_class_name('tt-input').send_keys(
-        school_name)
+    driver.typeahead_helper('.omegaup-course-details', school_name,
+                            select_suggestion=False)
     driver.browser.find_element_by_tag_name('textarea').send_keys(
         'course description')
 
@@ -66,16 +64,11 @@ def add_students(driver, users):
     '''Add students to a recently created course.'''
 
     driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "students")]')))).click()
 
     for user in users:
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, (
-                    '.omegaup-course-addstudent .tt-hint')))).send_keys(user)
-        driver.browser.find_element_by_css_selector(
-            '.omegaup-course-addstudent .tt-input').send_keys(user)
+        driver.typeahead_helper('.omegaup-course-addstudent', user)
 
         driver.browser.find_element_by_css_selector(
             '.omegaup-course-addstudent form button[type=submit]').click()
@@ -114,7 +107,7 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     '''Add problems to an assignment given.'''
 
     driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "#problems")]')))).click()
 
     driver.wait.until(
@@ -124,16 +117,12 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
               % assignment_alias)))).click()
 
     driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.CSS_SELECTOR, (
                 '.tab-pane.active .problemlist button')))).click()
 
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, (
-                '.problems-dropdown.tt-hint')))).send_keys(problem)
-    driver.browser.find_element_by_css_selector(
-        '.problems-dropdown.tt-input').send_keys(problem)
+    driver.typeahead_helper('.omegaup-course-problemlist', problem,
+                            select_suggestion=False)
 
     driver.browser.find_element_by_css_selector(
         '.omegaup-course-problemlist form button[type=submit]').click()

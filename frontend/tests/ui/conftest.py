@@ -14,6 +14,8 @@ import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 _DEFAULT_TIMEOUT = 3  # seconds
@@ -68,6 +70,27 @@ class Driver(object):
         self.wait.until(
             lambda _: self.browser.execute_script(
                 'return document.readyState;') == 'complete')
+        self.wait.until(
+            lambda _: self.browser.execute_script('return !jQuery.active;'))
+
+    def typeahead_helper(self, parent_selector, value, select_suggestion=True):
+        '''Helper to interact with Typeahead elements.'''
+
+        tt_input = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '%s input.tt-input' % parent_selector)))
+        for value_char in value:
+            tt_input.send_keys(value_char)
+
+        if not select_suggestion:
+            return
+
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '%s .tt-suggestion.tt-selectable' % parent_selector)
+            )).click()
 
     @contextlib.contextmanager
     def login_user(self):

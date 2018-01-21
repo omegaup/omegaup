@@ -124,31 +124,27 @@ let UI = {
     var pending = false;
     function wrappedCall(query, syncResults, asyncResults) {
       if (pending) {
-        lastRequest = [query, asyncResults];
-      } else {
-        pending = true;
-        f({query: query})
-            .then(function(data) {
-              if (lastRequest != null) {
-                // Typeahead will ignore any stale callbacks. Given that we
-                // will start a new request ASAP, let's do a best-effort
-                // asyncResults to the current request with the old data.
-                lastRequest[1](data);
-                pending = false;
-                var request = lastRequest;
-                lastRequest = null;
-                wrappedCall(request[0], request[1]);
-              } else {
-                if (data.results) {
-                  asyncResults(data.results);
-                } else {
-                  asyncResults(data);
-                }
-              }
-            })
-            .fail(UI.ignoreError)
-            .always(function() { pending = false; });
+        lastRequest = arguments;
+        return;
       }
+      pending = true;
+      f({query: query})
+          .then(function(data) {
+            if (lastRequest != null) {
+              // Typeahead will ignore any stale callbacks. Given that we
+              // will start a new request ASAP, let's do a best-effort
+              // asyncResults to the current request with the old data.
+              lastRequest[2](data);
+              pending = false;
+              let request = lastRequest;
+              lastRequest = null;
+              wrappedCall.apply(request);
+              return;
+            }
+            asyncResults(data.results || data);
+          })
+          .fail(UI.ignoreError)
+          .always(function() { pending = false; });
     }
     return wrappedCall;
   },
