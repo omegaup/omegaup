@@ -18,7 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-_DEFAULT_TIMEOUT = 5  # seconds
+_DEFAULT_TIMEOUT = 10  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
