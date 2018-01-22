@@ -11,8 +11,7 @@ omegaup.OmegaUp.on('ready', function() {
         // Explicitly join the contest.
         omegaup.API.Contest.open({contest_alias: contestAlias})
             .then(function(result) { window.location.reload(); })
-            .fail(function(result) { $('#start-contest-form')
-                                         .show(); });
+            .fail(omegaup.UI.apiError);
       });
 
   $('#request-access-form')

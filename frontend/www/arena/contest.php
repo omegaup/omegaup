@@ -14,7 +14,14 @@ try {
     die(file_get_contents('../404.html'));
 }
 
-if ($show_intro) {
+if ($show_intro['shouldShowIntro']) {
+    $session = SessionController::apiCurrentSession($r)['session'];
+    $smarty->assign(
+        'needsBasicInformation',
+        $show_intro['needsBasicInformation'] && !is_null($session['user']) && (
+            !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
+        )
+    );
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');
