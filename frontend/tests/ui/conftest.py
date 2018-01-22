@@ -13,7 +13,7 @@ import urllib
 import pytest
 
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -73,11 +73,22 @@ class Driver(object):
     def wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''
 
-        self.wait.until(
-            lambda _: self.browser.execute_script(
-                'return document.readyState;') == 'complete')
-        self.wait.until(
-            lambda _: self.browser.execute_script('return !jQuery.active;'))
+        try:
+            self.wait.until(
+                lambda _: self.browser.execute_script(
+                    'return document.readyState;') == 'complete')
+        except TimeoutException as ex:
+            raise Exception('document ready state still %s' %
+                            self.browser.execute_script(
+                                'return document.readyState;')) from ex
+        try:
+            self.wait.until(
+                lambda _: self.browser.execute_script(
+                    'return jQuery.active;') == 0)
+        except TimeoutException as ex:
+            raise Exception('%d AJAX calls still active' %
+                            self.browser.execute_script(
+                                'return jQuery.active;')) from ex
 
     def typeahead_helper(self, parent_selector, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
