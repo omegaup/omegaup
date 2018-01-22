@@ -77,6 +77,10 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
+                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
         # Alias should be set automatically
         driver.browser.find_element_by_name('source').send_keys('test')
