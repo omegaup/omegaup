@@ -1,6 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
   $('.new_contest_form')
-      .submit(function(ev) {
+      .on('submit', function(ev) {
         ev.preventDefault();
         var window_length_value = $('#window-length-enabled').is(':checked') ?
                                       $('#window-length').val() :
@@ -44,7 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Toggle on/off window length on checkbox change
   $('#window-length-enabled')
-      .change(function() {
+      .on('change', function() {
         if ($(this).is(':checked')) {
           // Enable
           $('#window-length').removeAttr('disabled');

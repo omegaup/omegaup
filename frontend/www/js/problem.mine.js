@@ -45,7 +45,7 @@
   }
   fillProblemsTable();
 
-  $('#show-admin-problems').click(fillProblemsTable);
+  $('#show-admin-problems').on('click', fillProblemsTable);
 
   function makePublic(isPublic) {
     return function() {
@@ -64,6 +64,6 @@
     };
   }
 
-  $('#bulk-make-public').click(makePublic(true));
-  $('#bulk-make-private').click(makePublic(false));
+  $('#bulk-make-public').on('click', makePublic(true));
+  $('#bulk-make-private').on('click', makePublic(false));
 })();

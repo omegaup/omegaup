@@ -36,7 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
         // Enable the first visible tab.
         var tabs = $('.nav-link');
         if (tabs.length > 0) {
-          $(tabs[0]).click();
+          $(tabs[0]).trigger('click');
         }
         $('.tab-container').show();
       })

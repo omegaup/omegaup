@@ -12,6 +12,7 @@ stage_install() {
 	# Install pre-dependencies
 	pip3 install --user selenium
 	pip3 install --user pytest
+	pip3 install --user flaky
 
 	# Expand all templates
 	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do

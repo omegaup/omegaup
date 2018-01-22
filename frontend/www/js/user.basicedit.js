@@ -1,10 +1,8 @@
 $('document')
     .ready(function() {
       omegaup.API.User.profile()
-          .then(function(data) {
-            $('#username').val(data.userinfo.username);
-            $('#name').val(data.userinfo.name);
-          })
+          .then(function(data) { $('#username')
+                                     .val(data.userinfo.username); })
           .fail(omegaup.UI.apiError);
 
       var formSubmit = function() {
@@ -17,7 +15,6 @@ $('document')
 
         omegaup.API.User.updateBasicInfo({
                           username: $('#username').val(),
-                          name: $('#name').val(),
                           password: $('#new-password-1').val(),
                         })
             .then(function(response) { window.location = '/profile/'; })
@@ -25,5 +22,5 @@ $('document')
         return false;  // Prevent page refresh on submit
       };
 
-      $('form#user_profile_form').submit(formSubmit);
+      $('form#user_profile_form').on('submit', formSubmit);
     });

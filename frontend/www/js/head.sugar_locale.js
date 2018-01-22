@@ -1,1 +1,7 @@
-Date.setLocale($('head').attr('data-locale'));
+(function() {
+  var locale = $('head').attr('data-locale');
+  if (locale == 'pseudo') {
+    locale = 'en';
+  }
+  Date.setLocale(locale);
+})();

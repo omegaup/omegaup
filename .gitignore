@@ -64,6 +64,7 @@ templates_c
 /omegaup/
 bin/grader.sh
 frontend/www/runner-distrib.sh
+geckodriver.log
 
 # Ignore Mac crap :P
 frontend/.DS_Store

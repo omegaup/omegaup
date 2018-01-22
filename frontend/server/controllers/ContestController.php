@@ -2134,13 +2134,15 @@ class ContestController extends Controller {
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
 
+        $original_contest = ContestsDAO::getByPK($r['contest']->contest_id);
+
         // Push changes
         try {
             // Begin a new transaction
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            ContestsDAO::save($r['contest']);
+            self::updateContest($r['contest'], $original_contest->penalty_type);
 
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
@@ -2250,6 +2252,17 @@ class ContestController extends Controller {
         self::$log->info('Contest updated (alias): ' . $r['contest_alias']);
 
         return $response;
+    }
+
+    /**
+     * This function reviews changes in penalty type
+     */
+    private static function updateContest(Contests $contest, $original_penalty_type) {
+        ContestsDAO::save($contest);
+        if ($original_penalty_type == $contest->penalty_type) {
+            return;
+        }
+        RunsDAO::recalculatePenaltyForContest($contest);
     }
 
     /**
