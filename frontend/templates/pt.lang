@@ -666,6 +666,7 @@ unableToVerifyCaptcha = "Não pudemos verificar o captcha. Recarregue a página 
 unverifiedUser = "Usuário não confirmado."
 updateItemsError = "Ocorreu um erro ao atualizar itens"
 updateItemsSuccess = "Todos os itens selecionados foram atualizados"
+userEditAddPassword = "Adicionar senha"
 userEditBachelors = "Grau"
 userEditBirthDate = "Data de nascimento"
 userEditChangePassword = "Alterar senha"
