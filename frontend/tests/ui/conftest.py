@@ -88,9 +88,9 @@ class Driver(object):
                     'return jQuery.active;') == 0)
         except TimeoutException as ex:
             raise Exception('%d AJAX calls still active after %f s' %
-                            self.browser.execute_script(
+                            (self.browser.execute_script(
                                 'return jQuery.active;'),
-                            time.time() - t0) from ex
+                             time.time() - t0)) from ex
 
     def typeahead_helper(self, parent_selector, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
@@ -108,8 +108,7 @@ class Driver(object):
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 '%s .tt-suggestion.tt-selectable' % parent_selector)
-            )).click()
+                 '%s .tt-suggestion.tt-selectable' % parent_selector))).click()
 
     @contextlib.contextmanager
     def login_user(self):

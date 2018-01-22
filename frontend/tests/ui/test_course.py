@@ -6,6 +6,7 @@
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 
 
 @flaky
@@ -118,14 +119,11 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//a[@href = "#problems"]'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//select[@name = "assignments"]'))).click()
-    driver.wait.until(
+    Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             ('//select[@name="assignments"]/option[contains(text(), %s)]'
-              % assignment_alias)))).click()
+             '//select[@name = "assignments"]')))).select_by_visible_text(
+                 assignment_alias)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
