@@ -165,7 +165,8 @@ class ProblemController extends Controller {
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
-        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
+        $acceptsSubmissions = $r['languages'] !== '';
+        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -687,7 +688,9 @@ class ProblemController extends Controller {
         $response = [
             'rejudged' => false
         ];
-        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
+
+        $acceptsSubmissions = $problem->languages !== '';
+        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
 
         // Insert new problem
         try {
@@ -1272,6 +1275,10 @@ class ProblemController extends Controller {
                 $r['problem']->problem_id
             );
         }
+
+        // send the supported languages as a JSON array instead of csv
+        // array_filter is needed to handle when $response['languages'] is empty
+        $response['languages'] = array_filter(explode(',', $response['languages']));
 
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
         $response['score'] = self::bestScore($r);

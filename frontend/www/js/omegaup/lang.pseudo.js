@@ -847,6 +847,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNextPage: "(N3x7 pag3)",
 	wordsNo: "(N0)",
 	wordsNoComment: "(N0 c0mm3n7)",
+	wordsNoSubmissions: "(N0 Submi55i0n5)",
 	wordsNominator: "(N0mina70r)",
 	wordsNumHomeworks: "(Num. 0f h0m3w0rk a55ignm3n75)",
 	wordsNumTests: "(Num. 0f 73575)",

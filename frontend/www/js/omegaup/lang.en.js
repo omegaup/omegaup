@@ -847,6 +847,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNextPage: "Next page",
 	wordsNo: "No",
 	wordsNoComment: "No comment",
+	wordsNoSubmissions: "No Submissions",
 	wordsNominator: "Nominator",
 	wordsNumHomeworks: "Num. of homework assignments",
 	wordsNumTests: "Num. of tests",

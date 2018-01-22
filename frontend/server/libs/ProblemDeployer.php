@@ -35,8 +35,9 @@ class ProblemDeployer {
     private $committed = false;
     private $operation = null;
     private $updatedLanguages = [];
+    private $acceptsSubmissions = true;
 
-    public function __construct($alias, $operation) {
+    public function __construct($alias, $operation, $acceptsSubmissions = true) {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
@@ -44,6 +45,8 @@ class ProblemDeployer {
         $this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->operation = $operation;
         $this->git = new Git($this->gitDir);
+
+        $this->acceptsSubmissions = $acceptsSubmissions;
 
         if (!is_writable(PROBLEMS_GIT_PATH)) {
             $this->log->error('path is not writable:' . PROBLEMS_GIT_PATH);
@@ -432,7 +435,7 @@ class ProblemDeployer {
     private function checkCases(ZipArchive $zip, array $zipFilesArray) {
         $this->log->info('Validating /cases');
 
-        // Necesitamos tener al menos 1 caso
+        // Count how many test cases were found
         $cases = 0;
 
         // Add all files in cases/ that end either in .in or .out
@@ -462,7 +465,8 @@ class ProblemDeployer {
             }
         }
 
-        if ($cases === 0) {
+        // if the problem accepts submissions it must have at least one test case
+        if ($this->acceptsSubmissions && $cases === 0) {
             throw new InvalidParameterException('problemDeployerNoCases');
         }
 
