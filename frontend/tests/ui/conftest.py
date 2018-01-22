@@ -62,13 +62,14 @@ class Driver(object):
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def ajax_page_transition(self):
+    def ajax_page_transition(self, wait_for_ajax=True):
         '''Waits for an AJAX-initiated page transition to finish.'''
 
         prev_url = self.browser.current_url
         yield
         self.wait.until(lambda _: self.browser.current_url != prev_url)
-        self.wait_for_page_loaded()
+        if wait_for_ajax:
+            self.wait_for_page_loaded()
 
     def wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''

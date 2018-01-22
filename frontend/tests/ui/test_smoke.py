@@ -91,7 +91,7 @@ def test_create_problem(driver):
             'problem_contents')
         contents_element.send_keys(os.path.join(
             _OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
-        with driver.ajax_page_transition():
+        with driver.ajax_page_transition(wait_for_ajax=False):
             contents_element.submit()
 
         assert (('/problem/%s/edit/' % problem_alias) in
