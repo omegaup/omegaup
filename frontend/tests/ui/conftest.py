@@ -18,7 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-_DEFAULT_TIMEOUT = 10  # seconds
+_DEFAULT_TIMEOUT = 30  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
@@ -81,14 +81,16 @@ class Driver(object):
             raise Exception('document ready state still %s' %
                             self.browser.execute_script(
                                 'return document.readyState;')) from ex
+        t0 = time.time()
         try:
             self.wait.until(
                 lambda _: self.browser.execute_script(
                     'return jQuery.active;') == 0)
         except TimeoutException as ex:
-            raise Exception('%d AJAX calls still active' %
+            raise Exception('%d AJAX calls still active after %f s' %
                             self.browser.execute_script(
-                                'return jQuery.active;')) from ex
+                                'return jQuery.active;'),
+                            time.time() - t0) from ex
 
     def typeahead_helper(self, parent_selector, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
