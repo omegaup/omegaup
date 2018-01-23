@@ -385,6 +385,8 @@ export class Arena {
 
     self.startTime = start;
     self.finishTime = finish;
+    // Once the clock is ready, we can now connect to the socket.
+    self.connectSocket();
     if (self.options.isPractice) {
       self.elements.clock.html('&infin;');
       return;
