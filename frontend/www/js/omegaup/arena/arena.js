@@ -385,6 +385,8 @@ export class Arena {
 
     self.startTime = start;
     self.finishTime = finish;
+    // Once the clock is ready, we can now connect to the socket.
+    self.connectSocket();
     if (self.options.isPractice) {
       self.elements.clock.html('&infin;');
       return;
@@ -914,6 +916,12 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     let self = this;
+
+    let can_submit = lang_array.length != 0;
+
+    $('.runs').toggle(can_submit);
+    $('.data').toggle(can_submit);
+    $('.best-solvers').toggle(can_submit);
     $('option', self.elements.submitForm.language)
         .each(function(index, item) {
           item = $(item);
@@ -1061,7 +1069,7 @@ export class Arena {
         $('#problem .statement').html(problem.problem_statement);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
-        let language_array = problem.languages.split(',');
+        let language_array = problem.languages;
         if (karel_langs.every(function(x) {
               return language_array.indexOf(x) != -1;
             })) {

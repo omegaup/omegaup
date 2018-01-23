@@ -5,7 +5,10 @@
 #
 # Too few public methods is bad for context managers.
 #  R0903 = Too few public methods
-disable=I0011,R0903
+#
+# TODOs are useful to locally indicate that something is not (yet) working.
+#  fixme = (warning notes in code comments; message varies).
+disable=I0011,R0903,fixme
 
 [BASIC]
 

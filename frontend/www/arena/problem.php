@@ -45,7 +45,7 @@ $smarty->assign('qualitynomination_reportproblem_payload', [
     'problem_alias' => $result['alias'],
 ]);
 $smarty->assign('karel_problem', count(array_intersect(
-    explode(',', $result['languages']),
+    $result['languages'],
     ['kp', 'kj']
 )) == 2);
 if (isset($result['sample_input'])) {

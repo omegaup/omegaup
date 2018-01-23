@@ -40,7 +40,7 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
@@ -53,7 +53,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
@@ -66,7 +66,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $show_intro = ContestController::showContestIntro($request2);
+        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
         $this->assertEquals($show_intro, !ContestController::SHOW_INTRO);
     }
 
@@ -186,5 +186,78 @@ class RegisterToContestTest extends OmegaupTestCase {
         } catch (ForbiddenAccessException $fae) {
             // Expected. Continue.
         }
+    }
+
+    /**
+     * Test user cannot join the contest because he doesn't have registered
+     * his basic profile information (country, state and school)
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testUserNotAllowedJoinTheContest() {
+        // create a contest and its admin
+        $contestAdmin = UserFactory::createUser();
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'contestDirector' => $contestAdmin,
+        ]));
+
+        $adminLogin = self::login($contestAdmin);
+        ContestController::apiUpdate(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'basic_information' => 1,
+            'auth_token' => $adminLogin->auth_token,
+        ]));
+
+        // Contestant will try to open the contest, it should fail
+        $contestant = UserFactory::createUser();
+
+        $contestantLogin = self::login($contestant);
+
+        ContestController::apiOpen(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $contestantLogin->auth_token,
+        ]));
+    }
+
+    /**
+     * Test user joins the contest
+     */
+    public function testUserAllowedJoinTheContest() {
+        // Create a school
+        $school = SchoolsFactory::createSchool();
+
+        // create a contest and its admin
+        $contestAdmin = UserFactory::createUser();
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'contestDirector' => $contestAdmin,
+        ]));
+
+        // Updates contest, with basic information needed
+        $adminLogin = self::login($contestAdmin);
+        ContestController::apiUpdate(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'basic_information' => 1,
+            'auth_token' => $adminLogin->auth_token,
+        ]));
+
+        // Contestant will try to open the contes, this should fail
+        $contestant = UserFactory::createUser();
+
+        // Updates contestant, with basic information
+        $contestantLogin = self::login($contestant);
+        $states = StatesDAO::search(['country_id' => 'MX']);
+        UserController::apiUpdate(new Request([
+            'auth_token' => $contestantLogin->auth_token,
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'school_id' => $school['school']->school_id
+        ]));
+
+        $contest = ContestController::apiOpen(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $contestantLogin->auth_token,
+        ]));
+
+        $this->assertEquals($contest['status'], 'ok');
     }
 }

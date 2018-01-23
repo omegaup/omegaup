@@ -286,6 +286,7 @@ class CourseController extends Controller {
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
+                'needs_basic_information' => $r['needs_basic_information'] == 'true',
             ]));
 
             CoursesDAO::transEnd();
@@ -1250,6 +1251,7 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
+                'basic_information_required' => $r['course']->needs_basic_information == '1'
             ];
         } else {
             $result = [
@@ -1263,6 +1265,7 @@ class CourseController extends Controller {
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
+                'basic_information_required' => $r['course']->needs_basic_information == '1'
             ];
 
             if ($isAdmin) {
@@ -1439,6 +1442,9 @@ class CourseController extends Controller {
             }],
             'school_id',
             'show_scoreboard',
+            'needs_basic_information' => ['transform' => function ($value) {
+                return $value == 'true' ? 1 : 0;
+            }],
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
             }],

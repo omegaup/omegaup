@@ -16,7 +16,7 @@ $smarty->assign('STACK_LIMIT', '10485760');
 $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
 $smarty->assign('VISIBILITY', '0');
-$smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,pas,py,rb,lua');
+$smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
