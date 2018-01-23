@@ -157,6 +157,41 @@ class Driver(object):
                             home_page_url)
             self.wait_for_page_loaded()
 
+    @contextlib.contextmanager
+    def register_user(self, user='unittest_user', passw='p@ssw0rd'):
+        '''Creates user :user and logs out when out of scope.'''
+
+        # Home page
+        home_page_url = self.url('/')
+        self.browser.get(home_page_url)
+        self.wait_for_page_loaded()
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/login/")]'))).click()
+
+        # Login screen
+        self.wait.until(lambda _: self.browser.current_url != home_page_url)
+        username = '%s' % user
+        password = '%s' % passw
+        self.browser.find_element_by_id('reg_username').send_keys(username)
+        self.browser.find_element_by_id('reg_email').send_keys(
+            'email_%s@localhost.localdomain' % username)
+        self.browser.find_element_by_id('reg_pass').send_keys(password)
+        self.browser.find_element_by_id('reg_pass2').send_keys(password)
+        with self.ajax_page_transition():
+            self.browser.find_element_by_id('register-form').submit()
+
+        try:
+            yield
+
+        finally:
+            # Home screen
+            self.browser.get(self.url('/logout/?redirect=/'))
+            self.wait.until(lambda _: self.browser.current_url ==
+                            home_page_url)
+            self.wait_for_page_loaded()
+
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):

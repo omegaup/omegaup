@@ -36,6 +36,68 @@ def test_create_course(driver):
         enter_to_course(driver, course_alias, assignment_alias)
 
 
+def test_user_ranking_course(driver):
+    '''Creates a course and students to participate make submits to problems'''
+
+    run_id = driver.generate_id()
+    user1 = 'unittest_ranking_user_%s_1' % run_id
+    user2 = 'unittest_ranking_user_%s_2' % run_id
+    password = 'r@nk1ng_p@55'
+    with driver.register_user(user1, password):
+        pass
+    with driver.register_user(user2, password):
+        pass
+
+    course_alias = 'ut_rank_course_%s' % run_id
+    school_name = 'ut_rank_school_%s' % run_id
+    assignment_alias = 'ut_rank_homework_%s' % run_id
+    problem = 'sumas'
+    with driver.login_admin():
+        create_course(driver, course_alias, school_name)
+        add_students(driver, user1)
+        add_students(driver, user2)
+        add_assignment(driver, assignment_alias)
+        add_problem_to_assignment(driver, assignment_alias, problem)
+
+    with driver.login(user1, password):
+        enter_to_course(driver, course_alias, assignment_alias)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, problems/%s)]' % problem)))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, new-run)]')))).click()
+
+        language = 'Java'
+        javascript_code = """
+                            import java.util.Scanner;
+
+                            public class Main {
+
+                                public static void main(String[] args) {
+                                    Scanner leer=new Scanner(System.in);
+                                    int a,b;
+                                    a=leer.nextInt();
+                                    b=leer.nextInt();
+                                    System.out.print((a+b));
+                                }
+                            }
+                            """
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CLASS_NAME, ('CodeMirror-scroll')))).send_keys(
+                    javascript_code)
+
+        driver.browser.find_element_by_xpath(
+            '//select[@name="language"]/option[contains(text(), %s)]' %
+            language).click()
+        with driver.ajax_page_transition():
+            driver.browser.find_element_by_id('submit').submit()
+
+
 def create_course(driver, course_alias, school_name):
     '''Creates one course with a new school.'''
 
