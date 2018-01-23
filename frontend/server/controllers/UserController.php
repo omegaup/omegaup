@@ -903,9 +903,16 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROO-18' => 500,
-                'ROOP-18' => 300,
-                'ROOS-18' => 300,
+                'OMIROO-D1-18' => 70
+            ];
+        } elseif ($r['contest_type'] == 'OMIQROO') {
+            if ($r['current_user']->username != 'pablobatun'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'OMIROO-D2-18' => 70
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
