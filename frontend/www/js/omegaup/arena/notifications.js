@@ -95,7 +95,6 @@ export default class {
 
   remove(data) {
     var self = this;
-    localStorage.setItem(data.id, Date.now());
-    self.notifications.remove(data);
+    $('a[href*="' + data.id + '"]').prev().trigger('click');
   }
 }

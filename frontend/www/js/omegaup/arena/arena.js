@@ -889,32 +889,10 @@ export class Arena {
       $('.answer pre', r).show();
       if (!$(r).hasClass('resolved')) {
         $(r).addClass('resolved');
-        self.updateNotificationsNumber(r);
-        self.notifications.remove({
-          id: 'clarification-' + clarification.clarification_id,
-          author: clarification.author,
-          contest: clarification.contest_alias,
-          problem: clarification.problem_alias,
-          message: clarification.message,
-          answer: clarification.answer,
-          anchor: '#' + anchor,
-          modificationTime: clarification.time.getTime()
-        });
-      }
-    }
-  }
-
-  updateNotificationsNumber(r) {
-    let self = this;
-    if (self.contestAdmin) {
-      let item_to_fade = $('a', r).prop('name');
-      $('li a[href="#' + item_to_fade + '"]').parent().remove();
-      let notification_counter = $('.notification-drawer li').length;
-      $('.notification-counter').html(notification_counter);
-      if (notification_counter == 0) {
-        //$('.notification-clear').parent().remove();
-        $('.empty').show();
-        $('.notification-counter').hide();
+        if (self.contestAdmin) {
+          self.notifications.remove(
+              {id: 'clarification-' + clarification.clarification_id});
+        }
       }
     }
   }
