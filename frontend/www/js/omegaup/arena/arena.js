@@ -1778,29 +1778,9 @@ class RunView {
           self.filter_username('');
         });
 
-    $('.runsproblem', elm)
-        .typeahead(
-            {
-              minLength: 2,
-              highlight: true,
-            },
-            {
-              source: UI.typeaheadWrapper(function(query, cb) {
-                API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); })
-                    .fail(UI.apiError);
-              }),
-              async: true,
-              display: 'title',
-              templates: {
-                suggestion: function(elm) {
-                  return '<strong>' + elm.title + '</strong> (' + elm.alias +
-                         ')';
-                }
-              }
-            })
-        .on('typeahead:select',
-            function(elm, item) { self.filter_problem(item.alias); });
+    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+      self.filter_problem(item.alias);
+    });
 
     $('.runsproblem-clear', elm)
         .on('click', function() {
