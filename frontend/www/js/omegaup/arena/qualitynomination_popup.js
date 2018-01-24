@@ -12,7 +12,11 @@ OmegaUp.on('ready', function() {
     el: '#qualitynomination-popup',
     render: function(createElement) {
       return createElement('qualitynomination-popup', {
-        props: {nominated: this.nominated, solved: this.solved},
+        props: {
+          nominated: this.nominated,
+          solved: this.solved,
+          dismissal: this.dismissal
+        },
         on: {
           submit: function(ev) {
             let contents = {};
@@ -45,7 +49,11 @@ OmegaUp.on('ready', function() {
         }
       });
     },
-    data: {nominated: qualityPayload.nominated, solved: qualityPayload.solved},
+    data: {
+      nominated: qualityPayload.nominated,
+      solved: qualityPayload.solved,
+      dismissal: qualityPayload.dismissal
+    },
     components: {
       'qualitynomination-popup': qualitynomination_Popup,
     }
