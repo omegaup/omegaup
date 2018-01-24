@@ -167,12 +167,11 @@ omegaup.OmegaUp.on('ready', function() {
         return false;
       });
 
-  $(window)
-      .hashchange(function(e) {
-        if (arena.options.isOnlyProblem) {
-          onlyProblemHashChanged(e);
-        } else {
-          arena.onHashChanged();
-        }
-      });
+  window.addEventListener('hashchange', function() {
+    if (arena.options.isOnlyProblem) {
+      onlyProblemHashChanged();
+    } else {
+      arena.onHashChanged();
+    }
+  });
 });
