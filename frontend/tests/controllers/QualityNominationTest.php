@@ -298,7 +298,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -377,7 +379,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -431,7 +435,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'open',
             'problem_alias' => $problemData['request']['alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -486,7 +492,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);

@@ -93,17 +93,18 @@ export default {
     problem: {alias: String, title: String},
     qualitynomination_id: Number,
     reviewer: Boolean,
-    votes: Array
+    votes: Array,
+    initialRationale: String
   },
-  data: function() { return {T: T, rationale: ''};},
+  data: function() { return {T: T, rationale: this.initialRationale};},
   methods: {
     userUrl: function(alias) { return '/profile/' + alias + '/';},
     problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
     markResolution: function(banProblem) {
-      if (!this.rationale && banProblem) {
+      /*if (!this.rationale && banProblem) {
         omegaup.UI.error(T.editFieldRequired);
         return;
-      }
+      }*/
       let newStatus = banProblem ? 'approved' : 'denied';
       API.QualityNomination.resolve({
                              problem_alias: this.problem.alias,

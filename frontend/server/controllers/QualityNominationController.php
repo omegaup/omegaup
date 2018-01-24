@@ -222,9 +222,8 @@ class QualityNominationController extends Controller {
         }
 
         Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        if ($r['status'] == 'approved') {
-            Validators::isStringNonEmpty($r['rationale'], 'rationale');
-        }
+        Validators::isStringNonEmpty($r['rationale'], 'rationale', ($r['status'] == 'approved') /*required only when approved*/);
+
         // Validate request
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
@@ -326,7 +325,6 @@ class QualityNominationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        //$reason = json_decode($qualitynomination->contents);
         $email_params = [
             'reason' => htmlspecialchars($rationale),
             'problem_name' => htmlspecialchars($r['problem']->title),
