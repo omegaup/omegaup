@@ -50,6 +50,11 @@
 						<div id="qualitynomination-demotionpopup"></div>
 						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_demotionpopup.js"}"></script>
 					</div>
+					<div id="qualitynomination">
+						<script type="text/json" id="quality-payload">{$quality_payload|json_encode}</script>
+						<div id="qualitynomination-popup"></div>
+						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
+					</div>
 {include file='arena.runs.tpl' show_submit=true show_details=true}
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
@@ -84,11 +89,6 @@
 		<div id="overlay">
 {include file='arena.runsubmit.tpl'}
 {include file='arena.rundetails.tpl'}
-		</div>
-		<div id="qualitynomination">
-			<script type="text/json" id="quality-payload">{$quality_payload|json_encode}</script>
-			<div id="qualitynomination-popup"></div>
-			<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
 		</div>
 		<div id="footer">
 		</div>

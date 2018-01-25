@@ -3,7 +3,7 @@ omegaup.OmegaUp.on('ready', function() {
       omegaup.arena.GetOptionsFromLocation(window.location));
   var admin = new omegaup.arena.ArenaAdmin(arena);
 
-  $(window).hashchange(arena.onHashChanged.bind(arena));
+  window.addEventListener('hashchange', arena.onHashChanged.bind(arena));
 
   Highcharts.setOptions({global: {useUTC: false}});
 
@@ -16,7 +16,7 @@ omegaup.OmegaUp.on('ready', function() {
     }, 5 * 60 * 1000);
 
     // Trigger the event (useful on page load).
-    $(window).hashchange();
+    arena.onHashChanged();
 
     $('#loading').fadeOut('slow');
     $('#root').fadeIn('slow');
@@ -79,7 +79,7 @@ omegaup.OmegaUp.on('ready', function() {
           }
 
           // Trigger the event (useful on page load).
-          $(window).hashchange();
+          arena.onHashChanged();
 
           $('#loading').fadeOut('slow');
           $('#root').fadeIn('slow');
