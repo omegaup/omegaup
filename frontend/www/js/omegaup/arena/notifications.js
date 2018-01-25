@@ -93,8 +93,11 @@ export default class {
     if (audio != null) audio.play();
   }
 
-  remove(data) {
+  resolve(data) {
     var self = this;
-    $('a[href*="' + data.id + '"]').prev().trigger('click');
+    if (!self.notificationMapping.hasOwnProperty(data.id)) {
+      return;
+    }
+    self.notificationMapping[data.id].onCloseClicked();
   }
 }

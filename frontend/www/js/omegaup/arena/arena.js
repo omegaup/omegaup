@@ -890,7 +890,7 @@ export class Arena {
       if (!$(r).hasClass('resolved')) {
         $(r).addClass('resolved');
         if (self.contestAdmin) {
-          self.notifications.remove(
+          self.notifications.resolve(
               {id: 'clarification-' + clarification.clarification_id});
         }
       }
