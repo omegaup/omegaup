@@ -23,36 +23,30 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = '
             SELECT
                 COUNT(r.run_id) > 0 as solved,
-                COUNT(qn.qualitynomination_id) > 0 as nominated,
-                COUNT(qnd.qualitynomination_id) > 0 as dismissal
+                (SELECT
+                    COUNT(*)
+                FROM
+                    QualityNominations qnn
+                WHERE
+                    qnn.problem_id = p.problem_id AND
+                    qnn.user_id = r.user_id AND
+                    qnn.nomination = \'suggestion\'
+                ) as nominated,
+                (SELECT
+                    COUNT(*)
+                FROM
+                    QualityNominations qnd
+                WHERE
+                    qnd.problem_id = p.problem_id AND
+                    qnd.user_id = r.user_id AND
+                    qnd.nomination = \'dismissal\'
+                ) as dismissed
             FROM
                 Problems p
             INNER JOIN
                 Runs r
             ON
                 r.problem_id = p.problem_id AND r.verdict = "AC"
-            LEFT JOIN
-                (SELECT
-                    qualitynomination_id,
-                    problem_id,
-                    user_id
-                 FROM
-                     QualityNominations
-                 WHERE
-                     nomination = \'suggestion\') qn
-            ON
-                qn.problem_id = p.problem_id AND qn.user_id = r.user_id
-            LEFT JOIN
-                (SELECT
-                    qualitynomination_id,
-                    problem_id,
-                    user_id
-                 FROM
-                     QualityNominations
-                 WHERE
-                     nomination = \'dismissal\') qnd
-            ON
-                qnd.problem_id = p.problem_id AND qnd.user_id = r.user_id
             WHERE
                 p.problem_id = ? AND r.user_id = ?;
         ';

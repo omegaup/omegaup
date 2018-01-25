@@ -9,7 +9,7 @@
             v-show="showForm">
         <button class="close"
               type="button"
-              v-on:click="onHide">×</button>
+              v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView == 'suggestion'">
             <div class="title-text">
@@ -68,7 +68,7 @@
                    v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
                    "col-md-4 btn btn-default"
                    type="button"
-                   v-on:click="onHide">{{ T.wordsCancel }}</button>
+                   v-on:click="onHide(true)">{{ T.wordsCancel }}</button>
             </div>
           </template>
           <template v-if="currentView == 'thanks'">
@@ -87,7 +87,7 @@ import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {solved: Boolean, nominated: Boolean, dismissal: Boolean},
+  props: {solved: Boolean, nominated: Boolean, dismissed: Boolean},
   data: function() {
     return {
       API: API,
@@ -97,7 +97,6 @@ export default {
       difficulty: undefined,
       quality: undefined,
       showFormOverride: true,
-      isDismissal: true,
       tags: [],
       problemTopics: [
         'problemTopic2Sat',
@@ -147,7 +146,7 @@ export default {
   computed: {
     showForm: function() {
       return this.showFormOverride && this.solved && !this.nominated &&
-             !this.dismissal;
+             !this.dismissed;
     },
     showSugestLink: function() { return this.solved && !this.nominated;},
     sortedProblemTopics: function() {
@@ -157,25 +156,23 @@ export default {
     }
   },
   methods: {
-    onHide() {
+    onHide(isDismissed) {
       this.showFormOverride = false;
-      if (this.isDismissal) {
+      if (isDismissed) {
         this.$emit('dismiss', this);
-        UI.info(T.qualityNominationRateProblemDesc);
       }
     },
     onShowSuggestion() {
       this.showFormOverride = true;
-      this.dismissal = false;
+      this.dismissed = false;
     },
     onSubmit() {
       this.$emit('submit', this);
       this.currentView = 'thanks';
-      this.isDismissal = false;
       this.nominated = true;
 
       var self = this;
-      setTimeout(function() { self.onHide() }, 1000);
+      setTimeout(function() { self.onHide(false) }, 1000);
     }
   }
 };

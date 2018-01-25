@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
         props: {
           nominated: this.nominated,
           solved: this.solved,
-          dismissal: this.dismissal
+          dismissed: this.dismissed
         },
         on: {
           submit: function(ev) {
@@ -44,6 +44,9 @@ OmegaUp.on('ready', function() {
                                    nomination: 'dismissal',
                                    contents: JSON.stringify(contents),
                                  })
+                .then(function(data) {
+                  UI.info(T.qualityNominationRateProblemDesc);
+                })
                 .fail(UI.apiError);
           }
         }
@@ -52,7 +55,7 @@ OmegaUp.on('ready', function() {
     data: {
       nominated: qualityPayload.nominated,
       solved: qualityPayload.solved,
-      dismissal: qualityPayload.dismissal
+      dismissed: qualityPayload.dismissed
     },
     components: {
       'qualitynomination-popup': qualitynomination_Popup,
