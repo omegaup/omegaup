@@ -607,6 +607,8 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationNotFound: "(N0mina7i0n n07 f0und)",
 	qualityNominationProblemHasBeenBanned: "(Thi5 pr0b13m ha5 b33n bann3d. Y0u cann07 upda73 i75 vi5ibi1i7y.)",
 	qualityNominationProblemHasBeenPromoted: "(Thi5 pr0b13m ha5 b33n pr0m073d. Y0u cann07 upda73 i75 vi5ibi1i7y.)",
+	qualityNominationRateProblem: "(Ra73 pr0b13m)",
+	qualityNominationRateProblemDesc: "(If y0u wan7 70 ra73 7h3 pr0b13m 1a73r, c1ick 0n \"Ra73 pr0b13m\" 1ink)",
 	qualityNominationResolutionSuccess: "(Qua1i7y n0mina7i0n 5ucc355fu11y r3501v3d.)",
 	qualityNominationShowAll: "(A150 5h0w r3501v3d n0mina7i0n5)",
 	qualityNominationType: "(Typ3)",
