@@ -518,6 +518,56 @@ class CourseController extends Controller {
         return ['status' => 'ok'];
     }
 
+    /**
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateAssignmentsOrder(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Get the associated problemset with this assignment
+        /*$assignmentsSet = CoursesDAO::getAllAssignments(
+            $r['course']->course_alias,
+            true
+        );
+        if (is_null($assignmentsSet)) {
+            throw new NotFoundException('assignmentNotFound');
+        }*/
+
+        // Update assignments order
+        $assignments = $r['assignments'];
+        foreach ($assignments as $assignment) {
+            $currentAssignment = AssignmentsDAO::getByAlias($assignment['alias']);
+            if (is_null($currentAssignment)) {
+                throw new NotFoundException('assignmentNotFound');
+            }
+
+            $order = 1;
+            if (is_numeric($r['order'])) {
+                $order = (int)$r['order'];
+            }
+            AssignmentsDAO::updateAssignmentsOrder(new Assignments([
+                'course_id' => $r['course']->course_id,
+                'alias' => $assignment['alias'],
+                'order' => $assignment['order']
+            ]));
+        }
+
+        return ['status' => 'ok'];
+    }
+
     public static function apiGetProblemUsers(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
@@ -636,7 +686,7 @@ class CourseController extends Controller {
         try {
             $assignments = AssignmentsDAO::search(new Assignments([
                 'course_id' => $r['course']->course_id
-            ]), 'start_time');
+            ]), 'order');
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
