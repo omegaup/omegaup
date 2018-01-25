@@ -56,7 +56,8 @@
                  data-toggle="tooltip"
                  v-bind:title="T.banProblemFormComments"></span>
           </div>
-          <div class="col-sm-8">
+          <div class="col-sm-8"
+               v-bind:class="{'has-error' : !rationale, 'has-success' : rationale}">
             <textarea class="form-control"
                  name="rationale"
                  type="text"
@@ -70,8 +71,10 @@
           </div>
           <div class="col-sm-8">
             <button class="btn btn-danger"
+                 v-bind:disabled="!rationale ? '' : disabled"
                  v-on:click="markResolution(true)">{{ T.wordsBanProblem }}</button> <button class=
                  "btn btn-success"
+                 v-bind:disabled="!rationale ? '' : disabled"
                  v-on:click="markResolution(false)">{{ T.wordsKeepProblem }}</button>
           </div>
         </div>
@@ -94,17 +97,18 @@ export default {
     qualitynomination_id: Number,
     reviewer: Boolean,
     votes: Array,
-    initialRationale: String
+    initialRationale: String,
+    disabled: String
   },
   data: function() { return {T: T, rationale: this.initialRationale};},
   methods: {
     userUrl: function(alias) { return '/profile/' + alias + '/';},
     problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
     markResolution: function(banProblem) {
-      /*if (!this.rationale && banProblem) {
+      if (!this.rationale) {
         omegaup.UI.error(T.editFieldRequired);
         return;
-      }*/
+      }
       let newStatus = banProblem ? 'approved' : 'denied';
       API.QualityNomination.resolve({
                              problem_alias: this.problem.alias,

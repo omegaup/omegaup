@@ -222,7 +222,7 @@ class QualityNominationController extends Controller {
         }
 
         Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        Validators::isStringNonEmpty($r['rationale'], 'rationale', ($r['status'] == 'approved') /*required only when approved*/);
+        Validators::isStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);
