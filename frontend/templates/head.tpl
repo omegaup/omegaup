@@ -20,7 +20,6 @@
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 {if isset($inArena) && $inArena}
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 {else}
 		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>

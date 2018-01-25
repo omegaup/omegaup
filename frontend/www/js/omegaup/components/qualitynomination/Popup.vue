@@ -1,16 +1,19 @@
 <template>
   <div class="qualitynomination-popup">
+    <a href="#"
+         v-on:click="onShowSuggestion"
+         v-show="showSugestLink">{{ T.qualityNominationRateProblem }}</a>
     <transition name="fade">
       <form class="panel panel-default popup"
             v-on:submit.prevent=""
             v-show="showForm">
         <button class="close"
               type="button"
-              v-on:click="onHide">×</button>
+              v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView == 'suggestion'">
             <div class="title-text">
-              {{T.qualityFormCongrats }}
+              {{ T.qualityFormCongrats }}
             </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>
@@ -65,7 +68,7 @@
                    v-on:click="onSubmit">{{ T.wordsSend }}</button> <button class=
                    "col-md-4 btn btn-default"
                    type="button"
-                   v-on:click="onHide">{{ T.wordsCancel }}</button>
+                   v-on:click="onHide(true)">{{ T.wordsCancel }}</button>
             </div>
           </template>
           <template v-if="currentView == 'thanks'">
@@ -84,7 +87,7 @@ import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {solved: Boolean, nominated: Boolean},
+  props: {solved: Boolean, nominated: Boolean, dismissed: Boolean},
   data: function() {
     return {
       API: API,
@@ -142,8 +145,10 @@ export default {
   },
   computed: {
     showForm: function() {
-      return this.showFormOverride && this.solved && !this.nominated;
+      return this.showFormOverride && this.solved && !this.nominated &&
+             !this.dismissed;
     },
+    showSugestLink: function() { return this.solved && !this.nominated;},
     sortedProblemTopics: function() {
       let topics =
           this.problemTopics.map(x => { return {value: x, text: T[x]}; });
@@ -151,20 +156,23 @@ export default {
     }
   },
   methods: {
-    onHide() {
+    onHide(isDismissed) {
       this.showFormOverride = false;
-      this.$emit('dismiss', this);
+      if (isDismissed) {
+        this.$emit('dismiss', this);
+      }
     },
     onShowSuggestion() {
-      this.$emit('show-suggestion', this);
-      this.currentView = 'suggestion';
+      this.showFormOverride = true;
+      this.dismissed = false;
     },
     onSubmit() {
       this.$emit('submit', this);
       this.currentView = 'thanks';
+      this.nominated = true;
 
       var self = this;
-      setTimeout(function() { self.onHide() }, 1000);
+      setTimeout(function() { self.onHide(false) }, 1000);
     }
   }
 };
