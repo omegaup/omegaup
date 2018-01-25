@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
 		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
