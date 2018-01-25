@@ -128,12 +128,12 @@ omegaup.OmegaUp.on('ready', function() {
               arena.trackRun(run);
               arena.updateRunFallback(run.guid, run);
 
-              $('#submit input').removeAttr('disabled');
+              $('#submit input').prop('disabled', false);
               arena.hideOverlay();
             })
             .fail(function(run) {
               alert(run.error);
-              $('#submit input').removeAttr('disabled');
+              $('#submit input').prop('disabled', false);
             });
 
         return false;

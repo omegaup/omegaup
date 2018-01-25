@@ -161,7 +161,7 @@ omegaup.OmegaUp.on('ready', function() {
             })
             .fail(function(run) { alert(run.error); })
             .always(function() {
-              $('#clarification input').removeAttr('disabled');
+              $('#clarification input').prop('disabled', false);
             });
 
         return false;
