@@ -469,7 +469,7 @@ export class Arena {
     }
 
     // Trigger the event (useful on page load).
-    $(window).hashchange();
+    self.onHashChanged();
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
