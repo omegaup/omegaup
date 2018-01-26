@@ -1134,10 +1134,21 @@ class UserController extends Controller {
             $response['userinfo']['rankinfo'] = [];
         }
 
+        $mentor_group = GroupsDAO::findByAlias(
+            Authorization::MENTOR_GROUP_ALIAS
+        );
+        $isMentor = false;
+        $lastCoderOfTheMonth = null;
+        if (Authorization::isGroupMember($r['current_user_id'], $mentor_group)) {
+            $isMentor = true;
+            $lastCoderOfTheMonth = CoderOfTheMonthDAO::getCodersOfTheMonth(true /*current_coder*/);
+        }
+
         // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one. Admins can see emails.
+        // the logged user's one. Admins can see emails, and now mentors can see only the coder of the month email too.
         if (!Authorization::isSystemAdmin($r['current_user_id'])
-                && $r['user']->user_id !== $r['current_user_id']) {
+              && $r['user']->user_id !== $r['current_user_id']
+              && (!$isMentor || $r['user']->username != $lastCoderOfTheMonth['username'])) {
             unset($response['userinfo']['email']);
         }
 

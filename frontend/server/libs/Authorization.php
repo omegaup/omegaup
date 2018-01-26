@@ -26,6 +26,9 @@ class Authorization {
     // Interviewer.
     const INTERVIEWER_ROLE = 4;
 
+    // Mentor.
+    const MENTOR_ROLE = 5;
+
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
@@ -34,6 +37,9 @@ class Authorization {
 
     // Group for course curators.
     const COURSE_CURATOR_GROUP_ALIAS = 'omegaup:course-curator';
+
+    // Group for mentors.
+    const MENTOR_GROUP_ALIAS = 'omegaup:mentor';
 
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {

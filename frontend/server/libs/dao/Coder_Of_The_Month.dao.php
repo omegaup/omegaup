@@ -93,7 +93,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * @static
      * @return Array
      */
-    final public static function getCodersOfTheMonth() {
+    final public static function getCodersOfTheMonth($current_coder = false) {
         $sql = '
           SELECT
             cm.time, u.username, u.country_id, e.email
@@ -113,6 +113,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         foreach ($rs as $row) {
             $allData[] = $row;
         }
-        return $allData;
+        return $current_coder ? $allData[0] : $allData;
     }
 }
