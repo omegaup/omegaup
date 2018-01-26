@@ -51,7 +51,7 @@ class ProblemsFactory {
 
         $r = new Request();
         $r['title'] = $title;
-        $r['alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
+        $r['problem_alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
         $r['author_username'] = $author->username;
         $r['validator'] = 'token';
         $r['time_limit'] = 5000;

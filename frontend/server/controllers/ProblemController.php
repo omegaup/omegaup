@@ -140,6 +140,7 @@ class ProblemController extends Controller {
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
+        $r['alias'] = !is_null($r['alias']) ? $r['alias'] : $r['problem_alias'];
         // Validates request
         self::validateCreateOrUpdate($r);
 

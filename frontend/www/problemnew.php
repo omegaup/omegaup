@@ -22,7 +22,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'title' => $_POST['title'],
-                'alias' => $_POST['alias'],
+                'problem_alias' => $_POST['alias'],
                 'validator' => $_POST['validator'],
                 'time_limit' => $_POST['time_limit'],
                 'validator_time_limit' => $_POST['validator_time_limit'],
