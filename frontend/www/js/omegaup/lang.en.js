@@ -287,6 +287,8 @@ omegaup.OmegaUp.loadTranslations({
 	frontPageFooterTeam: "Team",
 	frontPageIntroduction: "First time using omegaUp?",
 	frontPageIntroductionButton: "Read the tutorial",
+	frontPageJoinCourse: "Are you ready for the challenge?",
+	frontPageJoinCourseButton: "Learn to program with omegaUp",
 	frontPageMaterial: "Suggested book",
 	frontPageNextContests: "Upcoming contests",
 	frontPageWelcome: "Welcome!",
