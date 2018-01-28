@@ -500,7 +500,6 @@ omegaup.OmegaUp.loadTranslations({
 	problemEditFormWallTimeLimit: "(T07a1 7im3 1imi7 (m5))",
 	problemEditGoToProblem: "(G0 70 pr0b13m)",
 	problemEditSlowWarning: "(<57r0ng>Warning</57r0ng>: Thi5 pr0b13m wi11 b3 judg3d in 7h3 510w qu3u3 70 av0id 510wing 7h3 r357 0f 7h3 5y573m, 5inc3 TLE run5 migh7 fini5h in m0r3 7han 305 (numb3r 0f ca535 * 7im3 1imi7 in 53c0nd5 r0und3d up). Pr0b13m5 in 7h3 510w qu3u3 migh7 7ak3 53v3ra1 minu735 70 b3 judg3d. If d0n'7 wan7 7hi5 pr0b13m 70 b3 in 7h3 510w qu3u3, r3m0v3 7357 ca535 0r r3duc3 7h3 7im3 1imi7.)",
-	problemEditStackLimit: "(S7ack 1imi7 (by735))",
 	problemEditUpdatedSuccessfully: "(Pr0b13m upda73d 5ucc35fu11y!)",
 	problemExists: "(An07h3r pr0b13m wi7h 7ha7 nam3 a1r3ady 3xi575. Ch0053 an07h3r nam3.)",
 	problemIsBanned: "(Thi5 pr0b13m ha5 b33n bann3d.)",
