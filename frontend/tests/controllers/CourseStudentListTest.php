@@ -88,7 +88,7 @@ class CourseStudentListTest extends OmegaupTestCase {
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
                     'assignment_alias' => $assignmentAlias,
-                    'problem_alias' => $problemData['request']['alias'],
+                    'problem_alias' => $problemData['request']['problem_alias'],
                 ]));
                 $problemAssignmentsMap[$assignmentAlias][] = $problemData;
             }

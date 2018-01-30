@@ -115,7 +115,7 @@ class ProblemsFactory {
 
         // Call the API
         ProblemController::apiCreate($r);
-        $problem = ProblemsDAO::getByAlias($r['alias']);
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
 
         if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
             || $visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
@@ -138,7 +138,7 @@ class ProblemsFactory {
     public static function addAdminUser($problemData, $user) {
         // Prepare our request
         $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['usernameOrEmail'] = $user->username;
 
         // Log in the problem author
@@ -154,7 +154,7 @@ class ProblemsFactory {
     public static function addGroupAdmin($problemData, Groups $group) {
         // Prepare our request
         $r = new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'group' => $group->alias,
         ]);
 
@@ -169,7 +169,7 @@ class ProblemsFactory {
     public static function addTag($problemData, $tag, $public) {
         // Prepare our request
         $r = new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'name' => $tag,
             'public' => $public
         ]);

@@ -16,7 +16,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
      */
     public static function assertProblemAddedToContest($problemData, $contestData, $r) {
         // Get problem and contest from DB
-        $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
+        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it
@@ -41,7 +41,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'points' => 100,
             'order_in_contest' => 1,
         ]);
@@ -151,7 +151,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
             $r = new Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
                 'order_in_contest' => $i + 1
             ]);
@@ -195,7 +195,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
             ContestController::apiAddProblem(new Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
                 'order_in_contest' => 1,
             ]));
@@ -211,7 +211,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'points' => 100,
             'order_in_contest' => 1,
         ]);

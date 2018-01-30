@@ -8,7 +8,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'ew',
@@ -28,7 +28,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $result = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'ew',
@@ -59,7 +59,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => $contents,
         ]));
@@ -73,7 +73,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $details = QualityNominationController::apiDetails($request);
         $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
         $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
-        $this->assertEquals($problemData['request']['alias'], $details['problem']['alias'], 'Should have set problem');
+        $this->assertEquals($problemData['request']['problem_alias'], $details['problem']['alias'], 'Should have set problem');
         $this::assertArrayHasKey('author', $details);
         $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
         $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
@@ -92,7 +92,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
                 'statements' => [
@@ -122,11 +122,11 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals(1, count($response['nominations']));
         $nomination = $response['nominations'][0];
         $this->assertEquals(
-            $problemData['request']['alias'],
+            $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
         $this->assertEquals(
-            $problemData['request']['alias'],
+            $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
         $this->assertEquals(
@@ -157,7 +157,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
             'contents' => json_encode([
                 // No difficulty!
@@ -180,7 +180,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $r['qualitynomination_id'] = $response['qualitynomination_id'];
         $nomination = QualityNominationController::apiDetails($r);
         $this->assertEquals(
-            $problemData['request']['alias'],
+            $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
     }
@@ -196,7 +196,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'ew',
@@ -232,7 +232,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'ew',
@@ -262,7 +262,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                  'statements' => [
@@ -279,7 +279,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -293,7 +293,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -315,7 +315,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                  'statements' => [
@@ -332,7 +332,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -352,7 +352,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                  'statements' => [
@@ -369,7 +369,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -390,7 +390,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                  'statements' => [
@@ -407,7 +407,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -421,7 +421,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'open',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -443,7 +443,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                  'statements' => [
@@ -460,7 +460,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -474,7 +474,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
         $response = QualityNominationController::apiResolve($request);
 
@@ -498,7 +498,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate(new Request([
                 'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'demotion',
                 'contents' => json_encode([
                     'rationale' => 'ew',
@@ -512,7 +512,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate(new Request([
                 'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'demotion',
                 'contents' => json_encode([
                     'rationale' => 'otro sumas',
@@ -526,23 +526,23 @@ class QualityNominationTest extends OmegaupTestCase {
 
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'otro sumas',
                 'reason' => 'duplicate',
-                'original' => $originalProblemData['request']['alias'],
+                'original' => $originalProblemData['request']['problem_alias'],
             ]),
         ]));
 
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'otro sumas',
                 'reason' => 'duplicate',
-                'original' => 'https://omegaup.com/arena/problem/' . $originalProblemData['request']['alias'] . '#problems',
+                'original' => 'https://omegaup.com/arena/problem/' . $originalProblemData['request']['problem_alias'] . '#problems',
             ]),
         ]));
     }
@@ -559,7 +559,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
                 'rationale' => 'cool!',
@@ -581,7 +581,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $nomination = $this->findByPredicate(
             $response['nominations'],
             function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['alias'];
+                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
             }
         );
         $this->assertNotNull($nomination);
@@ -605,7 +605,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertArrayContainsWithPredicate(
             $response['nominations'],
             function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['alias'];
+                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
             }
         );
     }
@@ -624,7 +624,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
             'contents' => json_encode([
                 'rationale' => 'cool!',
@@ -641,7 +641,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Create demotion nomination.
         $qualitynomination = QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
             'contents' => json_encode([
                 'rationale' => 'ew',
@@ -652,7 +652,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Create dismissal nomination.
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
             'contents' => json_encode([]),
         ]));
@@ -660,7 +660,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Create dismissal nomination.
         QualityNominationFactory::createSuggestion(
             $login,
-            $problemData['request']['alias'],
+            $problemData['request']['problem_alias'],
             null,
             1,
             ['DP', 'Math']
@@ -693,7 +693,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
             'contents' => json_encode([]),
         ]);
@@ -793,8 +793,8 @@ class QualityNominationTest extends OmegaupTestCase {
                  ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
                  ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
 
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['alias']);
-        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['alias']);
+        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
+        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['problem_alias']);
         $this->assertEquals(3.48958, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(2.34545, $newProblem[0]->quality, 'Wrong quality.', 0.001);
         $this->assertEquals(3.27678, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
@@ -878,70 +878,70 @@ class QualityNominationTest extends OmegaupTestCase {
 
         QualityNominationFactory::createSuggestion(
             $login[0],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             null,
             1,
             ['DP', 'Math']
         );
         QualityNominationFactory::createSuggestion(
             $login[1],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             3,
             3,
             ['Math', 'DP']
         );
         QualityNominationFactory::createSuggestion(
             $login[2],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             4,
             0,
             ['Matrices', 'Math']
         );
         QualityNominationFactory::createSuggestion(
             $login[3],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             null,
             null,
             ['Math']
         );
         QualityNominationFactory::createSuggestion(
             $login[4],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             3,
             4,
             ['DP', 'Math', 'Greedy']
         );
         QualityNominationFactory::createSuggestion(
             $login[5],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             3,
             null,
             []
         );
         QualityNominationFactory::createSuggestion(
             $login[6],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             null,
             1,
             []
         );
         QualityNominationFactory::createSuggestion(
             $login[7],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             4,
             null,
             ['Greedy', 'DP']
         );
         QualityNominationFactory::createSuggestion(
             $login[8],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             4,
             0,
             ['DP']
         );
         QualityNominationFactory::createSuggestion(
             $login[9],
-            $problemData[0]['request']['alias'],
+            $problemData[0]['request']['problem_alias'],
             4,
             4,
             ['DP', 'Math']
@@ -949,70 +949,70 @@ class QualityNominationTest extends OmegaupTestCase {
 
         QualityNominationFactory::createSuggestion(
             $login[0],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             4,
             1,
             ['Search', 'Geometry']
         );
         QualityNominationFactory::createSuggestion(
             $login[1],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             1,
             1,
             ['Search', 'Geometry']
         );
         QualityNominationFactory::createSuggestion(
             $login[2],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             4,
             3,
             ['Matrices', 'Search']
         );
         QualityNominationFactory::createSuggestion(
             $login[3],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             3,
             null,
             ['Search']
         );
         QualityNominationFactory::createSuggestion(
             $login[4],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             3,
             null,
             ['Search', 'Math', 'Geometry']
         );
         QualityNominationFactory::createSuggestion(
             $login[5],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             3,
             null,
             []
         );
         QualityNominationFactory::createSuggestion(
             $login[6],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             null,
             1,
             []
         );
         QualityNominationFactory::createSuggestion(
             $login[7],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             3,
             null,
             ['Search', 'DP']
         );
         QualityNominationFactory::createSuggestion(
             $login[8],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             4,
             1,
             ['DP']
         );
         QualityNominationFactory::createSuggestion(
             $login[9],
-            $problemData[1]['request']['alias'],
+            $problemData[1]['request']['problem_alias'],
             4,
             3,
             ['Geometry', 'Math']

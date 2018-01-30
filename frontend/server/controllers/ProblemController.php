@@ -92,7 +92,7 @@ class ProblemController extends Controller {
                 }
             }
         } else {
-            Validators::isValidAlias($r['alias'], 'alias');
+            Validators::isValidAlias($r['problem_alias'], 'problem_alias');
             Validators::isInEnum(
                 $r['visibility'],
                 'visibility',
@@ -140,7 +140,6 @@ class ProblemController extends Controller {
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
-        $r['alias'] = !is_null($r['alias']) ? $r['alias'] : $r['problem_alias'];
         // Validates request
         self::validateCreateOrUpdate($r);
 
@@ -161,13 +160,13 @@ class ProblemController extends Controller {
         $problem->difficulty = 0;
         $problem->source = $r['source'];
         $problem->order = 'normal'; /* defaulting to normal */
-        $problem->alias = $r['alias'];
+        $problem->alias = $r['problem_alias'];
         $problem->languages = $r['languages'];
         $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
         $acceptsSubmissions = $r['languages'] !== '';
-        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
+        $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -226,7 +225,7 @@ class ProblemController extends Controller {
         // Adding unzipped files to response
         $result['uploaded_files'] = $problemDeployer->filesToUnzip;
         $result['status'] = 'ok';
-        $result['alias'] = $r['alias'];
+        $result['alias'] = $r['problem_alias'];
 
         self::updateLanguages($problem);
 

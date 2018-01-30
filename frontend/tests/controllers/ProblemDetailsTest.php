@@ -31,7 +31,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]);
         ContestController::apiOpen($r);
 
@@ -39,7 +39,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $response = ProblemController::apiDetails($r);
 
         // Get problem and contest from DB to check it
-        $problemDAO = ProblemsDAO::getByAlias($problemData['request']['alias']);
+        $problemDAO = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
         $contestDAO = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contestantsDAO = UsersDAO::search(new Users(['username' => $contestant->username]));
         $contestantDAO = $contestantsDAO[0];
@@ -95,7 +95,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'statement_type' => $type,
         ]));
 
@@ -135,10 +135,10 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
-        $this->assertEquals($response['alias'], $problemData['request']['alias']);
+        $this->assertEquals($response['alias'], $problemData['request']['problem_alias']);
     }
 
     /**
@@ -157,7 +157,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
     }
 
@@ -172,7 +172,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         // Call api
         $response = ProblemController::apiDetails(new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
     }
 
@@ -196,7 +196,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias']
+            'problem_alias' => $problemData['request']['problem_alias']
         ]));
 
         $this->assertEquals(100.00, $response['score']);
@@ -224,7 +224,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'contest_alias' => $contestData['request']['alias']
         ]));
 
@@ -263,7 +263,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]);
         $response = ProblemController::apiDetails($r);
 
