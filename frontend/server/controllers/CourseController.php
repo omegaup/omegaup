@@ -537,32 +537,21 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Get the associated problemset with this assignment
-        /*$assignmentsSet = CoursesDAO::getAllAssignments(
-            $r['course']->course_alias,
-            true
-        );
-        if (is_null($assignmentsSet)) {
-            throw new NotFoundException('assignmentNotFound');
-        }*/
-
         // Update assignments order
         $assignments = $r['assignments'];
         foreach ($assignments as $assignment) {
-            $currentAssignment = AssignmentsDAO::getByAlias($assignment['alias']);
-            if (is_null($currentAssignment)) {
+            $currentAssignment = AssignmentsDAO::search(new Assignments([
+                'alias' => $assignment['alias'],
+                'course_id' => $r['course']->course_id
+            ]));
+            if (is_null($currentAssignment[0])) {
                 throw new NotFoundException('assignmentNotFound');
             }
 
-            $order = 1;
-            if (is_numeric($r['order'])) {
-                $order = (int)$r['order'];
-            }
-            AssignmentsDAO::updateAssignmentsOrder(new Assignments([
-                'course_id' => $r['course']->course_id,
-                'alias' => $assignment['alias'],
-                'order' => $assignment['order']
-            ]));
+            AssignmentsDAO::updateAssignmentsOrder(
+                $currentAssignment[0]->assignment_id,
+                (int)$assignment['order']
+            );
         }
 
         return ['status' => 'ok'];
@@ -684,9 +673,9 @@ class CourseController extends Controller {
 
         $assignments = [];
         try {
-            $assignments = AssignmentsDAO::search(new Assignments([
+            $assignments = AssignmentsDAO::searchSortedAssignments(new Assignments([
                 'course_id' => $r['course']->course_id
-            ]), 'order');
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
