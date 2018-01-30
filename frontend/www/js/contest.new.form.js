@@ -18,7 +18,7 @@ omegaup.OmegaUp.on('ready', function() {
   $('#window-length-enabled')
       .on('change', function() {
         if ($(this).is(':checked')) {
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
         } else {
           $('#window-length').attr('disabled', 'disabled');
         }
@@ -30,7 +30,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #title')
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderOmiStyle);
-        $('#window-length-enabled').removeAttr('checked');
+        $('#window-length-enabled').prop('checked', false);
         $('#window-length').attr('disabled', 'disabled');
         $('#window-length').val('');
 
@@ -50,7 +50,7 @@ omegaup.OmegaUp.on('ready', function() {
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderIoiStyle);
         $('#window-length-enabled').attr('checked', 'checked');
-        $('#window-length').removeAttr('disabled');
+        $('#window-length').prop('disabled', false);
         $('#window-length').val('180');
 
         $('.new_contest_form #scoreboard').val('0');
@@ -68,7 +68,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #title')
             .attr('placeholder',
                   omegaup.T.contestNewFormTitlePlaceholderConacupStyle);
-        $('#window-length-enabled').removeAttr('checked');
+        $('#window-length-enabled').prop('checked', false);
         $('#window-length').attr('disabled', 'disabled');
         $('#window-length').val('');
 
