@@ -25,7 +25,6 @@ if (isset($_POST['request'])) {
                     'source' => $_POST['source'],
                     'visibility' => $_POST['visibility'],
                     'languages' => $_POST['languages'],
-                    'stack_limit' => $_POST['stack_limit'],
                     'email_clarifications' => $_POST['email_clarifications']
                 ]);
         $r->method = 'ProblemController::apiUpdate';

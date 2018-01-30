@@ -626,15 +626,12 @@ td.flagColumn {
   padding: 3px 20px;
   font-size: 18px;
   line-height: 24px;
+  display: block;
 }
 
 .tt-suggestion:hover, .tt-cursor {
   color: #fff;
   background-color: #0097cf;
-}
-
-.tt-suggestion p {
-  margin: 0;
 }
 
 /* Reset password stuff */

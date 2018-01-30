@@ -103,8 +103,6 @@ class UpdateProblemTest extends OmegaupTestCase {
         $statement = $problemArtifacts->get('statements/es.html');
         $this->assertContains('perímetro', $statement);
 
-        $this->assertEquals(12345, $problems[0]->stack_limit);
-
         // Call API again to add an example, should not trigger rejudge.
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos-examples.zip';
         $response = ProblemController::apiUpdate($r);
