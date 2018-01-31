@@ -224,7 +224,6 @@ class ProblemController extends Controller {
         // Adding unzipped files to response
         $result['uploaded_files'] = $problemDeployer->filesToUnzip;
         $result['status'] = 'ok';
-        $result['alias'] = $r['problem_alias'];
 
         self::updateLanguages($problem);
 

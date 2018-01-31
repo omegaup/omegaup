@@ -58,7 +58,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
         $smarty->assign('VISIBILITY', $_POST['visibility']);
     } elseif ($response['status'] == 'ok') {
-        header("Location: /problem/{$response['alias']}/edit/");
+        header("Location: /problem/{$_POST['alias']}/edit/");
         die();
     }
 }

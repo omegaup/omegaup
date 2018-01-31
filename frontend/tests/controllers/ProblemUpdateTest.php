@@ -69,7 +69,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'title' => 'new title',
             'time_limit' => 12345,
             'problem_alias' => $problemData['request']['problem_alias'],
-            'stack_limit' => 12345,
             'message' => 'Changed some properties',
         ]);
 

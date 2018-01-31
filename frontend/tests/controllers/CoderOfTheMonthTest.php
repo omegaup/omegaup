@@ -61,13 +61,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $responseCoder = $this->getCoderOfTheMonth($today, '-11 month');
         $this->assertNotEquals($userLastYear->username, $responseCoder['userinfo']['username']);
 
-        $interval = '28 days';
-        if (strpos($today, '01-29') === false &&
-               strpos($today, '01-30') === false &&
-               strpos($today, '01-31') === false) {
-            $interval = '1 month';
-        }
-        $responseCoder = $this->getCoderOfTheMonth($today, $interval);
+        $responseCoder = $this->getCoderOfTheMonth($today, '1 month');
         $this->assertEquals($userLastYear->username, $responseCoder['userinfo']['username']);
     }
 
