@@ -842,6 +842,11 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
+                  if (self.contestAdmin) {
+                    self.notifications.resolve({
+                      id: 'clarification-' + clarification.clarification_id
+                    });
+                  }
                 })
                 .fail(function() {
                   $('pre', answerNode).html(responseText);
@@ -887,13 +892,7 @@ export class Arena {
       $('.answer pre', r).hide();
     } else {
       $('.answer pre', r).show();
-      if (!$(r).hasClass('resolved')) {
-        $(r).addClass('resolved');
-        if (self.contestAdmin) {
-          self.notifications.resolve(
-              {id: 'clarification-' + clarification.clarification_id});
-        }
-      }
+      $(r).addClass('resolved');
     }
   }
 
