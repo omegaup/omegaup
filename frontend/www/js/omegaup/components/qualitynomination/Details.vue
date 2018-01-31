@@ -84,8 +84,7 @@
 </template>
 
 <script>
-import {T, API} from '../../omegaup.js';
-import UI from '../../ui.js';
+import {T} from '../../omegaup.js';
 
 export default {
   props: {
@@ -105,21 +104,7 @@ export default {
     userUrl: function(alias) { return '/profile/' + alias + '/';},
     problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
     markResolution: function(banProblem) {
-      if (!this.rationale) {
-        omegaup.UI.error(T.editFieldRequired);
-        return;
-      }
-      let newStatus = banProblem ? 'approved' : 'denied';
-      API.QualityNomination.resolve({
-                             problem_alias: this.problem.alias,
-                             status: newStatus,
-                             qualitynomination_id: this.qualitynomination_id,
-                             rationale: this.rationale
-                           })
-          .then(function(data) {
-            omegaup.UI.success(T.qualityNominationResolutionSuccess);
-          })
-          .fail(UI.apiError);
+      this.$emit('mark-resolution', this, banProblem);
     },
   }
 };
