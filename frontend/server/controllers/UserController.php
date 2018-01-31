@@ -1141,15 +1141,10 @@ class UserController extends Controller {
             return $response;
         }
 
-        $mentor_group = GroupsDAO::findByAlias(
-            Authorization::MENTOR_GROUP_ALIAS
-        );
-
         // Mentors can see current coder of the month email.
-        if (Authorization::isGroupMember($r['current_user_id'], $mentor_group)) {
-            if (CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
-                return $response;
-            }
+        if (Authorization::canViewEmail($r['current_user_id']) &&
+              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
+            return $response;
         }
         unset($response['userinfo']['email']);
         return $response;

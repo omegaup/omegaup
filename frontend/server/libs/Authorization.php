@@ -14,6 +14,9 @@ class Authorization {
     // Cache for system group for course curators
     private static $course_curator_group = null;
 
+    // Cache for system group for course curators
+    private static $mentor_group = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -130,6 +133,10 @@ class Authorization {
             self::hasRole($user_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
     }
 
+    public static function canViewEmail($user_id) {
+        return self::isMentor($user_id);
+    }
+
     public static function canViewCourse($user_id, Courses $course, Groups $group) {
         if (!Authorization::isCourseAdmin($user_id, $course) &&
             !Authorization::isGroupMember($user_id, $group)) {
@@ -187,6 +194,18 @@ class Authorization {
         );
     }
 
+    public static function isMentor($user_id) {
+        if (self::$mentor_group == null) {
+            self::$mentor_group = GroupsDAO::findByAlias(
+                Authorization::MENTOR_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $user_id,
+            self::$mentor_group
+        );
+    }
+
     public static function isGroupAdmin($user_id, Groups $group) {
         return self::isAdmin($user_id, $group);
     }
@@ -235,6 +254,7 @@ class Authorization {
     public static function clearCacheForTesting() {
         self::$is_system_admin = null;
         self::$quality_reviewer_group = null;
+        self::$mentor_group = null;
     }
 
     public static function canSubmitToProblemset($user_id, $problemset) {

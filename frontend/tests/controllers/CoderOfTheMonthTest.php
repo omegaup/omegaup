@@ -103,16 +103,36 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
+        $coders = [];
         foreach ($response['coders'] as $index => $coder) {
+            $coders[$index] = $coder['username'];
+        }
+        $coders = array_unique($coders);
+
+        foreach ($coders as $index => $coder) {
             $profile = UserController::apiProfile(new Request([
                 'auth_token' => $login->auth_token,
-                'username' => $coder['username']
+                'username' => $coder
             ]));
+
             if ($index == 0) {
+                // Mentor can see the current coder of the month email
                 $this->assertArrayHasKey('email', $profile['userinfo']);
             } else {
                 $this->assertArrayNotHasKey('email', $profile['userinfo']);
             }
+        }
+
+        $user = UserFactory::createUser();
+        $user_login = self::login($user);
+
+        foreach ($coders as $index => $coder) {
+            $profile = UserController::apiProfile(new Request([
+                'auth_token' => $user_login->auth_token,
+                'username' => $coder
+            ]));
+
+            $this->assertArrayNotHasKey('email', $profile['userinfo']);
         }
     }
 }

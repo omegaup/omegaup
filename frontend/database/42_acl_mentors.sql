@@ -7,10 +7,10 @@ VALUES
 INSERT INTO `ACLs` (`acl_id`, `owner_id`) VALUES (5, 1);
 
 INSERT INTO `Groups` (`acl_id`, `alias`, `name`, `description`) VALUES (
-	5,
-	'omegaup:mentor',
-	'omegaup:mentor',
-	'Equipo de mentores de omegaup'
+  5,
+  'omegaup:mentor',
+  'omegaup:mentor',
+  'Equipo de mentores de omegaup'
 );
 
 SET @mentor_group_id = LAST_INSERT_ID();
