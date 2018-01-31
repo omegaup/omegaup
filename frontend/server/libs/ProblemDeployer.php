@@ -489,7 +489,7 @@ class ProblemDeployer {
         $testplan_array = [];
 
         // LOL RegEx magic to get test case names from testplan
-        preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, $testplan_array);
+        preg_match_all('/^\\s*([^# \\t]+)\\s+([0-9.]+)\\s*$/m', $testplan, $testplan_array);
 
         if (count($testplan_array[1]) == 0) {
                 throw new InvalidParameterException('problemDeployerTestplanEmpty', null);
