@@ -177,21 +177,18 @@ OmegaUp.on('ready', function() {
           'sort-homeworks': function(courseAlias, homeworks) {
             let index = 1;
             for (let homework of homeworks) {
-              homework.order = index;
-              index++;
+              homework.order = index++;
             }
             omegaup.API.Course.updateAssignmentsOrder({
                                 course_alias: courseAlias,
                                 assignments: homeworks,
                               })
-                .then(function(response) {})
                 .fail(omegaup.UI.apiError);
           },
           'sort-tests': function(courseAlias, tests) {
             let index = 1;
             for (let test of tests) {
-              test.order = index;
-              index++;
+              test.order = index++;
             }
             omegaup.API.Course.updateAssignmentsOrder({
                                 course_alias: courseAlias,

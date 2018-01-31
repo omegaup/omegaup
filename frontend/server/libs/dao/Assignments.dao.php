@@ -93,7 +93,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
     /**
      * Get the course assigments sorted by order and start_time
      */
-    final public static function searchSortedAssignments(Assignments $Assignments) {
+    final public static function getSortedCourseAssignments($course_id) {
         $sql = 'SELECT
                    `assignment_id`,
                    `name`,
@@ -111,7 +111,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                      `order` ASC, `start_time` ASC';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$Assignments->course_id]);
+        $rs = $conn->Execute($sql, [$course_id]);
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = new Assignments($row);

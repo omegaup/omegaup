@@ -544,7 +544,8 @@ class CourseController extends Controller {
                 'alias' => $assignment['alias'],
                 'course_id' => $r['course']->course_id
             ]));
-            if (is_null($currentAssignment[0])) {
+
+            if (!empty($currentAssignment) && is_null($currentAssignment[0])) {
                 throw new NotFoundException('assignmentNotFound');
             }
 
@@ -673,9 +674,9 @@ class CourseController extends Controller {
 
         $assignments = [];
         try {
-            $assignments = AssignmentsDAO::searchSortedAssignments(new Assignments([
-                'course_id' => $r['course']->course_id
-            ]));
+            $assignments = AssignmentsDAO::getSortedCourseAssignments(
+                $r['course']->course_id
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
