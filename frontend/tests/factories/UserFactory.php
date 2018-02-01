@@ -124,6 +124,22 @@ class UserFactory {
     }
 
     /**
+     * Creates a new user with mentor role
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     * @return User
+     */
+    public static function createMentorUser($username = null, $password = null, $email = null) {
+        $user = self::createUser($username, $password, $email);
+
+        self::addMentorRole($user);
+
+        return $user;
+    }
+
+    /**
      * Adds a system role to the user.
      *
      * @param Users $user
@@ -136,5 +152,22 @@ class UserFactory {
             'acl_id' => Authorization::SYSTEM_ACL,
         ]);
         UserRolesDAO::save($userRoles);
+    }
+
+    /**
+     * Adds mentor role to the user
+     *
+     * @param Users $user
+     */
+    public static function addMentorRole(Users $user) {
+        $mentor_group = GroupsDAO::findByAlias(
+            Authorization::MENTOR_GROUP_ALIAS
+        );
+
+        $groupUser = new GroupsUsers([
+            'user_id' => $user->user_id,
+            'group_id' => $mentor_group->group_id,
+        ]);
+        GroupsUsersDao::save($groupUser);
     }
 }

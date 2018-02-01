@@ -91,4 +91,48 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         );
         return $response;
     }
+
+    /*
+     * Mentor can see the last coder of the month email
+     */
+    public function testMentorCanSeeLastCoderOfTheMonthEmail() {
+        $mentor = UserFactory::createMentorUser();
+
+        $login = self::login($mentor);
+        $response = UserController::apiCoderOfTheMonthList(new Request([
+            'auth_token' => $login->auth_token
+        ]));
+
+        $coders = [];
+        foreach ($response['coders'] as $index => $coder) {
+            $coders[$index] = $coder['username'];
+        }
+        $coders = array_unique($coders);
+
+        foreach ($coders as $index => $coder) {
+            $profile = UserController::apiProfile(new Request([
+                'auth_token' => $login->auth_token,
+                'username' => $coder
+            ]));
+
+            if ($index == 0) {
+                // Mentor can see the current coder of the month email
+                $this->assertArrayHasKey('email', $profile['userinfo']);
+            } else {
+                $this->assertArrayNotHasKey('email', $profile['userinfo']);
+            }
+        }
+
+        $user = UserFactory::createUser();
+        $user_login = self::login($user);
+
+        foreach ($coders as $index => $coder) {
+            $profile = UserController::apiProfile(new Request([
+                'auth_token' => $user_login->auth_token,
+                'username' => $coder
+            ]));
+
+            $this->assertArrayNotHasKey('email', $profile['userinfo']);
+        }
+    }
 }
