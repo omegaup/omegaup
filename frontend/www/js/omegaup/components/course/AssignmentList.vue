@@ -14,12 +14,17 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="3"
+            <th colspan="4"
                 v-text="T.wordsHomeworks"></th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="assignment in homeworks">
+        <tbody v-sortable="{ onUpdate: sortHomeworks }">
+          <tr v-bind:key="assignment.alias"
+              v-for="assignment in homeworks">
+            <td>
+              <a v-bind:title="T.courseAssignmentReorder"><span aria-hidden="true"
+                    class="glyphicon glyphicon-move handle"></span></a>
+            </td>
             <td>
               <a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a>
             </td>
@@ -40,12 +45,17 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="3"
+            <th colspan="4"
                 v-text="T.wordsTests"></th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="assignment in tests">
+        <tbody v-sortable="{ onUpdate: sortTests }">
+          <tr v-bind:key="assignment.alias"
+              v-for="assignment in tests">
+            <td>
+              <a v-bind:title="T.courseAssignmentReorder"><span aria-hidden="true"
+                    class="glyphicon glyphicon-move handle"></span></a>
+            </td>
             <td>
               <a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a>
             </td>
@@ -105,6 +115,16 @@ export default {
     onDelete: function(assignment) { this.$emit('delete', assignment);},
     onEdit: function(assignment) { this.$emit('edit', assignment);},
     onNew: function() { this.$emit('new');},
+    sortHomeworks: function(event) {
+      this.homeworks.splice(event.newIndex, 0,
+                            this.homeworks.splice(event.oldIndex, 1)[0]);
+      this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
+    },
+    sortTests: function(event) {
+      this.tests.splice(event.newIndex, 0,
+                        this.tests.splice(event.oldIndex, 1)[0]);
+      this.$emit('sort-tests', this.courseAlias, this.tests);
+    },
   },
 };
 </script>

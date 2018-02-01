@@ -359,7 +359,6 @@ CREATE TABLE `Problems` (
   `extra_wall_time` int(11) NOT NULL DEFAULT '0',
   `memory_limit` int(11) NOT NULL DEFAULT '64',
   `output_limit` int(11) NOT NULL DEFAULT '10240',
-  `stack_limit` int(11) NOT NULL DEFAULT '10485760',
   `visits` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',
   `accepted` int(11) NOT NULL DEFAULT '0',

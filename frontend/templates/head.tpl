@@ -15,14 +15,13 @@
 		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
 		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 {if isset($inArena) && $inArena}
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 {else}
 		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>

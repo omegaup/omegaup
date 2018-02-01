@@ -472,7 +472,7 @@ export class Arena {
     }
 
     // Trigger the event (useful on page load).
-    $(window).hashchange();
+    self.onHashChanged();
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
@@ -851,6 +851,11 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
+                  if (self.contestAdmin) {
+                    self.notifications.resolve({
+                      id: 'clarification-' + clarification.clarification_id
+                    });
+                  }
                 })
                 .fail(function() {
                   $('pre', answerNode).html(responseText);
@@ -891,6 +896,12 @@ export class Arena {
     if (!self.clarifications[clarification.clarification_id]) {
       $('.clarifications tbody.clarification-list').prepend(r);
       self.clarifications[clarification.clarification_id] = r;
+    }
+    if (clarification.answer == null) {
+      $('.answer pre', r).hide();
+    } else {
+      $('.answer pre', r).show();
+      $(r).addClass('resolved');
     }
   }
 
@@ -1262,7 +1273,7 @@ export class Arena {
   initSubmissionCountdown() {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
-    $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
+    $('#submit input[type=submit]').removeAttr('value').prop('disabled', false);
     let problem = self.problems[self.currentProblem.alias];
     if (typeof(problem) !== 'undefined') {
       if (typeof(problem.nextSubmissionTimestamp) !== 'undefined') {
@@ -1291,7 +1302,7 @@ export class Arena {
       } else {
         $('#submit input[type=submit]')
             .removeAttr('value')
-            .removeAttr('disabled');
+            .prop('disabled', false);
         clearInterval(self.submissionGapInterval);
       }
     }, 1000);
@@ -1420,14 +1431,14 @@ export class Arena {
           run.language = self.elements.submitForm.language.val();
           self.updateRun(run);
 
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
           self.hideOverlay();
           self.clearInputFile();
           self.initSubmissionCountdown();
         })
         .fail(function(run) {
           alert(run.error);
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
         }
 
               );

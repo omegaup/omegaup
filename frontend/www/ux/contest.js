@@ -161,18 +161,17 @@ omegaup.OmegaUp.on('ready', function() {
             })
             .fail(function(run) { alert(run.error); })
             .always(function() {
-              $('#clarification input').removeAttr('disabled');
+              $('#clarification input').prop('disabled', false);
             });
 
         return false;
       });
 
-  $(window)
-      .hashchange(function(e) {
-        if (arena.options.isOnlyProblem) {
-          onlyProblemHashChanged(e);
-        } else {
-          arena.onHashChanged();
-        }
-      });
+  window.addEventListener('hashchange', function() {
+    if (arena.options.isOnlyProblem) {
+      onlyProblemHashChanged();
+    } else {
+      arena.onHashChanged();
+    }
+  });
 });

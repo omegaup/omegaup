@@ -71,9 +71,6 @@ class Problems extends VO {
         if (isset($data['output_limit'])) {
             $this->output_limit = $data['output_limit'];
         }
-        if (isset($data['stack_limit'])) {
-            $this->stack_limit = $data['stack_limit'];
-        }
         if (isset($data['visits'])) {
             $this->visits = $data['visits'];
         }
@@ -229,13 +226,6 @@ class Problems extends VO {
       * @var int(11)
       */
     public $output_limit;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $stack_limit;
 
     /**
       *  [Campo no documentado]

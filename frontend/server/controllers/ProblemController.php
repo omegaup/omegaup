@@ -162,7 +162,6 @@ class ProblemController extends Controller {
         $problem->order = 'normal'; /* defaulting to normal */
         $problem->alias = $r['alias'];
         $problem->languages = $r['languages'];
-        $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
         $acceptsSubmissions = $r['languages'] !== '';
@@ -675,7 +674,6 @@ class ProblemController extends Controller {
             'extra_wall_time' => ['important' => true], // requires rejudge
             'memory_limit'  => ['important' => true], // requires rejudge
             'output_limit'  => ['important' => true], // requires rejudge
-            'stack_limit'   => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
@@ -1129,7 +1127,7 @@ class ProblemController extends Controller {
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
             'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
             'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
-            'languages', 'slow', 'stack_limit', 'email_clarifications'];
+            'languages', 'slow', 'email_clarifications'];
 
         $language = $r['lang'];
         $file_content = ProblemController::getProblemStatement(
