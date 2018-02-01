@@ -545,7 +545,7 @@ class CourseController extends Controller {
                 'course_id' => $r['course']->course_id
             ]));
 
-            if (!empty($currentAssignment) && is_null($currentAssignment[0])) {
+            if (empty($currentAssignment) || is_null($currentAssignment[0])) {
                 throw new NotFoundException('assignmentNotFound');
             }
 
