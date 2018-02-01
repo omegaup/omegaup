@@ -92,4 +92,12 @@ export default class {
     var audio = document.getElementById('notification-audio');
     if (audio != null) audio.play();
   }
+
+  resolve(data) {
+    var self = this;
+    if (!self.notificationMapping.hasOwnProperty(data.id)) {
+      return;
+    }
+    self.notificationMapping[data.id].onCloseClicked();
+  }
 }

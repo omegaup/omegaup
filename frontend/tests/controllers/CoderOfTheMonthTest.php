@@ -38,7 +38,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
     public function testCoderOfTheMonthAfterYear() {
         $userLastYear = UserFactory::createUser();
 
-        $today = date('Y-m-d');
+        // Using the first day of the month as "today" to avoid failures near
+        // certain dates.
+        $today = date('Y-m') . '-01';
 
         $runCreationDate = date_create($today);
         date_add($runCreationDate, date_interval_create_from_date_string('-13 month'));
