@@ -13,10 +13,12 @@ import urllib
 import pytest
 
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-_DEFAULT_TIMEOUT = 3  # seconds
+_DEFAULT_TIMEOUT = 10  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
@@ -29,8 +31,14 @@ class Driver(object):
     def __init__(self, browser, wait, url):
         self.browser = browser
         self.wait = wait
+        self._next_id = 0
         self._url = url
-        self.id = str(int(time.time()))
+
+    def generate_id(self):
+        '''Generates a relatively unique id.'''
+
+        self._next_id += 1
+        return '%d_%d' % (int(time.time()), self._next_id)
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -54,20 +62,54 @@ class Driver(object):
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def ajax_page_transition(self):
+    def ajax_page_transition(self, wait_for_ajax=True):
         '''Waits for an AJAX-initiated page transition to finish.'''
 
         prev_url = self.browser.current_url
         yield
         self.wait.until(lambda _: self.browser.current_url != prev_url)
-        self.wait_for_page_loaded()
+        if wait_for_ajax:
+            self.wait_for_page_loaded()
 
     def wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''
 
+        try:
+            self.wait.until(
+                lambda _: self.browser.execute_script(
+                    'return document.readyState;') == 'complete')
+        except TimeoutException as ex:
+            raise Exception('document ready state still %s' %
+                            self.browser.execute_script(
+                                'return document.readyState;')) from ex
+        t0 = time.time()
+        try:
+            self.wait.until(
+                lambda _: self.browser.execute_script(
+                    'return jQuery.active;') == 0)
+        except TimeoutException as ex:
+            raise Exception('%d AJAX calls still active after %f s' %
+                            (self.browser.execute_script(
+                                'return jQuery.active;'),
+                             time.time() - t0)) from ex
+
+    def typeahead_helper(self, parent_selector, value, select_suggestion=True):
+        '''Helper to interact with Typeahead elements.'''
+
+        tt_input = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '%s input.tt-input' % parent_selector)))
+        for value_char in value:
+            tt_input.send_keys(value_char)
+
+        if not select_suggestion:
+            return
+
         self.wait.until(
-            lambda _: self.browser.execute_script(
-                'return document.readyState;') == 'complete')
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '%s .tt-suggestion.tt-selectable' % parent_selector))).click()
 
     @contextlib.contextmanager
     def login_user(self):
@@ -91,21 +133,29 @@ class Driver(object):
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
         self.wait_for_page_loaded()
-        self.browser.find_element_by_xpath(
-            '//a[contains(@href, "/login/")]').click()
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[starts-with(@href, "/login/")]'))).click()
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
-        self.browser.find_element_by_id('user').send_keys(username)
+        self.wait_for_page_loaded()
+
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.ID, 'user'))).send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
         with self.ajax_page_transition():
             self.browser.find_element_by_id('login_form').submit()
 
-        yield
-
-        self.browser.get(self.url('/logout/?redirect=/'))
-        self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self.wait_for_page_loaded()
+        try:
+            yield
+        finally:
+            self.browser.get(self.url('/logout/?redirect=/'))
+            self.wait.until(lambda _: self.browser.current_url ==
+                            home_page_url)
+            self.wait_for_page_loaded()
 
 
 @pytest.hookimpl(hookwrapper=True)

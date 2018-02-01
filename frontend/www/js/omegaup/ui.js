@@ -120,35 +120,31 @@ let UI = {
   },
 
   typeaheadWrapper: function(f) {
-    var lastRequest = null;
-    var pending = false;
-    function wrappedCall(query, callback) {
+    let lastRequest = null;
+    let pending = false;
+    function wrappedCall(query, syncResults, asyncResults) {
       if (pending) {
-        lastRequest = [query, callback];
-      } else {
-        pending = true;
-        f({query: query})
-            .then(function(data) {
-              if (lastRequest != null) {
-                // Typeahead will ignore any stale callbacks. Given that we
-                // will start a new request ASAP, let's do a best-effort
-                // callback to the current request with the old data.
-                lastRequest[1](data);
-                pending = false;
-                var request = lastRequest;
-                lastRequest = null;
-                wrappedCall(request[0], request[1]);
-              } else {
-                if (data.results) {
-                  callback(data.results);
-                } else {
-                  callback(data);
-                }
-              }
-            })
-            .fail(UI.ignoreError)
-            .always(function() { pending = false; });
+        lastRequest = arguments;
+        return;
       }
+      pending = true;
+      f({query: query})
+          .then(function(data) {
+            if (lastRequest != null) {
+              // Typeahead will ignore any stale callbacks. Given that we
+              // will start a new request ASAP, let's do a best-effort
+              // asyncResults to the current request with the old data.
+              lastRequest[2](data.results || data);
+              pending = false;
+              let request = lastRequest;
+              lastRequest = null;
+              wrappedCall.apply(null, request);
+              return;
+            }
+            asyncResults(data.results || data);
+          })
+          .fail(UI.ignoreError)
+          .always(function() { pending = false; });
     }
     return wrappedCall;
   },
@@ -162,10 +158,11 @@ let UI = {
             },
             {
               source: UI.typeaheadWrapper(searchFn),
-              displayKey: 'label',
+              async: true,
+              display: 'label',
             })
-        .on('typeahead:selected', cb)
-        .on('typeahead:autocompleted', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   problemTypeahead: function(elem, cb) {
@@ -177,7 +174,8 @@ let UI = {
             },
             {
               source: UI.typeaheadWrapper(API.Problem.list),
-              displayKey: 'alias',
+              async: true,
+              display: 'alias',
               templates: {
                 suggestion: function(val) {
                   return UI.formatString('<strong>%(title)</strong> (%(alias))',
@@ -185,8 +183,8 @@ let UI = {
                 }
               }
             })
-        .on('typeahead:selected', cb)
-        .on('typeahead:autocompleted', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   schoolTypeahead: function(elem, cb) {
@@ -198,13 +196,14 @@ let UI = {
             },
             {
               source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
-              displayKey: 'label',
+              async: true,
+              display: 'label',
               templates: {
                 empty: omegaup.T.schoolToBeAdded,
               }
             })
-        .on('typeahead:selected', cb)
-        .on('typeahead:autocompleted', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },

@@ -866,7 +866,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'OVI17' => 100
+                'OVI18' => 155
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'
@@ -903,9 +903,8 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROO-18' => 500,
-                'ROOP-18' => 300,
-                'ROOS-18' => 300,
+                'OMIROO-D1-18' => 70,
+                'OMIROO-D2-18' => 70
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
@@ -1465,6 +1464,11 @@ class UserController extends Controller {
         $r['current_user']->password = $hashedPassword;
 
         UsersDAO::save($r['current_user']);
+
+        // Expire profile cache
+        Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
+        $sessionController = new SessionController();
+        $sessionController->InvalidateCache();
 
         return ['status' => 'ok'];
     }

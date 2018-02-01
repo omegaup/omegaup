@@ -15,7 +15,7 @@ try {
             $session['user']
         );
     } else {
-        $nominationStatus = ['solved' => false, 'nominated' => false];
+        $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissed' => false];
     }
 } catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
@@ -38,6 +38,7 @@ $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
     'nominated' => (bool) $nominationStatus['nominated'],
+    'dismissed' => (bool) $nominationStatus['dismissed'],
     'problem_alias' => $result['alias'],
     'language' => $result['problem_statement_language'],
 ]);
@@ -45,7 +46,7 @@ $smarty->assign('qualitynomination_reportproblem_payload', [
     'problem_alias' => $result['alias'],
 ]);
 $smarty->assign('karel_problem', count(array_intersect(
-    explode(',', $result['languages']),
+    $result['languages'],
     ['kp', 'kj']
 )) == 2);
 if (isset($result['sample_input'])) {

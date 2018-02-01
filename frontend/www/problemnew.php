@@ -12,11 +12,10 @@ $smarty->assign('OVERALL_WALL_TIME_LIMIT', '60000');
 $smarty->assign('EXTRA_WALL_TIME', '0');
 $smarty->assign('OUTPUT_LIMIT', '10240');
 $smarty->assign('MEMORY_LIMIT', '32768');
-$smarty->assign('STACK_LIMIT', '10485760');
 $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
 $smarty->assign('VISIBILITY', '0');
-$smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,pas,py,rb,lua');
+$smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
@@ -32,7 +31,6 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'output_limit' => $_POST['output_limit'],
                 'source' => $_POST['source'],
                 'visibility' => $_POST['visibility'],
-                'stack_limit' => $_POST['stack_limit'],
                 'languages' => $_POST['languages'],
                 'email_clarifications' => $_POST['email_clarifications']
             ]);
@@ -57,7 +55,6 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
         $smarty->assign('SOURCE', $_POST['source']);
         $smarty->assign('LANGUAGES', $_POST['languages']);
-        $smarty->assign('STACK_LIMIT', $_POST['stack_limit']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
         $smarty->assign('VISIBILITY', $_POST['visibility']);
     } elseif ($response['status'] == 'ok') {

@@ -385,6 +385,8 @@ export class Arena {
 
     self.startTime = start;
     self.finishTime = finish;
+    // Once the clock is ready, we can now connect to the socket.
+    self.connectSocket();
     if (self.options.isPractice) {
       self.elements.clock.html('&infin;');
       return;
@@ -467,7 +469,7 @@ export class Arena {
     }
 
     // Trigger the event (useful on page load).
-    $(window).hashchange();
+    self.onHashChanged();
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
@@ -925,6 +927,12 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     let self = this;
+
+    let can_submit = lang_array.length != 0;
+
+    $('.runs').toggle(can_submit);
+    $('.data').toggle(can_submit);
+    $('.best-solvers').toggle(can_submit);
     $('option', self.elements.submitForm.language)
         .each(function(index, item) {
           item = $(item);
@@ -1072,7 +1080,7 @@ export class Arena {
         $('#problem .statement').html(problem.problem_statement);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
-        let language_array = problem.languages.split(',');
+        let language_array = problem.languages;
         if (karel_langs.every(function(x) {
               return language_array.indexOf(x) != -1;
             })) {
@@ -1258,7 +1266,7 @@ export class Arena {
   initSubmissionCountdown() {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
-    $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
+    $('#submit input[type=submit]').removeAttr('value').prop('disabled', false);
     let problem = self.problems[self.currentProblem.alias];
     if (typeof(problem) !== 'undefined') {
       if (typeof(problem.nextSubmissionTimestamp) !== 'undefined') {
@@ -1287,7 +1295,7 @@ export class Arena {
       } else {
         $('#submit input[type=submit]')
             .removeAttr('value')
-            .removeAttr('disabled');
+            .prop('disabled', false);
         clearInterval(self.submissionGapInterval);
       }
     }, 1000);
@@ -1416,14 +1424,14 @@ export class Arena {
           run.language = self.elements.submitForm.language.val();
           self.updateRun(run);
 
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
           self.hideOverlay();
           self.clearInputFile();
           self.initSubmissionCountdown();
         })
         .fail(function(run) {
           alert(run.error);
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
         }
 
               );
@@ -1781,28 +1789,9 @@ class RunView {
           self.filter_username('');
         });
 
-    $('.runsproblem', elm)
-        .typeahead(
-            {
-              minLength: 2,
-              highlight: true,
-            },
-            {
-              source: UI.typeaheadWrapper(function(query, cb) {
-                API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); })
-                    .fail(UI.apiError);
-              }),
-              displayKey: 'title',
-              templates: {
-                suggestion: function(elm) {
-                  return '<strong>' + elm.title + '</strong> (' + elm.alias +
-                         ')';
-                }
-              }
-            })
-        .on('typeahead:selected',
-            function(elm, item) { self.filter_problem(item.alias); });
+    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+      self.filter_problem(item.alias);
+    });
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

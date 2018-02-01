@@ -2,11 +2,11 @@
   <div class="omegaup-course-assignmentdetails panel"
        v-show="show">
     <div class="panel-body">
-      <form class="form"
+      <form class="form schedule"
             v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-8">
-            <label>{{ T.wordsTitle }} <input class="form-control"
+            <label>{{ T.wordsTitle }} <input class="form-control name"
                    size="30"
                    type="text"
                    v-model="name"></label>
@@ -17,7 +17,7 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"></span>
-                  <input class="form-control"
+                  <input class="form-control alias"
                    type="text"
                    v-bind:disabled="update"
                    v-model="alias"></label>
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div class="form-group pull-right">
-          <button class="btn btn-primary"
+          <button class="btn btn-primary submit"
                type="submit">
           <template v-if="update">
             {{ T.courseAssignmentNewFormUpdate }}

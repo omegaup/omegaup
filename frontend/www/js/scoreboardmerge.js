@@ -26,21 +26,23 @@ omegaup.OmegaUp.on('ready', function() {
                          '<td></td><td><b>Username</b></td>';
 
               var contests = [];
-              for (var alias in scoreboard['ranking'][0]['contests']) {
-                html += '<td colspan=\"2\"><b>' + alias + '</b></td>';
-                contests.push(alias);
+              if (scoreboard.ranking.length > 0) {
+                for (var alias in scoreboard.ranking[0].contests) {
+                  html += '<td colspan=\"2\"><b>' + alias + '</b></td>';
+                  contests.push(alias);
+                }
               }
 
               html +=
                   '<td colspan="2"><b>' + omegaup.T.wordsTotal + '</b></td>';
               html += '</tr>';
 
-              ranking = scoreboard['ranking'];
+              var ranking = scoreboard.ranking;
               var showPenalty = false;
               for (var entry in ranking) {
                 if (!ranking.hasOwnProperty(entry)) continue;
                 data = ranking[entry];
-                showPenalty |= !!data['total']['penalty'];
+                showPenalty |= !!data.total.penalty;
               }
 
               for (var entry in ranking) {
@@ -50,11 +52,10 @@ omegaup.OmegaUp.on('ready', function() {
 
                 html += '<tr>';
                 html += '<td><strong>' + (place) + '</strong></td>';
-                html += '<td><div class=\"username\">' + data['username'] +
-                        '</div>';
-                if (data['username'] != data['name']) {
-                  html +=
-                      ('<div class=\"name\">' + data['name'] + '</div></td>');
+                html +=
+                    '<td><div class=\"username\">' + data.username + '</div>';
+                if (data.username != data.name) {
+                  html += ('<div class=\"name\">' + data.name + '</div></td>');
                 } else {
                   html += '<div class=\"name\">&nbsp;</div></td>';
                 }
@@ -62,23 +63,23 @@ omegaup.OmegaUp.on('ready', function() {
                 for (var c in contests) {
                   if (showPenalty) {
                     html += '<td class=\"numeric\">' +
-                            data['contests'][contests[c]]['points'] + '</td>';
+                            data.contests[contests[c]].points + '</td>';
                     html += '<td class=\"numeric\">' +
-                            data['contests'][contests[c]]['penalty'] + '</td>';
+                            data.contests[contests[c]].penalty + '</td>';
                   } else {
                     html += '<td class=\"numeric\" colspan=\"2\">' +
-                            data['contests'][contests[c]]['points'] + '</td>';
+                            data.contests[contests[c]].points + '</td>';
                   }
                 }
 
                 if (showPenalty) {
-                  html += '<td class=\"numeric\">' + data['total']['points'] +
-                          '</td>';
-                  html += '<td class=\"numeric\">' + data['total']['penalty'] +
-                          '</td>';
+                  html +=
+                      '<td class=\"numeric\">' + data.total.points + '</td>';
+                  html +=
+                      '<td class=\"numeric\">' + data.total.penalty + '</td>';
                 } else {
                   html += '<td class=\"numeric\" colspan=\"2\">' +
-                          data['total']['points'] + '</td>';
+                          data.total.points + '</td>';
                 }
 
                 html += '</tr>';

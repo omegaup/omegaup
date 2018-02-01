@@ -50,29 +50,33 @@
 					</select>
 				</div>
 
+				<div class="form-group col-md-6">
+					<label for="languages">{#problemEditFormLanguages#}</label>
+					<select name="languages" id="languages" class="form-control">
+						<option value="c,cpp,cpp11,cs,hs,java,lua,pas,py,rb" {if $IS_UPDATE eq 0 && $LANGUAGES eq "c,cpp,cpp11,cs,hs,java,lua,pas,py,rb"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
+						<option value="kj,kp" {if $IS_UPDATE eq 0 && $LANGUAGES eq "kj,kp"}selected{/if}>Karel</option>
+						<option value="cat" {if $IS_UPDATE eq 0 && $LANGUAGES eq "cat"}selected{/if}>{#wordsJustOutput#}</option>
+						<option value="" {if $IS_UPDATE eq 0 && $LANGUAGES eq ""}selected{/if}>{#wordsNoSubmissions#}</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
 				<div class="form-group  col-md-6">
 					<label for="validator_time_limit">{#problemEditFormValidatorTimeLimit#}</label>
 					<input id='validator_time_limit' name='validator_time_limit' value='{if $IS_UPDATE eq 0}{$VALIDATOR_TIME_LIMIT}{/if}' type='text' class="form-control" />
 				</div>
-			</div>
 
-			<div class="row">
 				<div class="form-group  col-md-6">
 					<label for="time_limit">{#problemEditFormTimeLimit#}</label>
 					<input id='time_limit' name='time_limit' value='{if $IS_UPDATE eq 0}{$TIME_LIMIT}{/if}' type='text' class="form-control" />
 				</div>
-
-				<div class="form-group col-md-6">
-					<label for="overall_wall_time_limit">{#problemEditFormWallTimeLimit#}</label>
-					<input id='overall_wall_time_limit' name='overall_wall_time_limit' value='{if $IS_UPDATE eq 0}{$OVERALL_WALL_TIME_LIMIT}{/if}' type='text' class="form-control" />
-				</div>
-
 			</div>
 
 			<div class="row">
-				<div class="form-group  col-md-6">
-					<label for="stack_limit">{#problemEditStackLimit#}</label>
-					<input id="stack_limit" name="stack_limit" value="{if $IS_UPDATE eq 0}{$STACK_LIMIT}{/if}" type='text' class="form-control" />
+				<div class="form-group col-md-6">
+					<label for="overall_wall_time_limit">{#problemEditFormWallTimeLimit#}</label>
+					<input id='overall_wall_time_limit' name='overall_wall_time_limit' value='{if $IS_UPDATE eq 0}{$OVERALL_WALL_TIME_LIMIT}{/if}' type='text' class="form-control" />
 				</div>
 
 				<div class="form-group col-md-6">
@@ -100,14 +104,12 @@
 				</div>
 
 				<div class="form-group col-md-6">
-					<label for="languages">{#problemEditFormLanguages#}</label>
-					<select name="languages" id="languages" class="form-control">
-						<option value="c,cpp,cpp11,cs,hs,java,pas,py,rb,lua" {if $IS_UPDATE eq 0 && $LANGUAGES eq "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
-						<option value="kp,kj" {if $IS_UPDATE eq 0 && $LANGUAGES eq "kp,kj"}selected{/if}>Karel</option>
-						<option value="cat" {if $IS_UPDATE eq 0 && $LANGUAGES eq "cat"}selected{/if}>{#wordsJustOutput#}</option>
-					</select>
+					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
+					<div class="form-control">
+						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq 0 && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq 0 && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
+					</div>
 				</div>
-
 			</div>
 
 			<div class="row">
@@ -119,29 +121,21 @@
 					</div>
 				</div>
 
-				{if $IS_UPDATE eq 1}
-				<div class="form-group  col-md-6" id="update-message-group">
-					<label class="control-label" for="update-message">{#problemEditCommitMessage#}</label>
-					<input id="update-message" name="message" type="text" class="form-control" />
-				</div>
-				{/if}
-
-				<div class="form-group col-md-6">
-					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
-					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq 0 && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq 0 && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
-					</div>
-				</div>
-			</div>
-
-			<div class="row">
 				<div class="form-group col-md-6" id="problem-contents-group">
 					<label for="problem_contents" class="control-label">{#problemEditFormFile#}</label>
 					<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup" target="_blank"><span>{#problemEditFormHowToWriteProblems#}</span></a>
 					<input name="problem_contents" id="problem_contents" type="file" class="form-control" />
 				</div>
 			</div>
+
+      {if $IS_UPDATE eq 1}
+			<div class="row">
+				<div class="form-group  col-md-12" id="update-message-group">
+					<label class="control-label" for="update-message">{#problemEditCommitMessage#}</label>
+					<input id="update-message" name="message" type="text" class="form-control" />
+				</div>
+			</div>
+      {/if}
 
 			<input id='' name='request' value='submit' type='hidden'>
 

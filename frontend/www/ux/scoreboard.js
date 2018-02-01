@@ -10,7 +10,6 @@ omegaup.OmegaUp.on('ready', function() {
   var arena = new omegaup.arena.Arena(options);
   var getRankingByTokenRefresh = 5 * 60 * 1000;  // 5 minutes
 
-  arena.connectSocket();
   omegaup.API.Contest.details({
                        contest_alias: arena.options.contestAlias,
                        token: arena.options.scoreboardToken,

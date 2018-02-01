@@ -10,5 +10,5 @@ omegaup.OmegaUp.on('ready', function() {
       .then(arena.contestLoaded.bind(arena))
       .fail(omegaup.UI.apiError);
 
-  $(window).hashchange(arena.onHashChanged.bind(arena));
+  window.addEventListener('hashchange', arena.onHashChanged.bind(arena));
 });

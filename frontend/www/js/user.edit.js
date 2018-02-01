@@ -6,23 +6,10 @@ omegaup.OmegaUp.on('ready', function() {
   $('#graduation_date').datepicker();
 
   $('#school_id').val('');
-  $('#school')
-      .typeahead(
-          {
-            minLength: 2,
-            highlight: true,
-          },
-          {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
-            displayKey: 'label',
-            templates: {
-              empty: omegaup.T.schoolToBeAdded,
-            }
-          })
-      .on('typeahead:selected', function(item, val, text) {
-        $('#school_id').val(val.id);
-        $('#school_name').val(val.label);
-      });
+  omegaup.UI.schoolTypeahead($('#school'), function(item, val, text) {
+    $('#school_id').val(val.id);
+    $('#school_name').val(val.label);
+  });
 
   $('#country_id')
       .on('change', function() {
@@ -35,7 +22,7 @@ omegaup.OmegaUp.on('ready', function() {
           $('#state_id').attr('disabled', 'disabled');
           return;
         }
-        $('#state_id').removeAttr('disabled');
+        $('#state_id').prop('disabled', false);
 
         for (var key in country.sub) {
           if (!country.sub.hasOwnProperty(key)) continue;

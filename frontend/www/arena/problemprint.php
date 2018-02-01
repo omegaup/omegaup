@@ -28,7 +28,7 @@ $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('karel_problem', count(array_intersect(
-    explode(',', $result['languages']),
+    $result['languages'],
     ['kp', 'kj']
 )) == 2);
 if (isset($result['sample_input'])) {

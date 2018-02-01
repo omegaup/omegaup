@@ -30,7 +30,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('.solver-list').append(prob);
     }
 
-    var language_array = problem.languages.split(',');
+    var language_array = problem.languages;
     arena.updateAllowedLanguages(language_array);
     arena.selectDefaultLanguage();
 
@@ -117,7 +117,6 @@ omegaup.OmegaUp.on('ready', function() {
     onlyProblemLoaded(JSON.parse(
         document.getElementById('problem-json').firstChild.nodeValue));
   } else {
-    arena.connectSocket();
     omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
         .then(arena.contestLoaded.bind(arena))
         .fail(omegaup.UI.ignoreError);
@@ -162,18 +161,17 @@ omegaup.OmegaUp.on('ready', function() {
             })
             .fail(function(run) { alert(run.error); })
             .always(function() {
-              $('#clarification input').removeAttr('disabled');
+              $('#clarification input').prop('disabled', false);
             });
 
         return false;
       });
 
-  $(window)
-      .hashchange(function(e) {
-        if (arena.options.isOnlyProblem) {
-          onlyProblemHashChanged(e);
-        } else {
-          arena.onHashChanged();
-        }
-      });
+  window.addEventListener('hashchange', function() {
+    if (arena.options.isOnlyProblem) {
+      onlyProblemHashChanged();
+    } else {
+      arena.onHashChanged();
+    }
+  });
 });

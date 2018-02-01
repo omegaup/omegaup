@@ -31,11 +31,11 @@ omegaup.OmegaUp.on('ready', function() {
 
         if (contest.window_length === null) {
           // Disable window length
-          $('#window-length-enabled').removeAttr('checked');
+          $('#window-length-enabled').prop('checked', false);
           $('#window-length').val('');
         } else {
           $('#window-length-enabled').attr('checked', 'checked');
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
           $('#window-length').val(contest.window_length);
         }
 
@@ -55,6 +55,9 @@ omegaup.OmegaUp.on('ready', function() {
           $('option[value="' + lang + '"]').prop('selected', true);
         });
         $('.new_contest_form #languages').multiselect('refresh');
+
+        $('.new_contest_form #basic-information-required')
+            .prop('checked', contest.needs_basic_information);
 
         $('.contest-publish-form #public').val(contest.public);
 
@@ -104,27 +107,23 @@ omegaup.OmegaUp.on('ready', function() {
     omegaup.API.Contest
         .update({
           contest_alias: contestAlias,
-          title: $('.new_contest_form #title').val(),
-          description: $('.new_contest_form #description').val(),
-          start_time:
-              (new Date($('.new_contest_form #start-time').val()).getTime()) /
-                  1000,
-          finish_time:
-              (new Date($('.new_contest_form #finish-time').val()).getTime()) /
-                  1000,
+          title: $('#title').val(),
+          description: $('#description').val(),
+          start_time: (new Date($('#start-time').val()).getTime()) / 1000,
+          finish_time: (new Date($('#finish-time').val()).getTime()) / 1000,
           window_length: window_length_value,
-          alias: $('.new_contest_form #alias').val(),
-          points_decay_factor:
-              $('.new_contest_form #points-decay-factor').val(),
-          submissions_gap: $('.new_contest_form #submissions-gap').val() * 60,
-          feedback: $('.new_contest_form #feedback').val(),
-          penalty: $('.new_contest_form #penalty').val(), public: public,
-          scoreboard: $('.new_contest_form #scoreboard').val(),
-          penalty_type: $('.new_contest_form #penalty-type').val(),
-          show_scoreboard_after:
-              $('.new_contest_form #show-scoreboard-after').val(),
-          languages: $('.new_contest_form #languages').val(),
-          contestant_must_register: $('.new_contest_form #register').val(),
+          alias: $('#alias').val(),
+          points_decay_factor: $('#points-decay-factor').val(),
+          submissions_gap: $('#submissions-gap').val() * 60,
+          feedback: $('#feedback').val(),
+          penalty: $('#penalty').val(), public: public,
+          scoreboard: $('#scoreboard').val(),
+          penalty_type: $('#penalty-type').val(),
+          show_scoreboard_after: $('#show-scoreboard-after').val(),
+          languages: $('#languages').val(),
+          contestant_must_register: $('#register').val(),
+          basic_information:
+              $('#basic-information-required').is(':checked') ? '1' : '0',
         })
         .then(function(data) {
           if (data.status == 'ok') {

@@ -73,9 +73,10 @@ omegaup.OmegaUp.on('ready', function() {
           },
           {
             source: omegaup.UI.typeaheadWrapper(omegaup.API.Tag.list),
-            displayKey: 'name',
+            async: true,
+            display: 'name',
           })
-      .on('typeahead:selected', function(event, val) {
+      .on('typeahead:select', function(event, val) {
         $(event.target).val(val.name);
       });
 
@@ -342,7 +343,6 @@ omegaup.OmegaUp.on('ready', function() {
       $('input[name=memory_limit]').val('');
       $('input[name=output_limit]').val('');
       $('input[name=source]').val('');
-      $('input[name=stack_limit]').val('');
       return;
     }
 
@@ -367,7 +367,6 @@ omegaup.OmegaUp.on('ready', function() {
     $('input[name=extra_wall_time]').val(problem.extra_wall_time);
     $('input[name=memory_limit]').val(problem.memory_limit);
     $('input[name=output_limit]').val(problem.output_limit);
-    $('input[name=stack_limit]').val(problem.stack_limit);
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(omegaup.UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -384,7 +383,7 @@ omegaup.OmegaUp.on('ready', function() {
       // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
     }
-    $('#languages').val(problem.languages);
+    $('#languages').val(problem.languages.sort().join());
     $('input[name=alias]').val(problemAlias);
 
     if (chosenLanguage == null ||

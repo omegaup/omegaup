@@ -10,8 +10,11 @@ OmegaUp.on('ready', function() {
     el: '#course-intro',
     render: function(createElement) {
       return createElement('course-intro', {
-        props:
-            {name: coursePayload.name, description: coursePayload.description},
+        props: {
+          name: coursePayload.name,
+          description: coursePayload.description,
+          needsBasicInformation: coursePayload.needsBasicInformation
+        },
         on: {
           submit: function(ev) {
             API.Course.addStudent({

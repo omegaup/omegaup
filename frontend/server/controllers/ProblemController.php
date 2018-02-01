@@ -162,10 +162,10 @@ class ProblemController extends Controller {
         $problem->order = 'normal'; /* defaulting to normal */
         $problem->alias = $r['alias'];
         $problem->languages = $r['languages'];
-        $problem->stack_limit = $r['stack_limit'];
         $problem->email_clarifications = $r['email_clarifications'];
 
-        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
+        $acceptsSubmissions = $r['languages'] !== '';
+        $problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -674,7 +674,6 @@ class ProblemController extends Controller {
             'extra_wall_time' => ['important' => true], // requires rejudge
             'memory_limit'  => ['important' => true], // requires rejudge
             'output_limit'  => ['important' => true], // requires rejudge
-            'stack_limit'   => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
@@ -687,7 +686,9 @@ class ProblemController extends Controller {
         $response = [
             'rejudged' => false
         ];
-        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
+
+        $acceptsSubmissions = $problem->languages !== '';
+        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
 
         // Insert new problem
         try {
@@ -1126,7 +1127,7 @@ class ProblemController extends Controller {
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
             'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
             'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
-            'languages', 'slow', 'stack_limit', 'email_clarifications'];
+            'languages', 'slow', 'email_clarifications'];
 
         $language = $r['lang'];
         $file_content = ProblemController::getProblemStatement(
@@ -1272,6 +1273,10 @@ class ProblemController extends Controller {
                 $r['problem']->problem_id
             );
         }
+
+        // send the supported languages as a JSON array instead of csv
+        // array_filter is needed to handle when $response['languages'] is empty
+        $response['languages'] = array_filter(explode(',', $response['languages']));
 
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
         $response['score'] = self::bestScore($r);

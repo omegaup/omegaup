@@ -56,6 +56,9 @@ class Courses extends VO {
         if (isset($data['school_id'])) {
             $this->school_id = $data['school_id'];
         }
+        if (isset($data['needs_basic_information'])) {
+            $this->needs_basic_information = $data['needs_basic_information'];
+        }
     }
 
     /**
@@ -140,4 +143,11 @@ class Courses extends VO {
       * @var int(11)
       */
     public $school_id;
+
+    /**
+      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
+      * @access public
+      * @var tinyint(1)
+      */
+    public $needs_basic_information;
 }

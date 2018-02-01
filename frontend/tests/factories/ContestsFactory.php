@@ -17,6 +17,7 @@ class ContestParams implements ArrayAccess {
         }
         ContestParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
         ContestParams::validateParameter('public', $this->params, false, 1);
+        ContestParams::validateParameter('basic_information', $this->params, false, 'false');
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
         ContestParams::validateParameter('languages', $this->params, false);
         ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
@@ -48,6 +49,7 @@ class ContestParams implements ArrayAccess {
         return new ContestParams([
             'title' => $contest->title,
             'public' => $contest->public,
+            'basic_information' => $contest->basic_information,
             'contestDirector' => $contest->contestDirector,
             'languages' => $contest->languages,
             'start_time' => $contest->start_time,
@@ -120,6 +122,7 @@ class ContestsFactory {
         }
         $r['languages'] = $params['languages'];
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
+        $r['basic_information'] = $params['basic_information']; // This is just a default value.
 
         return [
             'request' => $r,
@@ -135,6 +138,7 @@ class ContestsFactory {
         // Create a valid contest Request object
         $privateParams['public'] = 0;
         $contestData = ContestsFactory::getRequest($privateParams);
+
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 

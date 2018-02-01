@@ -29,6 +29,9 @@ omegaup.OmegaUp.on('ready', function() {
               show_scoreboard_after:
                   $('.new_contest_form #show-scoreboard-after').val(),
               languages: $('.new_contest_form #languages').val(),
+              basic_information:
+                  $('.new_contest_form #basic-information-required')
+                      .is(':checked'),
             })
             .then(function(data) {
               window.location.replace('/contest/' +
@@ -44,7 +47,7 @@ omegaup.OmegaUp.on('ready', function() {
       .on('change', function() {
         if ($(this).is(':checked')) {
           // Enable
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
         } else {
           // Disable
           $('#window-length').attr('disabled', 'disabled');
