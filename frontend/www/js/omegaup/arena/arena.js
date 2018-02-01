@@ -844,6 +844,11 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
+                  if (self.contestAdmin) {
+                    self.notifications.resolve({
+                      id: 'clarification-' + clarification.clarification_id
+                    });
+                  }
                 })
                 .fail(function() {
                   $('pre', answerNode).html(responseText);
@@ -884,6 +889,12 @@ export class Arena {
     if (!self.clarifications[clarification.clarification_id]) {
       $('.clarifications tbody.clarification-list').prepend(r);
       self.clarifications[clarification.clarification_id] = r;
+    }
+    if (clarification.answer == null) {
+      $('.answer pre', r).hide();
+    } else {
+      $('.answer pre', r).show();
+      $(r).addClass('resolved');
     }
   }
 
