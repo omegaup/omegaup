@@ -903,9 +903,8 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROO-18' => 500,
-                'ROOP-18' => 300,
-                'ROOS-18' => 300,
+                'OMIROO-D1-18' => 70,
+                'OMIROO-D2-18' => 70
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
@@ -1136,12 +1135,18 @@ class UserController extends Controller {
         }
 
         // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one. Admins can see emails.
-        if (!Authorization::isSystemAdmin($r['current_user_id'])
-                && $r['user']->user_id !== $r['current_user_id']) {
-            unset($response['userinfo']['email']);
+        // the logged user's one. Admins can see emails
+        if (Authorization::isSystemAdmin($r['current_user_id'])
+              || $r['user']->user_id == $r['current_user_id']) {
+            return $response;
         }
 
+        // Mentors can see current coder of the month email.
+        if (Authorization::canViewEmail($r['current_user_id']) &&
+              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
+            return $response;
+        }
+        unset($response['userinfo']['email']);
         return $response;
     }
 

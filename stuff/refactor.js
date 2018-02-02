@@ -56,6 +56,38 @@ const promiseVisitor = {
 };
 traverse(ast, promiseVisitor);
 
+// From https://github.com/jquery/jquery/blob/2d4f53416e5f74fa98e0c1d66b6f3c285a12f0ce/src/selector-native.js#L212
+const jQueryBooleanProperties = [
+  'checked', 'selected', 'async', 'autofocus', 'autoplay', 'controls', 'defer',
+  'disabled', 'hidden', 'ismap', 'loop', 'multiple', 'open', 'readonly',
+  'required', 'scoped'
+];
+const jQueryRemoveAttrVisitor = {
+  CallExpression(path) {
+    let callee = path.node.callee;
+    if (callee.type != 'MemberExpression') {
+      return;
+    }
+    const identifier = callee.property;
+    if (identifier.name != 'removeAttr') {
+      return;
+    }
+    if (path.node.arguments.length != 1 || path.node.arguments[0].type != 'StringLiteral') {
+      return;
+    }
+    let attributeName = path.node.arguments[0].value;
+    if (jQueryBooleanProperties.indexOf(attributeName) == -1) {
+      return;
+    }
+    fixes.push({
+      start: identifier.start - 1,
+      end: path.node.end,
+      contents: '.prop(\'' + attributeName + '\', false)',
+    });
+  },
+};
+traverse(ast, jQueryRemoveAttrVisitor);
+
 // From https://github.com/jquery/jquery/blob/305f193aa57014dc7d8fa0739a3fefd47166cd44/src/event/alias.js
 const jQueryDeprecatedFunctions = [
   'blur',      'focus',      'focusin',  'focusout',   'resize',
@@ -64,7 +96,7 @@ const jQueryDeprecatedFunctions = [
   'change',    'select',     'submit',   'keydown',    'keypress',
   'keyup',     'contextmenu'
 ];
-const jQueryVisitor = {
+const jQueryDeprecatedFunctionVisitor = {
   CallExpression(path) {
     let callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
@@ -101,7 +133,7 @@ const jQueryVisitor = {
     }
   },
 };
-traverse(ast, jQueryVisitor);
+traverse(ast, jQueryDeprecatedFunctionVisitor);
 
 fixes.sort(function(a, b) { return a.start - b.start; });
 

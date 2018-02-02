@@ -31,11 +31,11 @@ omegaup.OmegaUp.on('ready', function() {
 
         if (contest.window_length === null) {
           // Disable window length
-          $('#window-length-enabled').removeAttr('checked');
+          $('#window-length-enabled').prop('checked', false);
           $('#window-length').val('');
         } else {
           $('#window-length-enabled').attr('checked', 'checked');
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
           $('#window-length').val(contest.window_length);
         }
 

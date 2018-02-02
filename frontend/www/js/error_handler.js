@@ -50,6 +50,7 @@ function sendError(message, filename, lineno, colno, error) {
   } catch (e) {
     console.error('Failed to upload the error', e);
   }
+  console.error('Unhandled exception ', error);
 }
 if (window.addEventListener) {
   // Way too old browsers (IE8) don't even support window.addEventListener.
