@@ -27,18 +27,18 @@ OmegaUp.on('ready', function() {
           initialRationale: payload.contents.rationale
         },
         on: {
-          'mark-resolution': function(ev, banProblem) {
-            if (!ev.rationale) {
+          'mark-resolution': function(viewDetails, banProblem) {
+            if (!viewDetails.rationale) {
               omegaup.UI.error(T.editFieldRequired);
               return;
             }
             let newStatus = banProblem ? 'approved' : 'denied';
             API.QualityNomination.resolve({
-                                   problem_alias: ev.problem.alias,
+                                   problem_alias: viewDetails.problem.alias,
                                    status: newStatus,
                                    qualitynomination_id:
-                                       ev.qualitynomination_id,
-                                   rationale: ev.rationale
+                                       viewDetails.qualitynomination_id,
+                                   rationale: viewDetails.rationale
                                  })
                 .then(function(data) {
                   omegaup.UI.success(T.qualityNominationResolutionSuccess);
