@@ -51,7 +51,7 @@ class ProblemsFactory {
 
         $r = new Request();
         $r['title'] = $title;
-        $r['alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
+        $r['problem_alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
         $r['author_username'] = $author->username;
         $r['validator'] = 'token';
         $r['time_limit'] = 5000;
@@ -114,7 +114,7 @@ class ProblemsFactory {
 
         // Call the API
         ProblemController::apiCreate($r);
-        $problem = ProblemsDAO::getByAlias($r['alias']);
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
 
         if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
             || $visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
@@ -137,7 +137,7 @@ class ProblemsFactory {
     public static function addAdminUser($problemData, $user) {
         // Prepare our request
         $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['usernameOrEmail'] = $user->username;
 
         // Log in the problem author
@@ -153,7 +153,7 @@ class ProblemsFactory {
     public static function addGroupAdmin($problemData, Groups $group) {
         // Prepare our request
         $r = new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'group' => $group->alias,
         ]);
 
@@ -168,7 +168,7 @@ class ProblemsFactory {
     public static function addTag($problemData, $tag, $public) {
         // Prepare our request
         $r = new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'name' => $tag,
             'public' => $public
         ]);
