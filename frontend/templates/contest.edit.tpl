@@ -94,7 +94,7 @@
 						<textarea name="usernames" rows="4" class="form-control"></textarea>
 					</div>
 
-					<button class="btn btn-primary user-add-bulk" type="submit" id="multiple">{#contestAdduserAddUsers#}</button>
+					<button class="btn btn-primary user-add-bulk" type="submit">{#contestAdduserAddUsers#}</button>
 				</form>
 			</div>
 

@@ -344,8 +344,8 @@ omegaup.OmegaUp.on('ready', function() {
   $('#add-contestant-form')
       .on('submit', function(evt) {
         evt.preventDefault;
-        isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
-                     .hasClass('user-add-bulk');
+        isBulk =
+            document.activeElement.className.indexOf('user-add-bulk') !== -1;
         if (isBulk) {
           var promises = $('textarea[name="usernames"]')
                              .val()

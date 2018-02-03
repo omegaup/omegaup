@@ -241,8 +241,13 @@ export class Arena {
       loadingOverlay: $('#loading'),
       miniRanking: $('#mini-ranking'),
       problemList: $('#problem-list'),
-      rankingTable: new Vue({
-        el: '#ranking div',
+      ranking: $('#ranking div'),
+      socketStatus: $('#title .socket-status'),
+      submitForm: $('#submit'),
+    };
+    if (self.elements.ranking.length) {
+      self.elements.rankingTable = new Vue({
+        el: self.elements.ranking[0],
         render: function(createElement) {
           return createElement('omegaup-scoreboard', {
             props: {
@@ -262,10 +267,8 @@ export class Arena {
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
         },
-      }),
-      socketStatus: $('#title .socket-status'),
-      submitForm: $('#submit'),
-    };
+      });
+    }
     $.extend(self.elements.submitForm, {
       code: $('textarea[name="code"]', self.elements.submitForm),
       file: $('input[type="file"]', self.elements.submitForm),
@@ -488,8 +491,10 @@ export class Arena {
       }
       self.problems[alias] = problem;
     }
-    self.elements.rankingTable.problems = problems;
-    self.elements.rankingTable.showPenalty = contest.show_penalty;
+    if (self.elements.rankingTable) {
+      self.elements.rankingTable.problems = problems;
+      self.elements.rankingTable.showPenalty = contest.show_penalty;
+    }
   }
 
   updateClock() {
@@ -651,9 +656,11 @@ export class Arena {
       }
     }
 
-    self.elements.rankingTable.ranking = ranking;
-    if (data.time) {
-      self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+    if (self.elements.rankingTable) {
+      self.elements.rankingTable.ranking = ranking;
+      if (data.time) {
+        self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+      }
     }
 
     this.currentRanking = newRanking;
@@ -844,6 +851,11 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
+                  if (self.contestAdmin) {
+                    self.notifications.resolve({
+                      id: 'clarification-' + clarification.clarification_id
+                    });
+                  }
                 })
                 .fail(function() {
                   $('pre', answerNode).html(responseText);
@@ -884,6 +896,12 @@ export class Arena {
     if (!self.clarifications[clarification.clarification_id]) {
       $('.clarifications tbody.clarification-list').prepend(r);
       self.clarifications[clarification.clarification_id] = r;
+    }
+    if (clarification.answer == null) {
+      $('.answer pre', r).hide();
+    } else {
+      $('.answer pre', r).show();
+      $(r).addClass('resolved');
     }
   }
 
