@@ -59,7 +59,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $i = 0;
         foreach ($response['problems'] as $problem_array) {
             // Get problem from DB
-            $problem = ProblemsDAO::getByAlias($problems[$i]['request']['alias']);
+            $problem = ProblemsDAO::getByAlias($problems[$i]['request']['problem_alias']);
 
             // Assert data in DB
             $this->assertEquals($problem->title, $problem_array['title']);
@@ -554,7 +554,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $response = ContestController::apiReport($r);
         unset($login);
 
-        $this->assertEquals($problemData['request']['alias'], $response['problems'][0]['alias']);
+        $this->assertEquals($problemData['request']['problem_alias'], $response['problems'][0]['alias']);
 
         foreach ($contestants as $contestant) {
             $found = false;
@@ -603,7 +603,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $problem_request = new Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => $problems[0]['request']['alias'],
+                'problem_alias' => $problems[0]['request']['problem_alias'],
             ]);
 
             ProblemController::apiDetails($problem_request);

@@ -96,7 +96,7 @@ class ContestRunsTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'points' => 80,
             'order_in_contest' => 1,
         ]);
