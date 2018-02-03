@@ -243,7 +243,9 @@ class QualityNominationTest extends OmegaupTestCase {
         $request = new Request([
             'auth_token' => $login->auth_token,
             'status' => 'approved',
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew plus something else'
+        ]);
         try {
             $response = QualityNominationController::apiResolve($request);
             $this->fail("Normal user shouldn't be able to resolve demotion");
@@ -280,7 +282,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew plus something else',
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -294,7 +298,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -333,12 +339,15 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'qwert plus something else'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
         $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
+        $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
         $this->assertEquals(1, count($emailSender::$listEmails));
     }
 
@@ -370,7 +379,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -408,7 +419,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew plus something else'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -422,7 +435,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'open',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -461,7 +476,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew plus something else'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);
@@ -475,7 +492,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
             'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
         $response = QualityNominationController::apiResolve($request);
 
         $details = QualityNominationController::apiDetails($request);

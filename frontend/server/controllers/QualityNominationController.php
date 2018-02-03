@@ -1,5 +1,6 @@
 <?php
 require_once 'libs/dao/QualityNominations.dao.php';
+require_once 'libs/dao/QualityNomination_Log.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
 
 class QualityNominationController extends Controller {
@@ -221,6 +222,7 @@ class QualityNominationController extends Controller {
         }
 
         Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+        Validators::isStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);
@@ -266,7 +268,16 @@ class QualityNominationController extends Controller {
         }
 
         $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+
         $r['visibility'] = $newProblemVisibility;
+
+        $qualitynominationlog = new QualityNominationLog([
+            'user_id' => $r['current_user_id'],
+            'qualitynomination_id' => $qualitynomination->qualitynomination_id,
+            'from_status' => $qualitynomination->status,
+            'to_status' => $r['status'],
+            'rationale' => $r['rationale']
+        ]);
         $qualitynomination->status = $r['status'];
 
         QualityNominationsDAO::transBegin();
@@ -274,10 +285,11 @@ class QualityNominationController extends Controller {
             $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
+            QualityNominationLogDAO::save($qualitynominationlog);
             QualityNominationsDAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-                $response = self::sendDemotionEmail($r, $qualitynomination);
+                $response = self::sendDemotionEmail($r, $qualitynomination, $qualitynominationlog->rationale);
             }
         } catch (Exception $e) {
             QualityNominationsDAO::transRollback();
@@ -303,7 +315,7 @@ class QualityNominationController extends Controller {
      *
      * @throws InvalidDatabaseOperationException
      */
-    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination) {
+    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination, $rationale) {
         $request = [];
         try {
             $adminuser = ProblemsDAO::getAdminUser($r['problem']);
@@ -313,9 +325,8 @@ class QualityNominationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $reason = json_decode($qualitynomination->contents);
         $email_params = [
-            'reason' => $reason->rationale,
+            'reason' => htmlspecialchars($rationale),
             'problem_name' => htmlspecialchars($r['problem']->title),
             'user_name' => $username
         ];

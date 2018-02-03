@@ -45,7 +45,23 @@
             <strong>{{ T.wordsDetails }}</strong>
           </div>
           <div class="col-sm-8">
-            <pre>{{ this.contents | pretty }}</pre>
+            <pre>{{ this.contents }}</pre>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.banProblemFormQuestion }}</strong> <span aria-hidden="true"
+                 class="glyphicon glyphicon-info-sign"
+                 data-placement="top"
+                 data-toggle="tooltip"
+                 v-bind:title="T.banProblemFormComments"></span>
+          </div>
+          <div class="col-sm-8"
+               v-bind:class="{'has-error' : !rationale, 'has-success' : rationale}">
+            <textarea class="form-control"
+                 name="rationale"
+                 type="text"
+                 v-model="rationale"></textarea>
           </div>
         </div>
         <div class="row"
@@ -53,10 +69,12 @@
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-8">
             <button class="btn btn-danger"
+                 v-bind:disabled="!rationale ? '' : disabled"
                  v-on:click="markResolution(true)">{{ T.wordsBanProblem }}</button> <button class=
                  "btn btn-success"
+                 v-bind:disabled="!rationale ? '' : disabled"
                  v-on:click="markResolution(false)">{{ T.wordsKeepProblem }}</button>
           </div>
         </div>
@@ -66,8 +84,7 @@
 </template>
 
 <script>
-import {T, API} from '../../omegaup.js';
-import UI from '../../ui.js';
+import {T} from '../../omegaup.js';
 
 export default {
   props: {
@@ -78,28 +95,24 @@ export default {
     problem: {alias: String, title: String},
     qualitynomination_id: Number,
     reviewer: Boolean,
-    votes: Array
+    votes: Array,
+    initialRationale: String,
+    disabled: String
   },
-  data: function() {
-    return {
-      T: T,
-    };
-  },
+  data: function() { return {T: T, rationale: this.initialRationale};},
   methods: {
     userUrl: function(alias) { return '/profile/' + alias + '/';},
     problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
     markResolution: function(banProblem) {
-      let newStatus = banProblem ? 'approved' : 'denied';
-      API.QualityNomination.resolve({
-                             problem_alias: this.problem.alias,
-                             status: newStatus,
-                             qualitynomination_id: this.qualitynomination_id
-                           })
-          .then(function() {
-            omegaup.UI.success(T.qualityNominationResolutionSuccess);
-          })
-          .fail(UI.apiError);
+      this.$emit('mark-resolution', this, banProblem);
     },
   }
 };
 </script>
+
+<style>
+
+textarea {
+  margin: 0 0 10px;
+}
+</style>
