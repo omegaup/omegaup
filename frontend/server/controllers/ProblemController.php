@@ -912,7 +912,7 @@ class ProblemController extends Controller {
     public static function getProblemStatementImpl($params) {
         list($problemArtifacts, $sourcePath) = $params;
         try {
-            return $problemArtifacts->get($sourcePath);
+            return mb_convert_encoding($problemArtifacts->get($sourcePath), 'utf-8');
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException('statementNotFound');
         }
