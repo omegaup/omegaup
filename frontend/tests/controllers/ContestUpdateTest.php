@@ -203,7 +203,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);

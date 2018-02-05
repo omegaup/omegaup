@@ -41,6 +41,8 @@ omegaup.OmegaUp.loadTranslations({
 	arenaRunSubmitUpload: "Ou fa\u00e7a upload de um arquivo",
 	arenaRunSubmitWaitBetweenUploads: "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
 	assignmentNotFound: "Designa\u00e7\u00e3o n\u00e3o encontrado",
+	banProblemFormComments: "Coment\u00e1rios adicionais para o criador do problema",
+	banProblemFormQuestion: "Por que esse problema ser\u00e1 banido?",
 	banningDeclinedByReviewer: "Proibi\u00e7\u00e3o negada pelo revisor.",
 	banningProblemDueToReport: "Banido problema devido ao relat\u00f3rio do usu\u00e1rio.",
 	birthdayInTheFuture: "Voc\u00ea n\u00e3o tem idade suficiente para usar omegaUp",

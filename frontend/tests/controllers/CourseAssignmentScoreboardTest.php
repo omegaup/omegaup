@@ -24,7 +24,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
             ]));
 
             $problemAssignmentsMap[$courseData['assignment_alias']][] = $problemData;

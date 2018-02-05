@@ -100,9 +100,9 @@ def _run_script(path, args, now):
                 if request['api'] == '/problem/create':
                     if s.request('/problem/details/',
                                  {'problem_alias':
-                                  request['params']['alias']}):
+                                  request['params']['problem_alias']}):
                         logging.warning('Problem %s exists, skipping',
-                                        request['params']['alias'])
+                                        request['params']['problem_alias'])
                         continue
                 elif request['api'] == '/contest/create':
                     if s.request('/contest/adminDetails/',
