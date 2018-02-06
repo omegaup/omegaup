@@ -25,6 +25,10 @@
 				<div class="text-center">
 					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
 				</div>
+				<p class="text-center top-margin">{#frontPageJoinCourse#}</p>
+				<div class="text-center">
+					<a href="/course/Curso-OMI" class="btn btn-primary btn-lg">{#frontPageJoinCourseButton#}</a>
+				</div>
 			</div>
 		</div>
 		<div class="row">

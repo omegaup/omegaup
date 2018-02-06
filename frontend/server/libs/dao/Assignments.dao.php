@@ -71,4 +71,51 @@ class AssignmentsDAO extends AssignmentsDAOBase {
 
         return new Assignments($row);
     }
+
+    /**
+      * Update assignments order.
+      *
+      * @return Affected Rows
+      * @param Assignments [$Assignments]
+      */
+    final public static function updateAssignmentsOrder($assignment_id, $order) {
+        $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';
+        $params = [
+            $order,
+            $assignment_id,
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    /**
+     * Get the course assigments sorted by order and start_time
+     */
+    final public static function getSortedCourseAssignments($course_id) {
+        $sql = 'SELECT
+                   `assignment_id`,
+                   `name`,
+                   `description`,
+                   `alias`,
+                   `assignment_type`,
+                   `start_time`,
+                   `finish_time`,
+                   `order`
+                FROM
+                    `Assignments`
+                WHERE
+                    course_id = ?
+                ORDER BY
+                     `order` ASC, `start_time` ASC';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$course_id]);
+        $ar = [];
+        foreach ($rs as $row) {
+            $ar[] = new Assignments($row);
+        }
+        return $ar;
+    }
 }

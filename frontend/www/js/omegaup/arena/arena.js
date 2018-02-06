@@ -241,8 +241,13 @@ export class Arena {
       loadingOverlay: $('#loading'),
       miniRanking: $('#mini-ranking'),
       problemList: $('#problem-list'),
-      rankingTable: new Vue({
-        el: '#ranking div',
+      ranking: $('#ranking div'),
+      socketStatus: $('#title .socket-status'),
+      submitForm: $('#submit'),
+    };
+    if (self.elements.ranking.length) {
+      self.elements.rankingTable = new Vue({
+        el: self.elements.ranking[0],
         render: function(createElement) {
           return createElement('omegaup-scoreboard', {
             props: {
@@ -262,10 +267,8 @@ export class Arena {
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
         },
-      }),
-      socketStatus: $('#title .socket-status'),
-      submitForm: $('#submit'),
-    };
+      });
+    }
     $.extend(self.elements.submitForm, {
       code: $('textarea[name="code"]', self.elements.submitForm),
       file: $('input[type="file"]', self.elements.submitForm),
@@ -469,7 +472,7 @@ export class Arena {
     }
 
     // Trigger the event (useful on page load).
-    $(window).hashchange();
+    self.onHashChanged();
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
@@ -488,8 +491,10 @@ export class Arena {
       }
       self.problems[alias] = problem;
     }
-    self.elements.rankingTable.problems = problems;
-    self.elements.rankingTable.showPenalty = contest.show_penalty;
+    if (self.elements.rankingTable) {
+      self.elements.rankingTable.problems = problems;
+      self.elements.rankingTable.showPenalty = contest.show_penalty;
+    }
   }
 
   updateClock() {
@@ -651,9 +656,11 @@ export class Arena {
       }
     }
 
-    self.elements.rankingTable.ranking = ranking;
-    if (data.time) {
-      self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+    if (self.elements.rankingTable) {
+      self.elements.rankingTable.ranking = ranking;
+      if (data.time) {
+        self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+      }
     }
 
     this.currentRanking = newRanking;
@@ -844,6 +851,11 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
+                  if (self.contestAdmin) {
+                    self.notifications.resolve({
+                      id: 'clarification-' + clarification.clarification_id
+                    });
+                  }
                 })
                 .fail(function() {
                   $('pre', answerNode).html(responseText);
@@ -884,6 +896,12 @@ export class Arena {
     if (!self.clarifications[clarification.clarification_id]) {
       $('.clarifications tbody.clarification-list').prepend(r);
       self.clarifications[clarification.clarification_id] = r;
+    }
+    if (clarification.answer == null) {
+      $('.answer pre', r).hide();
+    } else {
+      $('.answer pre', r).show();
+      $(r).addClass('resolved');
     }
   }
 
@@ -1255,7 +1273,7 @@ export class Arena {
   initSubmissionCountdown() {
     let self = this;
     let nextSubmissionTimestamp = new Date(0);
-    $('#submit input[type=submit]').removeAttr('value').removeAttr('disabled');
+    $('#submit input[type=submit]').removeAttr('value').prop('disabled', false);
     let problem = self.problems[self.currentProblem.alias];
     if (typeof(problem) !== 'undefined') {
       if (typeof(problem.nextSubmissionTimestamp) !== 'undefined') {
@@ -1284,7 +1302,7 @@ export class Arena {
       } else {
         $('#submit input[type=submit]')
             .removeAttr('value')
-            .removeAttr('disabled');
+            .prop('disabled', false);
         clearInterval(self.submissionGapInterval);
       }
     }, 1000);
@@ -1413,14 +1431,14 @@ export class Arena {
           run.language = self.elements.submitForm.language.val();
           self.updateRun(run);
 
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
           self.hideOverlay();
           self.clearInputFile();
           self.initSubmissionCountdown();
         })
         .fail(function(run) {
           alert(run.error);
-          $('input', self.elements.submitForm).removeAttr('disabled');
+          $('input', self.elements.submitForm).prop('disabled', false);
         }
 
               );
@@ -1778,29 +1796,9 @@ class RunView {
           self.filter_username('');
         });
 
-    $('.runsproblem', elm)
-        .typeahead(
-            {
-              minLength: 2,
-              highlight: true,
-            },
-            {
-              source: UI.typeaheadWrapper(function(query, cb) {
-                API.Problem.list({query: query})
-                    .then(function(data) { cb(data.results); })
-                    .fail(UI.apiError);
-              }),
-              async: true,
-              display: 'title',
-              templates: {
-                suggestion: function(elm) {
-                  return '<strong>' + elm.title + '</strong> (' + elm.alias +
-                         ')';
-                }
-              }
-            })
-        .on('typeahead:select',
-            function(elm, item) { self.filter_problem(item.alias); });
+    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+      self.filter_problem(item.alias);
+    });
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

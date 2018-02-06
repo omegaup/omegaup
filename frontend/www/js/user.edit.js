@@ -22,7 +22,7 @@ omegaup.OmegaUp.on('ready', function() {
           $('#state_id').attr('disabled', 'disabled');
           return;
         }
-        $('#state_id').removeAttr('disabled');
+        $('#state_id').prop('disabled', false);
 
         for (var key in country.sub) {
           if (!country.sub.hasOwnProperty(key)) continue;

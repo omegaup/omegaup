@@ -32,7 +32,7 @@ class ProblemList extends OmegaupTestCase {
                     continue;
                 }
 
-                if ($problemResponse['alias'] === $problemData[$i]['request']['alias']) {
+                if ($problemResponse['alias'] === $problemData[$i]['request']['problem_alias']) {
                     $count++;
                 }
             }
@@ -44,14 +44,14 @@ class ProblemList extends OmegaupTestCase {
         // Check private problem is not there
         $exists = false;
         foreach ($response['results'] as $problemResponse) {
-            if ($problemResponse['alias'] === $privateProblemData['request']['alias']) {
+            if ($problemResponse['alias'] === $privateProblemData['request']['problem_alias']) {
                 $exists = true;
                 break;
             }
         }
 
         if ($exists) {
-            $this->fail('Private problem' . $privateProblemData['request']['alias'] . ' is in the list.');
+            $this->fail('Private problem' . $privateProblemData['request']['problem_alias'] . ' is in the list.');
         }
     }
 
@@ -187,7 +187,7 @@ class ProblemList extends OmegaupTestCase {
             'offset' => 1,
         ]));
         $this->assertCount(1, $response['results']);
-        $this->assertEquals($problemData[1]['request']['alias'], $response['results'][0]['alias']);
+        $this->assertEquals($problemData[1]['request']['problem_alias'], $response['results'][0]['alias']);
     }
 
     /**
@@ -207,7 +207,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
     }
 
     /**
@@ -227,7 +227,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
     }
 
     /**
@@ -247,12 +247,12 @@ class ProblemList extends OmegaupTestCase {
 
         // Should not be contained in problem list.
         $response = ProblemController::apiList($r);
-        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
 
         $login = self::login($author);
         $response = ProblemController::apiAddAdmin(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'usernameOrEmail' => $addedAdmin->username,
         ]));
 
@@ -260,7 +260,7 @@ class ProblemList extends OmegaupTestCase {
 
         // Now it should be visible.
         $response = ProblemController::apiList($r);
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
     }
 
     /**
@@ -270,7 +270,7 @@ class ProblemList extends OmegaupTestCase {
         $author = UserFactory::createUser();
 
         $problemDataPrivate = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE, $author);
-        $alias = $problemDataPrivate['request']['alias'];
+        $alias = $problemDataPrivate['request']['problem_alias'];
 
         $addedAdmin = UserFactory::createUser();
 
@@ -293,7 +293,7 @@ class ProblemList extends OmegaupTestCase {
 
         $response = ProblemController::apiAddGroupAdmin(new Request([
             'auth_token' => $authorLogin->auth_token,
-            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
 
@@ -314,7 +314,7 @@ class ProblemList extends OmegaupTestCase {
         $author = UserFactory::createUser();
 
         $problemDataPrivate = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE, $author);
-        $alias = $problemDataPrivate['request']['alias'];
+        $alias = $problemDataPrivate['request']['problem_alias'];
 
         $authorLogin = self::login($author);
         $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
@@ -323,7 +323,7 @@ class ProblemList extends OmegaupTestCase {
 
         $response = ProblemController::apiAddGroupAdmin(new Request([
             'auth_token' => $authorLogin->auth_token,
-            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
 
@@ -355,7 +355,7 @@ class ProblemList extends OmegaupTestCase {
         $login = self::login($author);
         $response = ProblemController::apiAddGroupAdmin(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemDataPrivate['request']['alias'],
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
 
@@ -365,7 +365,7 @@ class ProblemList extends OmegaupTestCase {
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
     }
 
     /**
@@ -384,7 +384,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(3, count($response['problems']));
-        $this->assertEquals($problemData[2]['request']['alias'], $response['problems'][0]['alias']);
+        $this->assertEquals($problemData[2]['request']['problem_alias'], $response['problems'][0]['alias']);
     }
 
     /**
@@ -410,11 +410,11 @@ class ProblemList extends OmegaupTestCase {
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
-            if ($responseProblem['alias'] === $problemData['request']['alias']) {
+            if ($responseProblem['alias'] === $problemData['request']['problem_alias']) {
                 if ($responseProblem['score'] != 100.00) {
                     $this->fail('Expected to see 100 score for this problem');
                 }
-            } elseif ($responseProblem['alias'] === $problemDataDecimal['request']['alias']) {
+            } elseif ($responseProblem['alias'] === $problemDataDecimal['request']['problem_alias']) {
                 if ($responseProblem['score'] != 12.35) {
                     $this->fail('Expected to see 12.34 score for this problem');
                 }
@@ -459,7 +459,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $userLogin->auth_token,
             'query' => substr($problemDataPublic['request']['title'], 2, 5),
         ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['problem_alias']);
 
         // Expect 0 problems, matches are private for $user
         $response = ProblemController::apiList(new Request([
@@ -473,13 +473,13 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'query' => substr($problemDataPrivate['request']['title'], 2, 5),
         ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
 
         // Expect public problem only
         $response = ProblemController::apiList(new Request([
             'auth_token' => $userLogin->auth_token,
         ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['alias']);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['problem_alias']);
     }
 
     /**

@@ -518,6 +518,46 @@ class CourseController extends Controller {
         return ['status' => 'ok'];
     }
 
+    /**
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateAssignmentsOrder(Request $r) {
+        global $experiments;
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // Update assignments order
+        $assignments = $r['assignments'];
+        foreach ($assignments as $assignment) {
+            $currentAssignment = AssignmentsDAO::search(new Assignments([
+                'alias' => $assignment['alias'],
+                'course_id' => $r['course']->course_id
+            ]));
+
+            if (empty($currentAssignment) || is_null($currentAssignment[0])) {
+                throw new NotFoundException('assignmentNotFound');
+            }
+
+            AssignmentsDAO::updateAssignmentsOrder(
+                $currentAssignment[0]->assignment_id,
+                (int)$assignment['order']
+            );
+        }
+
+        return ['status' => 'ok'];
+    }
+
     public static function apiGetProblemUsers(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
@@ -634,9 +674,9 @@ class CourseController extends Controller {
 
         $assignments = [];
         try {
-            $assignments = AssignmentsDAO::search(new Assignments([
-                'course_id' => $r['course']->course_id
-            ]), 'start_time');
+            $assignments = AssignmentsDAO::getSortedCourseAssignments(
+                $r['course']->course_id
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

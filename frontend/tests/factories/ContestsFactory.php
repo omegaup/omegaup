@@ -172,7 +172,7 @@ class ContestsFactory {
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['points'] = 100;
         $r['order_in_contest'] = 1;
 
@@ -191,7 +191,7 @@ class ContestsFactory {
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => $problemData['request']['alias']
+                'problem_alias' => $problemData['request']['problem_alias']
             ]
         );
 
@@ -225,7 +225,7 @@ class ContestsFactory {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
 
         // Log in the user
         $login = OmegaupTestCase::login($user);

@@ -8,7 +8,7 @@
 				"params": {
 					"visibility": 1,
 					"title": "Sumas",
-					"alias": "sumas",
+					"problem_alias": "sumas",
 					"validator": "token-numeric",
 					"time_limit": 1000,
 					"validator_time_limit": 0,
@@ -18,7 +18,6 @@
 					"output_limit": 10240,
 					"source": "omegaUp classics",
 					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-					"stack_limit": 33554432,
 					"email_clarifications": 1
 				},
 				"files": {
@@ -30,7 +29,7 @@
 				"params": {
 					"visibility": 1,
 					"title": "Triangulos",
-					"alias": "triangulos",
+					"problem_alias": "triangulos",
 					"validator": "token-numeric",
 					"time_limit": 1000,
 					"validator_time_limit": 0,
@@ -40,7 +39,6 @@
 					"output_limit": 10240,
 					"source": "omegaUp classics",
 					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-					"stack_limit": 33554432,
 					"email_clarifications": 1
 				},
 				"files": {

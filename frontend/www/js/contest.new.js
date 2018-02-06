@@ -47,7 +47,7 @@ omegaup.OmegaUp.on('ready', function() {
       .on('change', function() {
         if ($(this).is(':checked')) {
           // Enable
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
         } else {
           // Disable
           $('#window-length').attr('disabled', 'disabled');

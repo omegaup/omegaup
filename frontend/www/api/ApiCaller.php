@@ -87,9 +87,18 @@ class ApiCaller {
             $json_result = json_encode($response);
 
             if ($json_result === false) {
-                self::$log->error('json_encode failed for: '. implode(',', $response));
-                $apiException = new InternalServerErrorException();
-                $json_result = json_encode($apiException->asResponseArray());
+                self::$log->warn('json_encode failed for: '. print_r($response, true));
+                if (json_last_error() == JSON_ERROR_UTF8) {
+                    // Attempt to recover gracefully, removing any unencodeable
+                    // elements from the response. This should at least prevent
+                    // completely and premanently breaking some scenarios, like
+                    // trying to fix a problem with illegal UTF-8 codepoints.
+                    $json_result = json_encode($response, JSON_PARTIAL_OUTPUT_ON_ERROR);
+                }
+                if ($json_result === false) {
+                    $apiException = new InternalServerErrorException();
+                    $json_result = json_encode($apiException->asResponseArray());
+                }
             }
 
             // Print the result using late static binding semantics

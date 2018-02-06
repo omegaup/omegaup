@@ -174,6 +174,29 @@ OmegaUp.on('ready', function() {
                 .fail(omegaup.UI.apiError);
           },
           'new': onNewAssignment,
+          'sort-homeworks': function(courseAlias, homeworks) {
+            let index = 1;
+            for (let homework of homeworks) {
+              homework.order = index++;
+            }
+            omegaup.API.Course.updateAssignmentsOrder({
+                                course_alias: courseAlias,
+                                assignments: homeworks,
+                              })
+                .fail(omegaup.UI.apiError);
+          },
+          'sort-tests': function(courseAlias, tests) {
+            let index = 1;
+            for (let test of tests) {
+              test.order = index++;
+            }
+            omegaup.API.Course.updateAssignmentsOrder({
+                                course_alias: courseAlias,
+                                assignments: tests,
+                              })
+                .then(function(response) {})
+                .fail(omegaup.UI.apiError);
+          },
         },
       });
     },

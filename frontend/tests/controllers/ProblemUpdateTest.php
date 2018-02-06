@@ -22,7 +22,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'New statement is now more fun',
             'statement' => 'This is the new statement',
             'lang' => 'en'
@@ -68,8 +68,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'title' => 'new title',
             'time_limit' => 12345,
-            'problem_alias' => $problemData['request']['alias'],
-            'stack_limit' => 12345,
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed some properties',
         ]);
 
@@ -103,8 +102,6 @@ class UpdateProblemTest extends OmegaupTestCase {
         $statement = $problemArtifacts->get('statements/es.html');
         $this->assertContains('perímetro', $statement);
 
-        $this->assertEquals(12345, $problems[0]->stack_limit);
-
         // Call API again to add an example, should not trigger rejudge.
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos-examples.zip';
         $response = ProblemController::apiUpdate($r);
@@ -121,7 +118,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'languages' => 'hs,java,pl',
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed alias and languages',
         ]);
 
@@ -174,7 +171,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Statement is now more fun',
             'statement' => $statement
         ]));
@@ -182,7 +179,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new ProblemArtifacts($problemData['request']['alias']);
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
         $statementHtmlContents = $problemArtifacts->get('statements/es.html');
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
@@ -206,7 +203,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Statement now contains images',
             'statement' => $statement
         ]));
@@ -214,7 +211,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new ProblemArtifacts($problemData['request']['alias']);
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
         $statementHtmlContents = $problemArtifacts->get('statements/es.html');
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
@@ -245,7 +242,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'title' => 'new title',
             'time_limit' => 12345,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'This shoudl fail',
         ]);
 
@@ -285,7 +282,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiAddAdmin(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
         $this->assertEquals('ok', $response['status']);
@@ -295,7 +292,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $login = self::login($problemAdmin);
         $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'title' => $newTitle,
             'message' => 'Admin powers',
         ]));
@@ -325,7 +322,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiAddAdmin(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
         $this->assertEquals('ok', $response['status']);
@@ -334,7 +331,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiRemoveAdmin(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertEquals('ok', $response['status']);
 
@@ -343,7 +340,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $login = self::login($problemAdmin);
         $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'title' => $newTitle,
             'message' => 'Non-admin powers',
         ]));
@@ -368,7 +365,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
         $response = ProblemController::apiAddAdmin(new Request([
             'usernameOrEmail' => $problemAdmin->username,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
 
@@ -376,7 +373,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Get the list of admins
         $response = ProblemController::apiAdmins(new Request([
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
 
@@ -408,7 +405,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         try {
             ProblemController::apiDetails(new Request([
                 'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
             ]));
             $this->fail('Should not have been able to see the problem');
         } catch (ForbiddenAccessException $e) {
@@ -422,11 +419,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
         $this->assertEquals($response['status'], 'ok');
         $this->assertArrayContainsWithPredicate($response['results'], function ($problem) use (&$problemData) {
-            return $problem['alias'] == $problemData['request']['alias'];
+            return $problem['alias'] == $problemData['request']['problem_alias'];
         });
         $response = ProblemController::apiDetails(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertEquals($response['status'], 'ok');
 
@@ -434,7 +431,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $statement = 'This is the new statement \$x\$';
         $response = ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Statement is now more fun',
             'statement' => $statement
         ]));
@@ -443,7 +440,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Add a tag
         $response = ProblemController::apiAddTag(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test',
         ]));
         $this->assertEquals($response['status'], 'ok');

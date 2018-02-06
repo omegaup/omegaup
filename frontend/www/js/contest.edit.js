@@ -31,11 +31,11 @@ omegaup.OmegaUp.on('ready', function() {
 
         if (contest.window_length === null) {
           // Disable window length
-          $('#window-length-enabled').removeAttr('checked');
+          $('#window-length-enabled').prop('checked', false);
           $('#window-length').val('');
         } else {
           $('#window-length-enabled').attr('checked', 'checked');
-          $('#window-length').removeAttr('disabled');
+          $('#window-length').prop('disabled', false);
           $('#window-length').val(contest.window_length);
         }
 
@@ -344,8 +344,8 @@ omegaup.OmegaUp.on('ready', function() {
   $('#add-contestant-form')
       .on('submit', function(evt) {
         evt.preventDefault;
-        isBulk = $($(this).context.attributes[0].ownerDocument.activeElement)
-                     .hasClass('user-add-bulk');
+        isBulk =
+            document.activeElement.className.indexOf('user-add-bulk') !== -1;
         if (isBulk) {
           var promises = $('textarea[name="usernames"]')
                              .val()

@@ -30,7 +30,7 @@ class ClarificationsFactory {
         $r = new Request();
         $r['message'] = ($message === null ? Utils::CreateRandomString() : $message);
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['public'] = '0';
 
         // Log in our user and set the auth_token properly

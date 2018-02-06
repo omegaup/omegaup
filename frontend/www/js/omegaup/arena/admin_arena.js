@@ -64,7 +64,7 @@ export default class ArenaAdmin {
           .fail(function(run) { alert(run.error); })
           .always(function() {
             $('input', self.arena.elements.clarification)
-                .removeAttr('disabled');
+                .prop('disabled', false);
           });
 
       return false;
