@@ -33,6 +33,8 @@ class FileHandler {
 
     public static function CreateFile($filename, $contents) {
         // Open file
+        exec("find $filename -type d -exec chmod 0750 {} +");
+        exec("find $filename -type f -exec chmod 0644 {} +");
         $handle = @fopen($filename, 'w');
 
         if (!$handle) {
