@@ -95,4 +95,27 @@ class UsersDAO extends UsersDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+
+    public static function getHideTags($user_id) {
+        if (is_null($user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    `Users`.`hide_problem_tags`
+                FROM
+                    Users
+                WHERE
+                    (user_id = ?)
+                LIMIT
+                    1;';
+        $params = [$user_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        $user = new Users($rs);
+
+        return $user->hide_problem_tags;
+    }
 }

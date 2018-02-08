@@ -22,6 +22,10 @@ class TagController extends Controller {
     public static function apiList(Request $r) {
         self::authenticateRequest($r);
 
+        $hideTags = UsersDao::getHideTags($r['current_user_id']);
+        if ($hideTags && $r['controlledByUser']) {
+            return [];
+        }
         $param = '';
         if (!is_null($r['term'])) {
             $param = 'term';

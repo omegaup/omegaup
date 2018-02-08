@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   refreshProblemTags();
 
-  omegaup.API.Tag.list({query: ''})
+  omegaup.API.Tag.list({query: '', controlledByUser: true})
       .then(function(response) {
         var tags = {};
         $('#problem-tags a')

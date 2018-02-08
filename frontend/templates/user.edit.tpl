@@ -122,6 +122,14 @@
 					</div>
 
 					<div class="form-group">
+						<span class="col-md-4 control-label">&nbsp;</span>
+						<div class="col-md-7">
+							<input type="checkbox" id="hide_problem_tags" name='hide_problem_tags'>
+							<label for="hide_problem_tags" style="display: inline;">{#userEditHideProblemTags#}</label>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<div class="col-md-offset-3 col-md-7">
 							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
 						</div>

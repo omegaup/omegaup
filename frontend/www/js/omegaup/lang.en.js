@@ -696,6 +696,7 @@ omegaup.OmegaUp.loadTranslations({
 	userEditElementary: "Elementary",
 	userEditGraduationDate: "Graduation date",
 	userEditGravatar: "Upload in Gravatar.com using your email: ",
+	userEditHideProblemTags: "Hide problems tags",
 	userEditHighSchool: "High school",
 	userEditLanguage: "Language",
 	userEditMasters: "Master's",

@@ -764,6 +764,7 @@ CREATE TABLE `Users` (
   `reset_digest` varchar(45) DEFAULT NULL,
   `reset_sent_at` datetime DEFAULT NULL,
   `recruitment_optin` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
+  `hide_problem_tags` tinyint(1) DEFAULT NULL,
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),

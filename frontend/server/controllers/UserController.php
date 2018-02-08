@@ -1127,6 +1127,7 @@ class UserController extends Controller {
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
+        $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
         if (!is_null($user->language_id)) {
             $query = LanguagesDAO::getByPK($user->language_id);
@@ -1638,6 +1639,9 @@ class UserController extends Controller {
         if (!is_null($r['recruitment_optin'])) {
             Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
         }
+        if (!is_null($r['hide_problem_tags'])) {
+            Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
+        }
 
         $valueProperties = [
             'name',
@@ -1654,6 +1658,7 @@ class UserController extends Controller {
             }],
             'gender',
             'recruitment_optin',
+            'hide_problem_tags',
         ];
 
         self::updateValueProperties($r, $r['current_user'], $valueProperties);

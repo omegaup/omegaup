@@ -696,6 +696,7 @@ omegaup.OmegaUp.loadTranslations({
 	userEditElementary: "(E13m3n7ary)",
 	userEditGraduationDate: "(Gradua7i0n da73)",
 	userEditGravatar: "(Up10ad in Grava7ar.c0m u5ing y0ur 3mai1: )",
+	userEditHideProblemTags: "(Hid3 pr0b13m5 7ag5)",
 	userEditHighSchool: "(High 5ch001)",
 	userEditLanguage: "(Languag3)",
 	userEditMasters: "(Ma573r'5)",
