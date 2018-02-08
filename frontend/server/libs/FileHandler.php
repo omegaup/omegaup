@@ -33,8 +33,17 @@ class FileHandler {
 
     public static function CreateFile($filename, $contents) {
         // Open file
-        exec("find $filename -type d -exec chmod 0750 {} +");
-        exec("find $filename -type f -exec chmod 0644 {} +");
+        $directories = explode('/', $filename);
+        $path = '';
+        $numDirectories = count($directories);
+        foreach ($directories as $index => $directory) {
+            if ($index > 0) {
+                if (!is_dir($path)) {
+                    self::MakeDir($path);
+                }
+            }
+            $path .= $directory. '/';
+        }
         $handle = @fopen($filename, 'w');
 
         if (!$handle) {
