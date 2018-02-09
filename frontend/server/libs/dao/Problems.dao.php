@@ -465,7 +465,8 @@ class ProblemsDAO extends ProblemsDAOBase {
             WHERE
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gu.user_id = ?) AND
+                p.visibility > ?
             GROUP BY
                 p.problem_id
             ORDER BY
@@ -478,6 +479,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             $user_id,
             Authorization::ADMIN_ROLE,
             $user_id,
+            ProblemController::VISIBILITY_DELETED,
             $offset,
             $pageSize,
         ];
@@ -509,13 +511,15 @@ class ProblemsDAO extends ProblemsDAOBase {
             INNER JOIN
                 ACLs AS a ON a.acl_id = p.acl_id
             WHERE
-                a.owner_id = ?
+                a.owner_id = ? AND
+                p.visibility > ?
             ORDER BY
                 p.problem_id DESC
             LIMIT
                 ?, ?';
         $params = [
             $user_id,
+            ProblemController::VISIBILITY_DELETED,
             $offset,
             $pageSize,
         ];
@@ -528,6 +532,26 @@ class ProblemsDAO extends ProblemsDAOBase {
             array_push($problems, new Problems($row));
         }
         return $problems;
+    }
+
+    /**
+     * Return all problems, except deleted
+     */
+    final public static function getAllProblems($page, $cols_per_page, $order, $order_type) {
+        $sql = 'SELECT * from Problems where `visibility` > ? ';
+        global $conn;
+        if (!is_null($order)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+        }
+        if (!is_null($page)) {
+            $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
+        }
+        $rs = $conn->Execute($sql, [ProblemController::VISIBILITY_DELETED]);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = new Problems($row);
+        }
+        return $allData;
     }
 
     final public static function getUsersInGroupWhoAttemptedProblem(
@@ -566,5 +590,21 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function isVisible(Problems $problem) {
         return ((int) $problem->visibility) >= 1;
+    }
+
+    public static function deleteProblem($problem_id) {
+        $sql = 'UPDATE
+                    `Problems`
+                SET
+                    `visibility` = ?
+                WHERE
+                    `problem_id` = ?;';
+        $params = [
+            ProblemController::VISIBILITY_DELETED,
+            $problem_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 }

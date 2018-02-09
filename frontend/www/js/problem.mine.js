@@ -37,6 +37,20 @@
                     .attr('href', '/problem/' + problem.alias + '/edit/');
                 $('.stats', row)
                     .attr('href', '/problem/' + problem.alias + '/stats/');
+                $('.delete', row)
+                    .on('click', (function(problem_alias) {
+                          return function(e) {
+                            omegaup.API.Problem.delete({
+                                                 problem_alias: problem_alias
+                                               })
+                                .then(function(response) {
+                                  omegaup.UI.success(omegaup.T.problemDeleted);
+                                  var tr = e.target.parentElement.parentElement;
+                                  $(tr).remove();
+                                })
+                                .fail(omegaup.UI.apiError);
+                          };
+                        })(problem.alias));
                 $('#problem-list').append(row);
               }
               $('#problem-list').removeClass('wait_for_ajax');

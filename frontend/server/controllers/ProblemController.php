@@ -11,6 +11,7 @@ class ProblemController extends Controller {
     public static $grader = null;
 
     // Constants for problem visibility.
+    const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
     const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
     const VISIBILITY_PRIVATE = 0;
@@ -529,6 +530,42 @@ class ProblemController extends Controller {
         // Delete the role
         try {
             ProblemsTagsDAO::delete($problem_tag);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Removes a problem whether user is the creator
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiDelete(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check whether problem exists
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::canEditProblem($r['current_user_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        try {
+            ProblemsDAO::deleteProblem($problem->problem_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -1680,7 +1717,7 @@ class ProblemController extends Controller {
 
         try {
             if (Authorization::isSystemAdmin($r['current_user_id'])) {
-                $problems = ProblemsDAO::getAll(
+                $problems = ProblemsDAO::getAllProblems(
                     $page,
                     $pageSize,
                     'problem_id',

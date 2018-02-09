@@ -372,6 +372,8 @@ export default {
                             return data;
                           }),
 
+    delete: _call('/api/problem/delete/'),
+
     details: _call('/api/problem/details/', _convertRuntimes,
                    {statement_type: 'html'}),
 
