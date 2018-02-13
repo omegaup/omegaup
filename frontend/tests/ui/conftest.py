@@ -157,7 +157,6 @@ class Driver(object):
                             home_page_url)
             self.wait_for_page_loaded()
 
-    @contextlib.contextmanager
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''
 
@@ -180,15 +179,11 @@ class Driver(object):
         with self.ajax_page_transition():
             self.browser.find_element_by_id('register-form').submit()
 
-        try:
-            yield
-
-        finally:
-            # Home screen
-            self.browser.get(self.url('/logout/?redirect=/'))
-            self.wait.until(lambda _: self.browser.current_url ==
-                            home_page_url)
-            self.wait_for_page_loaded()
+        # Home screen
+        self.browser.get(self.url('/logout/?redirect=/'))
+        self.wait.until(lambda _: self.browser.current_url ==
+            home_page_url)
+        self.wait_for_page_loaded()
 
 
 @pytest.hookimpl(hookwrapper=True)

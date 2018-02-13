@@ -79,7 +79,7 @@ def test_user_ranking_course(driver):
                      language)
 
         contents_element = driver.browser.find_element_by_css_selector(
-            'input[type="file"]')
+            '#submit input[type="file"]')
         contents_element.send_keys(os.path.join(
             _OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
         with driver.ajax_page_transition():

@@ -18,8 +18,7 @@ def test_create_user(driver):
 
     username = 'unittest_user_%s' % driver.generate_id()
     password = 'p@ssw0rd'
-    with driver.register_user(username, password):
-        pass
+    driver.register_user(username, password)
 
     with driver.login(username, password):
         pass
