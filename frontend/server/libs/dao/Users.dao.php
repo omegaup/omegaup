@@ -98,7 +98,7 @@ class UsersDAO extends UsersDAOBase {
 
     public static function getHideTags($user_id) {
         if (is_null($user_id)) {
-            return null;
+            return false;
         }
         $sql = 'SELECT
                     `Users`.`hide_problem_tags`
@@ -110,12 +110,11 @@ class UsersDAO extends UsersDAOBase {
                     1;';
         $params = [$user_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
-            return null;
+        $response = $conn->GetOne($sql, $params);
+        if (count($response) == 0) {
+            return false;
         }
-        $user = new Users($rs);
 
-        return $user->hide_problem_tags;
+        return $response;
     }
 }

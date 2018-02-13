@@ -124,8 +124,8 @@
 					<div class="form-group">
 						<span class="col-md-4 control-label">&nbsp;</span>
 						<div class="col-md-7">
-							<input type="checkbox" id="hide_problem_tags" name='hide_problem_tags'>
-							<label for="hide_problem_tags" style="display: inline;">{#userEditHideProblemTags#}</label>
+							<input type="checkbox" id="hide_problem_tags" name="hide_problem_tags">
+							<label for="hide_problem_tags"">{#userEditHideProblemTags#}</label>
 						</div>
 					</div>
 
