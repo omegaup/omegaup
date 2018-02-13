@@ -85,6 +85,8 @@ def test_user_ranking_course(driver):
         with driver.ajax_page_transition():
             contents_element.submit()
 
+        driver.update_score_manually(problem, assignment_alias)
+
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,

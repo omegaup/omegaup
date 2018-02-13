@@ -60,7 +60,7 @@ class FileHandler {
 
     public static function MakeDirRecursively($path) {
         $directoriesToCreate = [];
-        for ( ; $path != '/' && !is_dir($path); $path = dirname($path)) {
+        for (; $path != '/' && !is_dir($path); $path = dirname($path)) {
             $directoriesToCreate[] = $path;
         }
         $directoriesToCreate = array_reverse($directoriesToCreate);
