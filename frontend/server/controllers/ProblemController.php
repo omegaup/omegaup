@@ -564,6 +564,10 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
+        if (ProblemsDAO::hasBeenUsedInCoursesOrContests($problem)) {
+            throw new ForbiddenAccessException('problemHasBeenUsedInContestOrCourse');
+        }
+
         try {
             ProblemsDAO::deleteProblem($problem->problem_id);
         } catch (Exception $e) {
@@ -1717,7 +1721,7 @@ class ProblemController extends Controller {
 
         try {
             if (Authorization::isSystemAdmin($r['current_user_id'])) {
-                $problems = ProblemsDAO::getAllProblems(
+                $problems = ProblemsDAO::getAll(
                     $page,
                     $pageSize,
                     'problem_id',

@@ -134,7 +134,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args[] = $query;
             } else {
                 // Finish the WHERE clause opened by addTagFilter
-                $sql .= ' TRUE';
+                $sql .= ' p.visibility > ?';
+                $args[] = ProblemController::VISIBILITY_DELETED;
             }
         } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
             $select = '
@@ -180,9 +181,10 @@ class ProblemsDAO extends ProblemsDAOBase {
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= '
-                (p.visibility >= ? OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
+                (p.visibility >= ? OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
             $args[] = $user_id;
+            $args[] = ProblemController::VISIBILITY_DELETED;
 
             if (!is_null($query)) {
                 $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
@@ -463,9 +465,9 @@ class ProblemsDAO extends ProblemsDAOBase {
             LEFT JOIN
                 Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
+                (a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?) AND
+                (gr.role_id = ? AND gu.user_id = ?)) AND
                 p.visibility > ?
             GROUP BY
                 p.problem_id
@@ -606,5 +608,19 @@ class ProblemsDAO extends ProblemsDAOBase {
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
+    }
+
+    public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
+        global $conn;
+
+        $sql = 'SELECT
+                    COUNT(1)
+                FROM
+                    `Runs`
+                WHERE
+                    `problemset_id` IS NOT NULL
+                    AND `problem_id` = ?';
+
+        return $conn->GetOne($sql, $problem->problem_id);
     }
 }

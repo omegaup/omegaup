@@ -12,5 +12,6 @@ if ($session['valid'] && !isset($_SESSION['private_problems_alert'])) {
 }
 
 $smarty->assign('PRIVATE_PROBLEMS_ALERT', $private_problems_alert);
+$smarty->assign('IS_SYSADMIN', Authorization::isSystemAdmin($session['user']->user_id));
 
 $smarty->display('../templates/problem.mine.tpl');
