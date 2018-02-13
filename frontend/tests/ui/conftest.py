@@ -18,6 +18,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+_OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..'))
+sys.path.append(os.path.join(_OMEGAUP_ROOT, 'stuff'))
+# pylint: disable=wrong-import-position
+import database_utils  # NOQA
+
 _DEFAULT_TIMEOUT = 10  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
@@ -28,11 +33,12 @@ _WINDOW_SIZE = (1920, 1080)
 class Driver(object):
     '''Wraps the state needed to run a test.'''
 
-    def __init__(self, browser, wait, url):
+    def __init__(self, browser, wait, url, options):
         self.browser = browser
         self.wait = wait
         self._next_id = 0
         self._url = url
+        self.options = options
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
@@ -44,6 +50,13 @@ class Driver(object):
         '''Gets the full url for :path.'''
 
         return urllib.parse.urljoin(self._url, path)
+
+    def mysql_auth(self):
+        '''Gets the authentication string for MySQL.'''
+
+        return database_utils.authentication(
+            config_file=self.options.mysql_config_file,
+            username=self.options.username, password=self.options.password)
 
     def eval_script(self, script):
         '''Returns the evaluation of the JavaScript expression |script|'''
@@ -233,6 +246,11 @@ def pytest_addoption(parser):
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
                      dest='headless', help='Show the browser window')
+    parser.addoption('--mysql-config-file',
+                     default=database_utils.default_config_file(),
+                     help='.my.cnf file that stores credentials')
+    parser.addoption('--username', default='root', help='MySQL root username')
+    parser.addoption('--password', default='omegaup', help='MySQL password')
 
 
 def pytest_generate_tests(metafunc):
@@ -303,7 +321,8 @@ def driver(request, browser_name):
                          poll_frequency=0.1)
 
     try:
-        yield Driver(browser, wait, request.config.option.url)
+        yield Driver(browser, wait, request.config.option.url,
+                     request.config.option)
     finally:
         if _CI:
             print(('\n\nYou can see the report at '
