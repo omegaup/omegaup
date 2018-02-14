@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table QualityNomination_Log.
+ * Value Object file for table Public_Contests.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class QualityNominationLog extends VO {
+class PublicContests extends VO {
     /**
-     * Constructor de QualityNominationLog
+     * Constructor de PublicContests
      *
-     * Para construir un objeto de tipo QualityNominationLog debera llamarse a el constructor
+     * Para construir un objeto de tipo PublicContests debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,26 +26,14 @@ class QualityNominationLog extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['qualitynomination_log_id'])) {
-            $this->qualitynomination_log_id = $data['qualitynomination_log_id'];
+        if (isset($data['public_contest_id'])) {
+            $this->public_contest_id = $data['public_contest_id'];
         }
-        if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = $data['qualitynomination_id'];
+        if (isset($data['contest_id'])) {
+            $this->contest_id = $data['contest_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
-        }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
-        }
-        if (isset($data['from_status'])) {
-            $this->from_status = $data['from_status'];
-        }
-        if (isset($data['to_status'])) {
-            $this->to_status = $data['to_status'];
-        }
-        if (isset($data['rationale'])) {
-            $this->rationale = $data['rationale'];
         }
     }
 
@@ -67,14 +55,14 @@ class QualityNominationLog extends VO {
       * @access public
       * @var int(11)
       */
-    public $qualitynomination_log_id;
+    public $public_contest_id;
 
     /**
       *  [Campo no documentado]
       * @access public
       * @var int(11)
       */
-    public $qualitynomination_id;
+    public $contest_id;
 
     /**
       *  [Campo no documentado]
@@ -82,32 +70,4 @@ class QualityNominationLog extends VO {
       * @var timestamp
       */
     public $time;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $from_status;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $to_status;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var text,
-      */
-    public $rationale;
 }

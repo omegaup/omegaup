@@ -132,7 +132,8 @@ class ContestsDAO extends ContestsDAOBase {
                                 public,
                                 alias,
                                 recommended,
-                                window_length
+                                window_length,
+                                Public_Contests.time
                                 ';
 
     final public static function getByAlias($alias) {
@@ -323,6 +324,8 @@ class ContestsDAO extends ContestsDAOBase {
                 $columns
             FROM
                 Contests
+            LEFT JOIN
+                Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
             JOIN
                 Problemset_Users
             ON
@@ -331,6 +334,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Problemset_Users.user_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
             ORDER BY
+                time DESC,
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
@@ -405,10 +409,10 @@ class ContestsDAO extends ContestsDAOBase {
                         $columns
                     FROM
                         Contests
+                    LEFT JOIN
+                        Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
                     INNER JOIN
-                        ACLs
-                    ON
-                        ACLs.acl_id = Contests.acl_id
+                        ACLs ON ACLs.acl_id = Contests.acl_id
                     WHERE
                         Contests.public = 0 AND ACLs.owner_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -428,10 +432,10 @@ class ContestsDAO extends ContestsDAOBase {
                         $columns
                     FROM
                         Contests
-                    JOIN
-                        Problemset_Users
-                    ON
-                        Contests.problemset_id = Problemset_Users.problemset_id
+                    LEFT JOIN
+                        Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                    INNER JOIN
+                        Problemset_Users ON Contests.problemset_id = Problemset_Users.problemset_id
                     WHERE
                         Contests.public = 0 AND Problemset_Users.user_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -451,10 +455,10 @@ class ContestsDAO extends ContestsDAOBase {
                          $columns
                      FROM
                          Contests
-                     JOIN
-                         User_Roles
-                     ON
-                         User_Roles.acl_id = Contests.acl_id
+                     LEFT JOIN
+                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                     INNER JOIN
+                         User_Roles ON User_Roles.acl_id = Contests.acl_id
                      WHERE
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
@@ -477,9 +481,11 @@ class ContestsDAO extends ContestsDAOBase {
                          $columns
                      FROM
                          Contests
-                     JOIN
+                     LEFT JOIN
+                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                     INNER JOIN
                          Group_Roles ON Contests.acl_id = Group_Roles.acl_id
-                     JOIN
+                     INNER JOIN
                          Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
                      WHERE
                          Contests.public = 0 AND
@@ -502,10 +508,13 @@ class ContestsDAO extends ContestsDAOBase {
                          $columns
                      FROM
                          Contests
+                     LEFT JOIN
+                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
                      WHERE
                          public = 1 AND $recommended_check AND $end_check AND $query_check
                  )
                  ORDER BY
+                     time DESC,
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                      `recommended` DESC,
                      `original_finish_time` DESC
@@ -553,12 +562,15 @@ class ContestsDAO extends ContestsDAOBase {
                     $columns
                 FROM
                     Contests
+                LEFT JOIN
+                    Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
                 WHERE
                     Public = 1
                 AND $recommended_check
                 AND $end_check
                 AND $query_check
                 ORDER BY
+                    time DESC,
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
                     `original_finish_time` DESC
@@ -606,8 +618,11 @@ class ContestsDAO extends ContestsDAOBase {
                     $columns
                 FROM
                     Contests
+                LEFT JOIN
+                    Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
                 WHERE $recommended_check AND $end_check AND $query_check
                 ORDER BY
+                    time DESC,
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
                     `original_finish_time` DESC

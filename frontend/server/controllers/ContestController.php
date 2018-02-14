@@ -2142,7 +2142,7 @@ class ContestController extends Controller {
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($r['contest'], $original_contest->penalty_type);
+            self::updateContest($r['contest'], $original_contest);
 
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
@@ -2255,11 +2255,28 @@ class ContestController extends Controller {
     }
 
     /**
-     * This function reviews changes in penalty type
+     * This function reviews changes in penalty type and visibility type
      */
-    private static function updateContest(Contests $contest, $original_penalty_type) {
+    private static function updateContest(Contests $contest, $original_contest) {
         ContestsDAO::save($contest);
-        if ($original_penalty_type == $contest->penalty_type) {
+        if ($original_contest->public == 0 && $contest->public == 1) {
+            $public_contest = PublicContestsDAO::search(new PublicContests([
+                'contest_id' => $contest->contest_id
+            ]));
+            if (count($public_contest)) {
+                PublicContestsDAO::save(new PublicContests([
+                    'public_contest_id' => $public_contest[0]->public_contest_id,
+                    'contest_id' => $contest->contest_id,
+                    'time' => gmdate('Y-m-d H:i:s', Time::get())
+                ]));
+            } else {
+                PublicContestsDAO::save(new PublicContests([
+                    'contest_id' => $contest->contest_id,
+                    'time' => gmdate('Y-m-d H:i:s', Time::get())
+                ]));
+            }
+        }
+        if ($original_contest->penalty_type == $contest->penalty_type) {
             return;
         }
         RunsDAO::recalculatePenaltyForContest($contest);
