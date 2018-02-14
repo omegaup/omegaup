@@ -95,4 +95,52 @@ class UsersDAO extends UsersDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+
+    final public static function getAllDataByPk($user_id) {
+        if (is_null($user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    u.`username`,
+                    u.`name`,
+                    u.`solved`,
+                    u.`submissions`,
+                    u.`birth_date`,
+                    u.`gender`,
+                    u.`graduation_date`,
+                    u.`scholar_degree`,
+                    u.`preferred_language`,
+                    u.`recruitment_optin`,
+                    u.`country_id`,
+                    c.`name` AS country,
+                    u.`state_id`,
+                    s.`name` AS state,
+                    u.`school_id`,
+                    sc.`name` AS school,
+                    e.`email`,
+                    l.`name` AS locale
+                FROM
+                    Users u
+                LEFT JOIN
+                    Countries c ON u.country_id = c.country_id
+                LEFT JOIN
+                    States s ON u.state_id = s.state_id
+                LEFT JOIN
+                    Schools sc ON u.school_id = sc.school_id
+                LEFT JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                LEFT JOIN
+                    Languages l ON u.language_id = l.language_id
+                WHERE
+                    u.`user_id` = ?
+                LIMIT
+                    1;';
+        $params = [$user_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return $rs;
+    }
 }
