@@ -1137,7 +1137,7 @@ class UserController extends Controller {
         }
 
         try {
-            $user_db = UsersDAO::getAllDataByPk($user->user_id);
+            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
 
             $response['userinfo']['email'] = $user_db['email'];
             $response['userinfo']['country'] = $user_db['country'];
