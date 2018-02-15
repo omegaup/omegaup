@@ -201,12 +201,25 @@ class Driver(object):
         '''Set score = 100 manually in DB'''
 
         database_utils.mysql((
-            'UPDATE `Runs` AS r \nINNER JOIN `Problems` AS p '
-            'ON p.problem_id = r.problem_id INNER JOIN Problemsets AS ps '
-            'ON ps.problemset_id = r.problemset_id INNER JOIN Assignments AS a'
-            ' ON a.acl_id = ps.acl_id SET `score` = 1, `contest_score` = 100, '
-            'verdict = \'AC\', `status` = \'ready\' WHERE p.alias = \'%s\' '
-            'AND a.alias = \'%s\';') % (problem_alias, assignment_alias),
+            '''
+            UPDATE
+                `Runs` AS r
+            INNER JOIN
+                `Problems` AS p ON p.problem_id = r.problem_id
+            INNER JOIN
+                `Problemsets` AS ps ON ps.problemset_id = r.problemset_id
+            INNER JOIN
+                `Assignments` AS a ON a.acl_id = ps.acl_id
+            SET
+                `score` = 1,
+                `contest_score` = 100,
+                `verdict` = 'AC',
+                `status` = 'ready'
+            WHERE
+                p.alias = '%s'
+                AND a.alias = '%s';
+            '''
+            ) % (problem_alias, assignment_alias),
                              dbname='omegaup', auth=self.mysql_auth())  # NOQA
 
 
