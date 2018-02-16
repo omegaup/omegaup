@@ -1137,24 +1137,19 @@ class UserController extends Controller {
         }
 
         try {
-            $email = EmailsDAO::getByPK($user->main_email_id);
-            if (is_null($email)) {
-                $response['userinfo']['email'] = null;
-            } else {
-                $response['userinfo']['email'] = $email->email;
-            }
+            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
 
-            $country = CountriesDAO::getByPK($user->country_id);
-            $response['userinfo']['country'] = is_null($country) ? null : $country->name;
+            $response['userinfo']['email'] = $user_db['email'];
+            $response['userinfo']['country'] = $user_db['country'];
             $response['userinfo']['country_id'] = $user->country_id;
-
-            $state = StatesDAO::getByPK($user->country_id, $user->state_id);
-            $response['userinfo']['state'] = is_null($state) ? null : $state->name;
+            $response['userinfo']['state'] = $user_db['state'];
             $response['userinfo']['state_id'] = $user->state_id;
-
-            $school = SchoolsDAO::getByPK($user->school_id);
+            $response['userinfo']['school'] = $user_db['school'];
             $response['userinfo']['school_id'] = $user->school_id;
-            $response['userinfo']['school'] = is_null($school) ? null : $school->name;
+
+            if (!is_null($user->language_id)) {
+                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
