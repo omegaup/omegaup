@@ -271,7 +271,7 @@ class Users extends VO {
     public $recruitment_optin;
 
     /**
-      *  [Campo no documentado]
+      * Determina si el usuario quiere ocultar las etiquetas de los problemas
       * @access public
       * @var tinyint(1)
       */

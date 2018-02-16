@@ -105,16 +105,11 @@ class UsersDAO extends UsersDAOBase {
                 FROM
                     Users
                 WHERE
-                    (user_id = ?)
+                    user_id = ?
                 LIMIT
                     1;';
         $params = [$user_id];
         global $conn;
-        $response = $conn->GetOne($sql, $params);
-        if (count($response) == 0) {
-            return false;
-        }
-
-        return $response;
+        return $conn->GetOne($sql, $params);
     }
 }
