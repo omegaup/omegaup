@@ -2142,7 +2142,7 @@ class ContestController extends Controller {
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($r['contest'], $original_contest);
+            self::updateContest($r['contest'], $original_contest, $r['current_user_id']);
 
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
@@ -2257,24 +2257,15 @@ class ContestController extends Controller {
     /**
      * This function reviews changes in penalty type and visibility type
      */
-    private static function updateContest(Contests $contest, $original_contest) {
+    private static function updateContest(Contests $contest, $original_contest, $user_id) {
         ContestsDAO::save($contest);
-        if ($original_contest->public == 0 && $contest->public == 1) {
-            $public_contest = PublicContestsDAO::search(new PublicContests([
-                'contest_id' => $contest->contest_id
+        if ($original_contest->public !== $contest->public) {
+            ContestLogDAO::save(new ContestLog([
+                'contest_id' => $contest->contest_id,
+                'user_id' => $user_id,
+                'from_visibility' => $original_contest->public,
+                'to_visibility' => $contest->public
             ]));
-            if (count($public_contest)) {
-                PublicContestsDAO::save(new PublicContests([
-                    'public_contest_id' => $public_contest[0]->public_contest_id,
-                    'contest_id' => $contest->contest_id,
-                    'time' => gmdate('Y-m-d H:i:s', Time::get())
-                ]));
-            } else {
-                PublicContestsDAO::save(new PublicContests([
-                    'contest_id' => $contest->contest_id,
-                    'time' => gmdate('Y-m-d H:i:s', Time::get())
-                ]));
-            }
         }
         if ($original_contest->penalty_type == $contest->penalty_type) {
             return;

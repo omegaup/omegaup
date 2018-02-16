@@ -8,69 +8,69 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** PublicContests Data Access Object (DAO) Base.
+/** ContestLog Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link PublicContests }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link ContestLog }.
  * @access public
  * @abstract
  *
  */
-abstract class PublicContestsDAOBase extends DAO {
+abstract class ContestLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Public_Contests`.`public_contest_id`, `Public_Contests`.`contest_id`, `Public_Contests`.`time`';
+    const FIELDS = '`Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link PublicContests} pasado en la base de datos. La llave
+     * Este metodo guarda el estado actual del objeto {@link ContestLog} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests
+     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(PublicContests $Public_Contests) {
-        if (!is_null(self::getByPK($Public_Contests->public_contest_id))) {
-            return PublicContestsDAOBase::update($Public_Contests);
+    final public static function save(ContestLog $Contest_Log) {
+        if (!is_null(self::getByPK($Contest_Log->public_contest_id))) {
+            return ContestLogDAOBase::update($Contest_Log);
         } else {
-            return PublicContestsDAOBase::create($Public_Contests);
+            return ContestLogDAOBase::create($Contest_Log);
         }
     }
 
     /**
-     * Obtener {@link PublicContests} por llave primaria.
+     * Obtener {@link ContestLog} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link PublicContests} de la base de datos
+     * Este metodo cargara un objeto {@link ContestLog} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link PublicContests Un objeto del tipo {@link PublicContests}. NULL si no hay tal registro.
+     * @return @link ContestLog Un objeto del tipo {@link ContestLog}. NULL si no hay tal registro.
      */
     final public static function getByPK($public_contest_id) {
         if (is_null($public_contest_id)) {
             return null;
         }
-        $sql = 'SELECT `Public_Contests`.`public_contest_id`, `Public_Contests`.`contest_id`, `Public_Contests`.`time` FROM Public_Contests WHERE (public_contest_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
         $params = [$public_contest_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new PublicContests($rs);
+        return new ContestLog($rs);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link PublicContests}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link ContestLog}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +79,10 @@ abstract class PublicContestsDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link PublicContests}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link ContestLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Public_Contests`.`public_contest_id`, `Public_Contests`.`contest_id`, `Public_Contests`.`time` from Public_Contests';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` from Contest_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -93,7 +93,7 @@ abstract class PublicContestsDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new PublicContests($row);
+            $allData[] = new ContestLog($row);
         }
         return $allData;
     }
@@ -101,7 +101,7 @@ abstract class PublicContestsDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PublicContests} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestLog} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,28 +116,40 @@ abstract class PublicContestsDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests
+      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Public_Contests, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Public_Contests instanceof PublicContests)) {
-            $Public_Contests = new PublicContests($Public_Contests);
+    final public static function search($Contest_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Contest_Log instanceof ContestLog)) {
+            $Contest_Log = new ContestLog($Contest_Log);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Public_Contests->public_contest_id)) {
+        if (!is_null($Contest_Log->public_contest_id)) {
             $clauses[] = '`public_contest_id` = ?';
-            $params[] = $Public_Contests->public_contest_id;
+            $params[] = $Contest_Log->public_contest_id;
         }
-        if (!is_null($Public_Contests->contest_id)) {
+        if (!is_null($Contest_Log->contest_id)) {
             $clauses[] = '`contest_id` = ?';
-            $params[] = $Public_Contests->contest_id;
+            $params[] = $Contest_Log->contest_id;
         }
-        if (!is_null($Public_Contests->time)) {
+        if (!is_null($Contest_Log->user_id)) {
+            $clauses[] = '`user_id` = ?';
+            $params[] = $Contest_Log->user_id;
+        }
+        if (!is_null($Contest_Log->from_visibility)) {
+            $clauses[] = '`from_visibility` = ?';
+            $params[] = $Contest_Log->from_visibility;
+        }
+        if (!is_null($Contest_Log->to_visibility)) {
+            $clauses[] = '`to_visibility` = ?';
+            $params[] = $Contest_Log->to_visibility;
+        }
+        if (!is_null($Contest_Log->time)) {
             $clauses[] = '`time` = ?';
-            $params[] = $Public_Contests->time;
+            $params[] = $Contest_Log->time;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -149,7 +161,7 @@ abstract class PublicContestsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Public_Contests`.`public_contest_id`, `Public_Contests`.`contest_id`, `Public_Contests`.`time` FROM `Public_Contests`';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` FROM `Contest_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -161,7 +173,7 @@ abstract class PublicContestsDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new PublicContests($row);
+            $ar[] = new ContestLog($row);
         }
         return $ar;
     }
@@ -170,14 +182,17 @@ abstract class PublicContestsDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests a actualizar.
+      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a actualizar.
       */
-    final private static function update(PublicContests $Public_Contests) {
-        $sql = 'UPDATE `Public_Contests` SET `contest_id` = ?, `time` = ? WHERE `public_contest_id` = ?;';
+    final private static function update(ContestLog $Contest_Log) {
+        $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_visibility` = ?, `to_visibility` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
-            $Public_Contests->contest_id,
-            $Public_Contests->time,
-            $Public_Contests->public_contest_id,
+            $Contest_Log->contest_id,
+            $Contest_Log->user_id,
+            $Contest_Log->from_visibility,
+            $Contest_Log->to_visibility,
+            $Contest_Log->time,
+            $Contest_Log->public_contest_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -188,23 +203,32 @@ abstract class PublicContestsDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto PublicContests suministrado. Asegurese
+     * contenidos del objeto ContestLog suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto PublicContests dentro de la misma transaccion.
+     * primaria generada en el objeto ContestLog dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests a crear.
+     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a crear.
      */
-    final private static function create(PublicContests $Public_Contests) {
-        if (is_null($Public_Contests->time)) {
-            $Public_Contests->time = gmdate('Y-m-d H:i:s');
+    final private static function create(ContestLog $Contest_Log) {
+        if (is_null($Contest_Log->from_visibility)) {
+            $Contest_Log->from_visibility = '0';
         }
-        $sql = 'INSERT INTO Public_Contests (`public_contest_id`, `contest_id`, `time`) VALUES (?, ?, ?);';
+        if (is_null($Contest_Log->to_visibility)) {
+            $Contest_Log->to_visibility = '1';
+        }
+        if (is_null($Contest_Log->time)) {
+            $Contest_Log->time = gmdate('Y-m-d H:i:s');
+        }
+        $sql = 'INSERT INTO Contest_Log (`public_contest_id`, `contest_id`, `user_id`, `from_visibility`, `to_visibility`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Public_Contests->public_contest_id,
-            $Public_Contests->contest_id,
-            $Public_Contests->time,
+            $Contest_Log->public_contest_id,
+            $Contest_Log->contest_id,
+            $Contest_Log->user_id,
+            $Contest_Log->from_visibility,
+            $Contest_Log->to_visibility,
+            $Contest_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -212,7 +236,7 @@ abstract class PublicContestsDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
-        $Public_Contests->public_contest_id = $conn->Insert_ID();
+        $Contest_Log->public_contest_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -220,8 +244,8 @@ abstract class PublicContestsDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PublicContests} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link PublicContests}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestLog} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestLog}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -243,17 +267,17 @@ abstract class PublicContestsDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests
-     * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests
+     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
+     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(PublicContests $Public_ContestsA, PublicContests $Public_ContestsB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(ContestLog $Contest_LogA, ContestLog $Contest_LogB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Public_ContestsA->public_contest_id;
-        $b = $Public_ContestsB->public_contest_id;
+        $a = $Contest_LogA->public_contest_id;
+        $b = $Contest_LogB->public_contest_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`public_contest_id` >= ? AND `public_contest_id` <= ?';
             $params[] = min($a, $b);
@@ -263,8 +287,8 @@ abstract class PublicContestsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Public_ContestsA->contest_id;
-        $b = $Public_ContestsB->contest_id;
+        $a = $Contest_LogA->contest_id;
+        $b = $Contest_LogB->contest_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
             $params[] = min($a, $b);
@@ -274,8 +298,41 @@ abstract class PublicContestsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Public_ContestsA->time;
-        $b = $Public_ContestsB->time;
+        $a = $Contest_LogA->user_id;
+        $b = $Contest_LogB->user_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`user_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Contest_LogA->from_visibility;
+        $b = $Contest_LogB->from_visibility;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`from_visibility` >= ? AND `from_visibility` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`from_visibility` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Contest_LogA->to_visibility;
+        $b = $Contest_LogB->to_visibility;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`to_visibility` >= ? AND `to_visibility` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`to_visibility` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Contest_LogA->time;
+        $b = $Contest_LogB->time;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`time` >= ? AND `time` <= ?';
             $params[] = min($a, $b);
@@ -285,7 +342,7 @@ abstract class PublicContestsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Public_Contests`';
+        $sql = 'SELECT * FROM `Contest_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -294,7 +351,7 @@ abstract class PublicContestsDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new PublicContests($row);
+            $ar[] = new ContestLog($row);
         }
         return $ar;
     }
@@ -303,21 +360,21 @@ abstract class PublicContestsDAOBase extends DAO {
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto PublicContests suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto ContestLog suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param PublicContests [$Public_Contests] El objeto de tipo PublicContests a eliminar
+     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a eliminar
      */
-    final public static function delete(PublicContests $Public_Contests) {
-        if (is_null(self::getByPK($Public_Contests->public_contest_id))) {
+    final public static function delete(ContestLog $Contest_Log) {
+        if (is_null(self::getByPK($Contest_Log->public_contest_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Public_Contests` WHERE public_contest_id = ?;';
-        $params = [$Public_Contests->public_contest_id];
+        $sql = 'DELETE FROM `Contest_Log` WHERE public_contest_id = ?;';
+        $params = [$Contest_Log->public_contest_id];
         global $conn;
 
         $conn->Execute($sql, $params);

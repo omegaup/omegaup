@@ -133,7 +133,7 @@ class ContestsDAO extends ContestsDAOBase {
                                 alias,
                                 recommended,
                                 window_length,
-                                Public_Contests.time
+                                Contest_Log.time
                                 ';
 
     final public static function getByAlias($alias) {
@@ -325,7 +325,7 @@ class ContestsDAO extends ContestsDAOBase {
             FROM
                 Contests
             LEFT JOIN
-                Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
             JOIN
                 Problemset_Users
             ON
@@ -410,7 +410,7 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     LEFT JOIN
-                        Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                        Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                     INNER JOIN
                         ACLs ON ACLs.acl_id = Contests.acl_id
                     WHERE
@@ -433,7 +433,7 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     LEFT JOIN
-                        Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                        Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                     INNER JOIN
                         Problemset_Users ON Contests.problemset_id = Problemset_Users.problemset_id
                     WHERE
@@ -456,7 +456,7 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      LEFT JOIN
-                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                         Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                      INNER JOIN
                          User_Roles ON User_Roles.acl_id = Contests.acl_id
                      WHERE
@@ -482,7 +482,7 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      LEFT JOIN
-                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                         Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                      INNER JOIN
                          Group_Roles ON Contests.acl_id = Group_Roles.acl_id
                      INNER JOIN
@@ -509,7 +509,7 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      LEFT JOIN
-                         Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                         Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                      WHERE
                          public = 1 AND $recommended_check AND $end_check AND $query_check
                  )
@@ -563,7 +563,7 @@ class ContestsDAO extends ContestsDAOBase {
                 FROM
                     Contests
                 LEFT JOIN
-                    Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                    Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                 WHERE
                     Public = 1
                 AND $recommended_check
@@ -619,7 +619,7 @@ class ContestsDAO extends ContestsDAOBase {
                 FROM
                     Contests
                 LEFT JOIN
-                    Public_Contests ON (Public_Contests.contest_id=Contests.contest_id)
+                    Contest_Log ON (Contest_Log.contest_id=Contests.contest_id)
                 WHERE $recommended_check AND $end_check AND $query_check
                 ORDER BY
                     time DESC,

@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Public_Contests.
+ * Value Object file for table Contest_Log.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class PublicContests extends VO {
+class ContestLog extends VO {
     /**
-     * Constructor de PublicContests
+     * Constructor de ContestLog
      *
-     * Para construir un objeto de tipo PublicContests debera llamarse a el constructor
+     * Para construir un objeto de tipo ContestLog debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -31,6 +31,15 @@ class PublicContests extends VO {
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = $data['contest_id'];
+        }
+        if (isset($data['user_id'])) {
+            $this->user_id = $data['user_id'];
+        }
+        if (isset($data['from_visibility'])) {
+            $this->from_visibility = $data['from_visibility'];
+        }
+        if (isset($data['to_visibility'])) {
+            $this->to_visibility = $data['to_visibility'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -63,6 +72,27 @@ class PublicContests extends VO {
       * @var int(11)
       */
     public $contest_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $user_id;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var tinyint(1)
+      */
+    public $from_visibility;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var tinyint(1)
+      */
+    public $to_visibility;
 
     /**
       *  [Campo no documentado]
