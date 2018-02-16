@@ -136,7 +136,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormDecrementFactor: "Score Decrement Factor %(window_length)%",
 	contestNewFormDescription: "Contest description",
 	contestNewFormDifferentStarts: "Different starts",
-	contestNewFormDifferentStartsDesc: "If activated, indicate how much time (in minutes) the contestant has to submit solutions from the point the contest is opened. If it's not activated, contestants may submit solutions any moment between the start and end times.",
+	contestNewFormDifferentStartsDesc: "If activated, indicate how much time (in minutes) the contestant has to submit solutions from the point the contest is opened. If it's not activated, contestants may submit solutions any moment between the start and end times. The value must be less than the difference in minutes of the duration of the contest.",
 	contestNewFormEndDate: "End date",
 	contestNewFormEndDateDesc: "The time and date (in local time) in which the contest will end.",
 	contestNewFormImmediateFeedbackDesc: "Give immediate feedback to user about their submission.",

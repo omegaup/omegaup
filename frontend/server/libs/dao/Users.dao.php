@@ -96,6 +96,41 @@ class UsersDAO extends UsersDAOBase {
         return $conn->Affected_Rows();
     }
 
+    final public static function getExtendedProfileDataByPk($user_id) {
+        if (is_null($user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    c.`name` AS country,
+                    s.`name` AS state,
+                    sc.`name` AS school,
+                    e.`email`,
+                    l.`name` AS locale
+                FROM
+                    Users u
+                INNER JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                LEFT JOIN
+                    Countries c ON u.country_id = c.country_id
+                LEFT JOIN
+                    States s ON u.state_id = s.state_id
+                LEFT JOIN
+                    Schools sc ON u.school_id = sc.school_id
+                LEFT JOIN
+                    Languages l ON u.language_id = l.language_id
+                WHERE
+                    u.`user_id` = ?
+                LIMIT
+                    1;';
+        $params = [$user_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return $rs;
+    }
+
     public static function getHideTags($user_id) {
         if (is_null($user_id)) {
             return false;
@@ -109,6 +144,7 @@ class UsersDAO extends UsersDAOBase {
                 LIMIT
                     1;';
         $params = [$user_id];
+
         global $conn;
         return $conn->GetOne($sql, $params);
     }

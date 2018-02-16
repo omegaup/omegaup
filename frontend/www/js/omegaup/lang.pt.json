@@ -133,7 +133,7 @@
 	"contestNewFormDecrementFactor": "Fator de decrescimiento de pontua\u00e7\u00e3o %(window_length)%",
 	"contestNewFormDescription": "Descri\u00e7a\u00f5 de concurso",
 	"contestNewFormDifferentStarts": "Diferentes in\u00edcios",
-	"contestNewFormDifferentStartsDesc": "Quando \u00e9 ativado, indica o tempo em minutos que tem o usu\u00e1rio para concursar e enviar solu\u00e7\u00f5es a partir do come\u00e7o do concurso  (estilo USACO/Preseletivo IOI). Se n\u00e3o estiver ativbado, ent\u00e3o o competidor tem todo o tempo entre a hora de in\u00edcio e la hora do final para concursar.",
+	"contestNewFormDifferentStartsDesc": "Quando \u00e9 ativado, indica o tempo em minutos que tem o usu\u00e1rio para concursar e enviar solu\u00e7\u00f5es a partir do come\u00e7o do concurso  (estilo USACO/Preseletivo IOI). Se n\u00e3o estiver ativbado, ent\u00e3o o competidor tem todo o tempo entre a hora de in\u00edcio e la hora do final para concursar. O valor deve ser inferior \u00e0 diferen\u00e7a em minutos da dura\u00e7\u00e3o do concurso.",
 	"contestNewFormEndDate": "Data de t\u00e9rmino",
 	"contestNewFormEndDateDesc": "A hora (no hor\u00e1rio local) em que o concurso vai acabar.",
 	"contestNewFormImmediateFeedbackDesc": "Se o usu\u00e1rio recebe feedback imediato sobre sua solu\u00e7\u00e3o",
