@@ -794,6 +794,8 @@ omegaup.OmegaUp.loadTranslations({
 	wordsConsole: "(C0n5013)",
 	wordsContest: "(C0n7357)",
 	wordsContests: "(C0n73575)",
+	wordsDangerZone: "(Dang3r Z0n3)",
+	wordsDangerZoneDesc: "(D31373 7h3 pr0b13m.<br><br>Thi5 can 0n1y b3 d0n3 if 7h3 pr0b13m ha5 n07 b33n u53d in a c0ur53 0r c0n7357.<br><br>Y0u mu57 b3 v3ry 5ur3 7ha7 y0u wan7 70 d0 i7, b3cau53 7h3r3 i5 n0 way 70 r3c0v3r i7 0nc3 i7 i5 r3m0v3d.)",
 	wordsDelete: "(D31373)",
 	wordsDeleted: "(D31373d)",
 	wordsDenied: "(D3ni3d)",

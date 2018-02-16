@@ -791,6 +791,8 @@
 	"wordsConsole": "Consola",
 	"wordsContest": "Concurso",
 	"wordsContests": "Concursos",
+	"wordsDangerZone": "\u00c1rea Peligrosa",
+	"wordsDangerZoneDesc": "Eliminar el problema.<br><br>Esto \u00fanicamente se puede hacer si el problema no ha sido usado en un curso o concurso.<br><br>Debes estar muy seguro de querer hacerlo, porque no hay manera de recuperarlo una vez eliminado.",
 	"wordsDelete": "Eliminar",
 	"wordsDeleted": "Eliminado",
 	"wordsDenied": "Rechazado",

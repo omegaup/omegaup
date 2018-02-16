@@ -41,7 +41,6 @@
         <th>{#wordsTitle#}</th>
         <th>{#wordsEdit#}</th>
         <th>{#wordsStatistics#}</th>
-        <th>{#wordsDelete#}</th>
       </tr>
     </thead>
     <tbody class="problem-list-template">
@@ -57,9 +56,6 @@
         </td>
         <td>
           <a class="glyphicon glyphicon-stats stats"></a>
-        </td>
-        <td>
-          <a class="glyphicon glyphicon-trash delete" href="#"></a>
         </td>
       </tr>
     </tbody>
