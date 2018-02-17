@@ -129,4 +129,29 @@ class UserRolesDAO extends UserRolesDAOBase {
         }
         return $roles;
     }
+
+    public static function getSystemGroups($user_id) {
+        $sql = "
+            SELECT
+                g.name
+            FROM
+                Groups_Users gu
+            INNER JOIN
+                Group_Roles gr ON gr.group_id = gu.group_id
+            INNER JOIN
+                Groups g ON gr.acl_id = g.acl_id
+            WHERE
+                gu.user_id = ? AND g.name LIKE '%:%';";
+        $params = [
+            $user_id
+        ];
+        global $conn;
+
+        $groups = [];
+        foreach ($conn->GetAll($sql, $params) as $group) {
+            $groups[] = $group['name'];
+        }
+
+        return $groups;
+    }
 }
