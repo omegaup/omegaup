@@ -701,7 +701,7 @@ las pestañas del framework. */
 }
 
 .arena-tabs>li>a {
-	width:142px;
+	width:120px;
 	display: table-cell;
 	vertical-align: middle;
 	text-align: center;

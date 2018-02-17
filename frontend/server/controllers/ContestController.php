@@ -47,8 +47,15 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
+            $public = isset($r['public'])
+                ? PublicStatus::getIntValue($r['public'])
+                : PublicStatus::NO;
+
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
+            if (is_null($public)) {
+                throw new InvalidParameterException('parameterInvalid', 'public');
             }
             $query = $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
@@ -66,6 +73,8 @@ class ContestController extends Controller {
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
                 $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
+            } elseif ($public == PublicStatus::YES) {
+                $contests = ContestsDAO::getRecentPublicContests($r['current_user_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
@@ -96,6 +105,7 @@ class ContestController extends Controller {
             'alias',
             'window_length',
             'recommended',
+            'last_updated'
             ];
 
         $addedContests = [];
@@ -2258,15 +2268,18 @@ class ContestController extends Controller {
      * This function reviews changes in penalty type and visibility type
      */
     private static function updateContest(Contests $contest, $original_contest, $user_id) {
-        ContestsDAO::save($contest);
         if ($original_contest->public !== $contest->public) {
+            $timestamp = gmdate('Y-m-d H:i:s', Time::get());
             ContestLogDAO::save(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $user_id,
                 'from_visibility' => $original_contest->public,
-                'to_visibility' => $contest->public
+                'to_visibility' => $contest->public,
+                'time' => $timestamp
             ]));
+            $contest->last_updated = $timestamp;
         }
+        ContestsDAO::save($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {
             return;
         }
