@@ -33,6 +33,7 @@ class FileHandler {
 
     public static function CreateFile($filename, $contents) {
         // Open file
+        self::MakeDirRecursively(dirname($filename));
         $handle = @fopen($filename, 'w');
 
         if (!$handle) {
@@ -54,6 +55,17 @@ class FileHandler {
         if (!(static::$fileUploader->IsUploadedFile($_FILES[$fileUploadName]['tmp_name']) &&
                 static::$fileUploader->MoveUploadedFile($_FILES[$fileUploadName]['tmp_name'], $targetPath))) {
             throw new RuntimeException('FATAL: Not able to move tmp_file from _FILE. ' . implode('\n', $_FILES[$fileUploadName]));
+        }
+    }
+
+    public static function MakeDirRecursively($path) {
+        $directoriesToCreate = [];
+        for (; $path != '/' && !is_dir($path); $path = dirname($path)) {
+            $directoriesToCreate[] = $path;
+        }
+        $directoriesToCreate = array_reverse($directoriesToCreate);
+        foreach ($directoriesToCreate as $directory) {
+            self::MakeDir($directory);
         }
     }
 
