@@ -617,6 +617,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationShowAll: "Tambi\u00e9n mostrar nominaciones resueltas",
 	qualityNominationType: "Tipo",
 	rankHeader: "Top %(count) usuarios con m\u00e1s puntaje",
+	rankRangeHeader: "Top %(lowCount) a %(highCount) usuarios con m\u00e1s puntaje",
 	rankScore: "Score",
 	rankSolved: "Problemas",
 	rankViewFull: "Ver rank completo",

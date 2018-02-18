@@ -617,6 +617,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationShowAll: "(A150 5h0w r3501v3d n0mina7i0n5)",
 	qualityNominationType: "(Typ3)",
 	rankHeader: "(T0p %(count) u53r5 wi7h 7h3 m057 p0in75)",
+	rankRangeHeader: "(T0p %(lowCount) 70 %(highCount) u53r5 wi7h 7h3 m057 p0in75)",
 	rankScore: "(Sc0r3)",
 	rankSolved: "(S01v3d pr0b13m5)",
 	rankViewFull: "(Vi3w fu11 rank)",
