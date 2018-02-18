@@ -12,7 +12,7 @@
 
 <div class=" panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
+		<h3 class="panel-title">{#rankHeader#|omegaup_format:[count=>$length]}</h3>
 		{if !$is_index}
 			{if $page > 1}
 				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
