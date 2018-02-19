@@ -16,31 +16,9 @@ _OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
-    # Home page
-    home_page_url = driver.url('/')
-    driver.browser.get(home_page_url)
-    driver.wait_for_page_loaded()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//a[contains(@href, "/login/")]'))).click()
-
-    # Login screen
-    driver.wait.until(lambda _: driver.browser.current_url != home_page_url)
     username = 'unittest_user_%s' % driver.generate_id()
     password = 'p@ssw0rd'
-    driver.browser.find_element_by_id('reg_username').send_keys(username)
-    driver.browser.find_element_by_id('reg_email').send_keys(
-        'email_%s@localhost.localdomain' % username)
-    driver.browser.find_element_by_id('reg_pass').send_keys(password)
-    driver.browser.find_element_by_id('reg_pass2').send_keys(password)
-    with driver.ajax_page_transition():
-        driver.browser.find_element_by_id('register-form').submit()
-
-    # Home screen
-    driver.browser.get(driver.url('/logout/?redirect=/'))
-    driver.wait.until(lambda _: driver.browser.current_url == home_page_url)
-    driver.wait_for_page_loaded()
+    driver.register_user(username, password)
 
     with driver.login(username, password):
         pass
