@@ -55,6 +55,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('#programming_language').val(data.userinfo.preferred_language);
         $('#recruitment_optin')
             .prop('checked', data.userinfo.recruitment_optin == 1);
+        $('#hide_problem_tags')
+            .prop('checked', data.userinfo.hide_problem_tags == 1);
 
         original_locale = data.userinfo.locale;
         original_school = data.userinfo.school;
@@ -96,7 +98,9 @@ omegaup.OmegaUp.on('ready', function() {
                           locale: $('#locale').val(),
                           preferred_language: $('#programming_language').val(),
                           recruitment_optin:
-                              $('#recruitment_optin').prop('checked') ? 1 : 0
+                              $('#recruitment_optin').prop('checked') ? 1 : 0,
+                          hide_problem_tags:
+                              $('#hide_problem_tags').prop('checked') ? 1 : 0
                         })
             .then(function(response) {
               if (locale_changed) {

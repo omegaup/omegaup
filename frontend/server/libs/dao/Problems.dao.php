@@ -233,6 +233,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
         $problems = [];
+        $hiddenTags = $user_type !== USER_ANONYMOUS ? UsersDao::getHideTags($user_id) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -242,7 +243,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $problem['score'] = $row['score'];
                 $problem['points'] = $row['points'];
                 $problem['ratio'] = $row['ratio'];
-                $problem['tags'] = ProblemsDAO::getTagsForProblem($temp, true);
+                $problem['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($temp, true);
                 array_push($problems, $problem);
             }
         }

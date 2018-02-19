@@ -1699,9 +1699,11 @@ class ProblemController extends Controller {
         }
 
         $addedProblems = [];
+
+        $hiddenTags = UsersDao::getHideTags($r['current_user_id']);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
+            $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
@@ -1737,9 +1739,11 @@ class ProblemController extends Controller {
         }
 
         $addedProblems = [];
+
+        $hiddenTags = UsersDao::getHideTags($r['current_user_id']);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
+            $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
