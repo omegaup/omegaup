@@ -642,39 +642,39 @@ class UserController extends Controller {
 
             // Arreglo de estados de MX
             $keys = [
-                'OMI2017-AGU' => 4,
-                'OMI2017-BCN' => 4,
-                'OMI2017-BCS' => 4,
-                'OMI2017-CAM' => 4,
-                'OMI2017-CHH' => 4,
-                'OMI2017-CHP' => 4,
-                'OMI2017-CMX' => 4,
-                'OMI2017-COA' => 4,
-                'OMI2017-COL' => 4,
-                'OMI2017-DUR' => 4,
-                'OMI2017-GRO' => 4,
-                'OMI2017-GUA' => 4,
-                'OMI2017-HID' => 4,
-                'OMI2017-JAL' => 4,
-                'OMI2017-MEX' => 4,
-                'OMI2017-MIC' => 4,
-                'OMI2017-MOR' => 4,
-                'OMI2017-NAY' => 4,
-                'OMI2017-NLE' => 4,
-                'OMI2017-OAX' => 4,
-                'OMI2017-PUE' => 4,
-                'OMI2017-QTO' => 8,
-                'OMI2017-ROO' => 4,
-                'OMI2017-SIN' => 4,
-                'OMI2017-SLP' => 4,
-                'OMI2017-SON' => 4,
-                'OMI2017-TAB' => 4,
-                'OMI2017-TAM' => 4,
-                'OMI2017-TLA' => 4,
-                'OMI2017-VER' => 4,
-                'OMI2017-YUC' => 4,
-                'OMI2017-ZAC' => 4,
-                'OMI2017-INV' => 4,
+                'OMI2018-AGU' => 4,
+                'OMI2018-BCN' => 4,
+                'OMI2018-BCS' => 4,
+                'OMI2018-CAM' => 4,
+                'OMI2018-CHH' => 4,
+                'OMI2018-CHP' => 4,
+                'OMI2018-CMX' => 8,
+                'OMI2018-COA' => 4,
+                'OMI2018-COL' => 4,
+                'OMI2018-DUR' => 4,
+                'OMI2018-GRO' => 4,
+                'OMI2018-GUA' => 4,
+                'OMI2018-HID' => 4,
+                'OMI2018-JAL' => 4,
+                'OMI2018-MEX' => 4,
+                'OMI2018-MIC' => 4,
+                'OMI2018-MOR' => 4,
+                'OMI2018-NAY' => 4,
+                'OMI2018-NLE' => 4,
+                'OMI2018-OAX' => 4,
+                'OMI2018-PUE' => 4,
+                'OMI2018-QTO' => 4,
+                'OMI2018-ROO' => 4,
+                'OMI2018-SIN' => 4,
+                'OMI2018-SLP' => 4,
+                'OMI2018-SON' => 4,
+                'OMI2018-TAB' => 4,
+                'OMI2018-TAM' => 4,
+                'OMI2018-TLA' => 4,
+                'OMI2018-VER' => 4,
+                'OMI2018-YUC' => 4,
+                'OMI2018-ZAC' => 4,
+                'OMI2018-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMIP') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -684,7 +684,38 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIP2017' => 800,
+                'OMIP2018-AGU' => 25,
+                'OMIP2018-BCN' => 25,
+                'OMIP2018-BCS' => 25,
+                'OMIP2018-CAM' => 25,
+                'OMIP2018-CHH' => 25,
+                'OMIP2018-CHP' => 25,
+                'OMIP2018-CMX' => 25,
+                'OMIP2018-COA' => 25,
+                'OMIP2018-COL' => 25,
+                'OMIP2018-DUR' => 25,
+                'OMIP2018-GRO' => 25,
+                'OMIP2018-GUA' => 25,
+                'OMIP2018-HID' => 25,
+                'OMIP2018-JAL' => 25,
+                'OMIP2018-MEX' => 25,
+                'OMIP2018-MIC' => 25,
+                'OMIP2018-MOR' => 25,
+                'OMIP2018-NAY' => 25,
+                'OMIP2018-NLE' => 25,
+                'OMIP2018-OAX' => 25,
+                'OMIP2018-PUE' => 25,
+                'OMIP2018-QTO' => 25,
+                'OMIP2018-ROO' => 25,
+                'OMIP2018-SIN' => 25,
+                'OMIP2018-SLP' => 25,
+                'OMIP2018-SON' => 25,
+                'OMIP2018-TAB' => 25,
+                'OMIP2018-TAM' => 25,
+                'OMIP2018-TLA' => 25,
+                'OMIP2018-VER' => 25,
+                'OMIP2018-YUC' => 25,
+                'OMIP2018-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIS') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -694,7 +725,38 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIS2017' => 800,
+                'OMIS2018-AGU' => 25,
+                'OMIS2018-BCN' => 25,
+                'OMIS2018-BCS' => 25,
+                'OMIS2018-CAM' => 25,
+                'OMIS2018-CHH' => 25,
+                'OMIS2018-CHP' => 25,
+                'OMIS2018-CMX' => 25,
+                'OMIS2018-COA' => 25,
+                'OMIS2018-COL' => 25,
+                'OMIS2018-DUR' => 25,
+                'OMIS2018-GRO' => 25,
+                'OMIS2018-GUA' => 25,
+                'OMIS2018-HID' => 25,
+                'OMIS2018-JAL' => 25,
+                'OMIS2018-MEX' => 25,
+                'OMIS2018-MIC' => 25,
+                'OMIS2018-MOR' => 25,
+                'OMIS2018-NAY' => 25,
+                'OMIS2018-NLE' => 25,
+                'OMIS2018-OAX' => 25,
+                'OMIS2018-PUE' => 25,
+                'OMIS2018-QTO' => 25,
+                'OMIS2018-ROO' => 25,
+                'OMIS2018-SIN' => 25,
+                'OMIS2018-SLP' => 25,
+                'OMIS2018-SON' => 25,
+                'OMIS2018-TAB' => 25,
+                'OMIS2018-TAM' => 25,
+                'OMIS2018-TLA' => 25,
+                'OMIS2018-VER' => 25,
+                'OMIS2018-YUC' => 25,
+                'OMIS2018-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIPN') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -704,39 +766,39 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIP2017-AGU' => 4,
-                'OMIP2017-BCN' => 4,
-                'OMIP2017-BCS' => 4,
-                'OMIP2017-CAM' => 4,
-                'OMIP2017-CHH' => 4,
-                'OMIP2017-CHP' => 4,
-                'OMIP2017-CMX' => 4,
-                'OMIP2017-COA' => 4,
-                'OMIP2017-COL' => 4,
-                'OMIP2017-DUR' => 4,
-                'OMIP2017-GRO' => 4,
-                'OMIP2017-GUA' => 4,
-                'OMIP2017-HID' => 4,
-                'OMIP2017-JAL' => 4,
-                'OMIP2017-MEX' => 4,
-                'OMIP2017-MIC' => 4,
-                'OMIP2017-MOR' => 4,
-                'OMIP2017-NAY' => 4,
-                'OMIP2017-NLE' => 4,
-                'OMIP2017-OAX' => 4,
-                'OMIP2017-PUE' => 4,
-                'OMIP2017-QTO' => 4,
-                'OMIP2017-ROO' => 4,
-                'OMIP2017-SIN' => 4,
-                'OMIP2017-SLP' => 4,
-                'OMIP2017-SON' => 4,
-                'OMIP2017-TAB' => 4,
-                'OMIP2017-TAM' => 4,
-                'OMIP2017-TLA' => 4,
-                'OMIP2017-VER' => 4,
-                'OMIP2017-YUC' => 4,
-                'OMIP2017-ZAC' => 4,
-                'OMIP2017-INV' => 4,
+                'OMIP2018-AGU' => 4,
+                'OMIP2018-BCN' => 4,
+                'OMIP2018-BCS' => 4,
+                'OMIP2018-CAM' => 4,
+                'OMIP2018-CHH' => 4,
+                'OMIP2018-CHP' => 4,
+                'OMIP2018-CMX' => 4,
+                'OMIP2018-COA' => 4,
+                'OMIP2018-COL' => 4,
+                'OMIP2018-DUR' => 4,
+                'OMIP2018-GRO' => 4,
+                'OMIP2018-GUA' => 4,
+                'OMIP2018-HID' => 4,
+                'OMIP2018-JAL' => 4,
+                'OMIP2018-MEX' => 4,
+                'OMIP2018-MIC' => 4,
+                'OMIP2018-MOR' => 4,
+                'OMIP2018-NAY' => 4,
+                'OMIP2018-NLE' => 4,
+                'OMIP2018-OAX' => 4,
+                'OMIP2018-PUE' => 4,
+                'OMIP2018-QTO' => 4,
+                'OMIP2018-ROO' => 4,
+                'OMIP2018-SIN' => 4,
+                'OMIP2018-SLP' => 4,
+                'OMIP2018-SON' => 4,
+                'OMIP2018-TAB' => 4,
+                'OMIP2018-TAM' => 4,
+                'OMIP2018-TLA' => 4,
+                'OMIP2018-VER' => 4,
+                'OMIP2018-YUC' => 4,
+                'OMIP2018-ZAC' => 4,
+                'OMIP2018-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMISN') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -746,39 +808,39 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIS2017-AGU' => 4,
-                'OMIS2017-BCN' => 4,
-                'OMIS2017-BCS' => 4,
-                'OMIS2017-CAM' => 4,
-                'OMIS2017-CHH' => 4,
-                'OMIS2017-CHP' => 4,
-                'OMIS2017-CMX' => 4,
-                'OMIS2017-COA' => 4,
-                'OMIS2017-COL' => 4,
-                'OMIS2017-DUR' => 4,
-                'OMIS2017-GRO' => 4,
-                'OMIS2017-GUA' => 4,
-                'OMIS2017-HID' => 4,
-                'OMIS2017-JAL' => 4,
-                'OMIS2017-MEX' => 4,
-                'OMIS2017-MIC' => 4,
-                'OMIS2017-MOR' => 4,
-                'OMIS2017-NAY' => 4,
-                'OMIS2017-NLE' => 4,
-                'OMIS2017-OAX' => 4,
-                'OMIS2017-PUE' => 4,
-                'OMIS2017-QTO' => 4,
-                'OMIS2017-ROO' => 4,
-                'OMIS2017-SIN' => 4,
-                'OMIS2017-SLP' => 4,
-                'OMIS2017-SON' => 4,
-                'OMIS2017-TAB' => 4,
-                'OMIS2017-TAM' => 4,
-                'OMIS2017-TLA' => 4,
-                'OMIS2017-VER' => 4,
-                'OMIS2017-YUC' => 4,
-                'OMIS2017-ZAC' => 4,
-                'OMIS2017-INV' => 4,
+                'OMIS2018-AGU' => 4,
+                'OMIS2018-BCN' => 4,
+                'OMIS2018-BCS' => 4,
+                'OMIS2018-CAM' => 4,
+                'OMIS2018-CHH' => 4,
+                'OMIS2018-CHP' => 4,
+                'OMIS2018-CMX' => 4,
+                'OMIS2018-COA' => 4,
+                'OMIS2018-COL' => 4,
+                'OMIS2018-DUR' => 4,
+                'OMIS2018-GRO' => 4,
+                'OMIS2018-GUA' => 4,
+                'OMIS2018-HID' => 4,
+                'OMIS2018-JAL' => 4,
+                'OMIS2018-MEX' => 4,
+                'OMIS2018-MIC' => 4,
+                'OMIS2018-MOR' => 4,
+                'OMIS2018-NAY' => 4,
+                'OMIS2018-NLE' => 4,
+                'OMIS2018-OAX' => 4,
+                'OMIS2018-PUE' => 4,
+                'OMIS2018-QTO' => 4,
+                'OMIS2018-ROO' => 4,
+                'OMIS2018-SIN' => 4,
+                'OMIS2018-SLP' => 4,
+                'OMIS2018-SON' => 4,
+                'OMIS2018-TAB' => 4,
+                'OMIS2018-TAM' => 4,
+                'OMIS2018-TLA' => 4,
+                'OMIS2018-VER' => 4,
+                'OMIS2018-YUC' => 4,
+                'OMIS2018-ZAC' => 4,
+                'OMIS2018-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'ORIG') {
             if ($r['current_user']->username != 'kuko.coder'
@@ -1065,6 +1127,7 @@ class UserController extends Controller {
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
+        $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
         if (!is_null($user->language_id)) {
             $query = LanguagesDAO::getByPK($user->language_id);
@@ -1075,24 +1138,19 @@ class UserController extends Controller {
         }
 
         try {
-            $email = EmailsDAO::getByPK($user->main_email_id);
-            if (is_null($email)) {
-                $response['userinfo']['email'] = null;
-            } else {
-                $response['userinfo']['email'] = $email->email;
-            }
+            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
 
-            $country = CountriesDAO::getByPK($user->country_id);
-            $response['userinfo']['country'] = is_null($country) ? null : $country->name;
+            $response['userinfo']['email'] = $user_db['email'];
+            $response['userinfo']['country'] = $user_db['country'];
             $response['userinfo']['country_id'] = $user->country_id;
-
-            $state = StatesDAO::getByPK($user->country_id, $user->state_id);
-            $response['userinfo']['state'] = is_null($state) ? null : $state->name;
+            $response['userinfo']['state'] = $user_db['state'];
             $response['userinfo']['state_id'] = $user->state_id;
-
-            $school = SchoolsDAO::getByPK($user->school_id);
+            $response['userinfo']['school'] = $user_db['school'];
             $response['userinfo']['school_id'] = $user->school_id;
-            $response['userinfo']['school'] = is_null($school) ? null : $school->name;
+
+            if (!is_null($user->language_id)) {
+                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1576,6 +1634,9 @@ class UserController extends Controller {
         if (!is_null($r['recruitment_optin'])) {
             Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
         }
+        if (!is_null($r['hide_problem_tags'])) {
+            Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
+        }
 
         $valueProperties = [
             'name',
@@ -1592,6 +1653,7 @@ class UserController extends Controller {
             }],
             'gender',
             'recruitment_optin',
+            'hide_problem_tags',
         ];
 
         self::updateValueProperties($r, $r['current_user'], $valueProperties);

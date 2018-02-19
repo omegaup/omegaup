@@ -62,7 +62,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // We need to verify that the contest and problem IDs where properly saved
         // Extractiing the contest and problem from DB to check IDs
-        $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
+        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         $this->assertEquals($contest->problemset_id, $clarification->problemset_id);

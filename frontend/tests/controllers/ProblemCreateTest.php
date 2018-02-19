@@ -185,7 +185,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('cases/g1.train0.out', $response['uploaded_files'][1]);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($r['alias']);
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('testplan'));
         $this->assertTrue($problemArtifacts->exists('cases/in/g1.train0.in'));
@@ -404,7 +404,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($r['alias']);
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.html'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));

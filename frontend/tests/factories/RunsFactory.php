@@ -49,7 +49,7 @@ class RunsFactory {
             $r['contest_alias'] = $contestData['request']['alias'];
         }
 
-        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['language'] = 'c';
         $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 

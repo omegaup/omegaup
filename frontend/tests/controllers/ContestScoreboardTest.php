@@ -573,7 +573,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     private function assertRunMapEntryIsOnEvents(array $runMapEntry, array $testData, array $events, $shouldBeIn = true) {
         $username = $testData['contestants'][$runMapEntry['contestant_idx']]->username;
-        $problemAlias = $testData['problemData'][$runMapEntry['problem_idx']]['request']['alias'];
+        $problemAlias = $testData['problemData'][$runMapEntry['problem_idx']]['request']['problem_alias'];
         $eventFound = null;
         foreach ($events as $event) {
             if ($event['name'] === $username &&

@@ -45,7 +45,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -84,13 +84,13 @@ class RunCreateTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $this->courseData['course_alias'],
             'assignment_alias' => $this->assignment->alias,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
         // Create an empty request
         $r = new Request([
             'problemset_id' => $this->assignment->problemset_id,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -287,7 +287,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertRun($r, $response);
 
         // Set the second problem as the target
-        $r['problem_alias'] = $problemData2['request']['alias'];
+        $r['problem_alias'] = $problemData2['request']['problem_alias'];
 
         // Send a run to the 2nd problem
         $response = RunController::apiCreate($r);
@@ -496,7 +496,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => '', // Not inside a contest
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -525,7 +525,7 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -561,7 +561,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -593,7 +593,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => '', // Not inside a contest
-            'problem_alias' => $problemData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
@@ -624,7 +624,7 @@ class RunCreateTest extends OmegaupTestCase {
             $r = new Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => '', // Not inside a contest
-                'problem_alias' => $problemData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
                 'language' => 'c',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]);

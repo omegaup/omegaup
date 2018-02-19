@@ -178,7 +178,7 @@ class CoursesFactory {
                         $runResponsePA = RunController::apiCreate(new Request([
                             'auth_token' => $studentLogin->auth_token,
                             'problemset_id' => $assignment->problemset_id,
-                            'problem_alias' => $problemData['request']['alias'],
+                            'problem_alias' => $problemData['request']['problem_alias'],
                             'language' => 'c',
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
@@ -190,7 +190,7 @@ class CoursesFactory {
                             $runResponseAC = RunController::apiCreate(new Request([
                                 'auth_token' => $studentLogin->auth_token,
                                 'problemset_id' => $assignment->problemset_id,
-                                'problem_alias' => $problemData['request']['alias'],
+                                'problem_alias' => $problemData['request']['problem_alias'],
                                 'language' => 'c',
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));

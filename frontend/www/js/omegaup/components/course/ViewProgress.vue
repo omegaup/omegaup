@@ -194,13 +194,8 @@ export default {
 </script>
 
 <style>
-.omegaup-course-viewprogress td, .omegaup-course-viewprogress th {
-  /* max-width 0 makes cell width proportional and allows content to overflow */
-  max-width: 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-.omegaup-course-viewprogress .score {
-  text-align: right;
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
 }
 </style>

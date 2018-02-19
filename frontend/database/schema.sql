@@ -537,6 +537,23 @@ CREATE TABLE `QualityNomination_Comments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `QualityNomination_Log` (
+  `qualitynomination_log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `qualitynomination_id` int(11) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` int(11) NOT NULL,
+  `from_status` enum('open','approved','denied') NOT NULL DEFAULT 'open',
+  `to_status` enum('open','approved','denied') NOT NULL DEFAULT 'open',
+  `rationale` text,
+  PRIMARY KEY (`qualitynomination_log_id`),
+  KEY `user_id` (`user_id`),
+  KEY `qualitynomination_id` (`qualitynomination_id`),
+  CONSTRAINT `fk_qnl_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_qnl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de cambios a nominaciones';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `QualityNomination_Reviewers` (
   `qualitynomination_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
@@ -747,6 +764,7 @@ CREATE TABLE `Users` (
   `reset_digest` varchar(45) DEFAULT NULL,
   `reset_sent_at` datetime DEFAULT NULL,
   `recruitment_optin` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
+  `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
