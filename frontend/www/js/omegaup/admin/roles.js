@@ -10,10 +10,8 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-user-roles', {
         props: {
-          roleNames: payload.roleNames,
-          groupNames: payload.groupNames,
-          roles: this.roles,
-          groups: this.groups,
+          initialRoles: this.roles,
+          initialGroups: this.groups,
         },
         on: {
           'change-role': function(role, enabled) {
@@ -54,8 +52,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      roles: payload.systemRoles,
-      groups: payload.systemGroups,
+      roles: payload.rolesUser,
+      groups: payload.groupsUser,
     },
     components: {
       'omegaup-user-roles': user_Roles,

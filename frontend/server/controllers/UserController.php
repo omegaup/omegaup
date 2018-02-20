@@ -1926,11 +1926,7 @@ class UserController extends Controller {
         return $response;
     }
 
-    private static function validateAddRemoveRoleGroup(Request $r) {
-        if (!Authorization::isSystemAdmin($r['current_user_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-            throw new ForbiddenAccessException();
-        }
-
+    private static function validateUser(Request $r) {
         // Validate request
         Validators::isValidUsername($r['username'], 'username');
         try {
@@ -1941,34 +1937,45 @@ class UserController extends Controller {
         if (is_null($r['user'])) {
             throw new NotFoundException('userNotExist');
         }
-        if (isset($r['role'])) {
-            Validators::isStringNonEmpty($r['role'], 'role');
-            $role = RolesDAO::search(new Roles([
-                'name' => $r['role'],
-            ]));
-            if (sizeof($role) != 1) {
-                throw new InvalidParameterException('parameterNotFound', 'role');
-            }
-            $r['role'] = $role[0];
+    }
 
-            if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-                // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
-                throw new ForbiddenAccessException('userNotAllowed');
-            }
-        } elseif (isset($r['group'])) {
-            Validators::isStringNonEmpty($r['group'], 'group');
-            $group = GroupsDAO::search(new Groups([
-                'name' => $r['group'],
-            ]));
-            if (sizeof($group) != 1) {
-                throw new InvalidParameterException('parameterNotFound', 'group');
-            }
-            $r['group'] = $group[0];
-
-            if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-                throw new ForbiddenAccessException('userNotAllowed');
-            }
+    private static function validateAddRemoveRole(Request $r) {
+        if (!Authorization::isSystemAdmin($r['current_user_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new ForbiddenAccessException();
         }
+
+        self::validateUser($r);
+
+        Validators::isStringNonEmpty($r['role'], 'role');
+        $role = RolesDAO::search(new Roles([
+            'name' => $r['role'],
+        ]));
+        if (sizeof($role) != 1) {
+            throw new InvalidParameterException('parameterNotFound', 'role');
+        }
+        $r['role'] = $role[0];
+
+        if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+    }
+
+    private static function validateAddRemoveGroup(Request $r) {
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        self::validateUser($r);
+
+        Validators::isStringNonEmpty($r['group'], 'group');
+        $group = GroupsDAO::search(new Groups([
+            'name' => $r['group'],
+        ]));
+        if (sizeof($group) != 1) {
+            throw new InvalidParameterException('parameterNotFound', 'group');
+        }
+        $r['group'] = $group[0];
     }
 
     /**
@@ -1982,7 +1989,7 @@ class UserController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAddRemoveRoleGroup($r);
+        self::validateAddRemoveRole($r);
 
         try {
             UserRolesDAO::save(new UserRoles([
@@ -2010,7 +2017,7 @@ class UserController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAddRemoveRoleGroup($r);
+        self::validateAddRemoveRole($r);
 
         try {
             UserRolesDAO::delete(new UserRoles([
@@ -2038,7 +2045,7 @@ class UserController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAddRemoveRoleGroup($r);
+        self::validateAddRemoveGroup($r);
 
         try {
             GroupsUsersDAO::save(new GroupsUsers([
@@ -2065,7 +2072,7 @@ class UserController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAddRemoveRoleGroup($r);
+        self::validateAddRemoveGroup($r);
 
         try {
             GroupsUsersDAO::delete(new GroupsUsers([
@@ -2088,16 +2095,7 @@ class UserController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Validate request
-        Validators::isValidUsername($r['username'], 'username');
-        try {
-            $r['user'] = UsersDAO::FindByUsername($r['username']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['user'])) {
-            throw new NotFoundException('userNotExist');
-        }
+        self::validateUser($r);
 
         Validators::isStringNonEmpty($r['experiment'], 'experiment');
         if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
