@@ -794,7 +794,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsConsole: "Consola",
 	wordsContest: "Concurso",
 	wordsContests: "Concursos",
-	wordsDangerZone: "<h3>\u00c1rea Peligrosa</h3>",
+	wordsDangerZone: "\u00c1rea Peligrosa",
 	wordsDangerZoneDesc: "<p>Eliminar el problema.</p><p>Esto \u00fanicamente se puede hacer si el problema no ha sido usado en un curso o concurso.</p><p>Debes estar muy seguro de querer hacerlo, porque no hay manera de recuperarlo una vez eliminado.</p>",
 	wordsDelete: "Eliminar",
 	wordsDeleted: "Eliminado",
