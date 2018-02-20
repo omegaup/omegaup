@@ -37,7 +37,7 @@ def test_create_course(driver):
         add_problem_to_assignment(driver, assignment_alias, problem)
 
     with driver.login_user():
-        enter_to_course(driver, course_alias, assignment_alias)
+        enter_course(driver, course_alias, assignment_alias)
 
 
 @flaky
@@ -59,7 +59,7 @@ def test_user_ranking_course(driver):
         add_problem_to_assignment(driver, assignment_alias, problem)
 
     with driver.login(user, user):
-        enter_to_course(driver, course_alias, assignment_alias)
+        enter_course(driver, course_alias, assignment_alias)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -85,7 +85,7 @@ def test_user_ranking_course(driver):
         with driver.ajax_page_transition():
             contents_element.submit()
 
-        driver.update_score_manually(problem, assignment_alias)
+        driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -226,7 +226,7 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait_for_page_loaded()
 
 
-def enter_to_course(driver, course_alias, assignment_alias):
+def enter_course(driver, course_alias, assignment_alias):
     '''Enter to course previously created.'''
 
     driver.wait.until(
