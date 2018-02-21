@@ -86,10 +86,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
                   'http://timeanddate.com/worldclock/fixedtime.html?iso=' +
                   contest.finish_time.iso();
               contest.finishText = contest.finish_time.long();
-              if (typeof contest.last_updated !== 'undefined') {
-                contest.last_updated = new Date(contest.last_updated * 1000);
-                contest.publicUpdateText = contest.last_updated.long();
-              }
+              contest.publicUpdateText = contest.last_updated.long();
               self.contests.push(contest);
             });
             ko.applyBindings(self, self.domElement);

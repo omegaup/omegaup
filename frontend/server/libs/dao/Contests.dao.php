@@ -379,19 +379,15 @@ class ContestsDAO extends ContestsDAOBase {
             SELECT
                 $columns
             FROM
-                Contest_Log
-            INNER JOIN
                 Contests
-            ON
-                Contests.contest_id = Contest_Log.contest_id
             WHERE
                 $recommended_check  AND $end_check AND $query_check
-                AND `time` IN (SELECT MAX(`time`) FROM Contest_Log GROUP BY contest_id)
                 AND `public` = 1
             ORDER BY
-                `time` DESC,
-                recommended DESC,
-                finish_time DESC
+                `last_updated` DESC,
+                `recommended` DESC,
+                `finish_time` DESC,
+                `contest_id` DESC
             LIMIT ?, ?;";
 
         global $conn;
@@ -403,6 +399,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $pageSize;
+
         $rs = $conn->Execute($sql, $params);
 
         $contests = [];
@@ -465,7 +462,9 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     INNER JOIN
-                        ACLs ON ACLs.acl_id = Contests.acl_id
+                        ACLs
+                    ON
+                        ACLs.acl_id = Contests.acl_id
                     WHERE
                         Contests.public = 0 AND ACLs.owner_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -486,7 +485,9 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     INNER JOIN
-                        Problemset_Users ON Contests.problemset_id = Problemset_Users.problemset_id
+                        Problemset_Users
+                    ON
+                        Contests.problemset_id = Problemset_Users.problemset_id
                     WHERE
                         Contests.public = 0 AND Problemset_Users.user_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -507,7 +508,9 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      INNER JOIN
-                         User_Roles ON User_Roles.acl_id = Contests.acl_id
+                         User_Roles
+                     ON
+                         User_Roles.acl_id = Contests.acl_id
                      WHERE
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
@@ -533,7 +536,9 @@ class ContestsDAO extends ContestsDAOBase {
                      INNER JOIN
                          Group_Roles ON Contests.acl_id = Group_Roles.acl_id
                      INNER JOIN
-                         Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
+                         Groups_Users
+                     ON
+                         Groups_Users.group_id = Group_Roles.group_id
                      WHERE
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND

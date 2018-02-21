@@ -844,6 +844,7 @@ class ContestController extends Controller {
         $contest->description = $r['description'];
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
+        $contest->last_updated = empty($r['last_updated']) ? null : gmdate('Y-m-d H:i:s', $r['last_updated']);
         $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
         $contest->rerun_id = 0; // NYI
         $contest->alias = $r['alias'];
@@ -2267,7 +2268,7 @@ class ContestController extends Controller {
     /**
      * This function reviews changes in penalty type and visibility type
      */
-    private static function updateContest(Contests $contest, $original_contest, $user_id) {
+    private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
         if ($original_contest->public !== $contest->public) {
             $timestamp = gmdate('Y-m-d H:i:s', Time::get());
             ContestLogDAO::save(new ContestLog([

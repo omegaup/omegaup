@@ -18,3 +18,6 @@ CREATE TABLE `Contest_Log` (
 
 ALTER TABLE `Contests`
   ADD COLUMN `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizó de privado a público un concurso o viceversa' AFTER `finish_time`;
+
+UPDATE `Contests`
+  SET `last_updated` = `start_time`;

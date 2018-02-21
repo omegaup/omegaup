@@ -162,6 +162,9 @@ export let OmegaUp = {
         if (item.hasOwnProperty('finish_time')) {
           item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
         }
+        if (item.hasOwnProperty('last_updated')) {
+          item.last_updated = OmegaUp.remoteTime(item.last_updated * 1000);
+        }
         if (item.hasOwnProperty('submission_deadline')) {
           item.submission_deadline =
               OmegaUp.remoteTime(item.submission_deadline * 1000);

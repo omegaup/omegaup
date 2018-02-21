@@ -22,6 +22,7 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('languages', $this->params, false);
         ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
         ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 
@@ -54,6 +55,7 @@ class ContestParams implements ArrayAccess {
             'languages' => $contest->languages,
             'start_time' => $contest->start_time,
             'finish_time' => $contest->finish_time,
+            'last_updated' => $contest->last_updated,
             'penalty_calc_policy' => $contest->penalty_calc_policy,
         ]);
     }
@@ -99,12 +101,14 @@ class ContestsFactory {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }
+
         // Set context
         $r = new Request();
         $r['title'] = $params['title'];
         $r['description'] = 'description';
         $r['start_time'] = $params['start_time'];
         $r['finish_time'] = $params['finish_time'];
+        $r['last_updated'] = $params['last_updated'];
         $r['window_length'] = null;
         $r['public'] = $params['public'];
         $r['alias'] = substr($params['title'], 0, 20);
@@ -149,7 +153,7 @@ class ContestsFactory {
         // Call the API
         $response = ContestController::apiCreate($r);
         if ($params['public'] === 1) {
-            self::forcePublic($contestData);
+            self::forcePublic($contestData, $params['last_updated']);
             $r['public'] = 1;
         }
 
@@ -290,9 +294,10 @@ class ContestsFactory {
         ContestsDAO::save($contest);
     }
 
-    public static function forcePublic($contestData) {
+    public static function forcePublic($contestData, $last_updated = null) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->public = 1;
+        $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
         ContestsDAO::save($contest);
     }
 
