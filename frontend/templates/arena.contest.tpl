@@ -1,4 +1,9 @@
-{include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true}
+{if isset($isCourse) and $isCourse}
+    {include file='head.tpl' jsfile={version_hash src='/ux/assignment.js'} inContest=$showNavigation inArena=true}
+{elseif isset($isArena) and $isArena}
+    {include file='head.tpl' jsfile={version_hash src='/js/interviews.arena.contest.js'} inContest=$showNavigation inArena=true}
+{/if}
+
 {if $admin}
 			<audio id="notification-audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />

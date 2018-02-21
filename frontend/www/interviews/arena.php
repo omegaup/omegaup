@@ -19,7 +19,7 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/interviews.arena.intro.tpl');
 } else {
-    $smarty->assign('jsfile', '/js/interviews.arena.contest.js');
+    $smarty->assign('isArena', true);
     $smarty->assign('admin', false);
     $smarty->assign('showDeadlines', false);
     $smarty->assign('showClarifications', true);
