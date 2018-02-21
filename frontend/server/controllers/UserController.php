@@ -73,6 +73,9 @@ class UserController extends Controller {
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
+        if (isset($r['is_private'])) {
+            $user_data['is_private'] = $r['is_private'];
+        }
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
         }
