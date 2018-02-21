@@ -124,6 +124,7 @@ class UserController extends Controller {
         }
 
         $user = new Users($user_data);
+        $identity = new Identities($user_data);
 
         $email = new Emails([
             'email' => $r['email'],
@@ -140,6 +141,10 @@ class UserController extends Controller {
 
             $user->main_email_id = $email->email_id;
             UsersDAO::save($user);
+
+            $identity->main_user_id = $user->user_id;
+            $identity->username = $user->username;
+            IdentitiesDAO::save($identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -395,6 +400,7 @@ class UserController extends Controller {
 
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
+                $identity = IdentitiesDAO::FindByUsername($r['username']);
 
                 if (is_null($user)) {
                     throw new NotFoundException('userNotExist');
@@ -409,6 +415,7 @@ class UserController extends Controller {
             }
         } else {
             $user = $r['current_user'];
+            $identity = IdentitiesDAO::FindByUserId($r['current_user']->user_id);
 
             if ($user->password != null) {
                 // Check the old password
@@ -429,7 +436,9 @@ class UserController extends Controller {
         }
 
         $user->password = $hashedPassword;
+        $identity->password = $hashedPassword;
         UsersDAO::save($user);
+        IdentitiesDAO::save($identity);
 
         return ['status' => 'ok'];
     }
@@ -1657,9 +1666,11 @@ class UserController extends Controller {
         ];
 
         self::updateValueProperties($r, $r['current_user'], $valueProperties);
+        $identity = IdentityController::createInstanceOfIdentity($r['current_user']);
 
         try {
             UsersDAO::save($r['current_user']);
+            IdentitiesDAO::save($identity);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
