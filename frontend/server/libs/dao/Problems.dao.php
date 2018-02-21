@@ -354,7 +354,15 @@ class ProblemsDAO extends ProblemsDAOBase {
             WHERE
                 u.user_id = ?
             AND
-                r.verdict <> 'AC'";
+                (SELECT
+                    COUNT(*)
+                 FROM
+                    Runs r2
+                 WHERE
+                    r2.user_id = u.user_id AND
+                    r2.problem_id = p.problem_id AND
+                    r2.verdict = 'AC'
+                ) = 0";
 
         $params = [$user_id];
 

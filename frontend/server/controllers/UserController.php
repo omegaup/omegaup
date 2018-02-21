@@ -1455,8 +1455,10 @@ class UserController extends Controller {
      */
     public static function apiListUnsolvedProblems(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
-        $response = [];
-        $response['problems'] = [];
+        $response = [
+            'problems' => [],
+            'status' => 'ok',
+        ];
 
         $user = self::resolveTargetUser($r);
 
@@ -1466,14 +1468,13 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!is_null($db_results)) {
-            $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
-            foreach ($db_results as $problem) {
-                if (ProblemsDAO::isVisible($problem)) {
-                    array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
-                }
+        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        foreach ($db_results as $problem) {
+            if (ProblemsDAO::isVisible($problem)) {
+                array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
             }
         }
+
         $response['status'] = 'ok';
         return $response;
     }

@@ -590,28 +590,32 @@ class ProblemList extends OmegaupTestCase {
      */
     public function testListUnsolvedProblemsByUser() {
         $user = UserFactory::createUser();
-        // Create 5 random problems
+        /* Five different problems, each variable has its expected final verdict as suffix */
         $problemDataAC = ProblemsFactory::createProblem();
         $problemDataAC2 = ProblemsFactory::createProblem();
-        $problemDataTLE = ProblemsFactory::createProblem();
         $problemDataWA = ProblemsFactory::createProblem();
         $problemDataPE = ProblemsFactory::createProblem();
 
-        // Create one run for each problem, 2 problems will be accepted and 3 non accepted
+        /*----------------- Different runs for each problem -----------------*/
+        // problemDataWA will have only one run with a WA verdict
+        $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $user);
+        RunsFactory::gradeRun($runDataWA, '0.0', 'WA');
+
+        // problemDataAC will have only one AC run
         $runDataAC = RunsFactory::createRunToProblem($problemDataAC, $user);
         RunsFactory::gradeRun($runDataAC);
 
-        $runDataAC2 = RunsFactory::createRunToProblem($problemDataAC2, $user);
-        RunsFactory::gradeRun($runDataAC2);
+        // problemDataAC2 will have three runs, one AC, one PE and one TLE
+        $runDataAC2_1 = RunsFactory::createRunToProblem($problemDataAC2, $user);
+        RunsFactory::gradeRun($runDataAC2_1, '0.05', 'PE');
+        $runDataAC2_2 = RunsFactory::createRunToProblem($problemDataAC2, $user);
+        RunsFactory::gradeRun($runDataAC2_2, '0.04', 'TLE');
+        $runDataAC2_3 = RunsFactory::createRunToProblem($problemDataAC2, $user);
+        RunsFactory::gradeRun($runDataAC2_3);
 
-        $runDataTLE = RunsFactory::createRunToProblem($problemDataTLE, $user);
-        RunsFactory::gradeRun($runDataTLE, '.123456', 'TLE');
-
-        $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $user);
-        RunsFactory::gradeRun($runDataWA, '.05', 'WA');
-
+        // problemDataPE will have only one run with a PE verdict
         $runDataPE = RunsFactory::createRunToProblem($problemDataPE, $user);
-        RunsFactory::gradeRun($runDataPE, '.20', 'PE');
+        RunsFactory::gradeRun($runDataPE, '0.10', 'PE');
 
         // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
         $r = new Request([
@@ -621,20 +625,31 @@ class ProblemList extends OmegaupTestCase {
 
         $response = UserController::apiListUnsolvedProblems($r);
 
-        // Validate results
+        /* -------- VALIDATE RESULTS -------*/
+
+        // Expected to have only two problems as response.
+        if (count($response['problems']) !== 2) {
+            $this -> fail('Expected to have only 2 problems as response.');
+        }
+
         foreach ($response['problems'] as $responseProblem) {
             // The title should match one of the non accepted problems's titles.
-            if ($responseProblem['title'] === $problemDataAC['problem']->title ||
-                $responseProblem['title'] === $problemDataAC2['problem']->title) {
-                $this -> fail('Expected to see a non ACCEPTED problem.');
-            } elseif ($responseProblem['title'] === $problemDataTLE['problem']->title) {
-                $this -> assertEquals($responseProblem['title'], $problemDataTLE['problem']->title);
-            } elseif ($responseProblem['title'] === $problemDataWA['problem']->title) {
-                $this -> assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
-            } elseif ($responseProblem['title'] === $problemDataPE['problem']->title) {
-                $this -> assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
-            } else {
-                $this -> fail('Expected to see only problems tried (but not solved) by the user.');
+            switch ($responseProblem['title']) {
+                case $problemDataAC['problem']->title:
+                case $problemDataAC2['problem']->title:
+                    $this -> fail('Expected to see a non ACCEPTED problem.');
+                    break;
+
+                case $problemDataPE['problem']->title:
+                    $this -> assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
+                    break;
+
+                case $problemDataWA['problem']->title:
+                    $this -> assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
+                    break;
+
+                default:
+                    $this -> fail('Expected to see only problems tried (but not solved) by the user.');
             }
         }
     }
