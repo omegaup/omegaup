@@ -459,7 +459,7 @@ omegaup.OmegaUp.loadTranslations({
 	privateUsers: "Usuarios privados",
 	privateUsersContainsInvalidUser: "Lista de usuarios privados contiene un usuario que no existe",
 	probAliasAndContestAliasInvalid: "Alias de problema y alias de concurso combinacion es invalida",
-	problemDeleted: "El problema fue eliminado exit\u00f3samente",
+	problemDeleted: "El problema fue eliminado exitosamente",
 	problemDeployerCorruptZip: "No se pudo abrir el archivo .zip. Ya sea est\u00e1 corrupto o no se subi\u00f3 correctamente.",
 	problemDeployerEmptyStatement: "La redacci\u00f3n en \"%(file)\" est\u00e1 vac\u00eda",
 	problemDeployerExceededZipSizeLimit: "El tama\u00f1o del .zip despu\u00e9s de descomprimir (%(size)) es mayor al l\u00edmite de (%(max_size)). Rechazando.",

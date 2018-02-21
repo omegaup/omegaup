@@ -455,7 +455,7 @@ privacyPolicyNotice = "Al dar click en Registrar aceptas las <a href=\"http://bl
 privateUsers = "Usuarios privados"
 privateUsersContainsInvalidUser = "Lista de usuarios privados contiene un usuario que no existe"
 probAliasAndContestAliasInvalid = "Alias de problema y alias de concurso combinacion es invalida"
-problemDeleted = "El problema fue eliminado exitósamente"
+problemDeleted = "El problema fue eliminado exitosamente"
 problemDeployerCorruptZip = "No se pudo abrir el archivo .zip. Ya sea está corrupto o no se subió correctamente."
 problemDeployerEmptyStatement = "La redacción en \"%(file)\" está vacía"
 problemDeployerExceededZipSizeLimit = "El tamaño del .zip después de descomprimir (%(size)) es mayor al límite de (%(max_size)). Rechazando."
