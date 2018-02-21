@@ -12,24 +12,23 @@ UITools::redirectToLoginIfNotLoggedIn();
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
-// TODO: Also support GroupRoles.
 $systemRoles = UserRolesDAO::getSystemRoles($session['user']->user_id);
 $roles = RolesDAO::getAll();
 $systemGroups = UserRolesDAO::getSystemGroups($session['user']->user_id);
 $groups = GroupsDAO::SearchByName('omegaup:');
-$rolesUser = [];
-$groupsUser = [];
+$userSystemRoles = [];
+$userSystemGroups = [];
 foreach ($roles as $key => $role) {
-    $rolesUser[$key]['title'] = $role->name;
-    $rolesUser[$key]['value'] = in_array($role->name, $systemRoles);
+    $userSystemRoles[$key]['title'] = $role->name;
+    $userSystemRoles[$key]['value'] = in_array($role->name, $systemRoles);
 }
 foreach ($groups as $key => $group) {
-    $groupsUser[$key]['title'] = $group->name;
-    $groupsUser[$key]['value'] = in_array($group->name, $systemGroups);
+    $userSystemGroups[$key]['title'] = $group->name;
+    $userSystemGroups[$key]['value'] = in_array($group->name, $systemGroups);
 }
 $payload = [
-    'rolesUser' => $rolesUser,
-    'groupsUser' => $groupsUser,
+    'userSystemRoles' => $userSystemRoles,
+    'userSystemGroups' => $userSystemGroups,
     'username' => $session['user']->username,
 ];
 

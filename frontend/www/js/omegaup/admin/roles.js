@@ -52,8 +52,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      roles: payload.rolesUser,
-      groups: payload.groupsUser,
+      roles: payload.userSystemRoles,
+      groups: payload.userSystemGroups,
     },
     components: {
       'omegaup-user-roles': user_Roles,

@@ -2035,7 +2035,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Adds the group to the user.
+     * Adds the user to the group.
      *
      * @param Request $r
      */
@@ -2062,7 +2062,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Removes the group from the user.
+     * Removes the user to the group.
      *
      * @param Request $r
      */
