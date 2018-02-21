@@ -584,4 +584,58 @@ class ProblemList extends OmegaupTestCase {
             }
         }
     }
+
+    /**
+     * Test getting the list of Problems unsolved by some user.
+     */
+    public function testListUnsolvedProblemsByUser() {
+        $user = UserFactory::createUser();
+        // Create 5 random problems
+        $problemDataAC = ProblemsFactory::createProblem();
+        $problemDataAC2 = ProblemsFactory::createProblem();
+        $problemDataTLE = ProblemsFactory::createProblem();
+        $problemDataWA = ProblemsFactory::createProblem();
+        $problemDataPE = ProblemsFactory::createProblem();
+
+        // Create one run for each problem, 2 problems will be accepted and 3 non accepted
+        $runDataAC = RunsFactory::createRunToProblem($problemDataAC, $user);
+        RunsFactory::gradeRun($runDataAC);
+
+        $runDataAC2 = RunsFactory::createRunToProblem($problemDataAC2, $user);
+        RunsFactory::gradeRun($runDataAC2);
+
+        $runDataTLE = RunsFactory::createRunToProblem($problemDataTLE, $user);
+        RunsFactory::gradeRun($runDataTLE, '.123456', 'TLE');
+
+        $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $user);
+        RunsFactory::gradeRun($runDataWA, '.05', 'WA');
+
+        $runDataPE = RunsFactory::createRunToProblem($problemDataPE, $user);
+        RunsFactory::gradeRun($runDataPE, '.20', 'PE');
+
+        // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
+        $r = new Request([
+            'user_id' => $user->user_id,
+            'username' => $user->username,
+        ]);
+
+        $response = UserController::apiListUnsolvedProblems($r);
+
+        // Validate results
+        foreach ($response['problems'] as $responseProblem) {
+            // The title should match one of the non accepted problems's titles.
+            if ($responseProblem['title'] === $problemDataAC['problem']->title ||
+                $responseProblem['title'] === $problemDataAC2['problem']->title) {
+                $this -> fail('Expected to see a non ACCEPTED problem.');
+            } elseif ($responseProblem['title'] === $problemDataTLE['problem']->title) {
+                $this -> assertEquals($responseProblem['title'], $problemDataTLE['problem']->title);
+            } elseif ($responseProblem['title'] === $problemDataWA['problem']->title) {
+                $this -> assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
+            } elseif ($responseProblem['title'] === $problemDataPE['problem']->title) {
+                $this -> assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
+            } else {
+                $this -> fail('Expected to see only problems tried (but not solved) by the user.');
+            }
+        }
+    }
 }
