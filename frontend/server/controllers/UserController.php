@@ -1465,6 +1465,39 @@ class UserController extends Controller {
     }
 
     /**
+     * Get Problems unsolved by user
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $response = [
+            'problems' => [],
+            'status' => 'ok',
+        ];
+
+        $user = self::resolveTargetUser($r);
+
+        try {
+            $db_results = ProblemsDAO::getProblemsUnsolvedByUser($user->user_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        foreach ($db_results as $problem) {
+            if (ProblemsDAO::isVisible($problem)) {
+                array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
+            }
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
