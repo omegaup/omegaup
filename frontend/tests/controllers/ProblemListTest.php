@@ -618,38 +618,34 @@ class ProblemList extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPE, '0.10', 'PE');
 
         // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
-        $r = new Request([
+        $response = UserController::apiListUnsolvedProblems(new Request([
             'user_id' => $user->user_id,
             'username' => $user->username,
         ]);
 
-        $response = UserController::apiListUnsolvedProblems($r);
-
         /* -------- VALIDATE RESULTS -------*/
 
         // Expected to have only two problems as response.
-        if (count($response['problems']) !== 2) {
-            $this -> fail('Expected to have only 2 problems as response.');
-        }
+        $this->assertEquals(count($response['problems']), 2, 'Expected to have only 2 problems as response.');
 
         foreach ($response['problems'] as $responseProblem) {
             // The title should match one of the non accepted problems's titles.
             switch ($responseProblem['title']) {
                 case $problemDataAC['problem']->title:
                 case $problemDataAC2['problem']->title:
-                    $this -> fail('Expected to see a non ACCEPTED problem.');
+                    $this->fail('Expected to see a non ACCEPTED problem.');
                     break;
 
                 case $problemDataPE['problem']->title:
-                    $this -> assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
+                    $this->assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
                     break;
 
                 case $problemDataWA['problem']->title:
-                    $this -> assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
+                    $this->assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
                     break;
 
                 default:
-                    $this -> fail('Expected to see only problems tried (but not solved) by the user.');
+                    $this->fail('Expected to see only problems tried (but not solved) by the user.');
             }
         }
     }
