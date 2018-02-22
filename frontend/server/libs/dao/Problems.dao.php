@@ -134,7 +134,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args[] = $query;
             } else {
                 // Finish the WHERE clause opened by addTagFilter
-                $sql .= ' TRUE';
+                $sql .= ' p.visibility > ?';
+                $args[] = ProblemController::VISIBILITY_DELETED;
             }
         } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
             $select = '
@@ -180,9 +181,10 @@ class ProblemsDAO extends ProblemsDAOBase {
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
             $sql .= '
-                (p.visibility >= ? OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
+                (p.visibility >= ? OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
             $args[] = $user_id;
+            $args[] = ProblemController::VISIBILITY_DELETED;
 
             if (!is_null($query)) {
                 $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
@@ -505,9 +507,10 @@ class ProblemsDAO extends ProblemsDAOBase {
             LEFT JOIN
                 Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
+                (a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gu.user_id = ?)) AND
+                p.visibility > ?
             GROUP BY
                 p.problem_id
             ORDER BY
@@ -520,6 +523,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             $user_id,
             Authorization::ADMIN_ROLE,
             $user_id,
+            ProblemController::VISIBILITY_DELETED,
             $offset,
             $pageSize,
         ];
@@ -551,13 +555,15 @@ class ProblemsDAO extends ProblemsDAOBase {
             INNER JOIN
                 ACLs AS a ON a.acl_id = p.acl_id
             WHERE
-                a.owner_id = ?
+                a.owner_id = ? AND
+                p.visibility > ?
             ORDER BY
                 p.problem_id DESC
             LIMIT
                 ?, ?';
         $params = [
             $user_id,
+            ProblemController::VISIBILITY_DELETED,
             $offset,
             $pageSize,
         ];
@@ -570,6 +576,26 @@ class ProblemsDAO extends ProblemsDAOBase {
             array_push($problems, new Problems($row));
         }
         return $problems;
+    }
+
+    /**
+     * Return all problems, except deleted
+     */
+    final public static function getAllProblems($page, $cols_per_page, $order, $order_type) {
+        $sql = 'SELECT * from Problems where `visibility` > ? ';
+        global $conn;
+        if (!is_null($order)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+        }
+        if (!is_null($page)) {
+            $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
+        }
+        $rs = $conn->Execute($sql, [ProblemController::VISIBILITY_DELETED]);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = new Problems($row);
+        }
+        return $allData;
     }
 
     final public static function getUsersInGroupWhoAttemptedProblem(
@@ -608,5 +634,35 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function isVisible(Problems $problem) {
         return ((int) $problem->visibility) >= 1;
+    }
+
+    public static function deleteProblem($problem_id) {
+        $sql = 'UPDATE
+                    `Problems`
+                SET
+                    `visibility` = ?
+                WHERE
+                    `problem_id` = ?;';
+        $params = [
+            ProblemController::VISIBILITY_DELETED,
+            $problem_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
+        global $conn;
+
+        $sql = 'SELECT
+                    COUNT(1)
+                FROM
+                    `Runs`
+                WHERE
+                    `problemset_id` IS NOT NULL
+                    AND `problem_id` = ?';
+
+        return $conn->GetOne($sql, $problem->problem_id);
     }
 }
