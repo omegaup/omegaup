@@ -53,8 +53,11 @@ omegaup.OmegaUp.on('ready', function() {
         $('#school_id').val(data.userinfo.school_id);
         $('#school').val(data.userinfo.school);
         $('#programming_language').val(data.userinfo.preferred_language);
+        $('#is_private').prop('checked', data.userinfo.is_private == 1);
         $('#recruitment_optin')
             .prop('checked', data.userinfo.recruitment_optin == 1);
+        $('#hide_problem_tags')
+            .prop('checked', data.userinfo.hide_problem_tags == 1);
 
         original_locale = data.userinfo.locale;
         original_school = data.userinfo.school;
@@ -95,8 +98,11 @@ omegaup.OmegaUp.on('ready', function() {
                           school_name: $('#school').val(),
                           locale: $('#locale').val(),
                           preferred_language: $('#programming_language').val(),
+                          is_private: $('#is_private').prop('checked') ? 1 : 0,
                           recruitment_optin:
-                              $('#recruitment_optin').prop('checked') ? 1 : 0
+                              $('#recruitment_optin').prop('checked') ? 1 : 0,
+                          hide_problem_tags:
+                              $('#hide_problem_tags').prop('checked') ? 1 : 0
                         })
             .then(function(response) {
               if (locale_changed) {

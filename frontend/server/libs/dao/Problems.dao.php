@@ -235,6 +235,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
         $problems = [];
+        $hiddenTags = $user_type !== USER_ANONYMOUS ? UsersDao::getHideTags($user_id) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -244,7 +245,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $problem['score'] = $row['score'];
                 $problem['points'] = $row['points'];
                 $problem['ratio'] = $row['ratio'];
-                $problem['tags'] = ProblemsDAO::getTagsForProblem($temp, true);
+                $problem['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($temp, true);
                 array_push($problems, $problem);
             }
         }
@@ -334,6 +335,47 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
 
         return $result;
+    }
+
+    final public static function getProblemsUnsolvedByUser(
+        $user_id
+    ) {
+        $sql = "
+            SELECT
+                p.*
+            FROM
+                Users u
+            INNER JOIN
+                Runs r
+            ON
+                r.user_id = u.user_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = r.problem_id
+            WHERE
+                u.user_id = ?
+            AND
+                (SELECT
+                    COUNT(*)
+                 FROM
+                    Runs r2
+                 WHERE
+                    r2.user_id = u.user_id AND
+                    r2.problem_id = p.problem_id AND
+                    r2.verdict = 'AC'
+                ) = 0";
+
+        $params = [$user_id];
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $problems = [];
+        foreach ($rs as $r) {
+            array_push($problems, new Problems($r));
+        }
+        return $problems;
     }
 
     final public static function isProblemSolved(Problems $problem, Users $user) {
