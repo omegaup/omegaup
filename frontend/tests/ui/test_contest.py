@@ -4,13 +4,16 @@
 '''Run Selenium contest tests.'''
 
 import os
-
-from flaky import flaky
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
+import sys
 
 _OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
+sys.path.append('%s/frontend/tests/ui/' % _OMEGAUP_ROOT)
+# pylint: disable=wrong-import-position
+import util  # NOQA
+from flaky import flaky  # NOQA
+from selenium.webdriver.common.by import By  # NOQA
+from selenium.webdriver.support import expected_conditions as EC  # NOQA
+from selenium.webdriver.support.select import Select  # NOQA
 
 
 @flaky
@@ -24,7 +27,7 @@ def test_create_contest(driver):
     user1 = 'unittest_user_1_%s' % run_id
     user2 = 'unittest_user_2_%s' % run_id
     password = 'P@55w0rd'
-    users = '%s, %s, %s' % (user, user1, user2)
+    users = '%s, %s' % (user1, user2)
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
@@ -38,6 +41,7 @@ def test_create_contest(driver):
         add_problem_to_contest(driver, problem)
 
         add_students_mass(driver, users)
+        util.add_students(driver, [user], 'contest')
 
         contest_url = '/arena/%s' % contest_alias
         driver.wait.until(
@@ -80,7 +84,7 @@ def test_create_contest(driver):
         contents_element = driver.browser.find_element_by_css_selector(
             '#submit input[type="file"]')
         contents_element.send_keys(os.path.join(
-            _OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
+            util.OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
         with driver.ajax_page_transition():
             contents_element.submit()
 
@@ -118,22 +122,6 @@ def create_contest(driver, contest_alias):
 
     with driver.ajax_page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
-
-
-def add_students(driver, users):
-    '''Add students to a recently created contest.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "#contestants")]')))).click()
-
-    for user in users:
-        driver.typeahead_helper('#contestants', user)
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CLASS_NAME, ('user-add-single')))).click()
-        driver.wait_for_page_loaded()
 
 
 def add_students_mass(driver, users):
@@ -177,10 +165,12 @@ def enter_contest(driver, contest_alias):
         EC.element_to_be_clickable(
             (By.XPATH, '//a[@href = "/arena/"]'))).click()
     driver.wait_for_page_loaded()
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//a[contains(@href, "#list-past-contest")]'))).click()
     driver.wait_for_page_loaded()
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,

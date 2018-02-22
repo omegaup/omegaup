@@ -4,12 +4,16 @@
 '''Run Selenium end-to-end tests.'''
 
 import os
-
-from flaky import flaky
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+import sys
 
 _OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
+sys.path.append('%s/frontend/tests/ui/' % _OMEGAUP_ROOT)
+# pylint: disable=wrong-import-position
+import util  # NOQA
+
+from flaky import flaky  # NOQA
+from selenium.webdriver.common.by import By  # NOQA
+from selenium.webdriver.support import expected_conditions as EC  # NOQA
 
 
 @flaky
@@ -68,7 +72,7 @@ def test_create_problem(driver):
         contents_element = driver.browser.find_element_by_name(
             'problem_contents')
         contents_element.send_keys(os.path.join(
-            _OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
+            util.OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
         with driver.ajax_page_transition(wait_for_ajax=False):
             contents_element.submit()
 
