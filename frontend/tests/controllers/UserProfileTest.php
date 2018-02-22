@@ -26,8 +26,8 @@ class UserProfileTest extends OmegaupTestCase {
 	 * Test for the function which returns the general user info
 	 */
     public function testUserDataAnotherUser() {
-        $user = UserFactory::createUser('testuser3');
-        $user2 = UserFactory::createUser('testuser4');
+        $user = UserFactory::createUser('testuser2');
+        $user2 = UserFactory::createUser('testuser3');
 
         $login = self::login($user);
         $r = new Request([
@@ -42,13 +42,44 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-     * Test admin can see emails for all profiles
+	 * Test apiProfile with is_private enabled
+	 */
+    public function testUserPrivateDataAnotherUser() {
+        $user = UserFactory::createUser();
+        // Mark user2's profile as private (5th argument)
+        $user2 = UserFactory::createUser(null, null, null, true, true);
+
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $user2->username
+        ]);
+        $response = UserController::apiProfile($r);
+
+        $visibleAttributes = ['is_private', 'username', 'rankinfo'];
+        foreach ($response['userinfo'] as $k => $v) {
+            if (in_array($k, $visibleAttributes)) {
+                continue;
+            }
+            $this->assertNull($v);
+        }
+        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+            if ($k == 'status') {
+                continue;
+            }
+            $this->assertNull($v);
+        }
+        $this->assertEquals($user2->username, $response['userinfo']['username']);
+    }
+
+    /*
+     * Test admin can see emails for all non-private profiles
      */
     public function testAdminCanSeeEmails() {
         $user = UserFactory::createUser();
         $admin = UserFactory::createAdminUser();
 
-        $login = self::login($user);
+        $login = self::login($admin);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username
@@ -56,6 +87,32 @@ class UserProfileTest extends OmegaupTestCase {
         $response = UserController::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
+    }
+
+    /*
+     * Test admin can see all details for private profiles
+     */
+    public function testAdminCanSeePrivateProfile() {
+        $user = UserFactory::createUser(null, null, null, true, true);
+        $admin = UserFactory::createAdminUser();
+
+        $login = self::login($admin);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $user->username
+        ]);
+        $response = UserController::apiProfile($r);
+
+        $this->assertArrayHasKey('email', $response['userinfo']);
+        $visibleAttributes = ['email', 'gravatar_92', 'name', 'solved', 'submissions', 'username', 'rankinfo'];
+        foreach ($response['userinfo'] as $k => $v) {
+            if (in_array($k, $visibleAttributes)) {
+                $this->assertNotNull($v);
+            }
+        }
+        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+            $this->assertNotNull($v);
+        }
     }
 
     /*
