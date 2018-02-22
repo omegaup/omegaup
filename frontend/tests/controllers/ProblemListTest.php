@@ -621,7 +621,7 @@ class ProblemList extends OmegaupTestCase {
         $response = UserController::apiListUnsolvedProblems(new Request([
             'user_id' => $user->user_id,
             'username' => $user->username,
-        ]);
+        ]));
 
         /* -------- VALIDATE RESULTS -------*/
 
