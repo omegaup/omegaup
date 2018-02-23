@@ -116,8 +116,24 @@
 					<div class="form-group">
 						<span class="col-md-4 control-label">&nbsp;</span>
 						<div class="col-md-7">
-							<input type="checkbox" id="recruitment_optin" name='recruitment_optin'>
+							<input type="checkbox" id="is_private" name="is_private">
+							<label for="is_private" style="display: inline;">{#userEditPrivateProfile#}</label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<span class="col-md-4 control-label">&nbsp;</span>
+						<div class="col-md-7">
+							<input type="checkbox" id="recruitment_optin" name="recruitment_optin">
 							<label for="recruitment_optin" style="display: inline;">{#userEditRecruitmentOptin#}</label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<span class="col-md-4 control-label">&nbsp;</span>
+						<div class="col-md-7">
+							<input type="checkbox" id="hide_problem_tags" name="hide_problem_tags">
+							<label for="hide_problem_tags">{#userEditHideProblemTags#}</label>
 						</div>
 					</div>
 

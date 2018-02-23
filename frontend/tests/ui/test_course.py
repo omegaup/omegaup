@@ -3,10 +3,14 @@
 
 '''Run Selenium course tests.'''
 
+import os
+
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
+
+_OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 
 @flaky
@@ -34,6 +38,90 @@ def test_create_course(driver):
 
     with driver.login_user():
         enter_to_course(driver, course_alias, assignment_alias)
+
+
+@flaky
+def test_user_ranking_course(driver):
+    '''Creates a course and students to participate make submits to problems'''
+
+    run_id = driver.generate_id()
+
+    course_alias = 'ut_rank_course_%s' % run_id
+    school_name = 'ut_rank_school_%s' % run_id
+    assignment_alias = 'ut_rank_homework_%s' % run_id
+    problem = 'sumas'
+    user = 'user'
+
+    with driver.login_admin():
+        create_course(driver, course_alias, school_name)
+        add_students(driver, [user])
+        add_assignment(driver, assignment_alias)
+        add_problem_to_assignment(driver, assignment_alias, problem)
+
+    with driver.login(user, user):
+        enter_to_course(driver, course_alias, assignment_alias)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, "new-run")]')))).click()
+
+        language = 'C++11'
+
+        Select(driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//select[@name = "language"]')))).select_by_visible_text(
+                     language)
+
+        contents_element = driver.browser.find_element_by_css_selector(
+            '#submit input[type="file"]')
+        contents_element.send_keys(os.path.join(
+            _OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
+        with driver.ajax_page_transition():
+            contents_element.submit()
+
+        driver.update_score_manually(problem, assignment_alias)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'button.details'))).click()
+
+        assert (('show-run:') in
+                driver.browser.current_url), driver.browser.current_url
+
+    with driver.login_admin():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "/schools/"]'))).click()
+        driver.wait_for_page_loaded()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, ('//a[@href = "/course/"]')))).click()
+        driver.wait_for_page_loaded()
+
+        course_url = '/course/%s' % course_alias
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[@href = "%s"]' % course_url))).click()
+        driver.wait_for_page_loaded()
+
+        progress_url = '/course/%s/students/' % course_alias
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[@href = "%s"]' % progress_url)))).click()
+        driver.wait_for_page_loaded()
+
+        assert driver.browser.find_element_by_css_selector(
+            'td.score').text == '100'
 
 
 def create_course(driver, course_alias, school_name):
