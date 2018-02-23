@@ -147,6 +147,17 @@
 						</div>
 						<p class="help-block">{#contestNewFormBasicInformationRequiredDesc#}</p>
 					</div>
+
+					<div class="form-group col-md-6">
+						<label for="user-information-required">{#contestNewFormUserInformationRequired#}</label>
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" id="user-information-required" name="user_information_required">
+								{#wordsEnable#}
+							</label>
+						</div>
+						<p class="help-block">{#contestNewFormUserInformationRequiredDesc#}</p>
+					</div>
 				</div>
 
 				{if $IS_UPDATE eq 1}

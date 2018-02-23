@@ -20,11 +20,26 @@
 				<form id="start-contest-form" method="POST" action="/">
 					{if !$needsBasicInformation}
 					    <p>{#aboutToStart#}</p>
+					    <input type="hidden" id="basic-information-needed" value="0">
 					{else}
 					    <p>{#courseBasicInformationNeeded#}</p>
+					    <input type="hidden" id="basic-information-needed" value="1">
+					{/if}
+					{if !$needsUserInfo}
+					    <p>{#aboutToStart#}</p>
+					{else}
+					    <p>{#contestUserInformationNeeded#}</p>
+					    <p>
+					    	<label>
+					    		<input type="radio" name="sharing-user-information" value="1"> {#wordsYes#}
+					    	</label>
+					    	<label>
+					    		<input type="radio" name="sharing-user-information" value="0"> {#wordsNo#}
+					    	</label>
+					    </p>
 					{/if}
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
-					{if $needsBasicInformation} disabled="true"{/if}>{#startContest#}</button>
+					{if $needsBasicInformation || $needsUserInfo} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 

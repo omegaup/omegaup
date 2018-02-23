@@ -28,7 +28,8 @@ if ($intro_details['shouldShowResults']) {
         'currentUsername' => $session['user']->username,
         'needsBasicInformation' => $intro_details['basic_information_required'] && !is_null($session['user']) && (
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
-        )
+        ),
+        'needsUserInformation' => $intro_details['user_information_required'] && !is_null($session['user'])
     ]);
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {

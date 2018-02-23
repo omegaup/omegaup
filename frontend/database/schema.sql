@@ -169,6 +169,7 @@ CREATE TABLE `Courses` (
   `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
   `school_id` int(11) DEFAULT NULL,
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
+  `needs_user_info` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
@@ -267,6 +268,7 @@ CREATE TABLE `Groups_Scoreboards_Contests` (
 CREATE TABLE `Groups_Users` (
   `group_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `accept_disclose_info` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`group_id`,`user_id`),
   KEY `user_id` (`user_id`),
   KEY `group_id` (`group_id`),
@@ -499,6 +501,7 @@ CREATE TABLE `Problemset_Users` (
   `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
+  `accept_disclose_info` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`user_id`,`problemset_id`),
   KEY `user_id` (`user_id`),
   KEY `problemset_id` (`problemset_id`),
@@ -514,6 +517,7 @@ CREATE TABLE `Problemsets` (
   `access_mode` enum('private','public','registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
+  `needs_user_info` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   PRIMARY KEY (`problemset_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION

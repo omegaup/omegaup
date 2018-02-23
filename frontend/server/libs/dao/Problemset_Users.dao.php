@@ -10,7 +10,12 @@ include('base/Problemset_Users.vo.base.php');
   *
   */
 class ProblemsetUsersDAO extends ProblemsetUsersDAOBase {
-    public static function CheckAndSaveFirstTimeAccess($user_id, $problemset_id, $grant_access = false) {
+    public static function CheckAndSaveFirstTimeAccess(
+        $user_id,
+        $problemset_id,
+        $grant_access = false,
+        $accept_disclose_info = 0
+    ) {
         $problemset_user = self::getByPK($user_id, $problemset_id);
         if (is_null($problemset_user)) {
             if (!$grant_access) {
@@ -23,10 +28,12 @@ class ProblemsetUsersDAO extends ProblemsetUsersDAOBase {
             $problemset_user->access_time = date('Y-m-d H:i:s');
             $problemset_user->score = 0;
             $problemset_user->time = 0;
+            $problemset_user->accept_disclose_info = $accept_disclose_info;
             ProblemsetUsersDAO::save($problemset_user);
         } elseif (is_null($problemset_user->access_time)) {
             // If its set to default time, update it
             $problemset_user->access_time = date('Y-m-d H:i:s');
+            $problemset_user->accept_disclose_info = $accept_disclose_info;
             ProblemsetUsersDAO::save($problemset_user);
         }
         return $problemset_user;

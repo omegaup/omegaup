@@ -32,6 +32,9 @@ class GroupsUsers extends VO {
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
+        if (isset($data['accept_disclose_info'])) {
+            $this->accept_disclose_info = $data['accept_disclose_info'];
+        }
     }
 
     /**
@@ -60,4 +63,11 @@ class GroupsUsers extends VO {
       * @var int(11)
       */
     public $user_id;
+
+    /**
+      * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
+      * @access public
+      * @var tinyint(1)
+      */
+    public $accept_disclose_info;
 }

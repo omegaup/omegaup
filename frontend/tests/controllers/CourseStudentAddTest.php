@@ -51,17 +51,13 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        // Add the same student. Should throw.
-        try {
-            $response = CourseController::apiAddStudent(new Request([
-                'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $student->username,
-                'course_alias' => $courseData['course_alias']
-            ]));
-            $this->fail('Expected DuplicatedEntryInDatabaseException');
-        } catch (DuplicatedEntryInDatabaseException $e) {
-            // OK.
-        }
+        // Add the same student. It only updates accept_disclose_info field.
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+            'accept_disclose_info' => 1
+        ]));
     }
 
     /**

@@ -20,7 +20,7 @@ abstract class CoursesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`';
+    const FIELDS = '`Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`needs_user_info`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class CoursesDAOBase extends DAO {
         if (is_null($course_id)) {
             return null;
         }
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` FROM Courses WHERE (course_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`needs_user_info` FROM Courses WHERE (course_id = ?) LIMIT 1;';
         $params = [$course_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class CoursesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Courses}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` from Courses';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`needs_user_info` from Courses';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -171,6 +171,10 @@ abstract class CoursesDAOBase extends DAO {
             $clauses[] = '`needs_basic_information` = ?';
             $params[] = $Courses->needs_basic_information;
         }
+        if (!is_null($Courses->needs_user_info)) {
+            $clauses[] = '`needs_user_info` = ?';
+            $params[] = $Courses->needs_user_info;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -181,7 +185,7 @@ abstract class CoursesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information` FROM `Courses`';
+        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`needs_user_info` FROM `Courses`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -205,7 +209,7 @@ abstract class CoursesDAOBase extends DAO {
       * @param Courses [$Courses] El objeto de tipo Courses a actualizar.
       */
     final private static function update(Courses $Courses) {
-        $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ? WHERE `course_id` = ?;';
+        $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ?, `needs_user_info` = ? WHERE `course_id` = ?;';
         $params = [
             $Courses->name,
             $Courses->description,
@@ -217,6 +221,7 @@ abstract class CoursesDAOBase extends DAO {
             $Courses->public,
             $Courses->school_id,
             $Courses->needs_basic_information,
+            $Courses->needs_user_info,
             $Courses->course_id,
         ];
         global $conn;
@@ -249,7 +254,10 @@ abstract class CoursesDAOBase extends DAO {
         if (is_null($Courses->needs_basic_information)) {
             $Courses->needs_basic_information = '0';
         }
-        $sql = 'INSERT INTO Courses (`course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        if (is_null($Courses->needs_user_info)) {
+            $Courses->needs_user_info = '0';
+        }
+        $sql = 'INSERT INTO Courses (`course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `needs_user_info`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Courses->course_id,
             $Courses->name,
@@ -262,6 +270,7 @@ abstract class CoursesDAOBase extends DAO {
             $Courses->public,
             $Courses->school_id,
             $Courses->needs_basic_information,
+            $Courses->needs_user_info,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -427,6 +436,17 @@ abstract class CoursesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`needs_basic_information` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $CoursesA->needs_user_info;
+        $b = $CoursesB->needs_user_info;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`needs_user_info` >= ? AND `needs_user_info` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`needs_user_info` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

@@ -287,6 +287,7 @@ class CourseController extends Controller {
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'needs_user_info' => $r['needs_user_info'] == 'true',
             ]));
 
             CoursesDAO::transEnd();
@@ -1004,11 +1005,11 @@ class CourseController extends Controller {
         ]);
         if (!is_null(GroupsUsersDAO::getByPK(
             $groupUser->group_id,
-            $groupUser->user_id
+            $groupUser->user_id,
+            $groupUser->accept_disclose_info = $r['accept_disclose_info']
         ))) {
-            throw new DuplicatedEntryInDatabaseException(
-                'courseStudentAlreadyPresent'
-            );
+            // Course student is already present, but we need update accept_disclose_info column
+            $groupUser->accept_disclose_info = $r['accept_disclose_info'];
         }
 
         try {
@@ -1266,11 +1267,16 @@ class CourseController extends Controller {
         self::resolveGroup($r);
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group']);
+        $isFirstTimeAccess = false;
+        if (!Authorization::isGroupAdmin($r['current_user_id'], $r['group'])) {
+            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_user_id'], $r['course'], $r['group']);
+        }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
-        $result['shouldShowResults'] = $shouldShowIntro;
+        $result['shouldShowResults'] = $shouldShowIntro || ($isFirstTimeAccess && $result['user_information_required']);
+        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         return $result;
     }
 
@@ -1291,7 +1297,8 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'user_information_required' => $r['course']->needs_user_info == '1'
             ];
         } else {
             $result = [
@@ -1305,7 +1312,8 @@ class CourseController extends Controller {
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'user_information_required' => $r['course']->needs_user_info == '1'
             ];
 
             if ($isAdmin) {
@@ -1483,6 +1491,9 @@ class CourseController extends Controller {
             'school_id',
             'show_scoreboard',
             'needs_basic_information' => ['transform' => function ($value) {
+                return $value == 'true' ? 1 : 0;
+            }],
+            'needs_user_info' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
             'public' => ['transform' => function ($value) {

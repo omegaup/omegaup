@@ -22,6 +22,10 @@ if ($show_intro['shouldShowIntro']) {
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         )
     );
+    $smarty->assign(
+        'needsUserInfo',
+        $show_intro['needsUserInfo'] && !is_null($session['user'])
+    );
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');

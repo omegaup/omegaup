@@ -32,6 +32,9 @@ omegaup.OmegaUp.on('ready', function() {
               basic_information:
                   $('.new_contest_form #basic-information-required')
                       .is(':checked'),
+              user_information:
+                  $('.new_contest_form #user-information-required')
+                      .is(':checked'),
             })
             .then(function(data) {
               window.location.replace('/contest/' +

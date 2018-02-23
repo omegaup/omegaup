@@ -41,6 +41,9 @@ class Problemsets extends VO {
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = $data['needs_basic_information'];
         }
+        if (isset($data['needs_user_info'])) {
+            $this->needs_user_info = $data['needs_user_info'];
+        }
     }
 
     /**
@@ -90,4 +93,11 @@ class Problemsets extends VO {
       * @var tinyint(1)
       */
     public $needs_basic_information;
+
+    /**
+      * Se solicita información de los participantes para contactarlos posteriormente.
+      * @access public
+      * @var tinyint(1)
+      */
+    public $needs_user_info;
 }
