@@ -18,10 +18,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-_OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..'))
-sys.path.append(os.path.join(_OMEGAUP_ROOT, 'stuff'))
-# pylint: disable=wrong-import-position
-import database_utils  # NOQA
+from ui.util import database_utils as database_utils
+
 
 _DEFAULT_TIMEOUT = 10  # seconds
 _CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'

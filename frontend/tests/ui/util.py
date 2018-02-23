@@ -4,11 +4,18 @@
 '''Utils for Selenium tests.'''
 
 import os
+import sys
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
+
+# This contains all the Python path-hacking to a single file instead of
+# spreading it throughout all the files.
+sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
+# pylint: disable=wrong-import-position,unused-import
+import database_utils  # NOQA
 
 
 def add_students(driver, users, instance):

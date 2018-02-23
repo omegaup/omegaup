@@ -4,17 +4,12 @@
 '''Run Selenium course tests.'''
 
 import os
-import sys
+from flaky import flaky
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 
-_OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
-sys.path.append('%s/frontend/tests/ui/' % _OMEGAUP_ROOT)
-# pylint: disable=wrong-import-position
-import util  # NOQA
-
-from flaky import flaky  # NOQA
-from selenium.webdriver.common.by import By  # NOQA
-from selenium.webdriver.support import expected_conditions as EC  # NOQA
-from selenium.webdriver.support.select import Select  # NOQA
+import ui.util as util
 
 
 @flaky
