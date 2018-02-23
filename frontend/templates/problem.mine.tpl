@@ -17,7 +17,11 @@
     <div class="checkbox btn-group">
       <label>
         <input type="checkbox" id="show-admin-problems" />
-        {#problemListShowAdminProblems#}
+        {if $IS_SYSADMIN}
+            {#problemListShowAdminProblemsAndDeleted#}
+        {else}
+            {#problemListShowAdminProblems#}
+        {/if}
       </label>
     </div>
     <div class="btn-group">

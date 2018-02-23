@@ -31,12 +31,21 @@
                                     .text(problem.tags[j].name));
                   }
                 }
-                if (problem.visibility <= 0)
+                if (problem.visibility <= 0) {
                   $('.private', row).removeClass('hidden');
+                  if (problem.visibility == -10) {
+                    $('.private', row).removeClass('glyphicon-eye-close');
+                    $('.private', row).addClass('glyphicon-trash');
+                    $('.private', row).prop('title', omegaup.T.wordsDeleted);
+                  }
+                }
                 $('.edit', row)
                     .attr('href', '/problem/' + problem.alias + '/edit/');
                 $('.stats', row)
                     .attr('href', '/problem/' + problem.alias + '/stats/');
+                if (problem.visibility == -10) {
+                  $('input[type=checkbox]', row).prop('disabled', 'disabled');
+                }
                 $('#problem-list').append(row);
               }
               $('#problem-list').removeClass('wait_for_ajax');
