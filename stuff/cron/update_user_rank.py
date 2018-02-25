@@ -3,12 +3,16 @@
 '''Updates the user ranking.'''
 
 import argparse
+import collections
 import configparser
 import getpass
 import logging
 import os
 
 import MySQLdb
+
+
+Cutoff = collections.namedtuple('Cutoff', ['percentile', 'classname'])
 
 
 def update_user_rank(cur):
@@ -61,9 +65,13 @@ def update_user_rank(cur):
     ''')
     rank = 0
     prev_score = None
+    # MySQL has no good way of obtaining percentiles, so we'll store the sorted
+    # list of scores in order to calculate the cutoff scores later.
+    scores = []
     for row in cur:
         if row['score'] != prev_score:
             rank += 1
+        scores.append(row['score'])
         prev_score = row['score']
         cur.execute('''
                     INSERT INTO
@@ -74,6 +82,32 @@ def update_user_rank(cur):
                     (row['user_id'], rank, row['problems_solved_count'],
                      row['score'], row['username'], row['name'],
                      row['country_id'], row['state_id'], row['school_id']))
+    return scores
+
+
+def update_user_rank_cutoffs(cur, scores):
+    '''Updates the user ranking cutoff table.'''
+
+    cur.execute('DELETE FROM `User_Rank_Cutoffs`;')
+    logging.info('Updating ranking cutoffs...')
+    cutoffs = [
+        Cutoff(.01, 'user-rank-international-master'),
+        Cutoff(.09, 'user-rank-master'),
+        Cutoff(.15, 'user-rank-expert'),
+        Cutoff(.35, 'user-rank-specialist'),
+        Cutoff(.40, 'user-rank-beginner'),
+    ]
+    if not scores:
+        return
+    for cutoff in cutoffs:
+        # Scores are already in descending order. That will also bias the
+        # cutoffs towards higher scores.
+        cur.execute('''
+                    INSERT INTO
+                        User_Rank_Cutoffs (score, percentile, classname)
+                    VALUES(%s, %s, %s);''',
+                    (scores[int(len(scores) * cutoff.percentile)],
+                     cutoff.percentile, cutoff.classname))
 
 
 def mysql_connect(args):
@@ -138,7 +172,8 @@ def main():
     dbconn = mysql_connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            update_user_rank(cur)
+            scores = update_user_rank(cur)
+            update_user_rank_cutoffs(cur, scores)
         dbconn.commit()
     except:  # pylint: disable=bare-except
         logging.exception('Failed to update user ranking')
