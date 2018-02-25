@@ -92,8 +92,14 @@ class Users extends VO {
         if (isset($data['recruitment_optin'])) {
             $this->recruitment_optin = $data['recruitment_optin'];
         }
+        if (isset($data['hide_problem_tags'])) {
+            $this->hide_problem_tags = $data['hide_problem_tags'];
+        }
         if (isset($data['in_mailing_list'])) {
             $this->in_mailing_list = $data['in_mailing_list'];
+        }
+        if (isset($data['is_private'])) {
+            $this->is_private = $data['is_private'];
         }
         if (isset($data['preferred_language'])) {
             $this->preferred_language = $data['preferred_language'];
@@ -268,11 +274,25 @@ class Users extends VO {
     public $recruitment_optin;
 
     /**
+      * Determina si el usuario quiere ocultar las etiquetas de los problemas
+      * @access public
+      * @var tinyint(1)
+      */
+    public $hide_problem_tags;
+
+    /**
       *  [Campo no documentado]
       * @access public
       * @var tinyint(1)
       */
     public $in_mailing_list;
+
+    /**
+      * Determina si el usuario eligió no compartir su información de manera pública
+      * @access public
+      * @var tinyint(1)
+      */
+    public $is_private;
 
     /**
       * El lenguaje de programación de preferencia de este usuario

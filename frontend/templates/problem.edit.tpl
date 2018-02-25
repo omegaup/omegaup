@@ -17,6 +17,7 @@
 	<li><a href="#group-admins" data-toggle="tab">{#problemEditAddGroupAdmin#}</a></li>
 	<li><a href="#tags" data-toggle="tab">{#problemEditAddTags#}</a></li>
 	<li><a href="#download" data-toggle="tab">{#wordsDownload#}</a></li>
+	<li><a href="#delete" data-toggle="tab">{#wordsDelete#}</a></li>
 </ul>
 
 <div class="tab-content">
@@ -138,7 +139,7 @@
 	<div class="tab-pane" id="tags">
 		<div class="panel panel-primary">
 			<div class="panel-body">
-				<form class="form" id="add-tag-form">
+				<form class="form">
 					<div class="form-group">
 						<label for="tag-name">{#wordsTags#}</label>
 						<input id="tag-name" name="tag_name" value="" type="text" size="20" class="form-control" autocomplete="off" />
@@ -172,9 +173,27 @@
 	<div class="tab-pane" id="download">
 		<div class="panel panel-primary">
 			<div class="panel-body">
-				<form class="form" id="add-tag-form">
+				<form class="form">
 					<div class="form-group">
 						<button class="btn btn-primary" type='submit'>{#wordsDownload#}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="tab-pane" id="delete">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="form">
+					<div class="form-group">
+						<div class="alert alert-danger">
+							<h4 class="alert-heading">{#wordsDangerZone#}</h4>
+							<hr>
+							<p>{#wordsDangerZoneDesc#}</p>
+							<br><br>
+							<button class="btn btn-danger" type='submit'>{#wordsDelete#}</button>
+						</div>
 					</div>
 				</form>
 			</div>

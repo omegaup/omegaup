@@ -170,6 +170,58 @@ class Driver(object):
                             home_page_url)
             self.wait_for_page_loaded()
 
+    def register_user(self, user, passw):
+        '''Creates user :user and logs out when out of scope.'''
+
+        # Home page
+        home_page_url = self.url('/')
+        self.browser.get(home_page_url)
+        self.wait_for_page_loaded()
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/login/")]'))).click()
+
+        # Login screen
+        self.wait.until(lambda _: self.browser.current_url != home_page_url)
+        self.browser.find_element_by_id('reg_username').send_keys(user)
+        self.browser.find_element_by_id('reg_email').send_keys(
+            'email_%s@localhost.localdomain' % user)
+        self.browser.find_element_by_id('reg_pass').send_keys(passw)
+        self.browser.find_element_by_id('reg_pass2').send_keys(passw)
+        with self.ajax_page_transition():
+            self.browser.find_element_by_id('register-form').submit()
+
+        # Home screen
+        self.browser.get(self.url('/logout/?redirect=/'))
+        self.wait.until(lambda _: self.browser.current_url == home_page_url)
+        self.wait_for_page_loaded()
+
+    def update_score_manually(self, problem_alias, assignment_alias):
+        '''Set score = 100 manually in DB'''
+
+        database_utils.mysql((
+            '''
+            UPDATE
+                `Runs` AS r
+            INNER JOIN
+                `Problems` AS p ON p.problem_id = r.problem_id
+            INNER JOIN
+                `Problemsets` AS ps ON ps.problemset_id = r.problemset_id
+            INNER JOIN
+                `Assignments` AS a ON a.acl_id = ps.acl_id
+            SET
+                `score` = 1,
+                `contest_score` = 100,
+                `verdict` = 'AC',
+                `status` = 'ready'
+            WHERE
+                p.alias = '%s'
+                AND a.alias = '%s';
+            '''
+            ) % (problem_alias, assignment_alias),
+                             dbname='omegaup', auth=self.mysql_auth())  # NOQA
+
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
