@@ -60,6 +60,25 @@
 			<div id="problems-solved-wait"><img src="/media/wait.gif" /></div>
 		</div>
 
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 class="panel-title">{#profileUnsolvedProblems#} <span class="badge" id="problems-unsolved-total">0</span></h2>
+			</div>
+			<table class="table table-striped" id="problems-unsolved">
+				<thead>
+					<tr>
+						<th>{#profileUnsolvedProblemsTableTitle#}</th>
+						<th>{#profileUnsolvedProblemsTableTitle#}</th>
+						<th>{#profileUnsolvedProblemsTableTitle#}</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+			<div id="problems-unsolved-wait"><img src="/media/wait.gif" /></div>
+		</div>
+
 		<div class="panel panel-default no-bottom-margin">
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileStatistics#}</h2>

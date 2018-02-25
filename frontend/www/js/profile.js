@@ -45,3 +45,25 @@ omegaup.API.User.problemsSolved({username: username})
       $('#problems-solved-total').text(data['problems'].length);
     })
     .fail(omegaup.UI.apiError);
+
+omegaup.API.User.listUnsolvedProblems({username: username})
+    .then(function(data) {
+      $('#problems-unsolved-wait').hide();
+
+      for (var i = 0; i < data['problems'].length; i++) {
+        var content = '<tr>';
+
+        for (var j = 0; j < 3 && i < data['problems'].length; j++, i++) {
+          content += "<td><a href='/arena/problem/" +
+                      data['problems'][i]['alias'] + "'>" +
+                      data['problems'][i]['title'] + '</a></td>';
+        }
+        i--;
+
+        content += '</tr>';
+
+        $('#problems-unsolved tbody').append(content);
+      }
+      $('#problems-unsolved-total').text(data['problems'].length);
+    })
+    .fail(omegaup.UI.apiError);
