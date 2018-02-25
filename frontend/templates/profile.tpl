@@ -48,9 +48,7 @@
 			<table class="table table-striped" id="problems-solved">
 				<thead>
 					<tr>
-						<th>{#profileSolvedProblemsTableTitle#}</th>
-						<th>{#profileSolvedProblemsTableTitle#}</th>
-						<th>{#profileSolvedProblemsTableTitle#}</th>
+						<th colspan="3">{#profileSolvedProblemsTableTitle#}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -67,9 +65,7 @@
 			<table class="table table-striped" id="problems-unsolved">
 				<thead>
 					<tr>
-						<th>{#profileUnsolvedProblemsTableTitle#}</th>
-						<th>{#profileUnsolvedProblemsTableTitle#}</th>
-						<th>{#profileUnsolvedProblemsTableTitle#}</th>
+						<th colspan="3">{#profileUnsolvedProblemsTableTitle#}</th>
 					</tr>
 				</thead>
 				<tbody>

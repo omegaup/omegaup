@@ -616,7 +616,7 @@ omegaup.OmegaUp.loadTranslations({
 	qualityNominationProblemHasBeenBanned: "Este problema ha sido suspendido. No puedes cambiar su visibilidad.",
 	qualityNominationProblemHasBeenPromoted: "Este problema ha sido promovido. No puedes cambiar su visibilidad.",
 	qualityNominationRateProblem: "Calificar el problema",
-	qualityNominationRateProblemDesc: "Si quieres calificar el problema m\u00e1s tarde, has clic en el enlace: \"Calificar el problema\"",
+	qualityNominationRateProblemDesc: "Si quieres calificar el problema m\u00e1s tarde, haz clic en el enlace: \"Calificar el problema\"",
 	qualityNominationResolutionSuccess: "Nominaci\u00f3n resuelta exitosamente.",
 	qualityNominationShowAll: "Tambi\u00e9n mostrar nominaciones resueltas",
 	qualityNominationType: "Tipo",
