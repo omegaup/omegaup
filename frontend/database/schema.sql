@@ -726,6 +726,14 @@ CREATE TABLE `User_Rank` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `User_Rank_Cutoffs` (
+  `score` double NOT NULL,
+  `percentile` double NOT NULL,
+  `classname` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los valores del ranking para los cuales hay un cambio de color.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `User_Roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
