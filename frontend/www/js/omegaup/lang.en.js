@@ -590,6 +590,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileStatisticsVerdictsOf: "Verdicts of %(user)",
 	profileStatisticsWeek: "Week",
 	profileStatisticsYear: "Year",
+	profileUnsolvedProblems: "Problems tried (but not solved)",
 	profileUsername: "Username",
 	publicContestMustHaveProb: "Public contest must have at least 1 problem added.",
 	publish: "Publish",
