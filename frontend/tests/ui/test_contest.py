@@ -152,14 +152,14 @@ def test_create_contest(driver):
         driver.wait_for_page_loaded()
 
         run_accepeted_user = driver.browser.find_element_by_xpath(
-            '//td[@class = "accepted"]/preceding-sibling::td')
+            '//td[@class="accepted"]/preceding-sibling::td[1]')
 
-        assert run_accepeted_user == user1, run_accepeted_user
+        assert run_accepeted_user.text == user1, run_accepeted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class = "wrong"]/preceding-sibling::td')
+            '//td[@class="wrong"]/preceding-sibling::td[1]')
 
-        assert run_wrong_user == user2, run_wrong_user
+        assert run_wrong_user.text == user2, run_wrong_user
 
 
 def create_contest(driver, contest_alias):
