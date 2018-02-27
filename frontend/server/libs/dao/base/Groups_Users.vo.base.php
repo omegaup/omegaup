@@ -32,8 +32,8 @@ class GroupsUsers extends VO {
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
-        if (isset($data['accept_disclose_info'])) {
-            $this->accept_disclose_info = $data['accept_disclose_info'];
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = $data['share_user_information'];
         }
     }
 
@@ -69,5 +69,5 @@ class GroupsUsers extends VO {
       * @access public
       * @var tinyint(1)
       */
-    public $accept_disclose_info;
+    public $share_user_information;
 }

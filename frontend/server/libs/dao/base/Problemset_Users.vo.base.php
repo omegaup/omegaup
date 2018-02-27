@@ -41,8 +41,8 @@ class ProblemsetUsers extends VO {
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
-        if (isset($data['accept_disclose_info'])) {
-            $this->accept_disclose_info = $data['accept_disclose_info'];
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = $data['share_user_information'];
         }
     }
 
@@ -99,5 +99,5 @@ class ProblemsetUsers extends VO {
       * @access public
       * @var tinyint(1)
       */
-    public $accept_disclose_info;
+    public $share_user_information;
 }

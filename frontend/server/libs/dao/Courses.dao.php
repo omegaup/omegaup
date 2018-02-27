@@ -330,7 +330,7 @@ class CoursesDAO extends CoursesDAOBase {
     final public static function isFirstTimeAccess($user_id, Courses $course, Groups $group) {
         $sql = '
             SELECT
-                accept_disclose_info
+                share_user_information
             FROM
                 Groups_Users AS gu
             INNER JOIN
@@ -349,7 +349,6 @@ class CoursesDAO extends CoursesDAOBase {
         ];
 
         global $conn;
-        $first = $conn->GetOne($sql, $params);
-        return $first == null;
+        return $conn->GetOne($sql, $params) == null;
     }
 }

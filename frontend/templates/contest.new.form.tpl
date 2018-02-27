@@ -149,13 +149,12 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="user-information-required">{#contestNewFormUserInformationRequired#}</label>
-						<div class="checkbox">
-							<label>
-								<input type="checkbox" id="user-information-required" name="user_information_required">
-								{#wordsEnable#}
-							</label>
-						</div>
+						<label for="requests-user-information">{#contestNewFormUserInformationRequired#}</label>
+						<select name="requests-user-information" id="requests-user-information" class="form-control">
+							<option value="no">{#wordsNo#}</option>
+							<option value="optional">{#wordsOptional#}</option>
+							<option value="required">{#wordsRequired#}</option>
+						</select>
 						<p class="help-block">{#contestNewFormUserInformationRequiredDesc#}</p>
 					</div>
 				</div>

@@ -20,7 +20,7 @@ abstract class ProblemsetsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`needs_user_info`';
+    const FIELDS = '`Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (is_null($problemset_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`needs_user_info` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsetsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Problemsets}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`needs_user_info` from Problemsets';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information` from Problemsets';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -147,9 +147,9 @@ abstract class ProblemsetsDAOBase extends DAO {
             $clauses[] = '`needs_basic_information` = ?';
             $params[] = $Problemsets->needs_basic_information;
         }
-        if (!is_null($Problemsets->needs_user_info)) {
-            $clauses[] = '`needs_user_info` = ?';
-            $params[] = $Problemsets->needs_user_info;
+        if (!is_null($Problemsets->requests_user_information)) {
+            $clauses[] = '`requests_user_information` = ?';
+            $params[] = $Problemsets->requests_user_information;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -161,7 +161,7 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`needs_user_info` FROM `Problemsets`';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information` FROM `Problemsets`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -185,13 +185,13 @@ abstract class ProblemsetsDAOBase extends DAO {
       * @param Problemsets [$Problemsets] El objeto de tipo Problemsets a actualizar.
       */
     final private static function update(Problemsets $Problemsets) {
-        $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `needs_user_info` = ? WHERE `problemset_id` = ?;';
+        $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ? WHERE `problemset_id` = ?;';
         $params = [
             $Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
             $Problemsets->needs_basic_information,
-            $Problemsets->needs_user_info,
+            $Problemsets->requests_user_information,
             $Problemsets->problemset_id,
         ];
         global $conn;
@@ -218,17 +218,17 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (is_null($Problemsets->needs_basic_information)) {
             $Problemsets->needs_basic_information = '0';
         }
-        if (is_null($Problemsets->needs_user_info)) {
-            $Problemsets->needs_user_info = '0';
+        if (is_null($Problemsets->requests_user_information)) {
+            $Problemsets->requests_user_information = 'no';
         }
-        $sql = 'INSERT INTO Problemsets (`problemset_id`, `acl_id`, `access_mode`, `languages`, `needs_basic_information`, `needs_user_info`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemsets (`problemset_id`, `acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Problemsets->problemset_id,
             $Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
             $Problemsets->needs_basic_information,
-            $Problemsets->needs_user_info,
+            $Problemsets->requests_user_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -331,14 +331,14 @@ abstract class ProblemsetsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $ProblemsetsA->needs_user_info;
-        $b = $ProblemsetsB->needs_user_info;
+        $a = $ProblemsetsA->requests_user_information;
+        $b = $ProblemsetsB->requests_user_information;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`needs_user_info` >= ? AND `needs_user_info` <= ?';
+            $clauses[] = '`requests_user_information` >= ? AND `requests_user_information` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`needs_user_info` = ?';
+            $clauses[] = '`requests_user_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

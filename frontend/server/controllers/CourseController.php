@@ -1002,15 +1002,8 @@ class CourseController extends Controller {
         $groupUser = new GroupsUsers([
             'group_id' => $r['course']->group_id,
             'user_id' => $r['user']->user_id,
+            'share_user_information' => $r['share_user_information']
         ]);
-        if (!is_null(GroupsUsersDAO::getByPK(
-            $groupUser->group_id,
-            $groupUser->user_id,
-            $groupUser->accept_disclose_info = $r['accept_disclose_info']
-        ))) {
-            // Course student is already present, but we need update accept_disclose_info column
-            $groupUser->accept_disclose_info = $r['accept_disclose_info'];
-        }
 
         try {
             GroupsUsersDAO::save($groupUser);
@@ -1276,7 +1269,6 @@ class CourseController extends Controller {
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
         $result['shouldShowResults'] = $shouldShowIntro || ($isFirstTimeAccess && $result['user_information_required']);
-        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         return $result;
     }
 

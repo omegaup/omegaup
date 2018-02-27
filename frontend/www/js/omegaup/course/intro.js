@@ -21,7 +21,7 @@ OmegaUp.on('ready', function() {
             API.Course.addStudent({
                         'course_alias': coursePayload.alias,
                         'usernameOrEmail': coursePayload.currentUsername,
-                        'accept_disclose_info': ev.shareUserInformation
+                        'share_user_information': ev.shareUserInformation
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + coursePayload.alias);

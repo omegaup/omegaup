@@ -658,7 +658,7 @@ class ContestsDAO extends ContestsDAOBase {
         $sql = '
                 SELECT
                     needs_basic_information,
-                    needs_user_info
+                    requests_user_information
                 FROM
                     Problemsets
                 WHERE
@@ -675,7 +675,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         return [
             'needs_basic_information' => $rs['needs_basic_information'] == '1',
-            'needs_user_info' => $rs['needs_user_info'] == '1'
+            'requests_user_information' => $rs['requests_user_information']
         ];
     }
 

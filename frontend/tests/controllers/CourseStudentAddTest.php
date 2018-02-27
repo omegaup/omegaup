@@ -51,13 +51,23 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        // Add the same student. It only updates accept_disclose_info field.
+        // Add the same student. It only updates share_user_information field.
         $response = CourseController::apiAddStudent(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
-            'accept_disclose_info' => 1
+            'share_user_information' => 1
         ]));
+
+        $userLogin = OmegaupTestCase::login($student);
+
+        $intro_details = CourseController::apiIntroDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'current_user_id' => $student->user_id,
+            'course_alias' => $courseData['request']['alias']
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
     }
 
     /**

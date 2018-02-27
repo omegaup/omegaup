@@ -20,7 +20,7 @@ abstract class ProblemsetUsersDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`accept_disclose_info`';
+    const FIELDS = '`Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`share_user_information`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsetUsersDAOBase extends DAO {
         if (is_null($user_id) || is_null($problemset_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`accept_disclose_info` FROM Problemset_Users WHERE (user_id = ? AND problemset_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`share_user_information` FROM Problemset_Users WHERE (user_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$user_id, $problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsetUsersDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetUsers}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`accept_disclose_info` from Problemset_Users';
+        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`share_user_information` from Problemset_Users';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -147,9 +147,9 @@ abstract class ProblemsetUsersDAOBase extends DAO {
             $clauses[] = '`time` = ?';
             $params[] = $Problemset_Users->time;
         }
-        if (!is_null($Problemset_Users->accept_disclose_info)) {
-            $clauses[] = '`accept_disclose_info` = ?';
-            $params[] = $Problemset_Users->accept_disclose_info;
+        if (!is_null($Problemset_Users->share_user_information)) {
+            $clauses[] = '`share_user_information` = ?';
+            $params[] = $Problemset_Users->share_user_information;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -161,7 +161,7 @@ abstract class ProblemsetUsersDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`accept_disclose_info` FROM `Problemset_Users`';
+        $sql = 'SELECT `Problemset_Users`.`user_id`, `Problemset_Users`.`problemset_id`, `Problemset_Users`.`access_time`, `Problemset_Users`.`score`, `Problemset_Users`.`time`, `Problemset_Users`.`share_user_information` FROM `Problemset_Users`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -185,12 +185,12 @@ abstract class ProblemsetUsersDAOBase extends DAO {
       * @param ProblemsetUsers [$Problemset_Users] El objeto de tipo ProblemsetUsers a actualizar.
       */
     final private static function update(ProblemsetUsers $Problemset_Users) {
-        $sql = 'UPDATE `Problemset_Users` SET `access_time` = ?, `score` = ?, `time` = ?, `accept_disclose_info` = ? WHERE `user_id` = ? AND `problemset_id` = ?;';
+        $sql = 'UPDATE `Problemset_Users` SET `access_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ? WHERE `user_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Users->access_time,
             $Problemset_Users->score,
             $Problemset_Users->time,
-            $Problemset_Users->accept_disclose_info,
+            $Problemset_Users->share_user_information,
             $Problemset_Users->user_id,$Problemset_Users->problemset_id,
         ];
         global $conn;
@@ -217,14 +217,14 @@ abstract class ProblemsetUsersDAOBase extends DAO {
         if (is_null($Problemset_Users->time)) {
             $Problemset_Users->time = '1';
         }
-        $sql = 'INSERT INTO Problemset_Users (`user_id`, `problemset_id`, `access_time`, `score`, `time`, `accept_disclose_info`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Users (`user_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Problemset_Users->user_id,
             $Problemset_Users->problemset_id,
             $Problemset_Users->access_time,
             $Problemset_Users->score,
             $Problemset_Users->time,
-            $Problemset_Users->accept_disclose_info,
+            $Problemset_Users->share_user_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -326,14 +326,14 @@ abstract class ProblemsetUsersDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_UsersA->accept_disclose_info;
-        $b = $Problemset_UsersB->accept_disclose_info;
+        $a = $Problemset_UsersA->share_user_information;
+        $b = $Problemset_UsersB->share_user_information;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`accept_disclose_info` >= ? AND `accept_disclose_info` <= ?';
+            $clauses[] = '`share_user_information` >= ? AND `share_user_information` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`accept_disclose_info` = ?';
+            $clauses[] = '`share_user_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

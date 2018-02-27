@@ -18,16 +18,13 @@
 			<!------------------- Click to proceed -------------------------->
 			<div id="click-to-proceed" class="hidden" >
 				<form id="start-contest-form" method="POST" action="/">
-					{if !$needsBasicInformation}
+					{if !$needsBasicInformation && !$requestsUserInformation}
 					    <p>{#aboutToStart#}</p>
-					    <input type="hidden" id="basic-information-needed" value="0">
-					{else}
-					    <p>{#courseBasicInformationNeeded#}</p>
-					    <input type="hidden" id="basic-information-needed" value="1">
 					{/if}
-					{if !$needsUserInfo}
-					    <p>{#aboutToStart#}</p>
-					{else}
+					{if $needsBasicInformation }
+					    <p class="basic-information-needed">{#courseBasicInformationNeeded#}</p>
+					{/if}
+					{if $requestsUserInformation}
 					    <p>{#contestUserInformationNeeded#}</p>
 					    <p>
 					    	<label>
@@ -39,7 +36,7 @@
 					    </p>
 					{/if}
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
-					{if $needsBasicInformation || $needsUserInfo} disabled="true"{/if}>{#startContest#}</button>
+					{if $needsBasicInformation || $requestsUserInformation} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 

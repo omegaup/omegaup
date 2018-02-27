@@ -59,8 +59,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #basic-information-required')
             .prop('checked', contest.needs_basic_information);
 
-        $('.new_contest_form #user-information-required')
-            .prop('checked', contest.needs_user_info);
+        $('.new_contest_form #requests-user-information')
+            .val(contest.requests_user_information);
 
         $('.contest-publish-form #public').val(contest.public);
 
@@ -127,8 +127,7 @@ omegaup.OmegaUp.on('ready', function() {
           contestant_must_register: $('#register').val(),
           basic_information:
               $('#basic-information-required').is(':checked') ? '1' : '0',
-          user_information:
-              $('#user-information-required').is(':checked') ? '1' : '0',
+          requests_user_information: $('#requests-user-information').val(),
         })
         .then(function(data) {
           if (data.status == 'ok') {

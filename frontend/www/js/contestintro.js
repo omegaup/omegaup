@@ -12,7 +12,7 @@ omegaup.OmegaUp.on('ready', function() {
         omegaup.API.Contest
             .open({
               contest_alias: contestAlias,
-              accept_disclose_info:
+              share_user_information:
                   $('input[name=sharing-user-information]:checked').val()
             })
             .then(function(result) { window.location.reload(); })
@@ -21,7 +21,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('input[name=sharing-user-information]')
       .on('click', function(ev) {
-        if ($('#basic-information-needed').val() == '0') {
+        if ($('.basic-information-needed').length < 1) {
           $('#start-contest-submit').prop('disabled', false);
         }
       });

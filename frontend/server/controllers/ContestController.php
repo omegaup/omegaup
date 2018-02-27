@@ -340,8 +340,8 @@ class ContestController extends Controller {
         if (is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
-        $needsInformation = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
-
+        $result = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
+        $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -350,12 +350,8 @@ class ContestController extends Controller {
                 $r['current_user_id'] = $session['user']->user_id;
             } else {
                 // No session, show the intro (if public), so that they can login.
-                return [
-                    'shouldShowIntro' =>
-                        $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO,
-                    'needsBasicInformation' => $needsInformation['needs_basic_information'],
-                    'needsUserInfo' => $needsInformation['needs_user_info'],
-                ];
+                $result['shouldShowIntro'] =
+                    $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
             }
             self::canAccessContest($r);
         } catch (Exception $e) {
@@ -365,11 +361,7 @@ class ContestController extends Controller {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
-            return [
-                'shouldShowIntro' => ContestController::SHOW_INTRO,
-                'needsBasicInformation' => $needsInformation['needs_basic_information'],
-                'needsUserInfo' => $needsInformation['needs_user_info'],
-            ];
+            $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
         }
 
         $cs = SessionController::apiCurrentSession()['session'];
@@ -381,18 +373,10 @@ class ContestController extends Controller {
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
-            return [
-                'shouldShowIntro' => !ContestController::SHOW_INTRO,
-                'needsBasicInformation' => $needsInformation['needs_basic_information'],
-                'needsUserInfo' => $needsInformation['needs_user_info'],
-            ];
+            $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
         }
 
-        return [
-            'shouldShowIntro' => ContestController::SHOW_INTRO,
-            'needsBasicInformation' => $needsInformation['needs_basic_information'],
-            'needsUserInfo' => $needsInformation['needs_user_info'],
-        ];
+        return $result;
     }
 
     /**
@@ -526,7 +510,7 @@ class ContestController extends Controller {
             $r['current_user_id'],
             $r['contest']->problemset_id,
             true,
-            $r['accept_disclose_info']
+            $r['share_user_information']
         );
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
@@ -629,9 +613,10 @@ class ContestController extends Controller {
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
             $result['languages'] = explode(',', $result['languages']);
-            $needs_information = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
-            $result['needs_basic_information'] = $needs_information['needs_basic_information'];
-            $result['needs_user_info'] = $needs_information['needs_user_info'];
+            $result = array_merge(
+                $result,
+                ContestsDAO::getNeedsInformation($r['contest']->problemset_id)
+            );
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -879,8 +864,8 @@ class ContestController extends Controller {
             // Save the problemset object with data sent by user to the database
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
-                'needs_basic_information' => $r['basic_information'] == 'true',
-                'needs_user_info' => $r['user_information'] == 'true'
+                'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information']
             ]);
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
@@ -2154,7 +2139,7 @@ class ContestController extends Controller {
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
             $problemset->needs_basic_information = $r['basic_information'] ?? 0;
-            $problemset->needs_user_info = $r['user_information'] ?? 0;
+            $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
             ProblemsetsDAO::save($problemset);
 
             // If the contest is private, add the list of allowed users
