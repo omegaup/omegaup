@@ -39,17 +39,26 @@ class CourseStudentAddTest extends OmegaupTestCase {
      * apiAddStudent test with a duplicate student.
      */
     public function testAddDuplicateStudentToCourse() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = CoursesFactory::createCourse(null, null, true, 'true');
         $student = UserFactory::createUser();
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        // Student is added to the course
         $response = CourseController::apiAddStudent(new Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        // User was added to the course, but it is the first access
+        $userLogin = OmegaupTestCase::login($student);
+        $intro_details = CourseController::apiIntroDetails(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'current_user_id' => $student->user_id,
+            'course_alias' => $courseData['request']['alias']
+        ]));
+        // Asserting shouldShowResults is on
+        $this->assertEquals(1, $intro_details['shouldShowResults']);
 
         // Add the same student. It only updates share_user_information field.
         $response = CourseController::apiAddStudent(new Request([
@@ -59,15 +68,14 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'share_user_information' => 1
         ]));
 
-        $userLogin = OmegaupTestCase::login($student);
-
+        // User agrees sharing his information
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'current_user_id' => $student->user_id,
             'course_alias' => $courseData['request']['alias']
         ]));
-
-        $this->assertEquals('ok', $response['status']);
+        // Asserting shouldShowResults is off
+        $this->assertEquals(0, $intro_details['shouldShowResults']);
     }
 
     /**
