@@ -27,7 +27,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Verify DB
         $user = UsersDAO::FindByUsername($r['username']);
-        $identity = IdentitiesDAO::FindByUserId($user->user_id);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $this->assertNotNull($user);
         $this->assertEquals($identity->password, $user->password);
     }
@@ -68,7 +68,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         self::login($admin);
 
         $user = UsersDAO::FindByUsername($user->username);
-        $identity = IdentitiesDAO::FindByUserId($user->user_id);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $this->assertEquals($identity->password, $user->password);
     }
 
@@ -103,7 +103,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         self::login($user);
 
         $user = UsersDAO::FindByUsername($user->username);
-        $identity = IdentitiesDAO::FindByUserId($user->user_id);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $this->assertEquals($identity->password, $user->password);
     }
 
@@ -176,7 +176,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         ]);
         $this->assertEquals($locale[0]->name, UserController::getPreferredLanguage($r));
 
-        $identity = IdentitiesDAO::FindByUserId($user_db->user_id);
+        $identity = IdentitiesDAO::getByPK($user_db->main_identity_id);
         $this->assertEquals($identity->password, $user_db->password);
     }
 }

@@ -38,8 +38,8 @@ class Identities extends VO {
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
-        if (isset($data['main_user_id'])) {
-            $this->main_user_id = $data['main_user_id'];
+        if (isset($data['user_id'])) {
+            $this->user_id = $data['user_id'];
         }
         if (isset($data['language_id'])) {
             $this->language_id = $data['language_id'];
@@ -101,7 +101,7 @@ class Identities extends VO {
       * @access public
       * @var int(11)
       */
-    public $main_user_id;
+    public $user_id;
 
     /**
       *  [Campo no documentado]
