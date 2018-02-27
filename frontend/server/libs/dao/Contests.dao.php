@@ -112,6 +112,11 @@ class ParticipatingStatus extends StatusBase {
     const YES = 1;
 }
 
+class PublicStatus extends StatusBase {
+    const NO = 0;
+    const YES = 1;
+}
+
 /** Contests Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -132,7 +137,8 @@ class ContestsDAO extends ContestsDAOBase {
                                 public,
                                 alias,
                                 recommended,
-                                window_length
+                                window_length,
+                                UNIX_TIMESTAMP (last_updated) as last_updated
                                 ';
 
     final public static function getByAlias($alias) {
@@ -354,6 +360,56 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     /**
+     * Returns all recent public contests.
+     */
+    final public static function getRecentPublicContests(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000,
+        $query = null
+    ) {
+        $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
+        $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
+        $columns = ContestsDAO::$getContestsColumns;
+        $offset = ($page - 1) * $pageSize;
+        $filter = self::formatSearch($query);
+        $query_check = FilteredStatus::sql($filter['type']);
+
+        $sql = "
+            SELECT
+                $columns
+            FROM
+                Contests
+            WHERE
+                $recommended_check  AND $end_check AND $query_check
+                AND `public` = 1
+            ORDER BY
+                `last_updated` DESC,
+                `recommended` DESC,
+                `finish_time` DESC,
+                `contest_id` DESC
+            LIMIT ?, ?;";
+
+        global $conn;
+        if ($filter['type'] === FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
+        }
+        $params[] = $offset;
+        $params[] = $pageSize;
+
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
      * Regresa todos los concursos que un usuario puede ver.
      *
      * Explicación:
@@ -428,7 +484,7 @@ class ContestsDAO extends ContestsDAOBase {
                         $columns
                     FROM
                         Contests
-                    JOIN
+                    INNER JOIN
                         Problemset_Users
                     ON
                         Contests.problemset_id = Problemset_Users.problemset_id
@@ -451,7 +507,7 @@ class ContestsDAO extends ContestsDAOBase {
                          $columns
                      FROM
                          Contests
-                     JOIN
+                     INNER JOIN
                          User_Roles
                      ON
                          User_Roles.acl_id = Contests.acl_id
@@ -477,10 +533,12 @@ class ContestsDAO extends ContestsDAOBase {
                          $columns
                      FROM
                          Contests
-                     JOIN
+                     INNER JOIN
                          Group_Roles ON Contests.acl_id = Group_Roles.acl_id
-                     JOIN
-                         Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
+                     INNER JOIN
+                         Groups_Users
+                     ON
+                         Groups_Users.group_id = Group_Roles.group_id
                      WHERE
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND

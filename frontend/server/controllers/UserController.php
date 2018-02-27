@@ -73,6 +73,9 @@ class UserController extends Controller {
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
+        if (isset($r['is_private'])) {
+            $user_data['is_private'] = $r['is_private'];
+        }
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
         }
@@ -1150,6 +1153,7 @@ class UserController extends Controller {
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
+        $response['userinfo']['is_private'] = $user->is_private;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
@@ -1245,7 +1249,21 @@ class UserController extends Controller {
         $r['user'] = self::resolveTargetUser($r);
 
         $response = self::getProfile($r);
-
+        if ((is_null($r['current_user']) || $r['current_user']->username != $r['user']->username)
+            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            $response['problems'] = [];
+            foreach ($response['userinfo'] as $k => $v) {
+                $response['userinfo'][$k] = null;
+            }
+            $response['userinfo']['username'] = $r['user']->username;
+            $response['userinfo']['rankinfo'] = [
+                'name' => null,
+                'problems_solved' => null,
+                'rank' => null,
+                'status' => 'ok',
+            ];
+            $response['userinfo']['is_private'] = true;
+        }
         $response['status'] = 'ok';
         return $response;
     }
@@ -1471,6 +1489,39 @@ class UserController extends Controller {
     }
 
     /**
+     * Get Problems unsolved by user
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $response = [
+            'problems' => [],
+            'status' => 'ok',
+        ];
+
+        $user = self::resolveTargetUser($r);
+
+        try {
+            $db_results = ProblemsDAO::getProblemsUnsolvedByUser($user->user_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        foreach ($db_results as $problem) {
+            if (ProblemsDAO::isVisible($problem)) {
+                array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
+            }
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
@@ -1507,10 +1558,16 @@ class UserController extends Controller {
      * Get stats
      *
      * @param Request $r
+     * @throws ForbiddenAccessException
      */
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $user = self::resolveTargetUser($r);
+
+        if ((is_null($r['current_user']) || $r['current_user']->username != $user->username)
+            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('userProfileIsPrivate');
+        }
 
         try {
             $runsPerDatePerVerdict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
@@ -1655,9 +1712,14 @@ class UserController extends Controller {
             $r['current_user']->language_id = $query[0]->language_id;
         }
 
+        if (!is_null($r['is_private'])) {
+            Validators::isNumber($r['is_private'], 'is_private', true);
+        }
+
         if (!is_null($r['recruitment_optin'])) {
             Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
         }
+
         if (!is_null($r['hide_problem_tags'])) {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
@@ -1676,6 +1738,7 @@ class UserController extends Controller {
                 return gmdate('Y-m-d', $value);
             }],
             'gender',
+            'is_private',
             'recruitment_optin',
             'hide_problem_tags',
         ];

@@ -372,6 +372,8 @@ export default {
                             return data;
                           }),
 
+    delete: _call('/api/problem/delete/'),
+
     details: _call('/api/problem/details/', _convertRuntimes,
                    {statement_type: 'html'}),
 
@@ -504,6 +506,8 @@ export default {
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
+
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include <unistd.h>
 
 #define ERR(error_code, filename, description) \
 	do { \
@@ -81,7 +82,10 @@ int normalize(const char* filename) {
 	while ((ch = f.get()) != EOF) {
 		switch (ch) {
 			case '\r': {
-				// Ignore, they only appear in windows CRLF.
+				// Treat CRLF or an unaccompanied CR as an LF
+				if (f.peek() != '\n') {
+					f.putback('\n');
+				}
 				break;
 			}
 
