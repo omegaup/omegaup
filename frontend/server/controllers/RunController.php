@@ -65,9 +65,12 @@ class RunController extends Controller {
 
             // Check that problem exists
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-
+            if ($r['problem']->deprecated) {
+                  throw new PreconditionFailedException('problemDeprecated');
+            }
+            // check that problem is not publicly or privately banned.
             if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-                throw new PreconditionFailedException('problemDeprecated');
+                throw new NptFoundException('problemNotfound');
             }
 
             $allowedLanguages = array_intersect(
