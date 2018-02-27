@@ -341,7 +341,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $user_id
     ) {
         $sql = "
-            SELECT
+            SELECT DISTINCT
                 p.*
             FROM
                 Users u

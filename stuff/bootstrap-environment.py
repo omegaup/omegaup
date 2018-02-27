@@ -59,10 +59,15 @@ class Session(object):
         # pylint: disable=abstract-class-instantiated
         self.jar = requests.cookies.RequestsCookieJar()
         self.url = args.root_url.rstrip('/')
-        result = self.request('/user/login/',
-                              {'usernameOrEmail': username,
-                               'password': password})
-        assert result['status'] == 'ok'
+        request = {
+            'api': '/user/login',
+            'params': {
+                'usernameOrEmail': username,
+                'password': password
+            }
+        }
+        result = self.request(request['api'], request['params'])
+        assert result['status'] == 'ok', (request, result)
 
     def __enter__(self):
         return self
@@ -88,6 +93,53 @@ class Session(object):
         return result
 
 
+def _process_one_request(s, request, now):
+    '''Invokes a single reqeust specified in |request|.'''
+    # First try to see if the resource has already been created.
+    if request['api'] == '/problem/create':
+        if s.request('/problem/details/',
+                     {'problem_alias':
+                      request['params']['problem_alias']}):
+            logging.warning('Problem %s exists, skipping',
+                            request['params']['problem_alias'])
+            return
+    if request['api'] == '/contest/create':
+        if s.request('/contest/adminDetails/',
+                     {'contest_alias':
+                      request['params']['alias']}):
+            logging.warning('Contest %s exists, skipping',
+                            request['params']['alias'])
+            return
+    if request['api'] == '/user/create':
+        if s.request('/user/profile',
+                     {'username':
+                      request['params']['username']}):
+            logging.warning('User %s exists, skipping',
+                            request['params']['username'])
+            return
+    # Date parameters need some special handling
+    for key, val in request['params'].items():
+        if isinstance(val, str) and val.startswith('$NOW$'):
+            # Replace $NOW$ with the current timestamp, adding an
+            # optional number of seconds.
+            tokens = val.split('+')
+            timestamp = now
+            if len(tokens) == 2:
+                timestamp += int(tokens[1])
+            val = int(timestamp)
+            request['params'][key] = val
+    result = s.request(
+        request['api'], data=request['params'],
+        files=(request['files'] if 'files' in request else None))
+    fail_ok = 'fail_ok' in request and request['fail_ok']
+    if result['status'] != 'ok':
+        if fail_ok:
+            logging.warning('Request %r failed, continuing. '
+                            'Result is %r', request, result)
+        else:
+            assert result['status'] == 'ok', (request, result)
+
+
 def _run_script(path, args, now):
     '''Runs a single script specified in |path|'''
     with open(path, 'r') as f:
@@ -96,36 +148,7 @@ def _run_script(path, args, now):
     for session in script:
         with Session(args, session['username'], session['password']) as s:
             for request in session['requests']:
-                # First try to see if the resource has already been created.
-                if request['api'] == '/problem/create':
-                    if s.request('/problem/details/',
-                                 {'problem_alias':
-                                  request['params']['problem_alias']}):
-                        logging.warning('Problem %s exists, skipping',
-                                        request['params']['problem_alias'])
-                        continue
-                elif request['api'] == '/contest/create':
-                    if s.request('/contest/adminDetails/',
-                                 {'contest_alias':
-                                  request['params']['alias']}):
-                        logging.warning('Contest %s exists, skipping',
-                                        request['params']['alias'])
-                        continue
-                # Date parameters need some special handling
-                for key, val in request['params'].items():
-                    if isinstance(val, str) and val.startswith('$NOW$'):
-                        # Replace $NOW$ with the current timestamp, adding an
-                        # optional number of seconds.
-                        tokens = val.split('+')
-                        timestamp = now
-                        if len(tokens) == 2:
-                            timestamp += int(tokens[1])
-                        val = int(timestamp)
-                        request['params'][key] = val
-                result = s.request(
-                    request['api'], data=request['params'],
-                    files=(request['files'] if 'files' in request else None))
-                assert result['status'] == 'ok', request
+                _process_one_request(s, request, now)
 
 
 def main():
@@ -156,16 +179,15 @@ def main():
         # Removing directories requires the user to be in the 'www-data' group.
         can_delete = 'www-data' in (grp.getgrgid(grid).gr_name for grid in
                                     os.getgroups())
-        for subdir in ('problems.git', 'problems'):
-            for alias in os.listdir(os.path.join(OMEGAUP_RUNTIME_ROOT,
-                                                 subdir)):
-                path = os.path.join(OMEGAUP_RUNTIME_ROOT, subdir, alias)
-                logging.debug('Removing %s', path)
-                if can_delete:
-                    shutil.rmtree(path)
-                else:
-                    subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf',
-                                           path])
+        problems_root = os.path.join(OMEGAUP_RUNTIME_ROOT, 'problems.git')
+        for alias in os.listdir(problems_root):
+            path = os.path.join(problems_root, alias)
+            logging.debug('Removing %s', path)
+            if can_delete:
+                shutil.rmtree(path)
+            else:
+                subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf',
+                                       path])
         logging.info('Purging database')
         db_migrate_args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
         for name, value in [('--username', args.username),

@@ -97,6 +97,7 @@ class Utils {
             'Auth_Tokens',
             'Clarifications',
             'Coder_Of_The_Month',
+            'Contest_Log',
             'Contests',
             'Courses',
             'Emails',

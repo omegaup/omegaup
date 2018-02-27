@@ -450,4 +450,98 @@ class ContestListTest extends OmegaupTestCase {
 
         $this->assertEquals($numberOfPrivateContests, count($response['contests']));
     }
+
+    /**
+     * Check that most recent updated contests are sorted on the top of the list
+     */
+    public function testLatestUpdatedPublicContests() {
+        // Create a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Create three PUBLIC contests
+        $contests[0] = ContestsFactory::createContest(
+            new ContestParams([
+                'last_updated' => Time::get()
+            ])
+        );
+
+        $contests[1] = ContestsFactory::createContest(
+            new ContestParams([
+                'last_updated' => Time::get() + 1
+            ])
+        );
+        ContestsFactory::addProblemToContest($problemData, $contests[1]);
+
+        $contests[2] = ContestsFactory::createContest(
+            new ContestParams([
+                'last_updated' => Time::get() + 2
+            ])
+        );
+        $originalOrderContest = [
+            $contests[2]['contest']->contest_id,
+            $contests[1]['contest']->contest_id,
+            $contests[0]['contest']->contest_id
+        ];
+
+        // Log as a random contestant
+        $contestant = UserFactory::createUser();
+
+        $loginContestant = self::login($contestant);
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $loginContestant->auth_token,
+            'page_size' => 50,
+            'public' => 'YES'
+        ]));
+
+        // Assert our contest is there.
+        $apiListOrder = [];
+        foreach ($response['results'] as $contest) {
+            if (in_array($contest['contest_id'], $originalOrderContest)) {
+                $apiListOrder[] = $contest['contest_id'];
+            }
+        }
+        $this->assertEquals($apiListOrder, $originalOrderContest);
+
+        $login = self::login($contests[1]['director']);
+
+        Time::setTimeForTesting(Time::get() + 5);
+        // set contests[1] to private
+        $response = ContestController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contests[1]['request']['alias'],
+            'public' => 0,
+        ]));
+
+        Time::setTimeForTesting(Time::get() + 10);
+        // set contests[1] to public
+        $response = ContestController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contests[1]['request']['alias'],
+            'public' => 1,
+        ]));
+
+        // New order must be [1, 2, 0]
+        $modifiedOrderContest = [
+            $contests[1]['contest']->contest_id,
+            $contests[2]['contest']->contest_id,
+            $contests[0]['contest']->contest_id
+        ];
+
+        $loginNewContestant = self::login($contestant);
+        $response = ContestController::apiList(new Request([
+            'auth_token' => $loginNewContestant->auth_token,
+            'page_size' => 50,
+            'public' => 'YES'
+        ]));
+
+        // Assert our contest is there.
+        $apiListOrder = [];
+        foreach ($response['results'] as $contest) {
+            if (in_array($contest['contest_id'], $originalOrderContest)) {
+                $apiListOrder[] = $contest['contest_id'];
+            }
+        }
+
+        $this->assertEquals($apiListOrder, $modifiedOrderContest);
+    }
 }

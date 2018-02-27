@@ -66,6 +66,170 @@
 					"problems": "[{\"problem\":\"triangulos\",\"points\":100},{\"problem\":\"sumas\",\"points\":100}]",
 					"show_scoreboard_after": 1
 				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_0",
+					"email": "test_user_0@localhost.localdomain",
+					"password": "test_user_0"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_1",
+					"email": "test_user_1@localhost.localdomain",
+					"password": "test_user_1"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_2",
+					"email": "test_user_2@localhost.localdomain",
+					"password": "test_user_2"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_3",
+					"email": "test_user_3@localhost.localdomain",
+					"password": "test_user_3"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_4",
+					"email": "test_user_4@localhost.localdomain",
+					"password": "test_user_4"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_0",
+		"password": "test_user_0",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+			},
+			{
+				"api": "/contest/open",
+				"params": {
+					"contest_alias": "prueba"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "prueba",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_1",
+		"password": "test_user_1",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print 3"
+				}
+			},
+			{
+				"api": "/contest/open",
+				"params": {
+					"contest_alias": "prueba"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "prueba",
+					"language": "py",
+					"source": "print 3"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_2",
+		"password": "test_user_2",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print 0"
+				}
+			},
+			{
+				"api": "/contest/open",
+				"params": {
+					"contest_alias": "prueba"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "prueba",
+					"language": "py",
+					"source": "print 0"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_3",
+		"password": "test_user_3",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "syntax error"
+				}
+			},
+			{
+				"api": "/contest/open",
+				"params": {
+					"contest_alias": "prueba"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "prueba",
+					"language": "py",
+					"source": "syntax error"
+				}
 			}
 		]
 	}
