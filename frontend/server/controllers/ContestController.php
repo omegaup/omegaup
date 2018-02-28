@@ -47,8 +47,15 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
+            $public = isset($r['public'])
+                ? PublicStatus::getIntValue($r['public'])
+                : PublicStatus::NO;
+
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
+            }
+            if (is_null($public)) {
+                throw new InvalidParameterException('parameterInvalid', 'public');
             }
             $query = $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
@@ -66,6 +73,8 @@ class ContestController extends Controller {
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
                 $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
+            } elseif ($public == PublicStatus::YES) {
+                $contests = ContestsDAO::getRecentPublicContests($r['current_user_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
@@ -96,6 +105,7 @@ class ContestController extends Controller {
             'alias',
             'window_length',
             'recommended',
+            'last_updated'
             ];
 
         $addedContests = [];
@@ -2142,7 +2152,7 @@ class ContestController extends Controller {
             ContestsDAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($r['contest'], $original_contest->penalty_type);
+            self::updateContest($r['contest'], $original_contest, $r['current_user_id']);
 
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
@@ -2255,11 +2265,22 @@ class ContestController extends Controller {
     }
 
     /**
-     * This function reviews changes in penalty type
+     * This function reviews changes in penalty type and visibility type
      */
-    private static function updateContest(Contests $contest, $original_penalty_type) {
+    private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
+        if ($original_contest->public !== $contest->public) {
+            $timestamp = gmdate('Y-m-d H:i:s', Time::get());
+            ContestLogDAO::save(new ContestLog([
+                'contest_id' => $contest->contest_id,
+                'user_id' => $user_id,
+                'from_visibility' => $original_contest->public,
+                'to_visibility' => $contest->public,
+                'time' => $timestamp
+            ]));
+            $contest->last_updated = $timestamp;
+        }
         ContestsDAO::save($contest);
-        if ($original_penalty_type == $contest->penalty_type) {
+        if ($original_contest->penalty_type == $contest->penalty_type) {
             return;
         }
         RunsDAO::recalculatePenaltyForContest($contest);

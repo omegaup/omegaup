@@ -509,6 +509,8 @@ export default {
 
     list: _call('/api/user/list/'),
 
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+
     problemsSolved: _call('/api/user/problemssolved/'),
 
     profile: _call('/api/user/profile/',

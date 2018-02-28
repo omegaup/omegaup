@@ -2,11 +2,12 @@ omegaup.OmegaUp.on('ready', function() {
   Date.setLocale(omegaup.T.locale);
 
   var contestListConfigs = [
-    // List Id, Active, Recommended, List header
+    // List Id, Active, Recommended, List, Public header
     [
       '#recommended-current-contests',
       'ACTIVE',
       'RECOMMENDED',
+      'NO',
       'NO',
       omegaup.T.arenaRecommendedCurrentContests
     ],
@@ -15,12 +16,22 @@ omegaup.OmegaUp.on('ready', function() {
       'ACTIVE',
       'NOT_RECOMMENDED',
       'NO',
+      'NO',
       omegaup.T.arenaCurrentContests
+    ],
+    [
+      '#list-current-public-contest',
+      'ACTIVE',
+      'NOT_RECOMMENDED',
+      'NO',
+      'YES',
+      omegaup.T.arenaCurrentPublicContests
     ],
     [
       '#future-contests',
       'FUTURE',
       'NOT_RECOMMENDED',
+      'NO',
       'NO',
       omegaup.T.arenaFutureContests
     ],
@@ -29,12 +40,14 @@ omegaup.OmegaUp.on('ready', function() {
       'PAST',
       'RECOMMENDED',
       'NO',
+      'NO',
       omegaup.T.arenaRecommendedOldContests
     ],
     [
       '#past-contests',
       'PAST',
       'NOT_RECOMMENDED',
+      'NO',
       'NO',
       omegaup.T.arenaOldContests
     ],
@@ -43,6 +56,7 @@ omegaup.OmegaUp.on('ready', function() {
       'ACTIVE',
       'NOT_RECOMMENDED',
       'YES',
+      'NO',
       omegaup.T.arenaMyActiveContests
     ],
   ];
@@ -51,15 +65,15 @@ omegaup.OmegaUp.on('ready', function() {
   var contestLists = [];
   for (var i = 0, len = contestListConfigs.length; i < len; i++) {
     var config = contestListConfigs[i];
-    var contestList =
-        new omegaup.arena.ContestList(config[0],
-                                      {
-                                        active: config[1],
-                                        recommended: config[2],
-                                        participating: config[3],
-                                        query: $('input[name=query]').val()
-                                      },
-                                      {header: config[4]});
+    var contestList = new omegaup.arena.ContestList(
+        config[0],
+        {
+          active: config[1],
+          recommended: config[2],
+          participating: config[3], public: config[4],
+          query: $('input[name=query]').val()
+        },
+        {header: config[5]});
     contestLists.push(contestList);
     requests.push(contestList.deferred);
   }

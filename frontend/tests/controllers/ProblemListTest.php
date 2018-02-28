@@ -601,9 +601,11 @@ class ProblemList extends OmegaupTestCase {
         $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $user);
         RunsFactory::gradeRun($runDataWA, '0.0', 'WA');
 
-        // problemDataAC will have only one AC run
-        $runDataAC = RunsFactory::createRunToProblem($problemDataAC, $user);
-        RunsFactory::gradeRun($runDataAC);
+        // problemDataAC will have two AC runs
+        $runDataAC1 = RunsFactory::createRunToProblem($problemDataAC, $user);
+        RunsFactory::gradeRun($runDataAC1);
+        $runDataAC1_2 = RunsFactory::createRunToProblem($problemDataAC, $user);
+        RunsFactory::gradeRun($runDataAC1_2);
 
         // problemDataAC2 will have three runs, one AC, one PE and one TLE
         $runDataAC2_1 = RunsFactory::createRunToProblem($problemDataAC2, $user);
@@ -613,9 +615,11 @@ class ProblemList extends OmegaupTestCase {
         $runDataAC2_3 = RunsFactory::createRunToProblem($problemDataAC2, $user);
         RunsFactory::gradeRun($runDataAC2_3);
 
-        // problemDataPE will have only one run with a PE verdict
+        // problemDataPE will have two runs, one with a PE verdict and  the other with a TLE verdict.
         $runDataPE = RunsFactory::createRunToProblem($problemDataPE, $user);
         RunsFactory::gradeRun($runDataPE, '0.10', 'PE');
+        $runDataTLE = RunsFactory::createRunToProblem($problemDataPE, $user);
+        RunsFactory::gradeRun($runDataTLE, '0.10', 'TLE');
 
         // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
         $response = UserController::apiListUnsolvedProblems(new Request([
@@ -625,7 +629,7 @@ class ProblemList extends OmegaupTestCase {
 
         /* -------- VALIDATE RESULTS -------*/
 
-        // Expected to have only two problems as response.
+        // Expected to have only two problems as response although one same problem hasn't been accepted two times.
         $this->assertEquals(count($response['problems']), 2, 'Expected to have only 2 problems as response.');
 
         foreach ($response['problems'] as $responseProblem) {
