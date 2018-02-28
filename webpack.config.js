@@ -4,6 +4,7 @@ var webpack = require('webpack')
 module.exports = {
   entry: {
     omegaup: ['babel-polyfill', './frontend/www/js/omegaup/omegaup.js'],
+    admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',

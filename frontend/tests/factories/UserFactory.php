@@ -141,6 +141,22 @@ class UserFactory {
     }
 
     /**
+     * Creates a new user with support role
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     * @return User
+     */
+    public static function createSupportUser($username = null, $password = null, $email = null) {
+        $user = self::createUser($username, $password, $email);
+
+        self::addSupportRole($user);
+
+        return $user;
+    }
+
+    /**
      * Adds a system role to the user.
      *
      * @param Users $user
@@ -168,6 +184,23 @@ class UserFactory {
         $groupUser = new GroupsUsers([
             'user_id' => $user->user_id,
             'group_id' => $mentor_group->group_id,
+        ]);
+        GroupsUsersDao::save($groupUser);
+    }
+
+    /**
+     * Adds support role to the user
+     *
+     * @param Users $user
+     */
+    public static function addSupportRole(Users $user) {
+        $support_group = GroupsDAO::findByAlias(
+            Authorization::SUPPORT_GROUP_ALIAS
+        );
+
+        $groupUser = new GroupsUsers([
+            'user_id' => $user->user_id,
+            'group_id' => $support_group->group_id,
         ]);
         GroupsUsersDao::save($groupUser);
     }

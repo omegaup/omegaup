@@ -14,8 +14,11 @@ class Authorization {
     // Cache for system group for course curators
     private static $course_curator_group = null;
 
-    // Cache for system group for course curators
+    // Cache for system group for mentors
     private static $mentor_group = null;
+
+    // Cache for system group for support team members
+    private static $support_group = null;
 
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
@@ -32,6 +35,9 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
+    // Support team member.
+    const SUPPORT_ROLE = 6;
+
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
@@ -43,6 +49,9 @@ class Authorization {
 
     // Group for mentors.
     const MENTOR_GROUP_ALIAS = 'omegaup:mentor';
+
+    // Group for support team members.
+    const SUPPORT_GROUP_ALIAS = 'omegaup:support';
 
     public static function canViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
@@ -206,6 +215,18 @@ class Authorization {
         );
     }
 
+    public static function isSupportTeamMember($user_id) {
+        if (self::$support_group == null) {
+            self::$support_group = GroupsDAO::findByAlias(
+                Authorization::SUPPORT_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $user_id,
+            self::$support_group
+        );
+    }
+
     public static function isGroupAdmin($user_id, Groups $group) {
         return self::isAdmin($user_id, $group);
     }
@@ -255,6 +276,7 @@ class Authorization {
         self::$is_system_admin = null;
         self::$quality_reviewer_group = null;
         self::$mentor_group = null;
+        self::$support_group = null;
     }
 
     public static function canSubmitToProblemset($user_id, $problemset) {

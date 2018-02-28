@@ -432,6 +432,7 @@ omegaup.OmegaUp.loadTranslations({
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redaccion",
 	omegaupTitleScoreboardmerge: "Scoreboard Merge",
+	omegaupTitleSupportDashboard: "Tablero de soporte",
 	onlyDemotionsSupported: "Solamente se pueden resolver demociones por ahora.",
 	openInKarelJs: "Puedes utilizar karel.js para resolver este problema",
 	parameterEmpty: "El campo no puede estar vac\u00edo",
