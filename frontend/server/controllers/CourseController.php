@@ -287,7 +287,7 @@ class CourseController extends Controller {
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'needs_user_info' => $r['needs_user_info'] == 'true',
+                'requests_user_information' => $r['requests_user_information'] == 'true',
             ]));
 
             CoursesDAO::transEnd();
@@ -1290,7 +1290,7 @@ class CourseController extends Controller {
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
-                'user_information_required' => $r['course']->needs_user_info == '1'
+                'user_information_required' => $r['course']->requests_user_information == '1'
             ];
         } else {
             $result = [
@@ -1305,7 +1305,7 @@ class CourseController extends Controller {
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
-                'user_information_required' => $r['course']->needs_user_info == '1'
+                'user_information_required' => $r['course']->requests_user_information == '1'
             ];
 
             if ($isAdmin) {
@@ -1485,7 +1485,7 @@ class CourseController extends Controller {
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
-            'needs_user_info' => ['transform' => function ($value) {
+            'requests_user_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
             'public' => ['transform' => function ($value) {

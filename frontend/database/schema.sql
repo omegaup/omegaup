@@ -186,7 +186,7 @@ CREATE TABLE `Courses` (
   `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
   `school_id` int(11) DEFAULT NULL,
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
-  `needs_user_info` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
+  `requests_user_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),

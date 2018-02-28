@@ -20,11 +20,7 @@ omegaup.OmegaUp.on('ready', function() {
       });
 
   $('input[name=sharing-user-information]')
-      .on('click', function(ev) {
-        if ($('.basic-information-needed').length < 1) {
-          $('#start-contest-submit').prop('disabled', false);
-        }
-      });
+      .on('click', function(ev) { enableStartContestButton(); });
 
   $('#request-access-form')
       .on('submit', function(ev) {
@@ -42,6 +38,18 @@ omegaup.OmegaUp.on('ready', function() {
             });
       });
 
+  function enableStartContestButton() {
+    var $formElement = $('form#start-contest-form>p');
+    if ($formElement.hasClass('basic-information-needed')) {
+      return false;
+    }
+    if ($formElement.hasClass('user-information-required') &&
+        $('input[name=sharing-user-information]:checked').val() != '1') {
+      $('#start-contest-submit').prop('disabled', true);
+      return false;
+    }
+    $('#start-contest-submit').prop('disabled', false);
+  }
   function formatDelta(delta) {
     var days = Math.floor(delta / (24 * 60 * 60 * 1000));
     delta -= days * (24 * 60 * 60 * 1000);

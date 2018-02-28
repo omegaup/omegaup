@@ -187,6 +187,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestTimeExpired: "Concurso de tempo expirou ou n\u00e3o foi iniciada ainda.",
 	contestUpdateAlreadyHasRuns: "A dura\u00e7\u00e3o do concurso n\u00e3o pode ser alterada se voc\u00ea j\u00e1 tem solu\u00e7\u00f5es julgadas.",
 	contestUserInformationNeeded: "O criador do concurso solicitou acesso \u00e0s informa\u00e7\u00f5es do usu\u00e1rio para contat\u00e1-lo, mas voc\u00ea decide se deseja autorizar esta a\u00e7\u00e3o. Deseja compartilhar suas informa\u00e7\u00f5es?",
+	contestUserInformationRequired: "The creator of the contest has requested access to your user information in order to contact you, voc\u00ea deve clicar na op\u00e7\u00e3o \"sim\" para iniciar o concurso. Deseja compartilhar suas informa\u00e7\u00f5es?",
 	contestWillBeginIn: "Concurso inciar\u00e1 em ",
 	contestsCreateNew: "Criar um novo concurso",
 	contestsJoinScoreboards: "Juntar paineis de avalia\u00e7\u00e3o",

@@ -351,7 +351,6 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         $result = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
-        $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -362,6 +361,7 @@ class ContestController extends Controller {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
                     $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+                return $result;
             }
             self::canAccessContest($r);
         } catch (Exception $e) {
@@ -372,6 +372,7 @@ class ContestController extends Controller {
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
             $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
+            return $result;
         }
 
         $cs = SessionController::apiCurrentSession()['session'];
@@ -384,8 +385,9 @@ class ContestController extends Controller {
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
             $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
+            return $result;
         }
-
+        $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
         return $result;
     }
 

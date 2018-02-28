@@ -59,8 +59,8 @@ class Courses extends VO {
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = $data['needs_basic_information'];
         }
-        if (isset($data['needs_user_info'])) {
-            $this->needs_user_info = $data['needs_user_info'];
+        if (isset($data['requests_user_information'])) {
+            $this->requests_user_information = $data['requests_user_information'];
         }
     }
 
@@ -159,5 +159,5 @@ class Courses extends VO {
       * @access public
       * @var tinyint(1)
       */
-    public $needs_user_info;
+    public $requests_user_information;
 }

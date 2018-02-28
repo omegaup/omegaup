@@ -14,7 +14,7 @@ class ProblemsetUsersDAO extends ProblemsetUsersDAOBase {
         $user_id,
         $problemset_id,
         $grant_access = false,
-        $share_user_information = 0
+        $share_user_information = false
     ) {
         $problemset_user = self::getByPK($user_id, $problemset_id);
         if (is_null($problemset_user)) {

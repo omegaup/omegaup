@@ -5,7 +5,7 @@ ALTER TABLE `Problemsets`
 
 -- Courses
 ALTER TABLE `Courses`
-  ADD COLUMN `needs_user_info` tinyint(1) NOT NULL DEFAULT '0'
+  ADD COLUMN `requests_user_information` tinyint(1) NOT NULL DEFAULT '0'
     COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.';
 
 -- Problemset_Users: consent for contests

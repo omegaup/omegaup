@@ -10,22 +10,26 @@
 				<span id="finish-time" name="finish_time"></span>
 			</div>
 {if $LOGGED_IN eq '1'}
-			<!------------------- Wait for contest start -------------------------->
+			<!-- Wait for contest start -->
 			<div id="ready-to-start" class="hidden" >
 				<p>{#contestWillBeginIn#} <span id="countdown_clock"></span></p>
 			</div>
 
-			<!------------------- Click to proceed -------------------------->
+			<!-- Click to proceed -->
 			<div id="click-to-proceed" class="hidden" >
 				<form id="start-contest-form" method="POST" action="/">
-					{if !$needsBasicInformation && !$requestsUserInformation}
+					{if !$needsBasicInformation and $requestsUserInformation == 'no'}
 					    <p>{#aboutToStart#}</p>
 					{/if}
 					{if $needsBasicInformation }
 					    <p class="basic-information-needed">{#courseBasicInformationNeeded#}</p>
 					{/if}
-					{if $requestsUserInformation}
-					    <p>{#contestUserInformationNeeded#}</p>
+					{if $requestsUserInformation != 'no'}
+				    	{if $requestsUserInformation == 'optional'}
+				    	    <p class="user-information-optional">{#contestUserInformationNeeded#}</p>
+				    	{elseif $requestsUserInformation == 'required'}
+				    	    <p class="user-information-required">{#contestUserInformationRequired#}</p>
+				    	{/if}
 					    <p>
 					    	<label>
 					    		<input type="radio" name="sharing-user-information" value="1"> {#wordsYes#}
@@ -36,27 +40,27 @@
 					    </p>
 					{/if}
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
-					{if $needsBasicInformation || $requestsUserInformation} disabled="true"{/if}>{#startContest#}</button>
+					{if $needsBasicInformation || $requestsUserInformation != 'no'} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 
-			<!------------------- Must register -------------------------->
+			<!-- Must register -->
 			<div id="must_register" class="hidden">
 				<form id="request-access-form" method="POST" action="/foobar/">
 					<p>{#mustRegisterToJoinContest#}</p>
 					<button type="submit" id="request-access-submit" class="btn btn-primary btn-lg">{#registerForContest#}</button>
 				</form>
 			</div>
-			<!------------------- Registration pending -------------------------->
+			<!-- Registration pending -->
 			<div id="registration_pending" class="hidden">
 				<p>{#registrationPending#}</p>
 			</div>
-			<!------------------- Registration denied -------------------------->
+			<!-- Registration denied -->
 			<div id="registration_denied" class="hidden">
 				<p>{#registrationDenied#}</p>
 			</div>
 {else}
-			<!------------------- Must login to do anything -------------------------->
+			<!-- Must login to do anything -->
 			<div class="panel">
 				<p>{#mustLoginToJoinContest#}</p>
 				<a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}' class='btn btn-primary'>{#loginHeader#}</a>

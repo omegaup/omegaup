@@ -24,7 +24,7 @@ if ($show_intro['shouldShowIntro']) {
     );
     $smarty->assign(
         'requestsUserInformation',
-        $show_intro['requests_user_information'] != 'no' && !is_null($session['user'])
+        $show_intro['requests_user_information']
     );
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {

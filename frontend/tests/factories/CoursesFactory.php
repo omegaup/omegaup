@@ -5,7 +5,7 @@ class CoursesFactory {
         Users $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
-        $needs_user_info = 'false'
+        $requests_user_information = false
     ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
@@ -34,7 +34,7 @@ class CoursesFactory {
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'public' => $public,
-            'needs_user_info' => $needs_user_info
+            'requests_user_information' => $requests_user_information
         ]);
 
         $response = CourseController::apiCreate($r);
