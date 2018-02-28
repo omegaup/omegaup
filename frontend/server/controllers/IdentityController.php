@@ -7,7 +7,7 @@
  */
 class IdentityController extends Controller {
     public static function convertFromUser(Users $user) {
-        $identity = new Identities([
+        return IdentitiesDAO::save(new Identities([
             'identity_id' => $user->main_identity_id,
             'username' => $user->username,
             'password' => $user->password,
@@ -17,7 +17,6 @@ class IdentityController extends Controller {
             'country_id' => $user->country_id,
             'state_id' => $user->state_id,
             'school_id' => $user->school_id
-        ]);
-        return IdentitiesDAO::save($identity);
+        ]));
     }
 }

@@ -24,11 +24,12 @@ CREATE TABLE IF NOT EXISTS `Identities` (
 -- Table Users
 
 ALTER TABLE `Users`
-  ADD COLUMN `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad con la que está relacionado el usuario' AFTER `main_email_id`,
+  ADD COLUMN `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario' AFTER `main_email_id`,
   ADD KEY `fk_main_identity_id` (`main_identity_id`),
   ADD CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Syncronize with Users table
+START TRANSACTION;
 
 INSERT INTO `Identities` (`identity_id`,`username`,`password`,`name`,`user_id`,`language_id`,`country_id`,`state_id`,`school_id`)
   SELECT `user_id`,`username`,`password`,`name`,`user_id`,`language_id`,`country_id`,`state_id`,`school_id` FROM `Users`;
@@ -41,3 +42,6 @@ ON
   Users.username = Identities.username
 SET
   `main_identity_id` = Identities.identity_id;
+
+-- Everything is ok
+COMMIT;

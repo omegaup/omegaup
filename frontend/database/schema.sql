@@ -797,7 +797,7 @@ CREATE TABLE `Users` (
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
   `password` varchar(100) DEFAULT NULL,
   `main_email_id` int(11) DEFAULT NULL,
-  `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad con la que está relacionado el usuario',
+  `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
   `name` varchar(256) DEFAULT NULL,
   `solved` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',

@@ -142,16 +142,12 @@ class UserController extends Controller {
             $email->user_id = $user->user_id;
             EmailsDAO::save($email);
 
+            $identity->user_id = $user->user_id;
             IdentitiesDAO::save($identity);
-            $saved_identity = IdentitiesDAO::search($identity);
 
             $user->main_email_id = $email->email_id;
-            $user->main_identity_id = $saved_identity[0]->identity_id;
+            $user->main_identity_id = $identity->identity_id;
             UsersDAO::save($user);
-            $saved_user = UsersDAO::search($user);
-
-            $identity->user_id = $saved_user[0]->user_id;
-            IdentitiesDAO::save($identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
