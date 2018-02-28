@@ -26,6 +26,7 @@ try_define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . '/server/');
 try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
 try_define('OMEGAUP_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
 try_define('OMEGAUP_BASE_URL', 'http://localhost');
+try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 
 # ####################################
 # LOG CONFIG
