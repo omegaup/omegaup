@@ -16,6 +16,7 @@ try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_DEVELOPMENT_MODE', false);
 try_define('OMEGAUP_MAINTENANCE', null);
+try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
 # ####################################
 # DATABASE CONFIG

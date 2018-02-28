@@ -129,4 +129,27 @@ class UserRolesDAO extends UserRolesDAOBase {
         }
         return $roles;
     }
+
+    public static function getSystemGroups($user_id) {
+        $sql = "
+            SELECT
+                g.name
+            FROM
+                Groups_Users gu
+            INNER JOIN
+                Groups g ON gu.group_id = g.group_id
+            WHERE
+                gu.user_id = ? AND g.name LIKE '%omegaup:%';";
+        $params = [
+            $user_id
+        ];
+        global $conn;
+
+        $groups = [];
+        foreach ($conn->GetAll($sql, $params) as $group) {
+            $groups[] = $group['name'];
+        }
+
+        return $groups;
+    }
 }
