@@ -31,8 +31,29 @@ ALTER TABLE `Users`
 -- Syncronize with Users table
 START TRANSACTION;
 
-INSERT INTO `Identities` (`identity_id`,`username`,`password`,`name`,`user_id`,`language_id`,`country_id`,`state_id`,`school_id`)
-  SELECT `user_id`,`username`,`password`,`name`,`user_id`,`language_id`,`country_id`,`state_id`,`school_id` FROM `Users`;
+INSERT INTO `Identities` (
+  `identity_id`,
+  `username`,
+  `password`,
+  `name`,
+  `user_id`,
+  `language_id`,
+  `country_id`,
+  `state_id`,
+  `school_id`
+)
+SELECT
+  `user_id`,
+  `username`,
+  `password`,
+  `name`,
+  `user_id`,
+  `language_id`,
+  `country_id`,
+  `state_id`,
+  `school_id`
+FROM
+  `Users`;
 
 UPDATE
   `Users`
@@ -44,5 +65,4 @@ SET
   `main_identity_id` = Identities.identity_id;
 
 -- Everything is ok
-
 COMMIT;
