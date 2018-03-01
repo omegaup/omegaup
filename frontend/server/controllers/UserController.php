@@ -127,6 +127,7 @@ class UserController extends Controller {
         }
 
         $user = new Users($user_data);
+        $identity = new Identities($user_data);
 
         $email = new Emails([
             'email' => $r['email'],
@@ -141,7 +142,11 @@ class UserController extends Controller {
             $email->user_id = $user->user_id;
             EmailsDAO::save($email);
 
+            $identity->user_id = $user->user_id;
+            IdentitiesDAO::save($identity);
+
             $user->main_email_id = $email->email_id;
+            $user->main_identity_id = $identity->identity_id;
             UsersDAO::save($user);
 
             DAO::transEnd();
@@ -398,6 +403,7 @@ class UserController extends Controller {
 
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
+                $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
                 if (is_null($user)) {
                     throw new NotFoundException('userNotExist');
@@ -412,6 +418,7 @@ class UserController extends Controller {
             }
         } else {
             $user = $r['current_user'];
+            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
                 // Check the old password
@@ -432,7 +439,20 @@ class UserController extends Controller {
         }
 
         $user->password = $hashedPassword;
-        UsersDAO::save($user);
+        $identity->password = $hashedPassword;
+
+        try {
+            DAO::transBegin();
+
+            UsersDAO::save($user);
+
+            IdentitiesDAO::save($identity);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return ['status' => 'ok'];
     }
@@ -1722,8 +1742,16 @@ class UserController extends Controller {
         self::updateValueProperties($r, $r['current_user'], $valueProperties);
 
         try {
+            DAO::transBegin();
+
             UsersDAO::save($r['current_user']);
+
+            IdentityController::convertFromUser($r['current_user']);
+
+            DAO::transEnd();
         } catch (Exception $e) {
+            DAO::transRollback();
+
             throw new InvalidDatabaseOperationException($e);
         }
 
