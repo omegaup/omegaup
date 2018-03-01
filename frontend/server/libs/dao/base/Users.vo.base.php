@@ -41,6 +41,9 @@ class Users extends VO {
         if (isset($data['main_email_id'])) {
             $this->main_email_id = $data['main_email_id'];
         }
+        if (isset($data['main_identity_id'])) {
+            $this->main_identity_id = $data['main_identity_id'];
+        }
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
@@ -153,6 +156,13 @@ class Users extends VO {
       * @var int(11)
       */
     public $main_email_id;
+
+    /**
+      * Identidad con la que está relacionado el usuario
+      * @access public
+      * @var int(11)
+      */
+    public $main_identity_id;
 
     /**
       *  [Campo no documentado]

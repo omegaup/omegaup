@@ -151,6 +151,7 @@ $log = Logger::getLogger('bootstrap');
  * */
 require_once('controllers/Controller.php');
 require_once('controllers/UserController.php');
+require_once('controllers/IdentityController.php');
 require_once('controllers/ACLController.php');
 require_once('controllers/SessionController.php');
 require_once('controllers/ContestController.php');
