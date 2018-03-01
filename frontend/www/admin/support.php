@@ -7,7 +7,7 @@ UITools::redirectToLoginIfNotLoggedIn();
 $is_suport_member = Authorization::isSupportTeamMember($session['user']->user_id);
 
 if (!$is_suport_member) {
-    header('Location: /');
+    header('HTTP/1.1 404 Not found');
     die();
 }
 
