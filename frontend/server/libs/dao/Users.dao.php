@@ -148,4 +148,28 @@ class UsersDAO extends UsersDAOBase {
         global $conn;
         return $conn->GetOne($sql, $params);
     }
+    public static function FindClassName($username){
+        global $conn;
+        $sql = 'select User_Rank.score 
+                from Users
+                inner join User_Rank on User_Rank.user_id=Users.user_id
+                where username = ?';
+        $params = [$username];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0){
+            return null;
+        }else{
+            $score = $rs[0];
+            $sql = 'select score, classname from User_Rank_Cutoffs order by score desc';
+            $rs = getAll($sql);
+            $classname = '';
+            foreach ($rs as $rule){
+                if ($score >= $rule[0]){
+                    $classname = $rule[1];
+                    break;
+                }
+            }
+            return $classname;
+        }
+    }
 }
