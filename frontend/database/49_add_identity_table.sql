@@ -44,4 +44,5 @@ SET
   `main_identity_id` = Identities.identity_id;
 
 -- Everything is ok
+
 COMMIT;
