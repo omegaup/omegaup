@@ -309,7 +309,7 @@ OmegaUp.on('ready', function() {
                         alias: ev.alias,
                         show_scoreboard: ev.showScoreboard,
                         needs_basic_information: ev.basic_information_required,
-                        requests_user_information: ev.user_information_required,
+                        requests_user_information: ev.requests_user_information,
                         school_id: school_id
                       })
                       .then(function(data) {

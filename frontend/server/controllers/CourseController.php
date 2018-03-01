@@ -287,7 +287,7 @@ class CourseController extends Controller {
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'requests_user_information' => $r['requests_user_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information'],
             ]));
 
             CoursesDAO::transEnd();
@@ -995,7 +995,8 @@ class CourseController extends Controller {
         // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
             && ($r['course']->public == false
-            || $r['user']->user_id !== $r['current_user_id'])) {
+            || $r['user']->user_id !== $r['current_user_id'])
+            && $r['course']->requests_user_information == 'no') {
             throw new ForbiddenAccessException();
         }
 
@@ -1268,7 +1269,9 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
-        $result['shouldShowResults'] = $shouldShowIntro || ($isFirstTimeAccess && $result['user_information_required']);
+        $result['shouldShowResults'] = $shouldShowIntro;
+        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
+        $result['requests_user_information'] = $result['requests_user_information'];
         return $result;
     }
 
@@ -1290,7 +1293,7 @@ class CourseController extends Controller {
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
-                'user_information_required' => $r['course']->requests_user_information == '1'
+                'requests_user_information' => $r['course']->requests_user_information
             ];
         } else {
             $result = [
@@ -1305,7 +1308,7 @@ class CourseController extends Controller {
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
-                'user_information_required' => $r['course']->requests_user_information == '1'
+                'requests_user_information' => $r['course']->requests_user_information
             ];
 
             if ($isAdmin) {
@@ -1485,9 +1488,7 @@ class CourseController extends Controller {
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
-            'requests_user_information' => ['transform' => function ($value) {
-                return $value == 'true' ? 1 : 0;
-            }],
+            'requests_user_information',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
             }],

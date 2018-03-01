@@ -8,16 +8,16 @@
       <p id="description">{{ description }}</p>
       <p v-html="T.courseBasicInformationNeeded"
          v-if="needsBasicInformation"></p>
-      <template v-if="needsUserInformation">
-        <p v-html="T.courseUserInformationNeeded"></p><label><input name=""
-               type="radio"
-               v-bind:value="1"
-               v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input name=
-               "sharing-user-information"
-               type="radio"
-               v-bind:value="0"
-               v-model="shareUserInformation"> {{ T.wordsNo }}</label>
+      <template v-if="requestsUserInformation == 'optional'">
+        <p v-html="T.courseUserInformationOptional"></p>
       </template>
+      <template v-if="requestsUserInformation == 'required'">
+        <p v-html="T.courseUserInformationRequired"></p>
+      </template><label><input type="radio"
+             v-bind:value="1"
+             v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
+             v-bind:value="0"
+             v-model="shareUserInformation"> {{ T.wordsNo }}</label>
       <div class="text-center">
         <form id="start-course-form"
               name="start-course-form"
@@ -26,7 +26,7 @@
                 id="start-course-submit"
                 type="button"
                 v-bind:disabled=
-                "needsBasicInformation || (needsUserInformation &amp;&amp; shareUserInformation == -1)"
+                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1)"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
@@ -42,10 +42,10 @@ export default {
     name: String,
     description: String,
     needsBasicInformation: Boolean,
-    needsUserInformation: Boolean
+    requestsUserInformation: Boolean
   },
   data: function() {
-    return { T: T, shareUserInformation: -1 }
+    return { T: T, shareUserInformation: undefined }
   },
   methods: {onSubmit() { this.$emit('submit', this);}}
 }

@@ -26,16 +26,16 @@
 					{/if}
 					{if $requestsUserInformation != 'no'}
 				    	{if $requestsUserInformation == 'optional'}
-				    	    <p class="user-information-optional">{#contestUserInformationNeeded#}</p>
+				    	    <p class="user-information-optional">{#contestUserInformationOptional#}</p>
 				    	{elseif $requestsUserInformation == 'required'}
-				    	    <p class="user-information-required">{#contestUserInformationRequired#}</p>
+				    	    <p class="requests-user-information">{#contestUserInformationRequired#}</p>
 				    	{/if}
 					    <p>
 					    	<label>
-					    		<input type="radio" name="sharing-user-information" value="1"> {#wordsYes#}
+					    		<input type="radio" name="share-user-information" value="1"> {#wordsYes#}
 					    	</label>
 					    	<label>
-					    		<input type="radio" name="sharing-user-information" value="0"> {#wordsNo#}
+					    		<input type="radio" name="share-user-information" value="0"> {#wordsNo#}
 					    	</label>
 					    </p>
 					{/if}

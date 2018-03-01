@@ -39,7 +39,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
      * apiAddStudent test with a duplicate student.
      */
     public function testAddDuplicateStudentToCourse() {
-        $courseData = CoursesFactory::createCourse(null, null, true, 'true');
+        $courseData = CoursesFactory::createCourse(null, null, true, 'optional');
         $student = UserFactory::createUser();
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
@@ -57,8 +57,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'current_user_id' => $student->user_id,
             'course_alias' => $courseData['request']['alias']
         ]));
-        // Asserting shouldShowResults is on
-        $this->assertEquals(1, $intro_details['shouldShowResults']);
+        // Asserting isFirstTimeAccess
+        $this->assertEquals('optional', $intro_details['requests_user_information']);
+        $this->assertEquals(1, $intro_details['isFirstTimeAccess']);
 
         // Add the same student. It only updates share_user_information field.
         $response = CourseController::apiAddStudent(new Request([
@@ -75,7 +76,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting shouldShowResults is off
-        $this->assertEquals(0, $intro_details['shouldShowResults']);
+        $this->assertEquals(0, $intro_details['isFirstTimeAccess']);
     }
 
     /**

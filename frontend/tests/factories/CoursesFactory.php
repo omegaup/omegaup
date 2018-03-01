@@ -5,7 +5,7 @@ class CoursesFactory {
         Users $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
-        $requests_user_information = false
+        $requests_user_information = 'no'
     ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();

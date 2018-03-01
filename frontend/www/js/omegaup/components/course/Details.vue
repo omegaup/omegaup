@@ -91,14 +91,18 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseNewFormUserInformationRequiredDesc"></span></span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"><input type="radio"
-                     v-bind:value="true"
-                     v-model="user_information_required">{{ T.wordsYes }}</label> <label class=
-                     "radio-inline"><input type="radio"
-                     v-bind:value="false"
-                     v-model="user_information_required">{{ T.wordsNo }}</label>
-            </div>
+                  <select class="form-control"
+                 v-model="requests_user_information">
+              <option value="no">
+                {{ T.wordsNo }}
+              </option>
+              <option value="optional">
+                {{ T.wordsOptional }}
+              </option>
+              <option value="required">
+                {{ T.wordsRequired }}
+              </option>
+            </select>
           </div>
           <div class="row">
             <div class="form-group container-fluid">
@@ -148,7 +152,7 @@ export default {
       school_id: this.course.school_id,
       school_name: this.course.school_name,
       basic_information_required: !!this.course.basic_information_required,
-      user_information_required: !!this.course.user_information_required
+      requests_user_information: this.course.requests_user_information || 'no'
     };
   },
   mounted: function() {
@@ -173,7 +177,8 @@ export default {
       this.school_name = this.course.school_name;
       this.basic_information_required =
           !!this.course.basic_information_required;
-      this.user_information_required = !!this.course.user_information_required;
+      this.requests_user_information =
+          this.course.requests_user_information || 'no';
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
