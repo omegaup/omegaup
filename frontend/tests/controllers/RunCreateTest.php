@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CreateRun
+/* Description of CreateRun
  *
  * @author joemmanuel
  */
@@ -741,5 +741,20 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Call API
         $response = RunController::apiCreate($r);
+    }
+
+    /**
+     * Should not allow sending banned problems to administrators
+     * @expectedException
+     */
+    public function testShouldNotAllowToSendBannedProblems() {
+        $r = $this->setValidRequest();
+
+        $r['visibility'] = ProblemController::VISIBILITY_PUBLIC_BANNED;
+        echo $r['visiblity'];
+        //Call API
+        $response = RunController::apiCreate($r);
+
+    //$this->assertRun($r, $response);
     }
 }
