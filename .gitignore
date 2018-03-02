@@ -20,12 +20,13 @@ tags
 # Ignore configuration files
 *.conf
 
-# NetBeans-related stuff
+# IDE-related stuff
 build.xml
 nbproject/
 manifest.mf
 build/
 grader/lib/
+.idea/
 
 # Ignore SSL-related stuff
 *.jks
@@ -76,6 +77,7 @@ frontend/www/coverage/
 frontend/www/img/
 frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
+frontend/www/phpminiadmin/
 frontend/www/templates/
 
 # Ignore sublime sftp config
