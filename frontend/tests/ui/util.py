@@ -5,6 +5,7 @@
 
 import os
 import sys
+import re
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,31 +19,23 @@ sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 import database_utils  # NOQA
 
 
-def add_students(driver, users, instance):
+def add_students(driver, users, selector, typeahead_helper, submit_button):
     '''Add students to a recently :instance.'''
-
-    if instance == 'course':
-        selector = 'students'
-        typeahead_helper = '.omegaup-course-addstudent'
-        submit_button = '.omegaup-course-addstudent form button[type=submit]'
-    else:
-        selector = '#contestants'
-        typeahead_helper = selector
-        submit_button = 'user-add-single'
 
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "%s")]' % selector)))).click()
 
+    pattern = re.compile(r'[. #\/]')
+    if pattern.search(submit_button):
+        locator = By.CSS_SELECTOR
+    else:
+        locator = By.CLASS_NAME
+
     for user in users:
         driver.typeahead_helper(typeahead_helper, user)
 
-        if instance == 'course':
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, (submit_button)))).click()
-        else:
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.CLASS_NAME, (submit_button)))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (locator, (submit_button)))).click()
         driver.wait_for_page_loaded()

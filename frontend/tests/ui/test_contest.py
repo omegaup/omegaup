@@ -29,108 +29,15 @@ def test_create_contest(driver):
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    with driver.login_admin():
-        create_contest(driver, contest_alias)
+    create_contest_admin(driver, contest_alias, problem, users, user)
 
-        assert (('/contest/%s/edit/' % contest_alias) in
-                driver.browser.current_url), driver.browser.current_url
-
-        add_problem_to_contest(driver, problem)
-
-        add_students_mass(driver, users)
-        util.add_students(driver, [user], 'contest')
-
-        contest_url = '/arena/%s' % contest_alias
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[starts-with(@href, "%s")]' % contest_url))).click()
-        driver.wait_for_page_loaded()
-
-        assert (contest_alias in
-                driver.browser.current_url), driver.browser.current_url
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'start-contest-submit'))).click()
-        driver.wait_for_page_loaded()
-
-        assert ((contest_url) in
-                driver.browser.current_url), driver.browser.current_url
-
+    file = 'Main.cpp11'
     with driver.login(user1, password):
-        enter_contest(driver, contest_alias)
+        create_run_user(driver, contest_alias, problem, file)
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "new-run")]')))).click()
-
-        language = 'C++11'
-
-        Select(driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//select[@name = "language"]')))).select_by_visible_text(
-                     language)
-
-        contents_element = driver.browser.find_element_by_css_selector(
-            '#submit input[type="file"]')
-        contents_element.send_keys(os.path.join(
-            util.OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
-        with driver.ajax_page_transition():
-            contents_element.submit()
-
-        driver.update_score_in_contest(problem, contest_alias)
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 'button.details'))).click()
-
-        assert (('show-run:') in
-                driver.browser.current_url), driver.browser.current_url
-
+    file = 'Main_wrong.cpp11'
     with driver.login(user2, password):
-        enter_contest(driver, contest_alias)
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "new-run")]')))).click()
-
-        language = 'C++11'
-
-        Select(driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//select[@name = "language"]')))).select_by_visible_text(
-                     language)
-
-        contents_element = driver.browser.find_element_by_css_selector(
-            '#submit input[type="file"]')
-        contents_element.send_keys(os.path.join(
-            util.OMEGAUP_ROOT, 'frontend/tests/resources/Main_wrong.cpp11'))
-        with driver.ajax_page_transition():
-            contents_element.submit()
-
-        driver.update_score_in_contest(problem, contest_alias)
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 'button.details'))).click()
-
-        assert (('show-run:') in
-                driver.browser.current_url), driver.browser.current_url
+        create_run_user(driver, contest_alias, problem, file)
 
     with driver.login_admin():
         driver.wait.until(
@@ -151,15 +58,88 @@ def test_create_contest(driver):
                   contest_alias)))).click()
         driver.wait_for_page_loaded()
 
-        run_accepeted_user = driver.browser.find_element_by_xpath(
+        run_accepted_user = driver.browser.find_element_by_xpath(
             '//td[@class="accepted"]/preceding-sibling::td[1]')
 
-        assert run_accepeted_user.text == user1, run_accepeted_user
+        assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
             '//td[@class="wrong"]/preceding-sibling::td[1]')
 
         assert run_wrong_user.text == user2, run_wrong_user
+
+
+def create_contest_admin(driver, contest_alias, problem, users, user):
+    ''' Admin create a full contest. '''
+
+    with driver.login_admin():
+        create_contest(driver, contest_alias)
+
+        assert (('/contest/%s/edit/' % contest_alias) in
+                driver.browser.current_url), driver.browser.current_url
+
+        add_problem_to_contest(driver, problem)
+
+        add_students_bulk(driver, users)
+        add_students_contest(driver, [user])
+
+        contest_url = '/arena/%s' % contest_alias
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[starts-with(@href, "%s")]' % contest_url))).click()
+        driver.wait_for_page_loaded()
+
+        assert (contest_alias in
+                driver.browser.current_url), driver.browser.current_url
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'start-contest-submit'))).click()
+        driver.wait_for_page_loaded()
+
+        assert ((contest_url) in
+                driver.browser.current_url), driver.browser.current_url
+
+
+def create_run_user(driver, contest_alias, problem, file):
+    ''' User join course and then creates a run. '''
+
+    enter_contest(driver, contest_alias)
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "new-run")]')))).click()
+
+    language = 'C++11'
+
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//select[@name = "language"]')))).select_by_visible_text(
+                 language)
+
+    contents_element = driver.browser.find_element_by_css_selector(
+        '#submit input[type="file"]')
+    contents_element.send_keys(os.path.join(
+        util.OMEGAUP_ROOT, 'frontend/tests/resources/%s' % file))
+    with driver.ajax_page_transition():
+        contents_element.submit()
+
+    driver.update_score_in_contest(problem, contest_alias)
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'button.details'))).click()
+
+    assert (('show-run:') in
+            driver.browser.current_url), driver.browser.current_url
 
 
 def create_contest(driver, contest_alias):
@@ -187,7 +167,17 @@ def create_contest(driver, contest_alias):
         driver.browser.find_element_by_tag_name('form').submit()
 
 
-def add_students_mass(driver, users):
+def add_students_contest(driver, users):
+    '''Add students to a recently contest.'''
+
+    selector = '#contestants'
+    typeahead_helper = selector
+    submit_button = 'user-add-single'
+
+    util.add_students(driver, users, selector, typeahead_helper, submit_button)
+
+
+def add_students_bulk(driver, users):
     '''Add students to a recently created contest.'''
 
     driver.wait.until(

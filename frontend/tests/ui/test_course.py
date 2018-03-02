@@ -29,7 +29,7 @@ def test_create_course(driver):
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-        util.add_students(driver, [user], 'course')
+        add_students_course(driver, [user])
 
         add_assignment(driver, assignment_alias)
 
@@ -53,7 +53,7 @@ def test_user_ranking_course(driver):
 
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
-        util.add_students(driver, [user], 'course')
+        add_students_course(driver, [user])
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
 
@@ -208,6 +208,16 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
             (By.CSS_SELECTOR,
              '.omegaup-course-problemlist form button[type=submit]'))).click()
     driver.wait_for_page_loaded()
+
+
+def add_students_course(driver, users):
+    '''Add students to a recently course.'''
+
+    selector = 'students'
+    typeahead_helper = '.omegaup-course-addstudent'
+    submit_button = '.omegaup-course-addstudent form button[type=submit]'
+
+    util.add_students(driver, users, selector, typeahead_helper, submit_button)
 
 
 def enter_course(driver, course_alias, assignment_alias):
