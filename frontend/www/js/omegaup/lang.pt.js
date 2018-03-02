@@ -171,7 +171,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI usado. Colocar o seu t\u00edtulo aqui**",
 	contestNewFormUpdateContest: "Atualizar concurso",
 	contestNewFormUserInformationRequired: "Solicitar acesso \u00e0s informa\u00e7\u00f5es do participante",
-	contestNewFormUserInformationRequiredDesc: "Ative esta op\u00e7\u00e3o para solicitar acesso \u00e0s informa\u00e7\u00f5es dos participantes que pertencem ao concurso para serem contatados mais tarde. Use a op\u00e7\u00e3o \"Obrigat\u00f3rio\" quando o concurso for pr\u00e9-selecionado, caso contr\u00e1rio voc\u00ea pode usar \"Opcional\", tenha em mente que, neste caso, os participantes podem escolher se eles compartilham suas informa\u00e7\u00f5es ou n\u00e3o.",
+	contestNewFormUserInformationRequiredDesc: "Escolha \"Opcional\" se desejar pedir aos usu\u00e1rios a sua permiss\u00e3o para compartilhar suas informa\u00e7\u00f5es. Eles podem ent\u00e3o decidir se devem ou n\u00e3o compartilhar, e eles poder\u00e3o participar no concurso independentemente. Se voc\u00ea n\u00e3o pode permitir que eles participem sem compartilhar suas informa\u00e7\u00f5es, escolha \"Obrigat\u00f3rio\", mas tenha em mente que alguns usu\u00e1rios simplesmente escolher\u00e3o n\u00e3o participar.",
 	contestNewInvalidStartTime: "O tempo de in\u00edcio deve ser antes do tempo do fim",
 	contestNewPublicInfoNotice: "Para fazer um concurso p\u00fablico, adicione um problema em primeiro lugar e, em seguida, marque o concurso como p\u00fablico em Editar Concurso.",
 	contestNotExist: "Concurso n\u00e3o existe",

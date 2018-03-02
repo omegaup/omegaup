@@ -171,7 +171,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI aplicado. Tu t\u00edtulo aqu\u00ed**",
 	contestNewFormUpdateContest: "Actualizar concurso",
 	contestNewFormUserInformationRequired: "Solicitar acceso a informaci\u00f3n de participantes",
-	contestNewFormUserInformationRequiredDesc: "Habilita esta opci\u00f3n para solicitar acceso a la informaci\u00f3n de los participantes que pertenecen al concurso con el fin de ser contactados posteriormente. Utiliza la opci\u00f3n \"Requerido\" cuando el concurso sea de caracter preselectivo, de lo contrario puedes utilizar \"Opcional\", ten en cuenta que en este caso los participantes pueden elegir si comparten su informaci\u00f3n o no.",
+	contestNewFormUserInformationRequiredDesc: "Elige \"Opcional\" si deseas solicitar permiso a los usuarios para compartir su informaci\u00f3n. Ellos pueden entonces decidir si la comparten o no, y podr\u00e1n participar en el concurso independientemente. Si no puedes permitir el acceso sin que compartan su informaci\u00f3n, elige \"Requerido\", pero toma en cuenta que algunos usuarios simplemente optar\u00e1n por no participar.",
 	contestNewInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
 	contestNewPublicInfoNotice: "Para hacer un concurso p\u00fablico, agr\u00e9gale un problema y m\u00e1rcalo como p\u00fablico en Editar Concurso",
 	contestNotExist: "Concurso no existe",

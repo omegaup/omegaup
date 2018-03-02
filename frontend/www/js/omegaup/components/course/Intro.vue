@@ -8,9 +8,8 @@
       <p id="description">{{ description }}</p>
       <p v-html="T.courseBasicInformationNeeded"
          v-if="needsBasicInformation"></p>
-      <template v-if="requestsUserInformation == 'optional'">
-        <p v-html="T.courseUserInformationOptional"></p>
-      </template>
+      <p v-html="T.courseUserInformationOptional"
+         v-if="requestsUserInformation == 'optional'"></p>
       <template v-if="requestsUserInformation == 'required'">
         <p v-html="T.courseUserInformationRequired"></p>
       </template><label><input type="radio"
@@ -42,7 +41,7 @@ export default {
     name: String,
     description: String,
     needsBasicInformation: Boolean,
-    requestsUserInformation: Boolean
+    requestsUserInformation: String
   },
   data: function() {
     return { T: T, shareUserInformation: undefined }

@@ -26,9 +26,9 @@
 					{/if}
 					{if $requestsUserInformation != 'no'}
 				    	{if $requestsUserInformation == 'optional'}
-				    	    <p class="user-information-optional">{#contestUserInformationOptional#}</p>
+				    	    <p class="requests-user-information-optional">{#contestUserInformationOptional#}</p>
 				    	{elseif $requestsUserInformation == 'required'}
-				    	    <p class="requests-user-information">{#contestUserInformationRequired#}</p>
+				    	    <p class="requests-user-information-required">{#contestUserInformationRequired#}</p>
 				    	{/if}
 					    <p>
 					    	<label>

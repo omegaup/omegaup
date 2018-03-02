@@ -168,7 +168,7 @@
 	"contestNewFormTitlePlaceholderOmiStyle": "**OMI Style applied. Set your title here**",
 	"contestNewFormUpdateContest": "Update contest",
 	"contestNewFormUserInformationRequired": "Request access to participant information",
-	"contestNewFormUserInformationRequiredDesc": "Enable this option to request access to the information of the participants that belong to the contest in order to be contacted later. Use \"Required\" option when the contest is preselective, otherwise you can use \"Optional\", keep in mind that in this case participants can choose whether they share their information or not.",
+	"contestNewFormUserInformationRequiredDesc": "Choose \"Optional\" if you would want to ask the users for their permission to share their information. They can then decide whether or not to share it, and they will be able to participate on the contest regardless. If you cannot allow them to participate without sharing their information, choose \"Required\", but keep in mind that some users will simply choose to not participate at all.",
 	"contestNewInvalidStartTime": "The start time must be before the end time.",
 	"contestNewPublicInfoNotice": "To make a public contest, add a problem first and then mark it as public in Edit Contest.",
 	"contestNotExist": "The provided contest does not exist.",
