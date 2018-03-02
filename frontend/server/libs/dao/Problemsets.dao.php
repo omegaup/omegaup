@@ -56,11 +56,11 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             return true;
         }
 
-        $problemset_user = ProblemsetUsersDAO::getByPK(
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK(
             $user_id,
             $container->problemset_id
         );
-        $first_access_time = $problemset_user->access_time;
+        $first_access_time = $problemset_identity->access_time;
 
         return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }

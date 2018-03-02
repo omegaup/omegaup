@@ -162,16 +162,16 @@ class InterviewController extends Controller {
 
         // add the user to the interview
         try {
-            ProblemsetUsersDAO::save(new ProblemsetUsers([
+            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
                 'problemset_id' => $r['interview']->problemset_id,
-                'user_id' => $r['user']->user_id,
+                'identity_id' => $r['user']->user_id,
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
             ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
-            self::$log->error('Failed to create new ProblemsetUser: ' . $e->getMessage());
+            self::$log->error('Failed to create new ProblemsetIdentity: ' . $e->getMessage());
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -208,7 +208,7 @@ class InterviewController extends Controller {
         $thisResult['problemset_id'] = $interview->problemset_id;
 
         try {
-            $db_results = ProblemsetUsersDAO::search(new ProblemsetUsers([
+            $db_results = ProblemsetIdentitiesDAO::search(new ProblemsetIdentities([
                 'problemset_id' => $interview->problemset_id,
             ]));
         } catch (Exception $e) {

@@ -388,9 +388,9 @@ class RunCreateTest extends OmegaupTestCase {
 
          // Alter first access time of our contestant such that he started
         // 21 minutes ago, this is, window length has expired by 1 minute
-        $problemset_user = ProblemsetUsersDAO::getByPK($this->contestant->user_id, $contest->problemset_id);
-        $problemset_user->access_time = date('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp() - 21 * 60); //Window length is in minutes
-        ProblemsetUsersDAO::save($problemset_user);
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($this->contestant->user_id, $contest->problemset_id);
+        $problemset_identity->access_time = date('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp() - 21 * 60); //Window length is in minutes
+        ProblemsetIdentitiesDAO::save($problemset_identity);
 
         // Call API
         RunController::apiCreate($r);

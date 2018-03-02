@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Problemset_Users.
+ * Value Object file for table Problemset_Identities.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetUsers extends VO {
+class ProblemsetIdentities extends VO {
     /**
-     * Constructor de ProblemsetUsers
+     * Constructor de ProblemsetIdentities
      *
-     * Para construir un objeto de tipo ProblemsetUsers debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetIdentities debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,8 +26,8 @@ class ProblemsetUsers extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = $data['problemset_id'];
@@ -55,12 +55,12 @@ class ProblemsetUsers extends VO {
     }
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $identity_id;
 
     /**
       *  [Campo no documentado]

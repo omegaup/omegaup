@@ -917,7 +917,7 @@ class ProblemController extends Controller {
                 // If the contest is private, verify that our user is invited
                 if (isset($r['contest'])) {
                     if ($r['contest']->public != '1') {
-                        if (is_null(ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['problemset']->problemset_id))) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_user_id'], $r['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }
                     }
@@ -1273,7 +1273,7 @@ class ProblemController extends Controller {
         if (!is_null($problemset_id)) {
             // At this point, contestant_user relationship should be established.
             try {
-                ProblemsetUsersDAO::CheckAndSaveFirstTimeAccess(
+                ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_user_id'],
                     $problemset_id,
                     Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])

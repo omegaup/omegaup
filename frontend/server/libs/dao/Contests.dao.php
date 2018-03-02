@@ -330,11 +330,11 @@ class ContestsDAO extends ContestsDAOBase {
             FROM
                 Contests
             JOIN
-                Problemset_Users
+                Problemset_Identities
             ON
-                Contests.problemset_id = Problemset_Users.problemset_id
+                Contests.problemset_id = Problemset_Identities.problemset_id
             WHERE
-                Problemset_Users.user_id = ? AND
+                Problemset_Identities.identity_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
             ORDER BY
                 recommended DESC,
@@ -485,11 +485,11 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     INNER JOIN
-                        Problemset_Users
+                        Problemset_Identities
                     ON
-                        Contests.problemset_id = Problemset_Users.problemset_id
+                        Contests.problemset_id = Problemset_Identities.problemset_id
                     WHERE
-                        Contests.public = 0 AND Problemset_Users.user_id = ? AND
+                        Contests.public = 0 AND Problemset_Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
