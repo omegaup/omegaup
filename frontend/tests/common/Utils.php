@@ -105,6 +105,7 @@ class Utils {
             'Groups_Scoreboards',
             'Groups_Scoreboards_Contests',
             'Groups_Users',
+            'Identities',
             'Interviews',
             'Problems',
             'Problems_Languages',
