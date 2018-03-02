@@ -167,7 +167,7 @@ class UsersDAO extends UsersDAOBase {
                 ORDER BY
                     `urc`.`percentile` ASC
                 LIMIT
-                    1;';
+                    1';
         $params = [$user_id];
         global $conn;
         return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';
