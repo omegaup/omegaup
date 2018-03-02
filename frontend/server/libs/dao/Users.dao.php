@@ -148,7 +148,8 @@ class UsersDAO extends UsersDAOBase {
         global $conn;
         return $conn->GetOne($sql, $params);
     }
-    public static function FindClassName($user_id){
+    
+    public static function getRankingClassName($user_id){
         $sql = 'SELECT
                     `urc`.`classname`,
                     `urc`.`score`,
@@ -170,7 +171,6 @@ class UsersDAO extends UsersDAOBase {
                     1';
         $params = [$user_id];
         global $conn;
-        return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';
-        
+        return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';     
     }
 }
