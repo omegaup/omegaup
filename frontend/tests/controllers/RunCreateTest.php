@@ -1,7 +1,7 @@
 <?php
 
 /**
-/* Description of CreateRun
+ * Description of CreateRun
  *
  * @author joemmanuel
  */
@@ -744,7 +744,7 @@ class RunCreateTest extends OmegaupTestCase {
     }
 
     /**
-     * Should not allow sending banned public problems to administrators
+     * Should not allow sending to banned public problems.
      * @expectedException NotFoundException
      */
     public function testShouldNotAllowToSendPubliclyBannedProblems() {
@@ -752,25 +752,25 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
-        // create new Request
-        $r = new Request([
+        // Change the visibility to public banned.
+        ProblemController::apiUpdate(new Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
              'visibility' => ProblemController::VISIBILITY_PUBLIC_BANNED,
              'message' => 'public_banned',
+        ]));
+
+        // Call API
+        RunController::apiCreate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
              'language' => 'c',
              'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
-        ]);
-
-    // change the visibility to public banned.
-        ProblemController::apiUpdate($r);
-
-        //Call API
-        RunController::apiCreate($r);
+        ]));
     }
 
      /**
-     * Should not allow sending of privately banned problems to administrators
+     * Should not allow sending to privately banned problems.
      * @expectedException NotFoundException
      */
     public function testShouldNotAllowToSendPrivatelyBannedProblems() {
@@ -778,20 +778,20 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
-        // create new Request
-        $r = new Request([
+        // Change the visibility to private banned.
+        ProblemController::apiUpdate(new Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
              'visibility' => ProblemController::VISIBILITY_PRIVATE_BANNED,
              'message' => 'private_banned',
+        ]));
+
+        // Call API
+        RunController::apiCreate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
              'language' => 'c',
              'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
-        ]);
-
-    // change the visibility to private banned.
-        ProblemController::apiUpdate($r);
-
-        //Call API
-        RunController::apiCreate($r);
+        ]));
     }
 }
