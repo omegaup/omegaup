@@ -4,9 +4,7 @@ require_once('../../server/bootstrap.php');
 
 UITools::redirectToLoginIfNotLoggedIn();
 
-$is_suport_member = Authorization::isSupportTeamMember($session['user']->user_id);
-
-if (!$is_suport_member) {
+if (!Authorization::isSupportTeamMember($session['user']->user_id)) {
     header('HTTP/1.1 404 Not found');
     die();
 }

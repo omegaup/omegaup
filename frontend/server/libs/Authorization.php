@@ -35,9 +35,6 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
-    // Support team member.
-    const SUPPORT_ROLE = 6;
-
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
