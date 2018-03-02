@@ -744,17 +744,54 @@ class RunCreateTest extends OmegaupTestCase {
     }
 
     /**
-     * Should not allow sending banned problems to administrators
-     * @expectedException
+     * Should not allow sending banned public problems to administrators
+     * @expectedException NotFoundException
      */
-    public function testShouldNotAllowToSendBannedProblems() {
-        $r = $this->setValidRequest();
+    public function testShouldNotAllowToSendPubliclyBannedProblems() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $problem = $problemData['problem'];
 
-        $r['visibility'] = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        echo $r['visiblity'];
+        // create new Request
+        $r = new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'visibility' => ProblemController::VISIBILITY_PUBLIC_BANNED,
+             'message' => 'public_banned',
+             'language' => 'c',
+             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+        ]);
+
+    // change the visibility to public banned.
+        ProblemController::apiUpdate($r);
+
         //Call API
-        $response = RunController::apiCreate($r);
+        RunController::apiCreate($r);
+    }
 
-    //$this->assertRun($r, $response);
+     /**
+     * Should not allow sending of privately banned problems to administrators
+     * @expectedException NotFoundException
+     */
+    public function testShouldNotAllowToSendPrivatelyBannedProblems() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $problem = $problemData['problem'];
+
+        // create new Request
+        $r = new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'visibility' => ProblemController::VISIBILITY_PRIVATE_BANNED,
+             'message' => 'private_banned',
+             'language' => 'c',
+             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+        ]);
+
+    // change the visibility to private banned.
+        ProblemController::apiUpdate($r);
+
+        //Call API
+        RunController::apiCreate($r);
     }
 }
