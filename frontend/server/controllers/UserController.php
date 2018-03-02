@@ -1240,8 +1240,7 @@ class UserController extends Controller {
             ];
             $response['userinfo']['is_private'] = true;
         }
-        $classname=UsersDAO::cd($response['userinfo']['username']);
-        $response['userinfo']['classname']=$classname; //update the userinfo
+        $response['userinfo']['classname'] = UsersDAO::cd($response['userinfo']['user_id']);
         $response['status'] = 'ok';
         return $response;
     }
