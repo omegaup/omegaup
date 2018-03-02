@@ -69,6 +69,10 @@ class RunController extends Controller {
             if ($r['problem']->deprecated) {
                 throw new PreconditionFailedException('problemDeprecated');
             }
+            // check that problem is not publicly or privately banned.
+            if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                throw new NotFoundException('problemNotfound');
+            }
 
             $allowedLanguages = array_intersect(
                 $allowedLanguages,
