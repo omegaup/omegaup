@@ -213,11 +213,11 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
 def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
-    selector = 'students'
-    typeahead_helper = '.omegaup-course-addstudent'
-    submit_button = '.omegaup-course-addstudent form button[type=submit]'
-
-    util.add_students(driver, users, selector, typeahead_helper, submit_button)
+    util.add_students(
+        driver, users, selector='students',
+        typeahead_helper='.omegaup-course-addstudent',
+        submit_locator=(By.CSS_SELECTOR,
+                        '.omegaup-course-addstudent form button[type=submit]'))
 
 
 def enter_course(driver, course_alias, assignment_alias):

@@ -195,55 +195,73 @@ class Driver(object):
         self.wait.until(lambda _: self.browser.current_url == home_page_url)
         self.wait_for_page_loaded()
 
-    def update_score_in_course(self, problem_alias, assignment_alias):
-        '''Set score = 100 manually in DB'''
+    def update_run_score(self, run_id, verdict, score):
+        '''Set verdict and score of specified run'''
 
-        database_utils.mysql((
-            '''
+        database_utils.mysql(
+            ('''
             UPDATE
-                `Runs` AS r
-            INNER JOIN
-                `Problems` AS p ON p.problem_id = r.problem_id
-            INNER JOIN
-                `Problemsets` AS ps ON ps.problemset_id = r.problemset_id
-            INNER JOIN
-                `Assignments` AS a ON a.acl_id = ps.acl_id
+                `Runs`
             SET
-                `score` = 1,
-                `contest_score` = 100,
-                `verdict` = 'AC',
+                `score` = %s,
+                `contest_score` = %s,
+                `verdict` = '%s',
                 `status` = 'ready'
             WHERE
-                p.alias = '%s'
-                AND a.alias = '%s';
-            '''
-            ) % (problem_alias, assignment_alias),
-                             dbname='omegaup', auth=self.mysql_auth())  # NOQA
+                `run_id` = %s;
+            ''') % (str(score), str(score * 100), verdict, str(run_id)),
+            dbname='omegaup', auth=self.mysql_auth())
 
-    def update_score_in_contest(self, problem_alias, contest_alias):
-        '''Set score = 100 manually in DB'''
+    def update_score_in_course(self, problem_alias, assignment_alias,
+                               verdict='AC', score=1):
+        '''Set verdict and score of latest run'''
 
-        database_utils.mysql((
-            '''
-            UPDATE
-                `Runs` AS r
+        run_id = database_utils.mysql(
+            ('''
+            SELECT
+                MAX(`r`.`run_id`)
+            FROM
+                `Runs` AS `r`
             INNER JOIN
-                `Problems` AS p ON p.problem_id = r.problem_id
+                `Problems` AS `p` ON
+                `p`.`problem_id` = `r`.`problem_id`
             INNER JOIN
-                `Problemsets` AS ps ON ps.problemset_id = r.problemset_id
+                `Problemsets` AS `ps` ON
+                `ps`.`problemset_id` = `r`.`problemset_id`
             INNER JOIN
-                `Contests` AS c ON c.acl_id = ps.acl_id
-            SET
-                `score` = 1,
-                `contest_score` = 100,
-                `verdict` = 'AC',
-                `status` = 'ready'
+                `Assignments` AS `a` ON `a`.`acl_id` = `ps`.`acl_id`
             WHERE
-                p.alias = '%s'
-                AND c.alias = '%s';
+                `p`.`alias` = '%s'
+                AND `a`.`alias` = '%s';
+            ''') % (problem_alias, assignment_alias),
+            dbname='omegaup', auth=self.mysql_auth())
+        self.update_run_score(int(run_id.strip()), verdict, score)
+
+    def update_score_in_contest(self, problem_alias, contest_alias,
+                               verdict='AC', score=1):
+        '''Set verdict and score of latest run'''
+
+        run_id = database_utils.mysql(
+            ('''
+            SELECT
+                MAX(`r`.`run_id`)
+            FROM
+                `Runs` AS `r`
+            INNER JOIN
+                `Problems` AS `p` ON
+                `p`.`problem_id` = `r`.`problem_id`
+            INNER JOIN
+                `Problemsets` AS `ps` ON
+                `ps`.`problemset_id` = `r`.`problemset_id`
+            INNER JOIN
+                `Contests` AS `c` ON `c`.`acl_id` = `ps`.`acl_id`
+            WHERE
+                `p`.`alias` = '%s'
+                AND `c`.`alias` = '%s';
             '''
             ) % (problem_alias, contest_alias),
-                             dbname='omegaup', auth=self.mysql_auth())  # NOQA
+            dbname='omegaup', auth=self.mysql_auth())
+        self.update_run_score(int(run_id.strip()), verdict, score)
 
 
 @pytest.hookimpl(hookwrapper=True)

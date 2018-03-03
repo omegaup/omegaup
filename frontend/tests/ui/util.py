@@ -19,23 +19,16 @@ sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 import database_utils  # NOQA
 
 
-def add_students(driver, users, selector, typeahead_helper, submit_button):
+def add_students(driver, users, selector, typeahead_helper, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "%s")]' % selector)))).click()
 
-    pattern = re.compile(r'[. #\/]')
-    if pattern.search(submit_button):
-        locator = By.CSS_SELECTOR
-    else:
-        locator = By.CLASS_NAME
-
     for user in users:
         driver.typeahead_helper(typeahead_helper, user)
 
         driver.wait.until(
-            EC.element_to_be_clickable(
-                (locator, (submit_button)))).click()
+            EC.element_to_be_clickable(submit_locator)).click()
         driver.wait_for_page_loaded()

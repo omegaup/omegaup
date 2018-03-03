@@ -4,6 +4,7 @@
 '''Run Selenium contest tests.'''
 
 import os
+import urllib
 
 from flaky import flaky
 from selenium.webdriver.common.by import By
@@ -31,15 +32,18 @@ def test_create_contest(driver):
 
     create_contest_admin(driver, contest_alias, problem, users, user)
 
-    file = 'Main.cpp11'
     with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, file)
+        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                        verdict='AC', score=1)
 
-    file = 'Main_wrong.cpp11'
     with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, file)
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+                        verdict='WA', score=0)
+
+    update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
+
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'nav-contests'))).click()
@@ -60,17 +64,15 @@ def test_create_contest(driver):
 
         run_accepted_user = driver.browser.find_element_by_xpath(
             '//td[@class="accepted"]/preceding-sibling::td[1]')
-
         assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
             '//td[@class="wrong"]/preceding-sibling::td[1]')
-
         assert run_wrong_user.text == user2, run_wrong_user
 
 
 def create_contest_admin(driver, contest_alias, problem, users, user):
-    ''' Admin create a full contest. '''
+    '''Creates a contest as an admin.'''
 
     with driver.login_admin():
         create_contest(driver, contest_alias)
@@ -102,8 +104,21 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
                 driver.browser.current_url), driver.browser.current_url
 
 
-def create_run_user(driver, contest_alias, problem, file):
-    ''' User join course and then creates a run. '''
+def update_scoreboard_for_contest(driver, contest_alias):
+    '''Updates the scoreboard for a contest.
+
+    This can be run without a session being active.
+    '''
+
+    scoreboard_refresh_url = driver.url(
+        '/api/scoreboard/refresh/alias/%s/token/secret' %
+        urllib.parse.quote(contest_alias, safe=''))
+    driver.browser.get(scoreboard_refresh_url)
+    assert '{"status":"ok"}' in driver.browser.page_source
+
+
+def create_run_user(driver, contest_alias, problem, filename, **kwargs):
+    '''Makes the user join a course and then creates a run.'''
 
     enter_contest(driver, contest_alias)
 
@@ -116,22 +131,20 @@ def create_run_user(driver, contest_alias, problem, file):
             (By.XPATH,
              ('//a[contains(@href, "new-run")]')))).click()
 
-    language = 'C++11'
-
     Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
              '//select[@name = "language"]')))).select_by_visible_text(
-                 language)
+                 'C++11')
 
     contents_element = driver.browser.find_element_by_css_selector(
         '#submit input[type="file"]')
     contents_element.send_keys(os.path.join(
-        util.OMEGAUP_ROOT, 'frontend/tests/resources/%s' % file))
+        util.OMEGAUP_ROOT, 'frontend/tests/resources/%s' % filename))
     with driver.ajax_page_transition():
         contents_element.submit()
 
-    driver.update_score_in_contest(problem, contest_alias)
+    driver.update_score_in_contest(problem, contest_alias, **kwargs)
 
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -170,11 +183,10 @@ def create_contest(driver, contest_alias):
 def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
-    selector = '#contestants'
-    typeahead_helper = selector
-    submit_button = 'user-add-single'
-
-    util.add_students(driver, users, selector, typeahead_helper, submit_button)
+    util.add_students(
+        driver, users, selector='#contestants',
+        typeahead_helper='#contestants',
+        submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
 
 def add_students_bulk(driver, users):
