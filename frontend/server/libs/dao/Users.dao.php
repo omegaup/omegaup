@@ -149,7 +149,7 @@ class UsersDAO extends UsersDAOBase {
         return $conn->GetOne($sql, $params);
     }
 
-       public static function getRankingClassName($user_id) {
+    public static function getRankingClassName($user_id) {
         $sql = 'SELECT
                     `urc`.`classname`
                 FROM
