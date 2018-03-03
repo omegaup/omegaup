@@ -131,6 +131,17 @@ omegaup.OmegaUp.on('ready', function() {
         return false;
       });
 
+  $('#delete form')
+      .on('submit', (function(event) {
+            event.preventDefault();
+            omegaup.API.Problem.delete({problem_alias: problemAlias})
+                .then(function(response) {
+                  window.location = '/problem/mine/';
+                })
+                .fail(omegaup.UI.apiError);
+            return false;
+          }));
+
   $('#markdown form')
       .on('submit', function() {
         var promises = [];
@@ -259,7 +270,7 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
   }
 
-  $('#add-tag-form')
+  $('#tags form')
       .on('submit', function() {
         var tagname = $('#tag-name').val();
         var public = $('#tag-public').val();

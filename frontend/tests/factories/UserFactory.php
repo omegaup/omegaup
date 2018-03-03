@@ -16,7 +16,7 @@ class UserFactory {
     * @param string $email optional
     * @return user (DAO)
     */
-    public static function createUser($username = null, $password = null, $email = null, $verify = true) {
+    public static function createUser($username = null, $password = null, $email = null, $verify = true, $is_private = false) {
         // If data is not provided, generate it randomly
         if (is_null($username)) {
             $username = Utils::CreateRandomString();
@@ -37,6 +37,7 @@ class UserFactory {
             'name' => $username,
             'password' => $password,
             'email' => $email,
+            'is_private' => $is_private,
             'permission_key' => UserController::$permissionKey
         ]);
 

@@ -47,6 +47,9 @@ class Contests extends VO {
         if (isset($data['finish_time'])) {
             $this->finish_time = $data['finish_time'];
         }
+        if (isset($data['last_updated'])) {
+            $this->last_updated = $data['last_updated'];
+        }
         if (isset($data['window_length'])) {
             $this->window_length = $data['window_length'];
         }
@@ -113,7 +116,7 @@ class Contests extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['start_time', 'finish_time']);
+            parent::toUnixTime(['start_time', 'finish_time', 'last_updated']);
         }
     }
 
@@ -167,6 +170,13 @@ class Contests extends VO {
       * @var timestamp
       */
     public $finish_time;
+
+    /**
+      * Indica la hora en que se actualizó de privado a público un concurso o viceversa
+      * @access public
+      * @var timestamp
+      */
+    public $last_updated;
 
     /**
       * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso
