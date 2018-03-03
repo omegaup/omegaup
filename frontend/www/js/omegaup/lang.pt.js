@@ -432,6 +432,7 @@ omegaup.OmegaUp.loadTranslations({
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Reda\u00e7\u00e3o",
 	omegaupTitleScoreboardmerge: "Uni\u00e3o de paineis de avalia\u00e7\u00e3o",
+	omegaupTitleSupportDashboard: "Painel de Suporte",
 	omegaupTitleUpdatePrivileges: "Atualizar privil\u00e9gios",
 	onlyDemotionsSupported: "Resolu\u00e7\u00e3o suportada apenas para demotions para agora.",
 	openInKarelJs: "Voc\u00ea pode usar karel.js para resolver este problema",

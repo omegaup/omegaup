@@ -432,6 +432,7 @@ omegaup.OmegaUp.loadTranslations({
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redaccion",
 	omegaupTitleScoreboardmerge: "Scoreboardmerge",
+	omegaupTitleSupportDashboard: "Support dashboard",
 	omegaupTitleUpdatePrivileges: "Update privileges",
 	onlyDemotionsSupported: "Resolution only supported for demotions for now.",
 	openInKarelJs: "You can use karel.js to solve this problem.",
