@@ -56,7 +56,7 @@ class UserProfileTest extends OmegaupTestCase {
         ]);
         $response = UserController::apiProfile($r);
 
-        $visibleAttributes = ['is_private', 'username', 'rankinfo'];
+        $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
         foreach ($response['userinfo'] as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;
