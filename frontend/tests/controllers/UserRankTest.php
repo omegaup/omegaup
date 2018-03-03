@@ -284,7 +284,7 @@ class UserRankTest extends OmegaupTestCase {
         $response = UserController::apiProfile(new Request([
             'username' => $contestant->username
         ]));
-        
+
         $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
     }
 }
