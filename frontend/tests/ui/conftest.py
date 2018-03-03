@@ -238,7 +238,7 @@ class Driver(object):
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score_in_contest(self, problem_alias, contest_alias,
-                               verdict='AC', score=1):
+                                verdict='AC', score=1):
         '''Set verdict and score of latest run'''
 
         run_id = database_utils.mysql(
@@ -258,8 +258,7 @@ class Driver(object):
             WHERE
                 `p`.`alias` = '%s'
                 AND `c`.`alias` = '%s';
-            '''
-            ) % (problem_alias, contest_alias),
+            ''') % (problem_alias, contest_alias),
             dbname='omegaup', auth=self.mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
