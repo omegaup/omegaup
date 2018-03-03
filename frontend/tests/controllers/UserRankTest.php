@@ -110,6 +110,23 @@ class UserRankTest extends OmegaupTestCase {
         $this->assertEquals($response['problems_solved'], 1);
     }
 
+    public function testUserRankingClassName() {
+        // Create a user and sumbit a run with him
+        $contestant = UserFactory::createUser();
+        $problemData = ProblemsFactory::createProblem();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        // Call API
+        $response = UserController::apiProfile(new Request([
+            'username' => $contestant->username
+        ]));
+
+        $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
+    }
     /**
      * Tests apiRankByProblemsSolved for a specific user with no runs
      */
