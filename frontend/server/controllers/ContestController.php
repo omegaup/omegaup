@@ -556,6 +556,8 @@ class ContestController extends Controller {
                 'window_length',
                 'alias',
                 'scoreboard',
+                'scoreboard_url',
+                'scoreboard_url_admin',
                 'points_decay_factor',
                 'partial_score',
                 'submissions_gap',
@@ -654,7 +656,8 @@ class ContestController extends Controller {
 
         $result = [];
         self::getCachedDetails($r, $result);
-
+        unset($result['scoreboard_url']); 
+        unset($result['scoreboard_url_admin']);
         if (is_null($r['token'])) {
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody

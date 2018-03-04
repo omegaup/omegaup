@@ -12,6 +12,7 @@
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
+	<li><a href="#links" data-toggle="tab">{#showLinks#}</a></li>
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
@@ -181,6 +182,19 @@
 				</thead>
 				<tbody id="contest-group-admins"></tbody>
 			</table>
+		</div>
+	</div>
+
+	<div class='tab-pane' id='links'>
+		<div class="panel panel-primary">
+			<div class='panel-body'>
+			<table class="table table-striped">
+				<thead>
+					<h3>{#contestEditAdministrativeLinks#}</h3>
+				</thead>
+				<tbody id="contest-admin-links"></tbody>
+			</table>
+			</div>
 		</div>
 	</div>
 </div>

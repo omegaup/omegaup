@@ -48,6 +48,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #public').val(contest.public);
         $('.new_contest_form #register').val(contest.contestant_must_register);
         $('.new_contest_form #scoreboard').val(contest.scoreboard);
+        $('#scoreboard-url').val(contest.scoreboard_url);
+        $('#scoreboard-admin-url').val(contest.scoreboard_url_admin);
         $('.new_contest_form #penalty-type').val(contest.penalty_type);
         $('.new_contest_form #show-scoreboard-after')
             .val(contest.show_scoreboard_after);
@@ -118,6 +120,8 @@ omegaup.OmegaUp.on('ready', function() {
           feedback: $('#feedback').val(),
           penalty: $('#penalty').val(), public: public,
           scoreboard: $('#scoreboard').val(),
+          scoreboard_url: $('#scoreboard_url').val(),
+          scoreboard_url_admin: $('#scoreboard_url_admin').val(),
           penalty_type: $('#penalty-type').val(),
           show_scoreboard_after: $('#show-scoreboard-after').val(),
           languages: $('#languages').val(),
@@ -466,8 +470,44 @@ omegaup.OmegaUp.on('ready', function() {
                                           };
                                         })(group_admin.alias))));
           }
-
-          $('#contest-admins .site-admin').hide();
+          $('#contest-admin-links').empty();
+          // Got the contests, lets populate the dropdown with them
+          $('#contest-admin-links')
+              .append(
+                  $('<tr></tr>')
+                      
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                    '/arena/' +
+                                                        contestAlias + '/admin/')
+                                              .text( ' Submissions')))
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                    '/contest/' +
+                                                        contestAlias + '/stats/')
+                                              .text( ' Stats')))
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                    '/contest/' +
+                                                        contestAlias + '/activity/')
+                                              .text( ' Activity Report')))
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                    '/arena/' +
+                                                        contestAlias + '/print/')
+                                              .text( 'Printable Version' )))
+                      
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                  '/arena/' +
+                                                  contestAlias + '/scoreboard/')
+                                              .text( 'Scoreboard' )))
+                        );
         })
         .fail(omegaup.UI.apiError);
   }
