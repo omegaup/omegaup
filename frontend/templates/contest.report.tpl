@@ -17,7 +17,7 @@
 	<th>Case</th>
 	<th>Time (Sec)</th>
 	<th>Time-wall (Sec)</th>
-	<th>Memory (MB)</th>
+	<th>Memory (MiB)</th>
 	<th>Status</th>
         <th>Score</th>
 	<th>Diff</th>

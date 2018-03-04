@@ -495,7 +495,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemEditFormHowToWriteProblems: "How to write the file",
 	problemEditFormLanguages: "Languages",
 	problemEditFormLiteral: "Interpret stdout as score",
-	problemEditFormMemoryLimit: "Memory limit (Kb)",
+	problemEditFormMemoryLimit: "Memory limit (KiB)",
 	problemEditFormNumericTokensWithTolerance: "Numeric tokens with tolerance",
 	problemEditFormOutputLimit: "Output limit (bytes)",
 	problemEditFormTimeLimit: "Time limit (ms)",
