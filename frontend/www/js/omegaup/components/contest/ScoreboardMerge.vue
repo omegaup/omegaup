@@ -1,45 +1,59 @@
 <template>
   <div>
     <div class="post">
-	    <div class="copy">
-		    <legend>Concurso:
-          <select class="contests" name='contests' id='contests' multiple="multiple" size="10">
-            <option v-for="contest in contests"
-                    v-bind:value="contest.alias"
-            >{{contest.title}}</option>
-          </select>
-        </legend>
-	    </div>
-	    <div class="POS Boton" id="get-merged-scoreboard" v-on:click.prevent="displayTable">Ver scoreboard total</div>
+      <div class="copy">
+        <legend>Concurso: <select class="contests"
+                id='contests'
+                multiple="multiple"
+                name='contests'
+                size="10">
+          <option v-bind:value="contest.alias"
+                  v-for="contest in contests">
+            {{contest.title}}
+          </option>
+        </select></legend>
+      </div>
+      <div class="POS Boton"
+           id="get-merged-scoreboard"
+           v-on:click.prevent="displayTable">
+        Ver scoreboard total
+      </div>
     </div>
-
     <div class="post">
-	    <div class="copy" id="ranking" v-if="showTable">
+      <div class="copy"
+           id="ranking"
+           v-if="showTable">
         <table class="merged-scoreboard">
           <tr>
             <td></td>
-            <td><b>Username</b></td>
-            <td v-if="isMoreThanZero"
+            <td><strong>Username</strong></td>
+            <td colspan="2"
                 v-for="alias in aliases"
-                colspan="2"><b>{{ alias }}</b>
+                v-if="isMoreThanZero"><strong>{{ alias }}</strong></td>
+            <td colspan="2"><strong>{{ total }}</strong></td>
+          </tr>
+          <tr v-for="rank in scoreboard"
+              v-if="scoreboard">
+            <td><strong>{{ rank.place }}</strong></td>
+            <td>
+              <div class="username">
+                {{ rank.username }}
+              </div>
+              <div class="name">
+                {{ rank.username != rank.name ? rank.name : '&nbsp;' }}
+              </div>
             </td>
-            <td colspan="2"><b>{{ total }}</b></td>
-            <tr v-if="scoreboard" v-for="rank in scoreboard">
-              <td><strong>{{ rank.place }}</strong></td>
-              <td>
-                <div class="username">{{ rank.username }}</div>
-                <div class="name">{{ rank.username != rank.name ? rank.name : '&nbsp;' }}</div>
-              </td>
-              <td class="numeric"
-                  v-for="alias in aliases"
-                  colspan="2">({{ rank.contests[alias].points }}<span class="scoreboard-penalty" v-if="showPenalty">{{ ' ' + rank.contests[alias].penalty }}</span>)
-              </td>
-              <td class="numeric" colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty" v-if="showPenalty">{{ ' ' + rank.totalPenalty }}</span>)
-              </td>
-            </tr>
+            <td class="numeric"
+                colspan="2"
+                v-for="alias in aliases">({{ rank.contests[alias].points }}<span class=
+                "scoreboard-penalty"
+                  v-if="showPenalty">{{ ' ' + rank.contests[alias].penalty }}</span>)</td>
+            <td class="numeric"
+                colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty"
+                  v-if="showPenalty">{{ ' ' + rank.totalPenalty }}</span>)</td>
           </tr>
         </table>
-	    </div>
+      </div>
     </div>
   </div>
 </template>
@@ -60,15 +74,13 @@ export default {
     displayTable: function() {
       let self = this;
       let contestAliases = $('select.contests option:selected')
-                             .map(function() { return this.value })
-                             .get();
+                               .map(function() { return this.value })
+                               .get();
       this.$emit('get-scoreboard', contestAliases);
     }
   },
   data: function() {
-    return {
-      total: T.wordsTotal,
-    }
+    return { total: T.wordsTotal, }
   }
 }
 </script>
