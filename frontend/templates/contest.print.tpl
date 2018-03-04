@@ -20,7 +20,7 @@
 				<td>{#wordsPoints#}</td>
 				<td class="points">{$problem.points}</div>
 				<td>{#arenaCommonMemoryLimit#}</td>
-				<td class="memory_limit">{$problem.memory_limit / 1024} MB</td>
+				<td class="memory_limit">{$problem.memory_limit / 1024} MiB</td>
 			</tr>
 			<tr>
 				<td>{#arenaCommonTimeLimit#}</td>
