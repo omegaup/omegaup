@@ -32,9 +32,9 @@
               </td>
               <td class="numeric"
                   v-for="alias in aliases"
-                  colspan="2">({{ rank.contests[alias].points }}<span class="scoreboard-penalty" >{{ ' ' + rank.contests[alias].penalty }}</span>)
+                  colspan="2">({{ rank.contests[alias].points }}<span class="scoreboard-penalty" v-if="showPenalty">{{ ' ' + rank.contests[alias].penalty }}</span>)
               </td>
-              <td class="numeric" colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty" >{{ ' ' + rank.totalPenalty }}</span>)
+              <td class="numeric" colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty" v-if="showPenalty">{{ ' ' + rank.totalPenalty }}</span>)
               </td>
             </tr>
           </tr>
