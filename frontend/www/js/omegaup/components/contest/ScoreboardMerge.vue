@@ -3,9 +3,9 @@
     <div class="post">
       <div class="copy">
         <legend>Concurso: <select class="contests"
-                v-model="selectedContests"
                 multiple="multiple"
-                size="10">
+                size="10"
+                v-model="selectedContests">
           <option v-bind:value="contest.alias"
                   v-for="contest in availableContests">
             {{contest.title}}
@@ -18,13 +18,12 @@
       </div>
     </div>
     <table class="merged-scoreboard"
-          v-if="scoreboard.length > 0">
+           v-if="scoreboard.length &gt; 0">
       <tr>
         <td></td>
         <td><strong>{{ T.User }}</strong></td>
         <td colspan="2"
-            v-for="alias in aliases"
-        ><strong>{{ alias }}</strong></td>
+            v-for="alias in aliases"><strong>{{ alias }}</strong></td>
         <td colspan="2"><strong>{{ T.wordsTotal }}</strong></td>
       </tr>
       <tr v-for="rank in scoreboard">
@@ -39,13 +38,16 @@
         </td>
         <td class="numeric"
             colspan="2"
-            v-for="alias in aliases">({{ rank.contests[alias].points }}<span class=
-            "scoreboard-penalty" v-if="showPenalty"> {{ rank.contests[alias].penalty }}</span>)</td>
+            v-for="alias in aliases">({{ rank.contests[alias].points }} <span class=
+            "scoreboard-penalty"
+              v-if="showPenalty">{{ rank.contests[alias].penalty }}</span>)</td>
         <td class="numeric"
-            colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty" v-if="showPenalty"> {{ rank.totalPenalty }}</span>)</td>
+            colspan="2">({{ rank.totalPoints }} <span class="scoreboard-penalty"
+              v-if="showPenalty">{{ rank.totalPenalty }}</span>)</td>
       </tr>
     </table>
-    <table v-else class="merged-scoreboard">
+    <table class="merged-scoreboard"
+           v-else="">
       <tr>
         <td></td>
         <td><strong>{{ T.User }}</strong></td>
@@ -71,10 +73,7 @@ export default {
     }
   },
   data: function() {
-    return {
-      T: T,
-      selectedContests: [],
-    }
+    return { T: T, selectedContests:[], }
   }
 }
 </script>
