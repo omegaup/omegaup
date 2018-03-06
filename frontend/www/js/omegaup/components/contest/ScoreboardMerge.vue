@@ -3,58 +3,55 @@
     <div class="post">
       <div class="copy">
         <legend>Concurso: <select class="contests"
-                id='contests'
+                v-model="selectedContests"
                 multiple="multiple"
-                name='contests'
                 size="10">
           <option v-bind:value="contest.alias"
-                  v-for="contest in contests">
+                  v-for="contest in availableContests">
             {{contest.title}}
           </option>
         </select></legend>
       </div>
       <div class="POS Boton"
-           id="get-merged-scoreboard"
            v-on:click.prevent="displayTable">
         Ver scoreboard total
       </div>
     </div>
-    <div class="post">
-      <div class="copy"
-           id="ranking"
-           v-if="showTable">
-        <table class="merged-scoreboard">
-          <tr>
-            <td></td>
-            <td><strong>Username</strong></td>
-            <td colspan="2"
-                v-for="alias in aliases"
-                v-if="isMoreThanZero"><strong>{{ alias }}</strong></td>
-            <td colspan="2"><strong>{{ total }}</strong></td>
-          </tr>
-          <tr v-for="rank in scoreboard"
-              v-if="scoreboard">
-            <td><strong>{{ rank.place }}</strong></td>
-            <td>
-              <div class="username">
-                {{ rank.username }}
-              </div>
-              <div class="name">
-                {{ rank.username != rank.name ? rank.name : '&nbsp;' }}
-              </div>
-            </td>
-            <td class="numeric"
-                colspan="2"
-                v-for="alias in aliases">({{ rank.contests[alias].points }}<span class=
-                "scoreboard-penalty"
-                  v-if="showPenalty">{{ ' ' + rank.contests[alias].penalty }}</span>)</td>
-            <td class="numeric"
-                colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty"
-                  v-if="showPenalty">{{ ' ' + rank.totalPenalty }}</span>)</td>
-          </tr>
-        </table>
-      </div>
-    </div>
+    <table class="merged-scoreboard"
+          v-if="scoreboard.length > 0">
+      <tr>
+        <td></td>
+        <td><strong>{{ T.User }}</strong></td>
+        <td colspan="2"
+            v-for="alias in aliases"
+        ><strong>{{ alias }}</strong></td>
+        <td colspan="2"><strong>{{ T.wordsTotal }}</strong></td>
+      </tr>
+      <tr v-for="rank in scoreboard">
+        <td><strong>{{ rank.place }}</strong></td>
+        <td>
+          <div class="username">
+            {{ rank.username }}
+          </div>
+          <div class="name">
+            {{ rank.username != rank.name ? rank.name : ' ' }}
+          </div>
+        </td>
+        <td class="numeric"
+            colspan="2"
+            v-for="alias in aliases">({{ rank.contests[alias].points }}<span class=
+            "scoreboard-penalty" v-if="showPenalty"> {{ rank.contests[alias].penalty }}</span>)</td>
+        <td class="numeric"
+            colspan="2">({{ rank.totalPoints }}<span class="scoreboard-penalty" v-if="showPenalty"> {{ rank.totalPenalty }}</span>)</td>
+      </tr>
+    </table>
+    <table v-else class="merged-scoreboard">
+      <tr>
+        <td></td>
+        <td><strong>{{ T.User }}</strong></td>
+        <td colspan="2"><strong>{{ T.wordsTotal }}</strong></td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -63,29 +60,30 @@ import {T} from '../../omegaup.js';
 
 export default {
   props: {
-    contests: Array,
-    showTable: Boolean,
-    isMoreThanZero: Boolean,
+    availableContests: Array,
     scoreboard: Array,
-    showPenalty: Boolean,
+    showPenalty: Number,
     aliases: Array,
   },
   methods: {
     displayTable: function() {
-      let self = this;
-      let contestAliases = $('select.contests option:selected')
-                               .map(function() { return this.value })
-                               .get();
-      this.$emit('get-scoreboard', contestAliases);
+      this.$emit('get-scoreboard', this.selectedContests);
     }
   },
   data: function() {
-    return { total: T.wordsTotal, }
+    return {
+      T: T,
+      selectedContests: [],
+    }
   }
 }
 </script>
 
 <style>
+  .merged-scoreboard {
+    background: white;
+  }
+
   .merged-scoreboard td {
     text-align: center;
   }

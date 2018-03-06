@@ -8,66 +8,51 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-contest-scoreboardmerge', {
         props: {
-          contests: this.contests,
-          showTable: this.showTable,
-          isMoreThanZero: this.isMoreThanZero,
+          availableContests: this.contests,
           scoreboard: this.scoreboard,
           showPenalty: this.showPenalty,
           aliases: this.aliases,
         },
         on: {
           'get-scoreboard': function(contestAliases) {
-            scoreboardMerge.showTable = false;
             omegaup.API.Contest.scoreboardMerge({
                                  contest_aliases:
                                      contestAliases.map(encodeURIComponent)
                                          .join(','),
                                })
-                .then(function(scoreboard) {
-                  const ranking = scoreboard.ranking;
-                  let sc = [], aliases = [];
-                  let data, place;
-                  let showPenalty = false;
-                  // Get values to pass through props
+                .then(function(ranks) {
+                  const ranking = ranks.ranking;
+                  let scoreboard = [], aliases = [], showPenalty = 0;
                   if (ranking.length > 0) {
-                    // Show penalty or not
-                    for (var entry in ranking) {
-                      if (!ranking.hasOwnProperty(entry)) continue;
-                      data = ranking[entry];
-                      showPenalty |= !!data.total.penalty;
+                    for (const entry of ranking) {
+                      showPenalty |= !!entry.total.penalty;
                     }
                     // Get aliases for indexing in the same order all rows
                     for (var entry in ranking[0].contests) {
                       aliases.push(entry);
                     }
-
-                    // Create the scoreboard object
-                    for (var entry in ranking) {
-                      if (!ranking.hasOwnProperty(entry)) continue;
-                      data = ranking[entry];
-                      place = parseInt(entry) + 1;
-                      sc.push({
+                    // Fill scoreboard object
+                    for (const index in ranking) {
+                      if (!ranking.hasOwnProperty(index)) continue;
+                      const place = parseInt(index) + 1;
+                      const entry = ranking[index];
+                      scoreboard.push({
                         'place': place,
-                        'username': data.username,
-                        'name': data.name,
-                        'contests': data.contests,
-                        'totalPoints': data.total.points,
-                        'totalPenalty': data.total.penalty
+                        'username': entry.username,
+                        'name': entry.name,
+                        'contests': entry.contests,
+                        'totalPoints': entry.total.points,
+                        'totalPenalty': entry.total.penalty
                       });
                     }
-                  } else {
-                    sc = null;
                   }
                   // Update the props values
                   scoreboardMerge.aliases = aliases;
-                  scoreboardMerge.showPenalty = showPenalty ? true : false;
-                  scoreboardMerge.isMoreThanZero =
-                      scoreboard.ranking.length > 0 ? true : false;
-                  scoreboardMerge.scoreboard = sc;
-                  scoreboardMerge.showTable = true;
+                  scoreboardMerge.showPenalty = showPenalty;
+                  scoreboardMerge.scoreboard = scoreboard;
                 })
                 .fail(omegaup.UI.apiError);
-          }
+          },
         },
       });
     },
@@ -80,10 +65,8 @@ OmegaUp.on('ready', function() {
     },
     data: {
       contests: [],
-      showTable: false,
-      isMoreThanZero: false,
       scoreboard: [],
-      showPenalty: false,
+      showPenalty: 0,
       aliases: [],
     },
     components: {
