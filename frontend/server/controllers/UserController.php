@@ -473,7 +473,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+            if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
                 throw new ForbiddenAccessException();
             }
 

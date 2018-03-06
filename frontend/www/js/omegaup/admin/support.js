@@ -7,30 +7,27 @@ OmegaUp.on('ready', function() {
     el: '#admin-support',
     render: function(createElement) {
       return createElement('omegaup-admin-support', {
-        props: {valid: this.valid, verified: this.verified},
+        props: {user: this.user},
         on: {
           'search-username': function(username) {
-            adminSupport.valid = false;
+            adminSupport.user = null;
             omegaup.API.User.profile({username: username})
-                .then(function(data) {
-                  adminSupport.valid = true;
-                  adminSupport.verified = data.userinfo.verified == '1';
-                })
+                .then(function(data) { adminSupport.user = data.userinfo; })
                 .fail(omegaup.UI.apiError);
           },
           'verify-user': function(username) {
             omegaup.API.User.verifyEmail({usernameOrEmail: username})
                 .then(function() {
-                  adminSupport.verified = true;
+                  adminSupport.user.verified = '1';
                   omegaup.UI.success(T.userVerified);
                 })
                 .fail(omegaup.UI.apiError);
           },
-          'reset': function() { adminSupport.valid = false; }
+          'reset': function() { adminSupport.user = null; }
         },
       });
     },
-    data: {valid: false, verified: false},
+    data: {user: null},
     components: {
       'omegaup-admin-support': admin_Support,
     },
