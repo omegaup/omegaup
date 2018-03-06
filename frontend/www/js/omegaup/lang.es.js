@@ -3,6 +3,7 @@ var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
 	RegisterForContestRules: "Reglas",
+	User: "Nombre de usuario",
 	aboutToStart: "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciar\u00e1.",
 	activeUsers: "Usuarios activos",
 	adminAdded: "Administrador agregado correctamente",
