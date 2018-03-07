@@ -20,7 +20,7 @@ abstract class GroupsUsersDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Groups_Users`.`group_id`, `Groups_Users`.`user_id`';
+    const FIELDS = '`Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         if (is_null($group_id) || is_null($user_id)) {
             return null;
         }
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id` FROM Groups_Users WHERE (group_id = ? AND user_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` FROM Groups_Users WHERE (group_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$group_id, $user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class GroupsUsersDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupsUsers}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id` from Groups_Users';
+        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` from Groups_Users';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -135,6 +135,10 @@ abstract class GroupsUsersDAOBase extends DAO {
             $clauses[] = '`user_id` = ?';
             $params[] = $Groups_Users->user_id;
         }
+        if (!is_null($Groups_Users->share_user_information)) {
+            $clauses[] = '`share_user_information` = ?';
+            $params[] = $Groups_Users->share_user_information;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -145,7 +149,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id` FROM `Groups_Users`';
+        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` FROM `Groups_Users`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -169,6 +173,14 @@ abstract class GroupsUsersDAOBase extends DAO {
       * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a actualizar.
       */
     final private static function update(GroupsUsers $Groups_Users) {
+        $sql = 'UPDATE `Groups_Users` SET `share_user_information` = ? WHERE `group_id` = ? AND `user_id` = ?;';
+        $params = [
+            $Groups_Users->share_user_information,
+            $Groups_Users->group_id,$Groups_Users->user_id,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -184,10 +196,11 @@ abstract class GroupsUsersDAOBase extends DAO {
      * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a crear.
      */
     final private static function create(GroupsUsers $Groups_Users) {
-        $sql = 'INSERT INTO Groups_Users (`group_id`, `user_id`) VALUES (?, ?);';
+        $sql = 'INSERT INTO Groups_Users (`group_id`, `user_id`, `share_user_information`) VALUES (?, ?, ?);';
         $params = [
             $Groups_Users->group_id,
             $Groups_Users->user_id,
+            $Groups_Users->share_user_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -253,6 +266,17 @@ abstract class GroupsUsersDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`user_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Groups_UsersA->share_user_information;
+        $b = $Groups_UsersB->share_user_information;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`share_user_information` >= ? AND `share_user_information` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`share_user_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
