@@ -656,7 +656,7 @@ class ContestController extends Controller {
 
         $result = [];
         self::getCachedDetails($r, $result);
-        unset($result['scoreboard_url']); 
+        unset($result['scoreboard_url']);
         unset($result['scoreboard_url_admin']);
         if (is_null($r['token'])) {
             // Adding timer info separately as it depends on the current user and we don't

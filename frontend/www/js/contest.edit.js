@@ -73,7 +73,6 @@ omegaup.OmegaUp.on('ready', function() {
       })
       .fail(omegaup.UI.apiError);
 
-
   omegaup.API.Problem.list()
       .then(function(problems) {
         // Got the problems, lets populate the dropdown with them
@@ -477,46 +476,47 @@ omegaup.OmegaUp.on('ready', function() {
           $('#contest-admin-links')
               .append(
                   $('<tr></tr>')
-                      
+
                       .append($('<td></td>')
                                   .append($('<a></a>')
-                                              .attr('href',
-                                                    '/arena/' +
-                                                        contestAlias + '/admin/')
-                                              .text( ' Submissions')))
+                                              .attr('href', '/arena/' +
+                                                                contestAlias +
+                                                                '/admin/')
+                                              .text(' Submissions')))
                       .append($('<td></td>')
                                   .append($('<a></a>')
-                                              .attr('href',
-                                                    '/contest/' +
-                                                        contestAlias + '/stats/')
-                                              .text( ' Stats')))
+                                              .attr('href', '/contest/' +
+                                                                contestAlias +
+                                                                '/stats/')
+                                              .text(' Stats')))
                       .append($('<td></td>')
                                   .append($('<a></a>')
-                                              .attr('href',
-                                                    '/contest/' +
-                                                        contestAlias + '/activity/')
-                                              .text( ' Activity Report')))
+                                              .attr('href', '/contest/' +
+                                                                contestAlias +
+                                                                '/activity/')
+                                              .text(' Activity Report')))
                       .append($('<td></td>')
                                   .append($('<a></a>')
-                                              .attr('href',
-                                                    '/arena/' +
-                                                        contestAlias + '/print/')
-                                              .text( 'Printable Version' )))
-                      
+                                              .attr('href', '/arena/' +
+                                                                contestAlias +
+                                                                '/print/')
+                                              .text('Printable Version')))
+
                       .append($('<td></td>')
                                   .append($('<a></a>')
-                                              .attr('href',
-                                                  '/arena/' +
-                                                  contestAlias + '/scoreboard/' + scoreboard_url)
-                                              .text( 'Public scoreboard')))
+                                              .attr('href', '/arena/' +
+                                                                contestAlias +
+                                                                '/scoreboard/' +
+                                                                scoreboard_url)
+                                              .text('Public scoreboard')))
 
                       .append($('<td></td>')
                                   .append($('<a></a>')
                                               .attr('href',
-                                                  '/arena/' +
-                                                  contestAlias + '/scoreboard/' + scoreboard_url_admin)
-                                              .text( 'Admin scoreboard')))
-                        );
+                                                    '/arena/' + contestAlias +
+                                                        '/scoreboard/' +
+                                                        scoreboard_url_admin)
+                                              .text('Admin scoreboard'))));
         })
         .fail(omegaup.UI.apiError);
   }
