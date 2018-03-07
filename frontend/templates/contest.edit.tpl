@@ -185,9 +185,9 @@
 		</div>
 	</div>
 
-	<div class='tab-pane' id='links'>
+	<div class="tab-pane" id="links">
 		<div class="panel panel-primary">
-			<div class='panel-body'>
+			<div class="panel-body">
 			<table class="table table-striped">
 				<thead>
 					<h3>{#contestEditAdministrativeLinks#}</h3>

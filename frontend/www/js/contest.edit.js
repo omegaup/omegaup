@@ -14,6 +14,9 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
+  var scoreboard_url;
+  var scoreboard_admin_url;
+
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
@@ -48,8 +51,6 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #public').val(contest.public);
         $('.new_contest_form #register').val(contest.contestant_must_register);
         $('.new_contest_form #scoreboard').val(contest.scoreboard);
-        $('#scoreboard-url').val(contest.scoreboard_url);
-        $('#scoreboard-admin-url').val(contest.scoreboard_url_admin);
         $('.new_contest_form #penalty-type').val(contest.penalty_type);
         $('.new_contest_form #show-scoreboard-after')
             .val(contest.show_scoreboard_after);
@@ -67,8 +68,11 @@ omegaup.OmegaUp.on('ready', function() {
             contest.contestant_must_register == '0') {
           $('#requests').hide();
         }
+        scoreboard_url = contest.scoreboard_url;
+        scoreboard_url_admin = contest.scoreboard_url_admin;
       })
       .fail(omegaup.UI.apiError);
+
 
   omegaup.API.Problem.list()
       .then(function(problems) {
@@ -120,8 +124,6 @@ omegaup.OmegaUp.on('ready', function() {
           feedback: $('#feedback').val(),
           penalty: $('#penalty').val(), public: public,
           scoreboard: $('#scoreboard').val(),
-          scoreboard_url: $('#scoreboard_url').val(),
-          scoreboard_url_admin: $('#scoreboard_url_admin').val(),
           penalty_type: $('#penalty-type').val(),
           show_scoreboard_after: $('#show-scoreboard-after').val(),
           languages: $('#languages').val(),
@@ -505,8 +507,15 @@ omegaup.OmegaUp.on('ready', function() {
                                   .append($('<a></a>')
                                               .attr('href',
                                                   '/arena/' +
-                                                  contestAlias + '/scoreboard/')
-                                              .text( 'Scoreboard' )))
+                                                  contestAlias + '/scoreboard/' + scoreboard_url)
+                                              .text( 'Public scoreboard')))
+
+                      .append($('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                  '/arena/' +
+                                                  contestAlias + '/scoreboard/' + scoreboard_url_admin)
+                                              .text( 'Admin scoreboard')))
                         );
         })
         .fail(omegaup.UI.apiError);
