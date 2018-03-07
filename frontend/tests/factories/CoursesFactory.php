@@ -1,7 +1,12 @@
 <?php
 
 class CoursesFactory {
-    public static function createCourse(Users $admin = null, ScopedLoginToken $adminLogin = null, $public = false) {
+    public static function createCourse(
+        Users $admin = null,
+        ScopedLoginToken $adminLogin = null,
+        $public = false,
+        $requests_user_information = 'no'
+    ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
@@ -28,7 +33,8 @@ class CoursesFactory {
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
-            'public' => $public
+            'public' => $public,
+            'requests_user_information' => $requests_user_information
         ]);
 
         $response = CourseController::apiCreate($r);

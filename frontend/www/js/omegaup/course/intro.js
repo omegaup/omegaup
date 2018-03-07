@@ -13,13 +13,15 @@ OmegaUp.on('ready', function() {
         props: {
           name: coursePayload.name,
           description: coursePayload.description,
-          needsBasicInformation: coursePayload.needsBasicInformation
+          needsBasicInformation: coursePayload.needsBasicInformation,
+          requestsUserInformation: coursePayload.requestsUserInformation
         },
         on: {
           submit: function(ev) {
             API.Course.addStudent({
                         'course_alias': coursePayload.alias,
-                        'usernameOrEmail': coursePayload.currentUsername
+                        'usernameOrEmail': coursePayload.currentUsername,
+                        'share_user_information': ev.shareUserInformation
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + coursePayload.alias);

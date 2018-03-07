@@ -712,10 +712,11 @@ class ContestsDAO extends ContestsDAOBase {
         return null;
     }
 
-    public static function getNeedsBasicInformation($problemset_id) {
+    public static function getNeedsInformation($problemset_id) {
         $sql = '
                 SELECT
-                    needs_basic_information
+                    needs_basic_information,
+                    requests_user_information
                 FROM
                     Problemsets
                 WHERE
@@ -730,7 +731,10 @@ class ContestsDAO extends ContestsDAOBase {
         if (count($rs) == 0) {
             throw new NotFoundException('problemsetNotFound');
         }
-        return $rs['needs_basic_information'] == '1';
+        return [
+            'needs_basic_information' => $rs['needs_basic_information'] == '1',
+            'requests_user_information' => $rs['requests_user_information']
+        ];
     }
 
     /**

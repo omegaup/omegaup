@@ -287,6 +287,7 @@ class CourseController extends Controller {
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information'],
             ]));
 
             CoursesDAO::transEnd();
@@ -994,22 +995,16 @@ class CourseController extends Controller {
         // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
             && ($r['course']->public == false
-            || $r['user']->user_id !== $r['current_user_id'])) {
+            || $r['user']->user_id !== $r['current_user_id'])
+            && $r['course']->requests_user_information == 'no') {
             throw new ForbiddenAccessException();
         }
 
         $groupUser = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
             'identity_id' => $r['user']->user_id,
+            'share_user_information' => $r['share_user_information']
         ]);
-        if (!is_null(GroupsIdentitiesDAO::getByPK(
-            $groupUser->group_id,
-            $groupUser->identity_id
-        ))) {
-            throw new DuplicatedEntryInDatabaseException(
-                'courseStudentAlreadyPresent'
-            );
-        }
 
         try {
             GroupsIdentitiesDAO::save($groupUser);
@@ -1266,11 +1261,17 @@ class CourseController extends Controller {
         self::resolveGroup($r);
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group']);
+        $isFirstTimeAccess = false;
+        if (!Authorization::isGroupAdmin($r['current_user_id'], $r['group'])) {
+            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_user_id'], $r['course'], $r['group']);
+        }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
         $result['shouldShowResults'] = $shouldShowIntro;
+        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
+        $result['requests_user_information'] = $result['requests_user_information'];
         return $result;
     }
 
@@ -1291,7 +1292,8 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'requests_user_information' => $r['course']->requests_user_information
             ];
         } else {
             $result = [
@@ -1305,7 +1307,8 @@ class CourseController extends Controller {
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'requests_user_information' => $r['course']->requests_user_information
             ];
 
             if ($isAdmin) {
@@ -1485,6 +1488,7 @@ class CourseController extends Controller {
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
+            'requests_user_information',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
             }],

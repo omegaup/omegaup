@@ -47,12 +47,6 @@ class Users extends VO {
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
-        if (isset($data['solved'])) {
-            $this->solved = $data['solved'];
-        }
-        if (isset($data['submissions'])) {
-            $this->submissions = $data['submissions'];
-        }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
         }
@@ -76,9 +70,6 @@ class Users extends VO {
         }
         if (isset($data['gender'])) {
             $this->gender = $data['gender'];
-        }
-        if (isset($data['last_access'])) {
-            $this->last_access = $data['last_access'];
         }
         if (isset($data['verified'])) {
             $this->verified = $data['verified'];
@@ -116,7 +107,7 @@ class Users extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['last_access']);
+            parent::toUnixTime([]);
         }
     }
 
@@ -174,20 +165,6 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $solved;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $submissions;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var char(3)
       */
     public $country_id;
@@ -240,13 +217,6 @@ class Users extends VO {
       * @var enum('female','male','other','decline')
       */
     public $gender;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $last_access;
 
     /**
       *  [Campo no documentado]
