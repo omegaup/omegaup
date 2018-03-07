@@ -3,6 +3,7 @@
 '''Validates and converts the i18n templates.'''
 
 import argparse
+import collections
 from glob import glob
 import os.path
 import re
@@ -93,7 +94,7 @@ def main():
         lang = os.path.splitext(lang_filename)[0]
         languages.add(lang)
         last_key = ''
-        with open(lang_path, 'r') as lang_file:
+        with open(lang_path, 'r', encoding='utf-8') as lang_file:
             for lineno, line in enumerate(lang_file):
                 try:
                     key, value = LINE_RE.split(line.strip(), 1)
@@ -101,7 +102,7 @@ def main():
                         not_sorted.add(lang)
                     last_key = key
                     if key not in strings:
-                        strings[key] = {}
+                        strings[key] = collections.defaultdict(str)
                     match = VALUE_RE.match(value)
                     if match is None:
                         raise Exception("Invalid value")

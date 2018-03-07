@@ -487,6 +487,8 @@ export default {
   User: {
     addExperiment: _call('/api/user/addexperiment/'),
 
+    addGroup: _call('/api/user/addgroup/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -523,6 +525,8 @@ export default {
     rankByProblemsSolved: _call('/api/user/rankByProblemsSolved/'),
 
     removeExperiment: _call('/api/user/removeexperiment/'),
+
+    removeGroup: _call('/api/user/removegroup/'),
 
     removeRole: _call('/api/user/removerole/'),
 

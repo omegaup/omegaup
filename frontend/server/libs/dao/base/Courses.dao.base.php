@@ -255,7 +255,7 @@ abstract class CoursesDAOBase extends DAO {
             $Courses->needs_basic_information = '0';
         }
         if (is_null($Courses->requests_user_information)) {
-            $Courses->requests_user_information = '0';
+            $Courses->requests_user_information = 'no';
         }
         $sql = 'INSERT INTO Courses (`course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [

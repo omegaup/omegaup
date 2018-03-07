@@ -157,7 +157,7 @@ class Courses extends VO {
     /**
       * Se solicita información de los participantes para contactarlos posteriormente.
       * @access public
-      * @var tinyint(1)
+      * @var enum('no','optional','required')
       */
     public $requests_user_information;
 }
