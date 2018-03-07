@@ -59,7 +59,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-md-4">
             <label>{{ T.profileSchool }} <input autocomplete="off"
                    class="form-control typeahead school"
                    type="text"
@@ -84,27 +84,47 @@
                      v-model="basic_information_required">{{ T.wordsNo }}</label>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="form-group container-fluid">
-            <label>{{ T.courseNewFormDescription }}
-            <textarea class="form-control"
-                      cols="30"
-                      rows="5"
-                      v-model="description"></textarea></label>
+          <div class="form-group col-md-4">
+            <span class="faux-label">{{ T.courseNewFormUserInformationRequired }}
+            <span aria-hidden="true"
+                  class="glyphicon glyphicon-info-sign"
+                  data-placement="top"
+                  data-toggle="tooltip"
+                  v-bind:title="T.courseNewFormUserInformationRequiredDesc"></span></span>
+                  <select class="form-control"
+                 v-model="requests_user_information">
+              <option value="no">
+                {{ T.wordsNo }}
+              </option>
+              <option value="optional">
+                {{ T.wordsOptional }}
+              </option>
+              <option value="required">
+                {{ T.wordsRequired }}
+              </option>
+            </select>
           </div>
-        </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary submit"
-               type="submit">
-          <template v-if="update">
-            {{ T.courseNewFormUpdateCourse }}
-          </template>
-          <template v-else="">
-            {{ T.courseNewFormScheduleCourse }}
-          </template></button> <button class="btn btn-secondary"
-               type="reset"
-               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+          <div class="row">
+            <div class="form-group container-fluid">
+              <label>{{ T.courseNewFormDescription }}
+              <textarea class="form-control"
+                        cols="30"
+                        rows="5"
+                        v-model="description"></textarea></label>
+            </div>
+          </div>
+          <div class="form-group pull-right">
+            <button class="btn btn-primary submit"
+                 type="submit">
+            <template v-if="update">
+              {{ T.courseNewFormUpdateCourse }}
+            </template>
+            <template v-else="">
+              {{ T.courseNewFormScheduleCourse }}
+            </template></button> <button class="btn btn-secondary"
+                 type="reset"
+                 v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+          </div>
         </div>
       </form>
     </div>
@@ -131,7 +151,8 @@ export default {
       name: this.course.name,
       school_id: this.course.school_id,
       school_name: this.course.school_name,
-      basic_information_required: !!this.course.basic_information_required
+      basic_information_required: !!this.course.basic_information_required,
+      requests_user_information: this.course.requests_user_information || 'no'
     };
   },
   mounted: function() {
@@ -153,9 +174,11 @@ export default {
       this.startTime = this.course.start_time || new Date();
       this.name = this.course.name;
       this.school_id = this.course.school_id;
-      this.school_name = this.course.school_name,
+      this.school_name = this.course.school_name;
       this.basic_information_required =
           !!this.course.basic_information_required;
+      this.requests_user_information =
+          this.course.requests_user_information || 'no';
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
