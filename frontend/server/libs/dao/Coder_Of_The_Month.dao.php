@@ -71,9 +71,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 				score DESC
 			LIMIT 1
 		";
-
         $val = [$startTime, $endTime, $endTime];
-
         global $conn;
         $rs = $conn->GetRow($sql, $val);
         if (count($rs) == 0) {
