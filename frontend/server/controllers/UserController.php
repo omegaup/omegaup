@@ -27,7 +27,7 @@ class UserController extends Controller {
 
         Validators::isEmail($r['email'], 'email');
 
-        public static $kAllowedScholarDegrees = ['none', 
+        static $kAllowedScholarDegrees = ['none', 
                                     'early_childhood', 
                                     'pre_primary', 
                                     'primary', 
