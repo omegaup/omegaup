@@ -168,10 +168,10 @@ class ProblemsDAO extends ProblemsDAOBase {
                     SELECT DISTINCT
                         gr.acl_id
                     FROM
-                        Groups_Users gu
+                        Groups_Identities gi
                     INNER JOIN
-                        Group_Roles gr ON gr.group_id = gu.group_id
-                    WHERE gu.user_id = ? AND gr.role_id = ?
+                        Group_Roles gr ON gr.group_id = gi.group_id
+                    WHERE gi.identity_id = ? AND gr.role_id = ?
                 ) gr ON p.acl_id = gr.acl_id' . $language_join;
             $args[] = $user_id;
             $args[] = $user_id;
@@ -505,11 +505,11 @@ class ProblemsDAO extends ProblemsDAOBase {
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = p.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
                 (a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)) AND
+                (gr.role_id = ? AND gi.identity_id = ?)) AND
                 p.visibility > ?
             GROUP BY
                 p.problem_id
@@ -604,21 +604,21 @@ class ProblemsDAO extends ProblemsDAOBase {
     ) {
         $sql = '
             SELECT
-                u.username
+                i.username
             FROM
-                Users u
+                Identities i
             WHERE
-                u.user_id
+                i.identity_id
             IN (SELECT DISTINCT
-                gu.user_id
+                gi.identity_id
             FROM
                 Runs r
             JOIN
-                Groups_Users gu
+                Groups_Identities gi
             ON
-                r.user_id = gu.user_id
+                r.user_id = gi.identity_id
             WHERE
-                gu.group_id = ?
+                gi.group_id = ?
                 AND r.problem_id = ?)';
         $params = [$group_id, $problem_id];
 

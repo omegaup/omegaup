@@ -875,13 +875,13 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupUser = new GroupsUsers([
+        $groupUser = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
-            'user_id' => $r['user']->user_id,
+            'identity_id' => $r['user']->user_id,
         ]);
-        if (is_null(GroupsUsersDAO::getByPK(
+        if (is_null(GroupsIdentitiesDAO::getByPK(
             $groupUser->group_id,
-            $groupUser->user_id
+            $groupUser->identity_id
         ))) {
             throw new NotFoundException(
                 'courseStudentNotInCourse'
@@ -998,13 +998,13 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $groupUser = new GroupsUsers([
+        $groupUser = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
-            'user_id' => $r['user']->user_id,
+            'identity_id' => $r['user']->user_id,
         ]);
-        if (!is_null(GroupsUsersDAO::getByPK(
+        if (!is_null(GroupsIdentitiesDAO::getByPK(
             $groupUser->group_id,
-            $groupUser->user_id
+            $groupUser->identity_id
         ))) {
             throw new DuplicatedEntryInDatabaseException(
                 'courseStudentAlreadyPresent'
@@ -1012,7 +1012,7 @@ class CourseController extends Controller {
         }
 
         try {
-            GroupsUsersDAO::save($groupUser);
+            GroupsIdentitiesDAO::save($groupUser);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1043,19 +1043,19 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupUser = new GroupsUsers([
+        $groupUser = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
-            'user_id' => $r['user']->user_id,
+            'identity_id' => $r['user']->user_id,
         ]);
-        if (is_null(GroupsUsersDAO::getByPK(
+        if (is_null(GroupsIdentitiesDAO::getByPK(
             $groupUser->group_id,
-            $groupUser->user_id
+            $groupUser->identity_id
         ))) {
             throw new NotFoundException('courseStudentNotInCourse');
         }
 
         try {
-            GroupsUsersDAO::delete($groupUser);
+            GroupsIdentitiesDAO::delete($groupUser);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1317,7 +1317,7 @@ class CourseController extends Controller {
                 if (is_null($group)) {
                     throw new NotFoundException('courseGroupNotFound');
                 }
-                $result['student_count'] = GroupsUsersDAO::GetMemberCountById(
+                $result['student_count'] = GroupsIdentitiesDAO::GetMemberCountById(
                     $group->group_id
                 );
             }

@@ -72,9 +72,9 @@ class CoursesDAO extends CoursesDAOBase {
                 FROM Courses c
                 INNER JOIN (
                     SELECT g.group_id
-                    FROM Groups_Users gu
-                    INNER JOIN Groups g ON g.group_id = gu.group_id
-                    WHERE gu.user_id = ?
+                    FROM Groups_Identities gi
+                    INNER JOIN Groups g ON g.group_id = gi.group_id
+                    WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
@@ -95,12 +95,12 @@ class CoursesDAO extends CoursesDAOBase {
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
         global  $conn;
 
-        $sql = 'SELECT u.username, u.name, pr.alias as assignment_alias, pr.assignment_score
+        $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
                 FROM Groups g
-                INNER JOIN Groups_Users gu
-                    ON g.group_id = ? AND g.group_id = gu.group_id
-                INNER JOIN Users u
-                    ON u.user_id = gu.user_id
+                INNER JOIN Groups_Identities gi
+                    ON g.group_id = ? AND g.group_id = gi.group_id
+                INNER JOIN Identities i
+                    ON i.identity_id = gi.identity_id
                 LEFT JOIN (
                     SELECT bpr.alias, bpr.user_id, sum(best_score_of_problem) as assignment_score
                     FROM (
@@ -118,7 +118,7 @@ class CoursesDAO extends CoursesDAOBase {
                     ) bpr
                     GROUP BY bpr.assignment_id, bpr.user_id
                 ) pr
-                ON pr.user_id = u.user_id';
+                ON pr.user_id = i.identity_id';
 
         $rs = $conn->Execute($sql, [$group_id, $course_id]);
         $progress = [];
@@ -211,11 +211,11 @@ class CoursesDAO extends CoursesDAOBase {
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gi.identity_id = ?)
             GROUP BY
                 c.course_id
             ORDER BY

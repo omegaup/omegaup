@@ -12,9 +12,9 @@ class CoursesFactory {
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsUsersDAO::save(new GroupsUsers([
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'user_id' => $admin->user_id,
+                'identity_id' => $admin->user_id,
                 'role_id' => Authorization::ADMIN_ROLE,
             ]));
         }

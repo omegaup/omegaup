@@ -240,11 +240,11 @@ class ContestsDAO extends ContestsDAOBase {
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gi.identity_id = ?)
             GROUP BY
                 c.contest_id
             ORDER BY
@@ -536,12 +536,12 @@ class ContestsDAO extends ContestsDAOBase {
                      INNER JOIN
                          Group_Roles ON Contests.acl_id = Group_Roles.acl_id
                      INNER JOIN
-                         Groups_Users
+                         Groups_Identities
                      ON
-                         Groups_Users.group_id = Group_Roles.group_id
+                         Groups_Identities.group_id = Group_Roles.group_id
                      WHERE
                          Contests.public = 0 AND
-                         Groups_Users.user_id = ? AND
+                         Groups_Identities.identity_id = ? AND
                          Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
                  ) ";

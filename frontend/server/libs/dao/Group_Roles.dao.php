@@ -48,9 +48,9 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                gu.user_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
+                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
             $user_id,
             $role_id,
@@ -72,9 +72,9 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                gu.user_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
+                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
         $params = [
             $user_id,
             Authorization::CONTESTANT_ROLE,
@@ -107,11 +107,11 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             INNER JOIN
                 Roles r ON r.role_id = gr.role_id
             WHERE
-                gu.user_id = ? AND gr.acl_id = ?;';
+                gi.identity_id = ? AND gr.acl_id = ?;';
         $params = [
             $user_id,
             Authorization::SYSTEM_ACL,

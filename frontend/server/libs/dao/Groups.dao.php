@@ -59,11 +59,11 @@ class GroupsDAO extends GroupsDAOBase {
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = g.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gi.identity_id = ?)
             ORDER BY
                 g.group_id DESC;';
         $params = [
@@ -92,11 +92,11 @@ class GroupsDAO extends GroupsDAOBase {
             SELECT
                 u.*
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             INNER JOIN
-                Users u ON u.user_id = gu.user_id
+                Users u ON u.user_id = gi.identity_id
             WHERE
-                gu.group_id = ?
+                gi.group_id = ?
             ORDER BY
                 RAND()
             LIMIT

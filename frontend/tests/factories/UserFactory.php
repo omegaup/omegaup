@@ -181,11 +181,11 @@ class UserFactory {
             Authorization::MENTOR_GROUP_ALIAS
         );
 
-        $groupUser = new GroupsUsers([
-            'user_id' => $user->user_id,
+        $groupUser = new GroupsIdentities([
+            'identity_id' => $user->user_id,
             'group_id' => $mentor_group->group_id,
         ]);
-        GroupsUsersDao::save($groupUser);
+        GroupsIdentitiesDao::save($groupUser);
     }
 
     /**
@@ -198,10 +198,10 @@ class UserFactory {
             Authorization::SUPPORT_GROUP_ALIAS
         );
 
-        $groupUser = new GroupsUsers([
-            'user_id' => $user->user_id,
+        $groupUser = new GroupsIdentities([
+            'identity_id' => $user->user_id,
             'group_id' => $support_group->group_id,
         ]);
-        GroupsUsersDao::save($groupUser);
+        GroupsIdentitiesDao::save($groupUser);
     }
 }

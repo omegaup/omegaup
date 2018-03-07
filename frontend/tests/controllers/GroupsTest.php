@@ -50,7 +50,7 @@ class GroupsTest extends OmegaupTestCase {
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $group_users = GroupsUsersDAO::getByPK($group['group']->group_id, $user->user_id);
+        $group_users = GroupsIdentitiesDAO::getByPK($group['group']->group_id, $user->user_id);
         $this->assertNotNull($group_users);
     }
 
@@ -89,7 +89,7 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $group_users = GroupsUsersDAO::getByPK($groupData['group']->group_id, $user->user_id);
+        $group_users = GroupsIdentitiesDAO::getByPK($groupData['group']->group_id, $user->user_id);
         $this->assertNull($group_users);
     }
 

@@ -473,7 +473,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+            if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
                 throw new ForbiddenAccessException();
             }
 
@@ -1150,6 +1150,7 @@ class UserController extends Controller {
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['is_private'] = $user->is_private;
+        $response['userinfo']['verified'] = $user->verified;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
@@ -2145,8 +2146,8 @@ class UserController extends Controller {
         self::validateAddRemoveGroup($r);
 
         try {
-            GroupsUsersDAO::save(new GroupsUsers([
-                'user_id' => $r['user']->user_id,
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
+                'identity_id' => $r['user']->user_id,
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {
@@ -2172,8 +2173,8 @@ class UserController extends Controller {
         self::validateAddRemoveGroup($r);
 
         try {
-            GroupsUsersDAO::delete(new GroupsUsers([
-                'user_id' => $r['user']->user_id,
+            GroupsIdentitiesDAO::delete(new GroupsIdentities([
+                'identity_id' => $r['user']->user_id,
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {

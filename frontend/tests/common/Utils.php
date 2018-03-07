@@ -104,7 +104,7 @@ class Utils {
             'Group_Roles',
             'Groups_Scoreboards',
             'Groups_Scoreboards_Contests',
-            'Groups_Users',
+            'Groups_Identities',
             'Identities',
             'Interviews',
             'Problems',

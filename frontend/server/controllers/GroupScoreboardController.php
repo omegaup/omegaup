@@ -175,14 +175,14 @@ class GroupScoreboardController extends Controller {
             $r['contest_aliases'] = rtrim($r['contest_aliases'], ',');
 
             try {
-                $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
+                $groupIdentities = GroupsIdentitiesDAO::search(new GroupsIdentities([
                     'group_id' => $r['scoreboard']->group_id
                 ]));
 
                 $r['usernames_filter'] = '';
-                foreach ($groupUsers as $groupUser) {
-                    $user = UsersDAO::getByPK($groupUser->user_id);
-                    $r['usernames_filter'] .= $user->username . ',';
+                foreach ($groupIdentities as $groupIdentity) {
+                    $identity_id = UsersDAO::getByPK($groupIdentity->identity_id);
+                    $r['usernames_filter'] .= $identity_id->username . ',';
                 }
 
                 $r['usernames_filter'] = rtrim($r['usernames_filter'], ',');

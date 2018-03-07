@@ -135,11 +135,11 @@ class UserRolesDAO extends UserRolesDAOBase {
             SELECT
                 g.name
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             INNER JOIN
-                Groups g ON gu.group_id = g.group_id
+                Groups g ON gi.group_id = g.group_id
             WHERE
-                gu.user_id = ? AND g.name LIKE '%omegaup:%';";
+                gi.identity_id = ? AND g.name LIKE '%omegaup:%';";
         $params = [
             $user_id
         ];

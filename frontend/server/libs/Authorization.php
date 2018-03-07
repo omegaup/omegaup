@@ -249,8 +249,8 @@ class Authorization {
             return true;
         }
 
-        $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
-            'user_id' => $user_id,
+        $groupUsers = GroupsIdentitiesDAO::search(new GroupsIdentities([
+            'identity_id' => $user_id,
             'group_id' => $group->group_id
         ]));
 
