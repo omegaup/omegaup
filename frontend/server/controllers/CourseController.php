@@ -18,6 +18,7 @@ class CourseController extends Controller {
     private static function validateCourseAlias(Request $r) {
         try {
             $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+            return $r['course'];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -53,6 +54,10 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r) {
         $is_required = true;
+        $course = self::validateCourseAlias($r);
+        $course_start_time = strtotime($course->start_time);
+        $course_finish_time = strtotime($course->finish_time);
+
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
@@ -63,10 +68,23 @@ class CourseController extends Controller {
             throw new InvalidParameterException('courseInvalidStartTime');
         }
 
+        Validators::isNumberInRange(
+            $r['start_time'],
+            'start_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+        Validators::isNumberInRange(
+            $r['finish_time'],
+            'finish_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+
         Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
-
-        self::validateCourseAlias($r);
     }
 
     /**
@@ -1360,6 +1378,8 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
+        $course_start_time = strtotime($r['course']->start_time);
+        $course_finish_time = strtotime($r['course']->finish_time);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
@@ -1373,6 +1393,20 @@ class CourseController extends Controller {
         $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
 
+        Validators::isNumberInRange(
+            $r['start_time'],
+            'start_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+        Validators::isNumberInRange(
+            $r['finish_time'],
+            'finish_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             return;
