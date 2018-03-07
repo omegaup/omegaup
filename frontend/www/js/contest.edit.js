@@ -14,9 +14,6 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  var scoreboard_url;
-  var scoreboard_admin_url;
-
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
@@ -63,13 +60,16 @@ omegaup.OmegaUp.on('ready', function() {
             .prop('checked', contest.needs_basic_information);
 
         $('.contest-publish-form #public').val(contest.public);
-
+        $('.contest-admin-links #submissions').attr('href', '/arena/' + contestAlias + '/admin/');
+        $('.contest-admin-links #conteststats').attr('href', '/contest/' + contestAlias + '/stats/');
+        $('.contest-admin-links #activityreport').attr('href', '/contest/' + contestAlias + '/activity/');
+        $('.contest-admin-links #printableversion').attr('href', '/arena/' + contestAlias + '/print/');
+        $('.contest-admin-links #publicscoreboard').attr('href', '/arena/' + contestAlias + '/scoreboard/' + contest.scoreboard_url);
+        $('.contest-admin-links #adminscoreboard').attr('href', '/arena/' + contestAlias + '/scoreboard/' + contest.scoreboard_url_admin);
         if (contest.contestant_must_register == null ||
             contest.contestant_must_register == '0') {
           $('#requests').hide();
         }
-        scoreboard_url = contest.scoreboard_url;
-        scoreboard_url_admin = contest.scoreboard_url_admin;
       })
       .fail(omegaup.UI.apiError);
 
@@ -386,7 +386,7 @@ omegaup.OmegaUp.on('ready', function() {
         }
       });
 
-  // Add admin
+// Add admin
   function refreshContestAdmins() {
     omegaup.API.Contest.admins({contest_alias: contestAlias})
         .then(function(admins) {
@@ -471,52 +471,8 @@ omegaup.OmegaUp.on('ready', function() {
                                           };
                                         })(group_admin.alias))));
           }
-          $('#contest-admin-links').empty();
-          // Got the contests, lets populate the dropdown with them
-          $('#contest-admin-links')
-              .append(
-                  $('<tr></tr>')
 
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href', '/arena/' +
-                                                                contestAlias +
-                                                                '/admin/')
-                                              .text(' Submissions')))
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href', '/contest/' +
-                                                                contestAlias +
-                                                                '/stats/')
-                                              .text(' Stats')))
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href', '/contest/' +
-                                                                contestAlias +
-                                                                '/activity/')
-                                              .text(' Activity Report')))
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href', '/arena/' +
-                                                                contestAlias +
-                                                                '/print/')
-                                              .text('Printable Version')))
-
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href', '/arena/' +
-                                                                contestAlias +
-                                                                '/scoreboard/' +
-                                                                scoreboard_url)
-                                              .text('Public scoreboard')))
-
-                      .append($('<td></td>')
-                                  .append($('<a></a>')
-                                              .attr('href',
-                                                    '/arena/' + contestAlias +
-                                                        '/scoreboard/' +
-                                                        scoreboard_url_admin)
-                                              .text('Admin scoreboard'))));
+          $('#contest-admins .site-admin').hide();
         })
         .fail(omegaup.UI.apiError);
   }

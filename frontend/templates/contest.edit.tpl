@@ -192,7 +192,16 @@
 				<thead>
 					<h3>{#contestEditAdministrativeLinks#}</h3>
 				</thead>
-				<tbody id="contest-admin-links"></tbody>
+				<tbody class="contest-admin-links">
+					<tr>
+						<td><a id="submissions">{#wordsSubmissions#}</a></td>
+						<td><a id="conteststats">{#profileStatistics#}</a></td>
+						<td><a id="activityreport">{#contestActivityReport#}</a></td>
+						<td><a id="printableversion">{#contestPrintableVersion#}</a></td>
+						<td><a id="publicscoreboard">{#contestScoreboardLink#}</a></td>
+						<td><a id="adminscoreboard">{#contestScoreboardAdminLink#}</a></td>
+					</tr>
+				</tbody>
 			</table>
 			</div>
 		</div>
