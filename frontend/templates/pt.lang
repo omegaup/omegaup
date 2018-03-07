@@ -1,4 +1,5 @@
 RegisterForContestRules = "Regras"
+User = "Nome do usuário"
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
 activeUsers = "Usuários ativos"
 adminAdded = "Administrador adicionado com sucesso"
