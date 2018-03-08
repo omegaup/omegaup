@@ -16,7 +16,7 @@ class UserFactory {
     * @param string $email optional
     * @return user (DAO)
     */
-    public static function createUser($username = null, $password = null, $email = null, $scholar_degree = 'none', $verify = true, $is_private = false) {
+    public static function createUser($username = null, $password = null, $email = null, $scholar_degree = null, $verify = true, $is_private = false) {
         // If data is not provided, generate it randomly
         if (is_null($username)) {
             $username = Utils::CreateRandomString();
@@ -29,6 +29,11 @@ class UserFactory {
         if (is_null($email)) {
             $email = Utils::CreateRandomString().'@mail.com';
         }
+
+        if (is_null($scholar_degree)) {
+            $scholar_degree = 'none';
+        }
+
 
         // Populate a new Request to pass to the API
         UserController::$permissionKey = uniqid();
