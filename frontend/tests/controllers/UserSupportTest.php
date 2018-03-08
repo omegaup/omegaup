@@ -21,4 +21,24 @@ class UserSupportTest extends OmegaupTestCase {
         // Asserting that user doesn't belong to the support group
         $this->assertNotEquals(1, $is_support_member);
     }
+
+    /**
+     *
+     */
+    public function testUserGeneratesToken() {
+        // Support team member will verify $user
+        $support = UserFactory::createSupportUser();
+
+        // Creates no verified user
+        $user = UserFactory::createUser();
+
+        // Call api using support team member
+        $supportLogin = self::login($support);
+        $response = ResetController::apiGenerateToken(new Request([
+            'auth_token' => $supportLogin->auth_token,
+            'email' => $user->username,
+        ]));
+
+        $this->assertContains($user->username, $response['link']);
+    }
 }

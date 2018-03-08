@@ -24,25 +24,27 @@
         </div>
       </form>
       <form class="form bottom-margin"
-            v-on:submit.prevent="onChangePassword"
+            v-on:submit.prevent="onGenerateToken"
             v-show="valid">
         <div class="row bottom-margin">
-          <div class="col-md-6">
+          <div class="col-md-12">
             <div class="input-group">
               <input class="form-control"
-                   name="password"
+                   disabled="true"
+                   name="link"
                    type="text"
-                   v-bind:placeholder="T.passwordResetPassword"
-                   v-model="password"> <span class="input-group-btn"><button class=
-                   "btn btn-default"
+                   v-bind:placeholder="T.passwordGenerateTokenDesc"
+                   v-model="link"> <span class="input-group-btn"><button class="btn btn-default"
                       type="button"
-                      v-bind:aria-label="T.passwordGenerateRandom"
-                      v-bind:title="T.passwordGenerateRandom"
-                      v-on:click.prevent="onGeneratePassword"><span aria-hidden="true"
-                    class="glyphicon glyphicon-random"></span></button> <button class=
+                      v-bind:aria-label="T.passwordCopyToken"
+                      v-bind:disabled="link == ''"
+                      v-bind:title="T.passwordCopyToken"
+                      v-on:click.prevent="onCopyToken"><span aria-hidden="true"
+                    class="glyphicon glyphicon-copy"></span></button> <button class=
                     "btn btn-default"
                       type="button"
-                      v-on:click.prevent="onChangePassword">{{ T.userEditChangePassword
+                      v-bind:title="T.passwordGenerateTokenDesc"
+                      v-on:click.prevent="onGenerateToken">{{ T.passwordGenerateToken
                       }}</button></span>
             </div>
           </div>
@@ -63,27 +65,18 @@
 import {T} from '../../omegaup.js';
 
 export default {
-  props: {
-    valid: Boolean,
-  },
-  data: function() { return {T: T, username: '', password: ''};},
+  props: {valid: Boolean, link: String},
+  data: function() { return {T: T, username: ''};},
   methods: {
     onSearchUsername: function() {
       this.$emit('search-username', this.username);
     },
-    onChangePassword: function() {
-      this.$emit('change-password', this.password, this.username);
-    },
-    onGeneratePassword: function() {
-      let chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let length = 8;
-      var newPassword = '';
-      for (var i = 0; i < length; i++) {
-        newPassword += chars[Math.floor(Math.random() * chars.length)];
-      }
-      this.password = newPassword;
-    },
-    onReset: function() { this.$emit('reset');}
+    onGenerateToken: function() { this.$emit('generate-token', this.username);},
+    onCopyToken: function() { this.$emit('copy-token');},
+    onReset: function() {
+      this.username = '';
+      this.$emit('reset');
+    }
   }
 };
 </script>
