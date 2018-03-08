@@ -33,6 +33,11 @@
 						<div class="content">
 						</div>
 						</li>
+
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileRank#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-rank">{$profile.userinfo.rankinfo.rank}</strong></span></a>
+						<div class="content">
+						</div>
+						</li>
 					</ul>
 				</div>
 			</div>
