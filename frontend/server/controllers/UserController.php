@@ -883,7 +883,7 @@ class UserController extends Controller {
                 'ORIG1516-VDS' => 15,
             ];
         } elseif ($r['contest_type'] == 'OMIAGS') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
