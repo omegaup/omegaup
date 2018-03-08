@@ -30,7 +30,6 @@ class UserFactory {
             $email = Utils::CreateRandomString().'@mail.com';
         }
 
-    
         // Populate a new Request to pass to the API
         UserController::$permissionKey = uniqid();
         $r = new Request([
