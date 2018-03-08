@@ -1378,7 +1378,6 @@ class UserController extends Controller {
         return $response;
     }
 
-
     /**
      * Returns the list of coders of the month
      *
@@ -1441,7 +1440,6 @@ class UserController extends Controller {
 
         return false;
     }
-
 
     /**
      * Get the results for this user in a given interview
