@@ -1005,7 +1005,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'PYE-AGS18' => 250,
+                'PYE-AGS18' => 40,
             ];
         } else {
             throw new InvalidParameterException(
