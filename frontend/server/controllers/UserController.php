@@ -68,8 +68,6 @@ class UserController extends Controller {
         $user_data = [
             'username' => $r['username'],
             'password' => $hashedPassword,
-            'solved' => 0,
-            'submissions' => 0,
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
@@ -1142,8 +1140,6 @@ class UserController extends Controller {
 
         $response['userinfo']['username'] = $user->username;
         $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['solved'] = $user->solved;
-        $response['userinfo']['submissions'] = $user->submissions;
         $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
         $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
@@ -1282,7 +1278,6 @@ class UserController extends Controller {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
         }
-
         try {
             $coderOfTheMonth = null;
 
