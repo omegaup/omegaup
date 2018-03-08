@@ -1405,6 +1405,32 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * Returns the Current top of coders of the month
+     *
+     * @param Request $r
+     */
+    public static function apiCurrentCoderOfTheMonthList() {
+        $response = [];
+        $response['coders'] = [];
+        try {
+            $coders = CoderOfTheMonthDAO::getCurrentCodersOfTheMonth();
+            foreach ($coders as $c) {
+                $response['coders'][] = [
+                    'username' => $c['username'],
+                    'country_id' => $c['country_id'],
+                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
+                    'date' => $c['time']
+                ];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
     public static function userOpenedProblemset($problemset_id, $user_id) {
         // User already started the problemset.
         $problemsetOpened = ProblemsetUsersDAO::getByPK($user_id, $problemset_id);
@@ -1415,6 +1441,7 @@ class UserController extends Controller {
 
         return false;
     }
+
 
     /**
      * Get the results for this user in a given interview
