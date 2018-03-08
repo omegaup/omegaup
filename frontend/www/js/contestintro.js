@@ -9,10 +9,18 @@ omegaup.OmegaUp.on('ready', function() {
         $('#start-contest-submit').prop('disabled', true);
 
         // Explicitly join the contest.
-        omegaup.API.Contest.open({contest_alias: contestAlias})
+        omegaup.API.Contest.open({
+                             contest_alias: contestAlias,
+                             share_user_information:
+                                 $('input[name=share-user-information]:checked')
+                                     .val()
+                           })
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);
       });
+
+  $('input[name=share-user-information]')
+      .on('click', function(ev) { enableStartContestButton(); });
 
   $('#request-access-form')
       .on('submit', function(ev) {
@@ -29,6 +37,19 @@ omegaup.OmegaUp.on('ready', function() {
               $('#start-contest-submit').prop('disabled', false);
             });
       });
+
+  function enableStartContestButton() {
+    var $formElement = $('form#start-contest-form>p');
+    if ($formElement.hasClass('basic-information-needed')) {
+      return false;
+    }
+    if ($formElement.hasClass('requests-user-information-required') &&
+        $('input[name=share-user-information]:checked').val() != '1') {
+      $('#start-contest-submit').prop('disabled', true);
+      return false;
+    }
+    $('#start-contest-submit').prop('disabled', false);
+  }
 
   function formatDelta(delta) {
     var days = Math.floor(delta / (24 * 60 * 60 * 1000));

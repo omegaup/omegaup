@@ -149,7 +149,7 @@ class Users extends VO {
     public $main_email_id;
 
     /**
-      * Identidad con la que está relacionado el usuario
+      * Identidad principal del usuario
       * @access public
       * @var int(11)
       */
