@@ -50,6 +50,34 @@ class UserRankTest extends OmegaupTestCase {
     }
 
     /**
+     * Tests refreshUserRank not displaying private profiles
+     */
+    public function testPrivateUserInRanking() {
+        // Create a private user
+        $contestantPrivate = UserFactory::createUser(null, null, null, true, true);
+        // Create one problem and a submission by the private user
+        $problemData = ProblemsFactory::createProblem();
+        $runDataPrivate = RunsFactory::createRunToProblem($problemData, $contestantPrivate);
+        RunsFactory::gradeRun($runDataPrivate);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request());
+
+        // Contestant should not appear in the rank as he's private.
+        $found = false;
+        foreach ($response['rank'] as $entry) {
+            if ($entry['username'] == $contestantPrivate->username) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertFalse($found);
+    }
+
+    /**
      * Tests apiRankByProblemsSolved
      */
     public function testFullRankByProblemSolvedNoPrivateProblems() {

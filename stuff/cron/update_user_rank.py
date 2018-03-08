@@ -58,6 +58,8 @@ def update_user_rank(cur):
             Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
         INNER JOIN
             Users u ON u.user_id = up.user_id
+        WHERE
+            u.is_private = 0
         GROUP BY
             user_id
         ORDER BY
