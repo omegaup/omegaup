@@ -27,24 +27,22 @@ class UserController extends Controller {
 
         Validators::isEmail($r['email'], 'email');
 
-        static $kAllowedScholarDegrees = ['none', 
-                                    'early_childhood', 
-                                    'pre_primary', 
-                                    'primary', 
+        static $kAllowedScholarDegrees = ['none',
+                                    'early_childhood',
+                                    'pre_primary',
+                                    'primary',
                                     'lower_secondary',
-                                    'upper_secondary', 
-                                    'post_secondary', 
-                                    'tertiary', 
-                                    'bachelors', 
-                                    'master', 
+                                    'upper_secondary',
+                                    'post_secondary',
+                                    'tertiary',
+                                    'bachelors',
+                                    'master',
                                     'doctorate'];
         Validators::isInEnum(
-                $r['scholar_degree'],
-                'scholar_degree',
-                $kAllowedScholarDegrees
-            );
-
-
+            $r['scholar_degree'],
+            'scholar_degree',
+            $kAllowedScholarDegrees
+        );
 
         // Check password
         $hashedPassword = null;
