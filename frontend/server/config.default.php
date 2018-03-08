@@ -13,7 +13,7 @@ try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
-try_define('OMEGAUP_URL', 'http://localhost:8080');
+try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_DEVELOPMENT_MODE', false);
 try_define('OMEGAUP_MAINTENANCE', null);
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
@@ -152,8 +152,8 @@ try_define('USER_ANONYMOUS', 'user_anonymous');
 # ########################
 # PASSWORD RESET CONFIG
 # ########################
-try_define('PASSWORD_RESET_TIMEOUT', 2 * 2);
-try_define('PASSWORD_RESET_MIN_WAIT', 2 * 2);
+try_define('PASSWORD_RESET_TIMEOUT', 2 * 3600);
+try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 
 # ########################
 # S3 CONFIG
