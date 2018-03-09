@@ -20,7 +20,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
-            'scholar_degree' => 'Maestría',
+            'scholar_degree' => 'master',
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale[0]->name,
