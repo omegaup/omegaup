@@ -66,7 +66,7 @@ class UserRankTest extends OmegaupTestCase {
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
 
-        // Contestant should not appear in the rank as he's private.
+        // Contestants should not appear in the rank as they're private.
         $found = false;
         foreach ($response['rank'] as $entry) {
             if ($entry['username'] == $contestantPrivate->username) {
