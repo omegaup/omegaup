@@ -10,6 +10,11 @@ class UserController extends Controller {
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
     public static $urlHelper = null;
+    const ALLOWED_SCHOLAR_DEGREES = [
+        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
+        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'doctorate',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -26,6 +31,16 @@ class UserController extends Controller {
         Validators::isValidUsername($r['username'], 'username');
 
         Validators::isEmail($r['email'], 'email');
+
+        if (empty($r['scholar_degree'])) {
+            $r['scholar_degree'] = 'none';
+        }
+
+        Validators::isInEnum(
+            $r['scholar_degree'],
+            'scholar_degree',
+            UserController::ALLOWED_SCHOLAR_DEGREES
+        );
 
         // Check password
         $hashedPassword = null;
