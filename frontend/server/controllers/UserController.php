@@ -10,6 +10,11 @@ class UserController extends Controller {
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
     public static $urlHelper = null;
+    const ALLOWED_SCHOLAR_DEGREES = [
+        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
+        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'doctorate',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -31,21 +36,10 @@ class UserController extends Controller {
             $r['scholar_degree'] = 'none';
         }
 
-        static $kAllowedScholarDegrees = ['none',
-                                    'early_childhood',
-                                    'pre_primary',
-                                    'primary',
-                                    'lower_secondary',
-                                    'upper_secondary',
-                                    'post_secondary',
-                                    'tertiary',
-                                    'bachelors',
-                                    'master',
-                                    'doctorate'];
         Validators::isInEnum(
             $r['scholar_degree'],
             'scholar_degree',
-            $kAllowedScholarDegrees
+            UserController::ALLOWED_SCHOLAR_DEGREES
         );
 
         // Check password
