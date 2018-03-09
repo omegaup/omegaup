@@ -76,13 +76,17 @@
 						<label for="scholar_degree" class="col-md-4 control-label">{#userEditSchoolGrade#}</label>
 						<div class="col-md-7">
 							<select name="scholar_degree" id="scholar_degree" class="form-control">
-								<option value="Elementary">{#userEditElementary#}</option>
-								<option value="Middle school">{#userEditMiddleSchool#}</option>
-								<option value="High school">{#userEditHighSchool#}</option>
-								<option value="Bachelor's">{#userEditBachelors#}</option>
-								<option value="Master's">{#userEditMasters#}</option>
-								<option value="Doctorate">{#userEditDoctorate#}</option>
-								<option value="Post-doc">Post-doc</option>
+								<option value="none">{#userEditNone#}</option>
+								<option value="early_childhood">{#userEditEarlyChildhood#}</option>
+								<option value="pre_primary">{#userEditPrePrimary#}</option>
+								<option value="primary">{#userEditPrimary#}</option>
+								<option value="lower_secondary">{#userEditLowerSecondary#}</option>
+								<option value="upper_secondary">{#userEditUpperSecondary#}</option>
+								<option value="post_secondary">{#userEditPostSecondary#}</option>
+								<option value="tertiary">{#userEditTertiary#}</option>
+								<option value="bachelors">{#userEditBachelors#}</option>
+								<option value="master">{#userEditMaster#}</option>
+								<option value="doctorate">{#userEditDoctorate#}</option>
 							</select>
 						</div>
 					</div>
