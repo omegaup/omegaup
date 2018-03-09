@@ -3,6 +3,7 @@
 '''Validates and converts the i18n templates.'''
 
 import argparse
+import collections
 from glob import glob
 import os.path
 import re
@@ -93,7 +94,7 @@ def main():
         lang = os.path.splitext(lang_filename)[0]
         languages.add(lang)
         last_key = ''
-        with open(lang_path, 'r') as lang_file:
+        with open(lang_path, 'r', encoding='utf-8') as lang_file:
             for lineno, line in enumerate(lang_file):
                 try:
                     key, value = LINE_RE.split(line.strip(), 1)
@@ -101,7 +102,7 @@ def main():
                         not_sorted.add(lang)
                     last_key = key
                     if key not in strings:
-                        strings[key] = {}
+                        strings[key] = collections.defaultdict(str)
                     match = VALUE_RE.match(value)
                     if match is None:
                         raise Exception("Invalid value")
@@ -130,7 +131,7 @@ def main():
                     if lang not in values:
                         with open(os.path.join(templates_dir,
                                                '%s.lang' % lang),
-                                  'a') as myfile:
+                                  'a', encoding='utf-8') as myfile:
                             print('%s = %s' % (key, english_word), file=myfile)
         print('Done fixing your missing files, re-run this tool again as '
               'usual.', file=sys.stderr)
@@ -158,14 +159,14 @@ def main():
         for lang in languages:
             js_lang_path = os.path.join(js_templates_dir,
                                         'lang.%s.js' % lang)
-            with open(js_lang_path, 'r') as lang_file:
+            with open(js_lang_path, 'r', encoding='utf-8') as lang_file:
                 if lang_file.read() != _generate_javascript(lang, strings):
                     print('Entries in %s do not match the .lang file.' %
                           js_lang_path, file=sys.stderr)
                     errors = True
             json_lang_path = os.path.join(js_templates_dir,
                                           'lang.%s.json' % lang)
-            with open(json_lang_path, 'r') as lang_file:
+            with open(json_lang_path, 'r', encoding='utf-8') as lang_file:
                 if _generate_json(lang, strings) != json.load(lang_file):
                     print('Entries in %s do not match the .lang file.' %
                           json_lang_path, file=sys.stderr)
@@ -192,15 +193,15 @@ def main():
 
     for lang in languages:
         lang_path = os.path.join(templates_dir, lang + '.lang')
-        with open(lang_path, 'w') as lang_file:
+        with open(lang_path, 'w', encoding='utf-8') as lang_file:
             for key in sorted(strings.keys()):
                 lang_file.write('%s = "%s"\n' %
                                 (key, strings[key][lang].replace('"', r'\"')))
         js_lang_path = os.path.join(js_templates_dir, 'lang.%s.js' % lang)
-        with open(js_lang_path, 'w') as lang_file:
+        with open(js_lang_path, 'w', encoding='utf-8') as lang_file:
             lang_file.write(_generate_javascript(lang, strings))
         json_lang_path = os.path.join(js_templates_dir, 'lang.%s.json' % lang)
-        with open(json_lang_path, 'w') as lang_file:
+        with open(json_lang_path, 'w', encoding='utf-8') as lang_file:
             json.dump(_generate_json(lang, strings), lang_file, sort_keys=True,
                       indent='\t')
 

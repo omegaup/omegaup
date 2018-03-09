@@ -69,6 +69,10 @@ class RunController extends Controller {
             if ($r['problem']->deprecated) {
                 throw new PreconditionFailedException('problemDeprecated');
             }
+            // check that problem is not publicly or privately banned.
+            if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                throw new NotFoundException('problemNotfound');
+            }
 
             $allowedLanguages = array_intersect(
                 $allowedLanguages,
@@ -171,13 +175,13 @@ class RunController extends Controller {
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetIdentitiesDAO::getByPK($r['current_user_id'], $problemset_id) &&
+                if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
                     !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_user_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_identity_id'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
@@ -347,7 +351,7 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_user_id'], $problemset_id);
+                $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id);
 
                 if (isset($r['container']->finish_time)) {
                     $response['submission_deadline'] = strtotime($r['container']->finish_time);

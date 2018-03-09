@@ -164,7 +164,7 @@ class InterviewController extends Controller {
         try {
             ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
                 'problemset_id' => $r['interview']->problemset_id,
-                'identity_id' => $r['user']->user_id,
+                'identity_id' => $r['user']->main_identity_id,
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',

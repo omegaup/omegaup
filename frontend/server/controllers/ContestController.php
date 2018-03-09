@@ -72,9 +72,9 @@ class ContestController extends Controller {
                     $contests
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
-                $contests = ContestsDAO::getContestsParticipating($r['current_user_id'], $page, $page_size, $query);
+                $contests = ContestsDAO::getContestsParticipating($r['current_identity_id'], $page, $page_size, $query);
             } elseif ($public == PublicStatus::YES) {
-                $contests = ContestsDAO::getRecentPublicContests($r['current_user_id'], $page, $page_size, $query);
+                $contests = ContestsDAO::getRecentPublicContests($r['current_identity_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_user_id'])) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
@@ -279,7 +279,7 @@ class ContestController extends Controller {
 
         if ($r['contest']->public != 1) {
             try {
-                if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id))
+                if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['contest']->problemset_id))
                         && !Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
                     throw new ForbiddenAccessException('userNotAllowed');
                 }
@@ -292,8 +292,8 @@ class ContestController extends Controller {
             }
         } else {
             if ($r['contest']->contestant_must_register == '1') {
-                if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
-                    $req = ProblemsetIdentityRequestDAO::getByPK($r['current_user_id'], $r['contest']->problemset_id);
+                if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
+                    $req = ProblemsetIdentityRequestDAO::getByPK($r['current_identity_id'], $r['contest']->problemset_id);
 
                     if (is_null($req) || ($req->accepted === '0')) {
                         throw new ForbiddenAccessException('contestNotRegistered');
@@ -350,8 +350,7 @@ class ContestController extends Controller {
         if (is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
-        $needsBasicInformation = ContestsDAO::getNeedsBasicInformation($r['contest']->problemset_id);
-
+        $result = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -360,11 +359,9 @@ class ContestController extends Controller {
                 $r['current_user_id'] = $session['user']->user_id;
             } else {
                 // No session, show the intro (if public), so that they can login.
-                return [
-                    'shouldShowIntro' =>
-                        $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO,
-                    'needsBasicInformation' => $needsBasicInformation
-                ];
+                $result['shouldShowIntro'] =
+                    $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+                return $result;
             }
             self::canAccessContest($r);
         } catch (Exception $e) {
@@ -374,31 +371,24 @@ class ContestController extends Controller {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
-            return [
-                'shouldShowIntro' => ContestController::SHOW_INTRO,
-                'needsBasicInformation' => $needsBasicInformation
-            ];
+            $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
+            return $result;
         }
 
         $cs = SessionController::apiCurrentSession()['session'];
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
-            $r['current_user_id'],
+            $r['current_identity_id'],
             $r['contest']->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
-            return [
-                'shouldShowIntro' => !ContestController::SHOW_INTRO,
-                'needsBasicInformation' => $needsBasicInformation
-            ];
+            $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
+            return $result;
         }
-
-        return [
-            'shouldShowIntro' => ContestController::SHOW_INTRO,
-            'needsBasicInformation' => $needsBasicInformation
-        ];
+        $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
+        return $result;
     }
 
     /**
@@ -500,7 +490,7 @@ class ContestController extends Controller {
 
         try {
             ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([
-                'identity_id' => $r['current_user_id'],
+                'identity_id' => $r['current_identity_id'],
                 'problemset_id' => $r['contest']->problemset_id,
                 'request_time' => gmdate('Y-m-d H:i:s'),
             ]));
@@ -520,19 +510,19 @@ class ContestController extends Controller {
      */
     public static function apiOpen(Request $r) {
         self::validateDetails($r);
-        $needsBasicInformation = ContestsDAO::getNeedsBasicInformation($r['contest']->problemset_id);
+        $needsInformation = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
         $session = SessionController::apiCurrentSession($r)['session'];
 
-        if ($needsBasicInformation && !is_null($session['user']) &&
+        if ($needsInformation['needs_basic_information'] && !is_null($session['user']) &&
               (!$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id)
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
-
         ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-            $r['current_user_id'],
+            $r['current_identity_id'],
             $r['contest']->problemset_id,
-            true
+            true,
+            $r['share_user_information']
         );
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
@@ -635,7 +625,10 @@ class ContestController extends Controller {
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
             $result['languages'] = explode(',', $result['languages']);
-            $result['needs_basic_information'] = ContestsDAO::getNeedsBasicInformation($r['contest']->problemset_id);
+            $result = array_merge(
+                $result,
+                ContestsDAO::getNeedsInformation($r['contest']->problemset_id)
+            );
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
@@ -661,7 +654,7 @@ class ContestController extends Controller {
             // Save the time of the first access
             try {
                 $problemset_user = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-                    $r['current_user_id'],
+                    $r['current_identity_id'],
                     $r['contest']->problemset_id
                 );
             } catch (ApiException $e) {
@@ -883,7 +876,8 @@ class ContestController extends Controller {
             // Save the problemset object with data sent by user to the database
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
-                'needs_basic_information' => $r['basic_information'] == 'true'
+                'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information']
             ]);
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
@@ -1381,7 +1375,7 @@ class ContestController extends Controller {
         try {
             ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
                 'problemset_id' => $r['contest']->problemset_id,
-                'identity_id' => $r['user']->user_id,
+                'identity_id' => $r['user']->main_identity_id,
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
@@ -1410,7 +1404,7 @@ class ContestController extends Controller {
         try {
             ProblemsetIdentitiesDAO::delete(new ProblemsetIdentities([
                 'problemset_id' => $r['contest']->problemset_id,
-                'identity_id' => $r['user']->user_id,
+                'identity_id' => $r['user']->main_identity_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -1898,8 +1892,8 @@ class ContestController extends Controller {
             $admin_id = $result['admin_id'];
 
             $result = new ProblemsetIdentityRequest($result);
-            $user_id = $result->identity_id;
-            $user = UsersDAO::getByPK($user_id);
+            $identity_id = $result->identity_id;
+            $user = IdentitiesDAO::getByPK($identity_id);
 
             // Get user profile. Email, school, etc.
             $profile_request = new Request();
@@ -1956,7 +1950,7 @@ class ContestController extends Controller {
 
         $targetUser = UsersDAO::FindByUsername($r['username']);
 
-        $request = ProblemsetIdentityRequestDAO::getByPK($targetUser->user_id, $contest->problemset_id);
+        $request = ProblemsetIdentityRequestDAO::getByPK($targetUser->main_identity_id, $contest->problemset_id);
 
         if (is_null($request)) {
             throw new InvalidParameterException('userNotInListOfRequests');
@@ -2028,7 +2022,7 @@ class ContestController extends Controller {
         // Add all users to an array
         foreach ($db_results as $result) {
             $user_id = $result->identity_id;
-            $user = UsersDAO::getByPK($user_id);
+            $user = IdentitiesDAO::getByPK($user_id);
             $users[] = ['user_id' => $user_id, 'username' => $user->username, 'access_time' => $result->access_time, 'country' => $user->country_id];
         }
 
@@ -2157,6 +2151,7 @@ class ContestController extends Controller {
             // Save the problemset object with data sent by user to the database
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
             $problemset->needs_basic_information = $r['basic_information'] ?? 0;
+            $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
             ProblemsetsDAO::save($problemset);
 
             // If the contest is private, add the list of allowed users

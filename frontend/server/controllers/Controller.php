@@ -35,6 +35,7 @@ class Controller {
 
         $r['current_user'] = $session['user'];
         $r['current_user_id'] = $session['user']->user_id;
+        $r['current_identity_id'] = $session['user']->main_identity_id;
     }
 
     /**

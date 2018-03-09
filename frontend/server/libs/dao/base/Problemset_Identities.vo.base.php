@@ -41,6 +41,9 @@ class ProblemsetIdentities extends VO {
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = $data['share_user_information'];
+        }
     }
 
     /**
@@ -90,4 +93,11 @@ class ProblemsetIdentities extends VO {
       * @var int(11)
       */
     public $time;
+
+    /**
+      * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
+      * @access public
+      * @var tinyint(1)
+      */
+    public $share_user_information;
 }

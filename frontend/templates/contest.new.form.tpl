@@ -147,6 +147,16 @@
 						</div>
 						<p class="help-block">{#contestNewFormBasicInformationRequiredDesc#}</p>
 					</div>
+
+					<div class="form-group col-md-6">
+						<label for="requests-user-information">{#contestNewFormUserInformationRequired#}</label>
+						<select name="requests-user-information" id="requests-user-information" class="form-control">
+							<option value="no">{#wordsNo#}</option>
+							<option value="optional">{#wordsOptional#}</option>
+							<option value="required">{#wordsRequired#}</option>
+						</select>
+						<p class="help-block">{#contestNewFormUserInformationRequiredDesc#}</p>
+					</div>
 				</div>
 
 				{if $IS_UPDATE eq 1}

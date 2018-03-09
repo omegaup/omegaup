@@ -143,6 +143,9 @@ class Utils {
 
             // The format of the question changed from this id
             $conn->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+
+            // Make sure the user_id and identity_id never matches in tests.
+            $conn->Execute('ALTER TABLE Identities auto_increment = 100000;');
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());

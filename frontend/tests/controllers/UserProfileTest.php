@@ -56,7 +56,7 @@ class UserProfileTest extends OmegaupTestCase {
         ]);
         $response = UserController::apiProfile($r);
 
-        $visibleAttributes = ['is_private', 'username', 'rankinfo'];
+        $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
         foreach ($response['userinfo'] as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;
@@ -104,7 +104,7 @@ class UserProfileTest extends OmegaupTestCase {
         $response = UserController::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
-        $visibleAttributes = ['email', 'gravatar_92', 'name', 'solved', 'submissions', 'username', 'rankinfo'];
+        $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
         foreach ($response['userinfo'] as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 $this->assertNotNull($v);

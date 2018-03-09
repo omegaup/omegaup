@@ -329,12 +329,16 @@ class ContestsDAO extends ContestsDAOBase {
                 $columns
             FROM
                 Contests
-            JOIN
+            INNER JOIN
                 Problemset_Identities
             ON
                 Contests.problemset_id = Problemset_Identities.problemset_id
+            INNER JOIN
+                Users
+            ON
+                Users.main_identity_id = Problemset_Identities.identity_id
             WHERE
-                Problemset_Identities.identity_id = ? AND
+                Users.user_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
             ORDER BY
                 recommended DESC,
@@ -488,8 +492,12 @@ class ContestsDAO extends ContestsDAOBase {
                         Problemset_Identities
                     ON
                         Contests.problemset_id = Problemset_Identities.problemset_id
+                    INNER JOIN
+                        Users
+                    ON
+                        Users.main_identity_id = Problemset_Identities.identity_id
                     WHERE
-                        Contests.public = 0 AND Problemset_Identities.identity_id = ? AND
+                        Contests.public = 0 AND Users.user_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
@@ -712,10 +720,11 @@ class ContestsDAO extends ContestsDAOBase {
         return null;
     }
 
-    public static function getNeedsBasicInformation($problemset_id) {
+    public static function getNeedsInformation($problemset_id) {
         $sql = '
                 SELECT
-                    needs_basic_information
+                    needs_basic_information,
+                    requests_user_information
                 FROM
                     Problemsets
                 WHERE
@@ -730,7 +739,10 @@ class ContestsDAO extends ContestsDAOBase {
         if (count($rs) == 0) {
             throw new NotFoundException('problemsetNotFound');
         }
-        return $rs['needs_basic_information'] == '1';
+        return [
+            'needs_basic_information' => $rs['needs_basic_information'] == '1',
+            'requests_user_information' => $rs['requests_user_information']
+        ];
     }
 
     /**

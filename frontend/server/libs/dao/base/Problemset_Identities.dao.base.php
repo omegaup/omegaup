@@ -20,7 +20,7 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`';
+    const FIELDS = '`Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
         if (is_null($identity_id) || is_null($problemset_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentities}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time` from Problemset_Identities';
+        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information` from Problemset_Identities';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -147,6 +147,10 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
             $clauses[] = '`time` = ?';
             $params[] = $Problemset_Identities->time;
         }
+        if (!is_null($Problemset_Identities->share_user_information)) {
+            $clauses[] = '`share_user_information` = ?';
+            $params[] = $Problemset_Identities->share_user_information;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -157,7 +161,7 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time` FROM `Problemset_Identities`';
+        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information` FROM `Problemset_Identities`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -181,11 +185,12 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
       * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities a actualizar.
       */
     final private static function update(ProblemsetIdentities $Problemset_Identities) {
-        $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `score` = ?, `time` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
+        $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Identities->access_time,
             $Problemset_Identities->score,
             $Problemset_Identities->time,
+            $Problemset_Identities->share_user_information,
             $Problemset_Identities->identity_id,$Problemset_Identities->problemset_id,
         ];
         global $conn;
@@ -212,13 +217,14 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
         if (is_null($Problemset_Identities->time)) {
             $Problemset_Identities->time = '1';
         }
-        $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`) VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Problemset_Identities->identity_id,
             $Problemset_Identities->problemset_id,
             $Problemset_Identities->access_time,
             $Problemset_Identities->score,
             $Problemset_Identities->time,
+            $Problemset_Identities->share_user_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -317,6 +323,17 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`time` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Problemset_IdentitiesA->share_user_information;
+        $b = $Problemset_IdentitiesB->share_user_information;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`share_user_information` >= ? AND `share_user_information` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`share_user_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

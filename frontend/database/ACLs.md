@@ -7,3 +7,4 @@ ID    | Descripción
 3     | `omegaup:quality-reviewer`. Los miembros de este grupo son jueces de calidad de problemas.
 4     | `omegaup:course-curator`. Los miembros de este grupo pueden hacer cursos Públicos.
 5     | `omegaup:mentor`. Los miembros de este grupo pueden ver los correos de los coders del mes.
+6     | `omegaup:support`. Los miembros de este grupo pueden realizar tareas administrativas dentro del sitio.
