@@ -104,7 +104,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestDetailsYes: "Si",
 	contestEdit: "Editar concurso",
 	contestEditAddProblems: "Agr\u00e9gale problemas!",
-	contestEditAdministrativeLinks: "Administrativo Enlaces",
+	contestEditAdministrativeLinks: "Enlaces administrativos",
 	contestEditContestEdited: "Tu concurso ha sido editado!",
 	contestEditGoToContest: "Ver Concurso",
 	contestEditRegisteredAdminDelete: "Eliminar",
