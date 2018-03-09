@@ -587,7 +587,6 @@ omegaup.OmegaUp.loadTranslations({
 	profileEmail: "Email",
 	profileGraduationDate: "Graduation date",
 	profileInfo: "Information",
-	profileRank: "Rank",
 	profileSchool: "School",
 	profileSolvedProblems: "Solved problems",
 	profileState: "State",

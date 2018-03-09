@@ -95,5 +95,4 @@ frontend/www/js/dist/
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
-frontend/server/libs/third_party/facebook-php-graph-sdk
-frontend/www/karel.js
+ubuntu-xenial-16.04-cloudimg-console.log
