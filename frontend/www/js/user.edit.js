@@ -37,6 +37,7 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.User.profile()
       .then(function(data) {
         $('#username').text(data.userinfo.username);
+        $('#username').val(data.userinfo.username);
         $('#name').val(data.userinfo.name);
         $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
         $('#gender').val(data.userinfo.gender);
@@ -85,8 +86,10 @@ omegaup.OmegaUp.on('ready', function() {
           omegaup.UI.error(omegaup.T.userEditNameTooLong);
           return;
         }
+        console.log($('#username').val());
 
         omegaup.API.User.update({
+                          username: $('#username').val(),
                           name: $('#name').val(),
                           birth_date: birth_date.getTime() / 1000,
                           gender: $('#gender').val(),

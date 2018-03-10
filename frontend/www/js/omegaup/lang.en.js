@@ -751,6 +751,7 @@ omegaup.OmegaUp.loadTranslations({
 	userRoles: "Roles",
 	userVerified: "User has been verified",
 	userVerify: "Verify user",
+	username: "Username",
 	usernameInUse: "Username already exists.",
 	usernameOrPassIsWrong: "Username or password is wrong. Please check your credentials.",
 	verdictAC: "Accepted",

@@ -1645,6 +1645,18 @@ class UserController extends Controller {
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
 
+        if (!is_null($r['username'])) {
+            Validators::isValidUsername($r['username'], 'username');
+            try {
+                $user = UsersDAO::FindByUsername($r['username']);
+                if ($r['username'] != $r['current_user']->username and $user) {
+                    throw new Exception("Duplicate username");
+                }
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+
         if (!is_null($r['name'])) {
             Validators::isStringNonEmpty($r['name'], 'name', true);
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
@@ -1741,6 +1753,7 @@ class UserController extends Controller {
         }
 
         $valueProperties = [
+            'username',
             'name',
             'country_id',
             'state_id',
