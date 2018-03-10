@@ -86,7 +86,6 @@ omegaup.OmegaUp.on('ready', function() {
           omegaup.UI.error(omegaup.T.userEditNameTooLong);
           return;
         }
-        console.log($('#username').val());
 
         omegaup.API.User.update({
                           username: $('#username').val(),
