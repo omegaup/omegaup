@@ -1348,6 +1348,61 @@ class UserController extends Controller {
     }
 
     /**
+     * Get coder of the month by trying to find it in the table using
+     * today date. If there's no coder of the month for the given
+     * date, calculate it and save it.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiCurrentCoderOfTheMonth() {
+        $firstDay = date('Y-m-d', strtotime('+1 month'));
+        try {
+            $coderOfTheMonth = null;
+
+            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay]));
+            if (count($codersOfTheMonth) > 0) {
+                $coderOfTheMonth = $codersOfTheMonth[0];
+            }
+            if (is_null($coderOfTheMonth)) {
+                // Generate the coder
+                $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+                if ($retArray == null) {
+                    return [
+                        'status' => 'ok',
+                        'userinfo' => null,
+                        'problems' => null,
+                    ];
+                }
+                $user = $retArray['user'];
+
+                // Save it
+                $c = new CoderOfTheMonth([
+                    'user_id' => $user->user_id,
+                    'time' => $firstDay,
+                ]);
+                CoderOfTheMonthDAO::save($c);
+            } else {
+                // Grab the user info
+                $user = UsersDAO::getByPK($coderOfTheMonth->user_id);
+            }
+        } catch (Exception $e) {
+            self::$log->error('Unable to get coder of the month: ' . $e);
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Get the profile of the coder of the month
+        $response = self::getProfileImpl($user);
+
+        // But avoid divulging the email in the response.
+        unset($response['userinfo']['email']);
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
      * Returns the list of coders of the month
      *
      * @param Request $r
@@ -1357,6 +1412,32 @@ class UserController extends Controller {
         $response['coders'] = [];
         try {
             $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            foreach ($coders as $c) {
+                $response['coders'][] = [
+                    'username' => $c['username'],
+                    'country_id' => $c['country_id'],
+                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
+                    'date' => $c['time']
+                ];
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
+     * Returns the Current top of coders of the month
+     *
+     * @param Request $r
+     */
+    public static function apiCurrentCoderOfTheMonthList() {
+        $response = [];
+        $response['coders'] = [];
+        try {
+            $coders = CoderOfTheMonthDAO::getCurrentCodersOfTheMonth();
             foreach ($coders as $c) {
                 $response['coders'][] = [
                     'username' => $c['username'],

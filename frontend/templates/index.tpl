@@ -87,8 +87,30 @@
 		</div>
 		{/if}
 
+		{if isset($currentCoderOfTheMonthData)}
 		<div class="panel panel-default">
 			<div class="panel-heading">
+				<h3 class="panel-title">{#index_current#}</h3>
+			</div>
+			<div id="current_coder_of_the_month" class="panel-body">
+				<div class="rss_element">
+					<h4 class="text-center" id="current-coder-of-the-month-username"><a href="/profile/{$currentCoderOfTheMonthData.username|htmlspecialchars}">{$currentCoderOfTheMonthData.username|htmlspecialchars}</a><img src="/media/flags/{$currentCoderOfTheMonthData.country_id|lower}.png" width="16" height="11" title="{$currentCoderOfTheMonthData.country_id}"/></h4>
+					<div class="text-center" id="current-coder-of-the-month-img"><a href="/profile/{$currentCoderOfTheMonthData.username|htmlspecialchars}"><img src="{$currentCoderOfTheMonthData.gravatar_92}"></a></div>
+					<div id="current-coder-of-the-month-name">{$currentCoderOfTheMonthData.name|htmlspecialchars}</div>
+					<div id="current-Coder-of-the-month-school">{$currentCoderOfTheMonthData.school|htmlspecialchars}</div>
+					<div id="current-coder-of-the-month-place">
+						{if isset($currentCoderOfTheMonthData.state)} {$currentCoderOfTheMonthData.state|htmlspecialchars}, {/if}{$currentCoderOfTheMonthData.country|htmlspecialchars}
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<a href="/currentcoderofthemonth/">{#currentCoderOfTheMonthFullList#}</a>
+        </div>
+    </div>
+    {/if}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
 				<h3 class="panel-title">{#frontPageMaterial#}</h3>
 			</div>
 			<div id="recommended_material" class="panel-body">

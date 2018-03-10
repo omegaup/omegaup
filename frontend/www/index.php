@@ -12,6 +12,9 @@ try {
     $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
 
+    $currentCoderOfTheMonthResponse = UserController::apiCurrentCoderOfTheMonth();
+    $smarty->assign('currentCoderOfTheMonthData', $currentCoderOfTheMonthResponse['userinfo']);
+
     $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
     // Show top 5 schools rank
     $smarty->assign('schoolRankPayload', ['rowCount' => 5, 'rank' => $schoolRankPayload['rank']]);

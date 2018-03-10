@@ -62,18 +62,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			INNER JOIN
 				Users u ON u.user_id = up.user_id
 			LEFT JOIN
-				Coder_Of_The_Month cm on u.user_id = cm.user_id
-			WHERE
-				cm.user_id IS NULL OR DATE_ADD(cm.time, INTERVAL 1 YEAR) < ?
+                Coder_Of_The_Month cm on u.user_id = cm.user_id and DAY(cm.time) = 1
+            WHERE
+                cm.user_id IS NULL OR DATE_ADD(cm.time, INTERVAL 1 YEAR) < ?
 			GROUP BY
-				user_id
+                user_id
 			ORDER BY
 				score DESC
 			LIMIT 1
 		";
-
         $val = [$startTime, $endTime, $endTime];
-
         global $conn;
         $rs = $conn->GetRow($sql, $val);
         if (count($rs) == 0) {
@@ -94,6 +92,37 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * @return Array
      */
     final public static function getCodersOfTheMonth() {
+        $sql = '
+          SELECT
+            cm.time, u.username, u.country_id, e.email
+          FROM
+            Coder_Of_The_Month cm
+          INNER JOIN
+            Users u ON u.user_id = cm.user_id
+          LEFT JOIN
+            Emails e ON e.user_id = u.user_id
+          WHERE
+            DAY(cm.time) = 1
+          ORDER BY
+            cm.time DESC
+        ';
+
+        global $conn;
+        $rs = $conn->Execute($sql);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = $row;
+        }
+        return $allData;
+    }
+
+    /**
+     * Get all Current top coders of the month
+     *
+     * @static
+     * @return Array
+     */
+    final public static function getCurrentCodersOfTheMonth() {
         $sql = '
           SELECT
             cm.time, u.username, u.country_id, e.email
