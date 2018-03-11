@@ -94,6 +94,40 @@ class UserUpdateTest extends OmegaupTestCase {
         UserController::apiUpdate($r);
     }
 
+    /**
+     * Update profile username with non-existence username
+     */
+    public function testUsernameUpdate() {
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $new_username = Utils::CreateRandomString();
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            //new username
+            'username' => $new_username
+        ]);
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+
+        $this->assertEquals($user_db->username, $new_username);
+    }
+
+    /**
+     * Update profile username with existed username
+     * @expectedException DuplicatedEntryInDatabaseException
+     */
+    public function testDuplicateUsernameUpdate() {
+        $old_user = UserFactory::createUser();
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            //update username with existed username
+            'username' => $old_user->username
+        ]);
+        UserController::apiUpdate($r);
+    }
+
      /**
      * Request parameter name cannot be too long
      * @expectedException InvalidParameterException
