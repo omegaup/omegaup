@@ -10,6 +10,11 @@ class UserController extends Controller {
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
     public static $urlHelper = null;
+    const ALLOWED_SCHOLAR_DEGREES = [
+        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
+        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'doctorate',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -26,6 +31,16 @@ class UserController extends Controller {
         Validators::isValidUsername($r['username'], 'username');
 
         Validators::isEmail($r['email'], 'email');
+
+        if (empty($r['scholar_degree'])) {
+            $r['scholar_degree'] = 'none';
+        }
+
+        Validators::isInEnum(
+            $r['scholar_degree'],
+            'scholar_degree',
+            UserController::ALLOWED_SCHOLAR_DEGREES
+        );
 
         // Check password
         $hashedPassword = null;
@@ -882,15 +897,15 @@ class UserController extends Controller {
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
             ];
-        } elseif ($r['contest_type'] == 'OMIAGS') {
-            if ($r['current_user']->username != 'andreasantillana'
+        } elseif ($r['contest_type'] == 'OMIAGS-2018') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
 
             $keys =  [
-                'OMIAGS' => 35
+                'OMIAGS-2018' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2017') {
             if ($r['current_user']->username != 'EfrenGonzalez'
@@ -998,13 +1013,22 @@ class UserController extends Controller {
             $keys = [
                 'TEBAEV' => 250,
             ];
+        } elseif ($r['contest_type'] == 'PYE-AGS') {
+            if ($r['current_user']->username != 'joemmanuel'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'PYE-AGS18' => 40,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS',
                 ]
             );
         }
