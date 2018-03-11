@@ -1647,13 +1647,15 @@ class UserController extends Controller {
 
         if (!is_null($r['username'])) {
             Validators::isValidUsername($r['username'], 'username');
+            $user = null;
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
-                if ($r['username'] != $r['current_user']->username and $user) {
-                    throw new Exception("Duplicate username");
-                }
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
+            }
+
+            if ($r['username'] != $r['current_user']->username && !is_null($user)) {
+                throw new DuplicatedEntryInDatabaseException('usernameInUse');
             }
         }
 
