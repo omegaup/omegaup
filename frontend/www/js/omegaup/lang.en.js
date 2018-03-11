@@ -331,7 +331,7 @@ omegaup.OmegaUp.loadTranslations({
 	interviewGoToInterview: "Go to interview",
 	interviewInProgress: "Interview in progress",
 	interviewInvitationEmailBodyIntro: "Hi, you have been invited to participate in the following interview.",
-	interviewInvitationEmailSubject: "You are invited to take an interview in OmegaUp",
+	interviewInvitationEmailSubject: "You are invited to take an interview in omegaUp",
 	interviewList: "List of interviews",
 	interviewNotFound: "Interivew not found",
 	interviewNotStarted: "Not started",
