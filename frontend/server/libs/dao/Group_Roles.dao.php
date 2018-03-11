@@ -49,8 +49,10 @@ class GroupRolesDAO extends GroupRolesDAOBase {
                 Group_Roles gr
             INNER JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
+            INNER JOIN
+                Identities i ON gi.identity_id = i.identity_id
             WHERE
-                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
+                i.user_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
             $user_id,
             $role_id,
@@ -65,7 +67,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
     }
 
-    public static function isContestant($user_id, $acl_id) {
+    public static function isContestant($identity_id, $acl_id) {
         $sql = '
             SELECT
                 COUNT(*) > 0
@@ -76,7 +78,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             WHERE
                 gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::CONTESTANT_ROLE,
             $acl_id,
         ];

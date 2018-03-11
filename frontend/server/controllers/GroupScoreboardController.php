@@ -181,8 +181,8 @@ class GroupScoreboardController extends Controller {
 
                 $r['usernames_filter'] = '';
                 foreach ($groupIdentities as $groupIdentity) {
-                    $identity_id = UsersDAO::getByPK($groupIdentity->identity_id);
-                    $r['usernames_filter'] .= $identity_id->username . ',';
+                    $identity = IdentitiesDAO::getByPK($groupIdentity->identity_id);
+                    $r['usernames_filter'] .= $identity->username . ',';
                 }
 
                 $r['usernames_filter'] = rtrim($r['usernames_filter'], ',');

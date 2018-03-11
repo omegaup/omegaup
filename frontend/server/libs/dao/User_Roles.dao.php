@@ -130,7 +130,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $roles;
     }
 
-    public static function getSystemGroups($user_id) {
+    public static function getSystemGroups($identity_id) {
         $sql = "
             SELECT
                 g.name
@@ -141,7 +141,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 gi.identity_id = ? AND g.name LIKE '%omegaup:%';";
         $params = [
-            $user_id
+            $identity_id
         ];
         global $conn;
 

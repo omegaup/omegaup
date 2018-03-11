@@ -926,7 +926,7 @@ class ProblemController extends Controller {
                         throw new ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
-                    if (!Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
+                    if (!Authorization::canSubmitToProblemset($r['current_identity_id'], $r['problemset'])) {
                         throw new ForbiddenAccessException();
                     }
                     // TODO: Check start times.
@@ -1276,7 +1276,7 @@ class ProblemController extends Controller {
                 ProblemsetUsersDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_user_id'],
                     $problemset_id,
-                    Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])
+                    Authorization::canSubmitToProblemset($r['current_identity_id'], $r['problemset'])
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -1653,8 +1653,8 @@ class ProblemController extends Controller {
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
         $user_type = USER_ANONYMOUS;
-        if (!is_null($r['current_user_id'])) {
-            $author_id = intval($r['current_user_id']);
+        if (!is_null($r['current_identity_id'])) {
+            $author_id = intval($r['current_identity_id']);
             if (Authorization::isSystemAdmin($r['current_user_id']) ||
                 Authorization::hasRole(
                     $r['current_user_id'],
@@ -1730,7 +1730,7 @@ class ProblemController extends Controller {
                 );
             } else {
                 $problems = ProblemsDAO::getAllProblemsAdminedByUser(
-                    $r['current_user_id'],
+                    $r['current_identity_id'],
                     $page,
                     $pageSize
                 );
@@ -1741,7 +1741,7 @@ class ProblemController extends Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDao::getHideTags($r['current_user_id']);
+        $hiddenTags = UsersDao::getHideTags($r['current_identity_id']);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
@@ -1781,7 +1781,7 @@ class ProblemController extends Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDao::getHideTags($r['current_user_id']);
+        $hiddenTags = UsersDao::getHideTags($r['current_identity_id']);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);

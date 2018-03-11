@@ -66,7 +66,7 @@ class CoursesDAO extends CoursesDAOBase {
         return $ar;
     }
 
-    public static function getCoursesForStudent($user) {
+    public static function getCoursesForStudent($identity_id) {
         global  $conn;
         $sql = 'SELECT c.*
                 FROM Courses c
@@ -78,7 +78,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = $conn->Execute($sql, $user);
+        $rs = $conn->Execute($sql, $identity_id);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -118,7 +118,7 @@ class CoursesDAO extends CoursesDAOBase {
                     ) bpr
                     GROUP BY bpr.assignment_id, bpr.user_id
                 ) pr
-                ON pr.user_id = i.identity_id';
+                ON pr.user_id = i.user_id';
 
         $rs = $conn->Execute($sql, [$group_id, $course_id]);
         $progress = [];
@@ -194,7 +194,7 @@ class CoursesDAO extends CoursesDAOBase {
      * Returns all courses that a user can manage.
      */
     final public static function getAllCoursesAdminedByUser(
-        $user_id,
+        $identity_id,
         $page = 1,
         $pageSize = 1000
     ) {
@@ -206,15 +206,19 @@ class CoursesDAO extends CoursesDAOBase {
                 Courses AS c
             INNER JOIN
                 ACLs AS a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Identities AS ai ON a.owner_id = ai.user_id
             LEFT JOIN
                 User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Identities uri ON ur.user_id = uri.identity_id
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
+                ai.identity_id = ? OR
+                (ur.role_id = ? AND uri.identity_id = ?) OR
                 (gr.role_id = ? AND gi.identity_id = ?)
             GROUP BY
                 c.course_id
@@ -223,11 +227,11 @@ class CoursesDAO extends CoursesDAOBase {
             LIMIT
                 ?, ?';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             $offset,
             $pageSize,
         ];
@@ -327,7 +331,7 @@ class CoursesDAO extends CoursesDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function isFirstTimeAccess($user_id, Courses $course, Groups $group) {
+    final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
         $sql = '
             SELECT
                 share_user_information
@@ -343,7 +347,7 @@ class CoursesDAO extends CoursesDAOBase {
                 c.course_id = ?
             ';
         $params = [
-            $user_id,
+            $identity_id,
             $group->group_id,
             $course->course_id
         ];

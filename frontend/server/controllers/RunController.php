@@ -176,7 +176,7 @@ class RunController extends Controller {
             if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
                 if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id) &&
-                    !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
+                    !Authorization::canSubmitToProblemset($r['current_identity_id'], $r['problemset'])) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 

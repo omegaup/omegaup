@@ -109,20 +109,20 @@ class GroupController extends Controller {
     }
 
     /**
-     * Add user to group
+     * Add identity to group
      *
      * @param Request $r
      */
     public static function apiAddUser(Request $r) {
         self::validateGroupAndOwner($r);
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
-            $groups_user = new GroupsIdentities([
+            $groups_identity = new GroupsIdentities([
                 'group_id' => $r['group']->group_id,
-                'identity_id' => $r['user']->user_id
+                'identity_id' => $r['identity']->identity_id
             ]);
-            GroupsIdentitiesDAO::save($groups_user);
+            GroupsIdentitiesDAO::save($groups_identity);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
@@ -137,12 +137,12 @@ class GroupController extends Controller {
      */
     public static function apiRemoveUser(Request $r) {
         self::validateGroupAndOwner($r);
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
             $key = new GroupsIdentities([
                 'group_id' => $r['group']->group_id,
-                'identity_id' => $r['user']->user_id
+                'identity_id' => $r['identity']->identity_id
             ]);
 
             // Check user is actually in group
@@ -152,7 +152,7 @@ class GroupController extends Controller {
             }
 
             GroupsIdentitiesDAO::delete($key);
-            self::$log->info('Removed ' . $r['user']->username . ' removed.');
+            self::$log->info('Removed ' . $r['identity']->username . ' removed.');
         } catch (ApiException $ex) {
             throw $ex;
         } catch (Exception $ex) {

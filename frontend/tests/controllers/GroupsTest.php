@@ -41,6 +41,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testAddUserToGroup() {
         $group = GroupsFactory::createGroup();
         $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::FindByUsername($user->username);
 
         $login = self::login($group['owner']);
         $response = GroupController::apiAddUser(new Request([
@@ -50,7 +51,7 @@ class GroupsTest extends OmegaupTestCase {
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $group_users = GroupsIdentitiesDAO::getByPK($group['group']->group_id, $user->user_id);
+        $group_users = GroupsIdentitiesDAO::getByPK($group['group']->group_id, $identity->identity_id);
         $this->assertNotNull($group_users);
     }
 

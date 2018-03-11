@@ -11,7 +11,7 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserHasSupportRole() {
         $support = UserFactory::createSupportUser();
-        $mentor = UserFactory::createMentorUser();
+        $mentor = UserFactory::createMentorIdentity();
 
         $is_support_member = Authorization::isSupportTeamMember($support->user_id);
         // Asserting that user belongs to the support group

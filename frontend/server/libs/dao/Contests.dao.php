@@ -223,7 +223,7 @@ class ContestsDAO extends ContestsDAOBase {
      * Returns all contests that a user can manage.
      */
     final public static function getAllContestsAdminedByUser(
-        $user_id,
+        $identity_id,
         $page = 1,
         $pageSize = 1000
     ) {
@@ -235,15 +235,19 @@ class ContestsDAO extends ContestsDAOBase {
                 Contests c
             INNER JOIN
                 ACLs AS a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Identities AS ai ON a.owner_id = ai.user_id
             LEFT JOIN
                 User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Identities uri ON uri.user_id = ur.user_id
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
+                ai.identity_id = ? OR
+                (ur.role_id = ? AND uri.identity_id = ?) OR
                 (gr.role_id = ? AND gi.identity_id = ?)
             GROUP BY
                 c.contest_id
@@ -252,11 +256,11 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT ?, ?;';
 
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             $offset,
             $pageSize,
         ];
@@ -431,7 +435,7 @@ class ContestsDAO extends ContestsDAOBase {
      *
      *
      * @global type $conn
-     * @param int $user_id
+     * @param int $identity_id
      * @param int $pagina
      * @param int $renglones_por_pagina
      * @param ActiveStatus $activos
@@ -440,7 +444,7 @@ class ContestsDAO extends ContestsDAOBase {
      * @return array
      */
     final public static function getAllContestsForUser(
-        $user_id,
+        $identity_id,
         $pagina = 1,
         $renglones_por_pagina = 1000,
         $activos = ActiveStatus::ALL,
@@ -465,11 +469,15 @@ class ContestsDAO extends ContestsDAOBase {
                         ACLs
                     ON
                         ACLs.acl_id = Contests.acl_id
+                    INNER JOIN
+                        Identities
+                    ON
+                        ACLs.owner_id = Identities.user_id
                     WHERE
-                        Contests.public = 0 AND ACLs.owner_id = ? AND
+                        Contests.public = 0 AND Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
-        $params[] = $user_id;
+        $params[] = $identity_id;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -488,11 +496,15 @@ class ContestsDAO extends ContestsDAOBase {
                         Problemset_Users
                     ON
                         Contests.problemset_id = Problemset_Users.problemset_id
+                    INNER JOIN
+                        Identities
+                    ON
+                        Identities.user_id = Problemset_Users.user_id
                     WHERE
-                        Contests.public = 0 AND Problemset_Users.user_id = ? AND
+                        Contests.public = 0 AND Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
-        $params[] = $user_id;
+        $params[] = $identity_id;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -511,13 +523,17 @@ class ContestsDAO extends ContestsDAOBase {
                          User_Roles
                      ON
                          User_Roles.acl_id = Contests.acl_id
+                     INNER JOIN
+                         Identities
+                     ON
+                         Identities.user_id = User_Roles.user_id
                      WHERE
                          Contests.public = 0 AND
-                         User_Roles.user_id = ? AND
+                         Identities.identity_id = ? AND
                          User_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
                  ) ";
-        $params[] = $user_id;
+        $params[] = $identity_id;
         $params[] = Authorization::ADMIN_ROLE;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -545,7 +561,7 @@ class ContestsDAO extends ContestsDAOBase {
                          Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
                  ) ";
-        $params[] = $user_id;
+        $params[] = $identity_id;
         $params[] = Authorization::ADMIN_ROLE;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -577,7 +593,6 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
-
         global $conn;
         $rs = $conn->Execute($sql, $params);
 

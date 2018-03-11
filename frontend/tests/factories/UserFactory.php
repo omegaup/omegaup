@@ -125,17 +125,18 @@ class UserFactory {
     }
 
     /**
-     * Creates a new user with mentor role
+     * Creates a new identity with mentor role
      *
      * @param string $username
      * @param string $password
      * @param string $email
-     * @return User
+     * @return Identity
      */
-    public static function createMentorUser($username = null, $password = null, $email = null) {
+    public static function createMentorIdentity($username = null, $password = null, $email = null) {
         $user = self::createUser($username, $password, $email);
+        $identity = IdentitiesDAO::FindByUsername($user->username);
 
-        self::addMentorRole($user);
+        self::addMentorRole($identity);
 
         return $user;
     }
@@ -150,8 +151,9 @@ class UserFactory {
      */
     public static function createSupportUser($username = null, $password = null, $email = null) {
         $user = self::createUser($username, $password, $email);
+        $identity = IdentitiesDAO::FindByUsername($user->username);
 
-        self::addSupportRole($user);
+        self::addSupportRole($identity);
 
         return $user;
     }
@@ -172,36 +174,36 @@ class UserFactory {
     }
 
     /**
-     * Adds mentor role to the user
+     * Adds mentor role to the identity
      *
-     * @param Users $user
+     * @param Identities $identity
      */
-    public static function addMentorRole(Users $user) {
+    public static function addMentorRole(Identities $identity) {
         $mentor_group = GroupsDAO::findByAlias(
             Authorization::MENTOR_GROUP_ALIAS
         );
 
-        $groupUser = new GroupsIdentities([
-            'identity_id' => $user->user_id,
+        $groupIdentity = new GroupsIdentities([
+            'identity_id' => $identity->identity_id,
             'group_id' => $mentor_group->group_id,
         ]);
-        GroupsIdentitiesDao::save($groupUser);
+        GroupsIdentitiesDao::save($groupIdentity);
     }
 
     /**
-     * Adds support role to the user
+     * Adds support role to the identity
      *
-     * @param Users $user
+     * @param Identities $identity
      */
-    public static function addSupportRole(Users $user) {
+    public static function addSupportRole(Identities $identity) {
         $support_group = GroupsDAO::findByAlias(
             Authorization::SUPPORT_GROUP_ALIAS
         );
 
-        $groupUser = new GroupsIdentities([
-            'identity_id' => $user->user_id,
+        $groupIdentity = new GroupsIdentities([
+            'identity_id' => $identity->identity_id,
             'group_id' => $support_group->group_id,
         ]);
-        GroupsIdentitiesDao::save($groupUser);
+        GroupsIdentitiesDao::save($groupIdentity);
     }
 }

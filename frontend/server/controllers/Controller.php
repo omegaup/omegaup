@@ -30,11 +30,13 @@ class Controller {
         if (is_null($session['user'])) {
             $r['current_user'] = null;
             $r['current_user_id'] = null;
+            $r['current_identity_id'] = null;
             throw new UnauthorizedException();
         }
 
         $r['current_user'] = $session['user'];
         $r['current_user_id'] = $session['user']->user_id;
+        $r['current_identity_id'] = $session['identity']->identity_id;
     }
 
     /**

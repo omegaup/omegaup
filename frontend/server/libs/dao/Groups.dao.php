@@ -90,11 +90,11 @@ class GroupsDAO extends GroupsDAOBase {
     final public static function sampleMembers(Groups $group, $n) {
         $sql = '
             SELECT
-                u.*
+                i.*
             FROM
                 Groups_Identities gi
             INNER JOIN
-                Users u ON u.user_id = gi.identity_id
+                Identities i ON i.identity_id = gi.identity_id
             WHERE
                 gi.group_id = ?
             ORDER BY
@@ -103,10 +103,10 @@ class GroupsDAO extends GroupsDAOBase {
                 0, ?;';
         global $conn;
 
-        $users = [];
+        $identities = [];
         foreach ($conn->Execute($sql, [$group->group_id, $n]) as $row) {
-            $users[] = new Users($row);
+            $identities[] = new Identities($row);
         }
-        return $users;
+        return $identities;
     }
 }

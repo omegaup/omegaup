@@ -12,6 +12,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
         $student = UserFactory::createUser();
+        $identity = IdentitiesDAO::FindByUsername($student->username);
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
         $response = CourseController::apiAddStudent(new Request([
@@ -28,7 +29,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
             'group_id' => $course->group_id,
-            'identity_id' => $student->user_id
+            'identity_id' => $identity->identity_id
             ]));
 
         $this->assertNotNull($studentsInGroup);
@@ -154,6 +155,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
         $student = UserFactory::createUser();
+        $identity = IdentitiesDAO::FindByUsername($student->username);
 
         $login = OmegaupTestCase::login($student);
         $response = CourseController::apiAddStudent(new Request([
@@ -170,7 +172,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
             'group_id' => $course->group_id,
-            'identity_id' => $student->user_id
+            'identity_id' => $identity->identity_id
             ]));
 
         $this->assertNotNull($studentsInGroup);

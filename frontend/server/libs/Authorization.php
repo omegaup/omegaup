@@ -248,9 +248,9 @@ class Authorization {
         if (Authorization::isSystemAdmin($user_id)) {
             return true;
         }
-
+        $identity = IdentitiesDAO::FindByUserId($user_id);
         $groupUsers = GroupsIdentitiesDAO::search(new GroupsIdentities([
-            'identity_id' => $user_id,
+            'identity_id' => $identity->identity_id,
             'group_id' => $group->group_id
         ]));
 
@@ -276,12 +276,12 @@ class Authorization {
         self::$support_group = null;
     }
 
-    public static function canSubmitToProblemset($user_id, $problemset) {
+    public static function canSubmitToProblemset($identity_id, $problemset) {
         if (is_null($problemset)) {
             return false;
         }
-        return self::isAdmin($user_id, $problemset) ||
-               GroupRolesDAO::isContestant($user_id, $problemset->acl_id);
+        return self::isAdmin($identity_id, $problemset) ||
+               GroupRolesDAO::isContestant($identity_id, $problemset->acl_id);
     }
 
     public static function canCreatePublicCourse($user_id) {

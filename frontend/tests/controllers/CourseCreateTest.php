@@ -11,9 +11,10 @@ class CourseCreateTest extends OmegaupTestCase {
         );
 
         self::$curator = UserFactory::createUser();
+        $identity = IdentitiesDAO::FindByUsername(self::$curator->username);
         GroupsIdentitiesDAO::save(new GroupsIdentities([
             'group_id' => $curatorGroup->group_id,
-            'identity_id' => self::$curator->user_id,
+            'identity_id' => $identity->identity_id,
             'role_id' => Authorization::ADMIN_ROLE,
         ]));
     }

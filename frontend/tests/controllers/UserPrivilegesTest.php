@@ -52,6 +52,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
         $user = UserFactory::createUser($username);
+        $identity = IdentitiesDAO::FindByUsername($user->username);
 
         $login = self::login($user);
         // Call to API Add Group
@@ -71,7 +72,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'group' => 'omegaup:mentor'
         ]));
 
-        $systemGroups = UserRolesDAO::getSystemGroups($user->user_id);
+        $systemGroups = UserRolesDAO::getSystemGroups($identity->identity_id);
         $this->assertContains('omegaup:quality-reviewer', $systemGroups);
         $this->assertContains('omegaup:course-curator', $systemGroups);
         $this->assertContains('omegaup:mentor', $systemGroups);
