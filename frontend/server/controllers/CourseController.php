@@ -18,7 +18,6 @@ class CourseController extends Controller {
     private static function validateCourseAlias(Request $r) {
         try {
             $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
-            return $r['course'];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -26,6 +25,7 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+        return $r['course'];
     }
 
     /**
