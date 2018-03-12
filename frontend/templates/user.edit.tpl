@@ -8,6 +8,13 @@
 			<div class="panel-body">
 				<form id="user_profile_form" class="form-horizontal" role="form">
 					<div class="form-group">
+						<label for="username" class="col-md-4 control-label">{#username#}</label>
+						<div class="col-md-7">
+							<input id='username' name='username' value='' type='text' size='30' class="form-control">
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label for="name" class="col-md-4 control-label">{#profile#}</label>
 						<div class="col-md-7">
 							<input id='name' name='name' value='' type='text' size='30' class="form-control">
