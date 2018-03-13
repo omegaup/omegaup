@@ -38,14 +38,8 @@ if ($intro_details['shouldShowResults']) {
         die();
     }
     $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['user']->user_id, $course);
-    $smarty->assign('isCourse', true);
-    $smarty->assign('admin', false);
-    $smarty->assign('showClarifications', false);
-    $smarty->assign('showDeadlines', true);
-    $smarty->assign('showNavigation', true);
-    $smarty->assign('showPoints', true);
     $smarty->assign('showRanking', $showScoreboard);
-    $smarty->display('../templates/arena.contest.tpl');
+    $smarty->display('../templates/arena.contest.course.tpl');
 } else {
     $smarty->display('../templates/course.details.tpl');
 }

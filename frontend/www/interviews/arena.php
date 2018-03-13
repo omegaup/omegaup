@@ -19,12 +19,5 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/interviews.arena.intro.tpl');
 } else {
-    $smarty->assign('isArena', true);
-    $smarty->assign('admin', false);
-    $smarty->assign('showDeadlines', false);
-    $smarty->assign('showClarifications', true);
-    $smarty->assign('showNavigation', false);
-    $smarty->assign('showPoints', true);
-    $smarty->assign('showRanking', false);
-    $smarty->display('../../templates/arena.contest.tpl');
+    $smarty->display('../../templates/arena.contest.interview.tpl');
 }
