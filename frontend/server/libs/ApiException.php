@@ -151,6 +151,21 @@ class DuplicatedEntryInDatabaseException extends ApiException {
 }
 
 /**
+ * DuplicatedEntryInArrayException
+ *
+ */
+class DuplicatedEntryInArrayException extends ApiException {
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message, Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
+    }
+}
+
+/**
  * DuplicatedEntryInDatabaseException
  *
  */
