@@ -156,6 +156,21 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
+    final public static function getByProblemset($problemset_id) {
+        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 1;';
+        $params = [  $problemset_id ];
+
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+
+        $contest = new Contests($rs);
+
+        return $contest;
+    }
+
     public static function getPrivateContestsCount(Users $user) {
         $sql = 'SELECT
            COUNT(c.contest_id) as total

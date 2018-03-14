@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Groups_Scoreboards_Contests.
+ * Value Object file for table Groups_Scoreboards_Problemsets.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsScoreboardsContests extends VO {
+class GroupsScoreboardsProblemsets extends VO {
     /**
-     * Constructor de GroupsScoreboardsContests
+     * Constructor de GroupsScoreboardsProblemsets
      *
-     * Para construir un objeto de tipo GroupsScoreboardsContests debera llamarse a el constructor
+     * Para construir un objeto de tipo GroupsScoreboardsProblemsets debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -29,8 +29,8 @@ class GroupsScoreboardsContests extends VO {
         if (isset($data['group_scoreboard_id'])) {
             $this->group_scoreboard_id = $data['group_scoreboard_id'];
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
         if (isset($data['only_ac'])) {
             $this->only_ac = $data['only_ac'];
@@ -65,7 +65,7 @@ class GroupsScoreboardsContests extends VO {
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $problemset_id;
 
     /**
       *  [Campo no documentado]
