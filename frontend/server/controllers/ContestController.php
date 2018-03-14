@@ -626,6 +626,16 @@ class ContestController extends Controller {
 
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
+            if (Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+                $result['users'] = self::apiUsers($r)['users'];
+                foreach ($result['users'] as $index => $user) {
+                    if ($user['user_id'] == $r['current_user_id']) {
+                        global $smarty;
+                        $result['users'][$index]['username'] = $smarty->getConfigVars('wordsPublic');
+                        break;
+                    }
+                }
+            }
             $result['languages'] = explode(',', $result['languages']);
             $result = array_merge(
                 $result,

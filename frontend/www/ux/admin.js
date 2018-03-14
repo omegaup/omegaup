@@ -61,12 +61,20 @@ omegaup.OmegaUp.on('ready', function() {
                 .html(problemName);
             $('#problem-list').append(prob);
 
-            $('#clarification select')
+            $('#clarification select[name=problem]')
                 .append('<option value="' + problem.alias + '">' + problemName +
                         '</option>');
             $('select.runsproblem')
                 .append('<option value="' + problem.alias + '">' + problemName +
                         '</option>');
+          }
+
+          for (var ind in contest.users) {
+            var user = contest.users[ind];
+
+            $('#clarification select[name=user]')
+                .append('<option value="' + user.user_id + '">' +
+                        omegaup.UI.escape(user.username) + '</option>');
           }
 
           arena.setupPolls();

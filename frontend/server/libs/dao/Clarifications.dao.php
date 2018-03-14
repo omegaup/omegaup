@@ -19,25 +19,29 @@ require_once('base/Clarifications.vo.base.php');
   */
 class ClarificationsDAO extends ClarificationsDAOBase {
     final public static function GetProblemsetClarifications($problemset_id, $admin, $user_id, $offset, $rowcount) {
-        $sql = '';
-        if ($admin) {
-            $sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
-                   'c.message, c.answer, UNIX_TIMESTAMP(c.time) `time`, c.public ' .
-                   'FROM Clarifications c ';
-        } else {
-            $sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
-                   'c.message, ' .
-                   'UNIX_TIMESTAMP(c.time) `time`, c.answer, c.public ' .
-                   'FROM Clarifications c ';
-        }
+        $sql = 'SELECT
+                  c.clarification_id,
+                  p.alias `problem_alias`,
+                  u.username `author`,
+                  r.username `receiver`,
+                  c.message,
+                  c.answer,
+                  UNIX_TIMESTAMP(c.time) `time`,
+                  c.public
+                FROM
+                  `Clarifications` c
+        ';
         $sql .= 'INNER JOIN Users u ON u.user_id = c.author_id ' .
+                'LEFT JOIN Users r ON r.user_id = c.receiver_id ' .
                 'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
                 'WHERE ' .
                 'c.problemset_id = ? ';
         $val = [$problemset_id];
 
         if (!$admin) {
-            $sql .= 'AND (c.public = 1 OR c.author_id = ?) ';
+            $sql .= 'AND (c.public = 1 OR c.author_id = ? OR c.receiver_id = ?) ' .
+                    'OR (c.author_id = c.receiver_id)';
+            $val[] = $user_id;
             $val[] = $user_id;
         }
 

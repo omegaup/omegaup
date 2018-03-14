@@ -53,6 +53,9 @@ export default class ArenaAdmin {
                          problem_alias: $('select[name="problem"]',
                                           self.arena.elements.clarification)
                                             .val(),
+                         user_id: $('select[name="user"]',
+                                    self.arena.elements.clarification)
+                                      .val(),
                          message: $('textarea[name="message"]',
                                     self.arena.elements.clarification)
                                       .val(),

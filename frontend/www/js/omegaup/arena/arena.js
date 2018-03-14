@@ -899,6 +899,9 @@ export class Arena {
     }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
+      if (clarification.receiver != null) {
+        $(r).addClass('direct-message');
+      }
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');

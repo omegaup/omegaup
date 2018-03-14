@@ -28,6 +28,7 @@ class ClarificationController extends Controller {
     private static function validateCreate(Request $r) {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::isNumber($r['user_id'], 'user_id', false);
         Validators::isStringNonEmpty($r['message'], 'message');
         Validators::isStringOfMaxLength($r['message'], 'message', 200);
 
@@ -69,8 +70,10 @@ class ClarificationController extends Controller {
         $response = [];
 
         $time = Time::get();
+
         $r['clarification'] = new Clarifications([
             'author_id' => $r['current_user_id'],
+            'receiver_id' => $r['user_id'],
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
