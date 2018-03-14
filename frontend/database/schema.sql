@@ -806,7 +806,7 @@ CREATE TABLE `Users` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
-  `scholar_degree` varchar(64) DEFAULT NULL,
+  `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
   `language_id` int(11) DEFAULT NULL,
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
