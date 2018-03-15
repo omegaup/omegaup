@@ -1852,15 +1852,23 @@ class UserController extends Controller {
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
+                $response['total'] = 0;
                 $selectedFilter = self::getSelectedFilter($r);
                 try {
-                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $selectedFilter['filteredBy'], $selectedFilter['value']);
+                    $userRankEntries = UserRankDAO::getFilteredRank(
+                        $r['offset'],
+                        $r['rowcount'],
+                        'rank',
+                        'ASC',
+                        $selectedFilter['filteredBy'],
+                        $selectedFilter['value']
+                    );
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
 
                 if (!is_null($userRankEntries)) {
-                    foreach ($userRankEntries as $userRank) {
+                    foreach ($userRankEntries['rows'] as $userRank) {
                         array_push($response['rank'], [
                             'username' => $userRank->username,
                             'name' => $userRank->name,
@@ -1869,6 +1877,7 @@ class UserController extends Controller {
                             'score' => $userRank->score,
                             'country_id' => $userRank->country_id]);
                     }
+                    $response['total'] = $userRankEntries['total'];
                 }
                 return $response;
             }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
