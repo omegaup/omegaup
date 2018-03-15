@@ -630,6 +630,78 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * Duplicate tag test.
+     */
+    public function testTagsForDuplicate() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        $login = self::login($contestant);
+        try {
+            QualityNominationController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'promotion',
+                'contents' => json_encode([
+                    'rationale' => 'cool!',
+                    'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                    ],
+                    'source' => 'omegaUp',
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                ]),
+            ]));
+            $this->fail("Duplicate tags should be caught.");
+        } catch (DuplicatedEntryInArrayException $e) {
+        }
+
+        try {
+            QualityNominationController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    // No difficulty!
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                ]),
+            ]));
+            $this->fail("Duplicate tags should be caught.");
+        } catch (DuplicatedEntryInArrayException $e) {
+        }
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'promotion',
+            'contents' => json_encode([
+                'rationale' => 'cool!',
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'source' => 'omegaUp',
+                'tags' => ['ez-pz', 'ez'],
+            ]),
+        ]));
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                // No difficulty!
+                'quality' => 3,
+                'tags' => ['ez-pz', 'ez'],
+            ]),
+        ]));
+    }
+
+    /**
      * Test that nomination list by default only shows promotions or demotions.
      * All other nomination types should not appear on this list.
      */

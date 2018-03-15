@@ -123,7 +123,7 @@ class QualityNominationController extends Controller {
                     $tag = TagController::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
-                    throw new DuplicateEntryInArrayException('duplicateTagsNotAllowed');
+                    throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
                 }
             }
         } elseif ($r['nomination'] == 'promotion') {
@@ -141,7 +141,7 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
-                throw new DuplicateEntryInArrayException('duplicateTagsNotAllowed');
+                throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
             }
             // Statements must be a dictionary of language => { 'markdown': string }.
             foreach ($contents['statements'] as $language => $statement) {
