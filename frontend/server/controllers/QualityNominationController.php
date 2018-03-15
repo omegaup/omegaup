@@ -141,7 +141,7 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
-                throw new DuplicateEntryInArrayException('Duplicate Tags not allowed.');
+                throw new DuplicateEntryInArrayException('duplicateTagsNotAllowed');
             }
             // Statements must be a dictionary of language => { 'markdown': string }.
             foreach ($contents['statements'] as $language => $statement) {
