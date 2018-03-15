@@ -24,9 +24,9 @@
 			<div class="panel-body">
 				<form class="form" id="add-problem-form">
 					<div class="form-group">
-						<label for="problems-dropdown">{#wordsProblems#}</label>
+						<label for="problems-dropdown">{#wordsProblem#}</label>
 						<input class="typeahead form-control" name="problems" id="problems-dropdown"
-							autocomplete="off" />
+							autocomplete="off" placeholder="Enter problem alias" />
 					</div>
 
 					<div class="form-group">
