@@ -70,7 +70,7 @@ class ClarificationController extends Controller {
 
         $time = Time::get();
         $r['clarification'] = new Clarifications([
-            'author_id' => $r['current_user_id'],
+            'author_id' => $r['current_identity_id'],
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
@@ -120,7 +120,7 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!(Authorization::canViewClarification($r['current_user_id'], $r['clarification']))) {
+            if (!(Authorization::canViewClarification($r['current_identity_id'], $r['clarification']))) {
                 throw new ForbiddenAccessException();
             }
         }

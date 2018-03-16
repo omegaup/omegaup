@@ -1619,7 +1619,7 @@ class ContestController extends Controller {
             $clarifications = ClarificationsDAO::GetProblemsetClarifications(
                 $r['contest']->problemset_id,
                 $is_contest_director,
-                $r['current_user_id'],
+                $r['current_identity_id'],
                 $r['offset'],
                 $r['rowcount']
             );

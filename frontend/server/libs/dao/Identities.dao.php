@@ -10,4 +10,19 @@ include_once('base/Identities.vo.base.php');
   *
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
+    public static function FindByUserId($user_id) {
+        global  $conn;
+        $sql = 'SELECT
+                  i.*
+                FROM
+                  `Identities` i
+                WHERE
+                  i.user_id = ?';
+        $params = [ $user_id ];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return null;
+        }
+        return new Identities($rs);
+    }
 }

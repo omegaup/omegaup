@@ -87,6 +87,28 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $conn->GetOne($sql, $params) > 0;
     }
 
+    public static function hasIdentityRole($identity_id, $acl_id, $role_id) {
+        $sql = '
+            SELECT
+                COUNT(*) > 0
+            FROM
+                `User_Roles` ur
+            INNER JOIN
+                `Users` u ON u.user_id = ur.user_id # TODO: Change by Identities table and gi.identity column when refactor phase 3 is approved
+            INNER JOIN
+                `Identities` i ON u.user_id = i.user_id
+            WHERE
+                i.identity_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
+        $params = [
+            $identity_id,
+            $role_id,
+            Authorization::SYSTEM_ACL,
+            $acl_id,
+        ];
+        global $conn;
+        return $conn->GetOne($sql, $params);
+    }
+
     public static function isAdmin($user_id, $acl_id) {
         return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
     }

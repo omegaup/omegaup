@@ -35,6 +35,28 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         return new Users($rs);
     }
 
+    public static function getIdentityByToken($auth_token) {
+        //look for it on the database
+        global $conn;
+        $sql = 'SELECT
+                  i.*
+                FROM
+                  `Identities` i
+                INNER JOIN
+                  `Auth_Tokens` at
+                ON
+                  at.user_id = i.user_id
+                WHERE
+                  at.token = ?;';
+        $params = [$auth_token];
+        $rs = $conn->GetRow($sql, $params);
+        //no matches
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Identities($rs);
+    }
+
     public static function expireAuthTokens($user_id) {
         // look for it on the database
         global $conn;

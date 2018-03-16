@@ -61,6 +61,33 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return $conn->GetOne($sql, $params);
     }
 
+    /**
+     * Merge with hasRole method when Group_Identities table is created
+     */
+    public static function hasIdentityRole($identity_id, $acl_id, $role_id) {
+        $sql = '
+            SELECT
+                COUNT(*) > 0
+            FROM
+                `Group_Roles` gr
+            INNER JOIN
+                `Groups_Users` gu ON gu.group_id = gr.group_id # TODO: Change by Groups_Identities table when refactor phase 3 is approved
+            INNER JOIN
+                `Users` u ON u.user_id = gu.user_id # TODO: Change by Identities table and gi.identity column when refactor phase 3 is approved
+            INNER JOIN
+                `Identities` i ON u.user_id = i.user_id
+            WHERE
+                i.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);'; # TODO: Change by i.identity column when refactor phase 3 is approved
+        $params = [
+            $identity_id,
+            $role_id,
+            Authorization::SYSTEM_ACL,
+            $acl_id,
+        ];
+        global $conn;
+        return $conn->GetOne($sql, $params);
+    }
+
     public static function isAdmin($user_id, $acl_id) {
         return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
     }

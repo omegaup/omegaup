@@ -88,12 +88,12 @@ class Authorization {
         return Authorization::isProblemAdmin($user_id, $problem);
     }
 
-    public static function canViewClarification($user_id, Clarifications $clarification) {
+    public static function canViewClarification($identity_id, Clarifications $clarification) {
         if (is_null($clarification) || !is_a($clarification, 'Clarifications')) {
             return false;
         }
 
-        if ($clarification->author_id === $user_id) {
+        if ($clarification->author_id === $identity_id) {
             return true;
         }
 
@@ -103,6 +103,7 @@ class Authorization {
             return false;
         }
 
+        return Authorization::isAdminClarifications($identity_id, $problemset);
         return Authorization::isAdmin($user_id, $problemset);
     }
 
@@ -160,6 +161,14 @@ class Authorization {
             self::hasRole($user_id, $entity->acl_id, Authorization::ADMIN_ROLE);
     }
 
+    public static function isAdminClarifications($identity_id, $entity) {
+        if (is_null($entity)) {
+            return false;
+        }
+        return self::isOwnerIdentity($identity_id, $entity->acl_id) ||
+            self::identityHasRole($identity_id, $entity->acl_id, Authorization::ADMIN_ROLE);
+    }
+
     public static function isContestAdmin($user_id, Contests $contest) {
         return self::isAdmin($user_id, $contest);
     }
@@ -175,6 +184,14 @@ class Authorization {
     public static function hasRole($user_id, $acl_id, $role_id) {
         return GroupRolesDAO::hasRole($user_id, $acl_id, $role_id) ||
             UserRolesDAO::hasRole($user_id, $acl_id, $role_id);
+    }
+
+    /**
+     * TODO: Merge with hasRole method and then remove
+     */
+    public static function identityHasRole($identity_id, $acl_id, $role_id) {
+        return GroupRolesDAO::hasIdentityRole($identity_id, $acl_id, $role_id) ||
+            UserRolesDAO::hasIdentityRole($identity_id, $acl_id, $role_id);
     }
 
     public static function isSystemAdmin($user_id) {
@@ -231,6 +248,14 @@ class Authorization {
     private static function isOwner($user_id, $acl_id) {
         $acl = ACLsDAO::getByPK($acl_id);
         return $acl->owner_id == $user_id;
+    }
+
+    /**
+     * TODO: merge with isOwner function and then remove it
+     */
+    private static function isOwnerIdentity($identity_id, $acl_id) {
+        $owner_id = ACLsDAO::getACLIdentityByPK($acl_id);
+        return $owner_id == $identity_id;
     }
 
     /**

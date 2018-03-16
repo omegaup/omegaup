@@ -1461,7 +1461,7 @@ class ProblemController extends Controller {
             $clarifications = ClarificationsDAO::GetProblemClarifications(
                 $r['problem']->problem_id,
                 $is_problem_admin,
-                $r['current_user_id'],
+                $r['current_identity_id'],
                 $r['offset'],
                 $r['rowcount']
             );

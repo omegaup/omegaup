@@ -127,12 +127,14 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
         }
 
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
+        $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
         if (is_null($currentUser)) {
             // Means user has auth token, but does not exist in DB
@@ -140,6 +142,7 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
@@ -153,6 +156,7 @@ class SessionController extends Controller {
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
             'auth_token' => $authToken,
+            'identity' => $currentIdentity,
             'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
         ];
     }
