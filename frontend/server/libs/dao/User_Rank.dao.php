@@ -52,20 +52,20 @@ class UserRankDAO extends UserRankDAOBase {
             $params_limit[] = (int)$colsPerPage;
             $sql_limit = ' LIMIT ?, ?';
         }
-      // Get total rows
+        // Get total rows
         $total_rows = $conn->GetOne($sql_count . $sql_from, $params);
 
         $params = array_merge($params, $params_limit);
 
-      // Get rows
+        // Get rows
         $rs = $conn->Execute($sql . $sql_from . $sql_limit, $params);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new UserRank($row);
         }
         return [
-        'rows' => $allData,
-        'total' => $total_rows
+            'rows' => $allData,
+            'total' => $total_rows
         ];
     }
 }
