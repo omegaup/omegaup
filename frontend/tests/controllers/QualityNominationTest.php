@@ -526,6 +526,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail('Missing "original" should have been caught');
         } catch (InvalidParameterException $e) {
+            // Expected.
         }
 
         try {
@@ -541,6 +542,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail('Invalid "original" should have been caught');
         } catch (NotFoundException $e) {
+            // Expected.
         }
 
         QualityNominationController::apiCreate(new Request([
@@ -657,6 +659,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail("Duplicate tags should be caught.");
         } catch (DuplicatedEntryInArrayException $e) {
+            // Expected.
         }
 
         try {
@@ -672,7 +675,9 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail("Duplicate tags should be caught.");
         } catch (DuplicatedEntryInArrayException $e) {
+            // Expected.
         }
+
         QualityNominationController::apiCreate(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -792,6 +797,7 @@ class QualityNominationTest extends OmegaupTestCase {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -809,12 +815,14 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::search($key);
             $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
     }
 
