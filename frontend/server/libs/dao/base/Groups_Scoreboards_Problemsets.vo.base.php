@@ -60,7 +60,7 @@ class GroupsScoreboardsProblemsets extends VO {
     public $group_scoreboard_id;
 
     /**
-      *  [Campo no documentado]
+      * Conjunto de problemas del scoreboard
       * Llave Primaria
       * @access public
       * @var int(11)

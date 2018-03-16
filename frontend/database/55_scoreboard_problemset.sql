@@ -17,11 +17,11 @@ ALTER TABLE `Groups_Scoreboards_Problemsets`
 UPDATE
   `Groups_Scoreboards_Problemsets`
 INNER JOIN
-  `Problemsets`
+  `Contests`
 ON
-  Problemsets.problemset_id = Groups_Scoreboards_Problemsets.problemset_id
+  Contests.contest_id = Groups_Scoreboards_Problemsets.contest_id
 SET
-  `Groups_Scoreboards_Problemsets`.`problemset_id` = Problemsets.problemset_id;
+  `Groups_Scoreboards_Problemsets`.`problemset_id` = Contests.contest_id;
 
 -- Deleting contest_id column and creating indexes
 ALTER TABLE `Groups_Scoreboards_Problemsets`
