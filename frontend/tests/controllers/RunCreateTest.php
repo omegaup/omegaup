@@ -742,4 +742,56 @@ class RunCreateTest extends OmegaupTestCase {
         // Call API
         $response = RunController::apiCreate($r);
     }
+
+    /**
+     * Should not allow sending to banned public problems.
+     * @expectedException NotFoundException
+     */
+    public function testShouldNotAllowToSendPubliclyBannedProblems() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $problem = $problemData['problem'];
+
+        // Change the visibility to public banned.
+        ProblemController::apiUpdate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'visibility' => ProblemController::VISIBILITY_PUBLIC_BANNED,
+             'message' => 'public_banned',
+        ]));
+
+        // Call API
+        RunController::apiCreate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'language' => 'c',
+             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+        ]));
+    }
+
+     /**
+     * Should not allow sending to privately banned problems.
+     * @expectedException NotFoundException
+     */
+    public function testShouldNotAllowToSendPrivatelyBannedProblems() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $problem = $problemData['problem'];
+
+        // Change the visibility to private banned.
+        ProblemController::apiUpdate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'visibility' => ProblemController::VISIBILITY_PRIVATE_BANNED,
+             'message' => 'private_banned',
+        ]));
+
+        // Call API
+        RunController::apiCreate(new Request([
+             'auth_token' => $login->auth_token,
+             'problem_alias' => $problem->alias,
+             'language' => 'c',
+             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+        ]));
+    }
 }

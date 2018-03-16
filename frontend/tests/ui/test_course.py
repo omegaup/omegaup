@@ -4,13 +4,12 @@
 '''Run Selenium course tests.'''
 
 import os
-
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-_OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
+import ui.util as util
 
 
 @flaky
@@ -30,14 +29,14 @@ def test_create_course(driver):
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-        add_students(driver, [user])
+        add_students_course(driver, [user])
 
         add_assignment(driver, assignment_alias)
 
         add_problem_to_assignment(driver, assignment_alias, problem)
 
     with driver.login_user():
-        enter_to_course(driver, course_alias, assignment_alias)
+        enter_course(driver, course_alias, assignment_alias)
 
 
 @flaky
@@ -54,12 +53,12 @@ def test_user_ranking_course(driver):
 
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
-        add_students(driver, [user])
+        add_students_course(driver, [user])
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
 
     with driver.login(user, user):
-        enter_to_course(driver, course_alias, assignment_alias)
+        enter_course(driver, course_alias, assignment_alias)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -81,11 +80,11 @@ def test_user_ranking_course(driver):
         contents_element = driver.browser.find_element_by_css_selector(
             '#submit input[type="file"]')
         contents_element.send_keys(os.path.join(
-            _OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
+            util.OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
         with driver.ajax_page_transition():
             contents_element.submit()
 
-        driver.update_score_manually(problem, assignment_alias)
+        driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -156,21 +155,6 @@ def create_course(driver, course_alias, school_name):
         driver.browser.find_element_by_tag_name('form').submit()
 
 
-def add_students(driver, users):
-    '''Add students to a recently created course.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "students")]')))).click()
-
-    for user in users:
-        driver.typeahead_helper('.omegaup-course-addstudent', user)
-
-        driver.browser.find_element_by_css_selector(
-            '.omegaup-course-addstudent form button[type=submit]').click()
-        driver.wait_for_page_loaded()
-
-
 def add_assignment(driver, assignment_alias):
     '''Add assignments to a recently created course.'''
 
@@ -226,7 +210,17 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait_for_page_loaded()
 
 
-def enter_to_course(driver, course_alias, assignment_alias):
+def add_students_course(driver, users):
+    '''Add students to a recently course.'''
+
+    util.add_students(
+        driver, users, selector='students',
+        typeahead_helper='.omegaup-course-addstudent',
+        submit_locator=(By.CSS_SELECTOR,
+                        '.omegaup-course-addstudent form button[type=submit]'))
+
+
+def enter_course(driver, course_alias, assignment_alias):
     '''Enter to course previously created.'''
 
     driver.wait.until(

@@ -297,20 +297,21 @@ OmegaUp.on('ready', function() {
             }
             schoolIdDeferred
                 .then(function(school_id) {
-                  API.Course.update({
-                              course_alias: courseAlias,
-                              name: ev.name,
-                              description: ev.description,
-                              start_time: ev.startTime.getTime() / 1000,
-                              finish_time: new Date(ev.finishTime)
-                                                   .setHours(23, 59, 59, 999) /
-                                               1000,
-                              alias: ev.alias,
-                              show_scoreboard: ev.showScoreboard,
-                              needs_basic_information:
-                                  ev.basic_information_required,
-                              school_id: school_id
-                            })
+                  API.Course
+                      .update({
+                        course_alias: courseAlias,
+                        name: ev.name,
+                        description: ev.description,
+                        start_time: ev.startTime.getTime() / 1000,
+                        finish_time:
+                            new Date(ev.finishTime).setHours(23, 59, 59, 999) /
+                                1000,
+                        alias: ev.alias,
+                        show_scoreboard: ev.showScoreboard,
+                        needs_basic_information: ev.basic_information_required,
+                        requests_user_information: ev.requests_user_information,
+                        school_id: school_id
+                      })
                       .then(function(data) {
                         UI.success(UI.formatString(
                             T.courseEditCourseEditedAndGoToCourse, {

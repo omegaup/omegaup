@@ -10,6 +10,11 @@ class UserController extends Controller {
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
     public static $urlHelper = null;
+    const ALLOWED_SCHOLAR_DEGREES = [
+        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
+        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'doctorate',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -26,6 +31,16 @@ class UserController extends Controller {
         Validators::isValidUsername($r['username'], 'username');
 
         Validators::isEmail($r['email'], 'email');
+
+        if (empty($r['scholar_degree'])) {
+            $r['scholar_degree'] = 'none';
+        }
+
+        Validators::isInEnum(
+            $r['scholar_degree'],
+            'scholar_degree',
+            UserController::ALLOWED_SCHOLAR_DEGREES
+        );
 
         // Check password
         $hashedPassword = null;
@@ -68,11 +83,12 @@ class UserController extends Controller {
         $user_data = [
             'username' => $r['username'],
             'password' => $hashedPassword,
-            'solved' => 0,
-            'submissions' => 0,
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
+        if (isset($r['is_private'])) {
+            $user_data['is_private'] = $r['is_private'];
+        }
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
         }
@@ -124,6 +140,7 @@ class UserController extends Controller {
         }
 
         $user = new Users($user_data);
+        $identity = new Identities($user_data);
 
         $email = new Emails([
             'email' => $r['email'],
@@ -138,7 +155,11 @@ class UserController extends Controller {
             $email->user_id = $user->user_id;
             EmailsDAO::save($email);
 
+            $identity->user_id = $user->user_id;
+            IdentitiesDAO::save($identity);
+
             $user->main_email_id = $email->email_id;
+            $user->main_identity_id = $identity->identity_id;
             UsersDAO::save($user);
 
             DAO::transEnd();
@@ -395,6 +416,7 @@ class UserController extends Controller {
 
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
+                $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
                 if (is_null($user)) {
                     throw new NotFoundException('userNotExist');
@@ -409,6 +431,7 @@ class UserController extends Controller {
             }
         } else {
             $user = $r['current_user'];
+            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
                 // Check the old password
@@ -429,7 +452,20 @@ class UserController extends Controller {
         }
 
         $user->password = $hashedPassword;
-        UsersDAO::save($user);
+        $identity->password = $hashedPassword;
+
+        try {
+            DAO::transBegin();
+
+            UsersDAO::save($user);
+
+            IdentitiesDAO::save($identity);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return ['status' => 'ok'];
     }
@@ -861,15 +897,15 @@ class UserController extends Controller {
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
             ];
-        } elseif ($r['contest_type'] == 'OMIAGS') {
-            if ($r['current_user']->username != 'andreasantillana'
+        } elseif ($r['contest_type'] == 'OMIAGS-2018') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
 
             $keys =  [
-                'OMIAGS' => 35
+                'OMIAGS-2018' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2017') {
             if ($r['current_user']->username != 'EfrenGonzalez'
@@ -977,13 +1013,22 @@ class UserController extends Controller {
             $keys = [
                 'TEBAEV' => 250,
             ];
+        } elseif ($r['contest_type'] == 'PYE-AGS') {
+            if ($r['current_user']->username != 'joemmanuel'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'PYE-AGS18' => 40,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS',
                 ]
             );
         }
@@ -1119,13 +1164,12 @@ class UserController extends Controller {
 
         $response['userinfo']['username'] = $user->username;
         $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['solved'] = $user->solved;
-        $response['userinfo']['submissions'] = $user->submissions;
         $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
         $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
+        $response['userinfo']['is_private'] = $user->is_private;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
@@ -1221,7 +1265,22 @@ class UserController extends Controller {
         $r['user'] = self::resolveTargetUser($r);
 
         $response = self::getProfile($r);
-
+        if ((is_null($r['current_user']) || $r['current_user']->username != $r['user']->username)
+            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            $response['problems'] = [];
+            foreach ($response['userinfo'] as $k => $v) {
+                $response['userinfo'][$k] = null;
+            }
+            $response['userinfo']['username'] = $r['user']->username;
+            $response['userinfo']['rankinfo'] = [
+                'name' => null,
+                'problems_solved' => null,
+                'rank' => null,
+                'status' => 'ok',
+            ];
+            $response['userinfo']['is_private'] = true;
+        }
+        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['user']->user_id);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1243,7 +1302,6 @@ class UserController extends Controller {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
         }
-
         try {
             $coderOfTheMonth = null;
 
@@ -1447,6 +1505,39 @@ class UserController extends Controller {
     }
 
     /**
+     * Get Problems unsolved by user
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $response = [
+            'problems' => [],
+            'status' => 'ok',
+        ];
+
+        $user = self::resolveTargetUser($r);
+
+        try {
+            $db_results = ProblemsDAO::getProblemsUnsolvedByUser($user->user_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        foreach ($db_results as $problem) {
+            if (ProblemsDAO::isVisible($problem)) {
+                array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
+            }
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
@@ -1483,10 +1574,16 @@ class UserController extends Controller {
      * Get stats
      *
      * @param Request $r
+     * @throws ForbiddenAccessException
      */
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $user = self::resolveTargetUser($r);
+
+        if ((is_null($r['current_user']) || $r['current_user']->username != $user->username)
+            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('userProfileIsPrivate');
+        }
 
         try {
             $runsPerDatePerVerdict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
@@ -1547,6 +1644,20 @@ class UserController extends Controller {
      */
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
+
+        if (!is_null($r['username'])) {
+            Validators::isValidUsername($r['username'], 'username');
+            $user = null;
+            try {
+                $user = UsersDAO::FindByUsername($r['username']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if ($r['username'] != $r['current_user']->username && !is_null($user)) {
+                throw new DuplicatedEntryInDatabaseException('usernameInUse');
+            }
+        }
 
         if (!is_null($r['name'])) {
             Validators::isStringNonEmpty($r['name'], 'name', true);
@@ -1631,14 +1742,20 @@ class UserController extends Controller {
             $r['current_user']->language_id = $query[0]->language_id;
         }
 
+        if (!is_null($r['is_private'])) {
+            Validators::isNumber($r['is_private'], 'is_private', true);
+        }
+
         if (!is_null($r['recruitment_optin'])) {
             Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
         }
+
         if (!is_null($r['hide_problem_tags'])) {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
 
         $valueProperties = [
+            'username',
             'name',
             'country_id',
             'state_id',
@@ -1652,6 +1769,7 @@ class UserController extends Controller {
                 return gmdate('Y-m-d', $value);
             }],
             'gender',
+            'is_private',
             'recruitment_optin',
             'hide_problem_tags',
         ];
@@ -1659,8 +1777,16 @@ class UserController extends Controller {
         self::updateValueProperties($r, $r['current_user'], $valueProperties);
 
         try {
+            DAO::transBegin();
+
             UsersDAO::save($r['current_user']);
+
+            IdentityController::convertFromUser($r['current_user']);
+
+            DAO::transEnd();
         } catch (Exception $e) {
+            DAO::transRollback();
+
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1931,11 +2057,7 @@ class UserController extends Controller {
         return $response;
     }
 
-    private static function validateAddRemoveRole(Request $r) {
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
-            throw new ForbiddenAccessException();
-        }
-
+    private static function validateUser(Request $r) {
         // Validate request
         Validators::isValidUsername($r['username'], 'username');
         try {
@@ -1946,6 +2068,14 @@ class UserController extends Controller {
         if (is_null($r['user'])) {
             throw new NotFoundException('userNotExist');
         }
+    }
+
+    private static function validateAddRemoveRole(Request $r) {
+        if (!Authorization::isSystemAdmin($r['current_user_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new ForbiddenAccessException();
+        }
+
+        self::validateUser($r);
 
         Validators::isStringNonEmpty($r['role'], 'role');
         $role = RolesDAO::search(new Roles([
@@ -1956,10 +2086,27 @@ class UserController extends Controller {
         }
         $r['role'] = $role[0];
 
-        if ($r['role']->role_id == Authorization::ADMIN_ROLE) {
-            // System-admin role cannot be added/removed from the UI.
+        if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
             throw new ForbiddenAccessException('userNotAllowed');
         }
+    }
+
+    private static function validateAddRemoveGroup(Request $r) {
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        self::validateUser($r);
+
+        Validators::isStringNonEmpty($r['group'], 'group');
+        $group = GroupsDAO::search(new Groups([
+            'name' => $r['group'],
+        ]));
+        if (sizeof($group) != 1) {
+            throw new InvalidParameterException('parameterNotFound', 'group');
+        }
+        $r['group'] = $group[0];
     }
 
     /**
@@ -2018,6 +2165,60 @@ class UserController extends Controller {
         ];
     }
 
+    /**
+     * Adds the user to the group.
+     *
+     * @param Request $r
+     */
+    public static function apiAddGroup(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveGroup($r);
+
+        try {
+            GroupsUsersDAO::save(new GroupsUsers([
+                'user_id' => $r['user']->user_id,
+                'group_id' => $r['group']->group_id
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Removes the user to the group.
+     *
+     * @param Request $r
+     */
+    public static function apiRemoveGroup(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateAddRemoveGroup($r);
+
+        try {
+            GroupsUsersDAO::delete(new GroupsUsers([
+                'user_id' => $r['user']->user_id,
+                'group_id' => $r['group']->group_id
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
     private static function validateAddRemoveExperiment(Request $r) {
         global $experiments;
 
@@ -2025,16 +2226,7 @@ class UserController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Validate request
-        Validators::isValidUsername($r['username'], 'username');
-        try {
-            $r['user'] = UsersDAO::FindByUsername($r['username']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['user'])) {
-            throw new NotFoundException('userNotExist');
-        }
+        self::validateUser($r);
 
         Validators::isStringNonEmpty($r['experiment'], 'experiment');
         if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {

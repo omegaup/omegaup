@@ -20,7 +20,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
-            'scholar_degree' => 'Maestría',
+            'scholar_degree' => 'master',
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale[0]->name,
@@ -48,7 +48,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
-            'scholar_degree' => 'Primaria',
+            'scholar_degree' => 'primary',
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
             'locale' => $locale[0]->name,
@@ -91,6 +91,40 @@ class UserUpdateTest extends OmegaupTestCase {
             'state_id' => -1,
         ]);
 
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * Update profile username with non-existence username
+     */
+    public function testUsernameUpdate() {
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $new_username = Utils::CreateRandomString();
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            //new username
+            'username' => $new_username
+        ]);
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+
+        $this->assertEquals($user_db->username, $new_username);
+    }
+
+    /**
+     * Update profile username with existed username
+     * @expectedException DuplicatedEntryInDatabaseException
+     */
+    public function testDuplicateUsernameUpdate() {
+        $old_user = UserFactory::createUser();
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            //update username with existed username
+            'username' => $old_user->username
+        ]);
         UserController::apiUpdate($r);
     }
 

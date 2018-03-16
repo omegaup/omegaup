@@ -372,6 +372,8 @@ export default {
                             return data;
                           }),
 
+    delete: _call('/api/problem/delete/'),
+
     details: _call('/api/problem/details/', _convertRuntimes,
                    {statement_type: 'html'}),
 
@@ -485,6 +487,8 @@ export default {
   User: {
     addExperiment: _call('/api/user/addexperiment/'),
 
+    addGroup: _call('/api/user/addgroup/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -505,6 +509,8 @@ export default {
 
     list: _call('/api/user/list/'),
 
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+
     problemsSolved: _call('/api/user/problemssolved/'),
 
     profile: _call('/api/user/profile/',
@@ -519,6 +525,8 @@ export default {
     rankByProblemsSolved: _call('/api/user/rankByProblemsSolved/'),
 
     removeExperiment: _call('/api/user/removeexperiment/'),
+
+    removeGroup: _call('/api/user/removegroup/'),
 
     removeRole: _call('/api/user/removerole/'),
 

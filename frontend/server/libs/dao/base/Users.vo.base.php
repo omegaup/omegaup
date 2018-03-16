@@ -41,14 +41,11 @@ class Users extends VO {
         if (isset($data['main_email_id'])) {
             $this->main_email_id = $data['main_email_id'];
         }
+        if (isset($data['main_identity_id'])) {
+            $this->main_identity_id = $data['main_identity_id'];
+        }
         if (isset($data['name'])) {
             $this->name = $data['name'];
-        }
-        if (isset($data['solved'])) {
-            $this->solved = $data['solved'];
-        }
-        if (isset($data['submissions'])) {
-            $this->submissions = $data['submissions'];
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
@@ -74,9 +71,6 @@ class Users extends VO {
         if (isset($data['gender'])) {
             $this->gender = $data['gender'];
         }
-        if (isset($data['last_access'])) {
-            $this->last_access = $data['last_access'];
-        }
         if (isset($data['verified'])) {
             $this->verified = $data['verified'];
         }
@@ -98,6 +92,9 @@ class Users extends VO {
         if (isset($data['in_mailing_list'])) {
             $this->in_mailing_list = $data['in_mailing_list'];
         }
+        if (isset($data['is_private'])) {
+            $this->is_private = $data['is_private'];
+        }
         if (isset($data['preferred_language'])) {
             $this->preferred_language = $data['preferred_language'];
         }
@@ -110,7 +107,7 @@ class Users extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['last_access']);
+            parent::toUnixTime([]);
         }
     }
 
@@ -152,25 +149,18 @@ class Users extends VO {
     public $main_email_id;
 
     /**
+      * Identidad principal del usuario
+      * @access public
+      * @var int(11)
+      */
+    public $main_identity_id;
+
+    /**
       *  [Campo no documentado]
       * @access public
       * @var varchar(256)
       */
     public $name;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $solved;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $submissions;
 
     /**
       *  [Campo no documentado]
@@ -231,13 +221,6 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $last_access;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var tinyint(1)
       */
     public $verified;
@@ -283,6 +266,13 @@ class Users extends VO {
       * @var tinyint(1)
       */
     public $in_mailing_list;
+
+    /**
+      * Determina si el usuario eligió no compartir su información de manera pública
+      * @access public
+      * @var tinyint(1)
+      */
+    public $is_private;
 
     /**
       * El lenguaje de programación de preferencia de este usuario

@@ -10,7 +10,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
       {
         active: 'ALL',
         recommended: 'ALL',
-        participating: 'NO',
+        participating: 'NO', public: 'NO',
         // TODO: Make this match uiParams.pageSize and do smaller requests.
         page_size: 1000,
       },
@@ -22,12 +22,14 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
         showTimes: (actualApiParams.active == 'ACTIVE' ||
                     actualApiParams.active == 'FUTURE'),
         showPractice: (actualApiParams.active == 'PAST'),
+        showPublicUpdated: actualApiParams.public == 'YES'
       },
       uiParams);
 
   // Contest list view model.
   self.header = actualUiParams.header;
   self.showTimes = actualUiParams.showTimes;
+  self.showPublicUpdated = actualUiParams.showPublicUpdated;
   self.showPractice = actualUiParams.showPractice;
   self.contests = ko.observableArray([]);
   self.recommended = (actualApiParams.recommended != 'NOT_RECOMMENDED');
@@ -50,6 +52,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
     var cols = 2;
     if (self.showPractice) cols += 1;
     if (self.showTimes) cols += 3;
+    if (self.showPublicUpdated) cols += 1;
     return cols;
   });
   // Click handlers.
@@ -83,6 +86,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
                   'http://timeanddate.com/worldclock/fixedtime.html?iso=' +
                   contest.finish_time.iso();
               contest.finishText = contest.finish_time.long();
+              contest.publicUpdateText = contest.last_updated.long();
               self.contests.push(contest);
             });
             ko.applyBindings(self, self.domElement);
