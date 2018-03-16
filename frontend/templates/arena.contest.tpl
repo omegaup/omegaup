@@ -1,4 +1,5 @@
 {include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true}
+
 {if $admin}
 			<audio id="notification-audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
