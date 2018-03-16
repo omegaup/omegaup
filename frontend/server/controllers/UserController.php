@@ -15,7 +15,7 @@ class UserController extends Controller {
         'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
         'doctorate',
     ];
-    const ALLOWED_GENDER_OPTIONS =  [
+    const ALLOWED_GENDER_OPTIONS = [
         'female','male','other','decline',
     ];
 
