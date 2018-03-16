@@ -122,6 +122,9 @@ class QualityNominationController extends Controller {
                     }
                     $tag = TagController::normalize($tag);
                 }
+                if (self::hasDuplicates($contents['tags'])) {
+                    throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
+                }
             }
         } elseif ($r['nomination'] == 'promotion') {
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
@@ -136,6 +139,9 @@ class QualityNominationController extends Controller {
                     throw new InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $tag = TagController::normalize($tag);
+            }
+            if (self::hasDuplicates($contents['tags'])) {
+                throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
             }
             // Statements must be a dictionary of language => { 'markdown': string }.
             foreach ($contents['statements'] as $language => $statement) {
@@ -396,6 +402,16 @@ class QualityNominationController extends Controller {
         if (!Authorization::isQualityReviewer($r['current_user_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
+    }
+
+    /**
+     * Checks if the given array has duplicate entries.
+     *
+     * @param $contents array
+     * @return boolean
+     */
+    private static function hasDuplicates($contents) {
+        return count($contents) !== count(array_unique($contents));
     }
 
     /**
