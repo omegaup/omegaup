@@ -37,3 +37,15 @@ El resto del código está en otros repositorios:
   para hacer problemas interactivos fácilmente.
 
 Todo el código de omegaUp está distribuido bajo la licencia BSD.
+
+## Navegadores Soportados
+
+Los navegadores oficialmente soportados son los siguientes:
+
+* [Chrome](https://www.chromium.org/getting-involved/dev-channel): Stable Channel
+
+* [Firefox](https://www.mozilla.org/en-US/firefox/releases/): V.46+
+
+* [Internet Explorer](https://support.microsoft.com/en-us/help/969393/information-about-internet-explorer-versions): 10 Consumer Preview
+
+* [Microsoft Edge](https://www.microsoft.com/es-mx/windows/microsoft-edge): All versions
