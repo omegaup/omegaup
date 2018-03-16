@@ -282,6 +282,7 @@
 	"emailNotVerified": "Tu direcci\u00f3n de correo a\u00fan no ha sido verificada. Busca el correo de verificaci\u00f3n en tu bandeja de entrada o de spam. Si sigues teniendo problemas, escribe a omegaup-soporte@googlegroups.com para obtener ayuda.",
 	"enterContest": "Entrar al concurso",
 	"enterCourse": "Entrar al curso",
+	"enterProblemAlias": "Ingrese el alias del problema",
 	"errorEc2RunInstances": "",
 	"errorEc2TerminateInstance": "",
 	"errorWhileSendingMail": "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
