@@ -657,7 +657,7 @@ class QualityNominationTest extends OmegaupTestCase {
                     'tags' => ['ez-pz', 'ez', 'ez'],
                 ]),
             ]));
-            $this->fail("Duplicate tags should be caught.");
+            $this->fail('Duplicate tags should be caught.');
         } catch (DuplicatedEntryInArrayException $e) {
             // Expected.
         }
@@ -673,7 +673,7 @@ class QualityNominationTest extends OmegaupTestCase {
                     'tags' => ['ez-pz', 'ez', 'ez'],
                 ]),
             ]));
-            $this->fail("Duplicate tags should be caught.");
+            $this->fail('Duplicate tags should be caught.');
         } catch (DuplicatedEntryInArrayException $e) {
             // Expected.
         }
