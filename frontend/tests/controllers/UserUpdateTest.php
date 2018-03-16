@@ -229,9 +229,9 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     *https://github.com/omegaup/omegaup/issues/1802
-     *Test gender with invalid gender option
-    */
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with invalid gender option
+     */
     public function testGenderWithInvalidOption() {
         // Create the user to edit
         $user = UserFactory::createUser();
@@ -252,9 +252,9 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     *https://github.com/omegaup/omegaup/issues/1802
-     *Test gender with valid gender option
-    */
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with valid gender option
+     */
     public function testGenderWithValidOption() {
         // Create the user to edit
         $user = UserFactory::createUser();
@@ -269,9 +269,9 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     *https://github.com/omegaup/omegaup/issues/1802
-     *Test gender with valid default option null
-    */
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with valid default option null
+     */
     public function testGenderWithNull() {
         // Create the user to edit
         $user = UserFactory::createUser();
@@ -286,9 +286,9 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     *https://github.com/omegaup/omegaup/issues/1802
-     *Test gender with invalid gender option
-    */
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with invalid gender option
+     */
     public function testGenderWithEmptyString() {
         // Create the user to edit
         $user = UserFactory::createUser();
