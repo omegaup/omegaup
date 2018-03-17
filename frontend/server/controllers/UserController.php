@@ -15,6 +15,9 @@ class UserController extends Controller {
         'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
         'doctorate',
     ];
+    const ALLOWED_GENDER_OPTIONS = [
+        'female','male','other','decline',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -1752,6 +1755,10 @@ class UserController extends Controller {
 
         if (!is_null($r['hide_problem_tags'])) {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
+        }
+
+        if (!is_null($r['gender'])) {
+            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
         }
 
         $valueProperties = [
