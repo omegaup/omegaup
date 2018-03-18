@@ -11,5 +11,5 @@ if ($c_Session->CurrentSessionAvailable()) {
 if (isset($_REQUEST['redirect'])) {
     die(header('Location: ' . $_REQUEST['redirect']));
 } else {
-    die(header('Location: /login/?logout'));
+    die(header('Location: /login'));
 }
