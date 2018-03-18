@@ -34,6 +34,9 @@
           });
         }
         $('#rank-by-problems-solved>tbody').append(html);
+        if (length * page >= result.total) {
+          $('.next,.delimiter').hide();
+        }
       })
       .fail(omegaup.UI.apiError);
 
