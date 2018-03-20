@@ -1,0 +1,1 @@
+{include file='arena.contest.tpl' jsfile={version_hash src='js/interviews.arena.contest.js'} admin=false showClarifications=true showDeadlines=false showNavigation=false showPoints=true showRanking=false inArena=true}

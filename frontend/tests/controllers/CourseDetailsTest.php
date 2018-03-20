@@ -16,7 +16,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+            'start_time' => (Utils::GetPhpUnixTimestamp()),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',

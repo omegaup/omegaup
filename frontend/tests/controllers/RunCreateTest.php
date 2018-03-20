@@ -727,7 +727,17 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testRunInAssignmentFromStudentAfterDeadline() {
         $r = $this->setUpAssignment();
+
         $adminLogin = self::login($this->courseData['admin']);
+        CourseController::apiUpdate(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => $this->courseData['request']['course']->name,
+            'alias' => $this->courseData['request']['course']->alias,
+            'course_alias' => $this->courseData['request']['course']->alias,
+            'description' => $this->courseData['request']['course']->description,
+            'start_time' => Utils::GetPhpUnixTimestamp() - 10,
+            'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
+        ]));
         CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $adminLogin->auth_token,
             'course' => $this->courseData['course_alias'],
