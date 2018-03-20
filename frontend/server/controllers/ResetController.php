@@ -15,7 +15,7 @@ class ResetController extends Controller {
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = ApiUtils::GetStringTime();
 
-        $user = UsersDAO::FindByEmailOrUsername($email);
+        $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
         UsersDAO::save($user);
@@ -66,7 +66,7 @@ class ResetController extends Controller {
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = ApiUtils::GetStringTime();
 
-        $user = UsersDAO::FindByUsername($email);
+        $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
         UsersDAO::save($user);
@@ -87,7 +87,7 @@ class ResetController extends Controller {
      */
     public static function apiUpdate(Request $r) {
         self::ValidateUpdateRequest($r);
-        $user = UsersDAO::FindByEmailOrUsername($r['email']);
+        $user = UsersDAO::FindByEmail($r['email']);
         $user->password = SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
@@ -101,7 +101,7 @@ class ResetController extends Controller {
     }
 
     private static function validateCreateRequest($r) {
-        $user = UsersDAO::FindByEmailOrUsername($r['email']);
+        $user = UsersDAO::FindByEmail($r['email']);
         if (is_null($user)) {
             throw new InvalidParameterException('invalidUser');
         }
@@ -117,7 +117,7 @@ class ResetController extends Controller {
     }
 
     private static function validateUpdateRequest($r) {
-        $user = UsersDAO::FindByEmailOrUsername($r['email']);
+        $user = UsersDAO::FindByEmail($r['email']);
         $reset_token = $r['reset_token'];
         $password = $r['password'];
         $password_confirmation = $r['password_confirmation'];

@@ -692,6 +692,7 @@ unableToVerifyCaptcha = "No fue posible verificar el captcha. Vuelve a cargar la
 unverifiedUser = "Usurio no verificado."
 updateItemsError = "Ocurrió un error al actualizar los items"
 updateItemsSuccess = "Todos los items han sido actualizados"
+userDoesNotHaveAnyPasswordChangeRequest = "El usuario no ha realizado la solicitud de cambio de contraseña en las últimas 24 horas."
 userEditAddPassword = "Agregar contraseña"
 userEditBachelors = "Licenciatura"
 userEditBirthDate = "Fecha de nacimiento"

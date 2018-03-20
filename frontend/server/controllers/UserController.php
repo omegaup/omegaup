@@ -1152,6 +1152,11 @@ class UserController extends Controller {
         $response['userinfo']['is_private'] = $user->is_private;
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
+        $response['userinfo']['request_password_change'] = false;
+        if (!is_null($user->reset_sent_at)) {
+            $response['userinfo']['request_password_change'] =
+                Time::get() - strtotime($user->reset_sent_at) < 60 * 60 * 24; // Request was made 24 hours ago or less
+        }
 
         if (!is_null($user->language_id)) {
             $query = LanguagesDAO::getByPK($user->language_id);
@@ -1217,8 +1222,8 @@ class UserController extends Controller {
         }
 
         // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_user_id'])
+        // the logged user's one. Admins and Support team members can see emails
+        if (Authorization::isSupportTeamMember($r['current_user_id'])
               || $r['user']->user_id == $r['current_user_id']) {
             return $response;
         }

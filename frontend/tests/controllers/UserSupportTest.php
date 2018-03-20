@@ -29,16 +29,22 @@ class UserSupportTest extends OmegaupTestCase {
         // Support team member will verify $user
         $support = UserFactory::createSupportUser();
 
-        // Creates no verified user
+        // Creates a user
         $user = UserFactory::createUser();
 
         // Call api using support team member
         $supportLogin = self::login($support);
+
+        $email = UserController::apiProfile(new Request([
+            'auth_token' => $supportLogin->auth_token,
+            'username' => $user->username
+        ]))['userinfo']['email'];
+
         $response = ResetController::apiGenerateToken(new Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $user->username,
+            'email' => $email,
         ]));
 
-        $this->assertContains($user->username, $response['link']);
+        $this->assertContains(urlencode($email), $response['link']);
     }
 }
