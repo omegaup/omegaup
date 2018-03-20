@@ -18,7 +18,7 @@ OmegaUp.on('ready', function() {
           'verify-user': function(username) {
             omegaup.API.User.verifyEmail({usernameOrEmail: username})
                 .then(function() {
-                  adminSupport.user.verified = '1';
+                  adminSupport.user.verified = true;
                   omegaup.UI.success(T.userVerified);
                 })
                 .fail(omegaup.UI.apiError);

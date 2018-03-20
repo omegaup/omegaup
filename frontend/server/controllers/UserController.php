@@ -520,6 +520,9 @@ class UserController extends Controller {
             }
         }
 
+        // Expire profile cache
+        Cache::deleteFromCache(Cache::USER_PROFILE, $user->username);
+
         return ['status' => 'ok'];
     }
 
@@ -1150,7 +1153,7 @@ class UserController extends Controller {
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['is_private'] = $user->is_private;
-        $response['userinfo']['verified'] = $user->verified;
+        $response['userinfo']['verified'] = $user->verified == '1';
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 

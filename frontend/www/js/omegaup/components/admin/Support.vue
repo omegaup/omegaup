@@ -23,15 +23,23 @@
           </div>
         </div>
       </form>
+      <div class="row bottom-margin"
+           v-if="user != null">
+        <div class="col-md-6">
+          <div class="input-group">
+            {{ user.email }}
+          </div>
+        </div>
+      </div>
       <form class="form bottom-margin"
             v-show="user != null">
         <div class="row bottom-margin">
           <div class="col-md-6">
             <button class="btn btn-default btn-block"
                  type="button"
-                 v-bind:disabled="user != null &amp;&amp; user.verified == '1'"
+                 v-bind:disabled="user != null &amp;&amp; user.verified"
                  v-on:click.prevent="onVerifyUser">
-            <template v-if="user != null &amp;&amp; user.verified == '1'">
+            <template v-if="user != null &amp;&amp; user.verified">
               <span aria-hidden="true"
                         class="glyphicon glyphicon-ok"></span> {{ T.userVerified }}
             </template>
@@ -66,25 +74,13 @@ export default {
   },
   methods: {
     onSearchUsername: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        // There is a hint currently visible in the UI, the user likely
-        // expects that hint to be used when trying to add someone, instead
-        // of what they've actually typed so far.
-        this.username = hint;
-      } else {
-        this.username = $('input.typeahead.tt-input', this.$el).val();
-      }
+      this.username = $('input.typeahead.tt-hint', this.$el).val() ||
+                      $('input.typeahead.tt-input', this.$el).val();
       this.$emit('search-username', this.username);
     },
     onVerifyUser: function() { this.$emit('verify-user', this.username);},
     onReset: function() {
-      this.username = '';
-
-      let inputElem = $('input.typeahead', this.$el);
-      inputElem.typeahead('close');
-      inputElem.val('');
+      $('input.typeahead', this.$el).typeahead('close').val('');
       this.$emit('reset');
     }
   }
