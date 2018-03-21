@@ -21,7 +21,7 @@ INNER JOIN
 ON
   Contests.contest_id = Groups_Scoreboards_Problemsets.contest_id
 SET
-  `Groups_Scoreboards_Problemsets`.`problemset_id` = Contests.contest_id;
+  `Groups_Scoreboards_Problemsets`.`problemset_id` = `Contests`.`problemset_id`;
 
 -- Deleting contest_id column and creating indexes
 ALTER TABLE `Groups_Scoreboards_Problemsets`
