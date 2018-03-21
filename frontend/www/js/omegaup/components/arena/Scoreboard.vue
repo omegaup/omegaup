@@ -89,7 +89,7 @@ export default {
         idx = idx - 1;
         label = String.fromCharCode(65 + idx % 26) + label;
         idx = (idx / 26) >> 0;
-      } while(idx > 0);
+      } while (idx > 0);
       return label;
     },
     renderUser: function(u) {
