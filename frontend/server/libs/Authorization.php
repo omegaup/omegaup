@@ -103,8 +103,7 @@ class Authorization {
             return false;
         }
 
-        return Authorization::isAdminClarifications($identity_id, $problemset);
-        return Authorization::isAdmin($user_id, $problemset);
+        return Authorization::isAdminIdentity($identity_id, $problemset);
     }
 
     public static function canEditClarification($user_id, Clarifications $clarification) {
@@ -161,7 +160,10 @@ class Authorization {
             self::hasRole($user_id, $entity->acl_id, Authorization::ADMIN_ROLE);
     }
 
-    public static function isAdminClarifications($identity_id, $entity) {
+    /**
+     * TODO: Merge with hasRole method and then remove
+     */
+    public static function isAdminIdentity($identity_id, $entity) {
         if (is_null($entity)) {
             return false;
         }
