@@ -84,7 +84,7 @@ export default {
                                                     '';
     },
     labelIterator: function(idx) {
-      var label = ""
+      var label = "";
       do {
         idx = idx - 1;
         label = String.fromCharCode(65 + idx % 26) + label;
