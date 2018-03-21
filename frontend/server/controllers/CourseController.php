@@ -577,7 +577,7 @@ class CourseController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        $users = ProblemsDAO::getUsersInGroupWhoAttemptedProblem(
+        $users = ProblemsDAO::getIdentitiesInGroupWhoAttemptedProblem(
             $r['course']->group_id,
             $problem->problem_id
         );
@@ -793,7 +793,7 @@ class CourseController extends Controller {
                     'DESC'
                 );
             } else {
-                $admin_courses = CoursesDAO::getAllCoursesAdminedByUser(
+                $admin_courses = CoursesDAO::getAllCoursesAdminedByIdentity(
                     $r['current_identity_id'],
                     $page,
                     $pageSize
@@ -995,7 +995,7 @@ class CourseController extends Controller {
         // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
             && ($r['course']->public == false
-            || $r['identity']->user_id !== $r['current_user_id'])
+            || $r['identity']->identity_id !== $r['current_identity_id'])
             && $r['course']->requests_user_information == 'no') {
             throw new ForbiddenAccessException();
         }

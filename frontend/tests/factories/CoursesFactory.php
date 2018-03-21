@@ -11,7 +11,7 @@ class CoursesFactory {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-        $identity = IdentitiesDAO::FindByUsername($admin->username);
+        $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = GroupsDAO::FindByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS

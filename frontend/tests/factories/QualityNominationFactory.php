@@ -14,7 +14,7 @@ class QualityNominationFactory {
         );
         for ($i = 0; $i < 5; $i++) {
             $reviewer = UserFactory::createUser();
-            $identity = IdentitiesDAO::FindByUsername($reviewer->username);
+            $identity = IdentitiesDAO::getByPK($reviewer->main_identity_id);
             GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
                 'identity_id' => $identity->identity_id,

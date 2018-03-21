@@ -12,7 +12,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
         $student = UserFactory::createUser();
-        $identity = IdentitiesDAO::FindByUsername($student->username);
+        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
         $response = CourseController::apiAddStudent(new Request([
@@ -155,7 +155,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
         $student = UserFactory::createUser();
-        $identity = IdentitiesDAO::FindByUsername($student->username);
+        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
 
         $login = OmegaupTestCase::login($student);
         $response = CourseController::apiAddStudent(new Request([

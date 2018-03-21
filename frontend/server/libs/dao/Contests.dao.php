@@ -220,9 +220,9 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     /**
-     * Returns all contests that a user can manage.
+     * Returns all contests that an identity can manage.
      */
-    final public static function getAllContestsAdminedByUser(
+    final public static function getAllContestsAdminedByIdentity(
         $identity_id,
         $page = 1,
         $pageSize = 1000
@@ -414,7 +414,7 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     /**
-     * Regresa todos los concursos que un usuario puede ver.
+     * Regresa todos los concursos que una identidad puede ver.
      *
      * Explicación:
      *
@@ -423,13 +423,13 @@ class ContestsDAO extends ContestsDAOBase {
      * El primer SELECT transforma las columnas a como las espera la API.
      * Luego:
      *
-     * Todos los concursos privados donde el usuario fue el creador
+     * Todos los concursos privados donde la identidad fue el creador
      * UNION
-     * Todos los concursos privados a los que el usuario ha sido invitado
+     * Todos los concursos privados a los que la identidad ha sido invitada
      * UNION
-     * Todos los concursos privados a los que el usuario es ADMIN
+     * Todos los concursos privados a los que la identidad es ADMIN
      * UNION
-     * Todos los concursos privados donde el usuario pertenece a un grupo que es ADMIN del concurso
+     * Todos los concursos privados donde la identidad pertenece a un grupo que es ADMIN del concurso
      * UNION
      * Todos los concursos públicos.
      *
@@ -443,7 +443,7 @@ class ContestsDAO extends ContestsDAOBase {
      * @param FilteredStatus $query
      * @return array
      */
-    final public static function getAllContestsForUser(
+    final public static function getAllContestsForIdentity(
         $identity_id,
         $pagina = 1,
         $renglones_por_pagina = 1000,

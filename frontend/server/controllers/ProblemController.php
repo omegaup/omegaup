@@ -926,7 +926,12 @@ class ProblemController extends Controller {
                         throw new ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
-                    if (!Authorization::canSubmitToProblemset($r['current_identity_id'], $r['problemset'])) {
+                    if (!Authorization::canSubmitToProblemset(
+                        $r['current_user_id'],
+                        $r['current_identity_id'],
+                        $r['problemset']
+                    )
+                    ) {
                         throw new ForbiddenAccessException();
                     }
                     // TODO: Check start times.
@@ -1276,7 +1281,11 @@ class ProblemController extends Controller {
                 ProblemsetUsersDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_user_id'],
                     $problemset_id,
-                    Authorization::canSubmitToProblemset($r['current_identity_id'], $r['problemset'])
+                    Authorization::canSubmitToProblemset(
+                        $r['current_user_id'],
+                        $r['current_identity_id'],
+                        $r['problemset']
+                    )
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -1729,7 +1738,7 @@ class ProblemController extends Controller {
                     'DESC'
                 );
             } else {
-                $problems = ProblemsDAO::getAllProblemsAdminedByUser(
+                $problems = ProblemsDAO::getAllProblemsAdminedByIdentity(
                     $r['current_identity_id'],
                     $page,
                     $pageSize

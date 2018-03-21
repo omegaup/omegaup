@@ -492,9 +492,9 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     /**
-     * Returns all problems that a user can manage.
+     * Returns all problems that an identity can manage.
      */
-    final public static function getAllProblemsAdminedByUser(
+    final public static function getAllProblemsAdminedByIdentity(
         $identity_id,
         $page = 1,
         $pageSize = 1000
@@ -609,7 +609,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $allData;
     }
 
-    final public static function getUsersInGroupWhoAttemptedProblem(
+    final public static function getIdentitiesInGroupWhoAttemptedProblem(
         $group_id,
         $problem_id
     ) {

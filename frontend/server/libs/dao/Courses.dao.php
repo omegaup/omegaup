@@ -191,9 +191,9 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     /**
-     * Returns all courses that a user can manage.
+     * Returns all courses that an identity can manage.
      */
-    final public static function getAllCoursesAdminedByUser(
+    final public static function getAllCoursesAdminedByIdentity(
         $identity_id,
         $page = 1,
         $pageSize = 1000

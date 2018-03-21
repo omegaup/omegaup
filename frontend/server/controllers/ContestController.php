@@ -88,7 +88,7 @@ class ContestController extends Controller {
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_identity_id'], $page, $page_size, $active_contests, $recommended, $query);
+                $contests = ContestsDAO::getAllContestsForIdentity($r['current_identity_id'], $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -153,7 +153,7 @@ class ContestController extends Controller {
                     'DESC'
                 );
             } else {
-                $contests = ContestsDAO::getAllContestsAdminedByUser(
+                $contests = ContestsDAO::getAllContestsAdminedByIdentity(
                     $r['current_identity_id'],
                     $page,
                     $pageSize

@@ -175,7 +175,8 @@ class GroupController extends Controller {
 
         try {
             $groups = GroupsDAO::getAllGroupsAdminedByUser(
-                $r['current_user_id']
+                $r['current_user_id'],
+                $r['current_identity_id']
             );
 
             foreach ($groups as $group) {

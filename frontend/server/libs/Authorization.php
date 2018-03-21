@@ -276,11 +276,12 @@ class Authorization {
         self::$support_group = null;
     }
 
-    public static function canSubmitToProblemset($identity_id, $problemset) {
+    // TODO Adding user_id and identity_id temporary to use in the correspondent function
+    public static function canSubmitToProblemset($user_id, $identity_id, $problemset) {
         if (is_null($problemset)) {
             return false;
         }
-        return self::isAdmin($identity_id, $problemset) ||
+        return self::isAdmin($user_id, $problemset) ||
                GroupRolesDAO::isContestant($identity_id, $problemset->acl_id);
     }
 

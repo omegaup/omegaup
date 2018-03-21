@@ -102,7 +102,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return self::hasRole($user_id, Authorization::SYSTEM_ACL, Authorization::ADMIN_ROLE);
     }
 
-    public static function getSystemRoles($user_id) {
+    public static function getSystemRoles($identity_id) {
         $sql = '
             SELECT
                 r.name
@@ -115,7 +115,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             WHERE
                 gi.identity_id = ? AND gr.acl_id = ?;';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::SYSTEM_ACL,
         ];
         global $conn;

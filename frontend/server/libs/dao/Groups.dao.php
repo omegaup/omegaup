@@ -46,7 +46,7 @@ class GroupsDAO extends GroupsDAOBase {
     /**
      * Returns all groups that a user can manage.
      */
-    final public static function getAllGroupsAdminedByUser($user_id) {
+    final public static function getAllGroupsAdminedByUser($user_id, $identity_id) {
         $sql = '
             SELECT
                 DISTINCT g.*
@@ -71,7 +71,7 @@ class GroupsDAO extends GroupsDAOBase {
             Authorization::ADMIN_ROLE,
             $user_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
         ];
 
         global $conn;

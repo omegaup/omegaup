@@ -52,7 +52,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
         $user = UserFactory::createUser($username);
-        $identity = IdentitiesDAO::FindByUsername($user->username);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         $login = self::login($user);
         // Call to API Add Group
