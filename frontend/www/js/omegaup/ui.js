@@ -119,6 +119,16 @@ let UI = {
     });
   },
 
+  columnName: function(idx) {
+      var name = String.fromCharCode("A".charCodeAt(0) + idx % 26);
+      while (idx >= 26) {
+        idx = (idx / 26) >> 0;
+        idx--;
+        name = String.fromCharCode("A".charCodeAt(0) + idx % 26) + name;
+      }
+      return name;
+  },
+
   typeaheadWrapper: function(f) {
     let lastRequest = null;
     let pending = false;

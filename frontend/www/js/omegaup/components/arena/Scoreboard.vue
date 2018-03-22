@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import UI from '../../ui.js';
 export default {
   props: {
     T: Object,
@@ -84,13 +85,7 @@ export default {
                                                     '';
     },
     columnName: function(idx) {
-      var name = String.fromCharCode("A".charCodeAt(0) + idx % 26);
-      while (idx >= 26) {
-        idx = (idx / 26) >> 0;
-        idx--;
-        name = String.fromCharCode("A".charCodeAt(0) + idx % 26) + name;
-      }
-      return name;
+      return UI.columnName(idx);
     },
     renderUser: function(u) {
       return u.username +
