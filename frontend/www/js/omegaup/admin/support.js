@@ -10,21 +10,21 @@ OmegaUp.on('ready', function() {
         props: {
           valid: this.valid,
           link: this.link,
-          email: this.email,
-          request_password_change: this.request_password_change
+          password_change_request: this.password_change_request,
+          username: this.username
         },
         on: {
-          'search-username': function(username) {
+          'search-email': function(email) {
             adminSupport.valid = false;
-            adminSupport.request_password_change = false;
+            adminSupport.password_change_request = false;
             adminSupport.link = '';
-            adminSupport.email = '';
-            omegaup.API.User.profile({username: username})
+            adminSupport.username = '';
+            omegaup.API.User.passwordChangeRequest({email: email})
                 .then(function(data) {
                   adminSupport.valid = true;
-                  adminSupport.email = data.userinfo.email;
-                  adminSupport.request_password_change =
-                      !!data.userinfo.request_password_change;
+                  adminSupport.password_change_request =
+                      data.password_change_request;
+                  adminSupport.username = data.username;
                 })
                 .fail(omegaup.UI.apiError);
           },
@@ -40,25 +40,19 @@ OmegaUp.on('ready', function() {
                 .fail(omegaup.UI.apiError);
           },
           'copy-token': function() {
-            let aux = document.createElement('input');
-            let input = document.getElementsByName('link');
-            aux.setAttribute('value', input[0].value);
-            document.body.appendChild(aux);
-            aux.trigger('select');
-            document.execCommand('copy');
-            document.body.removeChild(aux);
             omegaup.UI.success(T.passwordResetLinkCopiedToClipboard);
           },
           'reset': function() {
             adminSupport.valid = false;
-            adminSupport.request_password_change = false;
+            adminSupport.password_change_request = false;
             adminSupport.link = '';
-            adminSupport.email = '';
+            adminSupport.username = '';
           }
         },
       });
     },
-    data: {valid: false, request_password_change: false, link: '', email: ''},
+    data:
+        {valid: false, password_change_request: false, link: '', username: ''},
     components: {
       'omegaup-admin-support': admin_Support,
     },

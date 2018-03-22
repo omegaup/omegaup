@@ -55,13 +55,25 @@ class ResetController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function apiGenerateToken(Request $r) {
-        self::authenticateOrAllowUnauthenticatedRequest($r);
+        self::authenticateRequest($r);
 
         if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
             throw new ForbiddenAccessException();
         }
+
         self::validateCreateRequest($r);
         $email = $r['email'];
+
+        $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($email);
+
+        if (!$lastRequest['valid']) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        if (!$lastRequest['password_change_request']) {
+            throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+        }
+
         $token = ApiUtils::GetRandomString();
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = ApiUtils::GetStringTime();
@@ -86,7 +98,7 @@ class ResetController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiUpdate(Request $r) {
-        self::ValidateUpdateRequest($r);
+        self::validateUpdateRequest($r);
         $user = UsersDAO::FindByEmail($r['email']);
         $user->password = SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
@@ -108,6 +120,11 @@ class ResetController extends Controller {
 
         if (!$user->verified) {
             throw new InvalidParameterException('unverifiedUser');
+        }
+
+        // Support doesn't need wait to resest passwords
+        if (Authorization::isSupportTeamMember($r['current_user_id'])) {
+            return;
         }
 
         $seconds = Time::get() - strtotime($user->reset_sent_at);

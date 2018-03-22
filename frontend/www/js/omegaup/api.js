@@ -513,6 +513,8 @@ export default {
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 
+    passwordChangeRequest: _call('/api/user/passwordChangeRequest/'),
+
     problemsSolved: _call('/api/user/problemssolved/'),
 
     profile: _call('/api/user/profile/',

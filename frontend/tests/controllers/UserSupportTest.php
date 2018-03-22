@@ -23,28 +23,91 @@ class UserSupportTest extends OmegaupTestCase {
     }
 
     /**
-     *
+     * support generates a valid token, and users change their password
      */
-    public function testUserGeneratesToken() {
+    public function testUserGeneratesValidToken() {
         // Support team member will verify $user
         $support = UserFactory::createSupportUser();
 
         // Creates a user
-        $user = UserFactory::createUser();
+        $email = Utils::CreateRandomString().'@mail.com';
+        $user = UserFactory::createUser(null, null, $email, true /* verified */);
 
         // Call api using support team member
         $supportLogin = self::login($support);
 
-        $email = UserController::apiProfile(new Request([
-            'auth_token' => $supportLogin->auth_token,
-            'username' => $user->username
-        ]))['userinfo']['email'];
+        // Support tries to generate token without a request
+        try {
+            UserController::apiPasswordChangeRequest(new Request([
+                'auth_token' => $supportLogin->auth_token,
+                'email' => $email
+            ]));
+        } catch (InvalidParameterException $e) {
+            $message = $e->getMessage();
+            // Exception expected, continue
+        }
+        $this->assertEquals('userDoesNotHaveAnyPasswordChangeRequest', $message);
 
+        // Now, user makes a password change request
+        ResetController::apiCreate(new Request([
+            'email' => $email
+        ]));
+
+        // Support can genearate token
+        UserController::apiPasswordChangeRequest(new Request([
+            'auth_token' => $supportLogin->auth_token,
+            'email' => $email
+        ]));
         $response = ResetController::apiGenerateToken(new Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email,
         ]));
 
-        $this->assertContains(urlencode($email), $response['link']);
+        // Finally, users can update their password with the generated token
+        $reset_token = explode('reset_token=', $response['link'])[1];
+        $password = Utils::CreateRandomString();
+        $response = ResetController::apiUpdate(new Request([
+            'email' => $email,
+            'reset_token' => $reset_token,
+            'password' => $password,
+            'password_confirmation' => $password
+        ]));
+
+        $this->assertContains('ok', $response['status']);
+    }
+
+    /**
+     * support tries to generate an expired token
+     */
+    public function testUserGeneratesExpiredToken() {
+        // Support team member will verify $user
+        $support = UserFactory::createSupportUser();
+
+        // Creates a user
+        $email = Utils::CreateRandomString().'@mail.com';
+        $user = UserFactory::createUser(null, null, $email, true /* verified */);
+
+        // Call api using support team member
+        $supportLogin = self::login($support);
+
+        // time travel
+        $reset_sent_at =
+            ApiUtils::GetStringTime(Utils::GetPhpUnixTimestamp() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
+        $user = UsersDAO::FindByEmail($email);
+        $user->reset_sent_at = $reset_sent_at;
+        UsersDAO::save($user);
+
+        // Support can't genearate token because it has expired
+        try {
+            UserController::apiPasswordChangeRequest(new Request([
+                'auth_token' => $supportLogin->auth_token,
+                'email' => $email
+            ]));
+        } catch (InvalidParameterException $e) {
+            $message = $e->getMessage();
+            // Exception expected, continue
+        }
+
+        $this->assertEquals('userDoesNotHaveAnyPasswordChangeRequest', $message);
     }
 }
