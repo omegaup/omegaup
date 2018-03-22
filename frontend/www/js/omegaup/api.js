@@ -532,6 +532,8 @@ export default {
 
     stats: _call('/api/user/stats/'),
 
+    statusVerified: _call('/api/user/statusVerified/'),
+
     update: _call('/api/user/update/'),
 
     /**

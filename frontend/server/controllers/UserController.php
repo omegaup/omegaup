@@ -2205,6 +2205,35 @@ class UserController extends Controller {
     }
 
     /**
+     * Gets verify status of a user
+     *
+     * @param Request $r
+     * @return response array
+     * @throws ForbiddenAccessException
+     * @throws InvalidParameterException
+     */
+    public static function apiStatusVerified(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = IdentitiesDAO::getStatusVerified($r['email']);
+
+        if (!$response['valid']) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        return [
+            'status' => 'ok',
+            'valid' => $response['valid'],
+            'verified' => $response['verified'],
+            'username' => $response['username']
+        ];
+    }
+
+    /**
      * Adds the experiment to the user.
      *
      * @param Request $r

@@ -4,42 +4,43 @@
       <h2 class="panel-title">{{ T.omegaupTitleSupportDashboard }}</h2>
     </div>
     <div class="panel-body">
-      <form class="form bottom-margin"
-            v-on:submit.prevent="onSearchUsername">
-        <div class="row">
+      <div class="row">
+        <form class="form bottom-margin"
+              v-on:submit.prevent="onSearchEmail">
           <div class="col-md-6">
             <div class="input-group">
-              <input class="form-control typeahead"
-                   name="username"
+              <input class="form-control"
+                   name="email"
                    type="text"
-                   v-bind:disabled="user != null"
-                   v-bind:placeholder="T.wordsUser"
-                   v-model="username"> <span class="input-group-btn"><button class=
-                   "btn btn-default"
+                   v-bind:disabled="valid"
+                   v-bind:placeholder="T.email"
+                   v-model="email"> <span class="input-group-btn"><button class="btn btn-default"
                       type="button"
-                      v-bind:disabled="user != null"
-                      v-on:click.prevent="onSearchUsername">{{ T.wordsSearch }}</button></span>
+                      v-bind:disabled="valid"
+                      v-on:click.prevent="onSearchEmail">{{ T.wordsSearch }}</button></span>
             </div>
           </div>
-        </div>
-      </form>
-      <div class="row bottom-margin"
-           v-if="user != null">
+        </form>
+      </div>
+      <div class="row bottom-margin">
         <div class="col-md-6">
           <div class="input-group">
-            {{ user.email }}
+            {{ username }}
           </div>
         </div>
       </div>
-      <form class="form bottom-margin"
-            v-show="user != null">
-        <div class="row bottom-margin">
+      <div class="row bottom-margin">
+        <form class="form bottom-margin"
+              id="verifyUser"
+              name="verifyUser"
+              v-on:submit.prevent="onVerifyUser"
+              v-show="valid">
           <div class="col-md-6">
             <button class="btn btn-default btn-block"
                  type="button"
-                 v-bind:disabled="user != null &amp;&amp; user.verified"
+                 v-bind:disabled="verified"
                  v-on:click.prevent="onVerifyUser">
-            <template v-if="user != null &amp;&amp; user.verified">
+            <template v-if="verified">
               <span aria-hidden="true"
                         class="glyphicon glyphicon-ok"></span> {{ T.userVerified }}
             </template>
@@ -47,15 +48,15 @@
               {{ T.userVerify }}
             </template></button>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12 text-right">
-            <button class="btn btn-primary submit"
-                 type="reset"
-                 v-on:click.prevent="onReset">{{ T.wordsCancel }}</button>
+          <div class="row">
+            <div class="col-md-12 text-right">
+              <button class="btn btn-primary submit"
+                   type="reset"
+                   v-on:click.prevent="onReset">{{ T.wordsCancel }}</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -65,24 +66,12 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {user: Object},
-  data: function() { return {T: T, username: ''};},
-  mounted: function() {
-    let self = this;
-    UI.userTypeahead($('input.typeahead', self.$el),
-                     function(event, item) { self.username = item.value; });
-  },
+  props: {valid: Boolean, username: String, verified: Boolean},
+  data: function() { return {T: T, email: ''};},
   methods: {
-    onSearchUsername: function() {
-      this.username = $('input.typeahead.tt-hint', this.$el).val() ||
-                      $('input.typeahead.tt-input', this.$el).val();
-      this.$emit('search-username', this.username);
-    },
-    onVerifyUser: function() { this.$emit('verify-user', this.username);},
-    onReset: function() {
-      $('input.typeahead', this.$el).typeahead('close').val('');
-      this.$emit('reset');
-    }
+    onSearchEmail: function() { this.$emit('search-email', this.email);},
+    onVerifyUser: function() { this.$emit('verify-user', this.email);},
+    onReset: function() { this.$emit('reset');}
   }
 };
 </script>

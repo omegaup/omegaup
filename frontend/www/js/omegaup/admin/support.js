@@ -7,27 +7,41 @@ OmegaUp.on('ready', function() {
     el: '#admin-support',
     render: function(createElement) {
       return createElement('omegaup-admin-support', {
-        props: {user: this.user},
+        props: {
+          valid: this.valid,
+          username: this.username,
+          verified: this.verified
+        },
         on: {
-          'search-username': function(username) {
-            adminSupport.user = null;
-            omegaup.API.User.profile({username: username})
-                .then(function(data) { adminSupport.user = data.userinfo; })
+          'search-email': function(email) {
+            adminSupport.username = '';
+            adminSupport.verified = false;
+            adminSupport.valid = false;
+            omegaup.API.User.statusVerified({email: email})
+                .then(function(data) {
+                  adminSupport.valid = data.valid;
+                  adminSupport.username = data.username;
+                  adminSupport.verified = data.verified;
+                })
                 .fail(omegaup.UI.apiError);
           },
-          'verify-user': function(username) {
-            omegaup.API.User.verifyEmail({usernameOrEmail: username})
+          'verify-user': function(email) {
+            omegaup.API.User.verifyEmail({usernameOrEmail: email})
                 .then(function() {
-                  adminSupport.user.verified = true;
+                  adminSupport.verified = true;
                   omegaup.UI.success(T.userVerified);
                 })
                 .fail(omegaup.UI.apiError);
           },
-          'reset': function() { adminSupport.user = null; }
+          'reset': function() {
+            adminSupport.valid = false;
+            adminSupport.username = '';
+            adminSupport.verified = false;
+          }
         },
       });
     },
-    data: {user: null},
+    data: {valid: false, username: '', verified: false},
     components: {
       'omegaup-admin-support': admin_Support,
     },

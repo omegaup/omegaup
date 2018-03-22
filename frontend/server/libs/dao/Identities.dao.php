@@ -10,4 +10,33 @@ include_once('base/Identities.vo.base.php');
   *
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
+    public static function getStatusVerified($email) {
+        global  $conn;
+        $sql = 'SELECT
+                  u.verified,
+                  u.username
+                FROM
+                  `Identities` i
+                INNER JOIN
+                  `Users` u
+                ON
+                  u.user_id = i.user_id
+                INNER JOIN
+                  `Emails` e
+                ON
+                  e.user_id = u.user_id
+                WHERE
+                  e.email = ?';
+        $params = [ $email ];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return ['valid' => false];
+        }
+
+        return [
+            'valid' => true,
+            'verified' => $rs['verified'] == 1,
+            'username' => $rs['username']
+        ];
+    }
 }
