@@ -15,9 +15,10 @@
 		{if !$is_index}
 			<h3 class="panel-title">{#rankRangeHeader#|omegaup_format:[lowCount=>($page-1)*$length+1, highCount=>$page*$length]}</h3>
 			{if $page > 1}
-				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
+				<a class="prev" href="/rank/?page={$page-1}">{#wordsPrevPage#}</a>
+				<span class="delimiter"> | </span>
 			{/if}
-			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
+			<a class="next" href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
 		    {if count($availableFilters) > 0}
 		        <select class="filter">
 		        	<option value="">{#wordsSelectFilter#}</option>
@@ -55,9 +56,10 @@
 				<a href='/rank/'>{#rankViewFull#}</a>
 				{else}
 					{if $page > 1}
-					<a href="/rank/?page={$page-1}{if isset($filter)}&filter={$filter}{/if}">{#wordsPrevPage#}</a> |
+					<a class="prev" href="/rank/?page={$page-1}{if isset($filter)}&filter={$filter}{/if}">{#wordsPrevPage#}</a>
+					<span class="delimiter"> | </span>
 					{/if}
-					<a href="/rank/?page={$page+1}{if isset($filter)}&filter={$filter}{/if}">{#wordsNextPage#}</a>
+					<a class="next" href="/rank/?page={$page+1}{if isset($filter)}&filter={$filter}{/if}">{#wordsNextPage#}</a>
 				{/if}
 				<br/>
 			</div>

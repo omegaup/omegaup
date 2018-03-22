@@ -31,7 +31,7 @@ class CoursesFactory {
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'start_time' => (Utils::GetPhpUnixTimestamp()),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'public' => $public,
             'requests_user_information' => $requests_user_information
@@ -99,7 +99,7 @@ class CoursesFactory {
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
                     'description' => Utils::CreateRandomString(),
-                    'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+                    'start_time' => (Utils::GetPhpUnixTimestamp()),
                     'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType
