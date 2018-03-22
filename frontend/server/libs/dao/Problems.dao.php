@@ -76,6 +76,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $rowcount,
         $query,
         $user_id,
+        $identity_id,
         $tag,
         $min_visibility,
         &$total
@@ -105,7 +106,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $args = [];
 
         if ($user_type === USER_ADMIN) {
-            $args = [$user_id];
+            $args = [$identity_id];
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
@@ -122,7 +123,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     FROM
                         Problems
                     INNER JOIN
-                        Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
+                        Runs ON Runs.identity_id = ? AND Runs.problem_id = Problems.problem_id
                     GROUP BY
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
@@ -137,7 +138,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $sql .= ' p.visibility > ?';
                 $args[] = ProblemController::VISIBILITY_DELETED;
             }
-        } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
+        } elseif ($user_type === USER_NORMAL && !is_null($identity_id)) {
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
@@ -154,16 +155,19 @@ class ProblemsDAO extends ProblemsDAOBase {
                 LEFT JOIN (
                     SELECT
                         pi.problem_id,
+                        r.identity_id,
                         MAX(r.score) AS score
                     FROM
                         Problems pi
                     INNER JOIN
-                        Runs r ON r.user_id = ? AND r.problem_id = pi.problem_id
+                        Runs r ON r.identity_id = ? AND r.problem_id = pi.problem_id
                     GROUP BY
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
-                    User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
+                    User_Roles ur ON p.acl_id = ur.acl_id AND ur.role_id = ?
+                LEFT JOIN
+                    Identities i ON i.identity_id = ? AND ur.user_id = i.user_id
                 LEFT JOIN (
                     SELECT DISTINCT
                         gr.acl_id
@@ -171,12 +175,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Groups_Users gu
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gu.group_id
-                    WHERE gu.user_id = ? AND gr.role_id = ?
+                    LEFT JOIN
+                        Identities i ON gu.user_id = i.user_id
+                    WHERE i.identity_id = ? AND gr.role_id = ?
                 ) gr ON p.acl_id = gr.acl_id' . $language_join;
-            $args[] = $user_id;
-            $args[] = $user_id;
+            $args[] = $identity_id;
             $args[] = Authorization::ADMIN_ROLE;
-            $args[] = $user_id;
+            $args[] = $identity_id;
+            $args[] = $identity_id;
             $args[] = Authorization::ADMIN_ROLE;
 
             self::addTagFilter($user_type, $user_id, $tag, $sql, $args);
@@ -321,11 +327,11 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetOne($sql, $id);
     }
 
-    final public static function getProblemsSolved($id) {
+    final public static function getProblemsSolved($identity_id) {
         global $conn;
 
-        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.user_id = ? ORDER BY `Problems`.problem_id DESC";
-        $val = [$id];
+        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
+        $val = [$identity_id];
         $rs = $conn->Execute($sql, $val);
 
         $result = [];
@@ -337,36 +343,36 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
-    final public static function getProblemsUnsolvedByUser(
-        $user_id
+    final public static function getProblemsUnsolvedByIdentity(
+        $identity_id
     ) {
         $sql = "
             SELECT DISTINCT
                 p.*
             FROM
-                Users u
+                Identities i
             INNER JOIN
                 Runs r
             ON
-                r.user_id = u.user_id
+                r.identity_id = i.identity_id
             INNER JOIN
                 Problems p
             ON
                 p.problem_id = r.problem_id
             WHERE
-                u.user_id = ?
+                i.identity_id = ?
             AND
                 (SELECT
                     COUNT(*)
                  FROM
                     Runs r2
                  WHERE
-                    r2.user_id = u.user_id AND
+                    r2.identity_id = i.identity_id AND
                     r2.problem_id = p.problem_id AND
                     r2.verdict = 'AC'
                 ) = 0";
 
-        $params = [$user_id];
+        $params = [$identity_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
@@ -378,16 +384,16 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $problems;
     }
 
-    final public static function isProblemSolved(Problems $problem, Users $user) {
+    final public static function isProblemSolved(Problems $problem, $identity_id) {
         $sql = 'SELECT
             COUNT(r.run_id) as solved
         FROM
             Runs AS r
         WHERE
-            r.problem_id = ? AND r.user_id = ? AND r.verdict = "AC";';
+            r.problem_id = ? AND r.identity_id = ? AND r.verdict = "AC";';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $user->user_id])['solved'] > 0;
+        return $conn->GetRow($sql, [$problem->problem_id, $identity_id])['solved'] > 0;
     }
 
     public static function getPrivateCount(Users $user) {
@@ -604,19 +610,23 @@ class ProblemsDAO extends ProblemsDAOBase {
     ) {
         $sql = '
             SELECT
-                u.username
+                i.username
             FROM
-                Users u
+                Identities i
             WHERE
-                u.user_id
+                i.user_id
             IN (SELECT DISTINCT
                 gu.user_id
             FROM
                 Runs r
-            JOIN
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = r.identity_id
+            INNER JOIN
                 Groups_Users gu
             ON
-                r.user_id = gu.user_id
+                i.user_id = gu.user_id
             WHERE
                 gu.group_id = ?
                 AND r.problem_id = ?)';

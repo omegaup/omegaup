@@ -50,13 +50,13 @@ class Authorization {
     // Group for support team members.
     const SUPPORT_GROUP_ALIAS = 'omegaup:support';
 
-    public static function canViewRun($user_id, Runs $run) {
+    public static function canViewRun($user_id, $identity_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
             return false;
         }
 
         return (
-            $run->user_id === $user_id ||
+            $run->identity_id === $identity_id ||
             Authorization::canEditRun($user_id, $run)
         );
     }

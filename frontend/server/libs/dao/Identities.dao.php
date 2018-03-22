@@ -10,4 +10,32 @@ include_once('base/Identities.vo.base.php');
   *
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
+    public static function FindByEmail($email) {
+        global  $conn;
+        $sql = 'SELECT
+                  i.*
+                FROM
+                  `Identities` i
+                INNER JOIN
+                  `Emails` e
+                ON
+                  e.user_id = i.user_id
+                WHERE
+                  e.email = ?';
+        $params = [ $email ];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return null;
+        }
+        return new Identities($rs);
+    }
+    public static function FindByUsername($username) {
+        $result = IdentitiesDAO::search(new Identities([
+            'username' => $username
+        ]));
+        if (sizeof($result) != 1) {
+            return null;
+        }
+        return array_pop($result);
+    }
 }

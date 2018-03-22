@@ -1373,7 +1373,7 @@ class ProblemController extends Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['user'] = UsersDAO::FindByUsername($r['username']);
+                    $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new NotFoundException('userNotFound');
                 }
@@ -1385,7 +1385,7 @@ class ProblemController extends Controller {
                     $r['verdict'],
                     $r['problem']->problem_id,
                     $r['language'],
-                    !is_null($r['user']) ? $r['user']->user_id : null,
+                    !is_null($r['identity']) ? $r['identity']->identity_id : null,
                     $r['offset'],
                     $r['rowcount']
                 );
@@ -1647,14 +1647,16 @@ class ProblemController extends Controller {
 
         $response = [];
         $response['results'] = [];
-        $author_id = null;
+        $author_user_id = null;
+        $author_identity_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
         $user_type = USER_ANONYMOUS;
         if (!is_null($r['current_user_id'])) {
-            $author_id = intval($r['current_user_id']);
+            $author_user_id = intval($r['current_user_id']);
+            $author_identity_id = intval($r['current_identity_id']);
             if (Authorization::isSystemAdmin($r['current_user_id']) ||
                 Authorization::hasRole(
                     $r['current_user_id'],
@@ -1692,7 +1694,8 @@ class ProblemController extends Controller {
             $offset,
             $rowcount,
             $query,
-            $author_id,
+            $author_user_id,
+            $author_identity_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
@@ -1805,11 +1808,11 @@ class ProblemController extends Controller {
         // Uses same params as apiDetails, except for lang, which is optional
         self::validateDetails($r);
 
-        // If username is set in the request, we use that user as target.
+        // If username is set in the request, we use that identity as target.
         // else, we query using current_user
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        $response['score'] = self::bestScore($r, $user);
+        $response['score'] = self::bestScore($r, $identity);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1826,10 +1829,10 @@ class ProblemController extends Controller {
      * @return float
      * @throws InvalidDatabaseOperationException
      */
-    private static function bestScore(Request $r, Users $user = null) {
-        $current_user_id = (is_null($user) ? $r['current_user_id'] : $user->user_id);
+    private static function bestScore(Request $r, Identities $identity = null) {
+        $current_identity_id = (is_null($identity) ? $r['current_identity_id'] : $identity->identity_id);
 
-        if (is_null($current_user_id)) {
+        if (is_null($current_identity_id)) {
             return 0;
         }
 
@@ -1837,12 +1840,12 @@ class ProblemController extends Controller {
         try {
             // Add best score info
             if (!self::validateProblemset($r)) {
-                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
+                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_identity_id);
             } else {
                 $bestRun = RunsDAO::GetBestRun(
                     $r['problemset']->problemset_id,
                     $r['problem']->problem_id,
-                    $current_user_id,
+                    $current_identity_id,
                     false /*showAllRuns*/
                 );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;

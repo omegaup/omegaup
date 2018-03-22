@@ -1436,18 +1436,18 @@ class UserController extends Controller {
         $response = [];
         $response['contests'] = [];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        // Get contests where user had at least 1 run
+        // Get contests where identity had at least 1 run
         try {
-            $contestsParticipated = ContestsDAO::getContestsParticipated($user->user_id);
+            $contestsParticipated = ContestsDAO::getContestsParticipated($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $contests = [];
         foreach ($contestsParticipated as $contest) {
-            // Get user ranking
+            // Get identity ranking
             $scoreboardR = new Request([
                 'auth_token' => $r['auth_token'],
                 'contest_alias' => $contest->alias,
@@ -1455,10 +1455,10 @@ class UserController extends Controller {
             ]);
             $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 
-            // Grab the place of the current user in the given contest
+            // Grab the place of the current identity in the given contest
             $contests[$contest->alias]['place']  = null;
             foreach ($scoreboardResponse['ranking'] as $userData) {
-                if ($userData['username'] == $user->username) {
+                if ($userData['username'] == $identity->username) {
                     $contests[$contest->alias]['place'] = $userData['place'];
                     break;
                 }
@@ -1486,17 +1486,17 @@ class UserController extends Controller {
         $response = [];
         $response['problems'] = [];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
         try {
-            $db_results = ProblemsDAO::getProblemsSolved($user->user_id);
+            $problems = ProblemsDAO::getProblemsSolved($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!is_null($db_results)) {
+        if (!is_null($problems)) {
             $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
-            foreach ($db_results as $problem) {
+            foreach ($problems as $problem) {
                 if (ProblemsDAO::isVisible($problem)) {
                     array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
                 }
@@ -1521,16 +1521,16 @@ class UserController extends Controller {
             'status' => 'ok',
         ];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
         try {
-            $db_results = ProblemsDAO::getProblemsUnsolvedByUser($user->user_id);
+            $problems = ProblemsDAO::getProblemsUnsolvedByIdentity($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
-        foreach ($db_results as $problem) {
+        foreach ($problems as $problem) {
             if (ProblemsDAO::isVisible($problem)) {
                 array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
             }
@@ -1582,14 +1582,15 @@ class UserController extends Controller {
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        if ((is_null($r['current_user']) || $r['current_user']->username != $user->username)
+        if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
             && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
         try {
-            $runsPerDatePerVerdict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
+            $runsPerDatePerVerdict = RunsDAO::CountRunsOfIdentityPerDatePerVerdict($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

@@ -128,7 +128,7 @@ class RunController extends Controller {
                         null,
                         null,
                         $r['problem']->problem_id,
-                        $r['current_user_id']
+                        $r['current_identity_id']
                     )
                             && !Authorization::isSystemAdmin($r['current_user_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
@@ -190,7 +190,7 @@ class RunController extends Controller {
                     $problemset_id,
                     isset($r['contest']) ? $r['contest'] : null,
                     $r['problem']->problem_id,
-                    $r['current_user_id']
+                    $r['current_identity_id']
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
                 }
@@ -294,7 +294,7 @@ class RunController extends Controller {
 
         // Populate new run object
         $run = new Runs([
-                    'user_id' => $r['current_user_id'],
+                    'identity_id' => $r['current_identity_id'],
                     'problem_id' => $r['problem']->problem_id,
                     'problemset_id' => $problemset_id,
                     'language' => $r['language'],
@@ -315,9 +315,10 @@ class RunController extends Controller {
         try {
             // Push run into DB
             RunsDAO::save($run);
+            $identity = IdentitiesDAO::getByPK($run->identity_id);
 
             SubmissionLogDAO::save(new SubmissionLog([
-                'user_id' => $run->user_id,
+                'user_id' => $identity->user_id,
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
@@ -456,7 +457,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -474,7 +475,7 @@ class RunController extends Controller {
         if ($filtered['contest_score'] != null) {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
-        if ($r['run']->user_id == $r['current_user_id']) {
+        if ($r['run']->identity_id == $r['current_identity_id']) {
             $filtered['username'] = $r['current_user']->username;
         }
 
@@ -586,7 +587,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -693,7 +694,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -891,10 +892,12 @@ class RunController extends Controller {
         if (!is_null($r['username'])) {
             try {
                 $r['user'] = UserController::resolveUser($r['username']);
+                $r['identity'] = IdentityController::resolveIdentity($r['username']);
             } catch (NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;
                 $r['user'] = null;
+                $r['identity'] = null;
             }
         }
     }
@@ -918,7 +921,7 @@ class RunController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );

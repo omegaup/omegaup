@@ -85,7 +85,7 @@ class QualityNominationController extends Controller {
         if ($r['nomination'] != 'demotion') {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_user'])) {
+            if (!ProblemsDAO::isProblemSolved($problem, $r['current_identity_id'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }

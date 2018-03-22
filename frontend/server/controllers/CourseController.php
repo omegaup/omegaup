@@ -979,7 +979,7 @@ class CourseController extends Controller {
         try {
             $assignments = CoursesDAO::getAssignmentsProgress(
                 $r['course']->course_id,
-                $r['current_user_id']
+                $r['current_identity_id']
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

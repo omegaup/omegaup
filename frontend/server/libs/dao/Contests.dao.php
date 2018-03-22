@@ -187,7 +187,7 @@ class ContestsDAO extends ContestsDAOBase {
         return Time::get() >= strtotime($contest->finish_time);
     }
 
-    public static function getContestsParticipated($user_id) {
+    public static function getContestsParticipated($identity_id) {
         $sql = '
             SELECT
                 c.*
@@ -203,11 +203,11 @@ class ContestsDAO extends ContestsDAOBase {
                 ON
                     c2.problemset_id = r.problemset_id
                 WHERE
-                    r.user_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
+                    r.identity_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
             )
             ORDER BY
                 contest_id DESC;';
-        $params = [$user_id];
+        $params = [$identity_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);

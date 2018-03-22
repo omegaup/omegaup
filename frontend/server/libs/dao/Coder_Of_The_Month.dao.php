@@ -45,11 +45,11 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $sql = "
 			SELECT
-				username, name, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+				username, name, i.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
 			FROM
 				(
 					SELECT DISTINCT
-						r.user_id, r.problem_id
+						r.identity_id, r.problem_id
 					FROM
 						Runs r
 					WHERE
@@ -60,13 +60,13 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			INNER JOIN
 				Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
 			INNER JOIN
-				Users u ON u.user_id = up.user_id
+				Identities i ON i.identity_id = up.identity_id
 			LEFT JOIN
-				Coder_Of_The_Month cm on u.user_id = cm.user_id
+				Coder_Of_The_Month cm on i.user_id = cm.user_id
 			WHERE
 				cm.user_id IS NULL OR DATE_ADD(cm.time, INTERVAL 1 YEAR) < ?
 			GROUP BY
-				user_id
+				up.identity_id
 			ORDER BY
 				score DESC
 			LIMIT 1
