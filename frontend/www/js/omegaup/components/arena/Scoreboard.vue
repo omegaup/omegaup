@@ -9,7 +9,7 @@
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
             <a v-bind:href="'#problems/' + problem.alias"
-                v-bind:title="problem.alias">{{ labelIterator(index) }}</a>
+                v-bind:title="problem.alias">{{ columnName(index) }}</a>
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
@@ -83,14 +83,14 @@ export default {
       return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
                                                     '';
     },
-    labelIterator: function(idx) {
-      var label = "";
-      do {
-        idx = idx - 1;
-        label = String.fromCharCode(65 + idx % 26) + label;
+    columnName: function(idx) {
+      var name = String.fromCharCode("A".charCodeAt(0) + idx % 26);
+      while (idx >= 26) {
         idx = (idx / 26) >> 0;
-      } while (idx > 0);
-      return label;
+        idx--;
+        name = String.fromCharCode("A".charCodeAt(0) + idx % 26) + name;
+      }
+      return name;
     },
     renderUser: function(u) {
       return u.username +
