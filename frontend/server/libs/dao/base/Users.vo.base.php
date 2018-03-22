@@ -186,7 +186,7 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(64)
+      * @var enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate')
       */
     public $scholar_degree;
 

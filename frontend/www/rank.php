@@ -3,6 +3,7 @@
 require_once('../server/bootstrap.php');
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
+$length = isset($_GET['length']) ? $_GET['length'] : 100;
 $filter = isset($_GET['filter']) ? $_GET['filter'] : null;
 
 $r = new Request($_REQUEST);
@@ -21,6 +22,7 @@ if ($session['auth_token']) {
 }
 
 $smarty->assign('page', $page);
+$smarty->assign('length', $length);
 $smarty->assign('filter', $filter);
 $smarty->assign('availableFilters', $availableFilters);
 
