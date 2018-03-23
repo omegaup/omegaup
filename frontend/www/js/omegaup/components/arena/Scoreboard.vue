@@ -9,7 +9,7 @@
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
             <a v-bind:href="'#problems/' + problem.alias"
-                v-bind:title="problem.alias">{{ columnName(index) }}</a>
+                v-bind:title="problem.alias">{{ UI.columnName(index) }}</a>
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
@@ -70,7 +70,11 @@ export default {
       'default': true,
     },
   },
-  data: function() { return {};},
+  data: function() {
+    return {
+      UI: UI,
+    };
+  },
   computed: {
     lastUpdatedString: function() {
       if (!this.lastUpdated) {
@@ -84,7 +88,6 @@ export default {
       return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
                                                     '';
     },
-    columnName: function(idx) { return UI.columnName(idx);},
     renderUser: function(u) {
       return u.username +
              (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
