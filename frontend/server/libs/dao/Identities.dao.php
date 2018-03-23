@@ -26,15 +26,18 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 ON
                   e.user_id = u.user_id
                 WHERE
-                  e.email = ?';
+                  e.email = ?
+                ORDER BY
+                  u.user_id DESC
+                LIMIT
+                  0, 1';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
         if (count($rs)==0) {
-            return ['valid' => false];
+            return null;
         }
 
         return [
-            'valid' => true,
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username']
         ];

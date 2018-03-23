@@ -12,11 +12,11 @@
               <input class="form-control"
                    name="email"
                    type="text"
-                   v-bind:disabled="valid"
+                   v-bind:disabled="username != null"
                    v-bind:placeholder="T.email"
                    v-model="email"> <span class="input-group-btn"><button class="btn btn-default"
                       type="button"
-                      v-bind:disabled="valid"
+                      v-bind:disabled="username != null"
                       v-on:click.prevent="onSearchEmail">{{ T.wordsSearch }}</button></span>
             </div>
           </div>
@@ -34,7 +34,7 @@
               id="verifyUser"
               name="verifyUser"
               v-on:submit.prevent="onVerifyUser"
-              v-show="valid">
+              v-show="username != null">
           <div class="col-md-6">
             <button class="btn btn-default btn-block"
                  type="button"
@@ -66,8 +66,8 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {valid: Boolean, username: String, verified: Boolean},
-  data: function() { return {T: T, email: ''};},
+  props: {username: String, verified: Boolean},
+  data: function() { return {T: T, email: null};},
   methods: {
     onSearchEmail: function() { this.$emit('search-email', this.email);},
     onVerifyUser: function() { this.$emit('verify-user', this.email);},

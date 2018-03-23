@@ -2221,13 +2221,12 @@ class UserController extends Controller {
 
         $response = IdentitiesDAO::getStatusVerified($r['email']);
 
-        if (!$response['valid']) {
+        if (is_null($response)) {
             throw new InvalidParameterException('invalidUser');
         }
 
         return [
             'status' => 'ok',
-            'valid' => $response['valid'],
             'verified' => $response['verified'],
             'username' => $response['username']
         ];
