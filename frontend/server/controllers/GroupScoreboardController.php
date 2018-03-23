@@ -142,7 +142,7 @@ class GroupScoreboardController extends Controller {
             foreach ($r['gscs'] as $gsc) {
                 $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
                 if (is_null($contest)) {
-                    throw new InvalidDatabaseOperationException(new Exception('contest'));
+                    throw new NotFoundException('contestNotFound');
                 }
                 $response['contests'][$i] = $contest->asArray();
                 $response['contests'][$i]['only_ac'] = $gsc->only_ac;
