@@ -42,6 +42,7 @@ class UserSupportTest extends OmegaupTestCase {
                 'auth_token' => $supportLogin->auth_token,
                 'email' => $email
             ]));
+            $this->fail('Support tries to generate token without a request.');
         } catch (InvalidParameterException $e) {
             $message = $e->getMessage();
             // Exception expected, continue
@@ -97,12 +98,13 @@ class UserSupportTest extends OmegaupTestCase {
         $user->reset_sent_at = $reset_sent_at;
         UsersDAO::save($user);
 
-        // Support can't genearate token because it has expired
+        // Support can not genearate token because it has expired
         try {
-            UserController::apiPasswordChangeRequest(new Request([
+            $response = UserController::apiPasswordChangeRequest(new Request([
                 'auth_token' => $supportLogin->auth_token,
                 'email' => $email
             ]));
+            $this->fail('Support can not genearate token because it has expired.');
         } catch (InvalidParameterException $e) {
             $message = $e->getMessage();
             // Exception expected, continue

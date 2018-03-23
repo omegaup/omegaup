@@ -24,28 +24,6 @@ class UsersDAO extends UsersDAOBase {
         return new Users($rs);
     }
 
-    public static function FindByEmailOrUsername($emailOrUsername) {
-        global  $conn;
-        $sql = 'SELECT
-                  u.*
-                FROM
-                  `Users` u
-                INNER JOIN
-                  `Emails` e
-                ON
-                  e.user_id = u.user_id
-                WHERE
-                  e.email = ?
-                OR
-                  u.username = ?;';
-        $params = [ $emailOrUsername, $emailOrUsername ];
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
-            return null;
-        }
-        return new Users($rs);
-    }
-
     public static function FindByUsername($username) {
         $vo_Query = new Users([
             'username' => $username

@@ -7,25 +7,13 @@ OmegaUp.on('ready', function() {
     el: '#admin-support',
     render: function(createElement) {
       return createElement('omegaup-admin-support', {
-        props: {
-          valid: this.valid,
-          link: this.link,
-          password_change_request: this.password_change_request,
-          username: this.username
-        },
+        props: {link: this.link, username: this.username},
         on: {
           'search-email': function(email) {
-            adminSupport.valid = false;
-            adminSupport.password_change_request = false;
-            adminSupport.link = '';
-            adminSupport.username = '';
+            adminSupport.link = null;
+            adminSupport.username = null;
             omegaup.API.User.passwordChangeRequest({email: email})
-                .then(function(data) {
-                  adminSupport.valid = true;
-                  adminSupport.password_change_request =
-                      data.password_change_request;
-                  adminSupport.username = data.username;
-                })
+                .then(function(data) { adminSupport.username = data.username; })
                 .fail(omegaup.UI.apiError);
           },
           'generate-token': function(email) {
@@ -43,16 +31,13 @@ OmegaUp.on('ready', function() {
             omegaup.UI.success(T.passwordResetLinkCopiedToClipboard);
           },
           'reset': function() {
-            adminSupport.valid = false;
-            adminSupport.password_change_request = false;
             adminSupport.link = '';
-            adminSupport.username = '';
+            adminSupport.username = null;
           }
         },
       });
     },
-    data:
-        {valid: false, password_change_request: false, link: '', username: ''},
+    data: {link: null, username: null},
     components: {
       'omegaup-admin-support': admin_Support,
     },

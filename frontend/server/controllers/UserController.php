@@ -1282,17 +1282,16 @@ class UserController extends Controller {
 
         $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($r['email']);
 
-        if (!$lastRequest['valid']) {
+        if (is_null($lastRequest)) {
             throw new InvalidParameterException('invalidUser');
         }
 
-        if (!$lastRequest['password_change_request']) {
+        if (!$lastRequest['within_last_day']) {
             throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
         }
 
         return [
             'status' => 'ok',
-            'password_change_request' => $lastRequest['password_change_request'],
             'username' => $lastRequest['username']
         ];
     }

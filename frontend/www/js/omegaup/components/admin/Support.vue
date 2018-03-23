@@ -12,11 +12,11 @@
               <input class="form-control"
                    name="email"
                    type="text"
-                   v-bind:disabled="valid"
+                   v-bind:disabled="username != null"
                    v-bind:placeholder="T.email"
                    v-model="email"> <span class="input-group-btn"><button class="btn btn-default"
                       type="button"
-                      v-bind:disabled="valid"
+                      v-bind:disabled="username != null"
                       v-on:click.prevent="onSearchEmail">{{ T.wordsSearch }}</button></span>
             </div>
           </div>
@@ -34,9 +34,8 @@
               id="generateToken-"
               name="generateToken-"
               v-on:submit.prevent="onGenerateToken"
-              v-show="valid">
-          <div class="col-md-12 bottom-margin"
-               v-show="password_change_request">
+              v-show="username != null">
+          <div class="col-md-12 bottom-margin">
             <div class="input-group">
               <input class="form-control"
                    name="link"
@@ -74,20 +73,15 @@
 import {T} from '../../omegaup.js';
 
 export default {
-  props: {
-    valid: Boolean,
-    password_change_request: Boolean,
-    link: String,
-    username: String
-  },
+  props: {link: String, username: String},
   data: function() { return {T: T, email: ''};},
   methods: {
     onSearchEmail: function() { this.$emit('search-email', this.email);},
     onGenerateToken: function() { this.$emit('generate-token', this.email);},
     onCopyToken: function() {
-      let copyText = document.querySelector("input[name=link]");
+      let copyText = this.$el.querySelector("input[name=link]");
       copyText.trigger('select');
-      document.execCommand("copy");
+      document.execCommand('copy');
       this.$emit('copy-token');
     },
     onReset: function() {

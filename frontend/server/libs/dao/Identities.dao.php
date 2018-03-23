@@ -26,21 +26,25 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 ON
                   e.user_id = u.user_id
                 WHERE
-                  e.email = ?';
+                  e.email = ?
+                ORDER BY
+                  u.user_id DESC
+                LIMIT
+                  0, 1';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
+
         if (count($rs)==0) {
-            return ['valid' => false];
+            return null;
         }
 
-        $response['valid'] = true;
-        $response['password_change_request'] = false;
-        if (!is_null($rs['reset_sent_at'])) {
-            $response['password_change_request'] =
-                Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24; // Request was made 24 hours ago or after
-
-            $response['username'] = $rs['username'];
+        if (is_null($rs['reset_sent_at'])) {
+            return ['within_last_day' => null];
         }
+        // Request was made 24 hours ago or after
+        $response['within_last_day'] =
+            Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24;
+        $response['username'] = $rs['username'];
         return $response;
     }
 }

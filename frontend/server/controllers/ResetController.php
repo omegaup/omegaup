@@ -66,11 +66,11 @@ class ResetController extends Controller {
 
         $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($email);
 
-        if (!$lastRequest['valid']) {
+        if (is_null($lastRequest)) {
             throw new InvalidParameterException('invalidUser');
         }
 
-        if (!$lastRequest['password_change_request']) {
+        if (!$lastRequest['within_last_day']) {
             throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
         }
 
