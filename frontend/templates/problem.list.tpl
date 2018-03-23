@@ -14,8 +14,7 @@
 				<th class="numericColumn">{#wordsRatio#}</th>
 				<th class="numericColumn">
 					{#wordsPointsForRank#}
-					<a rel="tooltip" href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/
-" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
+					<a rel="tooltip" href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
 				<th class="numericColumn">{#wordsMyScore#}</th>
 			</tr>
