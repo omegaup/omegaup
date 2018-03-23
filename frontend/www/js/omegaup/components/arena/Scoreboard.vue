@@ -84,9 +84,7 @@ export default {
       return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
                                                     '';
     },
-    columnName: function(idx) {
-      return UI.columnName(idx);
-    },
+    columnName: function(idx) { return UI.columnName(idx);},
     renderUser: function(u) {
       return u.username +
              (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
