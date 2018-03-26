@@ -15,6 +15,9 @@ class UserController extends Controller {
         'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
         'doctorate',
     ];
+    const ALLOWED_GENDER_OPTIONS = [
+        'female','male','other','decline',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -1286,6 +1289,37 @@ class UserController extends Controller {
     }
 
     /**
+     * Get the last password change request for an identity
+     *
+     * @param Request $r
+     * @return response array with last password change request
+     * @throws ForbiddenAccessException
+     * @throws InvalidParameterException
+     */
+    public static function apiPasswordChangeRequest(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($r['email']);
+
+        if (is_null($lastRequest)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        if (!$lastRequest['within_last_day']) {
+            throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+        }
+
+        return [
+            'status' => 'ok',
+            'username' => $lastRequest['username']
+        ];
+    }
+
+    /**
      * Get coder of the month by trying to find it in the table using the first
      * day of the current month. If there's no coder of the month for the given
      * date, calculate it and save it.
@@ -1754,6 +1788,10 @@ class UserController extends Controller {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
 
+        if (!is_null($r['gender'])) {
+            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
+        }
+
         $valueProperties = [
             'username',
             'name',
@@ -1852,15 +1890,23 @@ class UserController extends Controller {
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
+                $response['total'] = 0;
                 $selectedFilter = self::getSelectedFilter($r);
                 try {
-                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $selectedFilter['filteredBy'], $selectedFilter['value']);
+                    $userRankEntries = UserRankDAO::getFilteredRank(
+                        $r['offset'],
+                        $r['rowcount'],
+                        'rank',
+                        'ASC',
+                        $selectedFilter['filteredBy'],
+                        $selectedFilter['value']
+                    );
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
 
                 if (!is_null($userRankEntries)) {
-                    foreach ($userRankEntries as $userRank) {
+                    foreach ($userRankEntries['rows'] as $userRank) {
                         array_push($response['rank'], [
                             'username' => $userRank->username,
                             'name' => $userRank->name,
@@ -1869,6 +1915,7 @@ class UserController extends Controller {
                             'score' => $userRank->score,
                             'country_id' => $userRank->country_id]);
                     }
+                    $response['total'] = $userRankEntries['total'];
                 }
                 return $response;
             }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
