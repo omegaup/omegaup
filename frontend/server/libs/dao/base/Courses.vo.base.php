@@ -59,6 +59,9 @@ class Courses extends VO {
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = $data['needs_basic_information'];
         }
+        if (isset($data['requests_user_information'])) {
+            $this->requests_user_information = $data['requests_user_information'];
+        }
     }
 
     /**
@@ -150,4 +153,11 @@ class Courses extends VO {
       * @var tinyint(1)
       */
     public $needs_basic_information;
+
+    /**
+      * Se solicita información de los participantes para contactarlos posteriormente.
+      * @access public
+      * @var enum('no','optional','required')
+      */
+    public $requests_user_information;
 }

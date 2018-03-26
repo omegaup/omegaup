@@ -12,6 +12,7 @@
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
+	<li><a href="#links" data-toggle="tab">{#showLinks#}</a></li>
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
@@ -23,9 +24,9 @@
 			<div class="panel-body">
 				<form class="form" id="add-problem-form">
 					<div class="form-group">
-						<label for="problems-dropdown">{#wordsProblems#}</label>
+						<label for="problems-dropdown">{#wordsProblem#}</label>
 						<input class="typeahead form-control" name="problems" id="problems-dropdown"
-							autocomplete="off" />
+							autocomplete="off" placeholder="{#enterProblemAlias#}" />
 					</div>
 
 					<div class="form-group">
@@ -181,6 +182,28 @@
 				</thead>
 				<tbody id="contest-group-admins"></tbody>
 			</table>
+		</div>
+	</div>
+
+	<div class="tab-pane" id="links">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+			<table class="table table-striped">
+				<thead>
+					<h3>{#contestEditAdministrativeLinks#}</h3>
+				</thead>
+				<tbody class="contest-admin-links">
+					<tr>
+						<td><a id="submissions">{#wordsSubmissions#}</a></td>
+						<td><a id="conteststats">{#profileStatistics#}</a></td>
+						<td><a id="activityreport">{#contestActivityReport#}</a></td>
+						<td><a id="printableversion">{#contestPrintableVersion#}</a></td>
+						<td><a id="publicscoreboard">{#contestScoreboardLink#}</a></td>
+						<td><a id="adminscoreboard">{#contestScoreboardAdminLink#}</a></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
 		</div>
 	</div>
 </div>

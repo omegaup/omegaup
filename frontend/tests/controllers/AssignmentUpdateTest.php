@@ -12,8 +12,8 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
         $courseAlias = $courseData['course_alias'];
 
-        $updatedStartTime = strtotime('2017-01-02 12:34:56');
-        $updatedFinishTime = strtotime('2017-03-04 12:34:56');
+        $updatedStartTime = $courseData['request']['start_time'] + 10;
+        $updatedFinishTime = $courseData['request']['start_time'] + 20;
 
         $response = CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
@@ -72,8 +72,8 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'assignment' => $courseData['assignment_alias'],
             'course' => $courseData['course_alias'],
-            'start_time' => strtotime('2017-03-04 12:34:56'),
-            'finish_time' => strtotime('2017-01-02 12:34:56'),
+            'start_time' => $courseData['request']['start_time'] + 10,
+            'finish_time' => $courseData['request']['start_time'] + 9,
         ]));
     }
 
@@ -101,11 +101,41 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
                 'course' => $courseData['course_alias'],
+                'start_time' => $courseData['request']['start_time'],
+                'finish_time' => $courseData['request']['finish_time'],
                 'description' => 'pwnd',
             ]));
             $this->fail('Expected ForbiddenAccessException');
         } catch (ForbiddenAccessException $e) {
             // OK.
         }
+    }
+
+    /**
+     * @expectedException InvalidParameterException
+     */
+    public function testAssignmentsOutOfDate() {
+        // Create 1 course with 1 assignment
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+
+        $adminLogin = self::login($courseData['admin']);
+        $response = CourseController::apiListAssignments(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias']
+        ]));
+
+        // Updating start_time of assignment out of the date
+        CourseController::apiUpdateAssignment(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course' => $courseData['course_alias'],
+            'name' => $response['assignments'][0]['name'],
+            'assignment' => $response['assignments'][0]['alias'],
+            'description' => $response['assignments'][0]['description'],
+            'start_time' => $response['assignments'][0]['start_time'] + 240,
+            'finish_time' => $response['assignments'][0]['finish_time'] + 240,
+            'assignment_type' => $response['assignments'][0]['assignment_type'],
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
     }
 }

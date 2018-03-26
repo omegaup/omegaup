@@ -1,0 +1,2 @@
+ALTER TABLE `Users`
+MODIFY COLUMN `scholar_degree` enum('none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary', 'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master', 'doctorate') DEFAULT NULL;

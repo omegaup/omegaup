@@ -25,6 +25,7 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+        return $r['course'];
     }
 
     /**
@@ -53,6 +54,10 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r) {
         $is_required = true;
+        $course = self::validateCourseAlias($r);
+        $course_start_time = strtotime($course->start_time);
+        $course_finish_time = strtotime($course->finish_time);
+
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
@@ -63,10 +68,23 @@ class CourseController extends Controller {
             throw new InvalidParameterException('courseInvalidStartTime');
         }
 
+        Validators::isNumberInRange(
+            $r['start_time'],
+            'start_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+        Validators::isNumberInRange(
+            $r['finish_time'],
+            'finish_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+
         Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
-
-        self::validateCourseAlias($r);
     }
 
     /**
@@ -287,6 +305,7 @@ class CourseController extends Controller {
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information'],
             ]));
 
             CoursesDAO::transEnd();
@@ -994,22 +1013,16 @@ class CourseController extends Controller {
         // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])
             && ($r['course']->public == false
-            || $r['user']->user_id !== $r['current_user_id'])) {
+            || $r['user']->user_id !== $r['current_user_id'])
+            && $r['course']->requests_user_information == 'no') {
             throw new ForbiddenAccessException();
         }
 
         $groupUser = new GroupsUsers([
             'group_id' => $r['course']->group_id,
             'user_id' => $r['user']->user_id,
+            'share_user_information' => $r['share_user_information']
         ]);
-        if (!is_null(GroupsUsersDAO::getByPK(
-            $groupUser->group_id,
-            $groupUser->user_id
-        ))) {
-            throw new DuplicatedEntryInDatabaseException(
-                'courseStudentAlreadyPresent'
-            );
-        }
 
         try {
             GroupsUsersDAO::save($groupUser);
@@ -1266,11 +1279,17 @@ class CourseController extends Controller {
         self::resolveGroup($r);
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group']);
+        $isFirstTimeAccess = false;
+        if (!Authorization::isGroupAdmin($r['current_user_id'], $r['group'])) {
+            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_user_id'], $r['course'], $r['group']);
+        }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
         $result['shouldShowResults'] = $shouldShowIntro;
+        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
+        $result['requests_user_information'] = $result['requests_user_information'];
         return $result;
     }
 
@@ -1291,7 +1310,8 @@ class CourseController extends Controller {
                 'name' => $r['course']->name,
                 'description' => $r['course']->description,
                 'alias' => $r['course']->alias,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'requests_user_information' => $r['course']->requests_user_information
             ];
         } else {
             $result = [
@@ -1305,7 +1325,8 @@ class CourseController extends Controller {
                 'finish_time' => strtotime($r['course']->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
-                'basic_information_required' => $r['course']->needs_basic_information == '1'
+                'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'requests_user_information' => $r['course']->requests_user_information
             ];
 
             if ($isAdmin) {
@@ -1357,6 +1378,8 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
+        $course_start_time = strtotime($r['course']->start_time);
+        $course_finish_time = strtotime($r['course']->finish_time);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
@@ -1370,6 +1393,20 @@ class CourseController extends Controller {
         $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
 
+        Validators::isNumberInRange(
+            $r['start_time'],
+            'start_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+        Validators::isNumberInRange(
+            $r['finish_time'],
+            'finish_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             return;
@@ -1485,6 +1522,7 @@ class CourseController extends Controller {
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
+            'requests_user_information',
             'public' => ['transform' => function ($value) {
                 return is_null($value) ? false : $value;
             }],

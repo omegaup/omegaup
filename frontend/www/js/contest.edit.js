@@ -59,8 +59,24 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #basic-information-required')
             .prop('checked', contest.needs_basic_information);
 
-        $('.contest-publish-form #public').val(contest.public);
+        $('.new_contest_form #requests-user-information')
+            .val(contest.requests_user_information);
 
+        $('.contest-publish-form #public').val(contest.public);
+        $('.contest-admin-links #submissions')
+            .attr('href', '/arena/' + contestAlias + '/admin/');
+        $('.contest-admin-links #conteststats')
+            .attr('href', '/contest/' + contestAlias + '/stats/');
+        $('.contest-admin-links #activityreport')
+            .attr('href', '/contest/' + contestAlias + '/activity/');
+        $('.contest-admin-links #printableversion')
+            .attr('href', '/arena/' + contestAlias + '/print/');
+        $('.contest-admin-links #publicscoreboard')
+            .attr('href', '/arena/' + contestAlias + '/scoreboard/' +
+                              contest.scoreboard_url + '/');
+        $('.contest-admin-links #adminscoreboard')
+            .attr('href', '/arena/' + contestAlias + '/scoreboard/' +
+                              contest.scoreboard_url_admin + '/');
         if (contest.contestant_must_register == null ||
             contest.contestant_must_register == '0') {
           $('#requests').hide();
@@ -124,6 +140,7 @@ omegaup.OmegaUp.on('ready', function() {
           contestant_must_register: $('#register').val(),
           basic_information:
               $('#basic-information-required').is(':checked') ? '1' : '0',
+          requests_user_information: $('#requests-user-information').val(),
         })
         .then(function(data) {
           if (data.status == 'ok') {

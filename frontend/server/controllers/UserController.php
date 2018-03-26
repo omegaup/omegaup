@@ -10,6 +10,14 @@ class UserController extends Controller {
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
     public static $urlHelper = null;
+    const ALLOWED_SCHOLAR_DEGREES = [
+        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
+        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'doctorate',
+    ];
+    const ALLOWED_GENDER_OPTIONS = [
+        'female','male','other','decline',
+    ];
 
     const SENDY_SUCCESS = '1';
 
@@ -26,6 +34,16 @@ class UserController extends Controller {
         Validators::isValidUsername($r['username'], 'username');
 
         Validators::isEmail($r['email'], 'email');
+
+        if (empty($r['scholar_degree'])) {
+            $r['scholar_degree'] = 'none';
+        }
+
+        Validators::isInEnum(
+            $r['scholar_degree'],
+            'scholar_degree',
+            UserController::ALLOWED_SCHOLAR_DEGREES
+        );
 
         // Check password
         $hashedPassword = null;
@@ -68,8 +86,6 @@ class UserController extends Controller {
         $user_data = [
             'username' => $r['username'],
             'password' => $hashedPassword,
-            'solved' => 0,
-            'submissions' => 0,
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
@@ -884,15 +900,15 @@ class UserController extends Controller {
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
             ];
-        } elseif ($r['contest_type'] == 'OMIAGS') {
-            if ($r['current_user']->username != 'andreasantillana'
+        } elseif ($r['contest_type'] == 'OMIAGS-2018') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
 
             $keys =  [
-                'OMIAGS' => 35
+                'OMIAGS-2018' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2017') {
             if ($r['current_user']->username != 'EfrenGonzalez'
@@ -1000,13 +1016,22 @@ class UserController extends Controller {
             $keys = [
                 'TEBAEV' => 250,
             ];
+        } elseif ($r['contest_type'] == 'PYE-AGS') {
+            if ($r['current_user']->username != 'joemmanuel'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'PYE-AGS18' => 40,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS',
                 ]
             );
         }
@@ -1142,8 +1167,6 @@ class UserController extends Controller {
 
         $response['userinfo']['username'] = $user->username;
         $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['solved'] = $user->solved;
-        $response['userinfo']['submissions'] = $user->submissions;
         $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
         $response['userinfo']['gender'] = $user->gender;
         $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
@@ -1313,7 +1336,6 @@ class UserController extends Controller {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
         }
-
         try {
             $coderOfTheMonth = null;
 
@@ -1657,6 +1679,20 @@ class UserController extends Controller {
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
 
+        if (!is_null($r['username'])) {
+            Validators::isValidUsername($r['username'], 'username');
+            $user = null;
+            try {
+                $user = UsersDAO::FindByUsername($r['username']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if ($r['username'] != $r['current_user']->username && !is_null($user)) {
+                throw new DuplicatedEntryInDatabaseException('usernameInUse');
+            }
+        }
+
         if (!is_null($r['name'])) {
             Validators::isStringNonEmpty($r['name'], 'name', true);
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
@@ -1752,7 +1788,12 @@ class UserController extends Controller {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
 
+        if (!is_null($r['gender'])) {
+            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
+        }
+
         $valueProperties = [
+            'username',
             'name',
             'country_id',
             'state_id',
@@ -1849,15 +1890,23 @@ class UserController extends Controller {
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
+                $response['total'] = 0;
                 $selectedFilter = self::getSelectedFilter($r);
                 try {
-                    $userRankEntries = UserRankDAO::getFilteredRank($r['offset'], $r['rowcount'], 'Rank', 'ASC', $selectedFilter['filteredBy'], $selectedFilter['value']);
+                    $userRankEntries = UserRankDAO::getFilteredRank(
+                        $r['offset'],
+                        $r['rowcount'],
+                        'rank',
+                        'ASC',
+                        $selectedFilter['filteredBy'],
+                        $selectedFilter['value']
+                    );
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
 
                 if (!is_null($userRankEntries)) {
-                    foreach ($userRankEntries as $userRank) {
+                    foreach ($userRankEntries['rows'] as $userRank) {
                         array_push($response['rank'], [
                             'username' => $userRank->username,
                             'name' => $userRank->name,
@@ -1866,6 +1915,7 @@ class UserController extends Controller {
                             'score' => $userRank->score,
                             'country_id' => $userRank->country_id]);
                     }
+                    $response['total'] = $userRankEntries['total'];
                 }
                 return $response;
             }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
