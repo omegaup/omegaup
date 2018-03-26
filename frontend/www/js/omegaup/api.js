@@ -429,6 +429,8 @@ export default {
   Reset: {
     create: _call('/api/reset/create/'),
 
+    generateToken: _call('/api/reset/generateToken/'),
+
     update: _call('/api/reset/update/'),
   },
 
@@ -510,6 +512,8 @@ export default {
     list: _call('/api/user/list/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+
+    passwordChangeRequest: _call('/api/user/passwordChangeRequest/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 
