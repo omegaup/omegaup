@@ -158,10 +158,9 @@ class ContestsDAO extends ContestsDAOBase {
 
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 1;';
-        $params = [  $problemset_id ];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = $conn->GetRow($sql, [$problemset_id]);
         if (count($rs) == 0) {
             return null;
         }
