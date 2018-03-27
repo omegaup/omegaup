@@ -10,41 +10,62 @@ include('base/User_Rank.vo.base.php');
   *
   */
 class UserRankDAO extends UserRankDAOBase {
-    public static function getFilteredRank($page = null, $colsPerPage = null, $order = null, $orderType = 'ASC', $filteredBy = null, $value = null) {
+    public static function getFilteredRank(
+        $page = null,
+        $colsPerPage = null,
+        $order = null,
+        $orderType = 'ASC',
+        $filteredBy = null,
+        $value = null
+    ) {
         $sql = '
-                SELECT
-                  user_id,
-                  rank,
-                  problems_solved_count,
-                  score,
-                  username, name,
-                  country_id
-                FROM
-                  User_Rank ';
+              SELECT
+                user_id,
+                rank,
+                problems_solved_count,
+                score,
+                username, name,
+                country_id';
+        $sql_count = '
+              SELECT
+                COUNT(1)';
         global $conn;
         $params = [];
+        $sql_from = '
+              FROM
+                User_Rank ';
         if ($filteredBy == 'state') {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
-            $sql .= ' WHERE country_id = ? AND state_id = ?';
+            $sql_from .= ' WHERE country_id = ? AND state_id = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql .= ' WHERE ' . mysqli_real_escape_string($conn->_connectionID, $filteredBy) . '_id = ?';
+            $sql_from .= ' WHERE ' . mysqli_real_escape_string($conn->_connectionID, $filteredBy) . '_id = ?';
         }
         if (!is_null($order)) {
-            $sql .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
+        $sql_limit = '';
         if (!is_null($page)) {
-            $params[] = (($page - 1) * $colsPerPage); // Offset
-            $params[] = (int)$colsPerPage;
-            $sql .= ' LIMIT ?, ?';
+            $params_limit[] = (($page - 1) * $colsPerPage); // Offset
+            $params_limit[] = (int)$colsPerPage;
+            $sql_limit = ' LIMIT ?, ?';
         }
-        $rs = $conn->Execute($sql, $params);
+        // Get total rows
+        $total_rows = $conn->GetOne($sql_count . $sql_from, $params);
+
+        $params = array_merge($params, $params_limit);
+
+        // Get rows
+        $rs = $conn->Execute($sql . $sql_from . $sql_limit, $params);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new UserRank($row);
         }
-        return $allData;
+        return [
+            'rows' => $allData,
+            'total' => $total_rows
+        ];
     }
 }
