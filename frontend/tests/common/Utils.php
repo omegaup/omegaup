@@ -103,7 +103,7 @@ class Utils {
             'Emails',
             'Group_Roles',
             'Groups_Scoreboards',
-            'Groups_Scoreboards_Contests',
+            'Groups_Scoreboards_Problemsets',
             'Groups_Users',
             'Identities',
             'Interviews',
