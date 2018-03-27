@@ -1289,6 +1289,37 @@ class UserController extends Controller {
     }
 
     /**
+     * Get the last password change request for an identity
+     *
+     * @param Request $r
+     * @return response array with last password change request
+     * @throws ForbiddenAccessException
+     * @throws InvalidParameterException
+     */
+    public static function apiPasswordChangeRequest(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($r['email']);
+
+        if (is_null($lastRequest)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        if (!$lastRequest['within_last_day']) {
+            throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+        }
+
+        return [
+            'status' => 'ok',
+            'username' => $lastRequest['username']
+        ];
+    }
+
+    /**
      * Get coder of the month by trying to find it in the table using the first
      * day of the current month. If there's no coder of the month for the given
      * date, calculate it and save it.

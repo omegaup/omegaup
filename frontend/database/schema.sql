@@ -268,16 +268,16 @@ CREATE TABLE `Groups_Scoreboards` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Groups_Scoreboards_Contests` (
+CREATE TABLE `Groups_Scoreboards_Problemsets` (
   `group_scoreboard_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL,
+  `problemset_id` int(11) NOT NULL COMMENT 'Conjunto de problemas del scoreboard',
   `only_ac` tinyint(1) NOT NULL DEFAULT '0',
   `weight` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`group_scoreboard_id`,`contest_id`),
+  PRIMARY KEY (`group_scoreboard_id`,`problemset_id`),
   KEY `group_scoreboard_id` (`group_scoreboard_id`),
-  KEY `contest_id` (`contest_id`),
-  CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `problemset_id` (`problemset_id`),
+  CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_gsp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
