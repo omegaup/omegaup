@@ -30,11 +30,13 @@
         </div>
       </div>
       <div class="row bottom-margin">
+        <!-- id-linter off -->
         <form class="form bottom-margin"
               id="generateToken-"
               name="generateToken-"
               v-on:submit.prevent="onGenerateToken"
               v-show="username != null">
+          <!-- id-linter on -->
           <div class="col-md-12 bottom-margin">
             <div class="input-group">
               <input class="form-control"

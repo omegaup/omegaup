@@ -37,6 +37,11 @@
 				"frontend/www/.*\\.vue$"
 			]
 		},
+		"vueid": {
+			"whitelist": [
+				"frontend/www/.*\\.vue$"
+			]
+		},
 		"python": {
 			"pep8_config": "setup.cfg",
 			"whitelist": [
