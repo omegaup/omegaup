@@ -326,4 +326,29 @@ class CoursesDAO extends CoursesDAOBase {
 
         return $conn->Affected_Rows();
     }
+
+    final public static function isFirstTimeAccess($user_id, Courses $course, Groups $group) {
+        $sql = '
+            SELECT
+                share_user_information
+            FROM
+                Groups_Users AS gu
+            INNER JOIN
+                Courses AS c ON gu.group_id = c.group_id
+            WHERE
+                gu.user_id = ?
+            AND
+                gu.group_id = ?
+            AND
+                c.course_id = ?
+            ';
+        $params = [
+            $user_id,
+            $group->group_id,
+            $course->course_id
+        ];
+
+        global $conn;
+        return $conn->GetOne($sql, $params) == null;
+    }
 }

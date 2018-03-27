@@ -10,9 +10,10 @@ include_once('base/Identities.vo.base.php');
   *
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
-    public static function getStatusVerified($email) {
+    public static function getExtraInformation($email) {
         global  $conn;
         $sql = 'SELECT
+                  u.reset_sent_at,
                   u.verified,
                   u.username
                 FROM
@@ -38,8 +39,10 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
 
         return [
-            'verified' => $rs['verified'] == 1,
-            'username' => $rs['username']
+          // Asks whether request was made on the last day
+          'within_last_day' => Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24,
+          'verified' => $rs['verified'] == 1,
+          'username' => $rs['username']
         ];
     }
 }

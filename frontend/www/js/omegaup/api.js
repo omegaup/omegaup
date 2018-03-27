@@ -429,6 +429,8 @@ export default {
   Reset: {
     create: _call('/api/reset/create/'),
 
+    generateToken: _call('/api/reset/generateToken/'),
+
     update: _call('/api/reset/update/'),
   },
 
@@ -505,6 +507,8 @@ export default {
      */
     create: _call('/api/user/create/'),
 
+    extraInformation: _call('/api/user/extraInformation/'),
+
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
@@ -531,8 +535,6 @@ export default {
     removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),
-
-    statusVerified: _call('/api/user/statusVerified/'),
 
     update: _call('/api/user/update/'),
 
