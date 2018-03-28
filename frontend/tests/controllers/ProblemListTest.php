@@ -108,10 +108,10 @@ class ProblemList extends OmegaupTestCase {
      * Tests problem lists when searching by tag when tags are not public.
      */
     public function testProblemListWithPrivateTags() {
-        $admin = UserFactory::createAdminUser('admin');
-        $user_a = UserFactory::createUser('user_a');
-        $user_b = UserFactory::createUser('user_b');
-        $other_user = UserFactory::createUser('other');
+        $admin = UserFactory::createAdminUser(new UserParams(['username' => 'admin']));
+        $user_a = UserFactory::createUser(new UserParams(['username' => 'user_a']));
+        $user_b = UserFactory::createUser(new UserParams(['username' => 'user_b']));
+        $other_user = UserFactory::createUser(new UserParams(['username' => 'other']));
 
         $problem = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PROMOTED, $admin);
         $private_problem = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE, $admin);
