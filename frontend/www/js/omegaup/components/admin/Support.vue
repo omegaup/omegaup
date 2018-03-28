@@ -89,7 +89,6 @@ export default {
     username: String,
     verified: Boolean,
     link: String,
-    within_last_day: Boolean
   },
   data: function() { return {T: T, email: null};},
   methods: {
