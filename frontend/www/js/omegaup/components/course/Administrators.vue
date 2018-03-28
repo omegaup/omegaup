@@ -18,11 +18,10 @@
                    v-model="useradmin">
             </div>
             <div class="form-group pull-right">
-              <input id="toggle-site-admins"
-                   name="toggle-site-admins"
-                   type="checkbox"
-                   v-model="showSiteAdmins"> <label for="toggle-site-admins">{{
-                   T.wordsShowSiteAdmins }}</label> <button class="btn btn-primary"
+              <label><input name="toggle-site-admins"
+                     type="checkbox"
+                     v-model="showSiteAdmins"> {{ T.wordsShowSiteAdmins }}</label> <button class=
+                     "btn btn-primary"
                    type="submit">{{ T.wordsAddAdmin }}</button> <button class="btn btn-secondary"
                    type="reset"
                    v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
