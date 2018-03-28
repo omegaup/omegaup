@@ -10,7 +10,7 @@ RENAME TABLE
 
 -- Creating column on Problemset_Identities and synchronizing user - identity data
 ALTER TABLE `Problemset_Identities`
-  ADD COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
+  ADD COLUMN `identity_id` int(11) DEFAULT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
   ADD KEY `identity_id` (`identity_id`),
   DROP FOREIGN KEY `fk_puu_user_id`,
   DROP KEY `user_id`,
@@ -27,13 +27,14 @@ SET
 
 -- Deleting user_id column and adding constraints
 ALTER TABLE `Problemset_Identities`
+  MODIFY COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   ADD CONSTRAINT `fk_pii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD PRIMARY KEY (`identity_id`, `problemset_id`),
   DROP COLUMN `user_id`;
 
 -- Creating column on Problemset_Identity_Request and synchronizing user - identity data
 ALTER TABLE `Problemset_Identity_Request`
-  ADD COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
+  ADD COLUMN `identity_id` int(11) DEFAULT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
   ADD KEY `identity_id` (`identity_id`),
   DROP FOREIGN KEY `fk_puru_user_id`,
   DROP PRIMARY KEY;
@@ -49,13 +50,14 @@ SET
 
 -- Deleting user_id column and adding constraints
 ALTER TABLE `Problemset_Identity_Request`
+  MODIFY COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   ADD CONSTRAINT `fk_piri_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD PRIMARY KEY (`identity_id`, `problemset_id`),
   DROP COLUMN `user_id`;
 
 -- Creating indexes on Problemset_Identity_Request_History and synchronizing user - identity data
 ALTER TABLE `Problemset_Identity_Request_History`
-  ADD COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
+  ADD COLUMN `identity_id` int(11) DEFAULT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
   DROP FOREIGN KEY `fk_purhu_user_id`,
   DROP KEY `user_problemset_hist`;
 
@@ -70,6 +72,7 @@ SET
 
 -- Deleting user_id column
 ALTER TABLE `Problemset_Identity_Request_History`
+  MODIFY COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   ADD KEY `identity_problemset_hist` (`identity_id`, `problemset_id`),
   ADD CONSTRAINT `fk_pirhi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   DROP COLUMN `user_id`;
