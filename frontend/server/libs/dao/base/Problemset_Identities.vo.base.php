@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Groups_Scoreboards_Contests.
+ * Value Object file for table Problemset_Identities.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsScoreboardsContests extends VO {
+class ProblemsetIdentities extends VO {
     /**
-     * Constructor de GroupsScoreboardsContests
+     * Constructor de ProblemsetIdentities
      *
-     * Para construir un objeto de tipo GroupsScoreboardsContests debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetIdentities debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,17 +26,23 @@ class GroupsScoreboardsContests extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['group_scoreboard_id'])) {
-            $this->group_scoreboard_id = $data['group_scoreboard_id'];
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
-        if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['only_ac'])) {
-            $this->only_ac = $data['only_ac'];
+        if (isset($data['access_time'])) {
+            $this->access_time = $data['access_time'];
         }
-        if (isset($data['weight'])) {
-            $this->weight = $data['weight'];
+        if (isset($data['score'])) {
+            $this->score = $data['score'];
+        }
+        if (isset($data['time'])) {
+            $this->time = $data['time'];
+        }
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = $data['share_user_information'];
         }
     }
 
@@ -52,12 +58,12 @@ class GroupsScoreboardsContests extends VO {
     }
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $group_scoreboard_id;
+    public $identity_id;
 
     /**
       *  [Campo no documentado]
@@ -65,19 +71,33 @@ class GroupsScoreboardsContests extends VO {
       * @access public
       * @var int(11)
       */
-    public $contest_id;
+    public $problemset_id;
 
     /**
-      *  [Campo no documentado]
+      * Hora a la que entró el usuario al concurso
+      * @access public
+      * @var datetime
+      */
+    public $access_time;
+
+    /**
+      * Indica el puntaje que obtuvo el usuario en el concurso
+      * @access public
+      * @var int(11)
+      */
+    public $score;
+
+    /**
+      * Indica el tiempo que acumulo en usuario en el concurso
+      * @access public
+      * @var int(11)
+      */
+    public $time;
+
+    /**
+      * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
       * @access public
       * @var tinyint(1)
       */
-    public $only_ac;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $weight;
+    public $share_user_information;
 }
