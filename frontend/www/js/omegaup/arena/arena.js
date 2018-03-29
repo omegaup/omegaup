@@ -4,6 +4,7 @@ import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
+import arena_RunDetails from '../components/arena/RunDetails.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -274,6 +275,9 @@ export class Arena {
       file: $('input[type="file"]', self.elements.submitForm),
       language: $('select[name="language"]', self.elements.submitForm),
     });
+
+    // Setup run details view
+    self.mountRunDetailsView();
 
     // Setup any global hooks.
     self.installLibinteractiveHooks();
@@ -1466,80 +1470,57 @@ export class Arena {
         contest.start_time.getTime() + duration * contest.scoreboard / 100));
   }
 
+  mountRunDetailsView() {
+    self.runDetailsView = new Vue({
+      el: '#run-details',
+      render: function(createElement) {
+        return createElement('omegaup-arena-rundetails', {
+          props: {
+            data: this.data,
+          },
+        })
+      },
+      data: {
+        data: null
+      },
+      components: {
+        'omegaup-arena-rundetails': arena_RunDetails,
+      },
+    });
+  }
+
   displayRunDetails(guid, data) {
     let self = this;
     let problemAdmin = data.admin;
-
     if (data.status == 'error') {
       self.hideOverlay();
       return;
     }
+    const compilation_log = data.compile_error ? UI.escape(data.compile_error) : null;
+    const logs = data.logs ? UI.escape(data.logs) : null;
+    const judged_by = data.judged_by ? UI.escape(data.judged_by) : null;
 
-    if (data.compile_error) {
-      $('#run-details .compile_error pre').html(UI.escape(data.compile_error));
-      $('#run-details .compile_error').show();
-    } else {
-      $('#run-details .compile_error').hide();
-      $('#run-details .compile_error pre').html('');
-    }
-    if (data.logs) {
-      $('#run-details .logs pre').html(UI.escape(data.logs));
-      $('#run-details .logs').show();
-    } else {
-      $('#run-details .logs').hide();
-      $('#run-details .logs pre').html('');
-    }
+    let sourceHTML;
     if (data.source.indexOf('data:') === 0) {
-      $('#run-details .source')
-          .html('<a href="' + data.source + '" download="data.zip">' +
-                T.wordsDownload + '</a>');
+      sourceHTML = '<a href="' + data.source + '" download="data.zip">' +
+      T.wordsDownload + '</a>';
     } else if (data.source == 'lockdownDetailsDisabled') {
-      $('#run-details .source')
-          .html(UI.escape((typeof(sessionStorage) !== 'undefined' &&
-                           sessionStorage.getItem('run:' + guid)) ||
-                          T.lockdownDetailsDisabled));
+      sourceHTML = UI.escape((typeof(sessionStorage) !== 'undefined' && sessionStorage.getItem('run:' + guid)) || T.lockdownDetailsDisabled);
     } else {
-      $('#run-details .source').html(UI.escape(data.source));
-    }
-
-    if (data.judged_by) {
-      $('#run-details .judged_by pre').html(UI.escape(data.judged_by));
-      $('#run-details .judged_by').show();
-    } else {
-      $('#run-details .judged_by').hide();
-      $('#run-details .judged_by pre').html('');
-    }
-
-    $('#run-details .cases div').remove();
-    $('#run-details .cases table').remove();
-    $('#run-details .download a.sourcecode')
-        .attr('href', window.URL.createObjectURL(
-                          new Blob([data.source], {'type': 'text/plain'})))
-        .attr('download', 'Main.' + data.language);
-    if (problemAdmin) {
-      $('#run-details .download a.output')
-          .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
-      $('#run-details .download a.details')
-          .attr('href',
-                '/api/run/download/run_alias/' + data.guid + '/complete/true/');
-      $('#run-details .download a').show();
-    } else {
-      $('#run-details .download a').hide();
-      $('#run-details .download a.sourcecode').show();
+      sourceHTML = UI.escape(data.source);
     }
 
     function numericSort(key) {
       function isDigit(x) { return '0' <= x && x <= '9'; }
-
       return function(x, y) {
         let i = 0, j = 0;
         for (; i < x[key].length && j < y[key].length; i++, j++) {
           if (isDigit(x[key][i]) && isDigit(x[key][j])) {
             let nx = 0, ny = 0;
             while (i < x[key].length && isDigit(x[key][i]))
-              nx = (nx * 10) + parseInt(x[key][i++]);
+            nx = (nx * 10) + parseInt(x[key][i++]);
             while (j < y[key].length && isDigit(y[key][j]))
-              ny = (ny * 10) + parseInt(y[key][j++]);
+            ny = (ny * 10) + parseInt(y[key][j++]);
             i--;
             j--;
             if (nx != ny) return nx - ny;
@@ -1552,122 +1533,29 @@ export class Arena {
         return (x[key].length - i) - (y[key].length - j);
       };
     }
-
-    // TODO(lhchavez): Use only data.details once backendv1 is deprecated.
-    let detailsGroups = data.groups;
-    if (data.details) {
-      detailsGroups = data.details.groups;
-    }
+    let detailsGroups = data.details.groups;
+    let groups;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
         detailsGroups[i].cases.sort(numericSort('name'));
       }
-
-      let groups =
-          $('<table></table>')
-              .append($('<thead></thead>')
-                          .append($('<tr></tr>')
-                                      .append('<th>' + T.wordsGroup + '</th>')
-                                      .append('<th>' + T.wordsCase + '</th>')
-                                      .append('<th>' + T.wordsVerdict + '</th>')
-                                      .append('<th colspan="3">' + T.rankScore +
-                                              '</th>')
-                                      .append('<th width="1"></th>')));
-
-      for (let i = 0; i < detailsGroups.length; i++) {
-        let g = detailsGroups[i];
-        let cases = $('<tbody></tbody>').hide();
-        groups.append(
-            $('<tbody></tbody>')
-                .append(
-                    $('<tr class="group"></tr>')
-                        .append('<th class="center">' + UI.escape(g.group) +
-                                '</th>')
-                        .append('<th colspan="2"></th>')
-                        .append('<th class="score">' +
-                                (g.contest_score !== undefined ?
-                                     g.contest_score :
-                                     g.score) +
-                                '</th>')
-                        .append('<th class="center" width="10">' +
-                                (g.max_score !== undefined ? '/' : '') +
-                                '</th>')
-                        .append('<th>' +
-                                (g.max_score !== undefined ? g.max_score : '') +
-                                '</th>')
-                        .append(
-                            $('<td></td>')
-                                .append(
-                                    $('<span class="collapse glyphicon ' +
-                                      'glyphicon-collapse-down"></span>')
-                                        .on('click', (function(cases) {
-                                              return function(ev) {
-                                                let target = $(ev.target);
-                                                if (target.hasClass(
-                                                        'glyphicon-collapse-down')) {
-                                                  target.removeClass(
-                                                      'glyphicon-collapse-down');
-                                                  target.addClass(
-                                                      'glyphicon-collapse-up');
-                                                } else {
-                                                  target.addClass(
-                                                      'glyphicon-collapse-down');
-                                                  target.removeClass(
-                                                      'glyphicon-collapse-up');
-                                                }
-                                                cases.toggle();
-                                                return false;
-                                              };
-                                            })(cases))))));
-        for (let j = 0; j < g.cases.length; j++) {
-          let c = g.cases[j];
-          let caseRow =
-              $('<tr></tr>')
-                  .append('<td></td>')
-                  .append('<td class="center">' + c.name + '</td>')
-                  .append('<td class="center">' + T['verdict' + c.verdict] +
-                          '</td>')
-                  .append('<td class="score">' +
-                          (c.contest_score !== undefined ? c.contest_score :
-                                                           c.score) +
-                          '</td>')
-                  .append('<td class="center" width="10">' +
-                          (c.max_score !== undefined ? '/' : '') + '</td>')
-                  .append('<td>' +
-                          (c.max_score !== undefined ? c.max_score : '') +
-                          '</td>');
-          cases.append(caseRow);
-          if (problemAdmin && c.meta) {
-            let metaRow =
-                $('<tr class="meta"></tr>')
-                    .append('<td colspan="6"><pre>' +
-                            JSON.stringify(c.meta, null, 2) + '</pre></td>')
-                    .hide();
-            caseRow.append(
-                $('<td></td>')
-                    .append(
-                        $('<span class="collapse glyphicon glyphicon-list-alt">' +
-                          '</span>')
-                            .on('click', (function(metaRow) {
-                                  return function(ev) {
-                                    metaRow.toggle();
-                                    return false;
-                                  };
-                                })(metaRow))));
-            cases.append(metaRow);
-          }
-        }
-        groups.append(cases);
-      }
-      $('#run-details .cases').append(groups);
-      $('#run-details .cases').show();
+      groups = detailsGroups;
     } else {
-      $('#run-details .cases').hide();
+      groups = null;
     }
-    $('#overlay form').hide();
-    $('#overlay').show();
-    $('#run-details').show();
+    runDetailsView.data = {
+      'compile_error': compilation_log,
+      'logs': logs,
+      'judged_by': judged_by,
+      'source': sourceHTML,
+      'source_url': window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
+      'source_name': 'Main.' + data.language,
+      'problem_admin': data.admin,
+      'guid': data.guid,
+      'groups': groups,
+    }
+    document.querySelector('.run-details-view').style.display = 'block';
   }
 
   trackRun(run) {
