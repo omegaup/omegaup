@@ -1409,7 +1409,7 @@ class UserController extends Controller {
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
         // User already started the problemset.
-        $problemsetOpened = ProblemsetUsersDAO::getByPK($user_id, $problemset_id);
+        $problemsetOpened = ProblemsetIdentitiesDAO::getByPK($user_id, $problemset_id);
 
         if (!is_null($problemsetOpened) && !is_null($problemsetOpened->access_time)) {
             return true;
