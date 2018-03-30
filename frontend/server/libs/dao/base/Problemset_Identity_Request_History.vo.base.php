@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Problemset_User_Request.
+ * Value Object file for table Problemset_Identity_Request_History.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetUserRequest extends VO {
+class ProblemsetIdentityRequestHistory extends VO {
     /**
-     * Constructor de ProblemsetUserRequest
+     * Constructor de ProblemsetIdentityRequestHistory
      *
-     * Para construir un objeto de tipo ProblemsetUserRequest debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemsetIdentityRequestHistory debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,23 +26,23 @@ class ProblemsetUserRequest extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['history_id'])) {
+            $this->history_id = $data['history_id'];
+        }
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['request_time'])) {
-            $this->request_time = $data['request_time'];
-        }
-        if (isset($data['last_update'])) {
-            $this->last_update = $data['last_update'];
+        if (isset($data['time'])) {
+            $this->time = $data['time'];
         }
         if (isset($data['accepted'])) {
             $this->accepted = $data['accepted'];
         }
-        if (isset($data['extra_note'])) {
-            $this->extra_note = $data['extra_note'];
+        if (isset($data['admin_id'])) {
+            $this->admin_id = $data['admin_id'];
         }
     }
 
@@ -53,21 +53,28 @@ class ProblemsetUserRequest extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['request_time', 'last_update']);
+            parent::toUnixTime(['time']);
         }
     }
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
+      * Auto Incremento
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $history_id;
+
+    /**
+      * Identidad del usuario
+      * @access public
+      * @var int(11)
+      */
+    public $identity_id;
 
     /**
       *  [Campo no documentado]
-      * Llave Primaria
       * @access public
       * @var int(11)
       */
@@ -78,26 +85,19 @@ class ProblemsetUserRequest extends VO {
       * @access public
       * @var timestamp
       */
-    public $request_time;
+    public $time;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $last_update;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
+      * @var tinyint(4)
       */
     public $accepted;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var mediumtext,
+      * @var int(11)
       */
-    public $extra_note;
+    public $admin_id;
 }
