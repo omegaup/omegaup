@@ -1496,18 +1496,18 @@ export class Arena {
       self.hideOverlay();
       return;
     }
-    const compilation_log = data.compile_error ? UI.escape(data.compile_error) : null;
-    const logs = data.logs ? UI.escape(data.logs) : null;
-    const judged_by = data.judged_by ? UI.escape(data.judged_by) : null;
+    const compilation_log = data.compile_error ? data.compile_error : null;
+    const logs = data.logs ? data.logs : null;
+    const judged_by = data.judged_by ? data.judged_by : null;
 
-    let sourceHTML;
+    let sourceHTML, sourceLink = false;
     if (data.source.indexOf('data:') === 0) {
-      sourceHTML = '<a href="' + data.source + '" download="data.zip">' +
-      T.wordsDownload + '</a>';
+      sourceLink = true;
+      sourceHTML = data.source;
     } else if (data.source == 'lockdownDetailsDisabled') {
-      sourceHTML = UI.escape((typeof(sessionStorage) !== 'undefined' && sessionStorage.getItem('run:' + guid)) || T.lockdownDetailsDisabled);
+      sourceHTML = (typeof(sessionStorage) !== 'undefined' && sessionStorage.getItem('run:' + guid)) || T.lockdownDetailsDisabled;
     } else {
-      sourceHTML = UI.escape(data.source);
+      sourceHTML = data.source;
     }
 
     function numericSort(key) {
@@ -1549,6 +1549,7 @@ export class Arena {
       'logs': logs,
       'judged_by': judged_by,
       'source': sourceHTML,
+      'source_link': sourceLink,
       'source_url': window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
       'source_name': 'Main.' + data.language,
       'problem_admin': data.admin,
