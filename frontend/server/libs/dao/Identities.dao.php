@@ -10,10 +10,11 @@ include_once('base/Identities.vo.base.php');
   *
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
-    public static function getLastPasswordChangeRequest($email) {
+    public static function getExtraInformation($email) {
         global  $conn;
         $sql = 'SELECT
                   u.reset_sent_at,
+                  u.verified,
                   u.username
                 FROM
                   `Identities` i
@@ -33,18 +34,15 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                   0, 1';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
-
         if (count($rs)==0) {
             return null;
         }
 
-        if (is_null($rs['reset_sent_at'])) {
-            return ['within_last_day' => null];
-        }
-        // Request was made 24 hours ago or after
-        $response['within_last_day'] =
-            Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24;
-        $response['username'] = $rs['username'];
-        return $response;
+        return [
+          // Asks whether request was made on the last day
+          'within_last_day' => Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24,
+          'verified' => $rs['verified'] == 1,
+          'username' => $rs['username']
+        ];
     }
 }
