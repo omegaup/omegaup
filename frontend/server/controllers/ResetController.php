@@ -64,7 +64,7 @@ class ResetController extends Controller {
         self::validateCreateRequest($r);
         $email = $r['email'];
 
-        $lastRequest = IdentitiesDAO::getLastPasswordChangeRequest($email);
+        $lastRequest = IdentitiesDAO::getExtraInformation($email);
 
         if (is_null($lastRequest)) {
             throw new InvalidParameterException('invalidUser');
