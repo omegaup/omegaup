@@ -2,11 +2,9 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases"
-           v-if="data.groups">
+      <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
-        <div></div><omegaup-arena-groupcases v-bind:group-element="group"
-             v-for="group in data.groups"></omegaup-arena-groupcases>
+        <div></div>
         <table>
           <thead>
             <tr>
@@ -17,25 +15,19 @@
               <th width="1"></th>
             </tr>
           </thead>
+          <omegaup-arena-groupcases v-bind:group-element="group" v-for="group in data.groups"></omegaup-arena-groupcases>
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3>
-      <pre class="source"
-           v-if="data.source_link">
-                                <a download="data.zip"
-     v-bind:href="data.source">{{ T.wordsDownload }}</a>
-                        </pre>
-      <pre class="source"
-           v-else=""
-           v-html="data.source"></pre>
-      <div class="compile_error"
-           v-if="data.compile_error">
+      <pre v-if="data.source_link" class="source">
+        <a download="data.zip" v-bind:href="data.source">{{ T.wordsDownload }}</a>
+      </pre>
+      <pre v-else class="source" v-html="data.source"></pre>
+      <div v-if="data.compile_error" class="compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
-        <pre class="compile_error"
-             v-text="data.compile_error"></pre>
+        <pre class="compile_error" v-text="data.compile_error"></pre>
       </div>
-      <div class="logs"
-           v-if="data.logs">
+      <div v-if="data.logs" class="logs">
         <h3>{{ T.wordsLogs }}</h3>
         <pre v-text="data.logs"></pre>
       </div>

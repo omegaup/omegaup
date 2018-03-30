@@ -1545,16 +1545,16 @@ export class Arena {
       groups = null;
     }
     runDetailsView.data = {
-      'compile_error': compilation_log,
-      'logs': logs,
-      'judged_by': judged_by,
-      'source': sourceHTML,
-      'source_link': sourceLink,
-      'source_url': window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
-      'source_name': 'Main.' + data.language,
-      'problem_admin': data.admin,
-      'guid': data.guid,
-      'groups': groups,
+      compile_error: compilation_log,
+      logs: logs,
+      judged_by: judged_by,
+      source: sourceHTML,
+      source_link: sourceLink,
+      source_url: window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
+      source_name: 'Main.' + data.language,
+      problem_admin: data.admin,
+      guid: data.guid,
+      groups: groups,
     }
     document.querySelector('.run-details-view').style.display = 'block';
   }

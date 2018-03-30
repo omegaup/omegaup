@@ -1,6 +1,4 @@
 <template>
-                     v-show="show"></omegaup-arena-cases>
-<body>
   <tbody>
     <tr class="group">
       <th class="center">{{ groupElement.group }}</th>
@@ -17,6 +15,7 @@
           width="10">{{ groupElement.max_score ? '/':''}}</th>
       <th>{{ groupElement.max_score ? groupElement.max_score : '' }}</th>
     </tr>
+    <omegaup-arena-cases v-show="show" v-for="problemCase in groupElement.cases" v-bind:problem="problemCase"></omegaup-arena-cases>
   </tbody>
 </template>
 
@@ -36,7 +35,6 @@ export default {
     'omegaup-arena-cases': arena_Cases,
   },
 }
-
 </script>
 
 <style>
