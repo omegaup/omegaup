@@ -23,8 +23,6 @@
           </div>
         </form>
         <form class="form"
-              id="verifyUser"
-              name="verifyUser"
               v-on:submit.prevent="onVerifyUser"
               v-show="username != null">
           <div class="col-md-6 bottom-margin">
