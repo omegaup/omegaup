@@ -23,8 +23,8 @@
              type="radio"
              v-model="period"
              value="year"> {{ T.profileStatisticsYear }}</label>
-    </div>
-    <div id="verdict-chart"></div>
+    </div><!-- id-lint off -->
+    <div id="verdict-chart"></div><!-- id-lint on -->
   </div>
 </template>
 

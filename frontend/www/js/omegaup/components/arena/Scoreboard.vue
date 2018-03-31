@@ -1,6 +1,7 @@
 <template>
   <div class="omegaup-scoreboard">
-    <div id="ranking-chart"></div>
+    <!-- id-lint off -->
+    <div id="ranking-chart"></div><!-- id-lint on -->
     <table>
       <thead>
         <tr>
