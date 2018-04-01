@@ -175,13 +175,13 @@ class RunController extends Controller {
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id) &&
+                if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
                     !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_user_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_identity_id'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
@@ -351,7 +351,7 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id);
+                $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id);
 
                 if (isset($r['container']->finish_time)) {
                     $response['submission_deadline'] = strtotime($r['container']->finish_time);
