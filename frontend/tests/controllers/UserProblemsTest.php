@@ -59,8 +59,14 @@ class UserProblemsTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($group, $author);
         ProblemsFactory::addGroupAdmin($problemAdminData[1], $group['group']);
 
-        $problemAuthorData[0] = ProblemsFactory::createProblem(null /*zipName*/, null /*title*/, 1 /*public*/, $author);
-        $problemAuthorData[1] = ProblemsFactory::createProblem(null /*zipName*/, null /*title*/, 0 /*public*/, $author);
+        $problemAuthorData[0] = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $author
+        ]));
+        $problemAuthorData[0] = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0,
+            'author' => $author
+        ]));
 
         // Call api
         $login = self::login($author);
@@ -82,7 +88,9 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemsCount() {
         // Create private problem
-        $problemData = ProblemsFactory::createProblem(null, null, 0 /*public*/);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
         $user = $problemData['author'];
 
         $this->assertEquals(1, ProblemsDAO::getPrivateCount($user));
@@ -93,7 +101,9 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemsCountWithPublicProblem() {
         // Create public problem
-        $problemData = ProblemsFactory::createProblem(null, null, 1 /*public*/);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1
+        ]));
         $user = $problemData['author'];
 
         $this->assertEquals(0, ProblemsDAO::getPrivateCount($user));

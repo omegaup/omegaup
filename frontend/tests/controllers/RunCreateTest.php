@@ -516,7 +516,10 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testRunInvalidProblemLanguage() {
         // Create public problem without C as an option.
-        $problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'languages' => 'cpp'
+        ]));
 
         // Create our contestant
         $contestant = UserFactory::createUser();
@@ -581,7 +584,10 @@ class RunCreateTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Create public problem
-        $problemData = ProblemsFactory::createProblem(null, null, 0 /* private */, $contestData['director']);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0,
+            'author' => $contestData['director']
+        ]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);

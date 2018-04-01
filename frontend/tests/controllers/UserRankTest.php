@@ -89,7 +89,9 @@ class UserRankTest extends OmegaupTestCase {
 
         // Create a user and sumbit a run with him
         $contestant2 = UserFactory::createUser();
-        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0);
+        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
         $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
         RunsFactory::gradeRun($runDataPrivate);
 

@@ -1,6 +1,71 @@
 <?php
 
 /**
+ * ProblemParams
+ */
+class ProblemParams implements ArrayAccess {
+    private $params;
+
+    public function __construct($params = null) {
+        if (!is_object($params)) {
+            $this->params = [];
+            if (is_array($params)) {
+                $this->params = array_merge([], $params);
+            }
+        } else {
+            $this->params = clone $params;
+        }
+
+        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_RESOURCES_ROOT . 'testprobleem.zip');
+        ProblemParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
+        ProblemParams::validateParameter('visibility', $this->params, false, ProblemController::VISIBILITY_PUBLIC);
+        ProblemParams::validateParameter('author', $this->params, false, UserFactory::createUser());
+        ProblemParams::validateParameter('languages', $this->params, false, 'c,cpp,py');
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->params[$offset]) ? $this->params[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->params[] = $value;
+        } else {
+            $this->params[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->params[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->params[$offset]);
+    }
+
+    /**
+     * Checks if array contains a key defined by $parameter
+     * @param string $parameter
+     * @param array $array
+     * @param boolean $required
+     * @param $default
+     * @return boolean
+     * @throws InvalidParameterException
+     */
+    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
+            if ($required) {
+                throw new InvalidParameterException('ParameterEmpty', $parameter);
+            }
+            $array[$parameter] = $default;
+        }
+
+        return true;
+    }
+}
+
+
+/**
  * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file
  * native functions of PHP to move files around needed for store zip contents
  * in the required places.
@@ -36,23 +101,15 @@ class ProblemsFactory {
      * @param string $zipName
      * @return Array
      */
-    public static function getRequest($zipName = null, $title = null, $visibility = ProblemController::VISIBILITY_PUBLIC, Users $author = null, $languages = null) {
-        if (is_null($author)) {
-            $author = UserFactory::createUser();
-        }
-
-        if (is_null($title)) {
-            $title = Utils::CreateRandomString();
-        }
-
-        if (is_null($zipName)) {
-            $zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+    public static function getRequest($params = null) {
+        if (!($params instanceof ProblemParams)) {
+            $params = new ProblemParams($params);
         }
 
         $r = new Request();
-        $r['title'] = $title;
+        $r['title'] = $params['title'];
         $r['problem_alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
-        $r['author_username'] = $author->username;
+        $r['author_username'] = $params['author']->username;
         $r['validator'] = 'token';
         $r['time_limit'] = 5000;
         $r['overall_wall_time_limit'] = 60000;
@@ -61,45 +118,40 @@ class ProblemsFactory {
         $r['memory_limit'] = 32000;
         $r['source'] = 'yo';
         $r['order'] = 'normal';
-        $r['visibility'] = $visibility;
+        $r['visibility'] = $params['visibility'];
         $r['output_limit'] = 10240;
-        if ($languages == null) {
-            $r['languages'] = 'c,cpp,py';
-        } else {
-            $r['languages'] = $languages;
-        }
+        $r['languages'] = $params['languages'];
 
         // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = $zipName;
+        $_FILES['problem_contents']['tmp_name'] = $params['zipName'];
 
         return  [
                 'request' => $r,
-                'author' => $author,
-                'zip_path' => $zipName];
+                'author' => $params['author'],
+                'zip_path' => $params['zipName']];
     }
 
     public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {
-        return self::createProblem(null, null, ProblemController::VISIBILITY_PUBLIC, $author, null, $login);
+        return self::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $author,
+        ]), $login);
     }
 
     /**
      *
      */
-    public static function createProblem($zipName = null, $title = null, $visibility = ProblemController::VISIBILITY_PUBLIC, Users $author = null, $languages = null, ScopedLoginToken $login = null) {
-        if (is_null($zipName)) {
-            $zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+    public static function createProblem($params, ScopedLoginToken $login = null) {
+        if (!($params instanceof ProblemParams)) {
+            $params = new ProblemParams($params);
         }
 
+        $params['visibility'] = $params['visibility'] >= ProblemController::VISIBILITY_PUBLIC
+            ? ProblemController::VISIBILITY_PUBLIC
+            : ProblemController::VISIBILITY_PRIVATE;
+
         // Get a user
-        $problemData = self::getRequest(
-            $zipName,
-            $title,
-            ($visibility >= ProblemController::VISIBILITY_PUBLIC)
-                ? ProblemController::VISIBILITY_PUBLIC
-                : ProblemController::VISIBILITY_PRIVATE,
-            $author,
-            $languages
-        );
+        $problemData = self::getRequest(params);
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -115,6 +167,7 @@ class ProblemsFactory {
         // Call the API
         ProblemController::apiCreate($r);
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $visibility = $params['visibility'];
 
         if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
             || $visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
