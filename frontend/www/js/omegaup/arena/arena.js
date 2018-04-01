@@ -1496,9 +1496,6 @@ export class Arena {
       self.hideOverlay();
       return;
     }
-    const compilation_log = data.compile_error ? data.compile_error : null;
-    const logs = data.logs ? data.logs : null;
-    const judged_by = data.judged_by ? data.judged_by : null;
 
     let sourceHTML, sourceLink = false;
     if (data.source.indexOf('data:') === 0) {
@@ -1534,20 +1531,18 @@ export class Arena {
       };
     }
     let detailsGroups = data.details.groups;
-    let groups;
+    let groups = null;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
         detailsGroups[i].cases.sort(numericSort('name'));
       }
       groups = detailsGroups;
-    } else {
-      groups = null;
     }
     runDetailsView.data = {
-      compile_error: compilation_log,
-      logs: logs,
-      judged_by: judged_by,
+      compile_error: data.compile_error,
+      logs: data.logs,
+      judged_by: data.judged_by,
       source: sourceHTML,
       source_link: sourceLink,
       source_url: window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
@@ -1555,7 +1550,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
-    }
+    };
     document.querySelector('.run-details-view').style.display = 'block';
   }
 
