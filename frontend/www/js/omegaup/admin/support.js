@@ -7,13 +7,29 @@ OmegaUp.on('ready', function() {
     el: '#admin-support',
     render: function(createElement) {
       return createElement('omegaup-admin-support', {
-        props: {link: this.link, username: this.username},
+        props: {
+          username: this.username,
+          link: this.link,
+          verified: this.verified,
+        },
         on: {
           'search-email': function(email) {
-            adminSupport.link = null;
             adminSupport.username = null;
-            omegaup.API.User.passwordChangeRequest({email: email})
-                .then(function(data) { adminSupport.username = data.username; })
+            adminSupport.link = null;
+            adminSupport.verified = false;
+            omegaup.API.User.extraInformation({email: email})
+                .then(function(data) {
+                  adminSupport.username = data.username;
+                  adminSupport.verified = data.verified;
+                })
+                .fail(omegaup.UI.apiError);
+          },
+          'verify-user': function(email) {
+            omegaup.API.User.verifyEmail({usernameOrEmail: email})
+                .then(function() {
+                  adminSupport.verified = true;
+                  omegaup.UI.success(T.userVerified);
+                })
                 .fail(omegaup.UI.apiError);
           },
           'generate-token': function(email) {
@@ -31,13 +47,14 @@ OmegaUp.on('ready', function() {
             omegaup.UI.success(T.passwordResetLinkCopiedToClipboard);
           },
           'reset': function() {
-            adminSupport.link = '';
             adminSupport.username = null;
+            adminSupport.link = null;
+            adminSupport.verified = false;
           }
         },
       });
     },
-    data: {link: null, username: null},
+    data: {username: null, link: null, verified: false},
     components: {
       'omegaup-admin-support': admin_Support,
     },

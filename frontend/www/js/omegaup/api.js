@@ -507,13 +507,13 @@ export default {
      */
     create: _call('/api/user/create/'),
 
+    extraInformation: _call('/api/user/extraInformation/'),
+
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
-
-    passwordChangeRequest: _call('/api/user/passwordChangeRequest/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 
