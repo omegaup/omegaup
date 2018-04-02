@@ -277,7 +277,22 @@ export class Arena {
     });
 
     // Setup run details view
-    self.mountRunDetailsView();
+    self.runDetailsView = new Vue({
+      el: '#run-details',
+      render: function(createElement) {
+        return createElement('omegaup-arena-rundetails', {
+          props: {
+            data: this.data,
+          },
+        })
+      },
+      data: {
+        data: null
+      },
+      components: {
+        'omegaup-arena-rundetails': arena_RunDetails,
+      },
+    });
 
     // Setup any global hooks.
     self.installLibinteractiveHooks();
@@ -1470,25 +1485,6 @@ export class Arena {
         contest.start_time.getTime() + duration * contest.scoreboard / 100));
   }
 
-  mountRunDetailsView() {
-    self.runDetailsView = new Vue({
-      el: '#run-details',
-      render: function(createElement) {
-        return createElement('omegaup-arena-rundetails', {
-          props: {
-            data: this.data,
-          },
-        })
-      },
-      data: {
-        data: null
-      },
-      components: {
-        'omegaup-arena-rundetails': arena_RunDetails,
-      },
-    });
-  }
-
   displayRunDetails(guid, data) {
     let self = this;
     let problemAdmin = data.admin;
@@ -1539,7 +1535,7 @@ export class Arena {
       }
       groups = detailsGroups;
     }
-    runDetailsView.data = {
+    self.runDetailsView.data = {
       compile_error: data.compile_error,
       logs: data.logs,
       judged_by: data.judged_by,
