@@ -22,7 +22,7 @@
                 <th colspan="2">
                   <div class="dropdown-cases"
                       v-on:click="toggle(element.group)">
-                    <span class="glyphicon glyphicon-collapse-down" v-bind:data-target="element.group"></span>
+                    <span v-bind:class="{'glyphicon glyphicon-collapse-up': groupVisible[element.group], 'glyphicon glyphicon-collapse-down': !groupVisible[element.group]}"></span>
                   </div>
                 </th>
                 <th class="score">{{ element.contest_score ? element.contest_score :
@@ -32,7 +32,7 @@
                 <th>{{ element.max_score ? element.max_score : '' }}</th>
               </tr>
               <template v-for="problem in element.cases">
-                <tr class="group-cases" v-bind:data-group="element.group">
+                <tr v-if="groupVisible[element.group]">
                   <td></td>
                   <td class="text-center">{{ problem.name }}</td>
                   <td class="text-center">{{ problem.verdict }}</td>
@@ -95,18 +95,12 @@ export default {
     data: Object,
   },
   data: function() {
-    return { T: T,}
+    return { T: T, groupVisible: {}}
   },
   methods: {
     toggle(group) {
-      const tableRows = document.querySelectorAll(`[data-group="${group}"]`);
-      const arrow = document.querySelector(`[data-target="${group}"]`);
-      tableRows.forEach(el => el.classList.toggle('show-cases'));
-      if (arrow.classList.contains('glyphicon-collapse-down')) {
-        arrow.classList.replace('glyphicon-collapse-down', 'glyphicon-collapse-up');
-      } else {
-        arrow.classList.replace('glyphicon-collapse-up', 'glyphicon-collapse-down');
-      }
+      const visible = this.groupVisible[group];
+      this.$set(this.groupVisible, group, !visible);
     },
   }
 }
@@ -120,12 +114,6 @@ export default {
     text-align: center;
     background: rgb(245, 245, 245);
     border-radius: 5px;
-  }
-  .group-cases {
-    display: none;
-  }
-  .show-cases {
-    display: table-row;
   }
 </style>
 
