@@ -2,12 +2,9 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases"
-           v-if="data.groups">
+      <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
-        <template v-for="element in data.groups"></template>
-        <template v-for="problem in element.cases"></template>
         <table>
           <thead>
             <tr>
@@ -18,53 +15,47 @@
               <th width="1"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="group">
-              <th class="center">{{ element.group }}</th>
-              <th colspan="2">
-                <div class="dropdown-cases"
-                     v-on:click="toggle(element.group)">
-                  <span class="glyphicon glyphicon-collapse-down"
-                       v-bind:data-target="element.group"></span>
-                </div>
-              </th>
-              <th class="score">{{ element.contest_score ? element.contest_score :
-              element.score}}</th>
-              <th class="center"
-                  width="10">{{ element.max_score ? '/':''}}</th>
-              <th>{{ element.max_score ? element.max_score : '' }}</th>
-            </tr>
-            <tr class="group-cases"
-                v-bind:data-group="element.group">
-              <td></td>
-              <td class="text-center">{{ problem.name }}</td>
-              <td class="text-center">{{ problem.verdict }}</td>
-              <td class="score">{{ problem.contest_score ? problem.contest_score : problem.score
-              }}</td>
-              <td class="center"
-                  width="10">{{ problem.max_score ? '/':'' }}</td>
-              <td>{{ problem.max_score ? problem.max_score:'' }}</td>
-            </tr>
-          </tbody>
+          <template v-for="element in data.groups">
+            <tbody>
+              <tr class="group">
+                <th class="center">{{ element.group }}</th>
+                <th colspan="2">
+                  <div class="dropdown-cases"
+                      v-on:click="toggle(element.group)">
+                    <span class="glyphicon glyphicon-collapse-down" v-bind:data-target="element.group"></span>
+                  </div>
+                </th>
+                <th class="score">{{ element.contest_score ? element.contest_score :
+                element.score}}</th>
+                <th class="center"
+                    width="10">{{ element.max_score ? '/':''}}</th>
+                <th>{{ element.max_score ? element.max_score : '' }}</th>
+              </tr>
+              <template v-for="problem in element.cases">
+                <tr class="group-cases" v-bind:data-group="element.group">
+                  <td></td>
+                  <td class="text-center">{{ problem.name }}</td>
+                  <td class="text-center">{{ problem.verdict }}</td>
+                  <td class="score">{{ problem.contest_score ? problem.contest_score : problem.score }}</td>
+                  <td class="center"
+                      width="10">{{ problem.max_score ? '/':'' }}</td>
+                  <td>{{ problem.max_score ? problem.max_score:'' }}</td>
+                </tr>
+              </template>
+            </tbody>
+          </template>
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3>
-      <pre class="source"
-           v-if="data.source_link">
-        <a download="data.zip"
-     v-bind:href="data.source">{{ T.wordsDownload }}</a>
+      <pre v-if="data.source_link" class="source">
+        <a download="data.zip" v-bind:href="data.source">{{ T.wordsDownload }}</a>
       </pre>
-      <pre class="source"
-           v-else=""
-           v-html="data.source"></pre>
-      <div class="compile_error"
-           v-if="data.compile_error">
+      <pre v-else class="source" v-html="data.source"></pre>
+      <div v-if="data.compile_error" class="compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
-        <pre class="compile_error"
-             v-text="data.compile_error"></pre>
+        <pre class="compile_error" v-text="data.compile_error"></pre>
       </div>
-      <div class="logs"
-           v-if="data.logs">
+      <div v-if="data.logs" class="logs">
         <h3>{{ T.wordsLogs }}</h3>
         <pre v-text="data.logs"></pre>
       </div>
@@ -104,7 +95,7 @@ export default {
     data: Object,
   },
   data: function() {
-    return { T: T, }
+    return { T: T,}
   },
   methods: {
     toggle(group) {
@@ -112,11 +103,9 @@ export default {
       const arrow = document.querySelector(`[data-target="${group}"]`);
       tableRows.forEach(el => el.classList.toggle('show-cases'));
       if (arrow.classList.contains('glyphicon-collapse-down')) {
-        arrow.classList.replace('glyphicon-collapse-down',
-                                'glyphicon-collapse-up');
+        arrow.classList.replace('glyphicon-collapse-down', 'glyphicon-collapse-up');
       } else {
-        arrow.classList.replace('glyphicon-collapse-up',
-                                'glyphicon-collapse-down');
+        arrow.classList.replace('glyphicon-collapse-up', 'glyphicon-collapse-down');
       }
     },
   }
@@ -139,3 +128,4 @@ export default {
     display: table-row;
   }
 </style>
+
