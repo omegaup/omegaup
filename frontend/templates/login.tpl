@@ -121,5 +121,4 @@
 
 <script type="text/javascript" src="{version_hash src="/js/login.js"}"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
-<!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
 {include file='footer.tpl'}
