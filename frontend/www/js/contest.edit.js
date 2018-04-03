@@ -173,11 +173,11 @@ omegaup.OmegaUp.on('ready', function() {
                              start_time:
                                  (new Date($('#start-time').val()).getTime()) /
                                      1000,
-                             alias: $('#alias').val(),
+                             alias: $('#alias_clone').val(),
                            })
             .then(function(response) {
               omegaup.UI.success(
-                  'Cloned successfully!'
+                  omegaup.T.contestEditContestClonedSuccessfully
                   // UI.formatString(T.courseEditCourseClonedSuccessfully, {
                   //          contest_alias: $('#alias').val(),
                   );

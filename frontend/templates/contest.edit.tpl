@@ -221,7 +221,7 @@
 					<div class="form-group col-md-6">
 						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
 						<span aria-hidden="true" data-placement="top" data-toggle="tooltip" title="{#contestNewFormShortTitle_alias_Desc#}" class="glyphicon glyphicon-info-sign"></span>
-						<input id="alias" name="alias" value="" type="text" class="form-control" >
+						<input id="alias_clone" name="alias" value="" type="text" class="form-control" >
 					</div>
 
 				</div>
@@ -237,7 +237,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary">{#contestNewFormScheduleContest#}
+					<button type="submit" class="btn btn-primary">{#wordsCloneContest#}
 					</button>
 				</div>
 				</form>

@@ -832,7 +832,7 @@ class ContestController extends Controller {
 
         $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
 
-        $offset = round($r['start_time']) - strtotime($original_contest->start_time);
+        $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
         ContestsDAO::transBegin();
@@ -844,7 +844,7 @@ class ContestController extends Controller {
                 'description' => $r['description'],
                 'alias' => $r['alias'],
                 'start_time' => $r['start_time'],
-                'finish_time' => strtotime($original_contest->finish_time) + $offset,
+                'finish_time' => $r['start_time'] + $length,
                 'scoreboard' => $original_contest->scoreboard,
                 'points_decay_factor' => $original_contest->points_decay_factor,
                 'submissions_gap' => $original_contest->submissions_gap,
