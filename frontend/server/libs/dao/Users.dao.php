@@ -113,7 +113,7 @@ class UsersDAO extends UsersDAOBase {
                 LEFT JOIN
                     Countries c ON u.country_id = c.country_id
                 LEFT JOIN
-                    States s ON u.state_id = s.state_id
+                    States s ON u.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
                     Schools sc ON u.school_id = sc.school_id
                 LEFT JOIN

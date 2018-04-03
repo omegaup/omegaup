@@ -70,6 +70,27 @@ class RegisterToContestTest extends OmegaupTestCase {
         $this->assertEquals($show_intro, !ContestController::SHOW_INTRO);
     }
 
+    /**
+     * Testing if intro must be shown
+     */
+    public function testShowIntro() {
+        $contestant = UserFactory::createUser();
+        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+
+        ContestsFactory::addUser($contestData, $contestant);
+
+        // user can now submit to contest
+        $contestantLogin = self::login($contestant);
+        $request = new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $contestantLogin->auth_token,
+        ]);
+
+        $show_intro = ContestController::showContestIntro($request)['shouldShowIntro'];
+
+        $this->assertEquals(1, $show_intro);
+    }
+
     //pruebas (público, privado) x (usuario mortal, admin, invitado)
     //pruebas extra para distinguir entre invitado y ya entrado al concurso
     public function testSimpleRegistrationActions() {

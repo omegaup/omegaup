@@ -281,16 +281,16 @@ CREATE TABLE `Groups_Scoreboards` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Groups_Scoreboards_Contests` (
+CREATE TABLE `Groups_Scoreboards_Problemsets` (
   `group_scoreboard_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL,
+  `problemset_id` int(11) NOT NULL COMMENT 'Conjunto de problemas del scoreboard',
   `only_ac` tinyint(1) NOT NULL DEFAULT '0',
   `weight` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`group_scoreboard_id`,`contest_id`),
+  PRIMARY KEY (`group_scoreboard_id`,`problemset_id`),
   KEY `group_scoreboard_id` (`group_scoreboard_id`),
-  KEY `contest_id` (`contest_id`),
-  CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `problemset_id` (`problemset_id`),
+  CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_gsp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -475,6 +475,54 @@ CREATE TABLE `Problemset_Access_Log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problemset_Identities` (
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `problemset_id` int(11) NOT NULL,
+  `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
+  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
+  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
+  PRIMARY KEY (`identity_id`,`problemset_id`),
+  KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_pii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_puc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden interactuar con una lista de problemas.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problemset_Identity_Request` (
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `problemset_id` int(11) NOT NULL,
+  `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_update` timestamp NULL DEFAULT NULL,
+  `accepted` tinyint(1) DEFAULT NULL,
+  `extra_note` mediumtext,
+  PRIMARY KEY (`identity_id`,`problemset_id`),
+  KEY `fk_purp_problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_piri_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_purp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used when contestant_must_register = 1';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problemset_Identity_Request_History` (
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `problemset_id` int(11) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `accepted` tinyint(4) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `fk_purhp_problemset_id` (`problemset_id`),
+  KEY `identity_problemset_hist` (`identity_id`,`problemset_id`),
+  CONSTRAINT `fk_pirhi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_purhp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problemset_Problem_Opened` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
@@ -503,53 +551,6 @@ CREATE TABLE `Problemset_Problems` (
   CONSTRAINT `fk_ppp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ppp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Los problemas de cada conjunto';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Problemset_User_Request` (
-  `user_id` int(11) NOT NULL,
-  `problemset_id` int(11) NOT NULL,
-  `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_update` timestamp NULL DEFAULT NULL,
-  `accepted` tinyint(1) DEFAULT NULL,
-  `extra_note` mediumtext,
-  PRIMARY KEY (`user_id`,`problemset_id`),
-  KEY `fk_purp_problemset_id` (`problemset_id`),
-  CONSTRAINT `fk_purp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_puru_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used when contestant_must_register = 1';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Problemset_User_Request_History` (
-  `history_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `problemset_id` int(11) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `accepted` tinyint(4) NOT NULL,
-  `admin_id` int(11) NOT NULL,
-  PRIMARY KEY (`history_id`),
-  KEY `user_problemset_hist` (`user_id`,`problemset_id`),
-  KEY `fk_purhp_problemset_id` (`problemset_id`),
-  CONSTRAINT `fk_purhp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_purhu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Problemset_Users` (
-  `user_id` int(11) NOT NULL,
-  `problemset_id` int(11) NOT NULL,
-  `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
-  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
-  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
-  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
-  PRIMARY KEY (`user_id`,`problemset_id`),
-  KEY `user_id` (`user_id`),
-  KEY `problemset_id` (`problemset_id`),
-  CONSTRAINT `fk_puc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_puu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden interactuar con una lista de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -806,7 +807,7 @@ CREATE TABLE `Users` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
-  `scholar_degree` varchar(64) DEFAULT NULL,
+  `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
   `language_id` int(11) DEFAULT NULL,
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,

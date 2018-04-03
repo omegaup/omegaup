@@ -18,11 +18,11 @@ require_once('base/Problems.vo.base.php');
   *
   */
 class ProblemsDAO extends ProblemsDAOBase {
-    final private static function addTagFilter($user_type, $identity_id, $tag, &$sql, &$args) {
+    final private static function addTagFilter($identity_type, $identity_id, $tag, &$sql, &$args) {
         $add_identity_id = false;
-        if ($user_type === USER_ADMIN) {
+        if ($identity_type === USER_ADMIN) {
             $public_check = '';
-        } elseif ($user_type === USER_NORMAL && !is_null($identity_id)) {
+        } elseif ($identity_type === USER_NORMAL && !is_null($identity_id)) {
             $public_check = '(ptp.public OR id.identity_id = ?) AND ';
             $add_identity_id = true;
         } else {
@@ -67,8 +67,8 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
     }
 
-    final public static function byUserType(
-        $user_type,
+    final public static function byIdentityType(
+        $identity_type,
         $language,
         $order,
         $mode,
@@ -104,7 +104,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql= '';
         $args = [];
 
-        if ($user_type === USER_ADMIN) {
+        if ($identity_type === USER_ADMIN) {
             $args = [$identity_id];
             $select = '
                 SELECT
@@ -129,7 +129,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
 
-            self::addTagFilter($user_type, $identity_id, $tag, $sql, $args);
+            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
             if (!is_null($query)) {
                 $sql .= " (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
                 $args[] = $query;
@@ -139,7 +139,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $sql .= ' p.visibility > ?';
                 $args[] = ProblemController::VISIBILITY_DELETED;
             }
-        } elseif ($user_type === USER_NORMAL && !is_null($identity_id)) {
+        } elseif ($identity_type === USER_NORMAL && !is_null($identity_id)) {
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
@@ -185,7 +185,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             $args[] = $identity_id;
             $args[] = Authorization::ADMIN_ROLE;
 
-            self::addTagFilter($user_type, $identity_id, $tag, $sql, $args);
+            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
             $sql .= '
                 (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
@@ -197,7 +197,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args[] = $query;
                 $args[] = $query;
             }
-        } elseif ($user_type === USER_ANONYMOUS) {
+        } elseif ($identity_type === USER_ANONYMOUS) {
             $select = '
                     SELECT
                         0 AS score,
@@ -208,7 +208,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     FROM
                         Problems p' . $language_join;
 
-            self::addTagFilter($user_type, $identity_id, $tag, $sql, $args);
+            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
             $sql .= ' p.visibility >= ? ';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
 
@@ -242,7 +242,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
         $problems = [];
-        $hiddenTags = $user_type !== USER_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
+        $hiddenTags = $identity_type !== USER_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);

@@ -231,9 +231,9 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests([
+        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'contest_id' => $contestData['contest']->contest_id
+            'problemset_id' => $contestData['contest']->problemset_id
         ]));
         $gsc = $gscs[0];
 
@@ -280,9 +280,9 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests([
+        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'contest_id' => $contestData['contest']->contest_id
+            'problemset_id' => $contestData['contest']->problemset_id
         ]));
 
         $this->assertEquals(0, count($gscs));

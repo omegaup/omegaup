@@ -913,11 +913,11 @@ class ProblemController extends Controller {
 
         // If we request a problem inside a contest
         if (self::validateProblemset($r)) {
-            if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
+            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (isset($r['contest'])) {
                     if ($r['contest']->public != '1') {
-                        if (is_null(ProblemsetUsersDAO::getByPK($r['current_user_id'], $r['problemset']->problemset_id))) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }
                     }
@@ -1278,8 +1278,8 @@ class ProblemController extends Controller {
         if (!is_null($problemset_id)) {
             // At this point, contestant_user relationship should be established.
             try {
-                ProblemsetUsersDAO::CheckAndSaveFirstTimeAccess(
-                    $r['current_user_id'],
+                ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                    $r['current_identity_id'],
                     $problemset_id,
                     Authorization::canSubmitToProblemset(
                         $r['current_user_id'],
@@ -1656,14 +1656,14 @@ class ProblemController extends Controller {
 
         $response = [];
         $response['results'] = [];
-        $author_id = null;
+        $author_identity_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
-        $user_type = USER_ANONYMOUS;
+        $identity_type = USER_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
-            $author_id = intval($r['current_identity_id']);
+            $author_identity_id = intval($r['current_identity_id']);
             if (Authorization::isSystemAdmin($r['current_user_id']) ||
                 Authorization::hasRole(
                     $r['current_user_id'],
@@ -1671,9 +1671,9 @@ class ProblemController extends Controller {
                     Authorization::REVIEWER_ROLE
                 )
             ) {
-                $user_type = USER_ADMIN;
+                $identity_type = USER_ADMIN;
             } else {
-                $user_type = USER_NORMAL;
+                $identity_type = USER_NORMAL;
             }
         }
 
@@ -1693,15 +1693,15 @@ class ProblemController extends Controller {
         }
 
         $total = 0;
-        $response['results'] = ProblemsDAO::byUserType(
-            $user_type,
+        $response['results'] = ProblemsDAO::byIdentityType(
+            $identity_type,
             $language,
             $order,
             $mode,
             $offset,
             $rowcount,
             $query,
-            $author_id,
+            $author_identity_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
