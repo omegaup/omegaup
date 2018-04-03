@@ -5,7 +5,6 @@ class ContestCloneTest extends OmegaupTestCase {
      * Create clone of a contest
      */
     public function testCreateContestClone() {
-
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
@@ -43,16 +42,14 @@ class ContestCloneTest extends OmegaupTestCase {
         foreach ($response['problems'] as $problem) {
             $this->assertEquals($problemData['request']['problem_alias'], $problem['alias']);
         }
-                
     }
 
     /**
      * Creating a clone with the original contest alias
      *
      * @expectedException DuplicatedEntryInDatabaseException
-    */ 
+    */
     public function testCreateContestCloneWithTheSameAlias() {
-
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
@@ -74,6 +71,5 @@ class ContestCloneTest extends OmegaupTestCase {
             'alias' => $contestData['request']['alias'],
             'start_time' => Time::get()
         ]));
-
     }
 }
