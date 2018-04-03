@@ -172,8 +172,8 @@ export class Arena {
 
     self.options = options;
 
-    // The current contest.
-    self.currentContest = null;
+    // The current problemset.
+    self.currentProblemset = null;
 
     // The interval for clock updates.
     self.clockInterval = null;
@@ -478,11 +478,12 @@ export class Arena {
     $('#root').fadeIn('slow');
   }
 
-  initProblems(contest) {
+  initProblems(problemset) {
     let self = this;
-    self.currentContest = contest;
-    self.contestAdmin = contest.admin;
-    let problems = contest.problems;
+    self.currentProblemset = problemset;
+    self.contestAdmin = problemset.admin;
+    console.log(self.contestAdmin);
+    let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
@@ -493,7 +494,7 @@ export class Arena {
     }
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
-      self.elements.rankingTable.showPenalty = contest.show_penalty;
+      self.elements.rankingTable.showPenalty = problemset.show_penalty;
     }
   }
 
@@ -571,7 +572,7 @@ export class Arena {
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias
                 })
-          .then(self.rankingChange.bind(self))
+          .then(self.rankingCourseChange.bind(self))
           .fail(UI.ignoreError);
     }
   }
@@ -587,6 +588,22 @@ export class Arena {
       params.token = self.options.scoreboardToken;
     }
     API.Contest.scoreboardEvents(params)
+        .then(self.onRankingEvents.bind(self))
+        .fail(UI.ignoreError);
+  }
+
+  rankingCourseChange(data) {
+    let self = this;
+    self.onRankingChanged(data);
+
+    let params = {
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Course.assignmentScoreboardEvents(params)
         .then(self.onRankingEvents.bind(self))
         .fail(UI.ignoreError);
   }
@@ -1283,7 +1300,7 @@ export class Arena {
                  problem.runs.length > 0) {
         nextSubmissionTimestamp =
             new Date(problem.runs[problem.runs.length - 1].time.getTime() +
-                     self.currentContest.submissions_gap * 1000);
+                     self.currentProblemset.submissions_gap * 1000);
       }
     }
     if (self.submissionGapInterval) {

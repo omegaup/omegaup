@@ -1478,11 +1478,12 @@ class UserController extends Controller {
 
         $contests = [];
         foreach ($contestsParticipated as $contest) {
+            $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
             // Get user ranking
             $scoreboardR = new Request([
                 'auth_token' => $r['auth_token'],
                 'contest_alias' => $contest->alias,
-                'token' => $contest->scoreboard_url_admin
+                'token' => $problemset->scoreboard_url_admin
             ]);
             $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 

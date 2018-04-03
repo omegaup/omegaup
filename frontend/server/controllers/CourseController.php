@@ -345,7 +345,9 @@ class CourseController extends Controller {
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
-                'acl_id' => $r['course']->acl_id
+                'acl_id' => $r['course']->acl_id,
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
 
@@ -1552,27 +1554,47 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);
-
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
-
-        $scoreboard = new Scoreboard(
-            new ScoreboardParams([
-                'alias' => $r['assignment']->alias,
-                'title' => $r['assignment']->name,
-                'problemset_id' => $r['assignment']->problemset_id,
-                'start_time' => $r['assignment']->start_time,
-                'finish_time' => $r['assignment']->finish_time,
-                'acl_id' => $r['assignment']->acl_id,
-                'group_id' => $r['course']->group_id,
-                'show_all_runs' => true
-            ])
+        $params = ScoreboardParams::fromAssignment(
+            $r['assignment'],
+            $r['course']->group_id,
+            true /*show_all_runs*/
         );
+        $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate(
             false /*withRunDetails*/,
             true /*sortByName*/
         );
+    }
+
+    /**
+     * Returns the Scoreboard events
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiAssignmentScoreboardEvents(Request $r) {
+        // Get the current user
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+        self::validateCourseAssignmentAlias($r);
+
+        $params = ScoreboardParams::fromAssignment(
+            $r['assignment'],
+            $r['course']->group_id,
+            Authorization::isCourseAdmin($r['current_user_id'], $r['course'])/*show_all_runs*/
+        );
+        $scoreboard = new Scoreboard($params);
+
+        // Push scoreboard data in response
+        $response = [];
+        $response['events'] = $scoreboard->events();
+
+        return $response;
     }
 }

@@ -89,12 +89,6 @@ class Contests extends VO {
         if (isset($data['show_scoreboard_after'])) {
             $this->show_scoreboard_after = $data['show_scoreboard_after'];
         }
-        if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = $data['scoreboard_url'];
-        }
-        if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
-        }
         if (isset($data['urgent'])) {
             $this->urgent = $data['urgent'];
         }
@@ -268,20 +262,6 @@ class Contests extends VO {
       * @var tinyint(1)
       */
     public $show_scoreboard_after;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url_admin;
 
     /**
       * Indica si el concurso es de alta prioridad y requiere mejor QoS.

@@ -222,6 +222,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseAssignmentUpdated: "Assignment updated successfully!",
 	courseBasicInformationNeeded: "To join the course you must fill in your basic information. Go to <a href=\"/profile/edit/\">My profile</a>",
 	courseDetails: "Course details",
+	courseDetailsScoreboard: "Scoreboard",
 	courseEdit: "Edit course",
 	courseEditAddAdminsTooltip: "Add admins using their omegaUp username",
 	courseEditAddAssignment: "Add assignment",

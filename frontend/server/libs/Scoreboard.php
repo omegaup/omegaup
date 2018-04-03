@@ -68,6 +68,19 @@ class ScoreboardParams implements ArrayAccess {
                 'scoreboard_pct' => $contest->scoreboard]);
     }
 
+    public static function fromAssignment(Assignments $assignment, $group_id, $show_all_runs) {
+        return new ScoreboardParams([
+                'alias' => $assignment->alias,
+                'title' => $assignment->name,
+                'problemset_id' => $assignment->problemset_id,
+                'start_time' => $assignment->start_time,
+                'finish_time' => $assignment->finish_time,
+                'acl_id' => $assignment->acl_id,
+                'group_id' => $group_id,
+                'show_all_runs' => $show_all_runs,
+        ]);
+    }
+
     /**
      * Checks if array contains a key defined by $parameter
      * @param  string  $parameter

@@ -129,6 +129,7 @@ class PublicStatus extends StatusBase {
 class ContestsDAO extends ContestsDAOBase {
     private static $getContestsColumns = '
                                 Contests.contest_id,
+                                Contests.problemset_id,
                                 title,
                                 description,
                                 finish_time as original_finish_time,
@@ -204,9 +205,15 @@ class ContestsDAO extends ContestsDAOBase {
     public static function getContestsParticipated($user_id) {
         $sql = '
             SELECT
-                c.*
+                c.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Contests c
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = c.problemset_id
             WHERE contest_id IN (
                 SELECT DISTINCT
                     c2.contest_id

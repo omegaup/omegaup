@@ -44,6 +44,12 @@ class Problemsets extends VO {
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
         }
+        if (isset($data['scoreboard_url'])) {
+            $this->scoreboard_url = $data['scoreboard_url'];
+        }
+        if (isset($data['scoreboard_url_admin'])) {
+            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+        }
     }
 
     /**
@@ -100,4 +106,18 @@ class Problemsets extends VO {
       * @var enum('no','optional','required')
       */
     public $requests_user_information;
+
+    /**
+      * Token para la url del scoreboard en problemsets
+      * @access public
+      * @var varchar(30)
+      */
+    public $scoreboard_url;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var varchar(30)
+      */
+    public $scoreboard_url_admin;
 }

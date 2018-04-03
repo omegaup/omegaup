@@ -195,6 +195,7 @@ class ContestController extends Controller {
         // Create array of relevant columns
         $relevant_columns = [
             'title',
+            'problemset_id',
             'alias',
             'start_time',
             'finish_time',
@@ -219,6 +220,9 @@ class ContestController extends Controller {
         foreach ($contests as $c) {
             $c->toUnixTime();
             $contestInfo = $c->asFilteredArray($relevant_columns);
+            $problemset = ProblemsetsDAO::getByPK($c->problemset_id);
+            $contestInfo['scoreboard_url'] = $problemset->scoreboard_url;
+            $contestInfo['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
             $addedContests[] = $contestInfo;
         }
 
@@ -312,6 +316,7 @@ class ContestController extends Controller {
         // If the contest is private, verify that our user is invited
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $r['problemset'] = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -420,9 +425,9 @@ class ContestController extends Controller {
                 throw $exception;
             }
         } else {
-            if ($r['token'] === $r['contest']->scoreboard_url_admin) {
+            if ($r['token'] === $r['problemset']->scoreboard_url_admin) {
                 $r['contest_admin'] = true;
-            } elseif ($r['token'] !== $r['contest']->scoreboard_url) {
+            } elseif ($r['token'] !== $r['problemset']->scoreboard_url) {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
             }
         }
@@ -852,8 +857,6 @@ class ContestController extends Controller {
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
-        $contest->scoreboard_url = SecurityTools::randomString(30);
-        $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
@@ -880,7 +883,9 @@ class ContestController extends Controller {
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'requests_user_information' => $r['requests_user_information']
+                'requests_user_information' => $r['requests_user_information'],
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
@@ -1672,18 +1677,7 @@ class ContestController extends Controller {
      * @throws NotFoundException
      */
     public static function apiScoreboard(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
-
-        try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
-        }
+        self::validateBasicDetails($r);
 
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
@@ -1698,9 +1692,9 @@ class ContestController extends Controller {
                 $showAllRuns = true;
             }
         } else {
-            if ($r['token'] === $r['contest']->scoreboard_url) {
+            if ($r['token'] === $r['problemset']->scoreboard_url) {
                 $showAllRuns = false;
-            } elseif ($r['token'] === $r['contest']->scoreboard_url_admin) {
+            } elseif ($r['token'] === $r['problemset']->scoreboard_url_admin) {
                 $showAllRuns = true;
             } else {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
