@@ -2,7 +2,8 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div v-if="data.groups" class="cases">
+      <div class="cases"
+           v-if="data.groups">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
@@ -15,47 +16,54 @@
               <th width="1"></th>
             </tr>
           </thead>
-          <template v-for="element in data.groups">
-            <tbody>
-              <tr class="group">
-                <th class="center">{{ element.group }}</th>
-                <th colspan="2">
-                  <div class="dropdown-cases"
-                      v-on:click="toggle(element.group)">
-                    <span v-bind:class="{'glyphicon glyphicon-collapse-up': groupVisible[element.group], 'glyphicon glyphicon-collapse-down': !groupVisible[element.group]}"></span>
-                  </div>
-                </th>
-                <th class="score">{{ element.contest_score ? element.contest_score :
-                element.score}}</th>
-                <th class="center"
-                    width="10">{{ element.max_score ? '/':''}}</th>
-                <th>{{ element.max_score ? element.max_score : '' }}</th>
-              </tr>
-              <template v-for="problem in element.cases">
-                <tr v-if="groupVisible[element.group]">
-                  <td></td>
-                  <td class="text-center">{{ problem.name }}</td>
-                  <td class="text-center">{{ problem.verdict }}</td>
-                  <td class="score">{{ problem.contest_score ? problem.contest_score : problem.score }}</td>
-                  <td class="center"
-                      width="10">{{ problem.max_score ? '/':'' }}</td>
-                  <td>{{ problem.max_score ? problem.max_score:'' }}</td>
-                </tr>
-              </template>
-            </tbody>
-          </template>
+          <tbody v-for="element in data.groups">
+            <tr class="group">
+              <th class="center">{{ element.group }}</th>
+              <th colspan="2">
+                <div class="dropdown-cases"
+                     v-on:click="toggle(element.group)">
+                  <span v-bind:class=
+                  "{'glyphicon glyphicon-collapse-up': groupVisible[element.group], 'glyphicon glyphicon-collapse-down': !groupVisible[element.group]}">
+                  </span>
+                </div>
+              </th>
+              <th class="score">{{ element.contest_score ? element.contest_score :
+              element.score}}</th>
+              <th class="center"
+                  width="10">{{ element.max_score ? '/':''}}</th>
+              <th>{{ element.max_score ? element.max_score : '' }}</th>
+            </tr>
+            <tr v-for="problem in element.cases"
+                v-if="groupVisible[element.group]">
+              <td></td>
+              <td class="text-center">{{ problem.name }}</td>
+              <td class="text-center">{{ problem.verdict }}</td>
+              <td class="score">{{ problem.contest_score ? problem.contest_score : problem.score
+              }}</td>
+              <td class="center"
+                  width="10">{{ problem.max_score ? '/':'' }}</td>
+              <td>{{ problem.max_score ? problem.max_score:'' }}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3>
-      <pre v-if="data.source_link" class="source">
-        <a download="data.zip" v-bind:href="data.source">{{ T.wordsDownload }}</a>
+      <pre class="source"
+           v-if="data.source_link">
+        <a download="data.zip"
+     v-bind:href="data.source">{{ T.wordsDownload }}</a>
       </pre>
-      <pre v-else class="source" v-html="data.source"></pre>
-      <div v-if="data.compile_error" class="compile_error">
+      <pre class="source"
+           v-else=""
+           v-html="data.source"></pre>
+      <div class="compile_error"
+           v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
-        <pre class="compile_error" v-text="data.compile_error"></pre>
+        <pre class="compile_error"
+             v-text="data.compile_error"></pre>
       </div>
-      <div v-if="data.logs" class="logs">
+      <div class="logs"
+           v-if="data.logs">
         <h3>{{ T.wordsLogs }}</h3>
         <pre v-text="data.logs"></pre>
       </div>
@@ -95,7 +103,9 @@ export default {
     data: Object,
   },
   data: function() {
-    return { T: T, groupVisible: {}}
+    return {
+      T: T, groupVisible: {}
+    }
   },
   methods: {
     toggle(group) {
@@ -116,4 +126,3 @@ export default {
     border-radius: 5px;
   }
 </style>
-
