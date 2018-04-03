@@ -155,6 +155,7 @@ class SessionController extends Controller {
             'valid' => true,
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
+            'identity' => $currentIdentity,
             'auth_token' => $authToken,
             'identity' => $currentIdentity,
             'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
@@ -399,6 +400,7 @@ class SessionController extends Controller {
         try {
             $vo_User = UserController::resolveUser($r['usernameOrEmail']);
             $r['user_id'] = $vo_User->user_id;
+            $r['identity_id'] = $vo_User->main_identity_id;
             $r['user'] = $vo_User;
         } catch (ApiException $e) {
             self::$log->warn('User ' . $r['usernameOrEmail'] . ' not found.');

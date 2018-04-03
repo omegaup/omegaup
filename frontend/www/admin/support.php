@@ -9,8 +9,4 @@ if (!Authorization::isSupportTeamMember($session['user']->user_id)) {
     die();
 }
 
-$payload = [];
-
-$smarty->assign('payload', $payload);
-
 $smarty->display('../templates/admin.support.tpl');

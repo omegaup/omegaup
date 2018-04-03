@@ -227,4 +227,84 @@ class UserUpdateTest extends OmegaupTestCase {
             // OK!
         }
     }
+
+    /**
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with invalid gender option
+     */
+    public function testGenderWithInvalidOption() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        //generate wrong gender option
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'gender' => Utils::CreateRandomString(),
+        ]);
+
+        try {
+            UserController::apiUpdate($r);
+            $this->fail('Please select a valid gender option');
+        } catch (InvalidParameterException $e) {
+            // OK!
+        }
+    }
+
+    /**
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with valid gender option
+     */
+    public function testGenderWithValidOption() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'gender' => 'female',
+        ]);
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with valid default option null
+     */
+    public function testGenderWithNull() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'gender' => null,
+        ]);
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * https://github.com/omegaup/omegaup/issues/1802
+     * Test gender with invalid gender option
+     */
+    public function testGenderWithEmptyString() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        //generate wrong gender option
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'gender' => '',
+        ]);
+
+        try {
+            UserController::apiUpdate($r);
+            $this->fail('Please select a valid gender option');
+        } catch (InvalidParameterException $e) {
+            // OK!
+        }
+    }
 }

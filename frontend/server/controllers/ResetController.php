@@ -9,7 +9,7 @@ class ResetController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiCreate(Request $r) {
-        self::ValidateCreateRequest($r);
+        self::validateCreateRequest($r);
         $email = $r['email'];
         $token = ApiUtils::GetRandomString();
         $reset_digest = hash('sha1', $token);
@@ -47,6 +47,49 @@ class ResetController extends Controller {
     }
 
     /**
+     * Creates a reset operation, support team members can generate a valid
+     * token and then they can send it to end user
+     * @param Request $r
+     * @return array
+     * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiGenerateToken(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        self::validateCreateRequest($r);
+        $email = $r['email'];
+
+        $lastRequest = IdentitiesDAO::getExtraInformation($email);
+
+        if (is_null($lastRequest)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        if (!$lastRequest['within_last_day']) {
+            throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+        }
+
+        $token = ApiUtils::GetRandomString();
+        $reset_digest = hash('sha1', $token);
+        $reset_sent_at = ApiUtils::GetStringTime();
+
+        $user = UsersDAO::FindByEmail($email);
+        $user->reset_digest = $reset_digest;
+        $user->reset_sent_at = $reset_sent_at;
+        UsersDAO::save($user);
+
+        $link = OMEGAUP_URL . '/login/password/reset/?';
+        $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
+
+        return ['status' => 'ok', 'token' => $token, 'link' => $link];
+    }
+
+    /**
      * Updates the password of a given user, this is the second and last step
      * in order to reset the password. This operation is done if and only if
      * the correct parameters are suplied.
@@ -55,7 +98,7 @@ class ResetController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiUpdate(Request $r) {
-        self::ValidateUpdateRequest($r);
+        self::validateUpdateRequest($r);
         $user = UsersDAO::FindByEmail($r['email']);
         $user->password = SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
@@ -77,6 +120,11 @@ class ResetController extends Controller {
 
         if (!$user->verified) {
             throw new InvalidParameterException('unverifiedUser');
+        }
+
+        // Support doesn't need wait to resest passwords
+        if (Authorization::isSupportTeamMember($r['current_user_id'])) {
+            return;
         }
 
         $seconds = Time::get() - strtotime($user->reset_sent_at);
