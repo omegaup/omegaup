@@ -1,6 +1,7 @@
 <template>
   <div class="omegaup-scoreboard">
-    <div id="ranking-chart"></div>
+    <!-- id-lint off -->
+    <div id="ranking-chart"></div><!-- id-lint on -->
     <table>
       <thead>
         <tr>
@@ -9,7 +10,7 @@
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
             <a v-bind:href="'#problems/' + problem.alias"
-                v-bind:title="problem.alias">{{ String.fromCharCode(65 + index) }}</a>
+                v-bind:title="problem.alias">{{ UI.columnName(index) }}</a>
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
@@ -57,6 +58,7 @@
 </template>
 
 <script>
+import UI from '../../ui.js';
 export default {
   props: {
     T: Object,
@@ -69,7 +71,11 @@ export default {
       'default': true,
     },
   },
-  data: function() { return {};},
+  data: function() {
+    return {
+      UI: UI,
+    };
+  },
   computed: {
     lastUpdatedString: function() {
       if (!this.lastUpdated) {

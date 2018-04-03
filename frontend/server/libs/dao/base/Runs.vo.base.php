@@ -100,7 +100,7 @@ class Runs extends VO {
     public $run_id;
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * @access public
       * @var int(11)
       */

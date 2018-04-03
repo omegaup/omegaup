@@ -44,7 +44,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         }
 
         $sql = "
-			SELECT
+			SELECT DISTINCT
 				username, name, i.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
 			FROM
 				(

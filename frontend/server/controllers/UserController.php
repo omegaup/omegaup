@@ -489,7 +489,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+            if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
                 throw new ForbiddenAccessException();
             }
 
@@ -535,6 +535,9 @@ class UserController extends Controller {
                 die(header('Location: /login/'));
             }
         }
+
+        // Expire profile cache
+        Cache::deleteFromCache(Cache::USER_PROFILE, $user->username);
 
         return ['status' => 'ok'];
     }
@@ -1173,6 +1176,7 @@ class UserController extends Controller {
         $response['userinfo']['scholar_degree'] = $user->scholar_degree;
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['is_private'] = $user->is_private;
+        $response['userinfo']['verified'] = $user->verified == '1';
         $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
@@ -1289,6 +1293,64 @@ class UserController extends Controller {
     }
 
     /**
+     * Gets verify status of a user
+     *
+     * @param Request $r
+     * @return response array
+     * @throws ForbiddenAccessException
+     * @throws InvalidParameterException
+     */
+    public static function apiStatusVerified(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = IdentitiesDAO::getStatusVerified($r['email']);
+
+        if (is_null($response)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        return [
+            'status' => 'ok',
+            'verified' => $response['verified'],
+            'username' => $response['username']
+        ];
+    }
+    /**
+     * Gets extra information of the identity:
+     * - last password change request
+     * - verify status
+     *
+     * @param Request $r
+     * @return response array
+     * @throws ForbiddenAccessException
+     * @throws InvalidParameterException
+     */
+    public static function apiExtraInformation(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = IdentitiesDAO::getExtraInformation($r['email']);
+
+        if (is_null($response)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+
+        return [
+            'status' => 'ok',
+            'username' => $response['username'],
+            'within_last_day' => $response['within_last_day'],
+            'verified' => $response['verified'],
+        ];
+    }
+
+    /**
      * Get coder of the month by trying to find it in the table using the first
      * day of the current month. If there's no coder of the month for the given
      * date, calculate it and save it.
@@ -1378,7 +1440,7 @@ class UserController extends Controller {
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
         // User already started the problemset.
-        $problemsetOpened = ProblemsetUsersDAO::getByPK($user_id, $problemset_id);
+        $problemsetOpened = ProblemsetIdentitiesDAO::getByPK($user_id, $problemset_id);
 
         if (!is_null($problemsetOpened) && !is_null($problemsetOpened->access_time)) {
             return true;

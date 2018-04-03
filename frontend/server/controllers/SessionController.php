@@ -399,6 +399,7 @@ class SessionController extends Controller {
         try {
             $vo_User = UserController::resolveUser($r['usernameOrEmail']);
             $r['user_id'] = $vo_User->user_id;
+            $r['identity_id'] = $vo_User->main_identity_id;
             $r['user'] = $vo_User;
         } catch (ApiException $e) {
             self::$log->warn('User ' . $r['usernameOrEmail'] . ' not found.');
