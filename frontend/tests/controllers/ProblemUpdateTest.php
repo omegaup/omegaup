@@ -10,7 +10,7 @@ class UpdateProblemTest extends OmegaupTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', 
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip',
             'title' => 'Problem Language'
         ]));
 

@@ -8,9 +8,9 @@
  * @author joemmanuel
  */
 class UserParams implements ArrayAccess {
-    private $params;
+    public $params;
 
-    public function __contruct($params = null) {
+    public function __construct($params = null) {
         if (!is_object($params)) {
             $this->params = [];
             if (is_array($params)) {
@@ -57,8 +57,8 @@ class UserParams implements ArrayAccess {
      * @return boolean
      * @throws InvalidParameterException
      */
-    private static function validateParameter($parameter, $array, $required = true, $default = null) {
-        if (!isset($array[$paramter])) {
+    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
+        if (!isset($array[$parameter])) {
             if ($required) {
                 throw new InvalidParameterException('ParameterEmpty', $parameter);
             }
@@ -105,7 +105,7 @@ class UserFactory {
         // Get user from db
         $user = UsersDAO::FindByUsername($params['username']);
 
-        if ($verify) {
+        if ($params['verify']) {
             UserController::$redirectOnVerify = false;
             $user = self::verifyUser($user);
         } else {
@@ -207,7 +207,7 @@ class UserFactory {
      * @return User
      */
     public static function createSupportUser($params = null) {
-        $user = self::createUser($username, $password, $email);
+        $user = self::createUser($params);
 
         self::addSupportRole($user);
 

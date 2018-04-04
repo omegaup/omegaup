@@ -16,7 +16,7 @@ class ProblemParams implements ArrayAccess {
             $this->params = clone $params;
         }
 
-        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_RESOURCES_ROOT . 'testprobleem.zip');
+        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_RESOURCES_ROOT . 'testproblem.zip');
         ProblemParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
         ProblemParams::validateParameter('visibility', $this->params, false, ProblemController::VISIBILITY_PUBLIC);
         ProblemParams::validateParameter('author', $this->params, false, UserFactory::createUser());
@@ -63,7 +63,6 @@ class ProblemParams implements ArrayAccess {
         return true;
     }
 }
-
 
 /**
  * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file
@@ -141,7 +140,7 @@ class ProblemsFactory {
     /**
      *
      */
-    public static function createProblem($params, ScopedLoginToken $login = null) {
+    public static function createProblem($params = null, ScopedLoginToken $login = null) {
         if (!($params instanceof ProblemParams)) {
             $params = new ProblemParams($params);
         }
@@ -151,7 +150,7 @@ class ProblemsFactory {
             : ProblemController::VISIBILITY_PRIVATE;
 
         // Get a user
-        $problemData = self::getRequest(params);
+        $problemData = self::getRequest($params);
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 

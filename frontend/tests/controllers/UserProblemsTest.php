@@ -63,7 +63,7 @@ class UserProblemsTest extends OmegaupTestCase {
             'visibility' => 1,
             'author' => $author
         ]));
-        $problemAuthorData[0] = ProblemsFactory::createProblem(new ProblemParams([
+        $problemAuthorData[1] = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 0,
             'author' => $author
         ]));
