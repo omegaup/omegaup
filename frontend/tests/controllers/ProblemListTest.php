@@ -75,9 +75,9 @@ class ProblemList extends OmegaupTestCase {
         }
 
         // Get 1 problem private, should not appear
-	$privateProblemData = ProblemsFactory::createProblem(new ProblemParams([
+        $privateProblemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => ProblemController::VISIBILITY_PRIVATE
-	]));
+        ]));
         for ($j = 0; $j < $n; $j++) {
             ProblemsFactory::addTag($privateProblemData, "tag-$j", 1 /* public */);
         }
