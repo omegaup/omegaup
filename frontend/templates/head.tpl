@@ -76,7 +76,7 @@
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
 {/if}
 {if isset($recaptchaFile)}
-	<script type="text/javascript" src="{$recaptchaFile}"></script>
+		<script type="text/javascript" src="{$recaptchaFile}"></script>
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
