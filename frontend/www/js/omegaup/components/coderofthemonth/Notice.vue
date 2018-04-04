@@ -1,6 +1,6 @@
 <template>
   <div class="alert alert-warning"
-       id="notice"
+       name="notice"
        v-if="show">
     {{ UI.formatString(T.coderOfTheMonthNotice, {username: coderUsername}) }}
   </div>
