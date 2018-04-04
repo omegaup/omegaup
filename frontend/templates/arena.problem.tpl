@@ -43,7 +43,9 @@
 					<div class="source">{#wordsSource#}: <span class="source-data">{$source|escape}</span></div>
 {/if}
 {if $problemsetter}
-					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
+					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a>
+					{#wordsOn#} {$problemsetter.creation_date}
+					</div>
 {/if}
 					<div>
 						<script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>

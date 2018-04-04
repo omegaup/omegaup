@@ -907,6 +907,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsNominator: "(N0mina70r)",
 	wordsNumHomeworks: "(Num. 0f h0m3w0rk a55ignm3n75)",
 	wordsNumTests: "(Num. 0f 73575)",
+	wordsOn: "(0n)",
 	wordsOnly: "(On1y)",
 	wordsOptional: "(Op7i0na1)",
 	wordsOrderBy: "(Ord3r by)",
