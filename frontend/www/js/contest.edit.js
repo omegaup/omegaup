@@ -17,7 +17,8 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
-            .html(omegaup.T.contestEdit + ' ' + contest.title);
+            .html(omegaup.T.contestEdit + ' ' +
+                  omegaup.UI.escape(contest.title));
         $('.page-header h1 small')
             .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
                   omegaup.T.contestDetailsGoToContest + '</a>');
