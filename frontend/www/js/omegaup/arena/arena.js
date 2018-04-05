@@ -284,11 +284,9 @@ export class Arena {
           props: {
             data: this.data,
           },
-        })
+        });
       },
-      data: {
-        data: null
-      },
+      data: {data: null},
       components: {
         'omegaup-arena-rundetails': arena_RunDetails,
       },
@@ -1498,7 +1496,9 @@ export class Arena {
       sourceLink = true;
       sourceHTML = data.source;
     } else if (data.source == 'lockdownDetailsDisabled') {
-      sourceHTML = (typeof(sessionStorage) !== 'undefined' && sessionStorage.getItem('run:' + guid)) || T.lockdownDetailsDisabled;
+      sourceHTML = (typeof(sessionStorage) !== 'undefined' &&
+                    sessionStorage.getItem('run:' + guid)) ||
+                   T.lockdownDetailsDisabled;
     } else {
       sourceHTML = data.source;
     }
@@ -1511,9 +1511,9 @@ export class Arena {
           if (isDigit(x[key][i]) && isDigit(x[key][j])) {
             let nx = 0, ny = 0;
             while (i < x[key].length && isDigit(x[key][i]))
-            nx = (nx * 10) + parseInt(x[key][i++]);
+              nx = (nx * 10) + parseInt(x[key][i++]);
             while (j < y[key].length && isDigit(y[key][j]))
-            ny = (ny * 10) + parseInt(y[key][j++]);
+              ny = (ny * 10) + parseInt(y[key][j++]);
             i--;
             j--;
             if (nx != ny) return nx - ny;
@@ -1541,7 +1541,8 @@ export class Arena {
       judged_by: data.judged_by,
       source: sourceHTML,
       source_link: sourceLink,
-      source_url: window.URL.createObjectURL(new Blob([data.source], {'type': 'text/plain'})),
+      source_url: window.URL.createObjectURL(
+          new Blob([data.source], {'type': 'text/plain'})),
       source_name: 'Main.' + data.language,
       problem_admin: data.admin,
       guid: data.guid,
