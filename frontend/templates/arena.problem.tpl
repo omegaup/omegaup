@@ -88,7 +88,7 @@
 		</div>
 		<div id="overlay">
 {include file='arena.runsubmit.tpl'}
-{include file='arena.rundetails.tpl'}
+			<div id="run-details"></div>
 		</div>
 		<div id="footer">
 		</div>
