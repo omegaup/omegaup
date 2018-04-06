@@ -24,7 +24,7 @@ class UserParams implements ArrayAccess {
         UserParams::validateParameter('name', $this->params, false, $username);
         UserParams::validateParameter('password', $this->params, false, Utils::CreateRandomString());
         UserParams::validateParameter('email', $this->params, false, Utils::CreateRandomString() . '@mail.com');
-        UserParams::validateParameter('is_private', $this->params, false, true);
+        UserParams::validateParameter('is_private', $this->params, false, false);
         UserParams::validateParameter('verify', $this->params, false, true);
     }
 
