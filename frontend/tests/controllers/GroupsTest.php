@@ -177,7 +177,7 @@ class GroupsTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias
         ]));
-        $this->assertEquals($nUsers, count($response['users']));
+        $this->assertEquals($nUsers, count($response['identities']));
     }
 
     /**

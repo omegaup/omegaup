@@ -600,7 +600,7 @@ class CourseController extends Controller {
             $problem->problem_id
         );
 
-        return ['status' => 'ok', 'users' => $identities];
+        return ['status' => 'ok', 'identities' => $identities];
     }
 
     /**

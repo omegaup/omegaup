@@ -20,9 +20,9 @@ require_once('base/Problems.vo.base.php');
 class ProblemsDAO extends ProblemsDAOBase {
     final private static function addTagFilter($identity_type, $identity_id, $tag, &$sql, &$args) {
         $add_identity_id = false;
-        if ($identity_type === USER_ADMIN) {
+        if ($identity_type === IDENTITY_ADMIN) {
             $public_check = '';
-        } elseif ($identity_type === USER_NORMAL && !is_null($identity_id)) {
+        } elseif ($identity_type === IDENTITY_NORMAL && !is_null($identity_id)) {
             $public_check = '(ptp.public OR id.identity_id = ?) AND ';
             $add_identity_id = true;
         } else {
@@ -104,7 +104,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql= '';
         $args = [];
 
-        if ($identity_type === USER_ADMIN) {
+        if ($identity_type === IDENTITY_ADMIN) {
             $args = [$identity_id];
             $select = '
                 SELECT
@@ -139,7 +139,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $sql .= ' p.visibility > ?';
                 $args[] = ProblemController::VISIBILITY_DELETED;
             }
-        } elseif ($identity_type === USER_NORMAL && !is_null($identity_id)) {
+        } elseif ($identity_type === IDENTITY_NORMAL && !is_null($identity_id)) {
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
@@ -197,7 +197,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args[] = $query;
                 $args[] = $query;
             }
-        } elseif ($identity_type === USER_ANONYMOUS) {
+        } elseif ($identity_type === IDENTITY_ANONYMOUS) {
             $select = '
                     SELECT
                         0 AS score,
@@ -242,7 +242,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
         $problems = [];
-        $hiddenTags = $identity_type !== USER_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
+        $hiddenTags = $identity_type !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -636,11 +636,11 @@ class ProblemsDAO extends ProblemsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $users = [];
+        $identities = [];
         foreach ($rs as $row) {
-            $users[] = $row['username'];
+            $identities[] = $row['username'];
         }
-        return $users;
+        return $identities;
     }
 
     final public static function isVisible(Problems $problem) {

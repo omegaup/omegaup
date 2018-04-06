@@ -31,22 +31,21 @@ class IdentityController extends Controller {
      */
     public static function resolveIdentity($userOrEmail) {
         Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
-
-        $identity = null;
-
         try {
-            if (!is_null($identity = IdentitiesDAO::FindByEmail($userOrEmail))
-                    || !is_null($identity = IdentitiesDAO::FindByUsername($userOrEmail))) {
+            $identity = IdentitiesDAO::FindByEmail($userOrEmail);
+            if (!is_null($identity)) {
                 return $identity;
-            } else {
-                throw new NotFoundException('userOrMailNotFound');
             }
+
+            $identity = IdentitiesDAO::FindByUsername($userOrEmail);
+            if (!is_null($identity)) {
+                return $identity;
+            }
+            //throw new NotFoundException('userOrMailNotFound');
         } catch (ApiException $apiException) {
             throw $apiException;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        return $identity;
     }
 }

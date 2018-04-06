@@ -1661,7 +1661,7 @@ class ProblemController extends Controller {
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
-        $identity_type = USER_ANONYMOUS;
+        $identity_type = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
             $author_identity_id = intval($r['current_identity_id']);
             if (Authorization::isSystemAdmin($r['current_user_id']) ||
@@ -1671,9 +1671,9 @@ class ProblemController extends Controller {
                     Authorization::REVIEWER_ROLE
                 )
             ) {
-                $identity_type = USER_ADMIN;
+                $identity_type = IDENTITY_ADMIN;
             } else {
-                $identity_type = USER_NORMAL;
+                $identity_type = IDENTITY_NORMAL;
             }
         }
 

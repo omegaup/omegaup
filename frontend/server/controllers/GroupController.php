@@ -146,8 +146,8 @@ class GroupController extends Controller {
             ]);
 
             // Check user is actually in group
-            $groups_user = GroupsIdentitiesDAO::search($key);
-            if (count($groups_user) === 0) {
+            $groupIdentities = GroupsIdentitiesDAO::search($key);
+            if (count($groupIdentities) === 0) {
                 throw new InvalidParameterException('parameterNotFound', 'User');
             }
 
@@ -261,7 +261,7 @@ class GroupController extends Controller {
         $response = [];
 
         try {
-            $response['users'] = GroupsIdentitiesDAO::GetMemberUsernames($r['group']);
+            $response['identities'] = GroupsIdentitiesDAO::GetMemberUsernames($r['group']);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
