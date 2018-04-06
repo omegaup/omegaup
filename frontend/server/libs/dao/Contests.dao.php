@@ -157,6 +157,30 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
+    final public static function getByAliasWithExtraInformation($alias) {
+        $sql = '
+                SELECT
+                    c.*,
+                    p.scoreboard_url,
+                    p.scoreboard_url_admin
+                FROM
+                    Contests c
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = c.problemset_id
+                WHERE (alias = ?) LIMIT 1;';
+        $params = [  $alias ];
+
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+
+        return $rs;
+    }
+
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 1;';
 
@@ -234,8 +258,7 @@ class ContestsDAO extends ContestsDAOBase {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $foo) {
-            $bar =  new Contests($foo);
-            array_push($ar, $bar);
+            array_push($ar, $foo);
         }
         return $ar;
     }
@@ -303,11 +326,15 @@ class ContestsDAO extends ContestsDAOBase {
         $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
-                c.*
+                c.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Contests c
             INNER JOIN
                 ACLs a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Problemsets p ON p.problemset_id = c.problemset_id
             WHERE
                 a.owner_id = ?
             ORDER BY
@@ -324,7 +351,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $contests = [];
         foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
+            array_push($contests, $row);
         }
         return $contests;
     }
@@ -347,13 +374,19 @@ class ContestsDAO extends ContestsDAOBase {
 
         $sql = "
             SELECT
-                $columns
+                $columns,
+                Problemsets.scoreboard_url,
+                Problemsets.scoreboard_url_admin
             FROM
                 Contests
-            JOIN
+            INNER JOIN
                 Problemset_Users
             ON
                 Contests.problemset_id = Problemset_Users.problemset_id
+            INNER JOIN
+                Problemsets
+            ON
+                Problemsets.problemset_id = Contests.problemset_id
             WHERE
                 Problemset_Users.user_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
@@ -375,7 +408,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $contests = [];
         foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
+            array_push($contests, $row);
         }
         return $contests;
     }

@@ -482,7 +482,6 @@ export class Arena {
     let self = this;
     self.currentProblemset = problemset;
     self.contestAdmin = problemset.admin;
-    console.log(self.contestAdmin);
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];

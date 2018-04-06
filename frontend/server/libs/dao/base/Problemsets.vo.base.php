@@ -115,7 +115,7 @@ class Problemsets extends VO {
     public $scoreboard_url;
 
     /**
-      *  [Campo no documentado]
+      * Token para la url del scoreboard de admin en problemsets
       * @access public
       * @var varchar(30)
       */

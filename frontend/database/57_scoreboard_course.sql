@@ -25,3 +25,10 @@ SET
 ALTER TABLE `Contests`
   DROP COLUMN `scoreboard_url`,
   DROP COLUMN `scoreboard_url_admin`;
+
+-- scoreboard_url and scoreboard_url_admin fields should not be null
+ALTER TABLE `Problemsets`
+  MODIFY COLUMN `scoreboard_url` varchar(30) NOT NULL
+    COMMENT 'Token para la url del scoreboard en problemsets',
+  MODIFY COLUMN `scoreboard_url_admin` varchar(30) NOT NULL
+    COMMENT 'Token para la url del scoreboard de admin en problemsets';

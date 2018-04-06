@@ -1557,12 +1557,14 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
-        $params = ScoreboardParams::fromAssignment(
-            $r['assignment'],
-            $r['course']->group_id,
-            true /*show_all_runs*/
+
+        $scoreboard = new Scoreboard(
+            ScoreboardParams::fromAssignment(
+                $r['assignment'],
+                $r['course']->group_id,
+                true /*show_all_runs*/
+            )
         );
-        $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate(
             false /*withRunDetails*/,

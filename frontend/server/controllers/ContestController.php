@@ -110,6 +110,9 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
+            if (gettype($c) != 'object') {
+                $c = new Contests($c);
+            }
             $contestInfo = $c->asFilteredArray($relevantColumns);
 
             $contestInfo['duration'] = (is_null($c->window_length) ?
@@ -218,11 +221,11 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
-            $c->toUnixTime();
-            $contestInfo = $c->asFilteredArray($relevant_columns);
-            $problemset = ProblemsetsDAO::getByPK($c->problemset_id);
-            $contestInfo['scoreboard_url'] = $problemset->scoreboard_url;
-            $contestInfo['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
+            $contest = new Contests($c);
+            $contest->toUnixTime();
+            $contestInfo = $contest->asFilteredArray($relevant_columns);
+            $contestInfo['scoreboard_url'] = $c['scoreboard_url'];
+            $contestInfo['scoreboard_url_admin'] = $c['scoreboard_url_admin'];
             $addedContests[] = $contestInfo;
         }
 
@@ -315,8 +318,9 @@ class ContestController extends Controller {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-            $r['problemset'] = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
+            $contest_problemset = ContestsDAO::getByAliasWithExtraInformation($r['contest_alias']);
+            $r['contest'] = new Contests($contest_problemset);
+            $r['problemset'] = new Problemsets($contest_problemset);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
