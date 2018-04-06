@@ -475,8 +475,6 @@
 	"passwordResetTokenWasGeneratedSuccessfully": "El token fue generado exitosamente",
 	"pendingRegistrations": "Solicitudes pendientes",
 	"privacyPolicyNotice": "Al dar click en Registrar aceptas las <a href=\"http://blog.omegaup.com/privacy-policy/\">Pol\u00edticas de Uso y Privacidad</a> del sitio.",
-	"privateUsers": "Usuarios privados",
-	"privateUsersContainsInvalidUser": "Lista de usuarios privados contiene un usuario que no existe",
 	"probAliasAndContestAliasInvalid": "Alias de problema y alias de concurso combinaci\u00f3n es inv\u00e1lida",
 	"problemDeleted": "El problema fue eliminado exitosamente",
 	"problemDeployerCorruptZip": "No se pudo abrir el archivo .zip. Ya sea est\u00e1 corrupto o no se subi\u00f3 correctamente.",

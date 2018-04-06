@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>omegaUp &mdash; {$title}</title>
+<title>omegaUp &mdash; {$title|htmlspecialchars}</title>
 <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
 <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
@@ -13,7 +13,7 @@
 </head>
 <body id="report">
 	<div class="title">
-		<h1 class="problem-title">{$title}</h2>
+		<h1 class="problem-title">{$title|htmlspecialchars}</h2>
 		<table class="data">
 			<tr>
 				<td>{#wordsPoints#}</td>

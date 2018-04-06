@@ -360,7 +360,7 @@ class ContestsDAO extends ContestsDAOBase {
      * Returns all contests where a user is participating in.
      */
     final public static function getContestsParticipating(
-        $user_id,
+        $identity_id,
         $page = 1,
         $pageSize = 1000,
         $query = null
@@ -380,22 +380,22 @@ class ContestsDAO extends ContestsDAOBase {
             FROM
                 Contests
             INNER JOIN
-                Problemset_Users
+                Problemset_Identities
             ON
-                Contests.problemset_id = Problemset_Users.problemset_id
+                Contests.problemset_id = Problemset_Identities.problemset_id
             INNER JOIN
                 Problemsets
             ON
                 Problemsets.problemset_id = Contests.problemset_id
             WHERE
-                Problemset_Users.user_id = ? AND
+                Problemset_Identities.identity_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
             ORDER BY
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
         global $conn;
-        $params[] = $user_id;
+        $params[] = $identity_id;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -539,11 +539,15 @@ class ContestsDAO extends ContestsDAOBase {
                     FROM
                         Contests
                     INNER JOIN
-                        Problemset_Users
+                        Problemset_Identities
                     ON
-                        Contests.problemset_id = Problemset_Users.problemset_id
+                        Contests.problemset_id = Problemset_Identities.problemset_id
+                    INNER JOIN
+                        Users
+                    ON
+                        Users.main_identity_id = Problemset_Identities.identity_id
                     WHERE
-                        Contests.public = 0 AND Problemset_Users.user_id = ? AND
+                        Contests.public = 0 AND Users.user_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $user_id;
