@@ -41,7 +41,7 @@ class IdentityController extends Controller {
             if (!is_null($identity)) {
                 return $identity;
             }
-            //throw new NotFoundException('userOrMailNotFound');
+            throw new NotFoundException('userOrMailNotFound');
         } catch (ApiException $apiException) {
             throw $apiException;
         } catch (Exception $e) {
