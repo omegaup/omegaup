@@ -178,12 +178,10 @@ class AddProblemToContestTest extends OmegaupTestCase {
      */
     public function testAddBannedProblemToContest() {
         $contestData = ContestsFactory::createContest();
-        $problemData = ProblemsFactory::createProblem(
-            null,
-            null,
-            ProblemController::VISIBILITY_PUBLIC,
-            $contestData['director']
-        );
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $contestData['director']
+        ]));
         $problem = $problemData['problem'];
 
         // Ban the problem.

@@ -130,7 +130,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['languages' => ['c','cpp','java']]));
 
         // Get some problems into the contest
-        $problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp,java,py');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'languages' => 'cpp,java,py'
+        ]));
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario

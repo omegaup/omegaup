@@ -10,7 +10,7 @@ class UserProfileTest extends OmegaupTestCase {
 	 * Test for the function which returns the general user info
 	 */
     public function testUserData() {
-        $user = UserFactory::createUser('testuser1');
+        $user = UserFactory::createUser(new UserParams(['username' => 'testuser1']));
 
         $login = self::login($user);
         $r = new Request([
@@ -26,8 +26,8 @@ class UserProfileTest extends OmegaupTestCase {
 	 * Test for the function which returns the general user info
 	 */
     public function testUserDataAnotherUser() {
-        $user = UserFactory::createUser('testuser2');
-        $user2 = UserFactory::createUser('testuser3');
+        $user = UserFactory::createUser(new UserParams(['username' => 'testuser2']));
+        $user2 = UserFactory::createUser(new UserParams(['username' => 'testuser3']));
 
         $login = self::login($user);
         $r = new Request([
@@ -47,7 +47,7 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserPrivateDataAnotherUser() {
         $user = UserFactory::createUser();
         // Mark user2's profile as private (5th argument)
-        $user2 = UserFactory::createUser(null, null, null, true, true);
+        $user2 = UserFactory::createUser(new UserParams(['is_private' => true]));
 
         $login = self::login($user);
         $r = new Request([
@@ -93,7 +93,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test admin can see all details for private profiles
      */
     public function testAdminCanSeePrivateProfile() {
-        $user = UserFactory::createUser(null, null, null, true, true);
+        $user = UserFactory::createUser(new UserParams(['is_private' => true]));
         $admin = UserFactory::createAdminUser();
 
         $login = self::login($admin);
