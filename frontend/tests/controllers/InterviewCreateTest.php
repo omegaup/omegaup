@@ -76,10 +76,10 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         // add 2 users that are already omegaup users (using registered email)
         $emailFor1 = Utils::CreateRandomString().'@mail.com';
-        $interviewee1 = UserFactory::createUser(null, null, $emailFor1);
+        $interviewee1 = UserFactory::createUser(new UserParams(['email' => $emailFor1]));
 
         $emailFor2 = Utils::CreateRandomString().'@mail.com';
-        $interviewee2 = UserFactory::createUser(null, null, $emailFor2);
+        $interviewee2 = UserFactory::createUser(new UserParams(['email' => $emailFor2]));
 
         $response = InterviewController::apiAddUsers(new Request([
             'auth_token' => $login->auth_token,

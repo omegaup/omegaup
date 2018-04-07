@@ -52,7 +52,8 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.Contest.adminDetails({contest_alias: interviewAlias})
       .then(function(contest) {
         $('.page-header h1 span')
-            .html(omegaup.T.interviewEdit + ' ' + contest.title);
+            .html(omegaup.T.interviewEdit + ' ' +
+                  omegaup.UI.escape(contest.title));
         $('.page-header h1 small')
             .html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' +
                   omegaup.T.interviewGoToInterview + '</a>');

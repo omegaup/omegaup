@@ -45,7 +45,7 @@
 						<div class="col-md-7">
 							<select name='country_id' id='country_id' class="form-control">
 								<option value=""></option>
-								{foreach from=sort($COUNTRIES) item=country}
+								{foreach from=$COUNTRIES item=country}
 								<option value="{$country->country_id}">{$country->name}</option>
 								{/foreach}
 							</select>
