@@ -602,7 +602,7 @@ omegaup.OmegaUp.loadTranslations({
 	profileStatisticsDay: "D\u00eda",
 	profileStatisticsDelta: "Delta",
 	profileStatisticsMonth: "Mes",
-	profileStatisticsNumberOfSolvedProblems: "Cantidad de problemas resueltos",
+	profileStatisticsNumberOfSolvedProblems: "Camntidad de envios",
 	profileStatisticsPeriod: "Periodo",
 	profileStatisticsRuns: "<b>Env\u00edos</b>",
 	profileStatisticsTotal: "Total",
