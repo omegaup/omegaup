@@ -105,7 +105,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestEdit: "Edit contest",
 	contestEditAddProblems: "Add problems",
 	contestEditAdministrativeLinks: "Administrative Links",
-	contestEditContestClonedSuccessfully: "Contest is Cloned successfully",
+	contestEditContestClonedSuccessfully: "Contest was cloned successfully",
 	contestEditContestEdited: "Your contest has been edited",
 	contestEditGoToContest: "View contest",
 	contestEditRegisteredAdminDelete: "Remove",

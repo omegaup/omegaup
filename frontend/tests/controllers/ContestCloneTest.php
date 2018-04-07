@@ -30,7 +30,6 @@ class ContestCloneTest extends OmegaupTestCase {
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
         // Create request
-        $login = self::login($contestData['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestAlias,
