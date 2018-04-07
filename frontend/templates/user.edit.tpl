@@ -48,7 +48,7 @@
                                 {foreach $COUNTRIES as $key=>$country}
                                     {$COUNTRIES.$key=[
                                         'country_id' => $country->country_id,
-                                        'name' => $smarty.config["words`$country->country_id`"]
+                                        'name' => $smarty.config["wordsCountry`$country->country_id`"]
                                     ]}
                                 {/foreach}
                                 {usort($COUNTRIES, create_function('$val1, $val2', 'return strcmp($val1[\'name\'], $val2[\'name\']);'))}
