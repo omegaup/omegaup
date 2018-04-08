@@ -178,8 +178,7 @@ omegaup.OmegaUp.on('ready', function() {
                            })
             .then(function(response) {
               omegaup.UI.success(
-                  omegaup.T.contestEditContestClonedSuccessfully
-                  );
+                  omegaup.T.contestEditContestClonedSuccessfully);
             })
             .fail(omegaup.UI.apiError);
 
