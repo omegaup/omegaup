@@ -78,6 +78,11 @@ omegaup.OmegaUp.on('ready', function() {
         $('.contest-admin-links #adminscoreboard')
             .attr('href', '/arena/' + contestAlias + '/scoreboard/' +
                               contest.scoreboard_url_admin + '/');
+        $('.clone_contest_form #title').val(contest.title);
+        $('.clone_contest_form #alias').val(contest.alias);
+        $('.clone_contest_form #start-time')
+            .val(omegaup.UI.formatDateTime(contest.start_time));
+        $('.clone_contest_form #description').val(contest.description);
         if (contest.contestant_must_register == null ||
             contest.contestant_must_register == '0') {
           $('#requests').hide();
@@ -158,6 +163,27 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
     return false;
   }
+
+  // Clone contest
+  $('.clone_contest_form')
+      .on('submit', function() {
+        omegaup.API.Contest.clone({
+                             contest_alias: contestAlias,
+                             title: $('#title').val(),
+                             description: $('#description').val(),
+                             start_time:
+                                 (new Date($('#start-time').val()).getTime()) /
+                                     1000,
+                             alias: $('#alias_clone').val(),
+                           })
+            .then(function(response) {
+              omegaup.UI.success(
+                  omegaup.T.contestEditContestClonedSuccessfully);
+            })
+            .fail(omegaup.UI.apiError);
+
+        return false;
+      });
 
   // Edit problems
   function refreshContestProblems() {
