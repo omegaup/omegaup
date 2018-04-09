@@ -2035,6 +2035,10 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
         if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
