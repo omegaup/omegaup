@@ -34,17 +34,16 @@ def test_create_contest(driver):
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1,
-                        source_contents='cout<<a+b<<endl')
+                        verdict='AC', score=1)
 
     with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0,
-                        source_contents='cout<<a-b<<endl')
+                        verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
+
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'nav-contests'))).click()
@@ -92,13 +91,11 @@ def test_user_ranking_contest(driver):
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1,
-                        source_contents='cout<<a+b<<endl')
+                        verdict='AC', score=1)
 
     with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0,
-                        source_contents='cout<<a-b<<endl')
+                        verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
 
@@ -177,8 +174,7 @@ def update_scoreboard_for_contest(driver, contest_alias):
     assert '{"status":"ok"}' in driver.browser.page_source
 
 
-def create_run_user(driver, contest_alias, problem, filename,
-                    source_contents=None, **kwargs):
+def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     '''Makes the user join a course and then creates a run.'''
 
     enter_contest(driver, contest_alias)
@@ -214,13 +210,6 @@ def create_run_user(driver, contest_alias, problem, filename,
 
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
-    source_element = driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, (
-                '//div[@id = "overlay"]'
-                '//pre[@class = "source"]'))))
-    if source_contents:
-        assert source_contents in source_element.text
 
 
 def create_contest(driver, contest_alias):
