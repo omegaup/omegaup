@@ -2,11 +2,7 @@
 		<div>
 			<div id="title">
 				<h1>
-					{if $isContest}
-					<span class="contest-title"></span>
-					{else}
-					<span class="course-title"></span>
-					{/if}
+					<span class="{$titleClassName}"></span>
 					<sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>
 			</div>

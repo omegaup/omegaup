@@ -255,12 +255,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params = [$user_id];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $foo) {
-            array_push($ar, $foo);
-        }
-        return $ar;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -363,7 +358,8 @@ class ContestsDAO extends ContestsDAOBase {
         $identity_id,
         $page = 1,
         $pageSize = 1000,
-        $query = null
+        $query = null,
+        $showScoreboard = false
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
@@ -408,7 +404,11 @@ class ContestsDAO extends ContestsDAOBase {
 
         $contests = [];
         foreach ($rs as $row) {
-            array_push($contests, $row);
+            if ($showScoreboard) {
+                array_push($contests, $row);
+            } else {
+                array_push($contests, new Contests($row));
+            }
         }
         return $contests;
     }

@@ -110,9 +110,6 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
-            if (gettype($c) != 'object') {
-                $c = new Contests($c);
-            }
             $contestInfo = $c->asFilteredArray($relevantColumns);
 
             $contestInfo['duration'] = (is_null($c->window_length) ?
@@ -215,20 +212,16 @@ class ContestController extends Controller {
                 $identity_id,
                 $page,
                 $pageSize,
-                $query
+                $query,
+                true
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $addedContests = [];
-        foreach ($contests as $c) {
-            $contest = new Contests($c);
-            $contest->toUnixTime();
-            $contestInfo = $contest->asFilteredArray($relevant_columns);
-            $contestInfo['scoreboard_url'] = $c['scoreboard_url'];
-            $contestInfo['scoreboard_url_admin'] = $c['scoreboard_url_admin'];
-            $addedContests[] = $contestInfo;
+        foreach ($contests as $contest) {
+            $addedContests[] = $contest;
         }
 
         // Expire contest-list cache

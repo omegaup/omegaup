@@ -1586,12 +1586,13 @@ class CourseController extends Controller {
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);
 
-        $params = ScoreboardParams::fromAssignment(
-            $r['assignment'],
-            $r['course']->group_id,
-            Authorization::isCourseAdmin($r['current_user_id'], $r['course'])/*show_all_runs*/
+        $scoreboard = new Scoreboard(
+            ScoreboardParams::fromAssignment(
+                $r['assignment'],
+                $r['course']->group_id,
+                Authorization::isCourseAdmin($r['current_user_id'], $r['course'])/*show_all_runs*/
+            )
         );
-        $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
         $response = [];

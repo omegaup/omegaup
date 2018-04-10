@@ -1508,29 +1508,26 @@ class UserController extends Controller {
         }
 
         $contests = [];
-        foreach ($contestsParticipated as $c) {
-            $contest =  new Contests($c);
-            $problemset = new Problemsets($c);
+        foreach ($contestsParticipated as $contest) {
             // Get user ranking
             $scoreboardResponse = ContestController::apiScoreboard(
                 new Request([
                     'auth_token' => $r['auth_token'],
-                    'contest_alias' => $contest->alias,
-                    'token' => $problemset->scoreboard_url_admin
+                    'contest_alias' => $contest['alias'],
+                    'token' => $contest['scoreboard_url_admin']
                 ])
             );
 
             // Grab the place of the current user in the given contest
-            $contests[$contest->alias]['place']  = null;
+            $contests[$contest['alias']]['place']  = null;
             foreach ($scoreboardResponse['ranking'] as $userData) {
                 if ($userData['username'] == $user->username) {
-                    $contests[$contest->alias]['place'] = $userData['place'];
+                    $contests[$contest['alias']]['place'] = $userData['place'];
                     break;
                 }
             }
 
-            $contest->toUnixTime();
-            $contests[$contest->alias]['data'] = $contest->asArray();
+            $contests[$contest['alias']]['data'] = $contest;
         }
 
         $response['contests'] = $contests;

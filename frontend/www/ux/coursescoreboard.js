@@ -21,7 +21,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(course) {
         arena.initProblems(course);
         arena.initClock(course.start_time, course.finish_time);
-        $('#title .course-title').text(course.title);
+        $('#title .course-title').text(course.name);
 
         omegaup.API.Course.assignmentScoreboard({
                             course_alias: arena.options.courseAlias,
