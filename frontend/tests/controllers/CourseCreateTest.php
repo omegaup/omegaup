@@ -125,7 +125,10 @@ class CourseCreateTest extends OmegaupTestCase {
         $assignment = $assignments[0];
 
         // Add a problem to the assignment.
-        $problemData = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'user' => $user
+        ]), $login);
         $points = 1337;
         CourseController::apiAddProblem(new Request([
             'auth_token' => $login->auth_token,

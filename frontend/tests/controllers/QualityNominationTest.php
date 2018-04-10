@@ -355,7 +355,9 @@ class QualityNominationTest extends OmegaupTestCase {
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {
-        $problemData = ProblemsFactory::createProblem(null /* zipName */, null /* title */, ProblemController::VISIBILITY_PUBLIC);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC
+        ]));
         $user = UserFactory::createUser();
 
         $login = self::login($user);
@@ -452,7 +454,9 @@ class QualityNominationTest extends OmegaupTestCase {
      * then denied, and it keeps its original visibility
      */
     public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
-        $problemData = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PRIVATE
+        ]));
         $user = UserFactory::createUser();
 
         $login = self::login($user);

@@ -17,7 +17,10 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $userLogin = UserFactory::createUser();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PUBLIC, $userLogin);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $userLogin
+        ]));
 
         // Get a contest
         $contestData = ContestsFactory::createContest();
@@ -51,18 +54,15 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $userLogin = UserFactory::createUser();
 
         // Get problems
-        $deletedProblemData = ProblemsFactory::createProblem(
-            null,
-            null,
-            ProblemController::VISIBILITY_PUBLIC,
-            $userLogin
-        );
-        $problemData = ProblemsFactory::createProblem(
-            null,
-            null,
-            ProblemController::VISIBILITY_PUBLIC,
-            $userLogin
-        );
+        $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $userLogin
+        ]));
+
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $userLogin
+        ]));
 
         $login = self::login($problemData['author']);
 
@@ -99,18 +99,14 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $userLogin = UserFactory::createUser();
 
         // Get problems
-        $deletedProblemData = ProblemsFactory::createProblem(
-            null,
-            null,
-            ProblemController::VISIBILITY_PUBLIC,
-            $userLogin
-        );
-        $problemData = ProblemsFactory::createProblem(
-            null,
-            null,
-            ProblemController::VISIBILITY_PUBLIC,
-            $userLogin
-        );
+        $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $userLogin
+        ]));
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'author' => $userLogin
+        ]));
 
         $login = self::login($problemData['author']);
 
