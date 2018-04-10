@@ -241,6 +241,7 @@ class InterviewController extends Controller {
         }
 
         $thisResult['users'] = $users;
+        $thisResult['status'] ='ok';
 
         return $thisResult;
     }

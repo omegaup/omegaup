@@ -59,6 +59,16 @@ function _normalizeContestFields(contest) {
   return contest;
 }
 
+function _normalizeProblemsetFields(problemset) {
+  omegaup.OmegaUp.convertTimes(problemset);
+  if (problemset.hasOwnProperty('submissions_gap')) {
+    problemset.submissions_gap = parseInt(problemset.submissions_gap);
+    problemset.show_penalty =
+        (problemset.penalty != 0 || problemset.penalty_type != 'none');
+  }
+  return problemset;
+}
+
 export default {
   Clarification: {
     create: _call('/api/clarification/create/'),
@@ -167,8 +177,6 @@ export default {
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
     scoreboard: _call('/api/contest/scoreboard/'),
-
-    scoreboardEvents: _call('/api/contest/scoreboardevents/'),
 
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
 
@@ -400,6 +408,14 @@ export default {
     update: _call('/api/problem/update/'),
 
     updateStatement: _call('/api/problem/updateStatement/'),
+  },
+
+  Problemset: {
+    details: _call('/api/problemset/details/', _normalizeProblemsetFields),
+
+    scoreboard: _call('/api/problemset/scoreboard/'),
+
+    scoreboardEvents: _call('/api/problemset/scoreboardevents/'),
   },
 
   QualityNomination: {

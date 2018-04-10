@@ -1,10 +1,12 @@
 omegaup.OmegaUp.on('ready', function() {
   var options = omegaup.arena.GetOptionsFromLocation(window.location);
-  var assignmentMatch = /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
-      window.location.pathname);
+  var assignmentMatch =
+      /\/course\/([^\/]+)(?:\/assignment\/([^\/]+))(?:\/problemset_id\/([^\/]+)\/?)?/
+          .exec(window.location.pathname);
   if (assignmentMatch) {
     options.courseAlias = assignmentMatch[1];
     options.assignmentAlias = assignmentMatch[2];
+    options.problemsetId = assignmentMatch[3];
   }
 
   var arena = new omegaup.arena.Arena(options);

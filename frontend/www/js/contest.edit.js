@@ -20,7 +20,8 @@ omegaup.OmegaUp.on('ready', function() {
             .html(omegaup.T.contestEdit + ' ' +
                   omegaup.UI.escape(contest.title));
         $('.page-header h1 small')
-            .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
+            .html('&ndash; <a href="/arena/' + contestAlias +
+                  '/problemset_id/' + contest.problemset_id + '/">' +
                   omegaup.T.contestDetailsGoToContest + '</a>');
         $('.new_contest_form #title').val(contest.title);
         $('.new_contest_form #alias').val(contest.alias);

@@ -21,7 +21,10 @@ omegaup.OmegaUp.on('ready', function() {
     $('#loading').fadeOut('slow');
     $('#root').fadeIn('slow');
   } else {
-    omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
+    omegaup.API.Problemset.details({
+                            contest_alias: arena.options.contestAlias,
+                            problemset_id: arena.options.problemsetId
+                          })
         .then(function(contest) {
           if (!contest.admin) {
             if (!omegaup.OmegaUp.loggedIn) {

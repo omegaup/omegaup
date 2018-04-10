@@ -1,7 +1,10 @@
 omegaup.OmegaUp.on('ready', function() {
+  var assignmentMatch =
+      /\/interview\/([^\/]+)(?:\/problemset_id\/([^\/]+)\/?)\/arena/.exec(
+          window.location.pathname);
   var arena = new omegaup.arena.Arena({
-    contestAlias:
-        /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1],
+    contestAlias: assignmentMatch[1],
+    problemsetId: assignmentMatch[2],
     isInterview: true
   });
   var admin = null;

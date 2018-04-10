@@ -94,6 +94,18 @@ class UserFilterTest extends OmegaupTestCase {
         $this->assertEquals($response['admin'], true);
     }
 
+    public function testPublicProblemsetAccess() {
+        $contest = ContestsFactory::createContest()['contest'];
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'filter' => '/problemset/' . $contest->problemset_id,
+        ]);
+        UserController::apiValidateFilter($r);
+    }
+
     public function testPublicContestAccess() {
         $contest = ContestsFactory::createContest()['contest'];
         $user = UserFactory::createUser();
@@ -102,6 +114,18 @@ class UserFilterTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'filter' => '/contest/' . $contest->alias,
+        ]);
+        UserController::apiValidateFilter($r);
+    }
+
+    /**
+     * @expectedException UnauthorizedException
+     */
+    public function testAnonymousPublicProblemsetAccess() {
+        $contest = ContestsFactory::createContest()['contest'];
+
+        $r = new Request([
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]);
         UserController::apiValidateFilter($r);
     }
@@ -121,6 +145,18 @@ class UserFilterTest extends OmegaupTestCase {
     /**
      * @expectedException UnauthorizedException
      */
+    public function testAnonymousProblemsetAccess() {
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+
+        $r = new Request([
+            'filter' => '/problemset/' . $contest->problemset_id,
+        ]);
+        UserController::apiValidateFilter($r);
+    }
+
+    /**
+     * @expectedException UnauthorizedException
+     */
     public function testAnonymousContestAccess() {
         $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
@@ -128,6 +164,17 @@ class UserFilterTest extends OmegaupTestCase {
             'filter' => '/contest/' . $contest->alias,
         ]);
         UserController::apiValidateFilter($r);
+    }
+
+    public function testAnonymousProblemsetWithToken() {
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+
+        $r = new Request([
+            'filter' => '/problemset/' . $contest->problemset_id . '/' .
+                        $contest->scoreboard_url,
+        ]);
+        $response = UserController::apiValidateFilter($r);
+        $this->assertEmpty($response['contest_admin']);
     }
 
     public function testAnonymousContestWithToken() {
@@ -139,6 +186,18 @@ class UserFilterTest extends OmegaupTestCase {
         ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEmpty($response['contest_admin']);
+    }
+
+    public function testAnonymousProblemsetWithAdminToken() {
+        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+
+        $r = new Request([
+            'filter' => '/problemset/' . $contest->problemset_id . '/' .
+                        $contest->scoreboard_url_admin,
+        ]);
+        $response = UserController::apiValidateFilter($r);
+        $this->assertContains($contest->alias, $response['contest_admin']);
+        $this->assertNull($response['user']);
     }
 
     public function testAnonymousContestWithAdminToken() {

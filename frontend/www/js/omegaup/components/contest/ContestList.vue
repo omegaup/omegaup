@@ -48,7 +48,8 @@
         <tr v-for="contest in contests">
           <td v-if="isAdmin"><input type='checkbox'
                  v-bind:id="contest.alias"></td>
-          <td><strong><a v-bind:href="'/arena/' + contest.alias + '/'">{{ contest.title
+          <td><strong><a v-bind:href=
+          "'/arena/' + contest.alias + '/problemset_id/' + contest.problemset_id">{{ contest.title
           }}</a></strong></td>
           <td>
             <a v-bind:href="makeWorldClockLink(contest.start_time)">{{
@@ -63,13 +64,14 @@
           <td v-else="">{{ T.wordsNo }}</td>
           <td v-if="contest.scoreboard_url &amp;&amp; isAdmin">
             <a class="glyphicon glyphicon-link"
-                v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
+                v-bind:href=
+                "'/arena/' + contest.alias + '/problemset_id/' + contest.problemset_id + '/scoreboard/' + contest.scoreboard_url"
                 v-bind:title="T.contestScoreboardLink">Public</a>
           </td>
           <td v-if="contest.scoreboard_url_admin &amp;&amp; isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href=
-                "'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url_admin"
+                "'/arena/' + contest.alias + '/problemset_id/' + contest.problemset_id + '/scoreboard/' + contest.scoreboard_url_admin"
                 v-bind:title="T.contestScoreboardAdminLink">Admin</a>
           </td>
           <td v-if="isAdmin">
@@ -79,7 +81,8 @@
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-dashboard"
-                v-bind:href="'/arena/' + contest.alias + '/admin/'"
+                v-bind:href=
+                "'/arena/' + contest.alias + '/problemset_id/' + contest.problemset_id + '/admin/'"
                 v-bind:title="T.contestListSubmissions"></a>
           </td>
           <td v-if="isAdmin">

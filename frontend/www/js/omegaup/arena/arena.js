@@ -77,9 +77,11 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.onlyProblemAlias =
         /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
   } else {
-    let match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    let match = /\/arena\/([^\/]+)\/?problemset_id\/([^\/]+)\/?/.exec(
+        arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
+      options.problemsetId = match[2];
     }
   }
 
@@ -348,17 +350,10 @@ export class Arena {
     let protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
     let uris = [];
     // Backendv2 uri
-    uris.push(protocol + window.location.host + '/events/?filter=/contest/' +
-              self.options.contestAlias +
+    uris.push(protocol + window.location.host + '/events/?filter=/problemset/' +
+              self.options.problemsetId +
               (self.options.scoreboardToken ?
                    ('/' + self.options.scoreboardToken) :
-                   ''));
-    // Legacy uri
-    // TODO(lhchavez): Remove once we migrate to backendv2
-    uris.push(protocol + window.location.host + '/api/contest/events/' +
-              self.options.contestAlias + '/' +
-              (self.options.scoreboardToken ?
-                   ('?token=' + self.options.scoreboardToken) :
                    ''));
 
     function connect(uris, index) {
@@ -418,12 +413,12 @@ export class Arena {
     }
   }
 
-  contestLoaded(contest) {
+  contestLoaded(problemset) {
     let self = this;
-    if (contest.status == 'error') {
+    if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
         window.location = '/login/?redirect=' + escape(window.location);
-      } else if (contest.start_time) {
+      } else if (problemset.start_time) {
         let f = (function(x, y) {
           return function() {
             let t = new Date();
@@ -433,41 +428,42 @@ export class Arena {
               setTimeout(f, 1000);
             } else {
               // TODO(pablo): Implement this for more than just contests.
-              API.Contest.details({contest_alias: x})
+              API.Problemset.details({problemset_id: x})
                   .then(contestLoaded.bind(self))
                   .fail(UI.ignoreError);
             }
           }
-        })(self.options.contestAlias, contest.start_time);
+        })(self.options.problemsetId, problemset.start_time);
         setTimeout(f, 1000);
       } else {
         self.elements.loadingOverlay.html('404');
       }
       return;
     }
-    if (self.options.isPractice && contest.finish_time &&
-        Date.now() < contest.finish_time.getTime()) {
+    if (self.options.isPractice && problemset.finish_time &&
+        Date.now() < problemset.finish_time.getTime()) {
       window.location = window.location.pathname.replace(/\/practice.*/, '/');
       return;
     }
 
-    if (contest.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = contest.problemset_id;
+    if (problemset.hasOwnProperty('problemset_id')) {
+      self.options.problemsetId = problemset.problemset_id;
     }
 
-    $('#title .contest-title').html(UI.escape(contest.title));
-    self.updateSummary(contest);
-    self.submissionGap = parseInt(contest.submission_gap);
+    $('#title .contest-title')
+        .html(UI.escape(problemset.title | problemset.name));
+    self.updateSummary(problemset);
+    self.submissionGap = parseInt(problemset.submission_gap);
     if (!(self.submissionGap > 0)) self.submissionGap = 0;
 
-    self.initClock(contest.start_time, contest.finish_time,
-                   contest.submission_deadline);
-    self.initProblems(contest);
+    self.initClock(problemset.start_time, problemset.finish_time,
+                   problemset.submission_deadline);
+    self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
     let problemTemplate = $('#problem-list .template');
-    for (let idx in contest.problems) {
-      let problem = contest.problems[idx];
+    for (let idx in problemset.problems) {
+      let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
       let prob = problemTemplate.clone()
@@ -495,11 +491,11 @@ export class Arena {
     $('#root').fadeIn('slow');
   }
 
-  initProblems(contest) {
+  initProblems(problemset) {
     let self = this;
-    self.currentContest = contest;
-    self.contestAdmin = contest.admin;
-    let problems = contest.problems;
+    self.currentContest = problemset;
+    self.contestAdmin = problemset.admin;
+    let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
@@ -510,7 +506,7 @@ export class Arena {
     }
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
-      self.elements.rankingTable.showPenalty = contest.show_penalty;
+      self.elements.rankingTable.showPenalty = problemset.show_penalty;
     }
   }
 
@@ -579,31 +575,21 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
-    if (self.options.contestAlias) {
-      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
-          .then(self.rankingChange.bind(self))
-          .fail(UI.ignoreError);
-    } else if (self.options.assignmentAlias) {
-      API.Course.assignmentScoreboard({
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias
-                })
-          .then(self.rankingChange.bind(self))
-          .fail(UI.ignoreError);
-    }
+    API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+        .then(self.rankingChange.bind(self))
+        .fail(UI.ignoreError);
   }
 
   rankingChange(data) {
     let self = this;
     self.onRankingChanged(data);
-
     let params = {
-      contest_alias: self.options.contestAlias,
+      problemset_id: self.options.problemsetId,
     };
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;
     }
-    API.Contest.scoreboardEvents(params)
+    API.Problemset.scoreboardEvents(params)
         .then(self.onRankingEvents.bind(self))
         .fail(UI.ignoreError);
   }
@@ -693,7 +679,6 @@ export class Arena {
     let series = [];
     let usernames = {};
     this.currentEvents = data;
-
     // group points by person
     for (let i = 0, l = data.events.length; i < l; i++) {
       let curr = data.events[i];
@@ -1720,6 +1705,7 @@ class ObservableRun {
 
     self.alias = ko.observable(run.alias);
     self.contest_alias = ko.observable(run.contest_alias);
+    self.problemset_id = ko.observable(run.problemset_id);
     self.contest_score = ko.observable(run.contest_score);
     self.country_id = ko.observable(run.country_id);
     self.judged_by = ko.observable(run.judged_by);
@@ -1776,7 +1762,8 @@ class ObservableRun {
     let self = this;
     return (self.contest_alias() === null) ?
                '' :
-               '/arena/' + self.contest_alias() + '/';
+               '/arena/' + self.contest_alias() + '/problemset_id/' +
+                   self.problemset_id() + '/';
   }
 
   $user_html() {

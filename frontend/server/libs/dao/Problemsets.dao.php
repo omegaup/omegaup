@@ -64,4 +64,45 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
         return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }
+
+    public static function getTypeByPK($problemset_id) {
+        $sql = 'SELECT
+                    c.alias as contest_alias,
+                    a.alias as assignment,
+                    cu.alias as course,
+                    i.alias as interview_alias,
+                    IF(c.contest_id IS NOT NULL, "Contest",
+                        IF(a.assignment_id IS NOT NULL, "Assignment", "Interview")) as type
+                FROM
+                    Problemsets p
+                LEFT JOIN
+                    Assignments a
+                ON
+                    p.problemset_id = a.problemset_id
+                LEFT JOIN
+                    Courses cu
+                ON
+                    a.course_id = cu.course_id
+                LEFT JOIN
+                    Contests c
+                ON
+                    p.problemset_id = c.problemset_id
+                LEFT JOIN
+                    Interviews i
+                ON
+                    p.problemset_id = i.problemset_id
+                WHERE
+                    (p.problemset_id = ?)
+                LIMIT
+                    1;';
+        $params = [$problemset_id];
+
+        global $conn;
+        $problemset = $conn->GetRow($sql, $params);
+        if (count($problemset) == 0) {
+            return null;
+        }
+
+        return $problemset;
+    }
 }

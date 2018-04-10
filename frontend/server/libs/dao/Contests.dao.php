@@ -129,6 +129,7 @@ class PublicStatus extends StatusBase {
 class ContestsDAO extends ContestsDAOBase {
     private static $getContestsColumns = '
                                 Contests.contest_id,
+                                Contests.problemset_id,
                                 title,
                                 description,
                                 finish_time as original_finish_time,
