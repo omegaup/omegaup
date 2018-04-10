@@ -46,10 +46,16 @@ if (isset($_GET['shva'])) {
 
 if ($c_Session->CurrentSessionAvailable()) {
     if (isset($_GET['redirect'])) {
-        die(header('Location: ' . $_GET['redirect']));
-    } else {
-        die(header('Location: /profile/'));
-    }
+        $redirect_hostname = parse_url($_GET['redirect'], PHP_URL_HOST);
+        //In case malformed URL is given redirect
+        if ($redirect_hostname !== false) {
+            $allowed_hosts = ['blog.omegaup.com', $_SERVER['SERVER_NAME']];
+            if (in_array($redirect_hostname, $allowed_hosts, true)) {
+                die(header('Location: ' . $_GET['redirect']));
+            }
+        }
+    } 
+    die(header('Location: /profile/'));
 } elseif ($triedToLogin) {
     if (isset($response['error'])) {
         $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
