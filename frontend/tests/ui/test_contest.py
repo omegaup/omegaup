@@ -34,11 +34,13 @@ def test_create_contest(driver):
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
+                        verdict='AC', score=1,
+                        source_contents='cout<<a+b<<endl')
 
     with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0)
+                        verdict='WA', score=0,
+                        source_contents='cout<<a-b<<endl')
 
     update_scoreboard_for_contest(driver, contest_alias)
 
@@ -213,9 +215,9 @@ def create_run_user(driver, contest_alias, problem, filename,
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
     source_element = driver.wait.until(
-        EC.visibility_of_element_located(
+        EC.element_to_be_clickable(
             (By.XPATH, (
-                '//form[@class = "run-details-view"]'
+                '//div[@id = "overlay"]'
                 '//pre[@class = "source"]'))))
     if source_contents:
         assert source_contents in source_element.text
