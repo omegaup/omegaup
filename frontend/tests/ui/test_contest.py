@@ -34,13 +34,11 @@ def test_create_contest(driver):
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1,
-                        source_contents='cout<<a+b<<endl')
+                        verdict='AC', score=1)
 
     with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0,
-                        source_contents='cout<<a-b<<endl')
+                        verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
 
