@@ -52,6 +52,10 @@ class ApiCaller {
         $r = null;
         try {
             $r = self::init();
+            if (!empty($_SERVER['HTTP_REFERER']) &&
+                parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['SERVER_NAME']) {
+                throw new CSRFException();
+            }
             $response = self::call($r);
         } catch (ApiException $apiException) {
             self::$log->error($apiException);
