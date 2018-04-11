@@ -8,7 +8,7 @@ if [ $# -lt 1 ]; then
 fi
 
 BRANCH_NAME="$1"
-UPSTEAM_NAME="${UPSTREAM_NAME:-upstream}"
+UPSTREAM_NAME="${UPSTREAM_NAME:-upstream}"
 REMOTE_NAME="${REMOTE_NAME:-origin}"
 
 # Use the new push default.
