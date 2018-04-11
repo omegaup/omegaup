@@ -46,10 +46,11 @@ if (isset($_GET['shva'])) {
 
 if ($c_Session->CurrentSessionAvailable()) {
     if (isset($_GET['redirect'])) {
-        $redirect_hostname = parse_url($_GET['redirect'], PHP_URL_HOST);
+        $redirect_parsed_url = parse_url($_GET['redirect']);
+        $redirect_hostname = $redirect_parsed_url['scheme'] . '://' . $redirect_parsed_url['host'];
         //In case malformed URL is given redirect
         if ($redirect_hostname !== false) {
-            $allowed_hosts = ['blog.omegaup.com', $_SERVER['SERVER_NAME']];
+            $allowed_hosts = [OMEGAUP_URL];
             if (in_array($redirect_hostname, $allowed_hosts, true)) {
                 die(header('Location: ' . $_GET['redirect']));
             }
