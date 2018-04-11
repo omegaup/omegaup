@@ -922,7 +922,7 @@ class UserController extends Controller {
 
             $keys =  [
                 'Pr8oUAIE' => 20
-            ];        
+            ];
         } elseif ($r['contest_type'] == 'OMIAGS-2018') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
