@@ -903,7 +903,6 @@ class UserController extends Controller {
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
             ];
-        // Agregamos estatales de Zacatecas
         } elseif ($r['contest_type'] == 'OMIZAC-2018') {
             if ($r['current_user']->username != 'rsolis'
                 && !$is_system_admin
