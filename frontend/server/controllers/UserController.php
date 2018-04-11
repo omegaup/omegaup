@@ -411,10 +411,12 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $hashedPassword = null;
-        if (isset($r['username']) &&
-            ((!is_null(self::$permissionKey) && self::$permissionKey == $r['permission_key']) ||
-            Authorization::isSystemAdmin($r['current_user_id']))) {
-            // System admin can force reset passwords for any user
+        $user = $r['current_user'];
+        if (isset($r['username']) && $r['username'] != $user->username) {
+            // This is usable only in tests.
+            if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
+                throw new ForbiddenAccessException();
+            }
             Validators::isStringNonEmpty($r['username'], 'username');
 
             try {
@@ -433,7 +435,6 @@ class UserController extends Controller {
                 $hashedPassword = SecurityTools::hashString($r['password']);
             }
         } else {
-            $user = $r['current_user'];
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
