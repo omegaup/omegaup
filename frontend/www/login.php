@@ -54,7 +54,7 @@ if ($c_Session->CurrentSessionAvailable()) {
                 die(header('Location: ' . $_GET['redirect']));
             }
         }
-    } 
+    }
     die(header('Location: /profile/'));
 } elseif ($triedToLogin) {
     if (isset($response['error'])) {
