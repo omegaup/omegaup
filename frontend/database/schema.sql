@@ -168,8 +168,7 @@ CREATE TABLE `Contests` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Countries` (
   `country_id` char(3) NOT NULL,
-  `name_en` varchar(50) NOT NULL,
-  `name_es` varchar(50) NOT NULL,
+  `name` varchar(50) NOT NULL,
   PRIMARY KEY (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
