@@ -75,15 +75,12 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $val = [$startTime, $endTime, $endTime];
 
         global $conn;
-        $results = $conn->GetRow($sql, $val);
+        $results = $conn->getAll($sql, $val);
         if (count($results) == 0) {
             return null;
         }
 
-        $users = array();
-        foreach ($rs as $results) array_push($users, UsersDAO::getByPK($rs['user_id']));
-
-        return $users;
+        return $results;
     }
 
     /**
