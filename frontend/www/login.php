@@ -44,16 +44,26 @@ if (isset($_GET['shva'])) {
     $triedToLogin = true;
 }
 
+function shouldRedirect($url) {
+    $redirect_parsed_url = parse_url($_GET['redirect']);
+    // If a malformed URL is given, don't redirect.
+    if ($redirect_parsed_url === false) {
+        return false;
+    }
+    // Just the path portion of the URL was given.
+    if (!isset($redirect_parsed_url['scheme']) && !isset($redirect_parsed_url['host'])) {
+        return true;
+    }
+    $redirect_url = $redirect_parsed_url['scheme'] . '://' . $redirect_parsed_url['host'];
+    if (isset($redirect_parsed_url['port'])) {
+        $redirect_url .= ':' . $redirect_parsed_url['port'];
+    }
+    return $redirect_url == OMEGAUP_URL;
+}
+
 if ($c_Session->CurrentSessionAvailable()) {
-    if (isset($_GET['redirect'])) {
-        $redirect_parsed_url = parse_url($_GET['redirect']);
-        // If a malformed URL is given, don't redirect.
-        if ($redirect_parsed_url !== false) {
-            $redirect_url = $redirect_parsed_url['scheme'] . '://' . $redirect_parsed_url['host'];
-            if ($redirect_url == OMEGAUP_URL) {
-                die(header('Location: ' . $_GET['redirect']));
-            }
-        }
+    if (shouldRedirect($_GET['redirect'])) {
+        die(header('Location: ' . $_GET['redirect']));
     }
     die(header('Location: /profile/'));
 } elseif ($triedToLogin) {
