@@ -411,10 +411,12 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $hashedPassword = null;
-        if (isset($r['username']) &&
-            ((!is_null(self::$permissionKey) && self::$permissionKey == $r['permission_key']) ||
-            Authorization::isSystemAdmin($r['current_user_id']))) {
-            // System admin can force reset passwords for any user
+        $user = $r['current_user'];
+        if (isset($r['username']) && $r['username'] != $user->username) {
+            // This is usable only in tests.
+            if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
+                throw new ForbiddenAccessException();
+            }
             Validators::isStringNonEmpty($r['username'], 'username');
 
             try {
@@ -433,7 +435,6 @@ class UserController extends Controller {
                 $hashedPassword = SecurityTools::hashString($r['password']);
             }
         } else {
-            $user = $r['current_user'];
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
@@ -903,6 +904,26 @@ class UserController extends Controller {
                 'ORIG1516-URI' => 17,
                 'ORIG1516-VDS' => 15,
             ];
+        } elseif ($r['contest_type'] == 'OMIZAC-2018') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIZAC-2018' => 20
+            ];
+        } elseif ($r['contest_type'] == 'Pr8oUAIE') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'Pr8oUAIE' => 20
+            ];
         } elseif ($r['contest_type'] == 'OMIAGS-2018') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
@@ -1034,7 +1055,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE',
                 ]
             );
         }
