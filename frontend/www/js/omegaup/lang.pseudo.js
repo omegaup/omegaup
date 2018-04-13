@@ -800,6 +800,7 @@ omegaup.OmegaUp.loadTranslations({
 	verificationIdInvalid: "(Th3 pr0vid3d v3rifica7i0n inf0rma7i0n i5 n07 va1id.)",
 	wordAccepted: "(Acc3p73d)",
 	wordsAccepted: "(Acc3p73d)",
+	wordsActions: "(Ac7i0n5)",
 	wordsAddAdmin: "(Add admini57ra70r)",
 	wordsAddGroupAdmin: "(Add admini57ra70r gr0up)",
 	wordsAddMember: "(Add m3mb3r)",

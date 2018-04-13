@@ -17,4 +17,24 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
         global $conn;
         return $conn->GetAll($sql, $val);
     }
+
+    public static function GetAccessForProblemsets(String $problemset_ids) {
+        $sql = "SELECT
+                    u.username,
+                    pal.ip,
+                    UNIX_TIMESTAMP(pal.time) AS `time`
+                FROM
+                    Problemset_Access_Log pal
+                INNER JOIN
+                    Users u
+                ON
+                    u.user_id = pal.user_id
+                WHERE
+                    pal.problemset_id IN ($problemset_ids)
+                ORDER BY
+                    `time`;";
+
+        global $conn;
+        return $conn->GetAll($sql, []);
+    }
 }

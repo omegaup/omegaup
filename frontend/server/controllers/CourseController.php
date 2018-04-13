@@ -1374,6 +1374,96 @@ class CourseController extends Controller {
         return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
+    /**
+     * Returns a report with all user activity for a course.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiActivityReport(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        $isAdmin = Authorization::isCourseAdmin(
+            $r['current_user_id'],
+            $r['course']
+        );
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+        $problemsets = AssignmentsDAO::GetProblemset($r['course']->course_id);
+        $problemset_ids = implode(',', array_column($problemsets, 'problemset_id'));
+        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemsets($problemset_ids);
+        $submissions = SubmissionLogDAO::GetSubmissionsForProblemsets($problemset_ids);
+
+        // Merge both logs.
+        $result['events'] = [];
+        $lenAccesses = count($accesses);
+        $lenSubmissions = count($submissions);
+        $iAccesses = 0;
+        $iSubmissions = 0;
+
+        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
+            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
+                array_push($result['events'], CourseController::processAccess(
+                    $accesses[$iAccesses++]
+                ));
+            } else {
+                array_push($result['events'], CourseController::processSubmission(
+                    $submissions[$iSubmissions++]
+                ));
+            }
+        }
+
+        while ($iAccesses < $lenAccesses) {
+            array_push($result['events'], CourseController::processAccess(
+                $accesses[$iAccesses++]
+            ));
+        }
+
+        while ($iSubmissions < $lenSubmissions) {
+            array_push($result['events'], CourseController::processSubmission(
+                $submissions[$iSubmissions++]
+            ));
+        }
+
+        // Anonimize data.
+        $ipMapping = [];
+        foreach ($result['events'] as &$entry) {
+            if (!array_key_exists($entry['ip'], $ipMapping)) {
+                $ipMapping[$entry['ip']] = count($ipMapping);
+            }
+            $entry['ip'] = $ipMapping[$entry['ip']];
+        }
+
+        $result['status'] = 'ok';
+        return $result;
+    }
+
+    private static function processAccess(&$access) {
+        return [
+            'username' => $access['username'],
+            'time' => (int)$access['time'],
+            'ip' => (int)$access['ip'],
+            'event' => [
+                'name' => 'open',
+            ],
+        ];
+    }
+
+    private static function processSubmission(&$submission) {
+        return [
+            'username' => $submission['username'],
+            'time' => (int)$submission['time'],
+            'ip' => (int)$submission['ip'],
+            'event' => [
+                'name' => 'submit',
+                'problem' => $submission['alias'],
+            ],
+        ];
+    }
+
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
@@ -1449,7 +1539,12 @@ class CourseController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
+        // Log the operation.
+        ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+            'user_id' => $r['current_user_id'],
+            'problemset_id' => $r['assignment']->problemset_id,
+            'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+        ]));
         return [
             'status' => 'ok',
             'name' => $r['assignment']->name,

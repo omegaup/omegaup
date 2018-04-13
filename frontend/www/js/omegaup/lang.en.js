@@ -800,6 +800,7 @@ omegaup.OmegaUp.loadTranslations({
 	verificationIdInvalid: "The provided verification information is not valid.",
 	wordAccepted: "Accepted",
 	wordsAccepted: "Accepted",
+	wordsActions: "Actions",
 	wordsAddAdmin: "Add administrator",
 	wordsAddGroupAdmin: "Add administrator group",
 	wordsAddMember: "Add member",
