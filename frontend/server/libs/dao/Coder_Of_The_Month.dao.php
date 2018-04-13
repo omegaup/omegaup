@@ -64,27 +64,27 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LEFT JOIN
 				Coder_Of_The_Month cm on u.user_id = cm.user_id
 			WHERE
-				cm.user_id IS NULL OR DATE_ADD(cm.time, INTERVAL 1 YEAR) < ?
+				cm.user_id IS NULL OR (DATE_ADD(cm.time, INTERVAL 1 YEAR) < ? AND cm.rank = 1)
 			GROUP BY
 				user_id
 			ORDER BY
-				score DESC
-			LIMIT 1
+                score DESC
+			LIMIT 100
 		";
 
         $val = [$startTime, $endTime, $endTime];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $val);
+        $results = $conn->GetRows($sql, $val);
         if (count($rs) == 0) {
             return null;
         }
 
         $totalCount = $rs['ProblemsSolved'];
-        $user = UsersDAO::getByPK($rs['user_id']);
-        $score = $rs['score'];
+        $users = array();
+        foreach ($rs as $results) array_push($users, UsersDAO::getByPK($rs['user_id']));
 
-        return ['totalCount' => $totalCount, 'user' => $user, 'score' => $score];
+        return Users;
     }
 
     /**
@@ -103,8 +103,10 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             Users u ON u.user_id = cm.user_id
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
+          WHERE
+            cm.rank = 1
           ORDER BY
-            cm.time DESC
+            cm.time DESC,
         ';
 
         global $conn;
@@ -130,6 +132,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             Coder_Of_The_Month cm
           INNER JOIN
             Users u ON u.user_id = cm.user_id
+          WHERE
+            cm.rank = 1
           ORDER BY
             cm.time DESC
           LIMIT 1
