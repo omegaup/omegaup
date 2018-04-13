@@ -1,7 +1,7 @@
 <?php
 
 class QualityNominationTest extends OmegaupTestCase {
-    public static function testGetNominationsHasAuthorAndNominatorSet() {
+    public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
 
@@ -21,7 +21,7 @@ class QualityNominationTest extends OmegaupTestCase {
         self::assertArrayHasKey('nominator', $nominations[0]);
     }
 
-    public static function testGetByIdHasAuthorAndNominatorSet() {
+    public function testGetByIdHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
 
