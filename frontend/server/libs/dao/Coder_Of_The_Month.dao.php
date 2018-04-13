@@ -75,7 +75,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $val = [$startTime, $endTime, $endTime];
 
         global $conn;
-        $results = $conn->GetRows($sql, $val);
+        $results = $conn->GetRow($sql, $val);
         if (count($rs) == 0) {
             return null;
         }
@@ -106,7 +106,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           WHERE
             cm.rank = 1
           ORDER BY
-            cm.time DESC,
+            cm.time DESC
         ';
 
         global $conn;

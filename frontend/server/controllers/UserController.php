@@ -1394,7 +1394,7 @@ class UserController extends Controller {
 
             $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
 
-            if (is_null($codersOfTheMonth)) {
+            if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
                 // Generate the coder
                 $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if (is_null($users)) {
