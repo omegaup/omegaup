@@ -47,11 +47,10 @@ if (isset($_GET['shva'])) {
 if ($c_Session->CurrentSessionAvailable()) {
     if (isset($_GET['redirect'])) {
         $redirect_parsed_url = parse_url($_GET['redirect']);
-        $redirect_hostname = $redirect_parsed_url['scheme'] . '://' . $redirect_parsed_url['host'];
-        //In case malformed URL is given redirect
-        if ($redirect_hostname !== false) {
-            $allowed_hosts = [OMEGAUP_URL];
-            if (in_array($redirect_hostname, $allowed_hosts, true)) {
+        // If a malformed URL is given, don't redirect.
+        if ($redirect_parsed_url !== false) {
+            $redirect_url = $redirect_parsed_url['scheme'] . '://' . $redirect_parsed_url['host'];
+            if ($redirect_url == OMEGAUP_URL) {
                 die(header('Location: ' . $_GET['redirect']));
             }
         }
