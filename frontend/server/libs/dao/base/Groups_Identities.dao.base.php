@@ -8,69 +8,69 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** GroupsUsers Data Access Object (DAO) Base.
+/** GroupsIdentities Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsUsers }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsIdentities }.
  * @access public
  * @abstract
  *
  */
-abstract class GroupsUsersDAOBase extends DAO {
+abstract class GroupsIdentitiesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information`';
+    const FIELDS = '`Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link GroupsUsers} pasado en la base de datos. La llave
+     * Este metodo guarda el estado actual del objeto {@link GroupsIdentities} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers
+     * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(GroupsUsers $Groups_Users) {
-        if (!is_null(self::getByPK($Groups_Users->group_id, $Groups_Users->user_id))) {
-            return GroupsUsersDAOBase::update($Groups_Users);
+    final public static function save(GroupsIdentities $Groups_Identities) {
+        if (!is_null(self::getByPK($Groups_Identities->group_id, $Groups_Identities->identity_id))) {
+            return GroupsIdentitiesDAOBase::update($Groups_Identities);
         } else {
-            return GroupsUsersDAOBase::create($Groups_Users);
+            return GroupsIdentitiesDAOBase::create($Groups_Identities);
         }
     }
 
     /**
-     * Obtener {@link GroupsUsers} por llave primaria.
+     * Obtener {@link GroupsIdentities} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link GroupsUsers} de la base de datos
+     * Este metodo cargara un objeto {@link GroupsIdentities} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link GroupsUsers Un objeto del tipo {@link GroupsUsers}. NULL si no hay tal registro.
+     * @return @link GroupsIdentities Un objeto del tipo {@link GroupsIdentities}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_id, $user_id) {
-        if (is_null($group_id) || is_null($user_id)) {
+    final public static function getByPK($group_id, $identity_id) {
+        if (is_null($group_id) || is_null($identity_id)) {
             return null;
         }
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` FROM Groups_Users WHERE (group_id = ? AND user_id = ?) LIMIT 1;';
-        $params = [$group_id, $user_id];
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
+        $params = [$group_id, $identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new GroupsUsers($rs);
+        return new GroupsIdentities($rs);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link GroupsUsers}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link GroupsIdentities}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +79,10 @@ abstract class GroupsUsersDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link GroupsUsers}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` from Groups_Users';
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` from Groups_Identities';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -93,7 +93,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new GroupsUsers($row);
+            $allData[] = new GroupsIdentities($row);
         }
         return $allData;
     }
@@ -101,7 +101,7 @@ abstract class GroupsUsersDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link GroupsUsers} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link GroupsIdentities} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,28 +116,28 @@ abstract class GroupsUsersDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers
+      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Groups_Users, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Groups_Users instanceof GroupsUsers)) {
-            $Groups_Users = new GroupsUsers($Groups_Users);
+    final public static function search($Groups_Identities, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Groups_Identities instanceof GroupsIdentities)) {
+            $Groups_Identities = new GroupsIdentities($Groups_Identities);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Groups_Users->group_id)) {
+        if (!is_null($Groups_Identities->group_id)) {
             $clauses[] = '`group_id` = ?';
-            $params[] = $Groups_Users->group_id;
+            $params[] = $Groups_Identities->group_id;
         }
-        if (!is_null($Groups_Users->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Groups_Users->user_id;
+        if (!is_null($Groups_Identities->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Groups_Identities->identity_id;
         }
-        if (!is_null($Groups_Users->share_user_information)) {
+        if (!is_null($Groups_Identities->share_user_information)) {
             $clauses[] = '`share_user_information` = ?';
-            $params[] = $Groups_Users->share_user_information;
+            $params[] = $Groups_Identities->share_user_information;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -149,7 +149,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Groups_Users`.`group_id`, `Groups_Users`.`user_id`, `Groups_Users`.`share_user_information` FROM `Groups_Users`';
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` FROM `Groups_Identities`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -161,7 +161,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new GroupsUsers($row);
+            $ar[] = new GroupsIdentities($row);
         }
         return $ar;
     }
@@ -170,13 +170,13 @@ abstract class GroupsUsersDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a actualizar.
+      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a actualizar.
       */
-    final private static function update(GroupsUsers $Groups_Users) {
-        $sql = 'UPDATE `Groups_Users` SET `share_user_information` = ? WHERE `group_id` = ? AND `user_id` = ?;';
+    final private static function update(GroupsIdentities $Groups_Identities) {
+        $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Groups_Users->share_user_information,
-            $Groups_Users->group_id,$Groups_Users->user_id,
+            $Groups_Identities->share_user_information,
+            $Groups_Identities->group_id,$Groups_Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -187,20 +187,20 @@ abstract class GroupsUsersDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto GroupsUsers suministrado. Asegurese
+     * contenidos del objeto GroupsIdentities suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto GroupsUsers dentro de la misma transaccion.
+     * primaria generada en el objeto GroupsIdentities dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a crear.
+     * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a crear.
      */
-    final private static function create(GroupsUsers $Groups_Users) {
-        $sql = 'INSERT INTO Groups_Users (`group_id`, `user_id`, `share_user_information`) VALUES (?, ?, ?);';
+    final private static function create(GroupsIdentities $Groups_Identities) {
+        $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`) VALUES (?, ?, ?);';
         $params = [
-            $Groups_Users->group_id,
-            $Groups_Users->user_id,
-            $Groups_Users->share_user_information,
+            $Groups_Identities->group_id,
+            $Groups_Identities->identity_id,
+            $Groups_Identities->share_user_information,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -215,8 +215,8 @@ abstract class GroupsUsersDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link GroupsUsers} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link GroupsUsers}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link GroupsIdentities} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link GroupsIdentities}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -238,17 +238,17 @@ abstract class GroupsUsersDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers
-     * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers
+     * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities
+     * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(GroupsUsers $Groups_UsersA, GroupsUsers $Groups_UsersB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(GroupsIdentities $Groups_IdentitiesA, GroupsIdentities $Groups_IdentitiesB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Groups_UsersA->group_id;
-        $b = $Groups_UsersB->group_id;
+        $a = $Groups_IdentitiesA->group_id;
+        $b = $Groups_IdentitiesB->group_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`group_id` >= ? AND `group_id` <= ?';
             $params[] = min($a, $b);
@@ -258,19 +258,19 @@ abstract class GroupsUsersDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Groups_UsersA->user_id;
-        $b = $Groups_UsersB->user_id;
+        $a = $Groups_IdentitiesA->identity_id;
+        $b = $Groups_IdentitiesB->identity_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Groups_UsersA->share_user_information;
-        $b = $Groups_UsersB->share_user_information;
+        $a = $Groups_IdentitiesA->share_user_information;
+        $b = $Groups_IdentitiesB->share_user_information;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`share_user_information` >= ? AND `share_user_information` <= ?';
             $params[] = min($a, $b);
@@ -280,7 +280,7 @@ abstract class GroupsUsersDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Groups_Users`';
+        $sql = 'SELECT * FROM `Groups_Identities`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -289,7 +289,7 @@ abstract class GroupsUsersDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new GroupsUsers($row);
+            $ar[] = new GroupsIdentities($row);
         }
         return $ar;
     }
@@ -298,21 +298,21 @@ abstract class GroupsUsersDAOBase extends DAO {
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto GroupsUsers suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto GroupsIdentities suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a eliminar
+     * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a eliminar
      */
-    final public static function delete(GroupsUsers $Groups_Users) {
-        if (is_null(self::getByPK($Groups_Users->group_id, $Groups_Users->user_id))) {
+    final public static function delete(GroupsIdentities $Groups_Identities) {
+        if (is_null(self::getByPK($Groups_Identities->group_id, $Groups_Identities->identity_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Groups_Users` WHERE group_id = ? AND user_id = ?;';
-        $params = [$Groups_Users->group_id, $Groups_Users->user_id];
+        $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
+        $params = [$Groups_Identities->group_id, $Groups_Identities->identity_id];
         global $conn;
 
         $conn->Execute($sql, $params);
