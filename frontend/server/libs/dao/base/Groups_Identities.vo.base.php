@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Groups_Users.
+ * Value Object file for table Groups_Identities.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsUsers extends VO {
+class GroupsIdentities extends VO {
     /**
-     * Constructor de GroupsUsers
+     * Constructor de GroupsIdentities
      *
-     * Para construir un objeto de tipo GroupsUsers debera llamarse a el constructor
+     * Para construir un objeto de tipo GroupsIdentities debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -29,8 +29,8 @@ class GroupsUsers extends VO {
         if (isset($data['group_id'])) {
             $this->group_id = $data['group_id'];
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
         if (isset($data['share_user_information'])) {
             $this->share_user_information = $data['share_user_information'];
@@ -57,12 +57,12 @@ class GroupsUsers extends VO {
     public $group_id;
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $identity_id;
 
     /**
       * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
