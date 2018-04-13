@@ -47,7 +47,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
-		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.min.js"}"></script>
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
@@ -74,6 +74,9 @@
 {/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
+{/if}
+{if isset($recaptchaFile)}
+		<script type="text/javascript" src="{$recaptchaFile}"></script>
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>

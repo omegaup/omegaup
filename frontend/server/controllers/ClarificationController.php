@@ -169,7 +169,7 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::canEditClarification($r['current_user_id'], $r['clarification'])) {
+        if (!Authorization::canEditClarification($r['current_identity_id'], $r['clarification'])) {
             throw new ForbiddenAccessException();
         }
     }

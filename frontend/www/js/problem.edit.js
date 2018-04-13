@@ -365,7 +365,8 @@ omegaup.OmegaUp.on('ready', function() {
 
   function problemCallback(problem) {
     $('.page-header h1 span')
-        .html(omegaup.T.problemEditEditProblem + ' ' + problem.title);
+        .html(omegaup.T.problemEditEditProblem + ' ' +
+              omegaup.UI.escape(problem.title));
     $('.page-header h1 small')
         .html('&ndash; <a href="/arena/problem/' + problemAlias + '/">' +
               omegaup.T.problemEditGoToProblem + '</a>');

@@ -16,7 +16,9 @@
 					{#wordsPointsForRank#}
 					<a rel="tooltip" href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
+				{if $LOGGED_IN eq '1'}
 				<th class="numericColumn">{#wordsMyScore#}</th>
+				{/if}
 			</tr>
 		</thead>
 		<tbody>
@@ -26,7 +28,7 @@
 					{if $problem.visibility < 0} <span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
 					{if $problem.visibility == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
 					{if $problem.visibility >= 2} <img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-					<a href="/arena/problem/{$problem.alias}">{$problem.title}</a>
+					<a href="/arena/problem/{$problem.alias}">{$problem.title|htmlspecialchars}</a>
 					{if count($problem.tags) > 0}
 					<div class="tag-list" title="{foreach item=tag from=$problem.tags}{$tag.name} {/foreach}">
 					{foreach item=tag from=$problem.tags}
@@ -65,7 +67,9 @@
   				{/if}
 				<td class="numericColumn">{100 * $problem.ratio}%</td>
 				<td class="numericColumn">{$problem.points}</td>
+				{if $LOGGED_IN eq '1'}
 				<td class="numericColumn">{$problem.score}</td>
+				{/if}
 				</tr>
 			{/foreach}
 		</tbody>

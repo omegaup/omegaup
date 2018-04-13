@@ -15,7 +15,10 @@ class CourseProblemsTest extends OmegaupTestCase {
         // Add 3 problems to the assignment.
         $numberOfProblems = 3;
         for ($i=0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'author' => $user,
+            ]), $login);
         }
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, $problemData);
 

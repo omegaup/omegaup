@@ -69,34 +69,16 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $admins;
     }
 
-    public static function hasRole($user_id, $acl_id, $role_id) {
+    public static function hasRole($identity_id, $acl_id, $role_id) {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
                 User_Roles ur
-            WHERE
-                ur.user_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
-        $params = [
-            $user_id,
-            $role_id,
-            Authorization::SYSTEM_ACL,
-            $acl_id,
-        ];
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
-    }
-
-    public static function hasIdentityRole($identity_id, $acl_id, $role_id) {
-        $sql = '
-            SELECT
-                COUNT(*) > 0
-            FROM
-                `User_Roles` ur
             INNER JOIN
-                `Users` u ON u.user_id = ur.user_id # TODO: Change by Identities table and gi.identity column when refactor phase 3 is approved
+                Users u ON u.user_id = ur.user_id
             INNER JOIN
-                `Identities` i ON u.user_id = i.user_id
+                Identities i ON u.user_id = i.user_id
             WHERE
                 i.identity_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
@@ -106,11 +88,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             $acl_id,
         ];
         global $conn;
-        return $conn->GetOne($sql, $params);
-    }
-
-    public static function isAdmin($user_id, $acl_id) {
-        return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
+        return $conn->GetOne($sql, $params) > 0;
     }
 
     public static function getContestAdmins(Contests $contest) {
@@ -123,10 +101,6 @@ class UserRolesDAO extends UserRolesDAOBase {
 
     public static function getProblemAdmins(Problems $problem) {
         return self::getAdmins($problem->acl_id);
-    }
-
-    public static function isSystemAdmin($user_id) {
-        return self::hasRole($user_id, Authorization::SYSTEM_ACL, Authorization::ADMIN_ROLE);
     }
 
     public static function getSystemRoles($user_id) {
@@ -152,18 +126,18 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $roles;
     }
 
-    public static function getSystemGroups($user_id) {
+    public static function getSystemGroups($identity_id) {
         $sql = "
             SELECT
                 g.name
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             INNER JOIN
-                Groups g ON gu.group_id = g.group_id
+                Groups g ON gi.group_id = g.group_id
             WHERE
-                gu.user_id = ? AND g.name LIKE '%omegaup:%';";
+                gi.identity_id = ? AND g.name LIKE '%omegaup:%';";
         $params = [
-            $user_id
+            $identity_id
         ];
         global $conn;
 

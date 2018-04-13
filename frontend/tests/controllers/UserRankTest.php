@@ -54,7 +54,7 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testPrivateUserInRanking() {
         // Create a private user
-        $contestantPrivate = UserFactory::createUser(null, null, null, true, true);
+        $contestantPrivate = UserFactory::createUser(new UserParams(['is_private' => true]));
         // Create one problem and a submission by the private user
         $problemData = ProblemsFactory::createProblem();
         $runDataPrivate = RunsFactory::createRunToProblem($problemData, $contestantPrivate);
@@ -89,7 +89,9 @@ class UserRankTest extends OmegaupTestCase {
 
         // Create a user and sumbit a run with him
         $contestant2 = UserFactory::createUser();
-        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0);
+        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
         $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
         RunsFactory::gradeRun($runDataPrivate);
 
