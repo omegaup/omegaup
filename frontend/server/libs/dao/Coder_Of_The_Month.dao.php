@@ -76,19 +76,18 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $results = $conn->GetRow($sql, $val);
-        if (count($rs) == 0) {
+        if (count($results) == 0) {
             return null;
         }
 
-        $totalCount = $rs['ProblemsSolved'];
         $users = array();
         foreach ($rs as $results) array_push($users, UsersDAO::getByPK($rs['user_id']));
 
-        return Users;
+        return $users;
     }
 
     /**
-     * Get all Coders of the month
+     * Get all first coders of the month
      *
      * @static
      * @return Array
@@ -116,6 +115,38 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             $allData[] = $row;
         }
         return $allData;
+    }
+
+    /**
+     * Get all coder of the months based on month
+     * 
+     * @params string (date) $firstDay
+     * @return Users
+     */
+    final public static function getMonthlyList($firstDay) {
+        $date = date('Y-m-01', strtotime($firstDay));
+        $sql = '
+          SELECT
+            cm.time, u.username, u.country_id, e.email, u.user_id
+          FROM
+            Coder_Of_The_Month cm
+          INNER JOIN
+            Users u ON u.user_id = cm.user_id
+          LEFT JOIN
+            Emails e ON e.user_id = u.user_id
+          WHERE
+            cm.time = ?
+          ORDER BY
+            cm.time DESC
+          LIMIT 100
+        ';
+        global $conn;
+        $results = $conn->getAll($sql, [$date]);
+        if (count($results) == 0) {
+            return null;
+        }
+
+        return $results;
     }
 
     /**

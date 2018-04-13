@@ -1443,7 +1443,9 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            $coders = array();
+            if (!empty($r['date'])) $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            else $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             foreach ($coders as $c) {
                 $response['coders'][] = [
                     'username' => $c['username'],
