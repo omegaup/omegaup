@@ -7,37 +7,13 @@
       <form class="form bottom-margin"
             v-on:submit.prevent="onChangePassword">
         <div class="row">
-          <div class="col-md-6">
-            <div class="input-group">
-              <input class="form-control"
-                   name="password"
-                   type="text"
-                   v-bind:placeholder="T.passwordResetPassword"
-                   v-model="password"> <span class="input-group-btn"><button class=
-                   "btn btn-default"
-                      type="button"
-                      v-bind:aria-label="T.passwordGenerateRandom"
-                      v-bind:title="T.passwordGenerateRandom"
-                      v-on:click.prevent="onGeneratePassword"><span aria-hidden="true"
-                    class="glyphicon glyphicon-random"></span></button> <button class=
-                    "btn btn-default"
-                      type="button"
-                      v-on:click.prevent="onChangePassword">{{ T.userEditChangePassword
-                      }}</button></span>
-            </div>
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-12">
             <button class="btn btn-default btn-block"
                  type="button"
                  v-bind:disabled="verified"
-                 v-on:click.prevent="onVerifyUser">
-            <template v-if="verified">
-              <span aria-hidden="true"
-                        class="glyphicon glyphicon-ok"></span> {{ T.userVerified }}
-            </template>
-            <template v-else="">
-              {{ T.userVerify }}
-            </template></button>
+                 v-on:click.prevent="onVerifyUser"><span v-if="verified"><span aria-hidden="true"
+                  class="glyphicon glyphicon-ok"></span> {{ T.userVerified }}</span><span v-else=
+                  "">{{ T.userVerify }}</span></button>
           </div>
         </div>
       </form>
@@ -92,7 +68,6 @@ export default {
   data: function() {
     return {
       T: T,
-      password: '',
     };
   },
   methods: {
@@ -103,22 +78,10 @@ export default {
     onChangeExperiment: function(ev, experiment) {
       this.$emit('change-experiment', experiment, ev.target.checked);
     },
-    onChangePassword: function() {
-      this.$emit('change-password', this.password);
-    },
     onChangeRole: function(ev, role) {
       this.$emit('change-role', role, ev.target.checked);
     },
     onVerifyUser: function() { this.$emit('verify-user');},
-    onGeneratePassword: function() {
-      let chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let length = 8;
-      var newPassword = '';
-      for (var i = 0; i < length; i++) {
-        newPassword += chars[Math.floor(Math.random() * chars.length)];
-      }
-      this.password = newPassword;
-    },
   },
 };
 </script>

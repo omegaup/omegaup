@@ -143,11 +143,11 @@ try_define('PROBLEMS_PER_PAGE', 100);
 try_define('MAX_PROBLEMS_IN_CONTEST', 30);
 
 # #########################
-# USER TYPES
+# IDENTITY TYPES
 # #########################
-try_define('USER_ADMIN', 'user_admin');
-try_define('USER_NORMAL', 'user_normal');
-try_define('USER_ANONYMOUS', 'user_anonymous');
+try_define('IDENTITY_ADMIN', 'identity_admin');
+try_define('IDENTITY_NORMAL', 'identity_normal');
+try_define('IDENTITY_ANONYMOUS', 'identity_anonymous');
 
 # ########################
 # PASSWORD RESET CONFIG

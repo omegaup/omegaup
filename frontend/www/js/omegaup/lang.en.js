@@ -6,6 +6,7 @@ omegaup.OmegaUp.loadTranslations({
 	User: "Username",
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
 	activeUsers: "Active users",
+	addUsersToReviewerGroup: "Clique para adicionar um usu\u00e1rio na lista de revisores.",
 	adminAdded: "Admin successfully added.",
 	adminRemoved: "Admin successfully removed.",
 	aliasInUse: "alias already exists. Please choose a different alias.",
