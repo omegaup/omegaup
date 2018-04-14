@@ -833,6 +833,10 @@ class ContestController extends Controller {
         // Authenticate user
         self::authenticateRequest($r);
 
+        if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+            throw new ForbiddenAccessException();
+        }
+
         $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
 
         $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
