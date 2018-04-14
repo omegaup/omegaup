@@ -126,7 +126,7 @@ class ProblemController extends Controller {
         Validators::isValidSubset(
             $r['languages'],
             'languages',
-            RunController::$kSupportedLanguages,
+            array_keys(RunController::$kSupportedLanguages),
             $is_required
         );
     }
