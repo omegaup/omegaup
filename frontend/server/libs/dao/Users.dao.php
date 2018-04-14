@@ -131,19 +131,23 @@ class UsersDAO extends UsersDAOBase {
         return $rs;
     }
 
-    public static function getHideTags($user_id) {
-        if (is_null($user_id)) {
+    public static function getHideTags($identity_id) {
+        if (is_null($identity_id)) {
             return false;
         }
         $sql = 'SELECT
                     `Users`.`hide_problem_tags`
                 FROM
                     Users
+                INNER JOIN
+                    Identities
+                ON
+                    Users.user_id = Identities.user_id
                 WHERE
-                    user_id = ?
+                    identity_id = ?
                 LIMIT
                     1;';
-        $params = [$user_id];
+        $params = [$identity_id];
 
         global $conn;
         return $conn->GetOne($sql, $params);

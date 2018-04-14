@@ -2265,7 +2265,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Adds the user to the group.
+     * Adds the identity to the group.
      *
      * @param Request $r
      */
@@ -2276,10 +2276,9 @@ class UserController extends Controller {
 
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
-
         try {
-            GroupsUsersDAO::save(new GroupsUsers([
-                'user_id' => $r['user']->user_id,
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
+                'identity_id' => $r['current_identity_id'],
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {
@@ -2305,8 +2304,8 @@ class UserController extends Controller {
         self::validateAddRemoveGroup($r);
 
         try {
-            GroupsUsersDAO::delete(new GroupsUsers([
-                'user_id' => $r['user']->user_id,
+            GroupsIdentitiesDAO::delete(new GroupsIdentities([
+                'identity_id' => $r['current_identity_id'],
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {

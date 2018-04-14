@@ -1,35 +1,26 @@
 <?php
 
-require_once('Estructura.php');
-require_once('base/Groups_Users.dao.base.php');
-require_once('base/Groups_Users.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** GroupsUsers Data Access Object (DAO).
+include_once('base/Groups_Identities.dao.base.php');
+include_once('base/Groups_Identities.vo.base.php');
+/** GroupsIdentities Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsUsers }.
-  * @author alanboy
+  * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsIdentities }.
   * @access public
-  * @package docs
   *
   */
-class GroupsUsersDAO extends GroupsUsersDAOBase {
+class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
     public static function GetMemberUsernames(Groups $group) {
         global  $conn;
         $sql = '
             SELECT
-                u.username
+                i.username
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             INNER JOIN
-                Users u ON u.user_id = gu.user_id
+                Identities i ON i.identity_id = gi.identity_id
             WHERE
-                gu.group_id = ?;';
+                gi.group_id = ?;';
         $params = [$group->group_id];
         return $conn->GetAll($sql, $params);
     }
@@ -40,9 +31,9 @@ class GroupsUsersDAO extends GroupsUsersDAOBase {
             SELECT
                 COUNT(*) AS count
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             WHERE
-                gu.group_id = ?;';
+                gi.group_id = ?;';
         $params = [$group_id];
         return $conn->GetOne($sql, $params);
     }
