@@ -45,6 +45,28 @@ class ApiCaller {
     }
 
     /**
+     * Detects CSRF attempts.
+     *
+     * @return whether this was a CSRF attempt.
+     */
+    private static function isCSRFAttempt() {
+        if (empty($_SERVER['HTTP_REFERER'])) {
+            // This API request was explicitly created.
+            return false;
+        }
+        $referrer_host = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+        if ($referrer_host === false) {
+            // Malformed referrer. Fail closed and prefer to not allow this.
+            return true;
+        }
+        // Instead of attempting to exactly match the whole URL, just ensure
+        // the host is the same. Otherwise this would break tests and local
+        // development environments.
+        $omegaup_url_host = parse_url(OMEGAUP_URL, PHP_URL_HOST);
+        return $referrer_host !== $omegaup_url_host;
+    }
+
+    /**
      *Handles main API workflow. All HTTP API calls start here.
      *
      */
@@ -52,8 +74,7 @@ class ApiCaller {
         $r = null;
         try {
             $r = self::init();
-            if (!empty($_SERVER['HTTP_REFERER']) &&
-                parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['SERVER_NAME']) {
+            if (self::isCSRFAttempt()) {
                 throw new CSRFException();
             }
             $response = self::call($r);
