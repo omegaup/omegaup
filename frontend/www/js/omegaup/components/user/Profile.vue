@@ -15,22 +15,15 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">{{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank} - `:
-          '' }} <omegaup-user-rankcolor v-bind:classname="profile.classname"
-                                  v-bind:username="profile.username"></omegaup-user-rankcolor>
-                                  <img height="11"
+          '' }} <omegaup-user-username v-bind:classname="profile.classname"
+                                 v-bind:username="profile.username"></omegaup-user-username>
+                                 <img height="11"
                v-bind:src="`/media/flags/${profile.country_id}.png`"
                v-bind:title="profile.country_id"
                v-if="profile.country_id"
                width="16"></h2>
-        </div><omegaup-user-basicinfo v-bind:classname="profile.classname"
-             v-bind:country="profile.country"
-             v-bind:email="profile.email"
-             v-bind:graduationdate="profile.graduation_date"
-             v-bind:name="profile.name"
-             v-bind:rank="rank"
-             v-bind:school="profile.school"
-             v-bind:state="profile.state"
-             v-bind:username="profile.username"></omegaup-user-basicinfo>
+        </div><omegaup-user-basicinfo v-bind:profile="profile"
+             v-bind:rank="rank"></omegaup-user-basicinfo>
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -67,14 +60,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="group in solved_problems">
+            <tr v-for="group in solvedProblems">
               <td v-for="problem in group">
                 <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!solved_problems"><img src="/media/wait.gif"></div>
+        <div v-show="!solvedProblems"><img src="/media/wait.gif"></div>
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -88,14 +81,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="group in unsolved_problems">
+            <tr v-for="group in unsolvedProblems">
               <td v-for="problem in group">
                 <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!unsolved_problems"><img src="/media/wait.gif"></div>
+        <div v-show="!unsolvedProblems"><img src="/media/wait.gif"></div>
       </div>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
@@ -111,7 +104,7 @@
 <script>
 import {T} from '../../omegaup.js';
 import user_BasicInfo from './BasicInfo.vue';
-import user_RankColor from './RankColor.vue';
+import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import ChartsVue from './Charts.vue';
 export default {
@@ -123,12 +116,31 @@ export default {
     rank: String,
     charts: Object,
   },
+  computed: {
+    solvedProblems: function() {
+      if (this.solved_problems)
+        return this.groupElements(this.solved_problems, this.columns);
+    },
+    unsolvedProblems: function() {
+      if (this.unsolved_problems)
+        return this.groupElements(this.unsolved_problems, this.columns);
+    },
+  },
+  methods: {
+    groupElements(elements, columns) {
+      let groups = [];
+      for (let i = 0; i < elements.length; i += columns) {
+        groups.push(elements.slice(i, i + columns));
+      }
+      return groups;
+    },
+  },
   data: function() {
-    return { T: T, }
+    return { T: T, columns: 3, }
   },
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
-    'omegaup-user-rankcolor': user_RankColor,
+    'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
   }
 }

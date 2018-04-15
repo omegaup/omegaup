@@ -6,50 +6,50 @@
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileUsername }}</strong></span>
-          <span class="fbSettingsListItemContent fcg">https://omegaup.com/profile/
-          <strong><omegaup-user-rankcolor v-bind:classname="classname"
-                                  v-bind:username=
-                                  "username"></omegaup-user-rankcolor></strong>/</span></a>
+          <span class="fbSettingsListItemContent fcg">https://omegaup.com/profile/<strong><omegaup-user-username v-bind:classname="profile.classname"
+                                 v-bind:username=
+                                 "profile.username"></omegaup-user-username></strong>/</span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profile }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg">{{ name }}</span></a>
+          "fbSettingsListItemContent fcg">{{ profile.name }}</span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem"
-            v-if="email">
+            v-if="profile.email">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileEmail }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg">Primary: <strong>{{ email }}</strong>&nbsp;</span></a>
+          "fbSettingsListItemContent fcg">Primary: <strong>{{ profile.email
+          }}</strong>&nbsp;</span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileCountry }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg"><strong>{{ country }}</strong></span></a>
+          "fbSettingsListItemContent fcg"><strong>{{ profile.country }}</strong></span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileState }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg"><strong>{{ state }}</strong></span></a>
+          "fbSettingsListItemContent fcg"><strong>{{ profile.state }}</strong></span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileSchool }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg"><strong>{{ school }}</strong></span></a>
+          "fbSettingsListItemContent fcg"><strong>{{ profile.school }}</strong></span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileGraduationDate }}</strong></span>
-          <span class="fbSettingsListItemContent fcg"><strong>{{ graduation_date
+          <span class="fbSettingsListItemContent fcg"><strong>{{ profile.graduation_date
           }}</strong></span></a>
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
           "pls fbSettingsListItemLabel"><strong>{{ T.profileRank }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg"><strong><omegaup-user-rankcolor v-bind:classname=
-          "classname"
-                                  v-bind:username=
-                                  "rank"></omegaup-user-rankcolor></strong></span></a>
+          "fbSettingsListItemContent fcg"><strong><omegaup-user-username v-bind:classname=
+          "profile.classname"
+                                 v-bind:username=
+                                 "rank"></omegaup-user-username></strong></span></a>
         </li>
       </ul>
     </div>
@@ -58,24 +58,17 @@
 
 <script>
 import {T} from '../../omegaup.js';
-import user_RankColor from './RankColor.vue';
+import user_Username from './Username.vue';
 export default {
   props: {
-    name: String,
-    username: String,
-    classname: String,
-    email: String,
-    country: String,
-    state: String,
-    school: String,
-    graduation_date: String,
+    profile: Object,
     rank: String,
   },
   data: function() {
     return { T: T, }
   },
   components: {
-    'omegaup-user-rankcolor': user_RankColor,
+    'omegaup-user-username': user_Username,
   }
 }
 </script>

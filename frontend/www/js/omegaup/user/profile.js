@@ -39,29 +39,13 @@ OmegaUp.on('ready', function() {
 
       API.User.problemsSolved({username: user_profile.username})
           .then(function(data) {
-            let problems = [], group;
-            for (let i = 0; i < data['problems'].length; i++) {
-              group = [];
-              for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
-                group.push(data['problems'][i]);
-              }
-              problems.push(group);
-            }
-            viewProfile.solved_problems = problems;
+            viewProfile.solved_problems = data['problems'];
           })
           .fail(UI.apiError);
 
       API.User.listUnsolvedProblems({username: user_profile.username})
           .then(function(data) {
-            let problems = [], group;
-            for (let i = 0; i < data['problems'].length; i++) {
-              group = [];
-              for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
-                group.push(data['problems'][i]);
-              }
-              problems.push(group);
-            }
-            viewProfile.unsolved_problems = problems;
+            viewProfile.unsolved_problems = data['problems'];
           })
           .fail(UI.apiError);
 
