@@ -17,56 +17,57 @@ OmegaUp.on('ready', function() {
           rank: this.rank,
           charts: this.charts,
         }
-      })
+      });
     },
     mounted: function() {
       API.User.contestStats({username: user_profile.username})
-        .then(function(data) {
-          let contests = [];
-          for (var contest_alias in data['contests']) {
-            var now = new Date();
-            var end = OmegaUp.remoteTime(data['contests'][contest_alias]['data']['finish_time'] * 1000);
-            if (data['contests'][contest_alias]['place'] != null && now > end) {
-              contests.push(data['contests'][contest_alias]);
+          .then(function(data) {
+            let contests = [];
+            for (var contest_alias in data['contests']) {
+              var now = new Date();
+              var end = OmegaUp.remoteTime(
+                  data['contests'][contest_alias]['data']['finish_time'] *
+                  1000);
+              if (data['contests'][contest_alias]['place'] != null &&
+                  now > end) {
+                contests.push(data['contests'][contest_alias]);
+              }
             }
-          }
-          viewProfile.contests = contests;
-        })
-        .fail(UI.apiError);
+            viewProfile.contests = contests;
+          })
+          .fail(UI.apiError);
 
       API.User.problemsSolved({username: user_profile.username})
-        .then(function(data) {
-          let problems = [], group;
-          for (let i = 0; i < data['problems'].length; i++) {
-            group = [];
-            for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
-              group.push(data['problems'][i]);
+          .then(function(data) {
+            let problems = [], group;
+            for (let i = 0; i < data['problems'].length; i++) {
+              group = [];
+              for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
+                group.push(data['problems'][i]);
+              }
+              problems.push(group);
             }
-            problems.push(group);
-          }
-          viewProfile.solved_problems = problems;
-        })
-        .fail(UI.apiError);
+            viewProfile.solved_problems = problems;
+          })
+          .fail(UI.apiError);
 
       API.User.listUnsolvedProblems({username: user_profile.username})
-        .then(function(data) {
-          let problems = [], group;
-          for (let i = 0; i < data['problems'].length; i++) {
-            group = [];
-            for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
-              group.push(data['problems'][i]);
+          .then(function(data) {
+            let problems = [], group;
+            for (let i = 0; i < data['problems'].length; i++) {
+              group = [];
+              for (let j = 0; j < 3 && i < data['problems'].length; j++, i++) {
+                group.push(data['problems'][i]);
+              }
+              problems.push(group);
             }
-            problems.push(group);
-          }
-          viewProfile.unsolved_problems = problems;
-        })
-        .fail(UI.apiError);
+            viewProfile.unsolved_problems = problems;
+          })
+          .fail(UI.apiError);
 
       API.User.stats({username: user_profile.username})
-        .then(function(data) {
-          viewProfile.charts = data;
-        })
-        .fail(omegaup.UI.apiError);
+          .then(function(data) { viewProfile.charts = data; })
+          .fail(omegaup.UI.apiError);
     },
     data: {
       profile: user_profile,
@@ -76,7 +77,7 @@ OmegaUp.on('ready', function() {
       charts: null,
     },
     computed: {
-      rank: function () {
+      rank: function() {
         switch (user_profile.classname) {
           case 'user-rank-unranked':
             return T.profileRankUnrated;
@@ -96,5 +97,5 @@ OmegaUp.on('ready', function() {
     components: {
       'omegaup-user-profile': user_Profile,
     },
-  })
+  });
 });

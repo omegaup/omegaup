@@ -40,4 +40,3 @@ export default {
   color: #CB000A;
 }
 </style>
-
