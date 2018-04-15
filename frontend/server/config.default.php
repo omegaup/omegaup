@@ -14,7 +14,7 @@ try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_URL', 'http://localhost');
-try_define('OMEGAUP_ENVIRONMENT', 'production');
+try_define('OMEGAUP_ENVIRONMENT', 'development');
 try_define('OMEGAUP_MAINTENANCE', null);
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
