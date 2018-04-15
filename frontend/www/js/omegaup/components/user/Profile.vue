@@ -105,7 +105,11 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{{ T.profileStatistics }}</h2>
 			</div>
-			<div id="omegaup-user-charts"></div>
+			<omegaup-user-charts
+				v-if="charts"
+				v-bind:data="charts"
+				v-bind:username="profile.username">
+			</omegaup-user-charts>
 		</div>
 
 	</div>
@@ -117,6 +121,8 @@
 import {T} from '../../omegaup.js';
 import user_BasicInfo from './BasicInfo.vue';
 import user_RankColor from './RankColor.vue';
+import user_Charts from './Charts.vue';
+import ChartsVue from './Charts.vue';
 export default {
 	props: {
 		profile: Object,
@@ -124,6 +130,7 @@ export default {
 		solved_problems: Array,
 		unsolved_problems: Array,
 		rank: String,
+		charts: Object,
 	},
 	data: function() {
 		return {
@@ -133,6 +140,7 @@ export default {
 	components: {
 		'omegaup-user-basicinfo': user_BasicInfo,
 		'omegaup-user-rankcolor': user_RankColor,
+		'omegaup-user-charts': user_Charts,
 	}
 }
 </script>

@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import user_Charts from '../components/user/Charts.vue';
 import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
@@ -16,6 +15,7 @@ OmegaUp.on('ready', function() {
           solved_problems: this.solved_problems,
           unsolved_problems: this.unsolved_problems,
           rank: this.rank,
+          charts: this.charts,
         }
       })
     },
@@ -64,17 +64,7 @@ OmegaUp.on('ready', function() {
 
       API.User.stats({username: user_profile.username})
         .then(function(data) {
-          let userCharts = new Vue({
-            el: '#omegaup-user-charts',
-            render: function(createElement) {
-              return createElement('omegaup-user-charts', {
-                props: {data: data, username: viewProfile.profile.username},
-              });
-            },
-            components: {
-              'omegaup-user-charts': user_Charts,
-            },
-          });
+          viewProfile.charts = data;
         })
         .fail(omegaup.UI.apiError);
     },
@@ -83,6 +73,7 @@ OmegaUp.on('ready', function() {
       contests: null,
       solved_problems: null,
       unsolved_problems: null,
+      charts: null,
     },
     computed: {
       rank: function () {
