@@ -53,16 +53,6 @@ OmegaUp.on('ready', function() {
                   .fail(omegaup.UI.apiError);
             }
           },
-          'change-password': function(password) {
-            omegaup.API.User.changePassword({
-                              username: payload.username,
-                              password: password,
-                            })
-                .then(function() {
-                  omegaup.UI.success(T.passwordResetResetSuccess);
-                })
-                .fail(omegaup.UI.apiError);
-          },
           'verify-user': function() {
             omegaup.API.User.verifyEmail({usernameOrEmail: payload.username})
                 .then(function() { adminUser.verified = true; })

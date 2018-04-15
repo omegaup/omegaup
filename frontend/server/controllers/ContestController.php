@@ -88,7 +88,7 @@ class ContestController extends Controller {
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended, $query);
+                $contests = ContestsDAO::getAllContestsForIdentity($r['current_identity_id'], $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -153,8 +153,8 @@ class ContestController extends Controller {
                     'DESC'
                 );
             } else {
-                $contests = ContestsDAO::getAllContestsAdminedByUser(
-                    $r['current_user_id'],
+                $contests = ContestsDAO::getAllContestsAdminedByIdentity(
+                    $r['current_identity_id'],
                     $page,
                     $pageSize
                 );
@@ -815,6 +815,69 @@ class ContestController extends Controller {
             $name = chr(ord('A') + $idx % 26) . $name;
         }
         return $name;
+    }
+
+    /**
+     * Clone a contest
+     *
+     * @return Array
+     * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiClone(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate user
+        self::authenticateRequest($r);
+
+        $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
+
+        $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
+        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+
+        ContestsDAO::transBegin();
+        $response = [];
+        try {
+            // Create the contest
+            $response[] = self::apiCreate(new Request([
+                'title' => $r['title'],
+                'description' => $r['description'],
+                'alias' => $r['alias'],
+                'start_time' => $r['start_time'],
+                'finish_time' => $r['start_time'] + $length,
+                'scoreboard' => $original_contest->scoreboard,
+                'points_decay_factor' => $original_contest->points_decay_factor,
+                'submissions_gap' => $original_contest->submissions_gap,
+                'feedback' => $original_contest->feedback,
+                'penalty_type' => $original_contest->penalty_type,
+                'public' => 0, // All cloned contests start in private mode
+                'auth_token' => $auth_token
+            ]));
+            $problems = self::apiProblems($r);
+            foreach ($problems['problems'] as $problem) {
+                $response[] = self::apiAddProblem(new Request([
+                        'contest_alias' => $r['alias'],
+                        'problem_alias' => $problem['alias'],
+                        'points' => $problem['points'],
+                        'auth_token' => $auth_token
+                    ]));
+            }
+            ContestsDAO::transEnd();
+        } catch (InvalidParameterException $e) {
+            ContestsDAO::transRollback();
+            throw $e;
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            ContestsDAO::transRollback();
+            throw $e;
+        } catch (Exception $e) {
+            ContestsDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok', 'alias' => $r['alias']];
     }
 
     /**
@@ -1970,6 +2033,10 @@ class ContestController extends Controller {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
         }
 
         if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
