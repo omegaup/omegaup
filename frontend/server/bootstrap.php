@@ -5,6 +5,9 @@
  *
  * */
 
+// Enable compression.
+ob_start('ob_gzhandler');
+
 // Set default time
 date_default_timezone_set('UTC');
 
