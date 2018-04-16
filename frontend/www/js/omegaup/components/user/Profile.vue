@@ -118,12 +118,10 @@ export default {
   },
   computed: {
     groupedSolvedProblems: function() {
-      if (this.solvedProblems)
-        return this.groupElements(this.solvedProblems, this.columns);
+      return this.groupElements(this.solvedProblems, this.columns);
     },
     groupedUnsolvedProblems: function() {
-      if (this.unsolvedProblems)
-        return this.groupElements(this.unsolvedProblems, this.columns);
+      return this.groupElements(this.unsolvedProblems, this.columns);
     },
   },
   methods: {
