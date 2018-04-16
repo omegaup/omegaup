@@ -1409,9 +1409,9 @@ class UserController extends Controller {
                 foreach ($users as $index=>$user) {
                     // Save it
                     $c = new CoderOfTheMonth([
-                        'user_id' => $user->user_id,
+                        'user_id' => $user['user_id'],
                         'time' => $firstDay,
-                        'rank' => $index,
+                        'rank' => $index + 1,
                     ]);
                     CoderOfTheMonthDAO::save($c);
                     array_push($codersOfTheMonth, $c);
