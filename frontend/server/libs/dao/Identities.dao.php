@@ -29,6 +29,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return new Identities($rs);
     }
+
     public static function FindByUsername($username) {
         $result = IdentitiesDAO::search(new Identities([
             'username' => $username
@@ -38,6 +39,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return array_pop($result);
     }
+
     public static function FindByUserId($user_id) {
         global  $conn;
         $sql = 'SELECT
@@ -53,6 +55,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return new Identities($rs);
     }
+
     public static function getExtraInformation($email) {
         global  $conn;
         $sql = 'SELECT
@@ -87,6 +90,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
           'username' => $rs['username']
         ];
     }
+
     public static function isVerified($identity_id) {
         global  $conn;
         $sql = 'SELECT

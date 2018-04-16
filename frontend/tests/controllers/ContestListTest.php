@@ -217,6 +217,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Assert our contest is there
         $response = ContestController::apiList($r);
+
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',

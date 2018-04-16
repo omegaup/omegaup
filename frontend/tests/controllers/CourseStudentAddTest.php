@@ -12,6 +12,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
         $student = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
         $response = CourseController::apiAddStudent(new Request([
@@ -26,9 +27,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
+        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
             'group_id' => $course->group_id,
-            'user_id' => $student->user_id
+            'identity_id' => $identity->identity_id
             ]));
 
         $this->assertNotNull($studentsInGroup);
@@ -105,9 +106,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
+        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
             'group_id' => $course->group_id,
-            'user_id' => $student->user_id
+            'identity_id' => $student->user_id
         ]));
 
         $this->assertNotNull($studentsInGroup);
@@ -154,6 +155,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
         $student = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
 
         $login = OmegaupTestCase::login($student);
         $response = CourseController::apiAddStudent(new Request([
@@ -168,9 +170,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsUsersDAO::search(new GroupsUsers([
+        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
             'group_id' => $course->group_id,
-            'user_id' => $student->user_id
+            'identity_id' => $identity->identity_id
             ]));
 
         $this->assertNotNull($studentsInGroup);

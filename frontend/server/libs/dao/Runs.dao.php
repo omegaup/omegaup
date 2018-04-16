@@ -370,9 +370,9 @@ class RunsDAO extends RunsDAOBase {
                     FROM
                         Identities i
                     INNER JOIN
-                        Groups_Users g ON i.user_id = g.user_id
+                        Groups_Identities gi ON i.identity_id = gi.identity_id
                     WHERE
-                        g.group_id = ? AND
+                        gi.group_id = ? AND
                         i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                         i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [

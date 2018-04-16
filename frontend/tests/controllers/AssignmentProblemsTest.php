@@ -11,7 +11,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user
+        ]), $login);
         $response = CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem])[0];
 
         $this->assertEquals('ok', $response['status']);
@@ -36,7 +39,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user,
+        ]), $login);
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
 
         // Remove a problem from the assignment
@@ -68,9 +74,19 @@ class AssignmentProblemsTest extends OmegaupTestCase {
 
         // Add multiple problems to the assignment
         $problems = [
-            ProblemsFactory::createProblem(null, null, 1, $user, null, $login),
-            ProblemsFactory::createProblem(null, null, 1, $user, null, $login),
-            ProblemsFactory::createProblem(null, null, 1, $user, null, $login)];
+            ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'author' => $user
+            ]), $login),
+            ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'author' => $user
+            ]), $login),
+            ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'author' => $user
+            ]), $login)
+        ];
         $responses = CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, $problems);
         $this->assertEquals('ok', $responses[0]['status']);
         $this->assertEquals('ok', $responses[1]['status']);
@@ -118,7 +134,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     public function testAddProblemForbiddenAccess() {
         $user = UserFactory::createUser();
         $login = self::login($user);
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user
+        ]), $login);
 
         // Create a course with an assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
@@ -139,7 +158,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     public function testAddProblemForbiddenAccessStudent() {
         $user = UserFactory::createUser();
         $login = self::login($user);
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user
+        ]), $login);
 
         // Create a course with an assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
@@ -167,7 +189,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user
+        ]), $login);
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
 
         // Remove a problem from the assignment with a normal user
@@ -196,7 +221,10 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $user
+        ]), $login);
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
 
         // Remove a problem from the assignment with a student
