@@ -8,7 +8,11 @@ init_submodules() {
 		frontend/server/libs/third_party/log4php \
 		frontend/server/libs/third_party/adodb \
 		frontend/server/libs/third_party/facebook-php-graph-sdk \
-		frontend/server/libs/third_party/google-api-php-client \
+		frontend/server/libs/third_party/google-api-php-client
+}
+
+init_frontend_submodules() {
+	git submodule update --init --recursive \
 		frontend/www/third_party/js/pagedown \
 		frontend/www/third_party/js/mathjax \
 		frontend/www/third_party/wenk

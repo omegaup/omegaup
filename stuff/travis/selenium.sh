@@ -4,6 +4,7 @@
 
 stage_before_install() {
 	init_submodules
+	init_frontend_submodules
 
 	install_yarn
 }
