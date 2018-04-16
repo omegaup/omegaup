@@ -508,6 +508,7 @@ export class Arena {
       }
       self.problems[alias] = problem;
     }
+
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
       self.elements.rankingTable.showPenalty = contest.show_penalty;
@@ -1678,6 +1679,10 @@ class RunView {
         });
 
     UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+      self.filter_problem(item.alias);
+    });
+
+    UI.problemContestTypeahead($('.runsproblemcontest', elm), function(event, item) {
       self.filter_problem(item.alias);
     });
 
