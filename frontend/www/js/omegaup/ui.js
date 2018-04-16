@@ -238,7 +238,8 @@ let UI = {
                   })
               .on('typeahead:select', cb)
               .on('typeahead:autocomplete', cb);
-        }).fail(UI.apiError);
+        })
+        .fail(UI.apiError);
   },
 
   schoolTypeahead: function(elem, cb) {
