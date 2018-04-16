@@ -106,7 +106,6 @@ import {T} from '../../omegaup.js';
 import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
-import ChartsVue from './Charts.vue';
 export default {
   props: {
     profile: Object,
