@@ -1,7 +1,8 @@
 'use strict';
 
 var omegaup = require('../../dist/omegaup.js');
-var Markdown = require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
+var Markdown =
+    require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
 
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {
