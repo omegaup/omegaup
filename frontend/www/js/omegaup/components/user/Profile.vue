@@ -27,8 +27,8 @@
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileContests }} <span class="badge">{{ contests ?
-          contests.length:0 }}</span></h2>
+          <h2 class="panel-title">{{ T.profileContests }} <span class="badge">{{ contests.length
+          }}</span></h2>
         </div>
         <table class="table table-striped">
           <thead>
@@ -51,7 +51,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileSolvedProblems }} <span class="badge">{{
-          solved_problems ? solved_problems.length:0 }}</span></h2>
+          solvedProblems.length }}</span></h2>
         </div>
         <table class="table table-striped">
           <thead>
@@ -60,19 +60,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="group in solvedProblems">
+            <tr v-for="group in groupedSolvedProblems">
               <td v-for="problem in group">
                 <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!solvedProblems"><img src="/media/wait.gif"></div>
+        <div v-show="!groupedSolvedProblems"><img src="/media/wait.gif"></div>
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
-          unsolved_problems ? unsolved_problems.length:0 }}</span></h2>
+          unsolvedProblems.length }}</span></h2>
         </div>
         <table class="table table-striped">
           <thead>
@@ -81,14 +81,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="group in unsolvedProblems">
+            <tr v-for="group in groupedUnsolvedProblems">
               <td v-for="problem in group">
                 <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!unsolvedProblems"><img src="/media/wait.gif"></div>
+        <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
       </div>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
@@ -111,19 +111,19 @@ export default {
   props: {
     profile: Object,
     contests: Array,
-    solved_problems: Array,
-    unsolved_problems: Array,
+    solvedProblems: Array,
+    unsolvedProblems: Array,
     rank: String,
     charts: Object,
   },
   computed: {
-    solvedProblems: function() {
-      if (this.solved_problems)
-        return this.groupElements(this.solved_problems, this.columns);
+    groupedSolvedProblems: function() {
+      if (this.solvedProblems)
+        return this.groupElements(this.solvedProblems, this.columns);
     },
-    unsolvedProblems: function() {
-      if (this.unsolved_problems)
-        return this.groupElements(this.unsolved_problems, this.columns);
+    groupedUnsolvedProblems: function() {
+      if (this.unsolvedProblems)
+        return this.groupElements(this.unsolvedProblems, this.columns);
     },
   },
   methods: {

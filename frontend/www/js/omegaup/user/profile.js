@@ -12,8 +12,8 @@ OmegaUp.on('ready', function() {
         props: {
           profile: this.profile,
           contests: this.contests,
-          solved_problems: this.solved_problems,
-          unsolved_problems: this.unsolved_problems,
+          solvedProblems: this.solvedProblems,
+          unsolvedProblems: this.unsolvedProblems,
           rank: this.rank,
           charts: this.charts,
         }
@@ -39,13 +39,13 @@ OmegaUp.on('ready', function() {
 
       API.User.problemsSolved({username: user_profile.username})
           .then(function(data) {
-            viewProfile.solved_problems = data['problems'];
+            viewProfile.solvedProblems = data['problems'];
           })
           .fail(UI.apiError);
 
       API.User.listUnsolvedProblems({username: user_profile.username})
           .then(function(data) {
-            viewProfile.unsolved_problems = data['problems'];
+            viewProfile.unsolvedProblems = data['problems'];
           })
           .fail(UI.apiError);
 
@@ -55,9 +55,9 @@ OmegaUp.on('ready', function() {
     },
     data: {
       profile: user_profile,
-      contests: null,
-      solved_problems: null,
-      unsolved_problems: null,
+      contests: [],
+      solvedProblems: [],
+      unsolvedProblems: [],
       charts: null,
     },
     computed: {
