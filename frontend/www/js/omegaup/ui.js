@@ -224,20 +224,21 @@ let UI = {
 
     var options = omegaup.arena.GetOptionsFromLocation(window.location);
 
-    omegaup.API.Contest.problems({contest_alias: options.contestAlias}).then(function(response) {
-      elem.typeahead(
-            {
-              minLength: 3,
-              highlight: false,
-            },
-            {
-              source: substringMatcher(response.problems),
-              async: true,
-              display: 'alias',
-            })
-          .on('typeahead:select', cb)
-          .on('typeahead:autocomplete', cb);
-    });
+    omegaup.API.Contest.problems({contest_alias: options.contestAlias})
+        .then(function(response) {
+          elem.typeahead(
+                  {
+                    minLength: 3,
+                    highlight: false,
+                  },
+                  {
+                    source: substringMatcher(response.problems),
+                    async: true,
+                    display: 'alias',
+                  })
+              .on('typeahead:select', cb)
+              .on('typeahead:autocomplete', cb);
+        }).fail(UI.apiError);
   },
 
   schoolTypeahead: function(elem, cb) {
