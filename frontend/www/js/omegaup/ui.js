@@ -201,13 +201,13 @@ let UI = {
     var substringMatcher = function(problems) {
       return function findMatches(q, cb) {
         var matches, substringRegex;
-    
+
         // an array that will be populated with substring matches
         matches = [];
-    
+
         // regex used to determine if a string contains the substring `q`
         substringRegex = new RegExp(q, 'i');
-    
+
         // iterate through the pool of strings and for any string that
         // contains the substring `q`, add it to the `matches` array
         $.each(problems, function(i, problem) {
@@ -215,7 +215,7 @@ let UI = {
             matches.push(problem);
           }
         });
-    
+
         cb(matches);
       };
     };

@@ -1682,9 +1682,9 @@ class RunView {
       self.filter_problem(item.alias);
     });
 
-    UI.problemContestTypeahead($('.runsproblemcontest', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
+    UI.problemContestTypeahead(
+        $('.runsproblemcontest', elm),
+        function(event, item) { self.filter_problem(item.alias); });
 
     $('.runsproblem-clear', elm)
         .on('click', function() {
