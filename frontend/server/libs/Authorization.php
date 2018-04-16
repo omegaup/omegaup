@@ -231,6 +231,7 @@ class Authorization {
     }
 
     private static function isOwner($identity_id, $acl_id) {
+        // TODO: Remove this when ACL is migrated
         $owner_id = ACLsDAO::getACLIdentityByPK($acl_id);
         return $owner_id == $identity_id;
     }
