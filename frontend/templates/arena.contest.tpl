@@ -122,7 +122,7 @@
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
+{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem_contest=true show_rejudge=true show_details=true}
 			</div>
 {/if}
 {if $showRanking}
