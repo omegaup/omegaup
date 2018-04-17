@@ -1689,7 +1689,6 @@ class RunView {
       });
     }
 
-
     $('.runsproblem-clear', elm)
         .on('click', function() {
           $('.runsproblem', elm).val('');
