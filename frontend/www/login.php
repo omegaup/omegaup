@@ -62,7 +62,7 @@ function shouldRedirect($url) {
 }
 
 if ($c_Session->CurrentSessionAvailable()) {
-    if (shouldRedirect($_GET['redirect'])) {
+    if (!empty($_GET['redirect']) && shouldRedirect($_GET['redirect'])) {
         die(header('Location: ' . $_GET['redirect']));
     }
     die(header('Location: /profile/'));

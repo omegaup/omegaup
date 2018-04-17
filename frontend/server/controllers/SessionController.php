@@ -157,7 +157,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
         ];
     }
 

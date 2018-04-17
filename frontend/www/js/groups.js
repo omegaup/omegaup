@@ -68,18 +68,19 @@ $(function() {
           .then(function(group) {
             $('#group-members').empty();
 
-            for (var i = 0; i < group.users.length; i++) {
-              var user = group.users[i];
+            for (var i = 0; i < group.identities.length; i++) {
+              var identity = group.identities[i];
               $('#group-members')
                   .append(
                       $('<tr></tr>')
-                          .append($('<td></td>')
-                                      .append($('<a></a>')
-                                                  .attr('href',
-                                                        '/profile/' +
-                                                            user.username + '/')
-                                                  .text(omegaup.UI.escape(
-                                                      user.username))))
+                          .append(
+                              $('<td></td>')
+                                  .append($('<a></a>')
+                                              .attr('href',
+                                                    '/profile/' +
+                                                        identity.username + '/')
+                                              .text(omegaup.UI.escape(
+                                                  identity.username))))
                           .append(
                               $('<td><button type="button" class="close">' +
                                 '&times;</button></td>')
@@ -101,7 +102,7 @@ $(function() {
                                               })
                                               .fail(omegaup.UI.apiError);
                                         };
-                                      })(user.username))));
+                                      })(identity.username))));
             }
           })
           .fail(omegaup.UI.apiError);
