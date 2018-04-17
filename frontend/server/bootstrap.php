@@ -253,13 +253,14 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         UITools::$IsAdmin = $session['is_admin'];
         $userRequest['username'] = $session['user']->username;
     } else {
+        $userRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
 
-    if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
+    if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {
         $smarty->force_compile = true;
     } else {
         $smarty->compile_check = false;

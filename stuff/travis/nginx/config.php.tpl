@@ -6,7 +6,7 @@ define('OMEGAUP_DB_PASS', '');
 define('OMEGAUP_DB_USER', 'travis');
 // Setting non-development mode to make all requests faster by avoiding parsing
 // Smarty templates every time.
-define('OMEGAUP_DEVELOPMENT_MODE', 'false');
+define('OMEGAUP_ENVIRONMENT', 'production');
 define('SMARTY_CACHE_DIR', '/tmp');
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
