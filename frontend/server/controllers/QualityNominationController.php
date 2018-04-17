@@ -399,7 +399,7 @@ class QualityNominationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(Request $r) {
-        if (!Authorization::isQualityReviewer($r['current_user_id'])) {
+        if (!Authorization::isQualityReviewer($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -500,7 +500,7 @@ class QualityNominationController extends Controller {
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
         $currentUserIsNominator = ($r['current_user']->username == $response['nominator']['username']);
-        $currentUserReviewer = Authorization::isQualityReviewer($r['current_user_id']);
+        $currentUserReviewer = Authorization::isQualityReviewer($r['current_identity_id']);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new ForbiddenAccessException('userNotAllowed');
         }

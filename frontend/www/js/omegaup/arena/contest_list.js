@@ -78,7 +78,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
               contest.contestLink = '/arena/' + contest.alias +
                                     '/problemset_id/' + contest.problemset_id;
               contest.practiceLink = contest.contestLink + '/practice/';
-              contest.duration = omegaup.UI.toHHMM(contest.duration);
+              contest.duration = omegaup.UI.toDDHHMM(contest.duration);
               contest.startLink =
                   'http://timeanddate.com/worldclock/fixedtime.html?iso=' +
                   contest.start_time.iso();
