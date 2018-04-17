@@ -1678,13 +1678,15 @@ class RunView {
           self.filter_username('');
         });
 
-    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
-
-    UI.problemContestTypeahead($('.runsproblemcontest', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
+    if (self.arena.options.contestAlias) {
+      UI.problemContestTypeahead(
+          $('.runsproblem', elm), self.arena.options.contestAlias,
+          function(event, item) { self.filter_problem(item.alias); });
+    } else {
+      UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+        self.filter_problem(item.alias);
+      });
+    }
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

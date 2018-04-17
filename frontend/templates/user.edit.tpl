@@ -74,7 +74,9 @@
 							<option value="es">{#wordsSpanish#}</option>
 							<option value="en">{#wordsEnglish#}</option>
 							<option value="pt">{#wordsPortuguese#}</option>
+							{if "OMEGAUP_ENVIRONMENT"|defined && $smarty.const.OMEGAUP_ENVIRONMENT != "production"}
 							<option value="pseudo">pseudo-loc</option>
+							{/if}
 						</select>
 						</div>
 					</div>

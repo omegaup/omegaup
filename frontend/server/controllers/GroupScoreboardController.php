@@ -52,7 +52,7 @@ class GroupScoreboardController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'Contest');
         }
 
-        if ($r['contest']->public != '1' && !Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if ($r['contest']->public != '1' && !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -178,14 +178,14 @@ class GroupScoreboardController extends Controller {
             $r['contest_aliases'] = rtrim($r['contest_aliases'], ',');
 
             try {
-                $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
+                $groupIdentities = GroupsIdentitiesDAO::search(new GroupsIdentities([
                     'group_id' => $r['scoreboard']->group_id
                 ]));
 
                 $r['usernames_filter'] = '';
-                foreach ($groupUsers as $groupUser) {
-                    $user = UsersDAO::getByPK($groupUser->user_id);
-                    $r['usernames_filter'] .= $user->username . ',';
+                foreach ($groupIdentities as $groupIdentity) {
+                    $identity = IdentitiesDAO::getByPK($groupIdentity->identity_id);
+                    $r['usernames_filter'] .= $identity->username . ',';
                 }
 
                 $r['usernames_filter'] = rtrim($r['usernames_filter'], ',');

@@ -60,13 +60,6 @@
 							<button type="button" class="close runsproblem-clear" style="float: none;">&times;</button>
 {/if}
 
-{if isset($show_problem_contest)}
-							<label>{#wordsProblem#}:
-								<input type="text" class="runsproblemcontest typeahead form-control" autocomplete="off" />
-							</label>
-							<button type="button" class="close runsproblem-clear" style="float: none;">&times;</button>
-{/if}
-
 {if isset($show_user)}
 							<label>{#wordsUser#}:
 								<input type="text" class="runsusername typeahead form-control" autocomplete="off" />
@@ -87,7 +80,7 @@
 {if isset($show_contest)}
 							<th>{#wordsContest#}</th>
 {/if}
-{if isset($show_problem) || isset($show_problem_contest)}
+{if isset($show_problem)}
 							<th>{#wordsProblem#}</th>
 {/if}
 							<th>{#wordsStatus#}</th>
@@ -126,7 +119,7 @@
 {if isset($show_contest)}
 							<td class="contest"><a data-bind="text: contest_alias, attr: { href: contest_alias_url }"></a></td>
 {/if}
-{if isset($show_problem) || isset($show_problem_contest)}
+{if isset($show_problem)}
 							<td class="problem"><a data-bind="text: alias, attr: { href: problem_url }"></a></td>
 {/if}
 							<td class="status" data-bind="style: { backgroundColor: status_color }">

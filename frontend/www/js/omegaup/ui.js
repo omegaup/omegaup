@@ -197,17 +197,17 @@ let UI = {
         .on('typeahead:autocomplete', cb);
   },
 
-  problemContestTypeahead: function(elem, cb) {
+  problemContestTypeahead: function(elem, contestAlias, cb) {
     var substringMatcher = function(problems) {
       return function findMatches(q, cb) {
         var matches, substringRegex;
-    
+
         // an array that will be populated with substring matches
         matches = [];
-    
+
         // regex used to determine if a string contains the substring `q`
         substringRegex = new RegExp(q, 'i');
-    
+
         // iterate through the pool of strings and for any string that
         // contains the substring `q`, add it to the `matches` array
         $.each(problems, function(i, problem) {
@@ -215,29 +215,29 @@ let UI = {
             matches.push(problem);
           }
         });
-    
+
         cb(matches);
       };
     };
 
     cb = cb || function(event, val) { $(event.target).val(val.alias); };
 
-    var options = omegaup.arena.GetOptionsFromLocation(window.location);
-
-    omegaup.API.Contest.problems({contest_alias: options.contestAlias}).then(function(response) {
-      elem.typeahead(
-            {
-              minLength: 3,
-              highlight: false,
-            },
-            {
-              source: substringMatcher(response.problems),
-              async: true,
-              display: 'alias',
-            })
-          .on('typeahead:select', cb)
-          .on('typeahead:autocomplete', cb);
-    });
+    omegaup.API.Contest.problems({contest_alias: contestAlias})
+        .then(function(response) {
+          elem.typeahead(
+                  {
+                    minLength: 3,
+                    highlight: false,
+                  },
+                  {
+                    source: substringMatcher(response.problems),
+                    async: true,
+                    display: 'alias',
+                  })
+              .on('typeahead:select', cb)
+              .on('typeahead:autocomplete', cb);
+        })
+        .fail(UI.apiError);
   },
 
   schoolTypeahead: function(elem, cb) {
@@ -269,13 +269,12 @@ let UI = {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
 
-  // From
-  // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
-  toHHMM: function(duration) {
+  toDDHHMM: function(duration) {
     var sec_num = parseInt(duration, 10);
-    var hours = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    var days = Math.floor(sec_num / 86400);
+    var hours = Math.floor((sec_num - (days * 86400)) / 3600);
+    var minutes = Math.floor((sec_num - (days * 86400) - (hours * 3600)) / 60);
+    var seconds = sec_num - (days * 86400) - (hours * 3600) - (minutes * 60);
 
     if (minutes < 10) {
       minutes = '0' + minutes;
@@ -284,8 +283,9 @@ let UI = {
       seconds = '0' + seconds;
     }
 
-    var time = hours + 'h ' + minutes + 'm';
-    return time;
+    var time = '';
+    if (days > 0) time += days + 'd ';
+    return time + hours + 'h ' + minutes + 'm';
   },
 
   getFlag: function(country) {
