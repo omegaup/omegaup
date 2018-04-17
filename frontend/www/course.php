@@ -39,7 +39,7 @@ if ($intro_details['shouldShowResults'] ||
         header('HTTP/1.1 404 Not Found');
         die();
     }
-    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['user']->user_id, $course);
+    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['identity']->identity_id, $course);
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {

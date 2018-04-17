@@ -45,7 +45,7 @@
 						<div class="col-md-7">
 							<select name='country_id' id='country_id' class="form-control">
 								<option value=""></option>
-								{foreach from=sort($COUNTRIES) item=country}
+								{foreach from=$COUNTRIES item=country}
 								<option value="{$country->country_id}">{$country->name}</option>
 								{/foreach}
 							</select>
@@ -74,7 +74,9 @@
 							<option value="es">{#wordsSpanish#}</option>
 							<option value="en">{#wordsEnglish#}</option>
 							<option value="pt">{#wordsPortuguese#}</option>
+							{if "OMEGAUP_ENVIRONMENT"|defined && $smarty.const.OMEGAUP_ENVIRONMENT != "production"}
 							<option value="pseudo">pseudo-loc</option>
+							{/if}
 						</select>
 						</div>
 					</div>

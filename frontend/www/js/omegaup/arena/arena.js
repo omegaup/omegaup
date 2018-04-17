@@ -1542,7 +1542,7 @@ export class Arena {
         return (x[key].length - i) - (y[key].length - j);
       };
     }
-    let detailsGroups = data.details.groups;
+    let detailsGroups = data.details && data.details.groups;
     let groups = null;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));

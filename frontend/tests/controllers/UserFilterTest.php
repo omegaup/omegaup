@@ -182,7 +182,9 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testAnonymousProblemAccess() {
-        $problem = ProblemsFactory::createProblem(null, null, 0)['problem'];
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]))['problem'];
 
         $r = new Request([
             'filter' => '/problem/' . $problem->alias,

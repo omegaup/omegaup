@@ -125,6 +125,8 @@ export default {
 
     create: _call('/api/contest/create/'),
 
+    clone: _call('/api/contest/clone/'),
+
     details: _call('/api/contest/details/', _normalizeContestFields),
 
     list: _call('/api/contest/list/',

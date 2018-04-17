@@ -164,7 +164,9 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateValidProblemWithINCases() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'mrkareltastic.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'mrkareltastic.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -271,7 +273,9 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testValidProblemNoTestplan() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -335,7 +339,9 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testValidProblemWithNonUTF8CharsInStmt() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'nonutf8stmt.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'nonutf8stmt.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -386,7 +392,9 @@ class CreateProblemTest extends OmegaupTestCase {
         $imageAbsoluteUrl = 'http://i.imgur.com/fUkvDkw.png';
 
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'imagetest.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'imagetest.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -486,7 +494,9 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemWithoutStatement() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'nostmt.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'nostmt.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -508,7 +518,9 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemMissingOutput() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'missingout.zip');
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'missingout.zip'
+        ]));
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 

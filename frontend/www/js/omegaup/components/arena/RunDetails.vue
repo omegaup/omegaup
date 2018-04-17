@@ -55,7 +55,7 @@
       </pre>
       <pre class="source"
            v-else=""
-           v-html="data.source"></pre>
+           v-text="data.source"></pre>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>

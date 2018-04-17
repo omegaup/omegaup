@@ -11,15 +11,15 @@ class CoursesFactory {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-
+        $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = GroupsDAO::FindByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsUsersDAO::save(new GroupsUsers([
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'user_id' => $admin->user_id,
+                'identity_id' => $identity->identity_id,
                 'role_id' => Authorization::ADMIN_ROLE,
             ]));
         }

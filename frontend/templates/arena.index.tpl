@@ -49,10 +49,12 @@
 								<a class="nav-link" href="#list-past-contest" data-toggle="tab">
 									{#arenaOldContests#}</a>
 							</li>
+							{if $LOGGED_IN == 1}
 							<li class="nav-item">
 								<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
 									{#arenaMyActiveContests#}</a>
 							</li>
+							{/if}
 						</ul>
 
 						<div class="tab-content">

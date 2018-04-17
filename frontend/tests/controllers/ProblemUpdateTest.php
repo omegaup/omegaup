@@ -9,7 +9,10 @@
 class UpdateProblemTest extends OmegaupTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', 'Problem Language');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip',
+            'title' => 'Problem Language'
+        ]));
 
         // Update statement
         $login = self::login($problemData['author']);
@@ -112,7 +115,9 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemWithValidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(null, 'valid-languages');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'title' => 'valid-languages'
+        ]));
 
         $login = self::login($problemData['author']);
         $r = new Request([
@@ -164,7 +169,9 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdate() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip'
+        ]));
 
         // Update statement
         $statement = 'This is the new statement \$x\$';
@@ -193,7 +200,9 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip'
+        ]));
 
         // Update statement
         $imgUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
@@ -397,7 +406,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
-        $problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . 'triangulos.zip', null, 0);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip',
+            'visibility' => 0
+        ]));
 
         // Normal user shouldn't even be able to see the problem.
         $reviewer = UserFactory::createUser();

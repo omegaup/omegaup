@@ -5,7 +5,7 @@ ALTER TABLE `Problemsets`
   ADD COLUMN `scoreboard_url_admin` varchar(30) DEFAULT NULL
     COMMENT 'Token para la url del scoreboard de admin en problemsets';
 
--- Filling scoreboard_url and scoreboard_url_admin fields in Problemsets with randmom strings
+-- Filling scoreboard_url and scoreboard_url_admin fields in Problemsets with random strings
 UPDATE `Problemsets`
 SET
   `scoreboard_url` = SUBSTRING(MD5(RAND()) FROM 1 FOR 30),
