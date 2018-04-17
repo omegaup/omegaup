@@ -89,25 +89,20 @@ class ContestCloneTest extends OmegaupTestCase {
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        $contestAlias = Utils::CreateRandomString();
-
         // Create new user
         $user = UserFactory::createUser();
-        $r = new Request([
+        $login = UserController::apiLogin(new Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
-        ]);
+        ]));
 
-        // login new user
-        $login = UserController::apiLogin($r);
-
-        // clone the contest
+        // Clone the contest
         $contestClonedData = ContestController::apiClone(new Request([
             'auth_token' => $login['auth_token'],
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'alias' => $contestAlias,
+            'alias' => Utils::CreateRandomString(),
             'contest' => $contestData['contest'],
             'start_time' => Time::get()
         ]));
