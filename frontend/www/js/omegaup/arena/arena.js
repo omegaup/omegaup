@@ -1680,8 +1680,7 @@ class RunView {
 
     if (self.arena.options.contestAlias) {
       UI.problemContestTypeahead(
-          $('.runsproblem', elm),
-          self.arena.options.contestAlias,
+          $('.runsproblem', elm), self.arena.options.contestAlias,
           function(event, item) { self.filter_problem(item.alias); });
     } else {
       UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
