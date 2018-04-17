@@ -490,7 +490,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+            if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
                 throw new ForbiddenAccessException();
             }
 
@@ -553,7 +553,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -675,7 +675,7 @@ class UserController extends Controller {
 
         $response = [];
 
-        $is_system_admin = Authorization::isSystemAdmin($r['current_user_id']);
+        $is_system_admin = Authorization::isSystemAdmin($r['current_identity_id']);
         if ($r['contest_type'] == 'OMI') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -1266,13 +1266,13 @@ class UserController extends Controller {
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged user's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_user_id'])
+        if (Authorization::isSystemAdmin($r['current_identity_id'])
               || $r['user']->user_id == $r['current_user_id']) {
             return $response;
         }
 
         // Mentors can see current coder of the month email.
-        if (Authorization::canViewEmail($r['current_user_id']) &&
+        if (Authorization::canViewEmail($r['current_identity_id']) &&
               CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
             return $response;
         }
@@ -1294,7 +1294,7 @@ class UserController extends Controller {
 
         $response = self::getProfile($r);
         if ((is_null($r['current_user']) || $r['current_user']->username != $r['user']->username)
-            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
@@ -1324,7 +1324,7 @@ class UserController extends Controller {
     public static function apiStatusVerified(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+        if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1353,7 +1353,7 @@ class UserController extends Controller {
     public static function apiExtraInformation(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r['current_user_id'])) {
+        if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1488,7 +1488,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1668,7 +1668,7 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
 
         if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
-            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_user_id'])) {
+            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -2089,9 +2089,9 @@ class UserController extends Controller {
         ];
 
         $session = SessionController::apiCurrentSession($r)['session'];
-        $user = $session['user'];
-        if (!is_null($user)) {
-            $response['user'] = $user->username;
+        $identity = $session['identity'];
+        if (!is_null($identity)) {
+            $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
 
@@ -2114,7 +2114,7 @@ class UserController extends Controller {
                     if (count($tokens) != 3) {
                         throw new InvalidParameterException('parameterInvalid', 'filter');
                     }
-                    if ($tokens[2] != $user->username && !$session['is_admin']) {
+                    if ($tokens[2] != $identity->username && !$session['is_admin']) {
                         throw new ForbiddenAccessException('userNotAllowed');
                     }
                     break;
@@ -2144,7 +2144,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($user) && Authorization::isProblemAdmin($user->user_id, $problem)) {
+                    if (!is_null($identity) && Authorization::isProblemAdmin($identity->identity_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif (!ProblemsDAO::isVisible($problem)) {
                         throw new ForbiddenAccessException('problemIsPrivate');
@@ -2171,7 +2171,7 @@ class UserController extends Controller {
     }
 
     private static function validateAddRemoveRole(Request $r) {
-        if (!Authorization::isSystemAdmin($r['current_user_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new ForbiddenAccessException();
         }
 
@@ -2321,7 +2321,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(Request $r) {
         global $experiments;
 
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
 

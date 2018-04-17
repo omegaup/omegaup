@@ -5,7 +5,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r['current_user_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->user_id)) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->user_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -156,7 +156,7 @@ class InterviewController extends Controller {
         }
 
         // Only director is allowed to add people to interview
-        if (!Authorization::isInterviewAdmin($r['current_user_id'], $r['interview'])) {
+        if (!Authorization::isInterviewAdmin($r['current_identity_id'], $r['interview'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -199,7 +199,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r['current_user_id'], $interview)) {
+        if (!Authorization::isInterviewAdmin($r['current_identity_id'], $interview)) {
             throw new ForbiddenAccessException();
         }
 
