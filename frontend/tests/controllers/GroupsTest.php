@@ -12,6 +12,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testCreateGroup() {
         $owner = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($owner->main_identity_id);
         $name = Utils::CreateRandomString();
         $description = Utils::CreateRandomString();
         $alias = Utils::CreateRandomString();
@@ -32,7 +33,7 @@ class GroupsTest extends OmegaupTestCase {
         $group = $groups[0];
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
-        $this->assertTrue(Authorization::isGroupAdmin($owner->user_id, $group));
+        $this->assertTrue(Authorization::isGroupAdmin($identity->identity_id, $group));
     }
 
     /**
@@ -41,6 +42,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testAddUserToGroup() {
         $group = GroupsFactory::createGroup();
         $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         $login = self::login($group['owner']);
         $response = GroupController::apiAddUser(new Request([
@@ -50,7 +52,7 @@ class GroupsTest extends OmegaupTestCase {
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $group_users = GroupsUsersDAO::getByPK($group['group']->group_id, $user->user_id);
+        $group_users = GroupsIdentitiesDAO::getByPK($group['group']->group_id, $identity->identity_id);
         $this->assertNotNull($group_users);
     }
 
@@ -89,7 +91,7 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $group_users = GroupsUsersDAO::getByPK($groupData['group']->group_id, $user->user_id);
+        $group_users = GroupsIdentitiesDAO::getByPK($groupData['group']->group_id, $user->user_id);
         $this->assertNull($group_users);
     }
 
@@ -176,7 +178,7 @@ class GroupsTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias
         ]));
-        $this->assertEquals($nUsers, count($response['users']));
+        $this->assertEquals($nUsers, count($response['identities']));
     }
 
     /**
@@ -230,9 +232,9 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests([
+        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'contest_id' => $contestData['contest']->contest_id
+            'problemset_id' => $contestData['contest']->problemset_id
         ]));
         $gsc = $gscs[0];
 
@@ -279,9 +281,9 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests([
+        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'contest_id' => $contestData['contest']->contest_id
+            'problemset_id' => $contestData['contest']->problemset_id
         ]));
 
         $this->assertEquals(0, count($gscs));

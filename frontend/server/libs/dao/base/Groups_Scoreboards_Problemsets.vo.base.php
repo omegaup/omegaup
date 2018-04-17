@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Groups_Users.
+ * Value Object file for table Groups_Scoreboards_Problemsets.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsUsers extends VO {
+class GroupsScoreboardsProblemsets extends VO {
     /**
-     * Constructor de GroupsUsers
+     * Constructor de GroupsScoreboardsProblemsets
      *
-     * Para construir un objeto de tipo GroupsUsers debera llamarse a el constructor
+     * Para construir un objeto de tipo GroupsScoreboardsProblemsets debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,14 +26,17 @@ class GroupsUsers extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['group_id'])) {
-            $this->group_id = $data['group_id'];
+        if (isset($data['group_scoreboard_id'])) {
+            $this->group_scoreboard_id = $data['group_scoreboard_id'];
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['problemset_id'])) {
+            $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'];
+        if (isset($data['only_ac'])) {
+            $this->only_ac = $data['only_ac'];
+        }
+        if (isset($data['weight'])) {
+            $this->weight = $data['weight'];
         }
     }
 
@@ -54,20 +57,27 @@ class GroupsUsers extends VO {
       * @access public
       * @var int(11)
       */
-    public $group_id;
+    public $group_scoreboard_id;
 
     /**
-      *  [Campo no documentado]
+      * Conjunto de problemas del scoreboard
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $problemset_id;
 
     /**
-      * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
+      *  [Campo no documentado]
       * @access public
       * @var tinyint(1)
       */
-    public $share_user_information;
+    public $only_ac;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $weight;
 }

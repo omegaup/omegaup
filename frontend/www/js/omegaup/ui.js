@@ -119,6 +119,16 @@ let UI = {
     });
   },
 
+  columnName: function(idx) {
+    var name = String.fromCharCode('A'.charCodeAt(0) + idx % 26);
+    while (idx >= 26) {
+      idx = (idx / 26) | 0;
+      idx--;
+      name = String.fromCharCode('A'.charCodeAt(0) + idx % 26) + name;
+    }
+    return name;
+  },
+
   typeaheadWrapper: function(f) {
     let lastRequest = null;
     let pending = false;
@@ -216,13 +226,12 @@ let UI = {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
 
-  // From
-  // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
-  toHHMM: function(duration) {
+  toDDHHMM: function(duration) {
     var sec_num = parseInt(duration, 10);
-    var hours = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    var days = Math.floor(sec_num / 86400);
+    var hours = Math.floor((sec_num - (days * 86400)) / 3600);
+    var minutes = Math.floor((sec_num - (days * 86400) - (hours * 3600)) / 60);
+    var seconds = sec_num - (days * 86400) - (hours * 3600) - (minutes * 60);
 
     if (minutes < 10) {
       minutes = '0' + minutes;
@@ -231,8 +240,9 @@ let UI = {
       seconds = '0' + seconds;
     }
 
-    var time = hours + 'h ' + minutes + 'm';
-    return time;
+    var time = '';
+    if (days > 0) time += days + 'd ';
+    return time + hours + 'h ' + minutes + 'm';
   },
 
   getFlag: function(country) {

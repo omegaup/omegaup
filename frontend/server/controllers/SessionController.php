@@ -127,12 +127,14 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
         }
 
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
+        $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
         if (is_null($currentUser)) {
             // Means user has auth token, but does not exist in DB
@@ -140,6 +142,7 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
@@ -152,8 +155,9 @@ class SessionController extends Controller {
             'valid' => true,
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
+            'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
         ];
     }
 
@@ -395,6 +399,7 @@ class SessionController extends Controller {
         try {
             $vo_User = UserController::resolveUser($r['usernameOrEmail']);
             $r['user_id'] = $vo_User->user_id;
+            $r['identity_id'] = $vo_User->main_identity_id;
             $r['user'] = $vo_User;
         } catch (ApiException $e) {
             self::$log->warn('User ' . $r['usernameOrEmail'] . ' not found.');

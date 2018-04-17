@@ -351,9 +351,9 @@ class RunsDAO extends RunsDAOBase {
                     FROM
                         Users u
                     INNER JOIN
-                        Problemset_Users pu ON u.user_id = pu.user_id
+                        Problemset_Identities pi ON u.main_identity_id = pi.identity_id
                     WHERE
-                        pu.problemset_id = ? AND
+                        pi.problemset_id = ? AND
                         u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                         u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [
@@ -370,9 +370,9 @@ class RunsDAO extends RunsDAOBase {
                     FROM
                         Users u
                     INNER JOIN
-                        Groups_Users g ON u.user_id = g.user_id
+                        Groups_Identities gi ON u.main_identity_id = gi.identity_id
                     WHERE
-                        g.group_id = ? AND
+                        gi.group_id = ? AND
                         u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                         u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [

@@ -122,7 +122,7 @@ class RunController extends Controller {
                 // Check for practice or public problem, there is no contest info
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
-                      Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
+                      Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']) ||
                       Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
                         null,
@@ -130,7 +130,7 @@ class RunController extends Controller {
                         $r['problem']->problem_id,
                         $r['current_user_id']
                     )
-                            && !Authorization::isSystemAdmin($r['current_user_id'])) {
+                            && !Authorization::isSystemAdmin($r['current_identity_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
                     }
 
@@ -173,15 +173,19 @@ class RunController extends Controller {
             }
 
             // Contest admins can skip following checks
-            if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
+            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id) &&
-                    !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
+                if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
+                    !Authorization::canSubmitToProblemset(
+                        $r['current_identity_id'],
+                        $r['problemset']
+                    )
+                ) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_user_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_identity_id'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
@@ -289,7 +293,7 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $test = Authorization::isAdmin($r['current_user_id'], $r['problemset']) ? 1 : 0;
+            $test = Authorization::isAdmin($r['current_identity_id'], $r['problemset']) ? 1 : 0;
         }
 
         // Populate new run object
@@ -351,7 +355,7 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetUsersDAO::getByPK($r['current_user_id'], $problemset_id);
+                $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id);
 
                 if (isset($r['container']->finish_time)) {
                     $response['submission_deadline'] = strtotime($r['container']->finish_time);
@@ -438,7 +442,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::isProblemAdmin($r['current_user_id'], $r['problem']))) {
+        if (!(Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -456,7 +460,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -498,7 +502,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canEditRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -586,7 +590,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -600,7 +604,7 @@ class RunController extends Controller {
 
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        $response['admin'] = Authorization::isProblemAdmin($r['current_user_id'], $r['problem']);
+        $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
 
         // Get the error
         $grade_dir = RunController::getGradePath($r['run']);
@@ -693,7 +697,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -855,7 +859,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 

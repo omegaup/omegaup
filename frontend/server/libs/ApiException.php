@@ -151,6 +151,21 @@ class DuplicatedEntryInDatabaseException extends ApiException {
 }
 
 /**
+ * DuplicatedEntryInArrayException
+ *
+ */
+class DuplicatedEntryInArrayException extends ApiException {
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message, Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    }
+}
+
+/**
  * DuplicatedEntryInDatabaseException
  *
  */
@@ -337,5 +352,11 @@ class LoginDisabledException extends ApiException {
 class UnimplementedException extends ApiException {
     public function __construct(ApiException $previous = null) {
         parent::__construct('wordsUnimplemented', 'HTTP/1.1 405 Method Not Allowed', 405, $previous);
+    }
+}
+
+class CSRFException extends ApiException {
+    public function __construct(ApiException $previous = null) {
+        parent::__construct('csrfException', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }

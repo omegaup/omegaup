@@ -46,7 +46,7 @@ class GroupsDAO extends GroupsDAOBase {
     /**
      * Returns all groups that a user can manage.
      */
-    final public static function getAllGroupsAdminedByUser($user_id) {
+    final public static function getAllGroupsAdminedByUser($user_id, $identity_id) {
         $sql = '
             SELECT
                 DISTINCT g.*
@@ -59,11 +59,11 @@ class GroupsDAO extends GroupsDAOBase {
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = g.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                (gr.role_id = ? AND gi.identity_id = ?)
             ORDER BY
                 g.group_id DESC;';
         $params = [
@@ -71,7 +71,7 @@ class GroupsDAO extends GroupsDAOBase {
             Authorization::ADMIN_ROLE,
             $user_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
         ];
 
         global $conn;
@@ -90,23 +90,23 @@ class GroupsDAO extends GroupsDAOBase {
     final public static function sampleMembers(Groups $group, $n) {
         $sql = '
             SELECT
-                u.*
+                i.*
             FROM
-                Groups_Users gu
+                Groups_Identities gi
             INNER JOIN
-                Users u ON u.user_id = gu.user_id
+                Identities i ON i.identity_id = gi.identity_id
             WHERE
-                gu.group_id = ?
+                gi.group_id = ?
             ORDER BY
                 RAND()
             LIMIT
                 0, ?;';
         global $conn;
 
-        $users = [];
+        $identities = [];
         foreach ($conn->Execute($sql, [$group->group_id, $n]) as $row) {
-            $users[] = new Users($row);
+            $identities[] = new Identities($row);
         }
-        return $users;
+        return $identities;
     }
 }

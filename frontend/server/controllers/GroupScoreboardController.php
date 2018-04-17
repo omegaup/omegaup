@@ -52,7 +52,7 @@ class GroupScoreboardController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'Contest');
         }
 
-        if ($r['contest']->public != '1' && !Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
+        if ($r['contest']->public != '1' && !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -69,14 +69,14 @@ class GroupScoreboardController extends Controller {
         Validators::isNumber($r['weight'], 'weight');
 
         try {
-            $groupScoreboardContest = new GroupsScoreboardsContests([
+            $groupScoreboardProblemset = new GroupsScoreboardsProblemsets([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
-                'contest_id' => $r['contest']->contest_id,
+                'problemset_id' => $r['contest']->problemset_id,
                 'only_ac' => $r['only_ac'],
                 'weight' => $r['weight']
             ]);
 
-            GroupsScoreboardsContestsDAO::save($groupScoreboardContest);
+            GroupsScoreboardsProblemsetsDAO::save($groupScoreboardProblemset);
 
             self::$log->info('Contest ' . $r['contest_alias'] . 'added to scoreboard ' . $r['scoreboard_alias']);
         } catch (Exception $ex) {
@@ -95,17 +95,17 @@ class GroupScoreboardController extends Controller {
         self::validateGroupScoreboardAndContest($r);
 
         try {
-            $groupScoreboardContestKey = new GroupsScoreboardsContests([
+            $groupScoreboardProblemsetKey = new GroupsScoreboardsProblemsets([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
-                'contest_id' => $r['contest']->contest_id
+                'problemset_id' => $r['contest']->problemset_id
             ]);
 
-            $gscs = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);
+            $gscs = GroupsScoreboardsProblemsetsDAO::search($groupScoreboardProblemsetKey);
             if (is_null($gscs) || count($gscs) === 0) {
                 throw new InvalidParameterException('parameterNotFound', 'Contest');
             }
 
-            GroupsScoreboardsContestsDAO::delete($groupScoreboardContestKey);
+            GroupsScoreboardsProblemsetsDAO::delete($groupScoreboardProblemsetKey);
 
             self::$log->info('Contest ' . $r['contest_alias'] . 'removed from group ' . $r['group_alias']);
         } catch (ApiException $ex) {
@@ -132,15 +132,18 @@ class GroupScoreboardController extends Controller {
         $response['contests'] = [];
         $response['ranking'] = [];
         try {
-            $groupScoreboardContestKey = new GroupsScoreboardsContests([
+            $groupScoreboardProblemsetKey = new GroupsScoreboardsProblemsets([
                 'group_scoreboard_id' => $r['scoreboard']->group_scoreboard_id,
             ]);
 
-            $r['gscs'] = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);
+            $r['gscs'] = GroupsScoreboardsProblemsetsDAO::search($groupScoreboardProblemsetKey);
             $i = 0;
             $contest_params = [];
             foreach ($r['gscs'] as $gsc) {
-                $contest = ContestsDAO::getByPK($gsc->contest_id);
+                $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
+                if (is_null($contest)) {
+                    throw new NotFoundException('contestNotFound');
+                }
                 $response['contests'][$i] = $contest->asArray();
                 $response['contests'][$i]['only_ac'] = $gsc->only_ac;
                 $response['contests'][$i]['weight'] = $gsc->weight;
@@ -175,14 +178,14 @@ class GroupScoreboardController extends Controller {
             $r['contest_aliases'] = rtrim($r['contest_aliases'], ',');
 
             try {
-                $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
+                $groupIdentities = GroupsIdentitiesDAO::search(new GroupsIdentities([
                     'group_id' => $r['scoreboard']->group_id
                 ]));
 
                 $r['usernames_filter'] = '';
-                foreach ($groupUsers as $groupUser) {
-                    $user = UsersDAO::getByPK($groupUser->user_id);
-                    $r['usernames_filter'] .= $user->username . ',';
+                foreach ($groupIdentities as $groupIdentity) {
+                    $identity = IdentitiesDAO::getByPK($groupIdentity->identity_id);
+                    $r['usernames_filter'] .= $identity->username . ',';
                 }
 
                 $r['usernames_filter'] = rtrim($r['usernames_filter'], ',');

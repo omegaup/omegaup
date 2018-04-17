@@ -96,7 +96,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
      * Mentor can see the last coder of the month email
      */
     public function testMentorCanSeeLastCoderOfTheMonthEmail() {
-        $mentor = UserFactory::createMentorUser();
+        $mentor = UserFactory::createMentorIdentity();
 
         $login = self::login($mentor);
         $response = UserController::apiCoderOfTheMonthList(new Request([

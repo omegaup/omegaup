@@ -43,7 +43,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByEmailPositive() {
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(null, null, $email);
+        $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Inflate request with user data
         $r = new Request([
@@ -100,7 +100,7 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(null, null, $email);
+        $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Inflate request with user data
         $r = new Request([
