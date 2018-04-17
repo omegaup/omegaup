@@ -12,6 +12,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testCreateGroup() {
         $owner = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($owner->main_identity_id);
         $name = Utils::CreateRandomString();
         $description = Utils::CreateRandomString();
         $alias = Utils::CreateRandomString();
@@ -32,7 +33,7 @@ class GroupsTest extends OmegaupTestCase {
         $group = $groups[0];
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
-        $this->assertTrue(Authorization::isGroupAdmin($owner->user_id, $group));
+        $this->assertTrue(Authorization::isGroupAdmin($identity->identity_id, $group));
     }
 
     /**
