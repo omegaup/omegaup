@@ -197,7 +197,7 @@ let UI = {
         .on('typeahead:autocomplete', cb);
   },
 
-  problemContestTypeahead: function(elem, cb) {
+  problemContestTypeahead: function(elem, contestAlias, cb) {
     var substringMatcher = function(problems) {
       return function findMatches(q, cb) {
         var matches, substringRegex;
@@ -222,9 +222,7 @@ let UI = {
 
     cb = cb || function(event, val) { $(event.target).val(val.alias); };
 
-    var options = omegaup.arena.GetOptionsFromLocation(window.location);
-
-    omegaup.API.Contest.problems({contest_alias: options.contestAlias})
+    omegaup.API.Contest.problems({contest_alias: contestAlias})
         .then(function(response) {
           elem.typeahead(
                   {
