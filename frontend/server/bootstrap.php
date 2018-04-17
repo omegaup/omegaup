@@ -236,7 +236,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
         $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', $session['user']->verified);
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
-        $smarty->assign('CURRENT_USER_IS_REVIEWER', Authorization::isQualityReviewer($session['user']->user_id));
+        $smarty->assign('CURRENT_USER_IS_REVIEWER', Authorization::isQualityReviewer($session['identity']->identity_id));
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=92">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=16">');
@@ -253,13 +253,14 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         UITools::$IsAdmin = $session['is_admin'];
         $userRequest['username'] = $session['user']->username;
     } else {
+        $userRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
 
-    if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
+    if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {
         $smarty->force_compile = true;
     } else {
         $smarty->compile_check = false;

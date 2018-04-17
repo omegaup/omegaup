@@ -48,6 +48,9 @@
         </tbody>
       </table>
     </div>
+    <div>
+      <a href="/group/omegaup:quality-reviewer/edit/#members">{{ T.addUsersToReviewerGroup }}</a>
+    </div>
   </div>
 </template>
 

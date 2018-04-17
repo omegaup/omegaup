@@ -23,7 +23,8 @@ module.exports = {
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
     qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
-    user_charts: './frontend/www/js/omegaup/user/charts.js'
+    user_charts: './frontend/www/js/omegaup/user/charts.js',
+    user_profile: './frontend/www/js/omegaup/user/profile.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

@@ -16,7 +16,9 @@
 					{#wordsPointsForRank#}
 					<a rel="tooltip" href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
+				{if $LOGGED_IN eq '1'}
 				<th class="numericColumn">{#wordsMyScore#}</th>
+				{/if}
 			</tr>
 		</thead>
 		<tbody>
@@ -65,7 +67,9 @@
   				{/if}
 				<td class="numericColumn">{100 * $problem.ratio}%</td>
 				<td class="numericColumn">{$problem.points}</td>
+				{if $LOGGED_IN eq '1'}
 				<td class="numericColumn">{$problem.score}</td>
+				{/if}
 				</tr>
 			{/foreach}
 		</tbody>
