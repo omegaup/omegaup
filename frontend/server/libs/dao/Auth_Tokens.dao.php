@@ -38,7 +38,6 @@ class AuthTokensDAO extends AuthTokensDAOBase {
     public static function getIdentityByToken($auth_token) {
         //look for it on the database
         global $conn;
-
         $sql = 'SELECT
                   i.*
                 FROM
@@ -49,16 +48,12 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                   at.user_id = i.user_id
                 WHERE
                   at.token = ?;';
-
         $params = [$auth_token];
-
         $rs = $conn->GetRow($sql, $params);
-
         //no matches
         if (count($rs) == 0) {
             return null;
         }
-
         return new Identities($rs);
     }
 
