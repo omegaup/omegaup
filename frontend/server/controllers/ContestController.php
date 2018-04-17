@@ -833,7 +833,19 @@ class ContestController extends Controller {
         // Authenticate user
         self::authenticateRequest($r);
 
-        $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
+        try {
+            $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($original_contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $original_contest)) {
+            throw new ForbiddenAccessException();
+        }
 
         $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
