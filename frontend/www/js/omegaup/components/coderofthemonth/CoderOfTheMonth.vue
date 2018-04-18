@@ -56,9 +56,9 @@ export default {
   created: function() {
     // top coder of the month
     var self = this;
-    API.User.coderOfTheMonthList().then(function(response) {
-      self.coders = response.coders;
-    }).fail(UI.apiError);
+    API.User.coderOfTheMonthList()
+        .then(function(response) { self.coders = response.coders; })
+        .fail(UI.apiError);
 
     // coder of the month list
     var today = new Date();
@@ -71,7 +71,8 @@ export default {
       (dd > 9 ? '' : '0') + dd
     ].join('-');
     API.User.coderOfTheMonthList({date: todayString})
-        .then(function(response) { self.coders_monthly = response.coders; }).fail(UI.apiError);
+        .then(function(response) { self.coders_monthly = response.coders; })
+        .fail(UI.apiError);
   }
 };
 </script>
