@@ -1026,13 +1026,13 @@ class ProblemController extends Controller {
 
     /**
      * Get the format of statement that was requested.
-     * HTML is the default if statement_type unspecified in the request.
+     * Markdown is the default if statement_type unspecified in the request.
      *
      * @param Request $r
      */
     private static function getStatementFormat(Request $r) {
         if (!isset($r['statement_type'])) {
-            return 'html';
+            return 'markdown';
         }
         return $r['statement_type'];
     }
@@ -1164,6 +1164,11 @@ class ProblemController extends Controller {
 
         // Validate request
         self::validateDetails($r);
+        if ($r['statement_type'] != 'markdown') {
+            // Remove this and just refuse to serve after a few weeks.
+            $e = new Exception('Deprecated call to view non-markdown statement.');
+            self::$log->error($e);
+        }
 
         $response = [];
 
