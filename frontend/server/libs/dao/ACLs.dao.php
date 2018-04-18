@@ -10,4 +10,20 @@ include('base/ACLs.vo.base.php');
   *
   */
 class ACLsDAO extends ACLsDAOBase {
+    public static function getACLIdentityByPK($acl_id) {
+        //look for it on the database
+        global $conn;
+        $sql = 'SELECT
+                  i.identity_id
+                FROM
+                  `Identities` i
+                INNER JOIN
+                  `ACLs` a
+                ON
+                  a.owner_id = i.user_id
+                WHERE
+                  a.acl_id = ?;';
+        $params = [$acl_id];
+        return $conn->GetOne($sql, $params);
+    }
 }
