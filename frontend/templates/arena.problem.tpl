@@ -1,6 +1,4 @@
 {include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true}
-			<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
-			<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 			<script type="text/json" id="payload">{$payload|json_encode}</script>
 			{if $problem_admin}
 			<ul class="tabs">
