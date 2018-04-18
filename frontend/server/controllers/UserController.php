@@ -1390,7 +1390,7 @@ class UserController extends Controller {
         }
 
         try {
-            $codersOfTheMonth = array();
+            $codersOfTheMonth = [];
 
             $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
 
@@ -1404,9 +1404,9 @@ class UserController extends Controller {
                         'problems' => null,
                     ];
                 }
-                
-                $codersOfTheMonth = array();
-                foreach ($users as $index=>$user) {
+
+                $codersOfTheMonth = [];
+                foreach ($users as $index => $user) {
                     // Save it
                     $c = new CoderOfTheMonth([
                         'user_id' => $user['user_id'],
@@ -1443,9 +1443,12 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = array();
-            if (!empty($r['date'])) $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
-            else $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            $coders = [];
+            if (!empty($r['date'])) {
+                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            } else {
+                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            }
             foreach ($coders as $c) {
                 $response['coders'][] = [
                     'username' => $c['username'],
