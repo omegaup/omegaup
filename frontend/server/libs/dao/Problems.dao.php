@@ -76,6 +76,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $rowcount,
         $query,
         $identity_id,
+        $user_id,
         $tag,
         $min_visibility,
         &$total
@@ -167,7 +168,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
-                    User_Roles ur ON p.acl_id = ur.acl_id AND ur.role_id = ?
+                    User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
                 LEFT JOIN
                     Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
                 LEFT JOIN (
@@ -180,6 +181,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     WHERE gi.identity_id = ? AND gr.role_id = ?
                 ) gr ON p.acl_id = gr.acl_id' . $language_join;
             $args[] = $identity_id;
+            $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
             $args[] = $identity_id;
             $args[] = $identity_id;

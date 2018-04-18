@@ -41,7 +41,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return $admins;
     }
 
-    public static function hasRole($user_id, $acl_id, $role_id) {
+    public static function hasRole($identity_id, $acl_id, $role_id) {
         $sql = '
             SELECT
                 COUNT(*) > 0
@@ -49,22 +49,16 @@ class GroupRolesDAO extends GroupRolesDAOBase {
                 Group_Roles gr
             INNER JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
-            INNER JOIN
-                Identities i ON gi.identity_id = i.identity_id
             WHERE
-                i.user_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
+                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
-            $user_id,
+            $identity_id,
             $role_id,
             Authorization::SYSTEM_ACL,
             $acl_id,
         ];
         global $conn;
         return $conn->GetOne($sql, $params);
-    }
-
-    public static function isAdmin($user_id, $acl_id) {
-        return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
     }
 
     public static function isContestant($identity_id, $acl_id) {
@@ -96,10 +90,6 @@ class GroupRolesDAO extends GroupRolesDAOBase {
 
     public static function getProblemAdmins(Problems $problem) {
         return self::getAdmins($problem->acl_id);
-    }
-
-    public static function isSystemAdmin($user_id) {
-        return self::hasRole($user_id, Authorization::SYSTEM_ACL, Authorization::ADMIN_ROLE);
     }
 
     public static function getSystemRoles($identity_id) {

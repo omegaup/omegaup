@@ -62,8 +62,11 @@ class ApiCaller {
         // Instead of attempting to exactly match the whole URL, just ensure
         // the host is the same. Otherwise this would break tests and local
         // development environments.
-        $omegaup_url_host = parse_url(OMEGAUP_URL, PHP_URL_HOST);
-        return $referrer_host !== $omegaup_url_host;
+        $allowed_hosts = [
+            parse_url(OMEGAUP_URL, PHP_URL_HOST),
+            OMEGAUP_LOCKDOWN_DOMAIN,
+        ];
+        return !in_array($referrer_host, $allowed_hosts, true);
     }
 
     /**
