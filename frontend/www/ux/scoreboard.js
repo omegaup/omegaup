@@ -1,26 +1,23 @@
 omegaup.OmegaUp.on('ready', function() {
-  var params =
-      /\/arena\/([^\/]+)\/problemset_id\/([^\/]+)\/scoreboard\/([^\/]+)\/?/
-          .exec(window.location.pathname);
+  var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
+      window.location.pathname);
   var options = {
     // There is no UI to show clarifications with scoreboard-only views.
     disableClarifications: true,
     contestAlias: params[1],
-    problemsetId: params[2],
-    scoreboardToken: params[3],
+    scoreboardToken: params[2],
   };
   var arena = new omegaup.arena.Arena(options);
   var getRankingByTokenRefresh = 5 * 60 * 1000;  // 5 minutes
-  omegaup.API.Problemset.details({
-                          contest_alias: arena.options.contestAlias,
-                          problemset_id: arena.options.problemsetId,
-                          token: arena.options.scoreboardToken,
-                        })
+  omegaup.API.Contest.details({
+                       contest_alias: arena.options.contestAlias,
+                       token: arena.options.scoreboardToken,
+                     })
       .then(function(contest) {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
+        arena.initProblemsetId(contest);
         $('#title .contest-title').text(contest.title);
-
         omegaup.API.Problemset.scoreboard({
                                 contest_alias: arena.options.contestAlias,
                                 problemset_id: arena.options.problemsetId,

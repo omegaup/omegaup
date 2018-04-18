@@ -411,8 +411,6 @@ export default {
   },
 
   Problemset: {
-    details: _call('/api/problemset/details/', _normalizeProblemsetFields),
-
     scoreboard: _call('/api/problemset/scoreboard/'),
 
     scoreboardEvents: _call('/api/problemset/scoreboardevents/'),

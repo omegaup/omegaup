@@ -21,10 +21,7 @@ omegaup.OmegaUp.on('ready', function() {
     $('#loading').fadeOut('slow');
     $('#root').fadeIn('slow');
   } else {
-    omegaup.API.Problemset.details({
-                            contest_alias: arena.options.contestAlias,
-                            problemset_id: arena.options.problemsetId
-                          })
+    omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
         .then(function(contest) {
           if (!contest.admin) {
             if (!omegaup.OmegaUp.loggedIn) {
@@ -47,7 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
 
           arena.initClock(contest.start_time, contest.finish_time);
           arena.initProblems(contest);
-
+          arena.initProblemsetId(contest);
           for (var idx in contest.problems) {
             var problem = contest.problems[idx];
             var problemName =

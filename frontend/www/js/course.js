@@ -14,10 +14,9 @@ omegaup.OmegaUp.on('ready', function() {
             assignments[type] = [];
           }
           assignments[type].push(course.assignments[i]);
-          course.assignments[i].assignmentUrl =
-              '/course/' + courseAlias + '/assignment/' +
-              course.assignments[i].alias + '/problemset_id/' +
-              course.assignments[i].problemset_id;
+          course.assignments[i].assignmentUrl = '/course/' + courseAlias +
+                                                '/assignment/' +
+                                                course.assignments[i].alias;
           course.assignments[i].startTime = omegaup.UI.formatDateTime(
               new Date(1000 * course.assignments[i].start_time));
           course.assignments[i].finishTime = omegaup.UI.formatDateTime(

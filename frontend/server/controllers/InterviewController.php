@@ -41,7 +41,8 @@ class InterviewController extends Controller {
             $interview->acl_id = $acl->acl_id;
 
             $problemset = new Problemsets([
-                'acl_id' => $acl->acl_id
+                'acl_id' => $acl->acl_id,
+                'type' => 'Interview'
             ]);
             ProblemsetsDAO::save($problemset);
             $interview->problemset_id = $problemset->problemset_id;
@@ -241,7 +242,7 @@ class InterviewController extends Controller {
         }
 
         $thisResult['users'] = $users;
-        $thisResult['status'] ='ok';
+        $thisResult['status'] = 'ok';
 
         return $thisResult;
     }

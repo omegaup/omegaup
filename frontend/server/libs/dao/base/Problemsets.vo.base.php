@@ -44,6 +44,9 @@ class Problemsets extends VO {
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
         }
+        if (isset($data['type'])) {
+            $this->type = $data['type'];
+        }
     }
 
     /**
@@ -100,4 +103,11 @@ class Problemsets extends VO {
       * @var enum('no','optional','required')
       */
     public $requests_user_information;
+
+    /**
+      * Almacena el tipo de problemset que se ha creado
+      * @access public
+      * @var enum('contest','assignment','interview')
+      */
+    public $type;
 }

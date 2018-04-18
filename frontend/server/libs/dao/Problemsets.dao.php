@@ -67,12 +67,11 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
     public static function getTypeByPK($problemset_id) {
         $sql = 'SELECT
-                    c.alias as contest_alias,
-                    a.alias as assignment,
-                    cu.alias as course,
-                    i.alias as interview_alias,
-                    IF(c.contest_id IS NOT NULL, "Contest",
-                        IF(a.assignment_id IS NOT NULL, "Assignment", "Interview")) as type
+                    type,
+                    c.alias AS contest_alias,
+                    a.alias AS assignment,
+                    cu.alias AS course,
+                    i.alias AS interview_alias
                 FROM
                     Problemsets p
                 LEFT JOIN
@@ -92,7 +91,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                 ON
                     p.problemset_id = i.problemset_id
                 WHERE
-                    (p.problemset_id = ?)
+                    p.problemset_id = ?
                 LIMIT
                     1;';
         $params = [$problemset_id];

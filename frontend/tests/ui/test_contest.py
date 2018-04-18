@@ -302,7 +302,8 @@ def enter_contest(driver, contest_alias):
     contest_url = '/arena/%s' % contest_alias
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "%s")]' % contest_url))).click()
+            (By.CSS_SELECTOR,
+             '#current-contests a[href="%s"]' % contest_url))).click()
     driver.wait_for_page_loaded()
 
     driver.wait.until(

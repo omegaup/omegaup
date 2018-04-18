@@ -77,11 +77,9 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.onlyProblemAlias =
         /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
   } else {
-    let match = /\/arena\/([^\/]+)\/?problemset_id\/([^\/]+)\/?/.exec(
-        arenaLocation.pathname);
+    let match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
-      options.problemsetId = match[2];
     }
   }
 
@@ -392,6 +390,13 @@ export class Arena {
 
       self.rankingInterval =
           setInterval(self.refreshRanking.bind(self), 5 * 60 * 1000);
+    }
+  }
+
+  initProblemsetId(problemset) {
+    let self = this;
+    if (problemset.hasOwnProperty('problemset_id')) {
+      self.options.problemsetId = problemset.problemset_id;
     }
   }
 
@@ -1762,8 +1767,7 @@ class ObservableRun {
     let self = this;
     return (self.contest_alias() === null) ?
                '' :
-               '/arena/' + self.contest_alias() + '/problemset_id/' +
-                   self.problemset_id() + '/';
+               '/arena/' + self.contest_alias() + '/';
   }
 
   $user_html() {

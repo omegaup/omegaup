@@ -75,27 +75,26 @@ class ProblemsetController extends Controller {
         ProblemsetController::validateDetails($r);
 
         if ($r['problemset']['type'] == 'Contest') {
-            $details = ContestController::apiDetails(
+            return ContestController::apiDetails(
                 new Request([
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
-            $details = CourseController::apiAssignmentDetails(
+            return CourseController::apiAssignmentDetails(
                 new Request([
                     'course' => $r['problemset']['course'],
                     'assignment' => $r['problemset']['assignment'],
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Interview') {
-            $details = InterviewController::apiDetails(
+            return InterviewController::apiDetails(
                 new Request([
                     'interview_alias' => $r['problemset']['interview_alias'],
                 ])
             );
         }
-
-        return $details;
+        throw new NotFoundException('problemsetNotFound');
     }
 
     /**
@@ -169,6 +168,19 @@ class ProblemsetController extends Controller {
 
         if (is_null($r['problemset'])) {
             throw new NotFoundException('problemsetNotFound');
+        }
+        if ($r['problemset']['type'] == 'Contest') {
+            $r3 = new Request([
+                'contest_alias' => $r['problemset']['contest_alias'],
+            ]);
+            if (isset($r['auth_token'])) {
+                $r3['auth_token'] = $r['auth_token'];
+            }
+            if (isset($r['tokens']) && count($r['tokens']) >= 4) {
+                $r3['token'] = $r['tokens'][3];
+            }
+            ContestController::validateDetails($r3);
+            return $r3;
         }
         return $r;
     }

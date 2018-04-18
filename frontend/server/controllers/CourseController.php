@@ -345,7 +345,8 @@ class CourseController extends Controller {
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
-                'acl_id' => $r['course']->acl_id
+                'acl_id' => $r['course']->acl_id,
+                'type' => 'Assignment'
             ]);
             ProblemsetsDAO::save($problemset);
 

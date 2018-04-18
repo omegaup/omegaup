@@ -959,7 +959,8 @@ class ContestController extends Controller {
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'requests_user_information' => $r['requests_user_information']
+                'requests_user_information' => $r['requests_user_information'],
+                'type' => 'Contest',
             ]);
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
@@ -2202,6 +2203,7 @@ class ContestController extends Controller {
             $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
             $problemset->needs_basic_information = $r['basic_information'] ?? 0;
             $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
+            $problemset->type = 'Contest';
             ProblemsetsDAO::save($problemset);
 
             if (!is_null($r['problems'])) {
