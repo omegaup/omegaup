@@ -198,8 +198,7 @@ let UI = {
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {
-    
-    var substringMatcher = function (query, cb) {
+    var substringMatcher = function(query, cb) {
       var matches, substringRegex;
 
       // an array that will be populated with substring matches
@@ -231,8 +230,8 @@ let UI = {
               async: true,
               display: 'alias',
             })
-          .on('typeahead:select', cb)
-          .on('typeahead:autocomplete', cb);
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
   },
 
   schoolTypeahead: function(elem, cb) {
