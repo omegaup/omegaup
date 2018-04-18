@@ -1,14 +1,14 @@
 <template>
-    <div class="wait_for_ajax panel panel-default" id="coders_list" >
+    <div class="wait_for_ajax panel panel-default" >
 	<div class="panel-heading">
         <ul class="nav nav-tabs">
-            <li class="active" v-on:click="show = true"><a href="#top-coder-of-the-month" data-toggle="tab">{{UI.formatString(T.codersOfTheMonth)}}</a></li>
-            <li v-on:click="show = false"><a href="#coder-of-the-month-list" data-toggle="tab">{{UI.formatString(T.codersOfTheMonthList)}}</a></li>
+            <li class="active" v-on:click="show = true"><a data-toggle="tab">{{UI.formatString(T.codersOfTheMonth)}}</a></li>
+            <li v-on:click="show = false"><a data-toggle="tab">{{UI.formatString(T.codersOfTheMonthList)}}</a></li>
         </ul>
 	</div>
 	<div class="panel-body">
 	</div>
-		<table class="table table-striped table-hover" id="coder-of-the-month-table">
+		<table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th></th>
