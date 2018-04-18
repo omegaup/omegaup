@@ -14,7 +14,7 @@ try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_URL', 'http://localhost');
-try_define('OMEGAUP_DEVELOPMENT_MODE', false);
+try_define('OMEGAUP_ENVIRONMENT', 'production');
 try_define('OMEGAUP_MAINTENANCE', null);
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
@@ -143,11 +143,11 @@ try_define('PROBLEMS_PER_PAGE', 100);
 try_define('MAX_PROBLEMS_IN_CONTEST', 30);
 
 # #########################
-# USER TYPES
+# IDENTITY TYPES
 # #########################
-try_define('USER_ADMIN', 'user_admin');
-try_define('USER_NORMAL', 'user_normal');
-try_define('USER_ANONYMOUS', 'user_anonymous');
+try_define('IDENTITY_ADMIN', 'identity_admin');
+try_define('IDENTITY_NORMAL', 'identity_normal');
+try_define('IDENTITY_ANONYMOUS', 'identity_anonymous');
 
 # ########################
 # PASSWORD RESET CONFIG
