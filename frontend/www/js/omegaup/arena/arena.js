@@ -1679,13 +1679,9 @@ class RunView {
         });
 
     if (self.arena.options.contestAlias) {
-      omegaup.API.Contest.problems({contest_alias: self.arena.options.contestAlias})
-        .then(function(response) {
-          UI.problemContestTypeahead(
-              $('.runsproblem', elm), response.problems,
-              function(event, item) { self.filter_problem(item.alias); });
-        })
-        .fail(UI.apiError);
+      UI.problemContestTypeahead(
+        $('.runsproblem', elm), self.arena.problems,
+        function(event, item) { self.filter_problem(item.alias); });
     } else {
       UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
         self.filter_problem(item.alias);
