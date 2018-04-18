@@ -197,47 +197,42 @@ let UI = {
         .on('typeahead:autocomplete', cb);
   },
 
-  problemContestTypeahead: function(elem, contestAlias, cb) {
-    var substringMatcher = function(problems) {
-      return function findMatches(q, cb) {
-        var matches, substringRegex;
+  problemContestTypeahead: function(elem, problemList, cb) {
+    
+    var substringMatcher = function (query, cb) {
+      var matches, substringRegex;
 
-        // an array that will be populated with substring matches
-        matches = [];
+      // an array that will be populated with substring matches
+      matches = [];
 
-        // regex used to determine if a string contains the substring `q`
-        substringRegex = new RegExp(q, 'i');
+      // regex used to determine if a string contains the substring `query`
+      substringRegex = new RegExp(query, 'i');
 
-        // iterate through the pool of strings and for any string that
-        // contains the substring `q`, add it to the `matches` array
-        $.each(problems, function(i, problem) {
-          if (substringRegex.test(problem.alias)) {
-            matches.push(problem);
-          }
-        });
+      // iterate through the pool of strings and for any string that
+      // contains the substring `query`, add it to the `matches` array
+      $.each(problemList, function(i, problem) {
+        if (substringRegex.test(problem.alias)) {
+          matches.push(problem);
+        }
+      });
 
-        cb(matches);
-      };
+      cb(matches);
     };
 
     cb = cb || function(event, val) { $(event.target).val(val.alias); };
 
-    omegaup.API.Contest.problems({contest_alias: contestAlias})
-        .then(function(response) {
-          elem.typeahead(
-                  {
-                    minLength: 3,
-                    highlight: false,
-                  },
-                  {
-                    source: substringMatcher(response.problems),
-                    async: true,
-                    display: 'alias',
-                  })
-              .on('typeahead:select', cb)
-              .on('typeahead:autocomplete', cb);
-        })
-        .fail(UI.apiError);
+    elem.typeahead(
+            {
+              minLength: 3,
+              highlight: false,
+            },
+            {
+              source: substringMatcher,
+              async: true,
+              display: 'alias',
+            })
+          .on('typeahead:select', cb)
+          .on('typeahead:autocomplete', cb);
   },
 
   schoolTypeahead: function(elem, cb) {
