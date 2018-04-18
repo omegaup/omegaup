@@ -116,7 +116,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
     /**
      * Get all coder of the months based on month
-     * 
+     *
      * @params string (date) $firstDay
      * @return Users
      */
