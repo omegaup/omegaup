@@ -1655,6 +1655,7 @@ class ProblemController extends Controller {
         $response = [];
         $response['results'] = [];
         $author_identity_id = null;
+        $author_user_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
@@ -1662,6 +1663,7 @@ class ProblemController extends Controller {
         $identity_type = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
             $author_identity_id = intval($r['current_identity_id']);
+            $author_user_id = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1700,6 +1702,7 @@ class ProblemController extends Controller {
             $rowcount,
             $query,
             $author_identity_id,
+            $author_user_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
