@@ -62,6 +62,7 @@ omegaup.OmegaUp.loadTranslations({
 	codersOfTheMonth: "Coders of the Month",
 	codersOfTheMonthCountry: "Country",
 	codersOfTheMonthDate: "Date",
+	codersOfTheMonthList: "Top coder monthly list",
 	codersOfTheMonthUser: "Username",
 	contestActivityReport: "Activity report",
 	contestActivityReportDuplicatesForOriginsDescription: "Addresses with more than one user",

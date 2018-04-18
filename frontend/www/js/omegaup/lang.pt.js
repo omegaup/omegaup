@@ -62,6 +62,7 @@ omegaup.OmegaUp.loadTranslations({
 	codersOfTheMonth: "Programadores do M\u00eas",
 	codersOfTheMonthCountry: "Pa\u00eds",
 	codersOfTheMonthDate: "Data",
+	codersOfTheMonthList: "Codificador superior da lista de meses",
 	codersOfTheMonthUser: "Usu\u00e1rio",
 	contestActivityReport: "Relat\u00f3rio de atividade",
 	contestActivityReportDuplicatesForOriginsDescription: "Origens com mais do que um usu\u00e1rio",

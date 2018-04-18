@@ -499,6 +499,8 @@ export default {
 
     contestStats: _call('/api/user/conteststats/'),
 
+    coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
+
     /**
      * Creates a new user.
      * @param {string} email - The user's email address.
