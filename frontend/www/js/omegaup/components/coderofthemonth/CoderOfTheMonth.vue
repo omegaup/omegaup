@@ -3,10 +3,10 @@
     <div class="panel-heading">
       <ul class="nav nav-tabs">
         <li class="active"
-            v-on:click="show = true">
+            v-on:click="showCoderOfTheMonth = true">
           <a data-toggle="tab">{{T.codersOfTheMonth}}</a>
         </li>
-        <li v-on:click="show = false">
+        <li v-on:click="showCoderOfTheMonth = false">
           <a data-toggle="tab">{{T.codersOfTheMonthList}}</a>
         </li>
       </ul>
@@ -21,19 +21,19 @@
           <th>{{T.codersOfTheMonthDate}}</th>
         </tr>
       </thead>
-      <tbody v-if="show">
+      <tbody v-if="showCoderOfTheMonth">
         <tr v-for="coder in coders">
           <td><img v-bind:src="coder.gravatar_32"></td>
-          <td><img v-bind:src="'/media/flags/' + coder.country_id.toLowerCase() + '.png'"
+          <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
           <td>{{coder.username}}</td>
           <td>{{coder.date}}</td>
         </tr>
       </tbody>
-      <tbody v-if="!show">
+      <tbody v-if="!showCoderOfTheMonth">
         <tr v-for="coder in coders_monthly">
           <td><img v-bind:src="coder.gravatar_32"></td>
-          <td><img v-bind:src="'/media/flags/' + coder.country_id.toLowerCase() + '.png'"
+          <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
           <td>{{coder.username}}</td>
           <td>{{coder.date}}</td>
@@ -51,7 +51,7 @@ export default {
   props: {},
   computed: {},
   data: function() {
-    return {T: T, UI: UI, coders: [], coders_monthly: [], show: true};
+    return {T: T, UI: UI, coders: [], coders_monthly: [], showCoderOfTheMonth: true};
   },
   created: function() {
     // top coder of the month
