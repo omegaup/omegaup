@@ -45,7 +45,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $sql = "
 			SELECT DISTINCT
-				username, name, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+				up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
 			FROM
 				(
 					SELECT DISTINCT
@@ -68,7 +68,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			GROUP BY
 				user_id
 			ORDER BY
-                score DESC
+				score DESC
 			LIMIT 100
 		";
 

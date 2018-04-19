@@ -4,10 +4,10 @@
       <ul class="nav nav-tabs">
         <li class="active"
             v-on:click="show = true">
-          <a data-toggle="tab">{{UI.formatString(T.codersOfTheMonth)}}</a>
+          <a data-toggle="tab">{{T.codersOfTheMonth}}</a>
         </li>
         <li v-on:click="show = false">
-          <a data-toggle="tab">{{UI.formatString(T.codersOfTheMonthList)}}</a>
+          <a data-toggle="tab">{{T.codersOfTheMonthList}}</a>
         </li>
       </ul>
     </div>
@@ -16,9 +16,9 @@
       <thead>
         <tr>
           <th></th>
-          <th>{{UI.formatString(T.codersOfTheMonthCountry)}}</th>
-          <th>{{UI.formatString(T.codersOfTheMonthUser)}}</th>
-          <th>{{UI.formatString(T.codersOfTheMonthDate)}}</th>
+          <th>{{T.codersOfTheMonthCountry}}</th>
+          <th>{{T.codersOfTheMonthUser}}</th>
+          <th>{{T.codersOfTheMonthDate}}</th>
         </tr>
       </thead>
       <tbody v-if="show">
@@ -62,15 +62,7 @@ export default {
 
     // coder of the month list
     var today = new Date();
-    var mm = today.getMonth() + 1;
-    var dd = today.getDate();
-
-    var todayString = [
-      today.getFullYear(),
-      (mm > 9 ? '' : '0') + mm,
-      (dd > 9 ? '' : '0') + dd
-    ].join('-');
-    API.User.coderOfTheMonthList({date: todayString})
+    API.User.coderOfTheMonthList({date: today.format('{yyyy}-{MM}-{dd}')})
         .then(function(response) { self.coders_monthly = response.coders; })
         .fail(UI.apiError);
   }

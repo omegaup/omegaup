@@ -1390,8 +1390,6 @@ class UserController extends Controller {
         }
 
         try {
-            $codersOfTheMonth = [];
-
             $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
 
             if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
