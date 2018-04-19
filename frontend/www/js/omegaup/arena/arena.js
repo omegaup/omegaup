@@ -215,6 +215,9 @@ export class Arena {
     // The last known scoreboard event stream.
     self.currentEvents = null;
 
+    // The Markdown-to-HTML converter.
+    self.markdownConverter = Markdown.getSanitizingConverter();
+
     // Currently opened notifications.
     self.notifications = new Notifications();
     OmegaUp.on('ready',
@@ -1101,7 +1104,8 @@ export class Arena {
         $('#problem .time_limit').html(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
             .html(problem.overall_wall_time_limit / 1000 + 's');
-        $('#problem .statement').html(problem.problem_statement);
+        $('#problem .statement')
+            .html(self.markdownConverter.makeHtml(problem.problem_statement));
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         let language_array = problem.languages;
@@ -1677,9 +1681,15 @@ class RunView {
           self.filter_username('');
         });
 
-    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
+    if (self.arena.options.contestAlias) {
+      UI.problemContestTypeahead(
+          $('.runsproblem', elm), self.arena.problems,
+          function(event, item) { self.filter_problem(item.alias); });
+    } else {
+      UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+        self.filter_problem(item.alias);
+      });
+    }
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

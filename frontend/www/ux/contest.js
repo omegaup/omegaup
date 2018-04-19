@@ -1,6 +1,7 @@
 omegaup.OmegaUp.on('ready', function() {
   var arena = new omegaup.arena.Arena(
       omegaup.arena.GetOptionsFromLocation(window.location));
+  var converter = Markdown.getSanitizingConverter();
   var admin = null;
 
   Highcharts.setOptions({global: {useUTC: false}});
@@ -10,9 +11,11 @@ omegaup.OmegaUp.on('ready', function() {
     arena.myRuns.filter_problem(problem.alias);
     arena.myRuns.attach($('#problem .runs'));
 
+    var statement = document.querySelector('div.statement');
+    statement.innerHTML = converter.makeHtml(problem.problem_statement);
+
     arena.mountEditor(problem);
-    MathJax.Hub.Queue(
-        ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
 
     for (var i = 0; i < problem.solvers.length; i++) {
       var solver = problem.solvers[i];
@@ -114,8 +117,8 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   if (arena.options.isOnlyProblem) {
-    onlyProblemLoaded(JSON.parse(
-        document.getElementById('problem-json').firstChild.nodeValue));
+    onlyProblemLoaded(
+        JSON.parse(document.getElementById('payload').firstChild.nodeValue));
   } else {
     omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
         .then(arena.contestLoaded.bind(arena))
