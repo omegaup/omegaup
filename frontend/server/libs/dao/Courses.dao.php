@@ -310,6 +310,56 @@ class CoursesDAO extends CoursesDAOBase {
         return new Assignments($row);
     }
 
+    final public static function getActivityReport($course_id) {
+        $sql = "(SELECT
+                    u.username,
+                    p.alias,
+                    sl.ip,
+                    UNIX_TIMESTAMP(sl.time) AS `time`
+                FROM
+                    Submission_Log sl
+                INNER JOIN
+                    Users u
+                ON
+                    u.user_id = sl.user_id
+                INNER JOIN
+                    Runs r
+                ON
+                    r.run_id = sl.run_id
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = sl.problemset_id
+                WHERE
+                    a.course_id = ?)
+                UNION
+                (SELECT
+                    u.username,
+                    '' as alias,
+                    pal.ip,
+                    UNIX_TIMESTAMP(pal.time) AS `time`
+                FROM
+                    Problemset_Access_Log pal
+                INNER JOIN
+                    Users u
+                ON
+                    u.user_id = pal.user_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = pal.problemset_id
+                WHERE
+                    a.course_id = ?)
+                ORDER BY
+                    `time`;";
+        global $conn;
+        return $conn->GetAll($sql, [$course_id, $course_id]);
+    }
+
     final public static function updateAssignmentMaxPoints(Courses $course, $assignment_alias) {
         $sql = 'UPDATE Assignments a
                 JOIN (

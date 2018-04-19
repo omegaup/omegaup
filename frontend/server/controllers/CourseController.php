@@ -1,5 +1,6 @@
 <?php
 
+require_once 'libs/ActivityReport.php';
 /**
  *  CourseController
  *
@@ -1385,60 +1386,23 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r, 'course_alias');
 
-        $isAdmin = Authorization::isCourseAdmin(
-            $r['current_user_id'],
-            $r['course']
-        );
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
-        $problemsets = AssignmentsDAO::GetProblemset($r['course']->course_id);
-        $problemset_ids = implode(',', array_column($problemsets, 'problemset_id'));
-        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemsets($problemset_ids);
-        $submissions = SubmissionLogDAO::GetSubmissionsForProblemsets($problemset_ids);
 
-        // Merge both logs.
-        $result['events'] = [];
-        $lenAccesses = count($accesses);
-        $lenSubmissions = count($submissions);
-        $iAccesses = 0;
-        $iSubmissions = 0;
-
-        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
-            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($result['events'], CourseController::processAccess(
-                    $accesses[$iAccesses++]
-                ));
+        $activity_report = CoursesDAO::getActivityReport($r['course']->course_id);
+        $accesses = [];
+        $submissions = [];
+        foreach ($activity_report as $activity) {
+            if ($activity['alias'] != '') {
+                $submissions[] = $activity;
             } else {
-                array_push($result['events'], CourseController::processSubmission(
-                    $submissions[$iSubmissions++]
-                ));
+                unset($activity['alias']);
+                $accesses[] = $activity;
             }
         }
 
-        while ($iAccesses < $lenAccesses) {
-            array_push($result['events'], CourseController::processAccess(
-                $accesses[$iAccesses++]
-            ));
-        }
-
-        while ($iSubmissions < $lenSubmissions) {
-            array_push($result['events'], CourseController::processSubmission(
-                $submissions[$iSubmissions++]
-            ));
-        }
-
-        // Anonimize data.
-        $ipMapping = [];
-        foreach ($result['events'] as &$entry) {
-            if (!array_key_exists($entry['ip'], $ipMapping)) {
-                $ipMapping[$entry['ip']] = count($ipMapping);
-            }
-            $entry['ip'] = $ipMapping[$entry['ip']];
-        }
-
-        $result['status'] = 'ok';
-        return $result;
+        return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
     private static function processAccess(&$access) {

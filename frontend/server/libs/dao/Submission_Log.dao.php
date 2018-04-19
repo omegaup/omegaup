@@ -17,33 +17,4 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
         global $conn;
         return $conn->GetAll($sql, $val);
     }
-
-    public static function GetSubmissionsForProblemsets(String $problemset_ids) {
-        $sql = "SELECT
-                    u.username,
-                    p.alias,
-                    sl.ip,
-                    UNIX_TIMESTAMP(sl.time) AS `time`
-                FROM
-                    Submission_Log sl
-                INNER JOIN
-                    Users u
-                ON
-                    u.user_id = sl.user_id
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = sl.run_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = r.problem_id
-                WHERE
-                    sl.problemset_id IN ($problemset_ids)
-                ORDER BY
-                    `time`;";
-
-        global $conn;
-        return $conn->GetAll($sql);
-    }
 }
