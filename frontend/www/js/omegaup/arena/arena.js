@@ -508,7 +508,6 @@ export class Arena {
       }
       self.problems[alias] = problem;
     }
-
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
       self.elements.rankingTable.showPenalty = contest.show_penalty;
