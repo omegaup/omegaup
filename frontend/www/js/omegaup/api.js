@@ -377,7 +377,7 @@ export default {
     delete: _call('/api/problem/delete/'),
 
     details: _call('/api/problem/details/', _convertRuntimes,
-                   {statement_type: 'html'}),
+                   {statement_type: 'markdown'}),
 
     list: _call('/api/problem/list/'),
 

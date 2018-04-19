@@ -451,6 +451,7 @@ omegaup.OmegaUp.loadTranslations({
 	omegaupTitleUpdatePrivileges: "Actualizar privilegios",
 	onlyDemotionsSupported: "Solamente se pueden resolver demociones por ahora.",
 	openInKarelJs: "Puedes utilizar karel.js para resolver este problema",
+	outputOnly: "S\u00f3lo salida",
 	parameterEmpty: "El campo no puede estar vac\u00edo",
 	parameterInvalid: "Par\u00e1metro inv\u00e1lido",
 	parameterInvalidAlias: "El campo debe constar de letras, n\u00fameros y _. Los espacios no son permitidos",

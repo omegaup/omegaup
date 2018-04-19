@@ -105,8 +105,14 @@
 						<div class="col-md-7">
 						<select id="programming_language" name="programming_language" class="form-control" >
 							<option value=""></option>
-							{foreach from=$PROGRAMMING_LANGUAGES item=programming_language}
-							<option value="{$programming_language}">{$programming_language}</option>
+							{foreach from=$PROGRAMMING_LANGUAGES key=extension item=name}
+							<option value="{$extension}">
+								{if $extension != 'cat'}
+									{$name}
+								{else}
+									{#outputOnly#}
+								{/if}
+							</option>
 							{/foreach}
 						</select>
 						</div>
