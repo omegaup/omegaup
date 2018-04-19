@@ -28,13 +28,14 @@ class ClarificationController extends Controller {
     private static function validateCreate(Request $r) {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isNumber($r['user_id'], 'user_id', false);
+        Validators::isStringNonEmpty($r['username'], 'username', false);
         Validators::isStringNonEmpty($r['message'], 'message');
         Validators::isStringOfMaxLength($r['message'], 'message', 200);
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -73,7 +74,7 @@ class ClarificationController extends Controller {
 
         $r['clarification'] = new Clarifications([
             'author_id' => $r['current_identity_id'],
-            'receiver_id' => $r['identity_id'],
+            'receiver_id' => $r['identity'] ? $r['identity']->identity_id : null,
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],

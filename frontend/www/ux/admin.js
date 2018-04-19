@@ -69,13 +69,20 @@ omegaup.OmegaUp.on('ready', function() {
                         '</option>');
           }
 
-          for (var ind in contest.users) {
-            var user = contest.users[ind];
-
-            $('#clarification select[name=user]')
-                .append('<option value="' + user.user_id + '">' +
-                        omegaup.UI.escape(user.username) + '</option>');
-          }
+          omegaup.API.Contest.users({contest_alias: arena.options.contestAlias})
+              .then(function(data) {
+                for (var ind in data.users) {
+                  var user = data.users[ind];
+                  var receiver = user.is_owner ?
+                                     omegaup.T.wordsPublic :
+                                     omegaup.UI.escape(user.username);
+                  $('#clarification select[name=user]')
+                      .append('<option value="' +
+                              omegaup.UI.escape(user.username) + '">' +
+                              receiver + '</option>');
+                }
+              })
+              .fail(omegaup.UI.ignoreError);
 
           arena.setupPolls();
           admin.refreshRuns();

@@ -629,16 +629,6 @@ class ContestController extends Controller {
 
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
-            if (Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
-                $result['users'] = self::apiUsers($r)['users'];
-                foreach ($result['users'] as $index => $user) {
-                    if ($user['user_id'] == $r['current_user_id']) {
-                        global $smarty;
-                        $result['users'][$index]['username'] = $smarty->getConfigVars('wordsPublic');
-                        break;
-                    }
-                }
-            }
             $result['languages'] = explode(',', $result['languages']);
             $result = array_merge(
                 $result,
@@ -2039,7 +2029,7 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns ALL users participating in a contest
+     * Returns ALL identities participating in a contest
      *
      * @param Request $r
      * @return array
@@ -2065,28 +2055,16 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Get users from DB
-        $problemset_user = new ProblemsetIdentities();
-        $problemset_user->problemset_id = $contest->problemset_id;
-
+        // Get identities from DB
         try {
-            $db_results = ProblemsetIdentitiesDAO::search($problemset_user);
+            $identities = ProblemsetIdentitiesDAO::getWithExtraInformation($contest->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $users = [];
-
-        // Add all users to an array
-        foreach ($db_results as $result) {
-            $identity_id = $result->identity_id;
-            $user = IdentitiesDAO::getByPK($identity_id);
-            $users[] = ['user_id' => $identity_id, 'username' => $user->username, 'access_time' => $result->access_time, 'country' => $user->country_id];
-        }
-
         $response = [];
-        $response['users'] = $users;
+        $response['users'] = $identities;
         $response['status'] = 'ok';
 
         return $response;
