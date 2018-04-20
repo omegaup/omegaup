@@ -51,7 +51,13 @@ export default {
   props: {},
   computed: {},
   data: function() {
-    return {T: T, UI: UI, coders: [], coders_monthly: [], showCoderOfTheMonth: true};
+    return {
+      T: T,
+      UI: UI,
+      coders: [],
+      coders_monthly: [],
+      showCoderOfTheMonth: true
+    };
   },
   created: function() {
     // top coder of the month
