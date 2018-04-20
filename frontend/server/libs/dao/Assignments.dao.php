@@ -12,11 +12,7 @@ include('base/Assignments.vo.base.php');
   */
 class AssignmentsDAO extends AssignmentsDAOBase {
     public static function GetProblemset($courseId, $assignmentAlias = null) {
-        $assignmentClause = 'TRUE';
-        if (!is_null($assignmentAlias)) {
-            $assignmentClause = 'a.alias = ?';
-        }
-        $sql = "SELECT
+        $sql = 'SELECT
                     p.*
                 FROM
                     Assignments a
@@ -25,12 +21,16 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 ON
                     a.problemset_id = p.problemset_id
                 WHERE
-                    a.course_id = ? AND $assignmentClause;";
+                    a.course_id = ?';
         global $conn;
+        $params = [$courseId];
         if (is_null($assignmentAlias)) {
-            return $conn->GetAll($sql, [$courseId]);
+            return $conn->GetAll($sql, $params);
         }
-        $rs = $conn->GetRow($sql, [$courseId, $assignmentAlias]);
+        $sql .= ' AND a.alias = ?';
+        $params[] = $assignmentAlias;
+
+        $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }

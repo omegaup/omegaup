@@ -49,6 +49,7 @@ class ActivityReport {
     private static function processAccess(&$access) {
         return [
             'username' => $access['username'],
+            'classname' => $access['classname'],
             'time' => (int)$access['time'],
             'ip' => (int)$access['ip'],
             'event' => [
@@ -60,6 +61,7 @@ class ActivityReport {
     private static function processSubmission(&$submission) {
         return [
             'username' => $submission['username'],
+            'classname' => $submission['classname'],
             'time' => (int)$submission['time'],
             'ip' => (int)$submission['ip'],
             'event' => [

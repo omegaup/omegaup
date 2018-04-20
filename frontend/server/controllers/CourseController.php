@@ -1,6 +1,6 @@
 <?php
 
-require_once 'libs/ActivityReport.php';
+require_once('libs/ActivityReport.php');
 /**
  *  CourseController
  *
@@ -1390,42 +1390,15 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $activity_report = CoursesDAO::getActivityReport($r['course']->course_id);
-        $accesses = [];
-        $submissions = [];
-        foreach ($activity_report as $activity) {
-            if ($activity['alias'] != '') {
-                $submissions[] = $activity;
-            } else {
-                unset($activity['alias']);
-                $accesses[] = $activity;
-            }
+        $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($r['course']->course_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForCourse($r['course']->course_id);
+        foreach ($accesses as $key => $access) {
+            $accesses[$key]['classname'] = UsersDAO::getRankingClassName($access['user_id']);
         }
-
+        foreach ($submissions as $key => $submission) {
+            $submissions[$key]['classname'] = UsersDAO::getRankingClassName($submission['user_id']);
+        }
         return ActivityReport::getActivityReport($accesses, $submissions);
-    }
-
-    private static function processAccess(&$access) {
-        return [
-            'username' => $access['username'],
-            'time' => (int)$access['time'],
-            'ip' => (int)$access['ip'],
-            'event' => [
-                'name' => 'open',
-            ],
-        ];
-    }
-
-    private static function processSubmission(&$submission) {
-        return [
-            'username' => $submission['username'],
-            'time' => (int)$submission['time'],
-            'ip' => (int)$submission['ip'],
-            'event' => [
-                'name' => 'submit',
-                'problem' => $submission['alias'],
-            ],
-        ];
     }
 
     private static function validateAssignmentDetails(Request $r, $is_required = false) {

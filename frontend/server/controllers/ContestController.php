@@ -1,7 +1,7 @@
 <?php
 
 require_once('libs/dao/Contests.dao.php');
-require_once 'libs/ActivityReport.php';
+require_once('libs/ActivityReport.php');
 
 /**
  * ContestController
@@ -734,9 +734,14 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($problemset);
-        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($problemset);
+        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($r['contest']->problemset_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($r['contest']->problemset_id);
+        foreach ($accesses as $key => $access) {
+            $accesses[$key]['classname'] = UsersDAO::getRankingClassName($access['user_id']);
+        }
+        foreach ($submissions as $key => $submission) {
+            $submissions[$key]['classname'] = UsersDAO::getRankingClassName($submission['user_id']);
+        }
 
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
