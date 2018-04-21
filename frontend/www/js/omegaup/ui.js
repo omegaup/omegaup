@@ -294,7 +294,36 @@ let UI = {
     return date.format('{MM}/{dd}/{yyyy} {HH}:{mm}');
   },
 
-  formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); }
+  formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
+
+  copyToClipboard: function() {
+    $('.clipboard')
+        .on('click', function() {
+          let value = $(this).data('value');
+          value = window.problem_samples[value];
+          
+          let tempInput = document.createElement('textarea');
+
+          tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
+          tempInput.value = value;
+
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand('copy');
+          
+          document.body.removeChild(tempInput);
+        });
+  },
+
+  renderSampleToClipboardButton: function() {
+    $('.sample_io > tbody > tr').each(function(index) {
+      let inputSample = $(this).find('td')[0];
+      $(inputSample).append('<button class="glyphicon glyphicon-copy clipboard" aria-hidden="true" data-value="' + index + '"></button>');
+    });
+
+    UI.copyToClipboard();
+  }
+
 };
 
 export {UI as default};
