@@ -414,6 +414,7 @@ let UI = {
                 inner.split(/ {0,3}\|\| *(input|output|description) *\n/);
             var result = '';
             var description_column = false;
+            var input_samples = [];
             for (var i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 description_column = true;
@@ -429,6 +430,7 @@ let UI = {
             result += '</tr></thead>';
             var first_row = true;
             var columns = 0;
+            var input_row = false;
             result += '<tbody>';
             for (var i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
@@ -446,10 +448,16 @@ let UI = {
                   first_row = false;
                   result += '<tr>';
                   columns = 0;
+                  input_row = true;
                 }
-                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') +
+                var inputSampleData = matches[i + 1].replace(/\s+$/, '');
+                result += '<td><pre>' + inputSampleData +
                           '</pre></td>';
+                if (input_row) {
+                  input_samples.push(inputSampleData);
+                }
                 columns++;
+                input_row = false;
               }
             }
             while (columns < (description_column ? 3 : 2)) {
@@ -457,6 +465,7 @@ let UI = {
               columns++;
             }
             result += '</tr></tbody>';
+            window.problem_samples = input_samples;
             return hashBlock('<table class="sample_io">\n' + result +
                              '\n</table>');
           });
