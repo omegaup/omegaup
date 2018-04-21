@@ -1697,6 +1697,8 @@ class RunView {
           self.filter_problem('');
         });
 
+    UI.renderSampleToClipboardButton();
+
     if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
   }
