@@ -1240,6 +1240,9 @@ export class Arena {
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML =
         self.markdownConverter.makeHtml(problem.problem_statement);
+      
+    UI.renderSampleToClipboardButton();
+
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
     if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
@@ -1713,8 +1716,6 @@ class RunView {
           $('.runsproblem', elm).val('');
           self.filter_problem('');
         });
-
-    UI.renderSampleToClipboardButton();
 
     if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
     self.attached = true;
