@@ -340,9 +340,10 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
   }
 
-  var md_converter = Markdown.getSanitizingConverter();
-  md_editor = new Markdown.Editor(md_converter, '-statement');  // Global.
-  md_editor.run();
+  var markdownConverter = omegaup.UI.markdownConverter({preview: true});
+  var markdownEditor =
+      new Markdown.Editor(markdownConverter, '-statement');  // Global.
+  markdownEditor.run();
 
   function refreshEditForm(problemAlias) {
     if (problemAlias === '') {
@@ -412,7 +413,7 @@ omegaup.OmegaUp.on('ready', function() {
     } else {
       $('#wmd-input-statement').val('');
     }
-    md_editor.refreshPreview();
+    markdownEditor.refreshPreview();
     if (problem.slow == 1) {
       $('.slow-warning').show();
     }
