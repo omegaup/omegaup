@@ -302,25 +302,29 @@ let UI = {
         .on('click', function() {
           let value = $(this).data('value');
           value = window.problem_samples[value];
-          
+
           let tempInput = document.createElement('textarea');
 
           tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
           tempInput.value = value;
 
           document.body.appendChild(tempInput);
-          tempInput.select();
+          tempInput.trigger('select');
           document.execCommand('copy');
-          
+
           document.body.removeChild(tempInput);
         });
   },
 
   renderSampleToClipboardButton: function() {
-    $('.sample_io > tbody > tr').each(function(index) {
-      let inputSample = $(this).find('td')[0];
-      $(inputSample).append('<button class="glyphicon glyphicon-copy clipboard" aria-hidden="true" data-value="' + index + '"></button>');
-    });
+    $('.sample_io > tbody > tr')
+        .each(function(index) {
+          let inputSample = $(this).find('td')[0];
+          $(inputSample)
+              .append(
+                  '<button class="glyphicon glyphicon-copy clipboard" aria-hidden="true" data-value="' +
+                  index + '"></button>');
+        });
 
     UI.copyToClipboard();
   },
@@ -451,8 +455,7 @@ let UI = {
                   input_row = true;
                 }
                 var inputSampleData = matches[i + 1].replace(/\s+$/, '');
-                result += '<td><pre>' + inputSampleData +
-                          '</pre></td>';
+                result += '<td><pre>' + inputSampleData + '</pre></td>';
                 if (input_row) {
                   input_samples.push(inputSampleData);
                 }
