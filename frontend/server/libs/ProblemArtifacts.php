@@ -34,9 +34,11 @@ class ProblemArtifacts {
     }
 
     public function lsTree($path) {
-        return explode('\n', $this->git->get([
-            'ls-tree', '--name-only', 'HEAD:' . $path
-        ]));
+        return explode("\n", trim($this->git->get(
+            ['ls-tree', '--name-only', 'HEAD:' . $path],
+            null /* cwd_override */,
+            true /* quiet */
+        )));
     }
 }
 
