@@ -1,10 +1,10 @@
 omegaup.OmegaUp.on('ready', function() {
-  var converter1 = Markdown.getSanitizingConverter();
-  var editor1 = new Markdown.Editor(converter1);
-  editor1.hooks.chain('onPreviewRefresh', function() {
+  var markdownConverter = omegaup.UI.markdownConverter({preview: true});
+  var markdownEditor = new Markdown.Editor(markdownConverter);
+  markdownEditor.hooks.chain('onPreviewRefresh', function() {
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#wmd-preview').get(0)]);
   });
-  editor1.run();
+  markdownEditor.run();
 
   // Ask the user if they want to restore the last draft
   if (localStorage.getItem('wmdinput')) {
