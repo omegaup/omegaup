@@ -41,8 +41,7 @@ class ClarificationsDAO extends ClarificationsDAOBase {
         $val = [$problemset_id];
 
         if (!$admin) {
-            $sql .= 'AND (c.public = 1 OR c.author_id = ? OR c.receiver_id = ?) ' .
-                    'OR (c.author_id = c.receiver_id)';
+            $sql .= 'AND (c.public = 1 OR c.author_id = ? OR c.receiver_id = ?) ';
             $val[] = $identity_id;
             $val[] = $identity_id;
         }

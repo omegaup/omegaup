@@ -71,15 +71,15 @@ class ClarificationController extends Controller {
         $response = [];
 
         $time = Time::get();
-
+        $receiver_id = $r['identity'] ? $r['identity']->identity_id : null;
         $r['clarification'] = new Clarifications([
             'author_id' => $r['current_identity_id'],
-            'receiver_id' => $r['identity'] ? $r['identity']->identity_id : null,
+            'receiver_id' => $receiver_id,
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
             'time' => gmdate('Y-m-d H:i:s', $time),
-            'public' => '0'
+            'public' => $receiver_id == $r['current_identity_id'] ? '1' : '0',
         ]);
 
         // Insert new Clarification

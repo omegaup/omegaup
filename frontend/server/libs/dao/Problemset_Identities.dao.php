@@ -55,7 +55,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     Problemsets p
                 ON
                     p.problemset_id = pi.problemset_id
-                LEFT JOIN
+                INNER JOIN
                     ACLs a
                 ON
                     a.acl_id = p.acl_id

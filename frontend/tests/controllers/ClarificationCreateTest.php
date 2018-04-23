@@ -121,7 +121,7 @@ class CreateClarificationTest extends OmegaupTestCase {
             $directorIdentity->username
         );
 
-        $messageToEspecificUser = ClarificationsFactory::createClarification(
+        $messageToSpecificUser = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -177,11 +177,5 @@ class CreateClarificationTest extends OmegaupTestCase {
             // Asserts that user has two clarifications
             $this->assertEquals(2, count($response['clarifications']));
         }
-
-        // Removing public messages, to avoid failiures in other tests
-        ClarificationsFactory::removePublicMessages(
-            $contestData['contest']->problemset_id,
-            $messageToEveryone['request']['clarification']->clarification_id
-        );
     }
 }
