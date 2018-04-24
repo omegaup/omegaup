@@ -84,27 +84,4 @@ class ClarificationsFactory {
         // Call api
         ClarificationController::apiUpdate($r);
     }
-
-    /**
-     * Removes all the public messages from a problemset, whether $clarification_id is given
-     * it removes only this one
-     */
-    public static function removePublicMessages($problemset_id, $clarification_id = null) {
-        if (!is_null($clarification_id)) {
-            $clarification = new Clarifications();
-            $clarification->clarification_id = $clarification_id;
-            return ClarificationsDAO::delete($clarification);
-        }
-
-        $clarification = new Clarifications();
-        $clarification->problemset_id = $problemset_id;
-        $clarifications = ClarificationsDAO::search($clarification);
-
-        foreach ($clarifications as $clarification) {
-            if ($clarification->receiver_id == $clarification->author_id) {
-                ClarificationsDAO::delete($clarification);
-            }
-        }
-        return true;
-    }
 }
