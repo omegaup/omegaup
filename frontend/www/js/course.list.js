@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
       course.numHomeworks = course.counts.homework;
       course.numTests = course.counts.test;
       course.activityURL = '/course/' + course.alias + '/activity/';
-      course.activity = omegaup.T.contestActivityReport;
+      course.activity = omegaup.T.wordsActivityReport;
       if (course.finish_time > Date.now()) {
         current.push(course);
       } else {

@@ -6,32 +6,32 @@ import UI from '../ui.js';
 OmegaUp.on('ready', function() {
   let match =
       /\/([^\/]+)\/([^\/]+)\/activity\/?.*/.exec(window.location.pathname);
-  let problemset_type = match[1];
-  let problemset_alias = match[2];
+  let problemsetType = match[1];
+  let problemsetAlias = match[2];
 
-  if (problemset_type == 'contest') {
-    API.Contest.activityReport({'contest_alias': problemset_alias})
+  if (problemsetType == 'contest') {
+    API.Contest.activityReport({'contest_alias': problemsetAlias})
         .then(function(report) {
-          createComponent(problemset_type, problemset_alias, report);
+          createComponent(problemsetType, problemsetAlias, report);
         })
         .fail(omegaup.UI.apiError);
-  } else if (problemset_type == 'course') {
-    API.Course.activityReport({'course_alias': problemset_alias})
+  } else if (problemsetType == 'course') {
+    API.Course.activityReport({'course_alias': problemsetAlias})
         .then(function(report) {
-          createComponent(problemset_type, problemset_alias, report);
+          createComponent(problemsetType, problemsetAlias, report);
         })
         .fail(omegaup.UI.apiError);
   }
 
-  function createComponent(problemset_type, problemset_alias, report) {
+  function createComponent(problemsetType, problemsetAlias, report) {
     let activityFeed = new Vue({
-      el: '#' + problemset_type + '-activity',
+      el: '#' + problemsetType + '-activity',
       render: function(createElement) {
         return createElement(
             'omegaup-activity-feed',
             {props: {type: this.type, alias: this.alias, report: this.report}});
       },
-      data: {type: problemset_type, alias: problemset_alias, report: report},
+      data: {type: problemsetType, alias: problemsetAlias, report: report},
       components: {
         'omegaup-activity-feed': activity_Feed,
       }

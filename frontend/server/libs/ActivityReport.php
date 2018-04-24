@@ -11,32 +11,34 @@ class ActivityReport {
 
         while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
             if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($result['events'], self::processAccess(
+                array_push($result['events'], self::processData(
                     $accesses[$iAccesses++]
                 ));
             } else {
-                array_push($result['events'], self::processSubmission(
-                    $submissions[$iSubmissions++]
+                array_push($result['events'], self::processData(
+                    $submissions[$iSubmissions++],
+                    true
                 ));
             }
         }
 
         while ($iAccesses < $lenAccesses) {
-            array_push($result['events'], self::processAccess(
+            array_push($result['events'], self::processData(
                 $accesses[$iAccesses++]
             ));
         }
 
         while ($iSubmissions < $lenSubmissions) {
-            array_push($result['events'], self::processSubmission(
-                $submissions[$iSubmissions++]
+            array_push($result['events'], self::processData(
+                $submissions[$iSubmissions++],
+                true
             ));
         }
 
         // Anonimize data.
         $ipMapping = [];
         foreach ($result['events'] as &$entry) {
-            if (!array_key_exists($entry['ip'], $ipMapping)) {
+            if (!isset($ipMapping[$entry['ip']]) || !array_key_exists($entry['ip'], $ipMapping)) {
                 $ipMapping[$entry['ip']] = count($ipMapping);
             }
             $entry['ip'] = $ipMapping[$entry['ip']];
@@ -46,28 +48,20 @@ class ActivityReport {
         return $result;
     }
 
-    private static function processAccess(&$access) {
+    private static function processData(&$data, $isSubmission = false) {
         return [
-            'username' => $access['username'],
-            'classname' => $access['classname'],
-            'time' => (int)$access['time'],
-            'ip' => (int)$access['ip'],
-            'event' => [
-                'name' => 'open',
-            ],
-        ];
-    }
-
-    private static function processSubmission(&$submission) {
-        return [
-            'username' => $submission['username'],
-            'classname' => $submission['classname'],
-            'time' => (int)$submission['time'],
-            'ip' => (int)$submission['ip'],
-            'event' => [
-                'name' => 'submit',
-                'problem' => $submission['alias'],
-            ],
+            'username' => $data['username'],
+            'classname' => $data['classname'],
+            'time' => (int)$data['time'],
+            'ip' => (int)$data['ip'],
+            'event' => $isSubmission ?
+                [
+                    'name' => 'submit',
+                    'problem' => $data['alias'],
+                ] :
+                [
+                    'name' => 'open'
+                ],
         ];
     }
 }
