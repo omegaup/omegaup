@@ -35,7 +35,7 @@ class ActivityReport {
             ));
         }
 
-        // Anonimize data.
+        // Anonymize data.
         $ipMapping = [];
         foreach ($result['events'] as &$entry) {
             if (!isset($ipMapping[$entry['ip']]) || !array_key_exists($entry['ip'], $ipMapping)) {
@@ -51,7 +51,7 @@ class ActivityReport {
     private static function processData(&$data, $isSubmission = false) {
         return [
             'username' => $data['username'],
-            'classname' => $data['classname'],
+            'classname' => $data['classname'] ?? 'user-rank-unranked',
             'time' => (int)$data['time'],
             'ip' => (int)$data['ip'],
             'event' => $isSubmission ?

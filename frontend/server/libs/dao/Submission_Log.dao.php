@@ -16,7 +16,22 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                     u.username,
                     p.alias,
                     sl.ip,
-                    UNIX_TIMESTAMP(sl.time) AS `time`
+                    UNIX_TIMESTAMP(sl.time) AS `time`,
+                    (SELECT `urc`.classname FROM
+                        `User_Rank_Cutoffs` urc
+                    WHERE
+                        `urc`.score <= (
+                                SELECT
+                                    `ur`.`score`
+                                FROM
+                                    `User_Rank` `ur`
+                                WHERE
+                                    `ur`.user_id = `u`.`user_id`
+                            )
+                    ORDER BY
+                        `urc`.percentile ASC
+                    LIMIT
+                        1) `classname`
                 FROM
                     Submission_Log sl
                 INNER JOIN

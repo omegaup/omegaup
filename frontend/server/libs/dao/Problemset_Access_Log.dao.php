@@ -15,7 +15,22 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                     u.user_id,
                     u.username,
                     pal.ip,
-                    UNIX_TIMESTAMP(pal.time) AS `time`
+                    UNIX_TIMESTAMP(pal.time) AS `time`,
+                    (SELECT `urc`.classname FROM
+                        `User_Rank_Cutoffs` urc
+                    WHERE
+                        `urc`.score <= (
+                                SELECT
+                                    `ur`.`score`
+                                FROM
+                                    `User_Rank` `ur`
+                                WHERE
+                                    `ur`.user_id = `u`.`user_id`
+                            )
+                    ORDER BY
+                        `urc`.percentile ASC
+                    LIMIT
+                        1) `classname`
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN

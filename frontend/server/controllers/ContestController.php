@@ -736,12 +736,6 @@ class ContestController extends Controller {
 
         $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($r['contest']->problemset_id);
         $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($r['contest']->problemset_id);
-        foreach ($accesses as $key => $access) {
-            $accesses[$key]['classname'] = UsersDAO::getRankingClassName($access['user_id']);
-        }
-        foreach ($submissions as $key => $submission) {
-            $submissions[$key]['classname'] = UsersDAO::getRankingClassName($submission['user_id']);
-        }
 
         return ActivityReport::getActivityReport($accesses, $submissions);
     }

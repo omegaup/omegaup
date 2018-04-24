@@ -1392,12 +1392,7 @@ class CourseController extends Controller {
 
         $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($r['course']->course_id);
         $submissions = SubmissionLogDAO::GetSubmissionsForCourse($r['course']->course_id);
-        foreach ($accesses as $key => $access) {
-            $accesses[$key]['classname'] = UsersDAO::getRankingClassName($access['user_id']);
-        }
-        foreach ($submissions as $key => $submission) {
-            $submissions[$key]['classname'] = UsersDAO::getRankingClassName($submission['user_id']);
-        }
+
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
