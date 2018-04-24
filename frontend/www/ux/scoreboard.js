@@ -19,7 +19,6 @@ omegaup.OmegaUp.on('ready', function() {
         arena.initProblemsetId(contest);
         $('#title .contest-title').text(contest.title);
         omegaup.API.Problemset.scoreboard({
-                                contest_alias: arena.options.contestAlias,
                                 problemset_id: arena.options.problemsetId,
                                 token: arena.options.scoreboardToken
                               })
@@ -28,7 +27,6 @@ omegaup.OmegaUp.on('ready', function() {
         if (new Date() < contest.finish_time && !arena.socket) {
           setInterval(function() {
             omegaup.API.Problemset.scoreboard({
-                                    contest_alias: arena.options.contestAlias,
                                     problemset_id: arena.options.problemsetId,
                                     token: arena.options.scoreboardToken
                                   })

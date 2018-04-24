@@ -59,16 +59,6 @@ function _normalizeContestFields(contest) {
   return contest;
 }
 
-function _normalizeProblemsetFields(problemset) {
-  omegaup.OmegaUp.convertTimes(problemset);
-  if (problemset.hasOwnProperty('submissions_gap')) {
-    problemset.submissions_gap = parseInt(problemset.submissions_gap);
-    problemset.show_penalty =
-        (problemset.penalty != 0 || problemset.penalty_type != 'none');
-  }
-  return problemset;
-}
-
 export default {
   Clarification: {
     create: _call('/api/clarification/create/'),

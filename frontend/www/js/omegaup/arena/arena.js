@@ -432,7 +432,6 @@ export class Arena {
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
-              // TODO(pablo): Implement this for more than just contests.
               API.Problemset.details({problemset_id: x})
                   .then(contestLoaded.bind(self))
                   .fail(UI.ignoreError);

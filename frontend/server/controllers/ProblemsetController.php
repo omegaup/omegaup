@@ -160,7 +160,7 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
 
         try {
-            $r['problemset'] = ProblemsetsDAO::getTypeByPK($r['problemset_id']);
+            $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -170,17 +170,17 @@ class ProblemsetController extends Controller {
             throw new NotFoundException('problemsetNotFound');
         }
         if ($r['problemset']['type'] == 'Contest') {
-            $r3 = new Request([
+            $request = new Request([
                 'contest_alias' => $r['problemset']['contest_alias'],
             ]);
             if (isset($r['auth_token'])) {
-                $r3['auth_token'] = $r['auth_token'];
+                $request['auth_token'] = $r['auth_token'];
             }
             if (isset($r['tokens']) && count($r['tokens']) >= 4) {
-                $r3['token'] = $r['tokens'][3];
+                $request['token'] = $r['tokens'][3];
             }
-            ContestController::validateDetails($r3);
-            return $r3;
+            ContestController::validateDetails($request);
+            return $request;
         }
         return $r;
     }

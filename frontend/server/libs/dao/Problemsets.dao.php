@@ -65,7 +65,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
         return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }
 
-    public static function getTypeByPK($problemset_id) {
+    public static function getWithTypeByPK($problemset_id) {
         $sql = 'SELECT
                     type,
                     c.alias AS contest_alias,
