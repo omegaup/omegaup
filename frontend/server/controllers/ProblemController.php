@@ -126,7 +126,7 @@ class ProblemController extends Controller {
         Validators::isValidSubset(
             $r['languages'],
             'languages',
-            RunController::$kSupportedLanguages,
+            array_keys(RunController::$kSupportedLanguages),
             $is_required
         );
     }
@@ -809,6 +809,7 @@ class ProblemController extends Controller {
             Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
         }
         Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
+        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
 
         return $response;
     }
@@ -1025,14 +1026,38 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Gets the libinteractive interface name from the filesystem.
+     *
+     * @param Request $r
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getLibinteractiveInterfaceName(Request $r) {
+        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+
+        $interactive_files = [];
+        try {
+            $interactive_files = $problemArtifacts->lsTree('interactive');
+        } catch (Exception $e) {
+            // Most problems won't have interactive files
+        }
+
+        foreach ($interactive_files as $filename) {
+            if (strrpos($filename, '.idl') == strlen($filename) - 4) {
+                return $filename;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the format of statement that was requested.
-     * HTML is the default if statement_type unspecified in the request.
+     * Markdown is the default if statement_type unspecified in the request.
      *
      * @param Request $r
      */
     private static function getStatementFormat(Request $r) {
         if (!isset($r['statement_type'])) {
-            return 'html';
+            return 'markdown';
         }
         return $r['statement_type'];
     }
@@ -1164,6 +1189,11 @@ class ProblemController extends Controller {
 
         // Validate request
         self::validateDetails($r);
+        if ($r['statement_type'] != 'markdown') {
+            // Remove this and just refuse to serve after a few weeks.
+            $e = new Exception('Deprecated call to view non-markdown statement.');
+            self::$log->error($e);
+        }
 
         $response = [];
 
@@ -1198,6 +1228,21 @@ class ProblemController extends Controller {
         if (!empty($sample_input)) {
             $response['sample_input'] = $sample_input;
         }
+
+        // Add the libinteractive interface name.
+        $libinteractive_interface_name = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME,
+            $r['problem']->alias,
+            $r,
+            'ProblemController::getLibinteractiveInterfaceName',
+            $libinteractive_interface_name,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        if (!empty($libinteractive_interface_name)) {
+            $response['libinteractive_interface_name'] = $libinteractive_interface_name;
+        }
+
         // Add preferred language of the user.
         $user_data = [];
         $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
@@ -1655,6 +1700,7 @@ class ProblemController extends Controller {
         $response = [];
         $response['results'] = [];
         $author_identity_id = null;
+        $author_user_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
@@ -1662,6 +1708,7 @@ class ProblemController extends Controller {
         $identity_type = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
             $author_identity_id = intval($r['current_identity_id']);
+            $author_user_id = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1700,6 +1747,7 @@ class ProblemController extends Controller {
             $rowcount,
             $query,
             $author_identity_id,
+            $author_user_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
