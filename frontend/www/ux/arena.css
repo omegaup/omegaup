@@ -471,6 +471,12 @@ table.clarifications {
 	background-color: rgb(223, 240, 216);
 }
 
+.clarifications tbody tr.direct-message {
+	color: rgb(125, 117, 18);
+	background-image: linear-gradient(rgb(253, 245, 154) 0px, rgba(255, 249, 181, .5) 100%);
+	background-color: rgb(223, 240, 216);
+}
+
 .clarifications tfoot td a {
 	display: block;
 	padding: 0.5em;

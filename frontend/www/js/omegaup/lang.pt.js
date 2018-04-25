@@ -904,6 +904,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsMemoryLimit: "Limite de mem\u00f3ria",
 	wordsMentor: "Mentor",
 	wordsMessage: "Mensagem",
+	wordsMessageTo: "Mensagem para",
 	wordsMinutes: "minutos",
 	wordsMode: "Orden",
 	wordsModeAsc: "Ascendente",
