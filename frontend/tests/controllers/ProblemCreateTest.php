@@ -66,7 +66,6 @@ class CreateProblemTest extends OmegaupTestCase {
 
         $this->assertTrue($problemArtifacts->exists('testplan'));
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/en.html'));
         $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
 
         // Default data
@@ -193,7 +192,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertTrue($problemArtifacts->exists('cases/in/g1.train0.in'));
         $this->assertTrue($problemArtifacts->exists('cases/out/g1.train0.out'));
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
     }
 
     /**
@@ -325,7 +324,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Default data
         $this->assertEquals(0, $problem->visits);
@@ -368,17 +367,11 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify problem contents were copied
         $problemArtifacts = new ProblemArtifacts($problem->alias);
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Verify we have the accents, lol
         $markdown_contents = $problemArtifacts->get('statements/es.markdown');
         if (strpos($markdown_contents, 'ó') === false) {
-            $this->fail('ó not found when expected.');
-        }
-
-        $html_contents = $problemArtifacts->get('statements/es.html');
-        if (strpos($html_contents, 'ó') === false) {
             $this->fail('ó not found when expected.');
         }
     }
@@ -414,22 +407,12 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify problem contents were copied
         $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
         $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
-        $this->assertFileExists(IMAGES_PATH . $imageSha1 . '.' . $imageExtension);
 
-        // Verify that all the images are there.
-        $html_contents = $problemArtifacts->get('statements/es.html');
-        $this->assertContains('<img src="'. IMAGES_URL_PATH ."$imageSha1.$imageExtension\"", $html_contents);
-        // And the direct URL.
-        $this->assertContains("<img src=\"$imageAbsoluteUrl\"", $html_contents);
-        // And the unmodified, not found image.
-        $this->assertContains('<img src="notfound.jpg"', $html_contents);
-
-        // Do image paht replacement checks in the markdown file
+        // Do image path replacement checks in the markdown file
         $markdown_contents = $problemArtifacts->get('statements/es.markdown');
-        $this->assertContains('![Saluda](' . IMAGES_URL_PATH . "$imageSha1.$imageExtension)", $markdown_contents);
+        $this->assertContains('![Saluda](bunny.jpg)', $markdown_contents);
         // And the direct URL.
         $this->assertContains("![Saluda]($imageAbsoluteUrl)", $markdown_contents);
         // And the unmodified, not found image.
@@ -484,7 +467,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         $this->assertTrue($problemArtifacts->exists('testplan'));
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/en.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
     }
 
     /**

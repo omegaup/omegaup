@@ -107,13 +107,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
     }
 
     /**
-     * Problem statement is returned in HTML.
-     */
-    public function testViewProblemStatementHtml() {
-        $this->internalViewProblemStatement('html', '<h1>Entrada</h1>');
-    }
-
-    /**
      * Problem statement is returned in Markdown.
      */
     public function testViewProblemStatementMarkdown() {
