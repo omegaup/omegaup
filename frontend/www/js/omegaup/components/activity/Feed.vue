@@ -65,7 +65,7 @@
              name="users"
              role="tabpanel">
           <!-- id-lint on -->
-          <p v-if="users &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForUsers }}</p>
+          <p v-if="users.length &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForUsers }}</p>
           <table class="table"
                  v-else="">
             <caption>
@@ -96,7 +96,7 @@
              name="origins"
              role="tabpanel">
           <!-- id-lint on -->
-          <p v-if="origins &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForOrigins }}</p>
+          <p v-if="origins.length &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForOrigins }}</p>
           <table class="table"
                  v-else="">
             <caption>
@@ -142,19 +142,21 @@ export default {
         mapping[key] = [value];
       }
     },
-    getClassByUser: function(events) {
-      let obj = {};
-      for (let evt of events) {
-        obj[evt.username] = evt.classname;
-      }
-      return obj;
-    },
   },
   computed: {
     wordsReportSummary: function() {
       let self = this;
       return self.type == 'contest' ? T.wordsActivityReportSummaryContest :
                                       T.wordsActivityReportSummaryCourse
+    },
+    classByUser: function() {
+      let self = this;
+      let events = self.report.events;
+      let obj = {};
+      for (let evt of events) {
+        obj[evt.username] = evt.classname;
+      }
+      return obj;
     },
     events: function() {
       let self = this;
@@ -164,7 +166,6 @@ export default {
     users: function() {
       let self = this;
       let events = self.report.events;
-      let classByUser = self.getClassByUser(events);
       let userMapping = {};
       for (let evt of events) {
         self.addMapping(userMapping, evt.username, evt.ip);
@@ -178,14 +179,14 @@ export default {
         let ips = Array.from(new Set(userMapping[user]));
         if (ips.length == 1) continue;
         ips.sort();
-        users.push({username: user, classname: classByUser[user], ips: ips});
+        users.push(
+            {username: user, classname: self.classByUser[user], ips: ips});
       }
       return users;
     },
     origins: function() {
       let self = this;
       let events = self.report.events;
-      let classByUser = self.getClassByUser(events);
       let originMapping = {};
       for (let evt of events) {
         self.addMapping(originMapping, evt.ip, evt.username);
@@ -201,7 +202,7 @@ export default {
         origins.push({
           origin: origin,
           usernames: users.map(
-              u => {return {username: u, classname: classByUser[u]}})
+              u => {return {username: u, classname: self.classByUser[u]}})
         });
       }
       return origins;
