@@ -72,6 +72,12 @@ def test_create_problem(driver):
         with driver.ajax_page_transition(wait_for_ajax=False):
             contents_element.submit()
 
+        try:
+            for entry in driver.browser.get_log('browser'):
+                print(entry['level'])
+        except:  # pylint: disable=bare-except
+            pass
+
         assert (('/problem/%s/edit/' % problem_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
