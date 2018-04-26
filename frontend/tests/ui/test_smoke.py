@@ -74,7 +74,8 @@ def test_create_problem(driver):
 
         try:
             for entry in driver.browser.get_log('browser'):
-                print(entry['level'])
+                if entry['level'] == 'SEVERE':
+                    print(entry['message'])
         except:  # pylint: disable=bare-except
             pass
 

@@ -285,8 +285,6 @@ def pytest_pyfunc_call(pyfuncitem):
         current_driver = pyfuncitem.funcargs['driver']
         try:
             logs = current_driver.browser.get_log('browser')
-            for data in logs:
-                print(data)
         except:  # pylint: disable=bare-except
             # geckodriver does not support getting logs:
             # https://github.com/mozilla/geckodriver/issues/284
