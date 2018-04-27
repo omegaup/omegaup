@@ -61,10 +61,10 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 				Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
 			INNER JOIN
 				Users u ON u.user_id = up.user_id
-			LEFT JOIN
-				Coder_Of_The_Month cm on u.user_id = cm.user_id
+            LEFT JOIN
+                (SELECT user_id, MAX(time) latest_time, rank FROM Coder_Of_The_Month WHERE rank = 1 GROUP BY user_id, rank) AS cm on u.user_id = cm.user_id
 			WHERE
-				cm.user_id IS NULL OR (DATE_ADD(cm.time, INTERVAL 1 YEAR) < ? AND cm.rank = 1)
+				cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?
 			GROUP BY
 				user_id
 			ORDER BY

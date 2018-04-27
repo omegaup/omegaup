@@ -3,10 +3,10 @@
     <div class="panel-heading">
       <ul class="nav nav-tabs">
         <li class="active"
-            v-on:click="showCoderOfTheMonth = true">
+            v-on:click="showCurrentMonth = true">
           <a data-toggle="tab">{{T.codersOfTheMonth}}</a>
         </li>
-        <li v-on:click="showCoderOfTheMonth = false">
+        <li v-on:click="showCurrentMonth = false">
           <a data-toggle="tab">{{T.codersOfTheMonthList}}</a>
         </li>
       </ul>
@@ -18,25 +18,16 @@
           <th></th>
           <th>{{T.codersOfTheMonthCountry}}</th>
           <th>{{T.codersOfTheMonthUser}}</th>
-          <th>{{T.codersOfTheMonthDate}}</th>
+          <th v-if="showCurrentMonth">{{T.codersOfTheMonthDate}}</th>
         </tr>
       </thead>
-      <tbody v-if="showCoderOfTheMonth">
-        <tr v-for="coder in coders">
+      <tbody>
+        <tr v-for="coder in visibleCoders">
           <td><img v-bind:src="coder.gravatar_32"></td>
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
           <td>{{coder.username}}</td>
-          <td>{{coder.date}}</td>
-        </tr>
-      </tbody>
-      <tbody v-if="!showCoderOfTheMonth">
-        <tr v-for="coder in coders_monthly">
-          <td><img v-bind:src="coder.gravatar_32"></td>
-          <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
-               v-if="coder.country_id != null"></td>
-          <td>{{coder.username}}</td>
-          <td>{{coder.date}}</td>
+          <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
       </tbody>
     </table>
@@ -49,27 +40,36 @@ import UI from '../../ui.js';
 
 export default {
   props: {},
-  computed: {},
+  computed: {
+    visibleCoders: function() {
+      return this.showCurrentMonth ? this.codersOfCurrentMonth :
+                                     this.codersOfPreviousMonth;
+    }
+  },
   data: function() {
     return {
       T: T,
       UI: UI,
-      coders: [],
-      coders_monthly: [],
-      showCoderOfTheMonth: true
+      codersOfCurrentMonth: [],
+      codersOfPreviousMonth: [],
+      showCurrentMonth: true
     };
   },
   created: function() {
     // top coder of the month
     var self = this;
     API.User.coderOfTheMonthList()
-        .then(function(response) { self.coders = response.coders; })
+        .then(function(response) {
+          self.codersOfCurrentMonth = response.coders;
+        })
         .fail(UI.apiError);
 
     // coder of the month list
     var today = new Date();
     API.User.coderOfTheMonthList({date: today.format('{yyyy}-{MM}-{dd}')})
-        .then(function(response) { self.coders_monthly = response.coders; })
+        .then(function(response) {
+          self.codersOfPreviousMonth = response.coders;
+        })
         .fail(UI.apiError);
   }
 };
