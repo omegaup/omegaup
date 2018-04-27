@@ -1,21 +1,15 @@
 omegaup.OmegaUp.on('ready', function() {
   var arena = new omegaup.arena.Arena(
       omegaup.arena.GetOptionsFromLocation(window.location));
-  var converter = Markdown.getSanitizingConverter();
   var admin = null;
 
   Highcharts.setOptions({global: {useUTC: false}});
 
   function onlyProblemLoaded(problem) {
-    arena.currentProblem = problem;
+    arena.renderProblem(problem);
+
     arena.myRuns.filter_problem(problem.alias);
     arena.myRuns.attach($('#problem .runs'));
-
-    var statement = document.querySelector('div.statement');
-    statement.innerHTML = converter.makeHtml(problem.problem_statement);
-
-    arena.mountEditor(problem);
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
 
     for (var i = 0; i < problem.solvers.length; i++) {
       var solver = problem.solvers[i];
@@ -32,10 +26,6 @@ omegaup.OmegaUp.on('ready', function() {
           .text(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
       $('.solver-list').append(prob);
     }
-
-    var language_array = problem.languages;
-    arena.updateAllowedLanguages(language_array);
-    arena.selectDefaultLanguage();
 
     if (problem.user.logged_in) {
       omegaup.API.Problem.runs({problem_alias: problem.alias})

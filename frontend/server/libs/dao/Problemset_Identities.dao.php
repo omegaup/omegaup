@@ -38,4 +38,31 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         }
         return $problemset_identity;
     }
+
+    public static function getWithExtraInformation($problemset_id) {
+        $sql = 'SELECT
+                    pi.access_time,
+                    i.username,
+                    i.country_id,
+                    IF(a.owner_id=i.identity_id, 1, NULL) as is_owner
+                FROM
+                    Problemset_Identities pi
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = pi.identity_id
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pi.problemset_id
+                INNER JOIN
+                    ACLs a
+                ON
+                    a.acl_id = p.acl_id
+                WHERE
+                    p.problemset_id = ?;';
+
+        global $conn;
+        return $conn->GetAll($sql, [$problemset_id]);
+    }
 }
