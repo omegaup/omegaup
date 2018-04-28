@@ -336,10 +336,10 @@ class ProblemDeployer {
         }
 
         foreach ($problemArtifacts->lsTree('') as $entry) {
-            if (stripos($entry, 'validator.') === 0) {
+            if (stripos($entry['name'], 'validator.') === 0) {
                 $validator = 1;
                 break;
-            } elseif (stripos($entry, 'interactive') === 0) {
+            } elseif (stripos($entry['name'], 'interactive') === 0) {
                 $validator = 1;
                 break;
             }
@@ -347,7 +347,7 @@ class ProblemDeployer {
 
         $input_count = 0;
         foreach ($problemArtifacts->lsTree('cases/in/') as $entry) {
-            if (!ProblemDeployer::endsWith($entry, '.in', true)) {
+            if (!ProblemDeployer::endsWith($entry['name'], '.in', true)) {
                 continue;
             }
             $input_count += 1;

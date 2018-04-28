@@ -380,7 +380,7 @@ class CreateProblemTest extends OmegaupTestCase {
      * Test that image upload works.
      */
     public function testImageUpload() {
-        $imageSha1 = '27938919b32434b39486d04db57d5b8dccbe881b';
+        $imageGitObjectId = '7b1279806a8c59f5a2c6ae21544ed2a8074691ab';
         $imageExtension = 'jpg';
         $imageAbsoluteUrl = 'http://i.imgur.com/fUkvDkw.png';
 
@@ -410,13 +410,25 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
         $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
 
-        // Do image path replacement checks in the markdown file
+        // Do image path checks in the markdown file
         $markdown_contents = $problemArtifacts->get('statements/es.markdown');
         $this->assertContains('![Saluda](bunny.jpg)', $markdown_contents);
         // And the direct URL.
         $this->assertContains("![Saluda]($imageAbsoluteUrl)", $markdown_contents);
         // And the unmodified, not found image.
         $this->assertContains('![404](notfound.jpg)', $markdown_contents);
+
+        // Check that the images are there.
+        $response = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $r['problem_alias'],
+        ]));
+        $imagePath = "{$r['problem_alias']}/{$imageGitObjectId}.{$imageExtension}";
+        $this->assertEquals(
+            IMAGES_URL_PATH . $imagePath,
+            $response['statement']['images']['bunny.jpg']
+        );
+        $this->assertFileExists(IMAGES_PATH . $imagePath);
     }
 
     /**

@@ -377,10 +377,14 @@ let UI = {
                    m1 + '</strong>';
           });
       // Images.
+      let imageMapping = converter._imageMapping || options.imageMapping || {};
       text = text.replace(
-          /<img src="([^"]+)" ([^>]+)>/g, function(wholeMatch, url, attributes) {
-            if (url.indexOf('/') != -1) return wholeMatch;
-            return '<img src="/img/' + options.alias + '/' + url + '" ' + attributes + '>';
+          /<img src="([^"]+)" ([^>]+)>/g,
+          function(wholeMatch, url, attributes) {
+            if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+              return wholeMatch;
+            }
+            return '<img src="' + imageMapping[url] + '" ' + attributes + '>';
           });
       return text;
     });
@@ -440,6 +444,15 @@ let UI = {
                              '\n</table>');
           });
     });
+
+    converter.makeHtmlWithImages = function(markdown, imageMapping) {
+      try {
+        converter._imageMapping = imageMapping;
+        return converter.makeHtml(markdown);
+      } finally {
+        delete converter._imageMapping;
+      }
+    };
 
     return converter;
   },

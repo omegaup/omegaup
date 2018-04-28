@@ -1171,7 +1171,7 @@ export class Arena {
       }
 
       if (problemChanged) {
-        if (problem.problem_statement) {
+        if (problem.statement) {
           update(problem);
         } else {
           let problemset = self.computeProblemsetArg();
@@ -1180,7 +1180,7 @@ export class Arena {
               .then(function(problem_ext) {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
-                problem.problem_statement = problem_ext.problem_statement;
+                problem.statement = problem_ext.statement;
                 problem.libinteractive_interface_name =
                     problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
@@ -1241,8 +1241,8 @@ export class Arena {
     let self = this;
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
-    statement.innerHTML =
-        self.markdownConverter.makeHtml(problem.problem_statement);
+    statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
+        problem.statement.markdown, problem.statement.images);
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
     if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {

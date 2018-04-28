@@ -77,7 +77,6 @@ rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /groupedit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /groupscoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
-rewrite ^/img/([a-zA-Z0-9_-]+)/([^/]+)$ /problemimage.php?alias=$1&filename=$2 last;
 rewrite ^/interview/list/?$ /interviews/list.php last;
 rewrite ^/interview/([a-zA-Z0-9_+-]+)/arena?$ /interviews/arena.php?alias=$1 last;
 rewrite ^/interview/([a-zA-Z0-9_+-]+)/edit?$ /interviews/edit.php?alias=$1 last;
