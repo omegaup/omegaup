@@ -137,5 +137,6 @@
 {include file='arena.clarification.tpl' admin=$admin}
 			<div id="run-details"></div>
 		</div>
+{include file='common.analytics.tpl'}
 	</body>
 </html>
