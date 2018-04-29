@@ -43,7 +43,7 @@ $csp_mode = 'Content-Security-Policy';
 if (defined('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS')) {
     $csp_mode = 'Content-Security-Policy-Report-Only';
 }
-header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com https://docs.google.com; report-uri /cspreport.php");
+header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com https://connect.facebook.net https://platform.twitter.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com https://docs.google.com https://staticxx.facebook.com; report-uri /cspreport.php");
 header('X-Frame-Options: DENY');
 
 /*

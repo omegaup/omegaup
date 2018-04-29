@@ -9,6 +9,7 @@
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
 <script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/ux/social-button.js"}"></script>
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -56,12 +57,11 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<!-- Facebook like button -->
-				<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21&amp;appId=197705690257857" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+                <div id="fb-root"></div>
+                <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="21" data-show-faces="false" data-share="true"></div>
 				<br/>
 				<!-- Twitter follow -->
-				<iframe allowtransparency="true" frameborder="0" scrolling="no"
-					src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
-					style="width:300px; height:20px;"></iframe>
+                <div id="twitter-follow"></div>
 			</div>
 		</div>
 
