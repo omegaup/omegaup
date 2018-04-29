@@ -17,11 +17,7 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
 
     public $filesToUnzip;
-    private $imageHashes = [];
-    private $casesFiles;
     private $log;
-    private $current_markdown_file_contents;
-    private $currentLanguage;
 
     private $alias;
     private $tmpDir = null;
@@ -29,7 +25,6 @@ class ProblemDeployer {
     public $hasValidator = false;
     public $requiresRejudge = false;
     private $isInteractive = false;
-    private $checkedForInteractive = false;
     private $idlFile = null;
     private $created = false;
     private $committed = false;
@@ -213,8 +208,7 @@ class ProblemDeployer {
 
             // Deploy statement
             FileHandler::CreateFile($markdownFile, $statement);
-            $this->current_markdown_file_contents = $statement;
-            $this->UTF8izeStatement($this->tmpDir, "$lang.markdown");
+            $this->UTF8izeStatement($this->tmpDir, "$lang.markdown", $statement);
             $this->updatedLanguages[] = $lang;
         } catch (ApiException $e) {
             throw new ProblemDeploymentFailedException($e->getMessage(), $e);
@@ -274,7 +268,7 @@ class ProblemDeployer {
             }
 
             // Handle cases
-            $this->handleCases($this->tmpDir, $this->casesFiles);
+            $this->handleCases($this->tmpDir);
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -415,7 +409,6 @@ class ProblemDeployer {
         // Add images to the files to be unzipped.
         foreach ($images as $file) {
             $this->filesToUnzip[] = $file;
-            $this->imageHashes[substr($file, strlen('statements/'))] = true;
             if (file_exists("$this->tmpDir/$file")) {
                 $this->git->get(['rm', '-f', $file], $this->tmpDir);
             }
@@ -457,7 +450,6 @@ class ProblemDeployer {
 
             if ($idx !== false) {
                 $cases++;
-                $this->casesFiles[] = $path;
                 $this->filesToUnzip[] = $path;
                 $this->filesToUnzip[] = $zipFilesArray[$idx];
             } else {
@@ -510,7 +502,6 @@ class ProblemDeployer {
             }
 
             $this->filesToUnzip[] = $path;
-            $this->casesFiles[] = $path;
 
             // Check .out file
             $path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
@@ -575,8 +566,6 @@ class ProblemDeployer {
         }
 
         $this->filesToUnzip = [];
-        $this->imageHashes = [];
-        $this->casesFiles = [];
 
         $this->zipPath = $_FILES['problem_contents']['tmp_name'];
 
@@ -624,8 +613,6 @@ class ProblemDeployer {
                     $this->filesToUnzip[] = $zip->getNameIndex($i);
             }
         }
-
-        $this->checkedForInteractive = true;
 
         if ($this->isInteractive) {
             if ($this->idlFile == null) {
@@ -717,10 +704,10 @@ class ProblemDeployer {
             $this->log->info('Reading file ' . $markdown_filepath);
 
             // Read the contents of the original markdown file
-            $this->current_markdown_file_contents = FileHandler::ReadFile($markdown_filepath);
+            $markdownContents = FileHandler::ReadFile($markdown_filepath);
 
             // Deploy statement raw (.markdown) and transformed (.html)
-            $this->UTF8izeStatement($this->tmpDir, basename($statement));
+            $this->UTF8izeStatement($this->tmpDir, basename($statement), $markdownContents);
             $this->updatedLanguages[] = basename($statement, '.markdown');
         }
     }
@@ -730,9 +717,9 @@ class ProblemDeployer {
      *
      * @param string $problemBasePath
      * @param string $statementFileName
-     * @param string $lang The 2-letter code for the language
+     * @param string $markdownContents The contents of the markdown file.
      */
-    private function UTF8izeStatement($problemBasePath, $statementFileName) {
+    private function UTF8izeStatement($problemBasePath, $statementFileName, $markdownContents) {
         $this->log->info('HTMLizing statement: ' . $statementFileName);
 
         // Path used to deploy the raw problem statement (.markdown)
@@ -743,7 +730,7 @@ class ProblemDeployer {
 
         // Fix for Windows Latin-1 statements:
         // For now, assume that if it is not UTF-8, then it is Windows Latin-1 and then convert
-        if (mb_check_encoding($this->current_markdown_file_contents, 'UTF-8')) {
+        if (mb_check_encoding($markdownContents, 'UTF-8')) {
             $this->log->info('File is UTF-8. Nice :)');
             return;
         }
@@ -751,98 +738,17 @@ class ProblemDeployer {
 
         // Convert from ISO-8859-1 (Windows Latin1) to UTF-8
         $this->log->info('Converting encoding from ISO-8859-1 to UTF-8 (Windows Latin1 to UTF-8, fixing accents)');
-        $this->current_markdown_file_contents = mb_convert_encoding($this->current_markdown_file_contents, 'UTF-8', 'ISO-8859-1');
-        FileHandler::CreateFile($markdown_filepath, $this->current_markdown_file_contents);
-    }
-
-    private function getIdlFile() {
-        if (!$this->checkedForInteractive) {
-            $this->checkedForInteractive = true;
-
-            $dirpath = $this->tmpDir . '/interactive/';
-
-            if (($handle = @opendir($dirpath)) !== false) {
-                while (($entry = readdir($handle)) !== false) {
-                    if (ProblemDeployer::endsWith($entry, '.idl', true)) {
-                        $this->idlFile = '/interactive/' . $entry;
-                        break;
-                    }
-                }
-                closedir($handle);
-            }
-        }
-        return $this->idlFile;
-    }
-
-    public function translationCallback($key) {
-        if ($key == 'alias') {
-            return $this->alias;
-        } elseif ($key == 'idl') {
-            $idlFile = $this->getIdlFile();
-            if ($idlFile == null) {
-                return '(null)';
-            } else {
-                $info = pathinfo($idlFile);
-                return basename($info['basename'], '.' . $info['extension']);
-            }
-        }
-        if ($this->currentLanguage == 'en') {
-            switch ($key) {
-                case 'input':
-                    return 'Input';
-                case 'output':
-                    return 'Output';
-                case 'description':
-                    return 'Description';
-                case 'os':
-                    return 'Operating System';
-                case 'language':
-                    return 'Language';
-                case 'download':
-                    return 'Download';
-                case 'libinteractive-filename':
-                    return 'File to submit';
-                case 'libinteractive-help':
-                    return '/libinteractive/en/contest/';
-                case 'libinteractive-title':
-                    return 'Interactive templates';
-            }
-        } else {
-            if ($this->currentLanguage != 'es') {
-                $this->log->error("Unknown language: $lang");
-            }
-            switch ($key) {
-                case 'input':
-                    return 'Entrada';
-                case 'output':
-                    return 'Salida';
-                case 'description':
-                    return 'Descripción';
-                case 'os':
-                    return 'Sistema Operativo';
-                case 'language':
-                    return 'Lenguaje';
-                case 'download':
-                    return 'Descargar';
-                case 'libinteractive-filename':
-                    return 'Archivo que debes enviar';
-                case 'libinteractive-title':
-                    return 'Plantillas para problema interactivo';
-                case 'libinteractive-help':
-                    return '/libinteractive/es/contest/';
-            }
-        }
-        throw new Exception("Invalid translation key $key");
+        $markdownContents = mb_convert_encoding($markdownContents, 'UTF-8', 'ISO-8859-1');
+        FileHandler::CreateFile($markdown_filepath, $markdownContents);
     }
 
     /**
      * Handle unzipped cases
      *
      * @param string $dirpath
-     * @param array $casesFiles
      * @throws InvalidFilesystemOperationException
      */
-    private function handleCases($dirpath, array $casesFiles) {
+    private function handleCases($dirpath) {
         $this->log->info('Handling cases...');
 
         // Aplying normalizr to cases
