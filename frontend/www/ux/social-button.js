@@ -24,8 +24,10 @@ omegaup.OmegaUp.on('ready', function() {
     return t;
   }(document, 'script', 'twitter-wjs'));
   twttr.ready(function() {
-    twttr.widgets.createFollowButton('omegaup',
-                                     document.getElementById('twitter-follow'),
-                                     {width: '300px', height: '20'});
+    els = document.getElementsByClassName('twitter-follow');
+    for (var idx = 0; idx < els.length; idx++) {
+      twttr.widgets.createFollowButton('omegaup', els[idx],
+                                       {width: '300px', height: '20'});
+    }
   });
 });

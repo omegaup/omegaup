@@ -9,7 +9,6 @@
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
 <script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/ux/social-button.js"}"></script>
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -61,7 +60,7 @@
                 <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="21" data-show-faces="false" data-share="true"></div>
 				<br/>
 				<!-- Twitter follow -->
-                <div id="twitter-follow"></div>
+                <div class="twitter-follow"></div>
 			</div>
 		</div>
 

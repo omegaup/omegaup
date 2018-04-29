@@ -28,6 +28,7 @@
 {else}
 		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>
 {/if}
+		<script type="text/javascript" src="{version_hash src="/ux/social-button.js"}"></script>
 
 {if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
