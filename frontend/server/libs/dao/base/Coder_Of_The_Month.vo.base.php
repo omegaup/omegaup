@@ -95,7 +95,7 @@ class CoderOfTheMonth extends VO {
     public $interview_url;
 
     /**
-      *  [Campo no documentado]
+      * El lugar en el que el usuario estuvo durante ese mes
       * @access public
       * @var int(11)
       */
