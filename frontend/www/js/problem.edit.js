@@ -175,7 +175,7 @@ omegaup.OmegaUp.on('ready', function() {
                 statements[lang].original = statements[lang].current;
               }
             })
-            .fail(omegaup.UI.apiError);
+            .catch(omegaup.UI.apiError);
         return false;
       });
 
