@@ -331,10 +331,11 @@ class CoursesDAO extends CoursesDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
+    final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
         $sql = '
             SELECT
-                share_user_information
+                share_user_information,
+                accept_teacher
             FROM
                 Groups_Identities AS gi
             INNER JOIN
@@ -353,6 +354,11 @@ class CoursesDAO extends CoursesDAOBase {
         ];
 
         global $conn;
-        return $conn->GetOne($sql, $params) == null;
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+
+        return $row;
     }
 }

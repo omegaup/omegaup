@@ -20,7 +20,7 @@ try {
     die();
 }
 
-if ($intro_details['shouldShowResults'] ||
+if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [
         'name' => $intro_details['name'],
@@ -30,7 +30,8 @@ if ($intro_details['shouldShowResults'] ||
         'needsBasicInformation' => $intro_details['basic_information_required'] && !is_null($session['user']) && (
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         ),
-        'requestsUserInformation' => $intro_details['requests_user_information']
+        'requestsUserInformation' => $intro_details['requests_user_information'],
+        'showAcceptTeacher' => $intro_details['showAcceptTeacher'],
     ]);
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {

@@ -35,6 +35,9 @@ class GroupsIdentities extends VO {
         if (isset($data['share_user_information'])) {
             $this->share_user_information = $data['share_user_information'];
         }
+        if (isset($data['accept_teacher'])) {
+            $this->accept_teacher = $data['accept_teacher'];
+        }
     }
 
     /**
@@ -70,4 +73,11 @@ class GroupsIdentities extends VO {
       * @var tinyint(1)
       */
     public $share_user_information;
+
+    /**
+      * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
+      * @access public
+      * @var enum('yes',
+      */
+    public $accept_teacher;
 }

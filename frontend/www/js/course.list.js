@@ -9,6 +9,8 @@ omegaup.OmegaUp.on('ready', function() {
       course.endDate = omegaup.UI.formatDate(course.finish_time);
       course.numHomeworks = course.counts.homework;
       course.numTests = course.counts.test;
+      course.submissions_list_url = '/course/' + course.alias + '/list/';
+      course.subissions_list = omegaup.T.courseListSubmissionsByGroup;
       if (course.finish_time > Date.now()) {
         current.push(course);
       } else {

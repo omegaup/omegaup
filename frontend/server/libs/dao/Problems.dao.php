@@ -387,6 +387,222 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $problems;
     }
 
+    final public static function getSolvedProblemsByContest($contest_alias) {
+        global $conn;
+
+        $sql = "
+            SELECT DISTINCT
+                rp.problem_id,
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Problemset_Identities pi
+            ON
+                pi.identity_id = i.identity_id
+            INNER JOIN
+                Contests c
+            ON
+                c.problemset_id = pi.problemset_id
+            INNER JOIN
+                (
+                SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.title,
+                    r.user_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                    AND r.verdict = 'AC'
+                    AND p.visibility = ?
+                ) rp
+            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
+                rp.user_id = i.user_id
+            WHERE
+                c.alias = ?
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+        $params = [ProblemController::VISIBILITY_PUBLIC, $contest_alias];
+        return $conn->GetAll($sql, $params);
+    }
+
+    final public static function getUnsolvedProblemsByContest(
+        $contest_alias
+    ) {
+        $sql = "
+            SELECT DISTINCT
+                rp.problem_id,
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Problemset_Identities pi
+            ON
+                pi.identity_id = i.identity_id
+            INNER JOIN
+                Contests c
+            ON
+                c.problemset_id = pi.problemset_id
+            INNER JOIN
+                (
+                SELECT
+                    pp.problem_id,
+                    pp.alias,
+                    pp.title,
+                    r.user_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems pp
+                ON
+                    pp.problem_id = r.problem_id
+                    AND r.verdict <> 'AC'
+                    AND pp.visibility = ?
+                ) rp
+            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
+                rp.user_id = i.user_id
+            INNER JOIN
+                Problems p
+            ON
+                rp.problem_id = p.problem_id
+            WHERE
+                c.alias = ?
+                AND
+                (SELECT
+                    COUNT(*)
+                 FROM
+                    Runs r2
+                 WHERE
+                    r2.user_id = i.user_id AND
+                    r2.problem_id = p.problem_id AND
+                    r2.verdict = 'AC'
+                ) = 0
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        $params = [ProblemController::VISIBILITY_PUBLIC, $contest_alias];
+
+        global $conn;
+        return $conn->GetAll($sql, $params);
+    }
+
+    final public static function getSolvedProblemsByCourse($course_alias) {
+        global $conn;
+
+        $sql = "
+            SELECT DISTINCT
+                rp.problem_id,
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                (
+                SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.title,
+                    r.user_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                    AND r.verdict = 'AC'
+                    AND p.visibility = ?
+                ) rp
+            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
+                rp.user_id = i.user_id
+            WHERE
+                c.alias = ?
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+        $params = [ProblemController::VISIBILITY_PUBLIC, $course_alias];
+        return $conn->GetAll($sql, $params);
+    }
+
+    final public static function getUnsolvedProblemsByCourse($course_alias) {
+        $sql = "
+            SELECT DISTINCT
+                rp.problem_id,
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                (
+                SELECT
+                    pp.problem_id,
+                    pp.alias,
+                    pp.title,
+                    r.user_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems pp
+                ON
+                    pp.problem_id = r.problem_id
+                    AND r.verdict <> 'AC'
+                    AND pp.visibility = ?
+                ) rp
+            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
+                rp.user_id = i.user_id
+            INNER JOIN
+                Problems p
+            ON
+                rp.problem_id = p.problem_id
+            WHERE
+                c.alias = ?
+                AND
+                (SELECT
+                    COUNT(*)
+                 FROM
+                    Runs r2
+                 WHERE
+                    r2.user_id = i.user_id AND
+                    r2.problem_id = p.problem_id AND
+                    r2.verdict = 'AC'
+                ) = 0
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        $params = [ProblemController::VISIBILITY_PUBLIC, $course_alias];
+
+        global $conn;
+        return $conn->GetAll($sql, $params);
+    }
+
     final public static function isProblemSolved(Problems $problem, Users $user) {
         $sql = 'SELECT
             COUNT(r.run_id) as solved

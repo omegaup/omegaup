@@ -36,12 +36,9 @@
           <th>{{ T.arenaPracticeEndtime }}</th>
           <th v-if="isAdmin">{{ T.contestsTablePublic }}</th>
           <th colspan="2"
-              v-if="isAdmin">Scoreboard</th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
+              v-if="isAdmin">{{ T.wordsScoreboard }}</th>
+          <th colspan="6"
+              v-if="isAdmin"></th>
         </tr>
       </thead>
       <tbody>
@@ -91,6 +88,11 @@
             <a class="glyphicon glyphicon-time"
                 v-bind:href="'/contest/' + contest.alias + '/activity/'"
                 v-bind:title="T.contestActivityReport"></a>
+          </td>
+          <td v-if="isAdmin">
+            <a class="glyphicon glyphicon-list-alt"
+                v-bind:href="'/contest/' + contest.alias + '/list/'"
+                v-bind:title="T.contestListSubmissionsByGroup"></a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-print"

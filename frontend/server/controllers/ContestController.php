@@ -385,7 +385,9 @@ class ContestController extends Controller {
             $r['current_identity_id'],
             $r['contest']->problemset_id
         );
-        if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
+        if (!is_null($contestOpened) && !is_null($contestOpened->access_time)
+            && !is_null($contestOpened->accept_teacher)
+        ) {
             self::$log->debug('No intro because you already started the contest');
             $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
             return $result;
@@ -525,7 +527,8 @@ class ContestController extends Controller {
             $r['current_identity_id'],
             $r['contest']->problemset_id,
             true,
-            $r['share_user_information']
+            $r['share_user_information'],
+            $r['accept_teacher']
         );
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
@@ -2742,5 +2745,61 @@ class ContestController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Get Problems solved by users of a contest
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListSolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateDetails($r);
+
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $db_results = ProblemsDAO::getSolvedProblemsByContest($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
+    }
+
+    /**
+     * Get Problems unsolved by users of a contest
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateDetails($r);
+
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $db_results = ProblemsDAO::getUnsolvedProblemsByContest($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
     }
 }

@@ -8,22 +8,30 @@
       <p name="description">{{ description }}</p>
       <p v-html="T.courseBasicInformationNeeded"
          v-if="needsBasicInformation"></p>
-      <p v-html="T.courseUserInformationOptional"
-         v-if="requestsUserInformation == 'optional'"></p>
-      <template v-if="requestsUserInformation == 'required'">
-        <p v-html="T.courseUserInformationRequired"></p>
-      </template><label><input type="radio"
-             v-bind:value="1"
-             v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
-             v-bind:value="0"
-             v-model="shareUserInformation"> {{ T.wordsNo }}</label>
+      <template v-if="requestsUserInformation != 'no'">
+        <p v-html="T.courseUserInformationOptional"
+           v-if="requestsUserInformation == 'optional'"></p>
+        <p v-html="T.courseUserInformationRequired"
+           v-if="requestsUserInformation == 'required'"></p><label><input type="radio"
+               v-bind:value="1"
+               v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
+               v-bind:value="0"
+               v-model="shareUserInformation"> {{ T.wordsNo }}</label>
+      </template>
+      <template v-if="showAcceptTeacher">
+        <p v-html="T.courseUserAcceptTeacher"></p><label><input type="radio"
+               v-model="acceptTeacher"
+               value="yes"> {{ T.wordsYes }}</label> <label><input type="radio"
+               v-model="acceptTeacher"
+               value="no"> {{ T.wordsNo }}</label>
+      </template>
       <div class="text-center">
         <form v-on:submit.prevent="">
           <button class="btn btn-primary btn-lg"
                 name="start-course-submit"
                 type="button"
                 v-bind:disabled=
-                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1)"
+                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1 || acceptTeacher == undefined)"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
@@ -39,10 +47,11 @@ export default {
     name: String,
     description: String,
     needsBasicInformation: Boolean,
-    requestsUserInformation: String
+    requestsUserInformation: String,
+    showAcceptTeacher: Boolean
   },
   data: function() {
-    return { T: T, shareUserInformation: undefined }
+    return { T: T, shareUserInformation: undefined, acceptTeacher: undefined }
   },
   methods: {onSubmit() { this.$emit('submit', this);}}
 }

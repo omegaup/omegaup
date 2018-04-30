@@ -308,6 +308,10 @@ def enter_contest(driver, contest_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'input[value=yes]'))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
             (By.ID, 'start-contest-submit'))).click()
     driver.wait_for_page_loaded()
 

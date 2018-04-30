@@ -1014,14 +1014,17 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])
             && ($r['course']->public == false
             || $r['identity']->identity_id !== $r['current_identity_id'])
-            && $r['course']->requests_user_information == 'no') {
+            && $r['course']->requests_user_information == 'no'
+            && is_null($r['accept_teacher'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
         $groupIdentity = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
             'identity_id' => $r['identity']->identity_id,
-            'share_user_information' => $r['share_user_information']
+            'share_user_information' => $r['share_user_information'],
+            'accept_teacher' => $r['accept_teacher']
         ]);
 
         try {
@@ -1280,13 +1283,17 @@ class CourseController extends Controller {
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group']);
         $isFirstTimeAccess = false;
+        $showAcceptTeacher = false;
         if (!Authorization::isGroupAdmin($r['current_identity_id'], $r['group'])) {
-            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_identity_id'], $r['course'], $r['group']);
+            $sharingInformation = CoursesDAO::getSharingInformation($r['current_identity_id'], $r['course'], $r['group']);
+            $isFirstTimeAccess = $sharingInformation['share_user_information'] == null;
+            $showAcceptTeacher = $sharingInformation['accept_teacher'] == null;
         }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result['showAcceptTeacher'] = $showAcceptTeacher;
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         $result['requests_user_information'] = $result['requests_user_information'];
@@ -1574,5 +1581,60 @@ class CourseController extends Controller {
             false /*withRunDetails*/,
             true /*sortByName*/
         );
+    }
+    /**
+     * Get Problems solved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListSolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $db_results = ProblemsDAO::getSolvedProblemsByCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
+    }
+
+    /**
+     * Get Problems unsolved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $db_results = ProblemsDAO::getUnsolvedProblemsByCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
     }
 }

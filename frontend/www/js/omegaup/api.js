@@ -138,6 +138,10 @@ export default {
                   return result;
                 }),
 
+    listSolvedProblems: _call('/api/contest/listSolvedProblems/'),
+
+    listUnsolvedProblems: _call('/api/contest/listUnsolvedProblems/'),
+
     myList: _call('/api/contest/mylist/',
                   function(result) {
                     for (var idx in result.contests) {
@@ -241,6 +245,10 @@ export default {
                        }),
 
     listStudents: _call('/api/course/listStudents/'),
+
+    listSolvedProblems: _call('/api/course/listSolvedProblems/'),
+
+    listUnsolvedProblems: _call('/api/course/listUnsolvedProblems/'),
 
     removeAdmin: _call('/api/course/removeAdmin/'),
 

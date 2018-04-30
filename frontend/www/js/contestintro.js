@@ -9,16 +9,20 @@ omegaup.OmegaUp.on('ready', function() {
         $('#start-contest-submit').prop('disabled', true);
 
         // Explicitly join the contest.
-        omegaup.API.Contest.open({
-                             contest_alias: contestAlias,
-                             share_user_information:
-                                 $('input[name=share-user-information]:checked')
-                                     .val()
-                           })
+        omegaup.API.Contest
+            .open({
+              contest_alias: contestAlias,
+              share_user_information:
+                  $('input[name=share-user-information]:checked').val(),
+              accept_teacher: $('input[name=accept-teacher]:checked').val()
+            })
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);
       });
 
+  // Handlers to enable start contest button
+  $('input[name=accept-teacher]')
+      .on('change', function(ev) { enableStartContestButton(); });
   $('input[name=share-user-information]')
       .on('click', function(ev) { enableStartContestButton(); });
 
@@ -43,8 +47,9 @@ omegaup.OmegaUp.on('ready', function() {
     if ($formElement.hasClass('basic-information-needed')) {
       return false;
     }
-    if ($formElement.hasClass('requests-user-information-required') &&
-        $('input[name=share-user-information]:checked').val() != '1') {
+    if (($formElement.hasClass('requests-user-information-required') &&
+         $('input[name=share-user-information]:checked').val() != '1') ||
+        !$('input[name=accept-teacher]').is(':checked')) {
       $('#start-contest-submit').prop('disabled', true);
       return false;
     }

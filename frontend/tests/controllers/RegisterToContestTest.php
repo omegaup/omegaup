@@ -60,6 +60,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request2 = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
+            'accept_teacher' => 'yes',
         ]);
 
         // Join this contest

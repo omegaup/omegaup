@@ -14,6 +14,7 @@
                     <th>{#wordsEndTime#}</th>
                     <th>{#wordsNumHomeworks#}</th>
                     <th>{#wordsNumTests#}</th>
+                    <th>{#wordsActions#}</th>
                 </tr>
             </thead>
             <tbody data-bind="foreach: course">
@@ -23,6 +24,7 @@
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>
                     <td data-bind="text: numTests"></td>
+                    <td><a class="glyphicon glyphicon-list-alt" data-bind="attr: { href: submissions_list_url, title: subissions_list }" /></td>
                 </tr>
             </tbody>
         </table>
