@@ -57,11 +57,11 @@
 			<div class="panel-body">
 				<!-- Facebook like button -->
                 <div id="fb-root"></div>
-                <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="21" data-show-faces="false" data-share="true"></div>
+                <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="20" data-show-faces="false" data-share="true"></div>
 				<br/>
 				<!-- Twitter follow -->
-                <div class="twitter-follow"></div>
-			</div>
+				<a href="https://twitter.com/omegaup?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-width="300px" data-height="20" data-show-screen-name="false" data-dnt="true" data-show-count="true">Follow @omegaup</a>
+                </div>
 		</div>
 
 		{if isset($coderOfTheMonthData)}
