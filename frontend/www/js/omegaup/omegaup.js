@@ -126,7 +126,7 @@ export let OmegaUp = {
 
               if (splitNames[i] == 'ready' && OmegaUp.ready) {
                 handler();
-                return;
+                continue;
               }
 
               OmegaUp._listeners[splitNames[i]].push(handler);
