@@ -10,8 +10,8 @@ export class Experiments {
     var self = this;
     self.enabledExperiments = {};
     if (!experimentList) return;
-    for (var i = 0; i < experimentList.length; i++)
-      self.enabledExperiments[experimentList[i]] = true;
+    for (let experiment of experimentList)
+      self.enabledExperiments[experiment] = true;
   }
 
   // The list of all enabled experiments for a particular request should have
@@ -27,6 +27,37 @@ export class Experiments {
   isEnabled(name) {
     var self = this;
     return self.enabledExperiments.hasOwnProperty(name);
+  }
+}
+;
+
+// Holds event listeners and notifies them exactly once. An event listener that
+// is added after the .notify() method has been called will be notified
+// immediately without adding it to the list.
+class EventListenerList {
+  constructor(listenerList) {
+    var self = this;
+    self.listenerList = [];
+    self.ready = false;
+    if (!listenerList) return;
+    for (let listener of listenerList) self.listenerList.push(listener);
+  }
+
+  notify() {
+    var self = this;
+    self.ready = true;
+    for (let listener of self.listenerList) listener();
+    self.listenerList = [];
+  }
+
+  add(listener) {
+    var self = this;
+    if (self.ready) {
+      listener();
+      return;
+    }
+
+    self.listenerList.push(listener);
   }
 }
 ;
@@ -54,13 +85,13 @@ export let OmegaUp = {
 
       _listeners:
           {
-            'ready': [
+            'ready': new EventListenerList([
               function() { OmegaUp.experiments = Experiments.loadGlobal(); },
               function() {
                 ko.bindingProvider.instance =
                     new ko.secureBindingsProvider({attribute: 'data-bind'});
               }
-            ],
+            ]),
           },
 
       _onDocumentReady:
@@ -100,10 +131,8 @@ export let OmegaUp = {
 
       _notify:
           function(eventName) {
-            for (var i = 0; i < OmegaUp._listeners[eventName].length; i++) {
-              OmegaUp._listeners[eventName][i]();
-            }
-            OmegaUp._listeners[eventName] = [];
+            if (!OmegaUp._listeners.hasOwnProperty(eventName)) return;
+            OmegaUp._listeners[eventName].notify();
           },
 
       loadTranslations:
@@ -119,16 +148,9 @@ export let OmegaUp = {
       on:
           function(events, handler) {
             OmegaUp._initialize();
-            var splitNames = events.split(' ');
-            for (var i = 0; i < splitNames.length; i++) {
-              if (!OmegaUp._listeners.hasOwnProperty(splitNames[i])) continue;
-
-              if (splitNames[i] == 'ready' && OmegaUp.ready) {
-                handler();
-                continue;
-              }
-
-              OmegaUp._listeners[splitNames[i]].push(handler);
+            for (let eventName of events.split(' ')) {
+              if (!OmegaUp._listeners.hasOwnProperty(eventName)) continue;
+              OmegaUp._listeners[eventName].add(handler);
             }
           },
 
