@@ -118,7 +118,6 @@ export let OmegaUp = {
 
       on:
           function(events, handler) {
-            if (OmegaUp.ready) return;
             OmegaUp._initialize();
             var splitNames = events.split(' ');
             for (var i = 0; i < splitNames.length; i++) {
