@@ -76,9 +76,10 @@ export let OmegaUp = {
 
       _initialize:
           function() {
-            if (OmegaUp.ready) {
+            if (OmegaUp._initialized) {
               return;
             }
+            OmegaUp._initialized = true;
             var t0 = OmegaUp._realTime();
             API.Session.currentSession()
                 .then(function(data) {
@@ -117,7 +118,6 @@ export let OmegaUp = {
 
       on:
           function(events, handler) {
-            if (OmegaUp._initialized) return;
             OmegaUp._initialize();
             var splitNames = events.split(' ');
             for (var i = 0; i < splitNames.length; i++) {
@@ -125,7 +125,7 @@ export let OmegaUp = {
 
               if (splitNames[i] == 'ready' && OmegaUp.ready) {
                 handler();
-                return;
+                continue;
               }
 
               OmegaUp._listeners[splitNames[i]].push(handler);
