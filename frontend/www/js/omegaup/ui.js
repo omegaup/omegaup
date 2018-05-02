@@ -297,36 +297,39 @@ let UI = {
 
   formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
 
-  copyToClipboard: function() {
-    $('.clipboard')
-        .on('click', function() {
-          let value = $(this).data('value');
-          value = window.problem_samples[value];
+  copyToClipboard: function(value) {
+    let tempInput = document.createElement('textarea');
 
-          let tempInput = document.createElement('textarea');
+    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
+    tempInput.value = value;
 
-          tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
-          tempInput.value = value;
+    document.body.appendChild(tempInput);
 
-          document.body.appendChild(tempInput);
-          tempInput.trigger('select');
-          document.execCommand('copy');
-
-          document.body.removeChild(tempInput);
-        });
+    try {
+      tempInput.select();
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(tempInput);
+    }
   },
 
   renderSampleToClipboardButton: function() {
-    $('.sample_io > tbody > tr')
-        .each(function(index) {
-          let inputSample = $(this).find('td')[0];
-          $(inputSample)
-              .append(
-                  '<button class="glyphicon glyphicon-copy clipboard" aria-hidden="true" data-value="' +
-                  index + '"></button>');
-        });
+    document.querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
+        .forEach(function(item, index) {
+          let inputValue = item.querySelector('pre').innerHTML;
 
-    UI.copyToClipboard();
+          let clipboardButton = document.createElement('button');
+
+          clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
+          
+          clipboardButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            UI.copyToClipboard(inputValue)
+          });
+
+          item.appendChild(clipboardButton);
+        });
   },
 
   markdownConverter: function(options) {
@@ -418,7 +421,6 @@ let UI = {
                 inner.split(/ {0,3}\|\| *(input|output|description) *\n/);
             var result = '';
             var description_column = false;
-            var input_samples = [];
             for (var i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 description_column = true;
@@ -434,7 +436,6 @@ let UI = {
             result += '</tr></thead>';
             var first_row = true;
             var columns = 0;
-            var input_row = false;
             result += '<tbody>';
             for (var i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
@@ -452,15 +453,9 @@ let UI = {
                   first_row = false;
                   result += '<tr>';
                   columns = 0;
-                  input_row = true;
                 }
-                var inputSampleData = matches[i + 1].replace(/\s+$/, '');
-                result += '<td><pre>' + inputSampleData + '</pre></td>';
-                if (input_row) {
-                  input_samples.push(inputSampleData);
-                }
+                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') + '</pre></td>';
                 columns++;
-                input_row = false;
               }
             }
             while (columns < (description_column ? 3 : 2)) {
@@ -468,7 +463,7 @@ let UI = {
               columns++;
             }
             result += '</tr></tbody>';
-            window.problem_samples = input_samples;
+
             return hashBlock('<table class="sample_io">\n' + result +
                              '\n</table>');
           });
