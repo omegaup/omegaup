@@ -306,7 +306,7 @@ let UI = {
     document.body.appendChild(tempInput);
 
     try {
-      tempInput.select();
+      tempInput.trigger('select');
       document.execCommand('copy');
     } finally {
       document.body.removeChild(tempInput);
@@ -325,7 +325,7 @@ let UI = {
           clipboardButton.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
-            UI.copyToClipboard(inputValue)
+            UI.copyToClipboard(inputValue);
           });
 
           item.appendChild(clipboardButton);
@@ -454,7 +454,8 @@ let UI = {
                   result += '<tr>';
                   columns = 0;
                 }
-                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') + '</pre></td>';
+                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') +
+                          '</pre></td>';
                 columns++;
               }
             }
