@@ -1238,6 +1238,7 @@ export class Arena {
     let self = this;
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
+    
     statement.innerHTML =
         self.markdownConverter.makeHtml(problem.problem_statement);
 
