@@ -321,7 +321,7 @@ let UI = {
           let clipboardButton = document.createElement('button');
 
           clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
-          
+
           clipboardButton.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
