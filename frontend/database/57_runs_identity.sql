@@ -1,10 +1,6 @@
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-
 -- Adding identity_id column on Runs and synchronizing user - identity data
 ALTER TABLE `Runs`
-  ADD COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
-  ADD KEY `identity_id` (`identity_id`),
+  ADD COLUMN `identity_id` int(11) DEFAULT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
   DROP FOREIGN KEY `fk_r_user_id`,
   DROP KEY `user_id`;
 
@@ -19,8 +15,7 @@ SET
 
 -- Deleting user_id column and creating indexes
 ALTER TABLE `Runs`
+  MODIFY COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  ADD KEY `identity_id` (`identity_id`),
   ADD CONSTRAINT `fk_r_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   DROP COLUMN `user_id`;
-
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

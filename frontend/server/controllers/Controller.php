@@ -111,20 +111,19 @@ class Controller {
         // By default use current identity
         $identity = $r['current_identity'];
 
-        if (!is_null($r['username'])) {
-            Validators::isStringNonEmpty($r['username'], 'username');
+        if (is_null($r['username'])) {
+            return $identity;
+        }
+        Validators::isStringNonEmpty($r['username'], 'username');
 
-            try {
-                $identity = IdentitiesDAO::FindByUsername($r['username']);
+        try {
+            $identity = IdentitiesDAO::FindByUsername($r['username']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
 
-                if (is_null($identity)) {
-                    throw new NotFoundException('userNotExist');
-                }
-            } catch (ApiException $e) {
-                throw $e;
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+        if (is_null($identity)) {
+            throw new NotFoundException('userNotExist');
         }
 
         return $identity;

@@ -322,7 +322,7 @@ class RunController extends Controller {
             $identity = IdentitiesDAO::getByPK($run->identity_id);
 
             SubmissionLogDAO::save(new SubmissionLog([
-                'user_id' => $identity->user_id,
+                'user_id' => $r['current_user_id'],
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
@@ -895,12 +895,10 @@ class RunController extends Controller {
         // Get user if we have something in username
         if (!is_null($r['username'])) {
             try {
-                $r['user'] = UserController::resolveUser($r['username']);
                 $r['identity'] = IdentityController::resolveIdentity($r['username']);
             } catch (NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;
-                $r['user'] = null;
                 $r['identity'] = null;
             }
         }

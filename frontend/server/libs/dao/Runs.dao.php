@@ -347,7 +347,7 @@ class RunsDAO extends RunsDAOBase {
             if (is_null($group_id)) {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, i.user_id
+                        i.identity_id, i.username, i.name, i.country_id
                     FROM
                         Identities i
                     INNER JOIN
@@ -366,7 +366,7 @@ class RunsDAO extends RunsDAOBase {
             } else {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, i.user_id
+                        i.identity_id, i.username, i.name, i.country_id
                     FROM
                         Identities i
                     INNER JOIN
@@ -386,7 +386,7 @@ class RunsDAO extends RunsDAOBase {
         } else {
             $sql = '
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id, i.user_id
+                    i.identity_id, i.username, i.name, i.country_id
                 FROM
                     Identities i
                 INNER JOIN

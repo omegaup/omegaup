@@ -150,7 +150,7 @@ class Scoreboard {
 
         try {
             // Get all distinct contestants participating in the given contest
-            $raw_contest_users = RunsDAO::getAllRelevantIdentities(
+            $raw_contest_identities = RunsDAO::getAllRelevantIdentities(
                 $this->params['problemset_id'],
                 $this->params['acl_id'],
                 true /* show all runs */,
@@ -185,7 +185,7 @@ class Scoreboard {
 
         $result = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping,
             $this->params['penalty'],
             $this->params['penalty_calc_policy'],
@@ -237,7 +237,7 @@ class Scoreboard {
 
         try {
             // Get all distinct contestants participating in the given contest
-            $raw_contest_users = RunsDAO::getAllRelevantIdentities(
+            $raw_contest_identities = RunsDAO::getAllRelevantIdentities(
                 $this->params['problemset_id'],
                 $this->params['acl_id'],
                 $this->params['show_all_runs']
@@ -266,7 +266,7 @@ class Scoreboard {
         $result = Scoreboard::calculateEvents(
             $this->params,
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping
         );
 
@@ -310,7 +310,7 @@ class Scoreboard {
             $contest_runs = RunsDAO::getProblemsetRuns($problemset);
 
             // Get all distinct contestants participating in the contest
-            $raw_contest_users = RunsDAO::getAllRelevantIdentities(
+            $raw_contest_identities = RunsDAO::getAllRelevantIdentities(
                 $params['problemset_id'],
                 $params['acl_id'],
                 true /* show all runs */,
@@ -342,7 +342,7 @@ class Scoreboard {
         $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping,
             $params['penalty'],
             $params['penalty_calc_policy'],
@@ -358,7 +358,7 @@ class Scoreboard {
         $contestantEventCache->set(Scoreboard::calculateEvents(
             $params,
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping
         ), $timeout);
 
@@ -369,7 +369,7 @@ class Scoreboard {
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($params);
         $adminScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping,
             $params['penalty'],
             $params['penalty_calc_policy'],
@@ -387,7 +387,7 @@ class Scoreboard {
         $adminEventCache->set(Scoreboard::calculateEvents(
             $params,
             $contest_runs,
-            $raw_contest_users,
+            $raw_contest_identities,
             $problem_mapping
         ), $timeout);
 
@@ -474,7 +474,7 @@ class Scoreboard {
 
     private static function getScoreboardFromRuns(
         $runs,
-        $raw_contest_users,
+        $raw_contest_identities,
         $problem_mapping,
         $contest_penalty,
         $contest_penalty_calc_policy,
@@ -489,7 +489,7 @@ class Scoreboard {
     ) {
         $test_only = [];
         $no_runs = [];
-        $users_info = [];
+        $identities_info = [];
         $problems = [];
 
         foreach ($problem_mapping as $problem) {
@@ -497,13 +497,13 @@ class Scoreboard {
         }
 
         // Calculate score for each contestant x problem
-        foreach ($raw_contest_users as $contestant) {
-            $user_problems = [];
+        foreach ($raw_contest_identities as $contestant) {
+            $identity_problems = [];
 
             $test_only[$contestant->identity_id] = true;
             $no_runs[$contestant->identity_id] = true;
             foreach ($problem_mapping as $id => $problem) {
-                array_push($user_problems, [
+                array_push($identity_problems, [
                     'points' => 0,
                     'percent' => 0,
                     'penalty' => 0,
@@ -512,8 +512,8 @@ class Scoreboard {
             }
 
             // Add the problems' information
-            $users_info[$contestant->identity_id] = [
-                'problems' => $user_problems,
+            $identities_info[$contestant->identity_id] = [
+                'problems' => $identity_problems,
                 'username' => $contestant->username,
                 'name' => $contestant->name ?
                     $contestant->name :
@@ -531,7 +531,7 @@ class Scoreboard {
             $is_test = $run->test != 0;
 
             $problem =
-                &$users_info[$identity_id]['problems'][$problem_mapping[$problem_id]['order']];
+                &$identities_info[$identity_id]['problems'][$problem_mapping[$problem_id]['order']];
 
             if (!array_key_exists($identity_id, $test_only)) {
                 //
@@ -579,14 +579,14 @@ class Scoreboard {
         }
 
         $result = [];
-        foreach ($raw_contest_users as $contestant) {
+        foreach ($raw_contest_identities as $contestant) {
             $identity_id = $contestant->identity_id;
 
             // Add contestant results to scoreboard data
             if (!$showAllRuns && $test_only[$identity_id] && !$no_runs[$identity_id]) {
                 continue;
             }
-            $info = $users_info[$identity_id];
+            $info = $identities_info[$identity_id];
             if ($info == null) {
                 continue;
             }
@@ -669,17 +669,17 @@ class Scoreboard {
     private static function calculateEvents(
         ScoreboardParams $params,
         $contest_runs,
-        $raw_contest_users,
+        $raw_contest_identities,
         $problem_mapping
     ) {
-        $contest_users = [];
+        $contest_identities = [];
 
-        foreach ($raw_contest_users as $identity) {
-            $contest_users[$identity->identity_id] = $identity;
+        foreach ($raw_contest_identities as $identity) {
+            $contest_identities[$identity->identity_id] = $identity;
         }
 
         $result = [];
-        $user_problems_score = [];
+        $identity_problems_score = [];
         $contestStart = $params['start_time'];
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($params);
 
@@ -703,16 +703,16 @@ class Scoreboard {
             $problem_id = $run->problem_id;
             $contest_score = $run->contest_score;
 
-            if (!isset($user_problems_score[$identity_id])) {
-                $user_problems_score[$identity_id] = [
+            if (!isset($identity_problems_score[$identity_id])) {
+                $identity_problems_score[$identity_id] = [
                     $problem_id => ['points' => 0, 'penalty' => 0]
                 ];
-            } elseif (!isset($user_problems_score[$identity_id][$problem_id])) {
-                $user_problems_score[$identity_id][$problem_id] =
+            } elseif (!isset($identity_problems_score[$identity_id][$problem_id])) {
+                $identity_problems_score[$identity_id][$problem_id] =
                     ['points' => 0, 'penalty' => 0];
             }
 
-            $problem_data = &$user_problems_score[$identity_id][$problem_id];
+            $problem_data = &$identity_problems_score[$identity_id][$problem_id];
 
             if ($problem_data['points'] >= $contest_score) {
                 continue;
@@ -721,7 +721,7 @@ class Scoreboard {
             $problem_data['points'] = round((float) $contest_score, 2);
             $problem_data['penalty'] = 0;
 
-            $identity = &$contest_users[$identity_id];
+            $identity = &$contest_identities[$identity_id];
 
             if ($identity == null) {
                 continue;
@@ -743,7 +743,7 @@ class Scoreboard {
                 'country' => $identity->country_id
             ];
 
-            foreach ($user_problems_score[$identity_id] as $problem) {
+            foreach ($identity_problems_score[$identity_id] as $problem) {
                 $data['total']['points'] += $problem['points'];
                 if ($params['penalty_calc_policy'] == 'sum') {
                     $data['total']['penalty'] += $problem['penalty'];

@@ -19,7 +19,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      */
     const CONFIDENCE = 5;
 
-    public static function getNominationStatusForProblem(Problems $problem, $identity_id) {
+    public static function getNominationStatusForProblem(Problems $problem, Identities $identity) {
         $sql = '
             SELECT
                 COUNT(r.run_id) > 0 as solved,

@@ -2346,7 +2346,6 @@ class ContestController extends Controller {
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
-            $r['user'] = UserController::resolveUser($r['username']);
             $r['identity'] = IdentityController::resolveIdentity($r['username']);
         }
     }
