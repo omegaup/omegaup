@@ -107,9 +107,10 @@ export let OmegaUp = {
 
       _initialize:
           function() {
-            if (OmegaUp.ready) {
+            if (OmegaUp._initialized) {
               return;
             }
+            OmegaUp._initialized = true;
             var t0 = OmegaUp._realTime();
             API.Session.currentSession()
                 .then(function(data) {
