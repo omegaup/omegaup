@@ -28,14 +28,15 @@ const promiseVisitor = {
     if (callee.type != 'MemberExpression') {
       return;
     }
-    if (callee.property.name != 'then' && callee.property.name != 'fail') {
+    if (callee.property.name != 'then' && callee.property.name != 'fail' &&
+        callee.property.name != 'catch') {
       return;
     }
     const p = path.getStatementParent();
     if (p.node.type != 'ExpressionStatement') {
       throw new Error('Unexpected statement type: ' + p.node.type);
     }
-    if (callee.property.name == 'fail') {
+    if (callee.property.name == 'fail' || callee.property.name == 'catch') {
       p.hasFail = true;
     } else if (callee.property.name == 'then') {
       if (p.visited) {
