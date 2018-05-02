@@ -306,7 +306,7 @@ let UI = {
     document.body.appendChild(tempInput);
 
     try {
-      tempInput.trigger('select');
+      tempInput.select();
       document.execCommand('copy');
     } finally {
       document.body.removeChild(tempInput);
