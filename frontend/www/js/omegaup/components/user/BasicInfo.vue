@@ -45,11 +45,12 @@
         </li>
         <li class="fbSettingsListItem clearfix uiListItem">
           <a class="pvm phs fbSettingsListLink clearfix"><span class=
-          "pls fbSettingsListItemLabel"><strong>{{ T.profileRank }}</strong></span> <span class=
-          "fbSettingsListItemContent fcg"><strong><omegaup-user-username v-bind:classname=
-          "profile.classname"
-                                 v-bind:username=
-                                 "rank"></omegaup-user-username></strong></span></a>
+          "pls fbSettingsListItemLabel"><strong>{{ T.profileRank }}</strong></span></a> <a href=
+          "https://blog.omegaup.com/categorias/"
+              target="_blank"><em class="glyphicon glyphicon-question-sign"></em></a> <span class=
+              "fbSettingsListItemContent fcg"><strong><omegaup-user-username v-bind:classname=
+              "profile.classname"
+                                 v-bind:username="rank"></omegaup-user-username></strong></span>
         </li>
       </ul>
     </div>
