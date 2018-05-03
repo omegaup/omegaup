@@ -110,10 +110,16 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
-            $contestInfo = $c->asFilteredArray($relevantColumns);
+            if (is_array($c)) {
+                $contestInfo = $c;
+                $contestInfo['duration'] = (is_null($c['window_length']) ?
+                                $c['finish_time'] - $c['start_time'] : ($c['window_length'] * 60));
+            } else {
+                $contestInfo = $c->asFilteredArray($relevantColumns);
 
-            $contestInfo['duration'] = (is_null($c->window_length) ?
+                $contestInfo['duration'] = (is_null($c->window_length) ?
                                 $c->finish_time - $c->start_time : ($c->window_length * 60));
+            }
 
             $addedContests[] = $contestInfo;
         }
@@ -212,8 +218,7 @@ class ContestController extends Controller {
                 $identity_id,
                 $page,
                 $pageSize,
-                $query,
-                true
+                $query
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

@@ -356,8 +356,7 @@ class ContestsDAO extends ContestsDAOBase {
         $identity_id,
         $page = 1,
         $pageSize = 1000,
-        $query = null,
-        $showScoreboard = false
+        $query = null
     ) {
         $end_check = ActiveStatus::sql(ActiveStatus::ACTIVE);
         $recommended_check = RecommendedStatus::sql(ActiveStatus::ALL);
@@ -398,17 +397,8 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $pageSize;
-        $rs = $conn->Execute($sql, $params);
 
-        $contests = [];
-        foreach ($rs as $row) {
-            if ($showScoreboard) {
-                array_push($contests, $row);
-            } else {
-                array_push($contests, new Contests($row));
-            }
-        }
-        return $contests;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
