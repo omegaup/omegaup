@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
             if (!omegaup.OmegaUp.loggedIn) {
               window.location = '/login/?redirect=' + escape(window.location);
             } else {
-              $('#loading').html('404');
+              window.location = '/';
             }
             return;
           } else if (arena.options.isPractice && contest.finish_time &&
@@ -61,13 +61,28 @@ omegaup.OmegaUp.on('ready', function() {
                 .html(problemName);
             $('#problem-list').append(prob);
 
-            $('#clarification select')
+            $('#clarification select[name=problem]')
                 .append('<option value="' + problem.alias + '">' + problemName +
                         '</option>');
             $('select.runsproblem')
                 .append('<option value="' + problem.alias + '">' + problemName +
                         '</option>');
           }
+
+          omegaup.API.Contest.users({contest_alias: arena.options.contestAlias})
+              .then(function(data) {
+                for (var ind in data.users) {
+                  var user = data.users[ind];
+                  var receiver = user.is_owner ?
+                                     omegaup.T.wordsPublic :
+                                     omegaup.UI.escape(user.username);
+                  $('#clarification select[name=user]')
+                      .append('<option value="' +
+                              omegaup.UI.escape(user.username) + '">' +
+                              receiver + '</option>');
+                }
+              })
+              .fail(omegaup.UI.ignoreError);
 
           arena.setupPolls();
           admin.refreshRuns();
@@ -88,7 +103,7 @@ omegaup.OmegaUp.on('ready', function() {
           if (!omegaup.OmegaUp.loggedIn) {
             window.location = '/login/?redirect=' + escape(window.location);
           } else {
-            $('#loading').html('404');
+            window.location = '/';
           }
         });
   }

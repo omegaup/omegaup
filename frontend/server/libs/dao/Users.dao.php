@@ -159,7 +159,7 @@ class UsersDAO extends UsersDAOBase {
                 FROM
                     `User_Rank_Cutoffs` `urc`
                 WHERE
-                    `urc`.score >= (
+                    `urc`.score <= (
                         SELECT
                             `ur`.`score`
                         FROM

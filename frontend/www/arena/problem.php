@@ -3,7 +3,7 @@ require_once('../../server/bootstrap.php');
 
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
-$r['statement_type'] = 'html';
+$r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
@@ -21,8 +21,6 @@ try {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
-$smarty->assign('problem_statement', $result['problem_statement']);
-$smarty->assign('problem_statement_language', $result['problem_statement_language']);
 $smarty->assign('problem_alias', $result['alias']);
 $smarty->assign('visibility', $result['visibility']);
 $smarty->assign('source', $result['source']);
@@ -61,8 +59,6 @@ $result['user'] = [
 ];
 $smarty->assign('problem_admin', $result['user']['admin']);
 
-// Remove the largest element to reduce the payload.
-unset($result['problem_statement']);
-$smarty->assign('problem', json_encode($result));
+$smarty->assign('payload', $result);
 
 $smarty->display('../../templates/arena.problem.tpl');

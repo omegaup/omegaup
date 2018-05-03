@@ -89,4 +89,93 @@ class CreateClarificationTest extends OmegaupTestCase {
             'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
         );
     }
+
+    /**
+     * Admin creates one message to everyone in the contest and
+     * other one to a specific user
+     */
+    public function testCreateClarificationsSentByAdmin() {
+        $problemData = null;
+        $contestData = null;
+        $contestant = null;
+
+        // Setup contest is required to submit a clarification
+        $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
+        $directorIdentity = IdentitiesDAO::getByPK($contestData['director']->main_identity_id);
+        // Create 5 users
+        $n = 5;
+        $users = [];
+        for ($i = 0; $i < $n; $i++) {
+            // Create a user
+            $users[$i] = UserFactory::createUser();
+
+            // Add it to the contest
+            ContestsFactory::addUser($contestData, $users[$i]);
+        }
+
+        $messageToEveryone = ClarificationsFactory::createClarification(
+            $problemData,
+            $contestData,
+            $contestData['director'],
+            'Message to everyone',
+            $directorIdentity->username
+        );
+
+        $messageToSpecificUser = ClarificationsFactory::createClarification(
+            $problemData,
+            $contestData,
+            $contestData['director'],
+            'Message to a specific user',
+            $contestant->username
+        );
+
+        $messageToSpecificUserWithPublicAnswer = ClarificationsFactory::createClarification(
+            $problemData,
+            $contestData,
+            $contestData['director'],
+            'Message to a specific user with public answer',
+            $contestant->username
+        );
+
+        $login = self::login($contestant);
+        // Call API
+        $response = ContestController::apiClarifications(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // Asserts that user has three clarifications (One to all the contestants and two privates)
+        $this->assertEquals(3, count($response['clarifications']));
+
+        for ($i = 0; $i < $n; $i++) {
+            $logins[$i] = self::login($users[$i]);
+
+            $response = ContestController::apiClarifications(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $logins[$i]->auth_token,
+            ]));
+
+            // Asserts that user has only one clarification
+            $this->assertEquals(1, count($response['clarifications']));
+        }
+
+        // Now, director answers one message, and it turns public
+        $response = ClarificationsFactory::answer(
+            $messageToSpecificUserWithPublicAnswer,
+            $contestData,
+            'answer to everyone',
+            $contestData['director']->username,
+            '1'
+        );
+
+        for ($i = 0; $i < $n; $i++) {
+            $response = ContestController::apiClarifications(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $logins[$i]->auth_token,
+            ]));
+
+            // Asserts that user has two clarifications
+            $this->assertEquals(2, count($response['clarifications']));
+        }
+    }
 }

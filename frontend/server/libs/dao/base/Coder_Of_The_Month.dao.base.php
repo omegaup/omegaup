@@ -20,7 +20,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`';
+    const FIELDS = '`Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
         if (is_null($coder_of_the_month_id)) {
             return null;
         }
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
         $params = [$coder_of_the_month_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link CoderOfTheMonth}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url` from Coder_Of_The_Month';
+        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank` from Coder_Of_The_Month';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -147,6 +147,10 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
             $clauses[] = '`interview_url` = ?';
             $params[] = $Coder_Of_The_Month->interview_url;
         }
+        if (!is_null($Coder_Of_The_Month->rank)) {
+            $clauses[] = '`rank` = ?';
+            $params[] = $Coder_Of_The_Month->rank;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -157,7 +161,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url` FROM `Coder_Of_The_Month`';
+        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank` FROM `Coder_Of_The_Month`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -181,12 +185,13 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
       * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a actualizar.
       */
     final private static function update(CoderOfTheMonth $Coder_Of_The_Month) {
-        $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ? WHERE `coder_of_the_month_id` = ?;';
+        $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ?, `rank` = ? WHERE `coder_of_the_month_id` = ?;';
         $params = [
             $Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
+            $Coder_Of_The_Month->rank,
             $Coder_Of_The_Month->coder_of_the_month_id,
         ];
         global $conn;
@@ -210,13 +215,14 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
         if (is_null($Coder_Of_The_Month->time)) {
             $Coder_Of_The_Month->time = '2000-01-01';
         }
-        $sql = 'INSERT INTO Coder_Of_The_Month (`coder_of_the_month_id`, `user_id`, `description`, `time`, `interview_url`) VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Coder_Of_The_Month (`coder_of_the_month_id`, `user_id`, `description`, `time`, `interview_url`, `rank`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Coder_Of_The_Month->coder_of_the_month_id,
             $Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
+            $Coder_Of_The_Month->rank,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -316,6 +322,17 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`interview_url` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Coder_Of_The_MonthA->rank;
+        $b = $Coder_Of_The_MonthB->rank;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`rank` >= ? AND `rank` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`rank` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

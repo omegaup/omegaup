@@ -128,6 +128,7 @@ class Cache {
     const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SAMPLE = 'sample-';
+    const PROBLEM_LIBINTERACTIVE_INTERFACE_NAME = 'interactive-interface-name-';
     const CONTEST_INFO = 'contest-info-';
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';

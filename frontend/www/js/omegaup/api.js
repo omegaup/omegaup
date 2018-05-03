@@ -380,7 +380,7 @@ export default {
     delete: _call('/api/problem/delete/'),
 
     details: _call('/api/problem/details/', _convertRuntimes,
-                   {statement_type: 'html'}),
+                   {statement_type: 'markdown'}),
 
     list: _call('/api/problem/list/'),
 
@@ -501,6 +501,8 @@ export default {
     changePassword: _call('/api/user/changepassword/'),
 
     contestStats: _call('/api/user/conteststats/'),
+
+    coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
     /**
      * Creates a new user.
