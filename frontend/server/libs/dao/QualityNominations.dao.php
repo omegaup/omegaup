@@ -56,7 +56,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $identity_id]);
+        return $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
     }
 
     /**

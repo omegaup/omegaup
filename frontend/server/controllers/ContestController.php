@@ -1108,7 +1108,7 @@ class ContestController extends Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                Validators::isInEnum($language, 'languages', RunController::$kSupportedLanguages, false);
+                Validators::isInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
             }
         }
 
@@ -2029,7 +2029,7 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns ALL users participating in a contest
+     * Returns ALL identities participating in a contest
      *
      * @param Request $r
      * @return array
@@ -2055,28 +2055,16 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Get users from DB
-        $problemset_user = new ProblemsetIdentities();
-        $problemset_user->problemset_id = $contest->problemset_id;
-
+        // Get identities from DB
         try {
-            $db_results = ProblemsetIdentitiesDAO::search($problemset_user);
+            $identities = ProblemsetIdentitiesDAO::getWithExtraInformation($contest->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $users = [];
-
-        // Add all users to an array
-        foreach ($db_results as $result) {
-            $identity_id = $result->identity_id;
-            $user = IdentitiesDAO::getByPK($identity_id);
-            $users[] = ['user_id' => $identity_id, 'username' => $user->username, 'access_time' => $result->access_time, 'country' => $user->country_id];
-        }
-
         $response = [];
-        $response['users'] = $users;
+        $response['users'] = $identities;
         $response['status'] = 'ok';
 
         return $response;
@@ -2342,7 +2330,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', RunController::$kSupportedLanguages, false);
+        Validators::isInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {

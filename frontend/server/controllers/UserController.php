@@ -1388,40 +1388,39 @@ class UserController extends Controller {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
         }
+
         try {
-            $coderOfTheMonth = null;
+            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
 
-            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay]));
-            if (count($codersOfTheMonth) > 0) {
-                $coderOfTheMonth = $codersOfTheMonth[0];
-            }
-
-            if (is_null($coderOfTheMonth)) {
+            if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
                 // Generate the coder
-                $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
-                if ($retArray == null) {
+                $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+                if (is_null($users)) {
                     return [
                         'status' => 'ok',
                         'userinfo' => null,
                         'problems' => null,
                     ];
                 }
-                $user = $retArray['user'];
 
-                // Save it
-                $c = new CoderOfTheMonth([
-                    'user_id' => $user->user_id,
-                    'time' => $firstDay,
-                ]);
-                CoderOfTheMonthDAO::save($c);
-            } else {
-                // Grab the user info
-                $user = UsersDAO::getByPK($coderOfTheMonth->user_id);
+                $codersOfTheMonth = [];
+                foreach ($users as $index => $user) {
+                    // Save it
+                    $c = new CoderOfTheMonth([
+                        'user_id' => $user['user_id'],
+                        'time' => $firstDay,
+                        'rank' => $index + 1,
+                    ]);
+                    CoderOfTheMonthDAO::save($c);
+                    array_push($codersOfTheMonth, $c);
+                }
             }
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
+
+        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = self::getProfileImpl($user);
@@ -1442,7 +1441,12 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            $coders = [];
+            if (!empty($r['date'])) {
+                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            } else {
+                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            }
             foreach ($coders as $c) {
                 $response['coders'][] = [
                     'username' => $c['username'],

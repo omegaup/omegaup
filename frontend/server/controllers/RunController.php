@@ -7,8 +7,20 @@
  */
 class RunController extends Controller {
     public static $kSupportedLanguages = [
-        'kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas',
-        'cat', 'hs', 'lua'
+        'kp' => 'Karel (Pascal)',
+        'kj' => 'Karel (Java)',
+        'c' => 'C',
+        'cpp' => 'C++',
+        'cpp11' => 'C++ 11',
+        'java' => 'Java',
+        'py' => 'Python',
+        'rb' => 'Ruby',
+        'pl' => 'Perl',
+        'cs' => 'C#',
+        'pas' => 'Pascal',
+        'cat' => 'Output Only',
+        'hs' => 'Haskell',
+        'lua' => 'Lua',
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
     public static $grader = null;
@@ -59,7 +71,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $allowedLanguages = RunController::$kSupportedLanguages;
+        $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
         try {
             Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -319,7 +331,6 @@ class RunController extends Controller {
         try {
             // Push run into DB
             RunsDAO::save($run);
-            $identity = IdentitiesDAO::getByPK($run->identity_id);
 
             SubmissionLogDAO::save(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
@@ -888,7 +899,7 @@ class RunController extends Controller {
         Validators::isInEnum(
             $r['language'],
             'language',
-            RunController::$kSupportedLanguages,
+            array_keys(RunController::$kSupportedLanguages),
             false
         );
 

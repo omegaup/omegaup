@@ -1,6 +1,8 @@
 'use strict';
 
 var omegaup = require('../../dist/omegaup.js');
+var Markdown =
+    require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
 
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {
@@ -55,6 +57,9 @@ describe('omegaup.arena', function() {
     });
 
     it('can be instantiated', function() {
+      if (typeof(global) !== 'undefined' && !global.Markdown) {
+        global.Markdown = Markdown;
+      }
       var arena = new omegaup.arena.Arena({contestAlias: 'test'});
       expect(arena.options.contestAlias).toEqual('test');
       expect(arena.contestAdmin).toEqual(false);

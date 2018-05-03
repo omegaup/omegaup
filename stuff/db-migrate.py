@@ -120,6 +120,21 @@ def migrate(args, auth, update_metadata=True):
                     (revision, comment), dbname='_omegaup_metadata', auth=auth)
 
 
+def validate(args, auth):  # pylint: disable=unused-argument
+    '''Validates that the versioning is has no repeated or missing entries.'''
+
+    expected_revision = 0
+    valid = True
+    for revision, _, path in _scripts():
+        expected_revision += 1
+        if expected_revision != revision:
+            print('Expected revision %d for path %s' % (expected_revision,
+                                                        path))
+            valid = False
+    if not valid:
+        sys.exit(1)
+
+
 def ensure(args, auth):  # pylint: disable=unused-argument
     '''Creates both the metadata database and table, if they don't exist yet.
     '''
@@ -230,6 +245,10 @@ def main():
     parser_migrate.set_defaults(func=migrate)
 
     # Commands for development.
+    parser_validate = subparsers.add_parser(
+        'validate', help='Validates that the versioning is sane')
+    parser_validate.set_defaults(func=validate)
+
     parser_ensure = subparsers.add_parser(
         'ensure', help='Ensures that the migration table exists')
     parser_ensure.set_defaults(func=ensure)
