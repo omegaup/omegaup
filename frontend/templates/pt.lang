@@ -58,6 +58,7 @@ coderOfTheMonthNotice = "Olá %(username)! Parabéns por ser o Programador do M�
 codersOfTheMonth = "Programadores do Mês"
 codersOfTheMonthCountry = "País"
 codersOfTheMonthDate = "Data"
+codersOfTheMonthList = "Codificador superior da lista de meses"
 codersOfTheMonthUser = "Usuário"
 contestActivityReport = "Relatório de atividade"
 contestActivityReportDuplicatesForOriginsDescription = "Origens com mais do que um usuário"

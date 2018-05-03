@@ -41,6 +41,9 @@ class CoderOfTheMonth extends VO {
         if (isset($data['interview_url'])) {
             $this->interview_url = $data['interview_url'];
         }
+        if (isset($data['rank'])) {
+            $this->rank = $data['rank'];
+        }
     }
 
     /**
@@ -90,4 +93,11 @@ class CoderOfTheMonth extends VO {
       * @var varchar(256)
       */
     public $interview_url;
+
+    /**
+      * El lugar en el que el usuario estuvo durante ese mes
+      * @access public
+      * @var int(11)
+      */
+    public $rank;
 }
