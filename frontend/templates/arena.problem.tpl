@@ -92,5 +92,6 @@
 		</div>
 		<div id="footer">
 		</div>
+{include file='common.analytics.tpl'}
 	</body>
 </html>

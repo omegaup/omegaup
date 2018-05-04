@@ -19,25 +19,30 @@ require_once('base/Clarifications.vo.base.php');
   */
 class ClarificationsDAO extends ClarificationsDAOBase {
     final public static function GetProblemsetClarifications($problemset_id, $admin, $identity_id, $offset, $rowcount) {
-        $sql = '';
-        if ($admin) {
-            $sql = 'SELECT c.clarification_id, p.alias problem_alias, i.username author, ' .
-                   'c.message, c.answer, UNIX_TIMESTAMP(c.time) `time`, c.public ' .
-                   'FROM Clarifications c ';
-        } else {
-            $sql = 'SELECT c.clarification_id, p.alias problem_alias, i.username author, ' .
-                   'c.message, ' .
-                   'UNIX_TIMESTAMP(c.time) `time`, c.answer, c.public ' .
-                   'FROM Clarifications c ';
-        }
-        $sql .= 'INNER JOIN Identities i ON i.identity_id = c.author_id ' .
-                'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .
-                'WHERE ' .
-                'c.problemset_id = ? ';
+        $sql = 'SELECT
+                  c.clarification_id,
+                  p.alias `problem_alias`,
+                  i.username `author`,
+                  r.username `receiver`,
+                  c.message,
+                  c.answer,
+                  UNIX_TIMESTAMP(c.time) `time`,
+                  c.public
+                FROM
+                  `Clarifications` c
+                INNER JOIN
+                  `Identities` i ON i.identity_id = c.author_id
+                LEFT JOIN
+                  `Identities` r ON r.identity_id = c.receiver_id
+                INNER JOIN
+                  `Problems` p ON p.problem_id = c.problem_id
+                WHERE
+                  c.problemset_id = ? ';
         $val = [$problemset_id];
 
         if (!$admin) {
-            $sql .= 'AND (c.public = 1 OR c.author_id = ?) ';
+            $sql .= 'AND (c.public = 1 OR c.author_id = ? OR c.receiver_id = ?) ';
+            $val[] = $identity_id;
             $val[] = $identity_id;
         }
 
