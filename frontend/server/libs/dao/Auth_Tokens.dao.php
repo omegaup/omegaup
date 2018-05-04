@@ -45,7 +45,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                 INNER JOIN
                   `Auth_Tokens` at
                 ON
-                  at.user_id = i.user_id
+                  at.identity_id = i.identity_id
                 WHERE
                   at.token = ?;';
         $params = [$auth_token];
@@ -57,13 +57,13 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         return new Identities($rs);
     }
 
-    public static function expireAuthTokens($user_id) {
+    public static function expireAuthTokens($identity_id) {
         // look for it on the database
         global $conn;
 
-        $sql = 'delete from Auth_Tokens where user_id = ?;';
+        $sql = 'delete from Auth_Tokens where identity_id = ?;';
 
-        $params = [$user_id];
+        $params = [$identity_id];
 
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();

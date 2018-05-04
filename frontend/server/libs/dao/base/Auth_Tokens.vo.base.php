@@ -29,6 +29,9 @@ class AuthTokens extends VO {
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
+        }
         if (isset($data['token'])) {
             $this->token = $data['token'];
         }
@@ -54,6 +57,13 @@ class AuthTokens extends VO {
       * @var int(11)
       */
     public $user_id;
+
+    /**
+      * Identidad del usuario
+      * @access public
+      * @var int(11)
+      */
+    public $identity_id;
 
     /**
       *  [Campo no documentado]
