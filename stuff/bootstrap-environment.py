@@ -88,7 +88,11 @@ class Session(object):
             self.jar[name] = value
         if req.status_code == 404:
             return None
-        result = req.json()
+        try:
+            result = req.json()
+        except:
+            logging.exception('Failed to parse json: %s', req.text)
+            raise
         logging.debug('Result: %s', result)
         return result
 
