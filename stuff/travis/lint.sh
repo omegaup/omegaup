@@ -6,6 +6,8 @@ stage_before_install() {
 	git submodule update --init --recursive \
 		stuff/hook_tools
 
+	init_frontend_submodules
+
 	pip install --user six
 	pip install --user https://github.com/google/closure-linter/zipball/master
 	pip3 install --user pylint
@@ -25,5 +27,6 @@ stage_script() {
 	yarn build
 	yarn test
 
+	python3 stuff/db-migrate.py validate
 	python3.5 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 }

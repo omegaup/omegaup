@@ -68,6 +68,91 @@
 				}
 			},
 			{
+				"api": "/school/create",
+				"params": {
+					"name": "Escuela curso",
+					"country_id": "MX",
+					"state_id": "QUE"
+				}
+			},
+			{
+				"api": "/course/create",
+				"params": {
+					"visibility": 1,
+					"name": "Curso de prueba",
+					"alias": "curso-prueba",
+					"description": "Curso de prueba",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+18000",
+					"public": 0,
+					"school_id": 1,
+					"needs_basic_information": 0,
+					"requests_user_information": "no"
+				}
+			},
+			{
+				"api": "/course/createAssignment",
+				"params": {
+					"course_alias": "curso-prueba",
+					"name": "Tarea de prueba",
+					"alias": "tarea-prueba",
+					"description": "Tarea de prueba",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+18000",
+					"assignment_type": "homework",
+					"max_points": 0,
+					"order": 1,
+					"publish_time_delay": 0
+				}
+			},
+			{
+				"api": "/course/createAssignment",
+				"params": {
+					"course_alias": "curso-prueba",
+					"name": "Examen de prueba",
+					"alias": "examen-prueba",
+					"description": "Examen de prueba",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+18000",
+					"assignment_type": "test",
+					"max_points": 0,
+					"order": 1,
+					"publish_time_delay": 0
+				}
+			},
+			{
+				"api": "/course/addProblem",
+				"params": {
+					"course_alias": "curso-prueba",
+					"assignment_alias": "tarea-prueba",
+					"problem_alias": "sumas"
+				}
+			},
+			{
+				"api": "/course/addProblem",
+				"params": {
+					"course_alias": "curso-prueba",
+					"assignment_alias": "tarea-prueba",
+					"problem_alias": "triangulos"
+				}
+			},
+			{
+				"api": "/course/addProblem",
+				"params": {
+					"course_alias": "curso-prueba",
+					"assignment_alias": "examen-prueba",
+					"problem_alias": "sumas"
+				}
+			},
+			{
+				"api": "/course/addProblem",
+				"params": {
+					"course_alias": "curso-prueba",
+					"assignment_alias": "examen-prueba",
+					"problem_alias": "triangulos"
+				}
+			},
+			{
 				"api": "/user/create",
 				"params": {
 					"username": "test_user_0",
@@ -105,6 +190,51 @@
 					"username": "test_user_4",
 					"email": "test_user_4@localhost.localdomain",
 					"password": "test_user_4"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "course_test_user_0",
+					"email": "course_test_user_0@localhost.localdomain",
+					"password": "course_test_user_0"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "course_test_user_1",
+					"email": "course_test_user_1@localhost.localdomain",
+					"password": "course_test_user_1"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "course_test_user_2",
+					"email": "course_test_user_2@localhost.localdomain",
+					"password": "course_test_user_2"
+				}
+			},
+			{
+				"api": "/course/addStudent",
+				"params": {
+					"usernameOrEmail": "course_test_user_0",
+					"course_alias": "curso-prueba"
+				}
+			},
+			{
+				"api": "/course/addStudent",
+				"params": {
+					"usernameOrEmail": "course_test_user_1",
+					"course_alias": "curso-prueba"
+				}
+			},
+			{
+				"api": "/course/addStudent",
+				"params": {
+					"usernameOrEmail": "course_test_user_2",
+					"course_alias": "curso-prueba"
 				}
 			}
 		]
@@ -229,6 +359,38 @@
 					"contest_alias": "prueba",
 					"language": "py",
 					"source": "syntax error"
+				}
+			}
+		]
+	},
+	{
+		"username": "course_test_user_0",
+		"password": "course_test_user_0",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "syntax error"
+				}
+			},
+			{
+				"api": "/course/introDetails",
+				"params": {
+					"course_alias": "curso-prueba",
+					"assignment_alias": "tarea-prueba"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"problemset_id": 2,
+					"language": "py",
+					"source": "print 0"
 				}
 			}
 		]

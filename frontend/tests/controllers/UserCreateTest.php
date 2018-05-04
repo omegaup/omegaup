@@ -197,7 +197,7 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(null, null, null, false /*not verified*/);
+        $user = UserFactory::createUser(new UserParams(['verify' => false]));
 
         // Admin will verify $user
         $admin = UserFactory::createAdminUser();
@@ -241,7 +241,7 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(null, null, null, false /*not verified*/);
+        $user = UserFactory::createUser(new UserParams(['verify' => false]));
 
         // Another user will try to verify $user
         $user2 = UserFactory::createUser();
@@ -295,7 +295,7 @@ class CreateUserTest extends OmegaupTestCase {
      * Test only verified users are backfilled into Sendy
      */
     public function testMailingListBackfillOnlyVerified() {
-        $userNotVerified = UserFactory::createUser(null /*username*/, null /*password*/, null /*email*/, false /*verified*/);
+        $userNotVerified = UserFactory::createUser(new UserParams(['verify' => false]));
 
         $urlHelperMock = $this->getMockBuilder('UrlHelper')->getMock();
         $urlHelperMock->expects($this->atLeastOnce())

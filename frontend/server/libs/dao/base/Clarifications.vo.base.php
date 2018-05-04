@@ -32,6 +32,9 @@ class Clarifications extends VO {
         if (isset($data['author_id'])) {
             $this->author_id = $data['author_id'];
         }
+        if (isset($data['receiver_id'])) {
+            $this->receiver_id = $data['receiver_id'];
+        }
         if (isset($data['message'])) {
             $this->message = $data['message'];
         }
@@ -78,6 +81,13 @@ class Clarifications extends VO {
       * @var int(11)
       */
     public $author_id;
+
+    /**
+      * Usuario que recibirá el mensaje
+      * @access public
+      * @var int(11)
+      */
+    public $receiver_id;
 
     /**
       *  [Campo no documentado]

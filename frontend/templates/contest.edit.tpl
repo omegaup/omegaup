@@ -13,6 +13,7 @@
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
 	<li><a href="#links" data-toggle="tab">{#showLinks#}</a></li>
+	<li><a href="#clone" data-toggle="tab">{#courseEditClone#}</a></li>
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
@@ -196,7 +197,7 @@
 					<tr>
 						<td><a id="submissions">{#wordsSubmissions#}</a></td>
 						<td><a id="conteststats">{#profileStatistics#}</a></td>
-						<td><a id="activityreport">{#contestActivityReport#}</a></td>
+						<td><a id="activityreport">{#wordsActivityReport#}</a></td>
 						<td><a id="printableversion">{#contestPrintableVersion#}</a></td>
 						<td><a id="publicscoreboard">{#contestScoreboardLink#}</a></td>
 						<td><a id="adminscoreboard">{#contestScoreboardAdminLink#}</a></td>
@@ -206,6 +207,44 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="tab-pane" id="clone">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="clone_contest_form">
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="title">{#wordsTitle#}</label>
+						<input id="title" name="title" value="" type="text" size="30" class="form-control">
+					</div>
+
+					<div class="form-group col-md-6">
+						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
+						<span aria-hidden="true" data-placement="top" data-toggle="tooltip" title="{#contestNewFormShortTitle_alias_Desc#}" class="glyphicon glyphicon-info-sign"></span>
+						<input id="alias_clone" name="alias" value="" type="text" class="form-control" >
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="description">{#contestNewFormDescription#}</label>
+						<textarea id="description" name="description" cols="30" rows="10" class="form-control"></textarea>
+					</div>
+					<div class="form-group col-md-3">
+						<label for="start-time">{#contestNewFormStartDate#}</label>
+						<span aria-hidden="true" data-placement="top" data-toggle="tooltip" title="{#contestNewFormStartDateDesc#}" class="glyphicon glyphicon-info-sign"></span>
+						<input id="start-time" name="start_time" value="" class="form-control" type="text" size ="16">
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">{#wordsCloneContest#}
+					</button>
+				</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <script type="text/javascript" src="/third_party/js/bootstrap-multiselect.js"></script>

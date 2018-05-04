@@ -6,13 +6,10 @@ omegaup.OmegaUp.on('ready', function() {
   Highcharts.setOptions({global: {useUTC: false}});
 
   function onlyProblemLoaded(problem) {
-    arena.currentProblem = problem;
+    arena.renderProblem(problem);
+
     arena.myRuns.filter_problem(problem.alias);
     arena.myRuns.attach($('#problem .runs'));
-
-    arena.mountEditor(problem);
-    MathJax.Hub.Queue(
-        ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
 
     for (var i = 0; i < problem.solvers.length; i++) {
       var solver = problem.solvers[i];
@@ -29,10 +26,6 @@ omegaup.OmegaUp.on('ready', function() {
           .text(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
       $('.solver-list').append(prob);
     }
-
-    var language_array = problem.languages;
-    arena.updateAllowedLanguages(language_array);
-    arena.selectDefaultLanguage();
 
     if (problem.user.logged_in) {
       omegaup.API.Problem.runs({problem_alias: problem.alias})
@@ -114,8 +107,8 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   if (arena.options.isOnlyProblem) {
-    onlyProblemLoaded(JSON.parse(
-        document.getElementById('problem-json').firstChild.nodeValue));
+    onlyProblemLoaded(
+        JSON.parse(document.getElementById('payload').firstChild.nodeValue));
   } else {
     omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
         .then(arena.contestLoaded.bind(arena))

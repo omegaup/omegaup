@@ -7,8 +7,20 @@
  */
 class RunController extends Controller {
     public static $kSupportedLanguages = [
-        'kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas',
-        'cat', 'hs', 'lua'
+        'kp' => 'Karel (Pascal)',
+        'kj' => 'Karel (Java)',
+        'c' => 'C',
+        'cpp' => 'C++',
+        'cpp11' => 'C++ 11',
+        'java' => 'Java',
+        'py' => 'Python',
+        'rb' => 'Ruby',
+        'pl' => 'Perl',
+        'cs' => 'C#',
+        'pas' => 'Pascal',
+        'cat' => 'Output Only',
+        'hs' => 'Haskell',
+        'lua' => 'Lua',
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
     public static $grader = null;
@@ -59,7 +71,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $allowedLanguages = RunController::$kSupportedLanguages;
+        $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
         try {
             Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -122,7 +134,7 @@ class RunController extends Controller {
                 // Check for practice or public problem, there is no contest info
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
-                      Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
+                      Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']) ||
                       Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
                         null,
@@ -130,7 +142,7 @@ class RunController extends Controller {
                         $r['problem']->problem_id,
                         $r['current_user_id']
                     )
-                            && !Authorization::isSystemAdmin($r['current_user_id'])) {
+                            && !Authorization::isSystemAdmin($r['current_identity_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
                     }
 
@@ -173,10 +185,14 @@ class RunController extends Controller {
             }
 
             // Contest admins can skip following checks
-            if (!Authorization::isAdmin($r['current_user_id'], $r['problemset'])) {
+            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
                 if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
-                    !Authorization::canSubmitToProblemset($r['current_user_id'], $r['problemset'])) {
+                    !Authorization::canSubmitToProblemset(
+                        $r['current_identity_id'],
+                        $r['problemset']
+                    )
+                ) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
@@ -289,7 +305,7 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $test = Authorization::isAdmin($r['current_user_id'], $r['problemset']) ? 1 : 0;
+            $test = Authorization::isAdmin($r['current_identity_id'], $r['problemset']) ? 1 : 0;
         }
 
         // Populate new run object
@@ -438,7 +454,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::isProblemAdmin($r['current_user_id'], $r['problem']))) {
+        if (!(Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -456,7 +472,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -498,7 +514,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canEditRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -586,7 +602,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -600,7 +616,7 @@ class RunController extends Controller {
 
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        $response['admin'] = Authorization::isProblemAdmin($r['current_user_id'], $r['problem']);
+        $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
 
         // Get the error
         $grade_dir = RunController::getGradePath($r['run']);
@@ -693,7 +709,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -855,7 +871,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -883,7 +899,7 @@ class RunController extends Controller {
         Validators::isInEnum(
             $r['language'],
             'language',
-            RunController::$kSupportedLanguages,
+            array_keys(RunController::$kSupportedLanguages),
             false
         );
 

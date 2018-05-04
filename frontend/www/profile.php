@@ -4,4 +4,4 @@ require_once('../server/bootstrap.php');
 
 UITools::setProfile($smarty);
 
-$smarty->display('../templates/profile.tpl');
+$smarty->display('../templates/user.profile.tpl');
