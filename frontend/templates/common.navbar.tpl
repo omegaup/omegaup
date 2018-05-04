@@ -71,6 +71,14 @@
 								</ul>
 							</li>
 						{/if} <!-- CURRENT_USER_IS_ADMIN -->
+						{else}
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+						{if $LOGGED_IN eq '1'}
+							<li>{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span></li>
+						{else}
+							<li><a href="/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}">{#navLogIn#}</a></li>
+						{/if}
 						{/if} <!-- OMEGAUP_LOCKDOWN -->
 						</ul>
 					</div>
