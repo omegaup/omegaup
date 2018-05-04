@@ -780,7 +780,7 @@ class RunsDAO extends RunsDAOBase {
                         `Problemset_Problem_Opened` ppo
                         ON (ppo.problemset_id = r.problemset_id
                             AND r.problem_id = ppo.problem_id)
-                    LEFT JOIN
+                    INNER JOIN
                         `Identities` i
                         ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
@@ -795,7 +795,7 @@ class RunsDAO extends RunsDAOBase {
                         `Problemset_Problem_Opened` ppo
                         ON (ppo.problemset_id = r.problemset_id
                             AND r.problem_id = ppo.problem_id)
-                    LEFT JOIN
+                    INNER JOIN
                         `Identities`
                         ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
