@@ -1,5 +1,6 @@
 <?php
 
+require_once('libs/ActivityReport.php');
 /**
  *  CourseController
  *
@@ -1374,6 +1375,27 @@ class CourseController extends Controller {
         return self::getCommonCourseDetails($r, false /*onlyIntroDetails*/);
     }
 
+    /**
+     * Returns a report with all user activity for a course.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiActivityReport(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseExists($r, 'course_alias');
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($r['course']->course_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForCourse($r['course']->course_id);
+
+        return ActivityReport::getActivityReport($accesses, $submissions);
+    }
+
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
@@ -1449,7 +1471,12 @@ class CourseController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
+        // Log the operation.
+        ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+            'user_id' => $r['current_user_id'],
+            'problemset_id' => $r['assignment']->problemset_id,
+            'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+        ]));
         return [
             'status' => 'ok',
             'name' => $r['assignment']->name,
