@@ -47,15 +47,13 @@
           </tbody>
         </table>
       </div>
-      <h3>{{ T.wordsSource }}</h3>
-      <omegaup-arena-codemirror ref="cm-wrapper"
+      <h3>{{ T.wordsSource }}</h3><omegaup-arena-codemirror ref="cm-wrapper"
            v-bind:options="editorOptions"
            v-bind:value="data.source"
            v-if="data.source_link">
         <a download="data.zip"
              v-bind:href="data.source">{{ T.wordsDownload }}</a>
-      </omegaup-arena-codemirror>
-      <omegaup-arena-codemirror ref="cm-wrapper"
+      </omegaup-arena-codemirror> <omegaup-arena-codemirror ref="cm-wrapper"
            v-bind:options="editorOptions"
            v-bind:value="data.source"
            v-else></omegaup-arena-codemirror>
