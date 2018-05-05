@@ -48,14 +48,17 @@
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3>
-      <pre class="source"
-           v-if="data.source_link">
+      <omegaup-arena-codemirror ref="cm-wrapper"
+        v-if="data.source_link"
+        v-bind:options="editorOptions"
+        v-bind:value="data.source">
         <a download="data.zip"
-     v-bind:href="data.source">{{ T.wordsDownload }}</a>
-      </pre>
-      <pre class="source"
-           v-else=""
-           v-text="data.source"></pre>
+          v-bind:href="data.source">{{ T.wordsDownload }}</a>  
+      </omegaup-arena-codemirror>
+      <omegaup-arena-codemirror ref="cm-wrapper"
+        v-else=""
+        v-bind:options="editorOptions"
+        v-bind:value="data.source"></omegaup-arena-codemirror>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
@@ -98,21 +101,55 @@
 
 <script>
 import {T} from '../../omegaup.js';
+import {codemirror} from 'vue-codemirror-lite';
+
+const languageModeMap = {
+  'c': 'text/x-csrc',
+  'cpp': 'text/x-c++src',
+  'java': 'text/x-java',
+  'py': 'text/x-python',
+  'rb': 'text/x-ruby',
+  'pl': 'text/x-perl',
+  'cs': 'text/x-csharp',
+  'pas': 'text/x-pascal',
+  'cat': 'text/plain',
+  'hs': 'text/x-haskell',
+  'cpp11': 'text/x-c++src',
+  'lua': 'text/x-lua',
+};
+
+// Preload all language modes.
+const modeList =
+    ['clike', 'python', 'ruby', 'perl', 'pascal', 'haskell', 'lua'];
+for (const mode of modeList) {
+  require('codemirror/mode/' + mode + '/' + mode + '.js');
+}
+
 export default {
   props: {
     data: Object,
   },
+  components: {
+    'omegaup-arena-codemirror': codemirror,
+  },
   data: function() {
     return {
-      T: T, groupVisible: {}
+      T: T, groupVisible: {},
     }
+  },
+  computed: {
+    editorOptions: function() {
+      return {
+        tabSize: 2, lineNumbers: true, mode: languageModeMap[this.data.language], readOnly: true
+      }
+    },
   },
   methods: {
     toggle(group) {
       const visible = this.groupVisible[group];
       this.$set(this.groupVisible, group, !visible);
     },
-  }
+  },
 }
 </script>
 
