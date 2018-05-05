@@ -134,7 +134,7 @@ export default {
   },
   data: function() {
     return {
-      T: T, groupVisible: {},
+      T: T, groupVisible: {}
     }
   },
   computed: {
@@ -149,7 +149,7 @@ export default {
       const visible = this.groupVisible[group];
       this.$set(this.groupVisible, group, !visible);
     },
-  },
+  }
 }
 </script>
 
