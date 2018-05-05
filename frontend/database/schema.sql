@@ -8,7 +8,7 @@
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ACLs` (
   `acl_id` int(11) NOT NULL AUTO_INCREMENT,
-  `owner_id` int(11) NOT NULL COMMENT 'El usuario que creÃ³ el objeto y que tiene un rol de administrador implÃ­cito',
+  `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
   PRIMARY KEY (`acl_id`),
   KEY `fk_au_owner_id` (`owner_id`),
   CONSTRAINT `fk_au_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -24,7 +24,7 @@ CREATE TABLE `Announcement` (
   PRIMARY KEY (`announcement_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_au_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajerÃ­a dentro del sitio.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -41,7 +41,7 @@ CREATE TABLE `Assignments` (
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
-  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de apariciÃ³n de los problemas/tareas',
+  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
@@ -60,7 +60,7 @@ CREATE TABLE `Auth_Tokens` (
   PRIMARY KEY (`token`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorizaciÃ³n para los logins.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorización para los logins.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -77,14 +77,14 @@ CREATE TABLE `Badges` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Clarifications` (
   `clarification_id` int(11) NOT NULL AUTO_INCREMENT,
-  `author_id` int(11) NOT NULL COMMENT 'Autor de la clarificaciÃ³n.',
-  `receiver_id` int(11) DEFAULT NULL COMMENT 'Usuario que recibirÃ¡ el mensaje',
+  `author_id` int(11) NOT NULL COMMENT 'Autor de la clarificación.',
+  `receiver_id` int(11) DEFAULT NULL COMMENT 'Usuario que recibirá el mensaje',
   `message` text NOT NULL,
   `answer` text,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `problem_id` int(11) DEFAULT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.',
   `problemset_id` int(11) NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'SÃ³lo las clarificaciones que el problemsetter marque como publicables aparecerÃ¡n en la lista que todos pueden ver.',
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
   KEY `author_id` (`author_id`),
@@ -102,14 +102,14 @@ CREATE TABLE `Coder_Of_The_Month` (
   `coder_of_the_month_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `description` tinytext,
-  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes.',
+  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histÃ³rico de coders del mes de forma sencilla.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -125,7 +125,7 @@ CREATE TABLE `Contest_Log` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_cl_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla funcionarÃ¡ para poder ordenar los concursos que se vuelven pÃºblicos y no se pierdan entre el resto';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla funcionará para poder ordenar los concursos que se vuelven públicos y no se pierdan entre el resto';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -137,25 +137,25 @@ CREATE TABLE `Contests` (
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de cada concurso.',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este concurso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
-  `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizÃ³ de privado a pÃºblico un concurso o viceversa',
-  `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso',
-  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algÃºn concurso',
+  `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizó de privado a público un concurso o viceversa',
+  `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
+  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `alias` varchar(32) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
-  `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible',
+  `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
+  `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
-  `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos',
-  `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro',
+  `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
+  `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro',
   `feedback` enum('no','yes','partial') NOT NULL,
-  `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted',
-  `penalty_type` enum('contest_start','problem_open','runtime','none') NOT NULL COMMENT 'Indica la polÃ­tica de cÃ¡lculo de penalty: minutos desde que iniciÃ³ el concurso, minutos desde que se abriÃ³ el problema, o tiempo de ejecuciÃ³n (en milisegundos).',
+  `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
+  `penalty_type` enum('contest_start','problem_open','runtime','none') NOT NULL COMMENT 'Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).',
   `penalty_calc_policy` enum('sum','max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
-  `show_scoreboard_after` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Mostrar el scoreboard automÃ¡ticamente despuÃ©s del concurso',
+  `show_scoreboard_after` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Mostrar el scoreboard automáticamente después del concurso',
   `scoreboard_url` varchar(30) DEFAULT NULL,
   `scoreboard_url_admin` varchar(30) DEFAULT NULL,
   `urgent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
   `contestant_must_register` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica que los participantes deben pre-registrarse antes de poder paticipar',
-  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de quÃ© lenguajes se pueden usar en un concurso',
+  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Mostrar el concurso en la lista de recomendados.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
@@ -174,7 +174,7 @@ CREATE TABLE `Countries` (
   `country_id` char(3) NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -189,8 +189,8 @@ CREATE TABLE `Courses` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
   `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
   `school_id` int(11) DEFAULT NULL,
-  `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sÃ³lo si ya llenÃ³ su informaciÃ³n de perfil',
-  `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita informaciÃ³n de los participantes para contactarlos posteriormente.',
+  `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
+  `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
@@ -260,7 +260,7 @@ CREATE TABLE `Groups` (
 CREATE TABLE `Groups_Identities` (
   `group_id` int(11) NOT NULL,
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
-  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si estÃ¡ de acuerdo en divulgar su informaciÃ³n.',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
@@ -331,7 +331,7 @@ CREATE TABLE `Interviews` (
   `alias` varchar(32) NOT NULL COMMENT 'El alias de la entrevista',
   `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
-  `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envÃ­ar soluciones.',
+  `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.',
   PRIMARY KEY (`interview_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
@@ -344,12 +344,12 @@ CREATE TABLE `Interviews` (
 CREATE TABLE `Languages` (
   `language_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `country_id` char(3) DEFAULT NULL COMMENT 'Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido.',
+  `country_id` char(3) DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.',
   PRIMARY KEY (`language_id`),
   UNIQUE KEY `nombre_UNIQUE` (`name`),
   KEY `country_id` (`country_id`),
   CONSTRAINT `fk_l_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarÃ­an.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarían.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -365,14 +365,14 @@ CREATE TABLE `Messages` (
   KEY `fk_m_recipient_id` (`recipient_id`),
   CONSTRAINT `fk_m_recipient_id` FOREIGN KEY (`recipient_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_m_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajerÃ­a dentro del sitio.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
   `permission_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
-  `description` varchar(100) NOT NULL COMMENT 'La descripciÃ³n humana del permiso.',
+  `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los roles.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -436,7 +436,7 @@ CREATE TABLE `Problems_Badges` (
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_pb_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `Badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='RelaciÃ³n entre 1 badge y los problemas que lo desbloqueaan.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relación entre 1 badge y los problemas que lo desbloqueaan.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -475,17 +475,17 @@ CREATE TABLE `Problemset_Access_Log` (
   KEY `fk_palu_user_id` (`user_id`),
   CONSTRAINT `fk_palc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_palu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='BitÃ¡cora de acceso a listas de problemas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a listas de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problemset_Identities` (
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `problemset_id` int(11) NOT NULL,
-  `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entrÃ³ el usuario al concurso',
+  `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
-  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si estÃ¡ de acuerdo en divulgar su informaciÃ³n.',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
@@ -547,7 +547,7 @@ CREATE TABLE `Problemset_Problems` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
   `points` double NOT NULL DEFAULT '1',
-  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de apariciÃ³n de los problemas en una lista de problemas',
+  `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
   PRIMARY KEY (`problemset_id`,`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
@@ -559,12 +559,12 @@ CREATE TABLE `Problemset_Problems` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problemsets` (
-  `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador Ãºnico para cada conjunto de problemas',
+  `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
   `access_mode` enum('private','public','registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
-  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de quÃ© lenguajes se pueden usar para resolver los problemas',
-  `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sÃ³lo si ya llenÃ³ su informaciÃ³n de perfil',
-  `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita informaciÃ³n de los participantes para contactarlos posteriormente.',
+  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
+  `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
+  `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   PRIMARY KEY (`problemset_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -575,7 +575,7 @@ CREATE TABLE `Problemsets` (
 CREATE TABLE `QualityNomination_Comments` (
   `qualitynomination_comment_id` int(11) NOT NULL AUTO_INCREMENT,
   `qualitynomination_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL COMMENT 'El usuario que emitiÃ³ el comentario',
+  `user_id` int(11) NOT NULL COMMENT 'El usuario que emitió el comentario',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de este comentario',
   `vote` tinyint(1) NOT NULL COMMENT 'El voto emitido en este comentario. En el rango de [-2, +2]',
   `contents` text NOT NULL COMMENT 'El contenido de el comentario',
@@ -584,7 +584,7 @@ CREATE TABLE `QualityNomination_Comments` (
   KEY `qualitynomination_id` (`qualitynomination_id`),
   CONSTRAINT `fk_qnc_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qnc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominación';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -601,29 +601,29 @@ CREATE TABLE `QualityNomination_Log` (
   KEY `qualitynomination_id` (`qualitynomination_id`),
   CONSTRAINT `fk_qnl_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qnl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='BitÃ¡cora de cambios a nominaciones';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de cambios a nominaciones';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `QualityNomination_Reviewers` (
   `qualitynomination_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominaciÃ³n',
+  `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
   PRIMARY KEY (`qualitynomination_id`,`user_id`),
   KEY `fk_qnr_user_id` (`user_id`),
   CONSTRAINT `fk_qnr_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qnr_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominación';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `QualityNominations` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL COMMENT 'El usuario que nominÃ³ el problema',
+  `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
-  `nomination` enum('suggestion','promotion','demotion','dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominaciÃ³n',
-  `contents` text NOT NULL COMMENT 'Un blob json con el contenido de la nominaciÃ³n',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominaciÃ³n',
-  `status` enum('open','approved','denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominaciÃ³n',
+  `nomination` enum('suggestion','promotion','demotion','dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
+  `contents` text NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
+  `status` enum('open','approved','denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
   PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
@@ -631,14 +631,14 @@ CREATE TABLE `QualityNominations` (
   KEY `idx_nomination_problem` (`nomination`,`problem_id`),
   CONSTRAINT `fk_qn_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominaciÃ³n a promociÃ³n / demociÃ³n de problemas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominación a promoción / democión de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Roles` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del rol.',
-  `description` varchar(100) NOT NULL COMMENT 'La descripciÃ³n humana del rol.',
+  `description` varchar(100) NOT NULL COMMENT 'La descripción humana del rol.',
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -705,7 +705,7 @@ CREATE TABLE `Schools` (
   KEY `state_id` (`country_id`,`state_id`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -716,7 +716,7 @@ CREATE TABLE `States` (
   PRIMARY KEY (`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   CONSTRAINT `fk_stc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -732,7 +732,7 @@ CREATE TABLE `Submission_Log` (
   CONSTRAINT `fk_slp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_slu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='BitÃ¡cora de envÃ­os';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -751,7 +751,7 @@ CREATE TABLE `User_Login_Log` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ullu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='BitÃ¡cora de inicios de sesiÃ³n exitosos';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -823,8 +823,8 @@ CREATE TABLE `Users` (
   `recruitment_optin` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
   `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
-  `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligiÃ³ no compartir su informaciÃ³n de manera pÃºblica',
-  `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programaciÃ³n de preferencia de este usuario',
+  `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',
+  `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `country_id` (`country_id`),
