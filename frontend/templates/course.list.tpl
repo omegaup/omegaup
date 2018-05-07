@@ -14,6 +14,7 @@
                     <th>{#wordsEndTime#}</th>
                     <th>{#wordsNumHomeworks#}</th>
                     <th>{#wordsNumTests#}</th>
+                    <th>{#wordsActions#}</th>
                 </tr>
             </thead>
             <tbody data-bind="foreach: course">
@@ -23,6 +24,7 @@
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>
                     <td data-bind="text: numTests"></td>
+                    <td><a data-bind="text: activity, attr: { href: activityURL }" /></td>
                 </tr>
             </tbody>
         </table>

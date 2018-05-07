@@ -1,6 +1,7 @@
 <?php
 
 require_once('libs/dao/Contests.dao.php');
+require_once('libs/ActivityReport.php');
 
 /**
  * ContestController
@@ -733,75 +734,10 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($problemset);
-        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($problemset);
+        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($r['contest']->problemset_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($r['contest']->problemset_id);
 
-        // Merge both logs.
-        $result['events'] = [];
-        $lenAccesses = count($accesses);
-        $lenSubmissions = count($submissions);
-        $iAccesses = 0;
-        $iSubmissions = 0;
-
-        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
-            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($result['events'], ContestController::processAccess(
-                    $accesses[$iAccesses++]
-                ));
-            } else {
-                array_push($result['events'], ContestController::processSubmission(
-                    $submissions[$iSubmissions++]
-                ));
-            }
-        }
-
-        while ($iAccesses < $lenAccesses) {
-            array_push($result['events'], ContestController::processAccess(
-                $accesses[$iAccesses++]
-            ));
-        }
-
-        while ($iSubmissions < $lenSubmissions) {
-            array_push($result['events'], ContestController::processSubmission(
-                $submissions[$iSubmissions++]
-            ));
-        }
-
-        // Anonimize data.
-        $ipMapping = [];
-        foreach ($result['events'] as &$entry) {
-            if (!array_key_exists($entry['ip'], $ipMapping)) {
-                $ipMapping[$entry['ip']] = count($ipMapping);
-            }
-            $entry['ip'] = $ipMapping[$entry['ip']];
-        }
-
-        $result['status'] = 'ok';
-        return $result;
-    }
-
-    private static function processAccess(&$access) {
-        return [
-            'username' => $access['username'],
-            'time' => (int)$access['time'],
-            'ip' => (int)$access['ip'],
-            'event' => [
-                'name' => 'open',
-            ],
-        ];
-    }
-
-    private static function processSubmission(&$submission) {
-        return [
-            'username' => $submission['username'],
-            'time' => (int)$submission['time'],
-            'ip' => (int)$submission['ip'],
-            'event' => [
-                'name' => 'submit',
-                'problem' => $submission['alias'],
-            ],
-        ];
+        return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
     /**
