@@ -48,16 +48,16 @@
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3><omegaup-arena-code-view ref="cm-wrapper"
-           v-bind:value="data.source"
            v-bind:language="data.language"
-           v-bind:readOnly="true"
+           v-bind:readonly="true"
+           v-bind:value="data.source"
            v-if="data.source_link">
         <a download="data.zip"
              v-bind:href="data.source">{{ T.wordsDownload }}</a>
       </omegaup-arena-code-view> <omegaup-arena-code-view ref="cm-wrapper"
-           v-bind:value="data.source"
            v-bind:language="data.language"
-           v-bind:readOnly="true"
+           v-bind:readonly="true"
+           v-bind:value="data.source"
            v-else></omegaup-arena-code-view>
       <div class="compile_error"
            v-if="data.compile_error">
