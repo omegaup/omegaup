@@ -2270,7 +2270,7 @@ class ContestController extends Controller {
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
-            $r['user'] = UserController::resolveUser($r['username']);
+            $r['identity'] = IdentityController::resolveIdentity($r['username']);
         }
     }
 
@@ -2296,7 +2296,7 @@ class ContestController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );
