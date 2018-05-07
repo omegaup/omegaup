@@ -47,16 +47,18 @@
           </tbody>
         </table>
       </div>
-      <h3>{{ T.wordsSource }}</h3><omegaup-arena-codemirror ref="cm-wrapper"
-           v-bind:options="editorOptions"
+      <h3>{{ T.wordsSource }}</h3><omegaup-arena-code-view ref="cm-wrapper"
            v-bind:value="data.source"
+           v-bind:language="data.language"
+           v-bind:readOnly="true"
            v-if="data.source_link">
         <a download="data.zip"
              v-bind:href="data.source">{{ T.wordsDownload }}</a>
-      </omegaup-arena-codemirror> <omegaup-arena-codemirror ref="cm-wrapper"
-           v-bind:options="editorOptions"
+      </omegaup-arena-code-view> <omegaup-arena-code-view ref="cm-wrapper"
            v-bind:value="data.source"
-           v-else></omegaup-arena-codemirror>
+           v-bind:language="data.language"
+           v-bind:readOnly="true"
+           v-else></omegaup-arena-code-view>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
@@ -99,49 +101,19 @@
 
 <script>
 import {T} from '../../omegaup.js';
-import {codemirror} from 'vue-codemirror-lite';
-
-const languageModeMap = {
-  'c': 'text/x-csrc',
-  'cpp': 'text/x-c++src',
-  'java': 'text/x-java',
-  'py': 'text/x-python',
-  'rb': 'text/x-ruby',
-  'pl': 'text/x-perl',
-  'cs': 'text/x-csharp',
-  'pas': 'text/x-pascal',
-  'cat': 'text/plain',
-  'hs': 'text/x-haskell',
-  'cpp11': 'text/x-c++src',
-  'lua': 'text/x-lua',
-};
-
-// Preload all language modes.
-const modeList =
-    ['clike', 'python', 'ruby', 'perl', 'pascal', 'haskell', 'lua'];
-for (const mode of modeList) {
-  require('codemirror/mode/' + mode + '/' + mode + '.js');
-}
+import arena_CodeView from './CodeView.vue';
 
 export default {
   props: {
     data: Object,
   },
   components: {
-    'omegaup-arena-codemirror': codemirror,
+    'omegaup-arena-code-view': arena_CodeView,
   },
   data: function() {
     return {
       T: T, groupVisible: {}
     }
-  },
-  computed: {
-    editorOptions: function() {
-      return {
-        tabSize: 2, lineNumbers: true,
-            mode: languageModeMap[this.data.language], readOnly: true
-      }
-    },
   },
   methods: {
     toggle(group) {
