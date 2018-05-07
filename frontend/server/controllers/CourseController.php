@@ -109,6 +109,17 @@ class CourseController extends Controller {
 
         Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
 
+        if (empty($r['school_id'])) {
+            $r['school'] = null;
+            $r['school_id'] = null;
+        } else {
+            $r['school'] = SchoolsDAO::getByPK($r['school_id']);
+            if (is_null($r['school'])) {
+                throw new InvalidParameterException('schoolNotFound');
+            }
+            $r['school_id'] = $r['school']->school_id;
+        }
+
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional.
         $start_time = null;
@@ -301,7 +312,7 @@ class CourseController extends Controller {
                 'alias' => $r['alias'],
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
-                'school_id' => $r['school_id'],
+                'school_id' => is_null($r['school']) ? null : $r['school']->school_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
@@ -980,7 +991,7 @@ class CourseController extends Controller {
         try {
             $assignments = CoursesDAO::getAssignmentsProgress(
                 $r['course']->course_id,
-                $r['current_user_id']
+                $r['current_identity_id']
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
