@@ -23,6 +23,10 @@ def test_create_user(driver):
     with driver.login(username, password):
         pass
 
+    errors = util.check_errors_log(driver)
+    if len(errors) != 0:
+        assert False, '\n'.join(errors)
+
 
 @flaky
 def test_login(driver):
@@ -33,6 +37,10 @@ def test_login(driver):
 
     with driver.login_admin():
         pass
+
+    errors = util.check_errors_log(driver)
+    if len(errors) != 0:
+        assert False, '\n'.join(errors)
 
 
 @flaky
@@ -72,15 +80,12 @@ def test_create_problem(driver):
         with driver.ajax_page_transition(wait_for_ajax=False):
             contents_element.submit()
 
-        try:
-            for entry in driver.browser.get_log('browser'):
-                if entry['level'] == 'SEVERE':
-                    print(entry['message'])
-        except:  # pylint: disable=bare-except
-            pass
-
         assert (('/problem/%s/edit/' % problem_alias) in
                 driver.browser.current_url), driver.browser.current_url
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
 
     with driver.login_user():
         driver.wait.until(
@@ -106,3 +111,7 @@ def test_create_problem(driver):
                  '//a[text() = "%s"]' % problem_alias))).click()
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)

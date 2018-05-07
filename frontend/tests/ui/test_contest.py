@@ -70,6 +70,10 @@ def test_create_contest(driver):
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
 
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
+
 
 @flaky
 def test_user_ranking_contest(driver):
@@ -126,6 +130,10 @@ def test_user_ranking_contest(driver):
         run_wrong_user = driver.browser.find_element_by_xpath(
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
 
 
 def create_contest_admin(driver, contest_alias, problem, users, user):

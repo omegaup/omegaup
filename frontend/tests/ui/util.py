@@ -31,3 +31,17 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
         driver.wait.until(
             EC.element_to_be_clickable(submit_locator)).click()
         driver.wait_for_page_loaded()
+
+
+def check_errors_log(driver):
+    ''' Checks whether there is an error or warning in javascript console'''
+    try:
+        log = []
+        for entry in driver.browser.get_log('browser'):
+            if entry['level'] == 'SEVERE':
+                log.append('%s in %s' % (entry['message'],
+                                         driver.browser.current_url))
+    except:  # pylint: disable=bare-except
+        pass
+
+    return log

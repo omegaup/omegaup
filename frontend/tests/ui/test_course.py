@@ -35,8 +35,16 @@ def test_create_course(driver):
 
         add_problem_to_assignment(driver, assignment_alias, problem)
 
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
+
     with driver.login_user():
         enter_course(driver, course_alias, assignment_alias)
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
 
 
 @flaky
@@ -56,6 +64,10 @@ def test_user_ranking_course(driver):
         add_students_course(driver, [user])
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
 
     with driver.login(user, user):
         enter_course(driver, course_alias, assignment_alias)
@@ -94,6 +106,10 @@ def test_user_ranking_course(driver):
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
 
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
+
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -121,6 +137,10 @@ def test_user_ranking_course(driver):
 
         assert driver.browser.find_element_by_css_selector(
             'td.score').text == '100'
+
+        errors = util.check_errors_log(driver)
+        if len(errors) != 0:
+            assert False, '\n'.join(errors)
 
 
 def create_course(driver, course_alias, school_name):
