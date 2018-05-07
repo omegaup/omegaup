@@ -320,14 +320,14 @@ class Problems extends VO {
     /**
       * Valores del histograma de calidad del problema.
       * @access public
-      * @var json
+      * @var text
       */
     public $quality_histogram;
 
     /**
       * Valores del histograma de dificultad del problema.
       * @access public
-      * @var json
+      * @var text
       */
     public $difficulty_histogram;
 }
