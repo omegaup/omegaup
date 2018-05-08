@@ -507,6 +507,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemEditFormHelp: "(H31p)",
 	problemEditFormHereIsHowToWriteProblems: "(H3r3 i5 h0w 70 wri73 7h3 fi13)",
 	problemEditFormHowToWriteProblems: "(H0w 70 wri73 7h3 fi13)",
+	problemEditFormInputLimit: "(Inpu7 1imi7 (by735))",
 	problemEditFormLanguages: "(Languag35)",
 	problemEditFormLiteral: "(In73rpr37 57d0u7 a5 5c0r3)",
 	problemEditFormMemoryLimit: "(M3m0ry 1imi7 (KiB))",

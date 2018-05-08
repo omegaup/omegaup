@@ -314,6 +314,36 @@ class ProblemDeployer {
     }
 
     /**
+     * Gets the maximum input file size. Returns -1 if there is a
+     * custom validator.
+     *
+     * @param string $alias
+     * @throws InvalidFilesystemOperationException
+     */
+    public function getInputLimit() {
+        if ($this->hasValidator) {
+            return -1;
+        }
+
+        $dirpath = "$this->tmpDir/cases/in";
+
+        $input_limit = 10240;
+
+        if ($handle = opendir($dirpath)) {
+            while (false !== ($entry = readdir($handle))) {
+                if (!ProblemDeployer::endsWith($entry, '.in', true)) {
+                    continue;
+                }
+
+                $input_limit = max($input_limit, filesize("$dirpath/$entry"));
+            }
+            closedir($handle);
+        }
+
+        return (int)(($input_limit + 4095) / 4096 + 1) * 4096;
+    }
+
+    /**
      * Calculates if this problem should go into the slow queue.
      * A slow problem takes 30s or more to judge.
      *

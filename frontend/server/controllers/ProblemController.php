@@ -115,6 +115,7 @@ class ProblemController extends Controller {
         Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
         Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
         Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -155,6 +156,7 @@ class ProblemController extends Controller {
         $problem->extra_wall_time = $r['extra_wall_time'];
         $problem->memory_limit = $r['memory_limit'];
         $problem->output_limit = $r['output_limit'];
+        $problem->input_limit = $r['input_limit'];
         $problem->visits = 0;
         $problem->submissions = 0;
         $problem->accepted = 0;
@@ -184,11 +186,15 @@ class ProblemController extends Controller {
             }
             $problem->slow = $problemDeployer->isSlow($problem);
 
-            // Calculate output limit.
+            // Calculate input and output limit.
             $output_limit = $problemDeployer->getOutputLimit();
+            $input_limit = $problemDeployer->getInputLimit();
 
             if ($output_limit != -1) {
                 $problem->output_limit = $output_limit;
+            }
+            if ($input_limit != -1) {
+                $problem->input_limit = $input_limit;
             }
 
             // Save the contest object with data sent by user to the database
@@ -715,6 +721,7 @@ class ProblemController extends Controller {
             'extra_wall_time' => ['important' => true], // requires rejudge
             'memory_limit'  => ['important' => true], // requires rejudge
             'output_limit'  => ['important' => true], // requires rejudge
+            'input_limit'  => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
@@ -749,11 +756,15 @@ class ProblemController extends Controller {
                 // This must come before the commit in case isSlow throws an exception.
                 $problem->slow = $problemDeployer->isSlow($problem);
 
-                // Calculate output limit.
+                // Calculate input and output limit.
                 $output_limit = $problemDeployer->getOutputLimit();
+                $input_limit = $problemDeployer->getInputLimit();
 
                 if ($output_limit != -1) {
                     $r['problem']->output_limit = $output_limit;
+                }
+                if ($input_limit != -1) {
+                    $r['problem']->input_limit = $input_limit;
                 }
 
                 $response['uploaded_files'] = $problemDeployer->filesToUnzip;
@@ -1200,9 +1211,9 @@ class ProblemController extends Controller {
         // Create array of relevant columns
         $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
-            'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
-            'languages', 'slow', 'email_clarifications'];
+            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
+            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
+            'visibility','languages', 'slow', 'email_clarifications'];
 
         $language = $r['lang'];
         $file_content = ProblemController::getProblemStatement(

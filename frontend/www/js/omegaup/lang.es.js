@@ -507,6 +507,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemEditFormHelp: "Ayuda",
 	problemEditFormHereIsHowToWriteProblems: "Aqu\u00ed est\u00e1 c\u00f3mo crear el archivo",
 	problemEditFormHowToWriteProblems: "C\u00f3mo crear el archivo",
+	problemEditFormInputLimit: "L\u00edmite de entrada (bytes)",
 	problemEditFormLanguages: "Lenguajes",
 	problemEditFormLiteral: "Interpretar salida est\u00e1ndar como puntaje",
 	problemEditFormMemoryLimit: "L\u00edmite de memoria (KiB)",
