@@ -49,7 +49,7 @@ class IdentityLoginLog extends VO {
     }
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * @access public
       * @var int(11)
       */

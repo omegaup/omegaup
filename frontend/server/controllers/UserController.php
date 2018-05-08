@@ -186,8 +186,7 @@ class UserController extends Controller {
 
         return [
             'status' => 'ok',
-            'user_id' => $user->user_id,
-            'identity_id' => $identity->identity_id,
+            'username' => $identity->username,
         ];
     }
 
