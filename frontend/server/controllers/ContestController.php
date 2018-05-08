@@ -111,16 +111,9 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
-            //if (is_array($c)) {
-                $contestInfo = $c;
-                $contestInfo['duration'] = (is_null($c['window_length']) ?
-                                $c['finish_time'] - $c['start_time'] : ($c['window_length'] * 60));
-            /*} else {
-                $contestInfo = $c->asFilteredArray($relevantColumns);
-
-                $contestInfo['duration'] = (is_null($c->window_length) ?
-                                $c->finish_time - $c->start_time : ($c->window_length * 60));
-            }*/
+            $contestInfo = $c;
+            $contestInfo['duration'] = (is_null($c['window_length']) ?
+                            $c['finish_time'] - $c['start_time'] : ($c['window_length'] * 60));
 
             $addedContests[] = $contestInfo;
         }
