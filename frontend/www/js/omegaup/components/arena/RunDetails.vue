@@ -47,14 +47,12 @@
           </tbody>
         </table>
       </div>
-      <h3>{{ T.wordsSource }}</h3>
-      <a download="data.zip"
-             v-bind:href="data.source"
-             v-if="data.source_link">{{ T.wordsDownload }}</a>
-      <omegaup-arena-code-view
-           v-bind:language="data.language"
-           v-bind:readOnly="true"
-           v-bind:value="data.source"></omegaup-arena-code-view> 
+      <h3>{{ T.wordsSource }}</h3><a download="data.zip"
+           v-bind:href="data.source"
+           v-if="data.source_link">{{ T.wordsDownload }}</a>
+           <omegaup-arena-code-view v-bind:language="data.language"
+           v-bind:readonly="true"
+           v-bind:value="data.source"></omegaup-arena-code-view>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
