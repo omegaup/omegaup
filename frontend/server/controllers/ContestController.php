@@ -111,16 +111,16 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $c) {
-            if (is_array($c)) {
+            //if (is_array($c)) {
                 $contestInfo = $c;
                 $contestInfo['duration'] = (is_null($c['window_length']) ?
                                 $c['finish_time'] - $c['start_time'] : ($c['window_length'] * 60));
-            } else {
+            /*} else {
                 $contestInfo = $c->asFilteredArray($relevantColumns);
 
                 $contestInfo['duration'] = (is_null($c->window_length) ?
                                 $c->finish_time - $c->start_time : ($c->window_length * 60));
-            }
+            }*/
 
             $addedContests[] = $contestInfo;
         }
@@ -226,8 +226,13 @@ class ContestController extends Controller {
         }
 
         $addedContests = [];
-        foreach ($contests as $contest) {
+        foreach ($contests as $index => $contest) {
             $addedContests[] = $contest;
+            foreach ($contest as $key => $item) {
+                if ($key ==  'start_time' || $key ==  'finish_time' || $key ==  'last_updated') {
+                    $addedContests[$index][$key] = strtotime($item);
+                }
+            }
         }
 
         // Expire contest-list cache
@@ -2266,7 +2271,7 @@ class ContestController extends Controller {
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
-            $r['user'] = UserController::resolveUser($r['username']);
+            $r['identity'] = IdentityController::resolveIdentity($r['username']);
         }
     }
 
@@ -2292,7 +2297,7 @@ class ContestController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );

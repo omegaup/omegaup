@@ -226,7 +226,7 @@ class ContestsDAO extends ContestsDAOBase {
         return Time::get() >= strtotime($contest->finish_time);
     }
 
-    public static function getContestsParticipated($user_id) {
+    public static function getContestsParticipated($identity_id) {
         $sql = '
             SELECT
                 c.*,
@@ -248,11 +248,11 @@ class ContestsDAO extends ContestsDAOBase {
                 ON
                     c2.problemset_id = r.problemset_id
                 WHERE
-                    r.user_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
+                    r.identity_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
             )
             ORDER BY
                 contest_id DESC;';
-        $params = [$user_id];
+        $params = [$identity_id];
 
         global $conn;
         return $conn->GetAll($sql, $params);
@@ -442,13 +442,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = $offset;
         $params[] = $pageSize;
 
-        $rs = $conn->Execute($sql, $params);
-
-        $contests = [];
-        foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
-        }
-        return $contests;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -628,16 +622,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
         global $conn;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     final public static function getAllPublicContests(
@@ -681,16 +666,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     final public static function getAllContests(
@@ -730,16 +706,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     public static function getContestForProblemset($problemset_id) {

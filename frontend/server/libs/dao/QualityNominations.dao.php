@@ -19,7 +19,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      */
     const CONFIDENCE = 5;
 
-    public static function getNominationStatusForProblem(Problems $problem, Users $user) {
+    public static function getNominationStatusForProblem(Problems $problem, Identities $identity) {
         $sql = '
             SELECT
                 COUNT(r.run_id) > 0 as solved,
@@ -29,7 +29,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     QualityNominations qnn
                 WHERE
                     qnn.problem_id = p.problem_id AND
-                    qnn.user_id = r.user_id AND
+                    qnn.user_id = i.user_id AND
                     qnn.nomination = \'suggestion\'
                 ) as nominated,
                 (SELECT
@@ -38,7 +38,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     QualityNominations qnd
                 WHERE
                     qnd.problem_id = p.problem_id AND
-                    qnd.user_id = r.user_id AND
+                    qnd.user_id = i.user_id AND
                     qnd.nomination = \'dismissal\'
                 ) as dismissed
             FROM
@@ -47,12 +47,16 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 Runs r
             ON
                 r.problem_id = p.problem_id AND r.verdict = "AC"
+            LEFT JOIN
+                Identities i
+            ON
+                r.identity_id = i.identity_id
             WHERE
-                p.problem_id = ? AND r.user_id = ?;
+                p.problem_id = ? AND i.identity_id = ?;
         ';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $user->user_id]);
+        return $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
     }
 
     /**
@@ -66,8 +70,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     private static function getVotesForNomination($qualitynomination_id) {
         $sql = '
         SELECT
-            u.username,
-            u.name,
+            i.username,
+            i.name,
             COALESCE(qnc.vote, 0) AS vote,
             UNIX_TIMESTAMP(qnc.time) AS time
         FROM
@@ -90,13 +94,13 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     user_id
             )
         INNER JOIN
-            Users u
+            Identities i
         ON
-            u.user_id = qnr.user_id
+            i.user_id = qnr.user_id
         WHERE
             qnr.qualitynomination_id = ?
         ORDER BY
-            u.username;';
+            i.username;';
         global $conn;
 
         $votes = [];
