@@ -11,6 +11,8 @@ omegaup.OmegaUp.on('ready', function() {
       course.numTests = course.counts.test;
       course.submissions_list_url = '/course/' + course.alias + '/list/';
       course.subissions_list = omegaup.T.courseListSubmissionsByGroup;
+      course.activity_url = '/course/' + course.alias + '/activity/';
+      course.activity = omegaup.T.wordsActivityReport;
       if (course.finish_time > Date.now()) {
         current.push(course);
       } else {

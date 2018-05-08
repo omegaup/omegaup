@@ -39,16 +39,8 @@
 					    	</label>
 					    </p>
 					{/if}
-					<p class="accept-teacher">{#contestUserAcceptTeacher#}</p>
-				    <p>
-				    	<label>
-				    		<input type="radio" name="accept-teacher" value="yes"> {#wordsYes#}
-				    	</label>
-				    	<label>
-				    		<input type="radio" name="accept-teacher" value="no"> {#wordsNo#}
-				    	</label>
-				    </p>
-					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg" disabled="true">{#startContest#}</button>
+					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
+					{if $needsBasicInformation || $requestsUserInformation != 'no'} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 

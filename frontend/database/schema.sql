@@ -104,6 +104,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `description` tinytext,
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
+  `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
@@ -419,6 +420,8 @@ CREATE TABLE `Problems` (
   `deprecated` tinyint(1) NOT NULL DEFAULT '0',
   `email_clarifications` tinyint(1) NOT NULL DEFAULT '0',
   `quality` double DEFAULT NULL,
+  `quality_histogram` text COMMENT 'Valores del histograma de calidad del problema.',
+  `difficulty_histogram` text COMMENT 'Valores del histograma de dificultad del problema.',
   PRIMARY KEY (`problem_id`),
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
@@ -486,7 +489,6 @@ CREATE TABLE `Problemset_Identities` (
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
-  `accept_teacher` enum('yes','no') DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si acepta al organizador como su maestro.',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
@@ -668,7 +670,7 @@ CREATE TABLE `Run_Counts` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Runs` (
   `run_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `problem_id` int(11) NOT NULL,
   `problemset_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
@@ -686,12 +688,12 @@ CREATE TABLE `Runs` (
   `judged_by` char(32) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_r_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

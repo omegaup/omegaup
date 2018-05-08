@@ -125,7 +125,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     INNER JOIN
                         Runs ON Runs.problem_id = Problems.problem_id
                     INNER JOIN
-                        Identities ON Identities.identity_id = ? AND Runs.user_id = Identities.user_id
+                        Identities ON Identities.identity_id = ? AND Runs.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
@@ -157,13 +157,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                 LEFT JOIN (
                     SELECT
                         pi.problem_id,
+                        r.identity_id,
                         MAX(r.score) AS score
                     FROM
                         Problems pi
                     INNER JOIN
                         Runs r ON r.problem_id = pi.problem_id
                     INNER JOIN
-                        Identities i ON i.identity_id = ? AND r.user_id = i.user_id
+                        Identities i ON i.identity_id = ? AND r.identity_id = i.identity_id
                     GROUP BY
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
@@ -330,11 +331,11 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetOne($sql, $id);
     }
 
-    final public static function getProblemsSolved($id) {
+    final public static function getProblemsSolved($identity_id) {
         global $conn;
 
-        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.user_id = ? ORDER BY `Problems`.problem_id DESC";
-        $val = [$id];
+        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
+        $val = [$identity_id];
         $rs = $conn->Execute($sql, $val);
 
         $result = [];
@@ -346,36 +347,36 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
-    final public static function getProblemsUnsolvedByUser(
-        $user_id
+    final public static function getProblemsUnsolvedByIdentity(
+        $identity_id
     ) {
         $sql = "
             SELECT DISTINCT
                 p.*
             FROM
-                Users u
+                Identities i
             INNER JOIN
                 Runs r
             ON
-                r.user_id = u.user_id
+                r.identity_id = i.identity_id
             INNER JOIN
                 Problems p
             ON
                 p.problem_id = r.problem_id
             WHERE
-                u.user_id = ?
+                i.identity_id = ?
             AND
                 (SELECT
                     COUNT(*)
                  FROM
                     Runs r2
                  WHERE
-                    r2.user_id = u.user_id AND
+                    r2.identity_id = i.identity_id AND
                     r2.problem_id = p.problem_id AND
                     r2.verdict = 'AC'
                 ) = 0";
 
-        $params = [$user_id];
+        $params = [$identity_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
@@ -387,120 +388,11 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $problems;
     }
 
-    final public static function getSolvedProblemsByContest($contest_alias) {
+    final public static function getSolvedProblemsByUsersOfCourse($course_alias) {
         global $conn;
 
         $sql = "
-            SELECT DISTINCT
-                rp.problem_id,
-                rp.alias,
-                rp.title,
-                i.username
-            FROM
-                Identities i
-            INNER JOIN
-                Problemset_Identities pi
-            ON
-                pi.identity_id = i.identity_id
-            INNER JOIN
-                Contests c
-            ON
-                c.problemset_id = pi.problemset_id
-            INNER JOIN
-                (
-                SELECT
-                    p.problem_id,
-                    p.alias,
-                    p.title,
-                    r.user_id
-                FROM
-                    Runs r
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = r.problem_id
-                    AND r.verdict = 'AC'
-                    AND p.visibility = ?
-                ) rp
-            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
-                rp.user_id = i.user_id
-            WHERE
-                c.alias = ?
-            ORDER BY
-                i.username ASC,
-                rp.problem_id DESC;";
-        $params = [ProblemController::VISIBILITY_PUBLIC, $contest_alias];
-        return $conn->GetAll($sql, $params);
-    }
-
-    final public static function getUnsolvedProblemsByContest(
-        $contest_alias
-    ) {
-        $sql = "
-            SELECT DISTINCT
-                rp.problem_id,
-                rp.alias,
-                rp.title,
-                i.username
-            FROM
-                Identities i
-            INNER JOIN
-                Problemset_Identities pi
-            ON
-                pi.identity_id = i.identity_id
-            INNER JOIN
-                Contests c
-            ON
-                c.problemset_id = pi.problemset_id
-            INNER JOIN
-                (
-                SELECT
-                    pp.problem_id,
-                    pp.alias,
-                    pp.title,
-                    r.user_id
-                FROM
-                    Runs r
-                INNER JOIN
-                    Problems pp
-                ON
-                    pp.problem_id = r.problem_id
-                    AND r.verdict <> 'AC'
-                    AND pp.visibility = ?
-                ) rp
-            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
-                rp.user_id = i.user_id
-            INNER JOIN
-                Problems p
-            ON
-                rp.problem_id = p.problem_id
-            WHERE
-                c.alias = ?
-                AND
-                (SELECT
-                    COUNT(*)
-                 FROM
-                    Runs r2
-                 WHERE
-                    r2.user_id = i.user_id AND
-                    r2.problem_id = p.problem_id AND
-                    r2.verdict = 'AC'
-                ) = 0
-            ORDER BY
-                i.username ASC,
-                rp.problem_id DESC;";
-
-        $params = [ProblemController::VISIBILITY_PUBLIC, $contest_alias];
-
-        global $conn;
-        return $conn->GetAll($sql, $params);
-    }
-
-    final public static function getSolvedProblemsByCourse($course_alias) {
-        global $conn;
-
-        $sql = "
-            SELECT DISTINCT
+            SELECT
                 rp.problem_id,
                 rp.alias,
                 rp.title,
@@ -521,7 +413,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     p.problem_id,
                     p.alias,
                     p.title,
-                    r.user_id
+                    r.identity_id
                 FROM
                     Runs r
                 INNER JOIN
@@ -530,11 +422,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                     p.problem_id = r.problem_id
                     AND r.verdict = 'AC'
                     AND p.visibility = ?
+                GROUP BY
+                    p.problem_id, r.identity_id
                 ) rp
-            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
-                rp.user_id = i.user_id
+            ON
+                rp.identity_id = i.identity_id
             WHERE
                 c.alias = ?
+                AND accept_teacher = 'yes'
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
@@ -542,9 +437,9 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetAll($sql, $params);
     }
 
-    final public static function getUnsolvedProblemsByCourse($course_alias) {
+    final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
         $sql = "
-            SELECT DISTINCT
+            SELECT
                 rp.problem_id,
                 rp.alias,
                 rp.title,
@@ -565,34 +460,29 @@ class ProblemsDAO extends ProblemsDAOBase {
                     pp.problem_id,
                     pp.alias,
                     pp.title,
-                    r.user_id
+                    r.identity_id,
+                    MAX(r.score) AS max_score
                 FROM
                     Runs r
                 INNER JOIN
                     Problems pp
                 ON
                     pp.problem_id = r.problem_id
-                    AND r.verdict <> 'AC'
                     AND pp.visibility = ?
+                GROUP BY
+                    pp.problem_id, r.identity_id
+                HAVING
+                    max_score < 1
                 ) rp
-            ON # TODO: Change this for Identity table when Identity Refactor phase 5 is merged
-                rp.user_id = i.user_id
+            ON
+                rp.identity_id = i.identity_id
             INNER JOIN
                 Problems p
             ON
                 rp.problem_id = p.problem_id
             WHERE
                 c.alias = ?
-                AND
-                (SELECT
-                    COUNT(*)
-                 FROM
-                    Runs r2
-                 WHERE
-                    r2.user_id = i.user_id AND
-                    r2.problem_id = p.problem_id AND
-                    r2.verdict = 'AC'
-                ) = 0
+                AND accept_teacher = 'yes'
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
@@ -603,16 +493,16 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetAll($sql, $params);
     }
 
-    final public static function isProblemSolved(Problems $problem, Users $user) {
+    final public static function isProblemSolved(Problems $problem, $identity_id) {
         $sql = 'SELECT
             COUNT(r.run_id) as solved
         FROM
             Runs AS r
         WHERE
-            r.problem_id = ? AND r.user_id = ? AND r.verdict = "AC";';
+            r.problem_id = ? AND r.identity_id = ? AND r.verdict = "AC";';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $user->user_id])['solved'] > 0;
+        return $conn->GetRow($sql, [$problem->problem_id, $identity_id])['solved'] > 0;
     }
 
     public static function getPrivateCount(Users $user) {
@@ -842,10 +732,10 @@ class ProblemsDAO extends ProblemsDAOBase {
                 gi.identity_id
             FROM
                 Runs r
-            JOIN
+            INNER JOIN
                 Groups_Identities gi
             ON
-                r.user_id = gi.identity_id
+                r.identity_id = gi.identity_id
             WHERE
                 gi.group_id = ?
                 AND r.problem_id = ?)';

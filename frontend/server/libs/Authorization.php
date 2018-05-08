@@ -55,10 +55,8 @@ class Authorization {
             return false;
         }
 
-        // TODO: Change $run->user_id by $run->identity_id when phase 5 is merged
-        $identity = IdentitiesDAO::FindByUserId($run->user_id);
         return (
-            $identity->identity_id === $identity_id ||
+            $run->identity_id === $identity_id ||
             Authorization::canEditRun($identity_id, $run)
         );
     }

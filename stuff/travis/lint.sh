@@ -27,7 +27,6 @@ stage_script() {
 	yarn build
 	yarn test
 
-	python3 stuff/i18n.py --validate < /dev/null
 	python3 stuff/db-migrate.py validate
 	python3.5 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
 }

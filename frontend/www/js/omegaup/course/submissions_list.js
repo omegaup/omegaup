@@ -1,4 +1,4 @@
-import course_SubmissionsList from '../components/contest/SubmissionsList.vue';
+import course_SubmissionsList from '../components/course/SubmissionsList.vue';
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 

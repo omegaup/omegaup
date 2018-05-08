@@ -87,12 +87,7 @@
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-time"
                 v-bind:href="'/contest/' + contest.alias + '/activity/'"
-                v-bind:title="T.contestActivityReport"></a>
-          </td>
-          <td v-if="isAdmin">
-            <a class="glyphicon glyphicon-list-alt"
-                v-bind:href="'/contest/' + contest.alias + '/list/'"
-                v-bind:title="T.contestListSubmissionsByGroup"></a>
+                v-bind:title="T.wordsActivityReport"></a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-print"

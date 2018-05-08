@@ -1,6 +1,7 @@
 <?php
 
 require_once('libs/dao/Contests.dao.php');
+require_once('libs/ActivityReport.php');
 
 /**
  * ContestController
@@ -385,9 +386,7 @@ class ContestController extends Controller {
             $r['current_identity_id'],
             $r['contest']->problemset_id
         );
-        if (!is_null($contestOpened) && !is_null($contestOpened->access_time)
-            && !is_null($contestOpened->accept_teacher)
-        ) {
+        if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
             $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
             return $result;
@@ -527,8 +526,7 @@ class ContestController extends Controller {
             $r['current_identity_id'],
             $r['contest']->problemset_id,
             true,
-            $r['share_user_information'],
-            $r['accept_teacher']
+            $r['share_user_information']
         );
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
@@ -736,75 +734,10 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($problemset);
-        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($problemset);
+        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($r['contest']->problemset_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($r['contest']->problemset_id);
 
-        // Merge both logs.
-        $result['events'] = [];
-        $lenAccesses = count($accesses);
-        $lenSubmissions = count($submissions);
-        $iAccesses = 0;
-        $iSubmissions = 0;
-
-        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
-            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($result['events'], ContestController::processAccess(
-                    $accesses[$iAccesses++]
-                ));
-            } else {
-                array_push($result['events'], ContestController::processSubmission(
-                    $submissions[$iSubmissions++]
-                ));
-            }
-        }
-
-        while ($iAccesses < $lenAccesses) {
-            array_push($result['events'], ContestController::processAccess(
-                $accesses[$iAccesses++]
-            ));
-        }
-
-        while ($iSubmissions < $lenSubmissions) {
-            array_push($result['events'], ContestController::processSubmission(
-                $submissions[$iSubmissions++]
-            ));
-        }
-
-        // Anonimize data.
-        $ipMapping = [];
-        foreach ($result['events'] as &$entry) {
-            if (!array_key_exists($entry['ip'], $ipMapping)) {
-                $ipMapping[$entry['ip']] = count($ipMapping);
-            }
-            $entry['ip'] = $ipMapping[$entry['ip']];
-        }
-
-        $result['status'] = 'ok';
-        return $result;
-    }
-
-    private static function processAccess(&$access) {
-        return [
-            'username' => $access['username'],
-            'time' => (int)$access['time'],
-            'ip' => (int)$access['ip'],
-            'event' => [
-                'name' => 'open',
-            ],
-        ];
-    }
-
-    private static function processSubmission(&$submission) {
-        return [
-            'username' => $submission['username'],
-            'time' => (int)$submission['time'],
-            'ip' => (int)$submission['ip'],
-            'event' => [
-                'name' => 'submit',
-                'problem' => $submission['alias'],
-            ],
-        ];
+        return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
     /**
@@ -2337,7 +2270,7 @@ class ContestController extends Controller {
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
-            $r['user'] = UserController::resolveUser($r['username']);
+            $r['identity'] = IdentityController::resolveIdentity($r['username']);
         }
     }
 
@@ -2363,7 +2296,7 @@ class ContestController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );
@@ -2745,61 +2678,5 @@ class ContestController extends Controller {
         }
 
         return ['status' => 'ok'];
-    }
-
-    /**
-     * Get Problems solved by users of a contest
-     *
-     * @param Request $r
-     * @return Problems array
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiListSolvedProblems(Request $r) {
-        self::authenticateRequest($r);
-        self::validateDetails($r);
-
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
-
-        try {
-            $db_results = ProblemsDAO::getSolvedProblemsByContest($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        $user_problems = [];
-        foreach ($db_results as $problem) {
-            unset($problem['problem_id']);
-            $user_problems[$problem['username']][] = $problem;
-        }
-        return ['status' => 'ok', 'user_problems' => $user_problems];
-    }
-
-    /**
-     * Get Problems unsolved by users of a contest
-     *
-     * @param Request $r
-     * @return Problems array
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiListUnsolvedProblems(Request $r) {
-        self::authenticateRequest($r);
-        self::validateDetails($r);
-
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
-
-        try {
-            $db_results = ProblemsDAO::getUnsolvedProblemsByContest($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        $user_problems = [];
-        foreach ($db_results as $problem) {
-            unset($problem['problem_id']);
-            $user_problems[$problem['username']][] = $problem;
-        }
-        return ['status' => 'ok', 'user_problems' => $user_problems];
     }
 }

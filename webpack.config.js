@@ -4,14 +4,15 @@ var webpack = require('webpack')
 module.exports = {
   entry: {
     omegaup: ['babel-polyfill', './frontend/www/js/omegaup/omegaup.js'],
+    activity_feed: './frontend/www/js/omegaup/activity/feed.js',
     admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
+    coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant: './frontend/www/js/omegaup/contest/list_participant.js',
     contest_scoreboardmerge: './frontend/www/js/omegaup/contest/scoreboardmerge.js',
-    contest_submissions_list: './frontend/www/js/omegaup/contest/submissions_list.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_new: './frontend/www/js/omegaup/course/new.js',

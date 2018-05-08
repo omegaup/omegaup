@@ -77,7 +77,7 @@ class GroupsIdentities extends VO {
     /**
       * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
       * @access public
-      * @var enum('yes',
+      * @var enum('yes','no')
       */
     public $accept_teacher;
 }
