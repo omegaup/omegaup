@@ -52,7 +52,8 @@
            v-if="data.source_link">{{ T.wordsDownload }}</a>
            <omegaup-arena-code-view v-bind:language="data.language"
            v-bind:readonly="true"
-           v-bind:value="data.source"></omegaup-arena-code-view>
+           v-bind:value="data.source"
+           v-else></omegaup-arena-code-view>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
