@@ -61,14 +61,14 @@ class ProblemOfTheWeek extends VO {
     public $problem_of_the_week_id;
 
     /**
-      * El id del problema que fue seleccionado como problema de la semana.
+      * The id of the problem that was chosen as problem of the week.
       * @access public
       * @var int(11)
       */
     public $problem_id;
 
     /**
-      * Fecha no es UNIQUE por si hay más de 1 problema de la semana.
+      * Time is not unique because we plan to have two problems of the week per week.
       * @access public
       * @var date
       */
