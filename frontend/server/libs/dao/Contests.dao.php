@@ -164,11 +164,11 @@ class ContestsDAO extends ContestsDAOBase {
                 INNER JOIN
                     ACLs ON ACLs.acl_id = Contests.acl_id
                 WHERE
-                    ACLs.owner_id = ? AND Contests.alias IS NULL AND Contests.problemset_id = ?
+                    ACLs.owner_id = ? AND Contests.alias IS NULL AND Contests.rerun_id = ?
                 ORDER BY
                     Contests.start_time DESC
                 LIMIT 1;';
-        $params = [$user->user_id, $real_contest->problemset_id];
+        $params = [$user->user_id, $real_contest->contest_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
