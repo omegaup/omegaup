@@ -847,11 +847,10 @@ class ContestController extends Controller {
         // Validate request
         if (isset($r['virtual']) and $r['virtual'] == true) {
             self::validateCreateVirtual($r);
-        }
-        else {
+        } else {
             //there is no rerun id in real contest
             $r['rerun_id'] = 0;
-            $r['problemset_id'] = NULL;
+            $r['problemset_id'] = null;
             self::validateCreateOrUpdate($r);
         }
 
@@ -955,14 +954,13 @@ class ContestController extends Controller {
         }
         try {
             $r['contest'] = ContestsDAO::getVirtualByContest($real_contest, $r['current_user']);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         if (!ContestsDAO::hasFinished($real_contest)) {
             throw new ForbiddenAccessException('realContestHasNotBeenEnded');
-        }
-        else if (!is_null($r['contest']) and !ContestsDAO::hasFinished($r['contest']))  {
+        } elseif (!is_null($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
             throw new ForbiddenAccessException('unfinishedVirtualContest');
         }
 
@@ -974,7 +972,7 @@ class ContestController extends Controller {
         $r['finish_time'] = time() + strtotime($real_contest->finish_time) - strtotime($real_contest->start_time);
         $r['window_length'] = $real_contest->window_length;
         $r['rerun_id'] = $real_contest->contest_id;
-        $r['alias'] = NULL;
+        $r['alias'] = null;
         $r['scoreboard'] = 100; //TODO should this be $real_contest->scoreboard?
         $r['points_decay_factor'] = $real_contest->points_decay_factor;
         $r['partial_score'] = $real_contest->partial_score;
@@ -983,7 +981,7 @@ class ContestController extends Controller {
         $r['penalty_type'] = $real_contest->penalty_type;
         $r['penalty_calc_policy'] = $real_contest->penalty_calc_policy;
         $r['languages'] = $real_contest->languages;
-        $r['show_scoreboard_after'] = NULL; //TODO should this be $real_contest->show_scoreboard_after ?
+        $r['show_scoreboard_after'] = null; //TODO should this be $real_contest->show_scoreboard_after ?
 
         //TODO scoreboard url admin and user?
     }
