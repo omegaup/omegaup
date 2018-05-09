@@ -1,8 +1,5 @@
 # Ignore objects
 *.o
-karel/lib/x86_64-linux/*
-karel/karel
-karel/kcl
 bin/mysql-connector-java-5.1.29.jar
 
 # Ignore temporary files
@@ -35,13 +32,6 @@ grader/lib/
 *.pem
 *.srl
 
-# SBT-related stuff
-target/
-lib_managed/
-src_managed/
-project/target
-project/classes
-
 # ignore frontend config file
 config.php
 frontend/server/config.php
@@ -66,6 +56,7 @@ templates_c
 bin/grader.sh
 frontend/www/runner-distrib.sh
 geckodriver.log
+yarn-error.log
 
 # Ignore Mac crap :P
 frontend/.DS_Store
