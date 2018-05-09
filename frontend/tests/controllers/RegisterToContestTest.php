@@ -75,7 +75,7 @@ class RegisterToContestTest extends OmegaupTestCase {
      */
     public function testShowIntro() {
         $contestant = UserFactory::createUser();
-        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -103,7 +103,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $adminLogin = self::login($contestAdmin);
         $r1 = new Request([
             'contest_alias' => $contestData['request']['alias'],
-            'contestant_must_register' => true,
+            'modality' => 'registration',
             'auth_token' => $adminLogin->auth_token,
         ]);
         ContestController::apiUpdate($r1);
@@ -180,7 +180,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $adminLogin = self::login($contestAdmin);
         $r1 = new Request([
             'contest_alias' => $contestData['request']['alias'],
-            'contestant_must_register' => true,
+            'modality' => 'registration',
             'auth_token' => $adminLogin->auth_token,
         ]);
         ContestController::apiUpdate($r1);

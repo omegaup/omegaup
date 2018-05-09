@@ -62,7 +62,7 @@
 					"feedback": "yes",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",
-					"public": 1,
+					"modality": "public",
 					"problems": "[{\"problem\":\"triangulos\",\"points\":100},{\"problem\":\"sumas\",\"points\":100}]",
 					"show_scoreboard_after": 1
 				}

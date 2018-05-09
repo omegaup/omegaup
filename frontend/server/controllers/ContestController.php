@@ -48,15 +48,13 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
-            $public = isset($r['public'])
-                ? PublicStatus::getIntValue($r['public'])
-                : PublicStatus::NO;
+            $public = $r['modality'] == 'public';
 
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
             }
             if (is_null($public)) {
-                throw new InvalidParameterException('parameterInvalid', 'public');
+                throw new InvalidParameterException('parameterInvalid', 'modality');
             }
             $query = $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
@@ -102,7 +100,7 @@ class ContestController extends Controller {
             'description',
             'start_time',
             'finish_time',
-            'public',
+            'modality',
             'alias',
             'window_length',
             'recommended',
@@ -143,7 +141,7 @@ class ContestController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time', 'public', 'scoreboard_url', 'scoreboard_url_admin'];
+        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time', 'modality', 'scoreboard_url', 'scoreboard_url_admin'];
         $contests = null;
         try {
             if (Authorization::isSystemAdmin($r['current_identity_id'])) {
@@ -199,7 +197,7 @@ class ContestController extends Controller {
             'alias',
             'start_time',
             'finish_time',
-            'public',
+            'modality',
             'scoreboard_url',
             'scoreboard_url_admin'
         ];
@@ -280,7 +278,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('contest must be an instance of ContestVO');
         }
 
-        if ($r['contest']->public != 1) {
+        if ($r['contest']->modality == 'private') {
             try {
                 if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['contest']->problemset_id))
                         && !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
@@ -292,16 +290,6 @@ class ContestController extends Controller {
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
-            }
-        } else {
-            if ($r['contest']->contestant_must_register == '1') {
-                if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
-                    $req = ProblemsetIdentityRequestDAO::getByPK($r['current_identity_id'], $r['contest']->problemset_id);
-
-                    if (is_null($req) || ($req->accepted === '0')) {
-                        throw new ForbiddenAccessException('contestNotRegistered');
-                    }
-                }
             }
         }
     }
@@ -333,7 +321,7 @@ class ContestController extends Controller {
         if (is_null($r['contest']) || is_null($r['current_user_id'])) {
             return false;
         }
-        return $r['contest']->public == 1 ||
+        return $r['contest']->modality == 'public' ||
             !is_null(ProblemsetIdentitiesDAO::getByPK(
                 $r['current_identity_id'],
                 $r['contest']->problemset_id
@@ -364,7 +352,7 @@ class ContestController extends Controller {
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
-                    $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+                    $r['contest']->modality == 'public' ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
                 return $result;
             }
             self::canAccessContest($r);
@@ -456,15 +444,15 @@ class ContestController extends Controller {
         }
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'description', 'start_time', 'finish_time', 'window_length', 'alias', 'scoreboard', 'points_decay_factor', 'partial_score', 'submissions_gap', 'feedback', 'penalty', 'time_start', 'penalty_type', 'penalty_calc_policy', 'public', 'show_scoreboard_after', 'contestant_must_register'];
+        $relevant_columns = ['title', 'description', 'start_time', 'finish_time', 'window_length', 'alias', 'scoreboard', 'points_decay_factor', 'partial_score', 'submissions_gap', 'feedback', 'penalty', 'time_start', 'penalty_type', 'penalty_calc_policy', 'show_scoreboard_after', 'modality'];
 
         // Initialize response to be the contest information
         $result = $r['contest']->asFilteredArray($relevant_columns);
 
         $current_ses = SessionController::getCurrentSession($r);
-        $result['contestant_must_register'] = ($result['contestant_must_register'] == '1');
+        $result['modality'] = $result['modality'];
 
-        if ($current_ses['valid'] && $result['contestant_must_register']) {
+        if ($current_ses['valid'] && $result['modality'] == 'registration') {
             $registration = ProblemsetIdentityRequestDAO::getByPK($current_ses['identity']->identity_id, $r['contest']->problemset_id);
 
             $result['user_registration_requested'] = !is_null($registration);
@@ -560,9 +548,8 @@ class ContestController extends Controller {
                 'time_start',
                 'penalty_type',
                 'penalty_calc_policy',
-                'public',
                 'show_scoreboard_after',
-                'contestant_must_register',
+                'modality',
                 'languages',
                 'problemset_id'];
 
@@ -801,7 +788,7 @@ class ContestController extends Controller {
                 'submissions_gap' => $original_contest->submissions_gap,
                 'feedback' => $original_contest->feedback,
                 'penalty_type' => $original_contest->penalty_type,
-                'public' => 0, // All cloned contests start in private mode
+                'modality' => 'private', // All cloned contests start in private modality
                 'auth_token' => $auth_token
             ]));
             $problems = self::apiProblems($r);
@@ -849,7 +836,7 @@ class ContestController extends Controller {
 
         // Create and populate a new Contests object
         $contest = new Contests();
-        $contest->public = $r['public'];
+        $contest->modality = 'private'; // Set private contest by default
         $contest->title = $r['title'];
         $contest->description = $r['description'];
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
@@ -875,7 +862,7 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = '1';
         }
 
-        if ($r['public'] == 1 && is_null($r['problems'])) {
+        if ($r['modality'] == 'public' && is_null($r['problems'])) {
             throw new InvalidParameterException('contestPublicRequiresProblem');
         }
 
@@ -1002,7 +989,7 @@ class ContestController extends Controller {
             );
         }
 
-        Validators::isInEnum($r['public'], 'public', ['0', '1'], $is_required);
+        Validators::isInEnum($r['modality'], 'modality', ['public', 'private', 'registration'], false);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
         Validators::isNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
         Validators::isNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
@@ -1282,7 +1269,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
-        if ($contest->public == 1) {
+        if ($contest->modality == 'public') {
             // Check that contest has at least 2 problems
             $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
             $problemsInContest = ProblemsetProblemsDAO::GetRelevantProblems($problemset);
@@ -1929,9 +1916,9 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $targetUser = UsersDAO::FindByUsername($r['username']);
+        $targetIdentity = IdentitiesDAO::FindByUsername($r['username']);
 
-        $request = ProblemsetIdentityRequestDAO::getByPK($targetUser->main_identity_id, $contest->problemset_id);
+        $request = ProblemsetIdentityRequestDAO::getByPK($targetIdentity->identity_id, $contest->problemset_id);
 
         if (is_null($request)) {
             throw new InvalidParameterException('userNotInListOfRequests');
@@ -1959,7 +1946,7 @@ class ContestController extends Controller {
         ]));
 
         self::$log->info('Arbitrated contest for user, new accepted user_id='
-                                . $targetUser->user_id . ', state=' . $resolution);
+                                . $targetIdentity->user_id . ', state=' . $resolution);
 
         return ['status' => 'ok'];
     }
@@ -2069,13 +2056,13 @@ class ContestController extends Controller {
         self::validateCreateOrUpdate($r, true /* is update */);
 
         // Update contest DAO
-        if (!is_null($r['public'])) {
+        if (!is_null($r['modality'])) {
             // If going public
-            if ($r['public'] == 1) {
+            if ($r['modality'] == 'public') {
                 self::validateContestCanBePublic($r['contest']);
             }
 
-            $r['contest']->public = $r['public'];
+            $r['contest']->modality = $r['modality'];
         }
 
         $valueProperties = [
@@ -2107,7 +2094,7 @@ class ContestController extends Controller {
                 }
                 return join(',', $value);
             }],
-            'contestant_must_register',
+            'modality',
         ];
         self::updateValueProperties($r, $r['contest'], $valueProperties);
 
@@ -2193,13 +2180,13 @@ class ContestController extends Controller {
      * This function reviews changes in penalty type and visibility type
      */
     private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
-        if ($original_contest->public !== $contest->public) {
+        if ($original_contest->modality !== $contest->modality) {
             $timestamp = gmdate('Y-m-d H:i:s', Time::get());
             ContestLogDAO::save(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $user_id,
-                'from_visibility' => $original_contest->public,
-                'to_visibility' => $contest->public,
+                'from_visibility' => $original_contest->modality == 'public',
+                'to_visibility' => $contest->modality == 'public',
                 'time' => $timestamp
             ]));
             $contest->last_updated = $timestamp;

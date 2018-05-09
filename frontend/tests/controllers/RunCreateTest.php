@@ -16,12 +16,12 @@ class RunCreateTest extends OmegaupTestCase {
      *
      * @return Request
      */
-    private function setValidRequest($contest_public = 1) {
+    private function setValidRequest($contest_public = 'public') {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $this->contestData = ContestsFactory::createContest(new ContestParams(['public' => $contest_public]));
+        $this->contestData = ContestsFactory::createContest(new ContestParams(['modality' => $contest_public]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $this->contestData);
@@ -30,7 +30,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->contestant = UserFactory::createUser();
 
         // If the contest is private, add the user
-        if ($contest_public === 0) {
+        if ($contest_public === 'private') {
             ContestsFactory::addUser($this->contestData, $this->contestant);
         }
 
@@ -189,7 +189,7 @@ class RunCreateTest extends OmegaupTestCase {
      * Test a valid submission to a private contest
      */
     public function testRunToValidPrivateContest() {
-        $r = $this->setValidRequest(0 /* private contest */);
+        $r = $this->setValidRequest('private' /* private contest */);
         $this->detourGraderCalls();
 
         // Call API
@@ -206,7 +206,7 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException NotAllowedToSubmitException
      */
     public function testRunPrivateContestWithUserNotRegistred() {
-        $r = $this->setValidRequest(0 /* private contest */);
+        $r = $this->setValidRequest('private' /* private contest */);
 
         // Create a second user not regitered to private contest
         $contestant2 = UserFactory::createUser();

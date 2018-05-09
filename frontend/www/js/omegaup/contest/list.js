@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
             this.showAdmin = showAdmin;
             fillContestsTable();
           },
-          'bulk-update': (publiclyVisible) => this.makePublic(publiclyVisible),
+          'bulk-update': (modality) => this.changeModality(modality),
         }
       });
     },
@@ -44,9 +44,9 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      makePublic: function(isPublic) {
+      changeModality: function(modality) {
         UI.bulkOperation(function(alias, resolve, reject) {
-          API.Contest.update({contest_alias: alias, 'public': isPublic ? 1 : 0})
+          API.Contest.update({contest_alias: alias, 'modality': modality})
               .then(resolve)
               .fail(reject);
         }, fillContestsTable);

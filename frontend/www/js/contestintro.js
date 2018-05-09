@@ -169,7 +169,7 @@ omegaup.OmegaUp.on('ready', function() {
       })
       .always(function(contest) {
         // Feel free to re-write this if you have the time.
-        if (contest.contestant_must_register) {
+        if (contest.modality == 'registration') {
           if (contest.user_registration_requested) {
             if (contest.user_registration_answered) {
               if (contest.user_registration_accepted) {

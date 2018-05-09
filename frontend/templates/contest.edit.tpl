@@ -8,7 +8,7 @@
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#edit" data-toggle="tab">{#contestEdit#}</a></li>
 	<li><a href="#problems" data-toggle="tab">{#wordsAddProblem#}</a></li>
-	<li><a href="#publish" data-toggle="tab">{#makePublic#}</a></li>
+	<li><a href="#publish" data-toggle="tab">{#contestNewFormModality#}</a></li>
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
@@ -64,12 +64,13 @@
 			<div class='panel-body'>
 				<form class='contest-publish-form'>
 					<div class="form-group">
-						<label for="public">{#contestNewFormPublic#}</label>
-						<select name='public' id='public' class="form-control">
-							<option value='0' selected="selected">{#wordsNo#}</option>
-							<option value='1'>{#wordsYes#}</option>
+						<label for="public">{#contestNewFormModality#}</label>
+						<select name='modality' id='modality' class="form-control">
+							<option value='private' selected="selected">{#wordsPrivate#}</option>
+							<option value='registration'>{#wordsRegistration#}</option>
+							<option value='public'>{#wordsPublic#}</option>
 						</select>
-						<p class="help-block">{#contestNewFormPublicDesc#}</p>
+						<p class="help-block">{#contestNewFormModalityDesc#}</p>
 					</div>
 
 					<button class="btn btn-primary" type="submit">{#wordsSaveChanges#}</button>

@@ -59,7 +59,7 @@ class UserContestsTest extends OmegaupTestCase {
 
         $contestDirectorData[0] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director]));
         ContestsFactory::addGroupAdmin($contestDirectorData[0], $helperGroup['group']);
-        $contestDirectorData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director, 'public' => 0]));
+        $contestDirectorData[1] = ContestsFactory::createContest(new ContestParams(['contestDirector' => $director, 'modality' => 'private']));
         ContestsFactory::addGroupAdmin($contestDirectorData[1], $helperGroup['group']);
 
         // Call api
@@ -83,7 +83,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCount() {
         // Create private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
         $user = $contestData['director'];
 
         $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));

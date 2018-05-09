@@ -18,10 +18,13 @@
         <ul class="dropdown-menu"
             role="menu">
           <li>
-            <a v-on:click="onBulkUpdate(true)">{{ T.makePublic }}</a>
+            <a v-on:click="onBulkUpdate('public')">{{ T.makePublic }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate(false)">{{ T.makePrivate }}</a>
+            <a v-on:click="onBulkUpdate('private')">{{ T.makePrivate }}</a>
+          </li>
+          <li>
+            <a v-on:click="onBulkUpdate('registration')">{{ T.makeRegistration }}</a>
           </li>
           <li class="divider"></li>
         </ul>
@@ -34,7 +37,7 @@
           <th>{{ T.wordsTitle }}</th>
           <th>{{ T.arenaPracticeStartTime }}</th>
           <th>{{ T.arenaPracticeEndtime }}</th>
-          <th v-if="isAdmin">{{ T.contestsTablePublic }}</th>
+          <th v-if="isAdmin">{{ T.contestNewFormModality }}</th>
           <th colspan="2"
               v-if="isAdmin">Scoreboard</th>
           <th v-if="isAdmin"></th>
@@ -59,8 +62,10 @@
             contest.finish_time.format('long') }}</a>
           </td>
           <td v-if="!isAdmin"></td>
-          <td v-else-if="contest.public == '1'">{{ T.wordsYes }}</td>
-          <td v-else="">{{ T.wordsNo }}</td>
+          <td v-else-if="contest.modality == 'public'">{{ T.wordsPublic }}</td>
+          <td v-else-if="contest.modality == 'private'">{{ T.wordsPrivate }}</td>
+          <td v-else-if="contest.modality == 'registration'">{{ T.wordsRegistration }}</td>
+          <td v-else=""></td>
           <td v-if="contest.scoreboard_url &amp;&amp; isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
@@ -120,9 +125,7 @@ export default {
       return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
              date.toISOString();
     },
-    onBulkUpdate: function(publiclyVisible) {
-      this.$emit('bulk-update', publiclyVisible);
-    },
+    onBulkUpdate: function(modality) { this.$emit('bulk-update', modality);},
     onShowAdmin: function() {
       this.$emit('toggle-show-admin',
                  this.$el.querySelector('.show-admin-contests').checked);
