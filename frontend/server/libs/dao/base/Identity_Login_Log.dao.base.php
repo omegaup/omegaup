@@ -8,40 +8,40 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** UserLoginLog Data Access Object (DAO) Base.
+/** IdentityLoginLog Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link UserLoginLog }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link IdentityLoginLog }.
  * @access public
  * @abstract
  *
  */
-abstract class UserLoginLogDAOBase extends DAO {
+abstract class IdentityLoginLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`User_Login_Log`.`user_id`, `User_Login_Log`.`ip`, `User_Login_Log`.`time`';
+    const FIELDS = '`Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link UserLoginLog} pasado en la base de datos.
+     * Este metodo guarda el estado actual del objeto {@link IdentityLoginLog} pasado en la base de datos.
      * save() siempre creara una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog
+     * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(UserLoginLog $User_Login_Log) {
-        return UserLoginLogDAOBase::create($User_Login_Log);
+    final public static function save(IdentityLoginLog $Identity_Login_Log) {
+        return IdentityLoginLogDAOBase::create($Identity_Login_Log);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link UserLoginLog}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link IdentityLoginLog}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -50,10 +50,10 @@ abstract class UserLoginLogDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UserLoginLog}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link IdentityLoginLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `User_Login_Log`.`user_id`, `User_Login_Log`.`ip`, `User_Login_Log`.`time` from User_Login_Log';
+        $sql = 'SELECT `Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time` from Identity_Login_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -64,7 +64,7 @@ abstract class UserLoginLogDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new UserLoginLog($row);
+            $allData[] = new IdentityLoginLog($row);
         }
         return $allData;
     }
@@ -72,7 +72,7 @@ abstract class UserLoginLogDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link IdentityLoginLog} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -87,28 +87,28 @@ abstract class UserLoginLogDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog
+      * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($User_Login_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($User_Login_Log instanceof UserLoginLog)) {
-            $User_Login_Log = new UserLoginLog($User_Login_Log);
+    final public static function search($Identity_Login_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Identity_Login_Log instanceof IdentityLoginLog)) {
+            $Identity_Login_Log = new IdentityLoginLog($Identity_Login_Log);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($User_Login_Log->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $User_Login_Log->user_id;
+        if (!is_null($Identity_Login_Log->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Identity_Login_Log->identity_id;
         }
-        if (!is_null($User_Login_Log->ip)) {
+        if (!is_null($Identity_Login_Log->ip)) {
             $clauses[] = '`ip` = ?';
-            $params[] = $User_Login_Log->ip;
+            $params[] = $Identity_Login_Log->ip;
         }
-        if (!is_null($User_Login_Log->time)) {
+        if (!is_null($Identity_Login_Log->time)) {
             $clauses[] = '`time` = ?';
-            $params[] = $User_Login_Log->time;
+            $params[] = $Identity_Login_Log->time;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -120,7 +120,7 @@ abstract class UserLoginLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `User_Login_Log`.`user_id`, `User_Login_Log`.`ip`, `User_Login_Log`.`time` FROM `User_Login_Log`';
+        $sql = 'SELECT `Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time` FROM `Identity_Login_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -132,7 +132,7 @@ abstract class UserLoginLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new UserLoginLog($row);
+            $ar[] = new IdentityLoginLog($row);
         }
         return $ar;
     }
@@ -141,23 +141,23 @@ abstract class UserLoginLogDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto UserLoginLog suministrado. Asegurese
+     * contenidos del objeto IdentityLoginLog suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto UserLoginLog dentro de la misma transaccion.
+     * primaria generada en el objeto IdentityLoginLog dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog a crear.
+     * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog a crear.
      */
-    final private static function create(UserLoginLog $User_Login_Log) {
-        if (is_null($User_Login_Log->time)) {
-            $User_Login_Log->time = gmdate('Y-m-d H:i:s');
+    final private static function create(IdentityLoginLog $Identity_Login_Log) {
+        if (is_null($Identity_Login_Log->time)) {
+            $Identity_Login_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO User_Login_Log (`user_id`, `ip`, `time`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
-            $User_Login_Log->user_id,
-            $User_Login_Log->ip,
-            $User_Login_Log->time,
+            $Identity_Login_Log->identity_id,
+            $Identity_Login_Log->ip,
+            $Identity_Login_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -172,8 +172,8 @@ abstract class UserLoginLogDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link UserLoginLog}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link IdentityLoginLog} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link IdentityLoginLog}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -195,28 +195,28 @@ abstract class UserLoginLogDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog
-     * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog
+     * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog
+     * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(UserLoginLog $User_Login_LogA, UserLoginLog $User_Login_LogB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(IdentityLoginLog $Identity_Login_LogA, IdentityLoginLog $Identity_Login_LogB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $User_Login_LogA->user_id;
-        $b = $User_Login_LogB->user_id;
+        $a = $Identity_Login_LogA->identity_id;
+        $b = $Identity_Login_LogB->identity_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $User_Login_LogA->ip;
-        $b = $User_Login_LogB->ip;
+        $a = $Identity_Login_LogA->ip;
+        $b = $Identity_Login_LogB->ip;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`ip` >= ? AND `ip` <= ?';
             $params[] = min($a, $b);
@@ -226,8 +226,8 @@ abstract class UserLoginLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $User_Login_LogA->time;
-        $b = $User_Login_LogB->time;
+        $a = $Identity_Login_LogA->time;
+        $b = $Identity_Login_LogB->time;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`time` >= ? AND `time` <= ?';
             $params[] = min($a, $b);
@@ -237,7 +237,7 @@ abstract class UserLoginLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `User_Login_Log`';
+        $sql = 'SELECT * FROM `Identity_Login_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -246,7 +246,7 @@ abstract class UserLoginLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new UserLoginLog($row);
+            $ar[] = new IdentityLoginLog($row);
         }
         return $ar;
     }
