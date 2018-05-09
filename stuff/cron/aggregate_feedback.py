@@ -24,7 +24,7 @@ PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 
 # Before this id the questions were different
-QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
+QUALITYNOMINATION_QUESTION_CHANGE_ID = 0
 
 
 def get_global_quality_and_difficulty_average(dbconn):
@@ -92,11 +92,11 @@ def get_problem_aggregates(dbconn, problem_id):
             contents = json.loads(row[0])
             if 'quality' in contents:
                 quality_sum += contents['quality']
-                quality_votes[5] += 1
+                quality_votes[-1] += 1
                 quality_votes[contents['quality']] += 1
             if 'difficulty' in contents:
                 difficulty_sum += contents['difficulty']
-                difficulty_votes[5] += 1
+                difficulty_votes[-1] += 1
                 difficulty_votes[contents['difficulty']] += 1
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
@@ -204,10 +204,10 @@ def aggregate_feedback(dbconn):
 
             problem_quality = bayesian_average(
                 global_quality_average, problem_quality_sum,
-                problem_quality_votes[5])
+                problem_quality_votes[-1])
             problem_difficulty = bayesian_average(global_difficulty_average,
                                                   problem_difficulty_sum,
-                                                  problem_difficulty_votes[5])
+                                                  problem_difficulty_votes[-1])
             if problem_quality is not None and problem_difficulty is not None:
                 problem_quality_votes = json.dumps(problem_quality_votes[:-1])
                 problem_difficulty_votes = json.dumps(
