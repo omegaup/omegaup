@@ -141,7 +141,7 @@ CREATE TABLE `Contests` (
   `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
   `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
+  `alias` varchar(32) DEFAULT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
   `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',

@@ -845,7 +845,15 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Validate request
-        self::validateCreateOrUpdate($r);
+        if (isset($r['virtual']) and $r['virtual'] == true) {
+            self::validateCreateVirtual($r);
+        }
+        else {
+            //there is no rerun id in real contest
+            $r['rerun_id'] = 0;
+            $r['problemset_id'] = NULL;
+            self::validateCreateOrUpdate($r);
+        }
 
         // Create and populate a new Contests object
         $contest = new Contests();
@@ -855,7 +863,7 @@ class ContestController extends Controller {
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
-        $contest->rerun_id = 0; // NYI
+        $contest->rerun_id = $r['rerun_id'];
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
         $contest->points_decay_factor = $r['points_decay_factor'];
@@ -868,6 +876,10 @@ class ContestController extends Controller {
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
         $contest->scoreboard_url_admin = SecurityTools::randomString(30);
+
+        if (!is_null($r['problemset_id'])) {
+            $contest->problemset_id = $r['problemset_id'];
+        }
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
@@ -934,6 +946,46 @@ class ContestController extends Controller {
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return ['status' => 'ok'];
+    }
+
+    private static function validateCreateVirtual(Request $r) {
+        $real_contest = ContestsDAO::getByAlias($r['contest_alias']);
+        if (is_null($real_contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+        try {
+            $r['contest'] = ContestsDAO::getVirtualByContest($real_contest, $r['current_user']);
+        } catch(Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!ContestsDAO::hasFinished($real_contest)) {
+            throw new ForbiddenAccessException('realContestHasNotBeenEnded');
+        }
+        else if (!is_null($r['contest']) and !ContestsDAO::hasFinished($r['contest']))  {
+            throw new ForbiddenAccessException('unfinishedVirtualContest');
+        }
+
+        $r['public'] = 0;
+        $r['title'] = $real_contest->title;
+        $r['description'] = $real_contest->description;
+        $r['problemset_id'] = $real_contest->problemset_id;
+        $r['start_time'] = time();
+        $r['finish_time'] = time() + strtotime($real_contest->finish_time) - strtotime($real_contest->start_time);
+        $r['window_length'] = $real_contest->window_length;
+        $r['rerun_id'] = $real_contest->contest_id;
+        $r['alias'] = NULL;
+        $r['scoreboard'] = 100; //TODO should this be $real_contest->scoreboard?
+        $r['points_decay_factor'] = $real_contest->points_decay_factor;
+        $r['partial_score'] = $real_contest->partial_score;
+        $r['feedback'] = $real_contest->feedback; //TODO should there be feedback in ghost mode?
+        $r['penalty'] = $real_contest->penalty;
+        $r['penalty_type'] = $real_contest->penalty_type;
+        $r['penalty_calc_policy'] = $real_contest->penalty_calc_policy;
+        $r['languages'] = $real_contest->languages;
+        $r['show_scoreboard_after'] = NULL; //TODO should this be $real_contest->show_scoreboard_after ?
+
+        //TODO scoreboard url admin and user?
     }
 
     /**
