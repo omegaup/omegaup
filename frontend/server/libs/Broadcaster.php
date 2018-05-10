@@ -13,7 +13,7 @@ class Broadcaster {
             $message = json_encode([
                 'message' => '/clarification/update/',
                 'clarification' => [
-                    'clarification_id' => $r['clarification']->clarification_id,
+                    'clarification_id' => (int)$r['clarification']->clarification_id,
                     'problem_alias' => $r['problem']->alias,
                     'author' => $r['user']->username,
                     'message' => $r['clarification']->message,
@@ -21,7 +21,7 @@ class Broadcaster {
                     'time' => $time,
                     'public' => $r['clarification']->public != '0'
                 ]
-            ]);
+            ],JSON_NUMERIC_CHECK);
 
             $grader = new Grader();
             $this->log->debug("Sending update $message");
