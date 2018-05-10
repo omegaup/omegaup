@@ -16,7 +16,7 @@ class ContestParams implements ArrayAccess {
             $this->params = clone $params;
         }
         ContestParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
-        ContestParams::validateParameter('modality', $this->params, false, 'public');
+        ContestParams::validateParameter('admission_mode', $this->params, false, 'public');
         ContestParams::validateParameter('basic_information', $this->params, false, 'false');
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
         ContestParams::validateParameter('languages', $this->params, false);
@@ -49,7 +49,7 @@ class ContestParams implements ArrayAccess {
     public static function fromContest(Contests $contest) {
         return new ContestParams([
             'title' => $contest->title,
-            'modality' => $contest->modality,
+            'admission_mode' => $contest->admission_mode,
             'basic_information' => $contest->basic_information,
             'contestDirector' => $contest->contestDirector,
             'languages' => $contest->languages,
@@ -110,7 +110,7 @@ class ContestsFactory {
         $r['finish_time'] = $params['finish_time'];
         $r['last_updated'] = $params['last_updated'];
         $r['window_length'] = null;
-        $r['modality'] = $params['modality'];
+        $r['admission_mode'] = $params['admission_mode'];
         $r['alias'] = substr($params['title'], 0, 20);
         $r['points_decay_factor'] = '.02';
         $r['partial_score'] = '0';
@@ -140,7 +140,7 @@ class ContestsFactory {
         }
         $privateParams = new ContestParams($params);
         // Create a valid contest Request object
-        $privateParams['modality'] = 'private';
+        $privateParams['admission_mode'] = 'private';
         $contestData = ContestsFactory::getRequest($privateParams);
 
         $r = $contestData['request'];
@@ -152,9 +152,9 @@ class ContestsFactory {
 
         // Call the API
         $response = ContestController::apiCreate($r);
-        if ($params['modality'] === 'public') {
+        if ($params['admission_mode'] === 'public') {
             self::forcePublic($contestData, $params['last_updated']);
-            $r['modality'] = 'public';
+            $r['admission_mode'] = 'public';
         }
 
         $contest = ContestsDAO::getByAlias($r['alias']);
@@ -296,7 +296,7 @@ class ContestsFactory {
 
     public static function forcePublic($contestData, $last_updated = null) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->modality = 'public';
+        $contest->admission_mode = 'public';
         $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
         ContestsDAO::save($contest);
     }

@@ -65,7 +65,7 @@
 				<form class='contest-publish-form'>
 					<div class="form-group">
 						<label for="public">{#contestNewFormModality#}</label>
-						<select name='modality' id='modality' class="form-control">
+						<select name='admission_mode' id='admission_mode' class="form-control">
 							<option value='private' selected="selected">{#wordsPrivate#}</option>
 							<option value='registration'>{#wordsRegistration#}</option>
 							<option value='public'>{#wordsPublic#}</option>

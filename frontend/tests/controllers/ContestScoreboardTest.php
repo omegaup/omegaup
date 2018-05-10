@@ -363,7 +363,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrl() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem
@@ -451,7 +451,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlNoLogin() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
         ContestsFactory::setScoreboardPercentage($contestData, 0);
 
         // Create problem

@@ -56,8 +56,8 @@ class Contests extends VO {
         if (isset($data['rerun_id'])) {
             $this->rerun_id = $data['rerun_id'];
         }
-        if (isset($data['modality'])) {
-            $this->modality = $data['modality'];
+        if (isset($data['admission_mode'])) {
+            $this->admission_mode = $data['admission_mode'];
         }
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
@@ -194,7 +194,7 @@ class Contests extends VO {
       * @access public
       * @var enum('private','registration','public')
       */
-    public $modality;
+    public $admission_mode;
 
     /**
       * Almacenará el token necesario para acceder al concurso

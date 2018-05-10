@@ -917,7 +917,7 @@ class ProblemController extends Controller {
             if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (isset($r['contest'])) {
-                    if ($r['contest']->modality != 'public') {
+                    if (!ContestController::isPublic($r['contest']->admission_mode)) {
                         if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }

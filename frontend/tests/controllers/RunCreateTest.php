@@ -21,7 +21,7 @@ class RunCreateTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $this->contestData = ContestsFactory::createContest(new ContestParams(['modality' => $contest_public]));
+        $this->contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => $contest_public]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $this->contestData);

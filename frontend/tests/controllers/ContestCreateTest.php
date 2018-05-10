@@ -14,7 +14,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateContestPositive() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -54,7 +54,7 @@ class CreateContestTest extends OmegaupTestCase {
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
             $contestData = ContestsFactory::getRequest(new ContestParams(
-                ['modality' => 'private']
+                ['admission_mode' => 'private']
             ));
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
@@ -88,7 +88,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -113,7 +113,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -137,11 +137,11 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreatePublicContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
-        $r['modality'] = 'public';
+        $r['admission_mode'] = 'public';
 
         // Log in the user and set the auth token in the new request
         $login = self::login($contestDirector);
@@ -159,11 +159,11 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
-        $r['modality'] = 'public';
+        $r['admission_mode'] = 'public';
         $r['problems'] = json_encode([[
             'problem' => $problem['problem']->alias,
             'points' => 100,
@@ -204,11 +204,11 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['modality' => 'private']
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
-        $r['modality'] = 'public';
+        $r['admission_mode'] = 'public';
         $r['problems'] = json_encode([[
             'problem' => $problem['problem']->alias,
             'points' => 100,

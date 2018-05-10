@@ -57,14 +57,14 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         // Update public
         $login = self::login($contestData['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'modality' => 'public',
+            'admission_mode' => 'public',
         ]);
 
         // Call API
@@ -77,7 +77,7 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['modality' => 'private']));
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -90,13 +90,13 @@ class UpdateContestTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'modality' => 'public',
+            'admission_mode' => 'public',
         ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
 
-        $contestData['request']['modality'] = $r['modality'];
+        $contestData['request']['admission_mode'] = $r['admission_mode'];
         $this->assertContest($contestData['request']);
     }
 
