@@ -1,4 +1,5 @@
 import API from './api.js';
+import {T} from './omegaup.js';
 
 let UI = {
   navigateTo: function(url) { window.location = url; },
@@ -83,11 +84,11 @@ let UI = {
             onOperationFinished();
 
             if (success === false) {
-              UI.error(UI.formatString(options && options.errorTemplate ||
-                                           omegaup.T.bulkOperationError,
-                                       error));
+              UI.error(UI.formatString(
+                  options && options.errorTemplate || T.bulkOperationError,
+                  error));
             } else {
-              UI.success(omegaup.T.updateItemsSuccess);
+              UI.success(T.updateItemsSuccess);
             }
           }
         });
@@ -117,6 +118,16 @@ let UI = {
       }
       return '<span class="' + cls + '">' + match + '</span>';
     });
+  },
+
+  columnName: function(idx) {
+    var name = String.fromCharCode('A'.charCodeAt(0) + idx % 26);
+    while (idx >= 26) {
+      idx = (idx / 26) | 0;
+      idx--;
+      name = String.fromCharCode('A'.charCodeAt(0) + idx % 26) + name;
+    }
+    return name;
   },
 
   typeaheadWrapper: function(f) {
@@ -187,6 +198,43 @@ let UI = {
         .on('typeahead:autocomplete', cb);
   },
 
+  problemContestTypeahead: function(elem, problemList, cb) {
+    var substringMatcher = function(query, cb) {
+      var matches, substringRegex;
+
+      // an array that will be populated with substring matches
+      matches = [];
+
+      // regex used to determine if a string contains the substring `query`
+      substringRegex = new RegExp(query, 'i');
+
+      // iterate through the pool of strings and for any string that
+      // contains the substring `query`, add it to the `matches` array
+      $.each(problemList, function(i, problem) {
+        if (substringRegex.test(problem.alias)) {
+          matches.push(problem);
+        }
+      });
+
+      cb(matches);
+    };
+
+    cb = cb || function(event, val) { $(event.target).val(val.alias); };
+
+    elem.typeahead(
+            {
+              minLength: 3,
+              highlight: false,
+            },
+            {
+              source: substringMatcher,
+              async: true,
+              display: 'alias',
+            })
+        .on('typeahead:select', cb)
+        .on('typeahead:autocomplete', cb);
+  },
+
   schoolTypeahead: function(elem, cb) {
     cb = cb || function(event, val) { $(event.target).val(val.value); };
     elem.typeahead(
@@ -195,11 +243,11 @@ let UI = {
               highlight: true,
             },
             {
-              source: omegaup.UI.typeaheadWrapper(omegaup.API.School.list),
+              source: UI.typeaheadWrapper(omegaup.API.School.list),
               async: true,
               display: 'label',
               templates: {
-                empty: omegaup.T.schoolToBeAdded,
+                empty: T.schoolToBeAdded,
               }
             })
         .on('typeahead:select', cb)
@@ -216,13 +264,12 @@ let UI = {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
 
-  // From
-  // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
-  toHHMM: function(duration) {
+  toDDHHMM: function(duration) {
     var sec_num = parseInt(duration, 10);
-    var hours = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    var days = Math.floor(sec_num / 86400);
+    var hours = Math.floor((sec_num - (days * 86400)) / 3600);
+    var minutes = Math.floor((sec_num - (days * 86400) - (hours * 3600)) / 60);
+    var seconds = sec_num - (days * 86400) - (hours * 3600) - (minutes * 60);
 
     if (minutes < 10) {
       minutes = '0' + minutes;
@@ -231,8 +278,9 @@ let UI = {
       seconds = '0' + seconds;
     }
 
-    var time = hours + 'h ' + minutes + 'm';
-    return time;
+    var time = '';
+    if (days > 0) time += days + 'd ';
+    return time + hours + 'h ' + minutes + 'm';
   },
 
   getFlag: function(country) {
@@ -247,7 +295,147 @@ let UI = {
     return date.format('{MM}/{dd}/{yyyy} {HH}:{mm}');
   },
 
-  formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); }
+  formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
+
+  markdownConverter: function(options) {
+    options = options || {};
+
+    // Map of templates.
+    var templates = {};
+    if (options.preview) {
+      templates['libinteractive:download'] =
+          '<code class="libinteractive-download">' +
+          '<i class="glyphicon glyphicon-download-alt"></i></code>';
+    } else {
+      templates['libinteractive:download'] =
+          `<div class="libinteractive-download panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            ${T.libinteractiveTitle}
+            <a class="libinteractive-help" target="_blank" href="/libinteractive/${T.locale}/contest/"><span class="glyphicon glyphicon-question-sign"></span></a>
+          </h3>
+        </div>
+        <div class="panel-body">
+          <form role="form">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <div class="col-sm-10">
+                  <label class="col-sm-2 control-label">${T.libinteractiveOs}</label>
+                  <select class="form-control download-os">
+                    <option value="unix">Linux/Mac OS X</option>
+                    <option value="windows">Windows</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-10">
+                  <label class="col-sm-2 control-label">${T.libinteractiveLanguage}</label>
+                  <select class="form-control download-lang">
+                    <option value="c" selected="selected">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="java">Java</option>
+                    <option value="py">Python</option>
+                    <option value="pas">Pascal</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <strong class="col-sm-2 control-label">${T.libinteractiveFilename}</strong>
+                <div class="col-sm-10">
+                  <span class="libinteractive-interface-name"></span>.<span class="libinteractive-extension">c</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary active">
+                    ${T.libinteractiveDownload}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>`;
+    }
+
+    let converter = Markdown.getSanitizingConverter();
+    let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|code|i|table|tbody|thead|tr|th|td|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    let imageWhitelist = new RegExp('^<img\\ssrc="data:image\/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
+
+    converter.hooks.chain('isValidTag', function(tag) {
+      return tag.match(whitelist) || tag.match(imageWhitelist);
+    });
+
+    converter.hooks.chain('postSpanGamut', function(text) {
+      // Templates.
+      return text.replace(
+          /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
+            if (templates.hasOwnProperty(m1)) {
+              return templates[m1];
+            }
+            return '<strong style="color: red">Unrecognized template name: ' +
+                   m1 + '</strong>';
+          });
+    });
+    converter.hooks.chain('preBlockGamut', function(text, hashBlock) {
+      // Sample I/O table.
+      return text.replace(
+          /^( {0,3}\|\| *input *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
+          function(whole, inner) {
+            var matches =
+                inner.split(/ {0,3}\|\| *(input|output|description) *\n/);
+            var result = '';
+            var description_column = false;
+            for (var i = 1; i < matches.length; i += 2) {
+              if (matches[i] == 'description') {
+                description_column = true;
+                break;
+              }
+            }
+            result += '<thead><tr>';
+            result += '<th>Entrada</th>';
+            result += '<th>Salida</th>';
+            if (description_column) {
+              result += '<th>Descripción</th>';
+            }
+            result += '</tr></thead>';
+            var first_row = true;
+            var columns = 0;
+            result += '<tbody>';
+            for (var i = 1; i < matches.length; i += 2) {
+              if (matches[i] == 'description') {
+                result += '<td>' + hashBlock(matches[i + 1]) + '</td>';
+                columns++;
+              } else {
+                if (matches[i] == 'input') {
+                  if (!first_row) {
+                    while (columns < (description_column ? 3 : 2)) {
+                      result += '<td></td>';
+                      columns++;
+                    }
+                    result += '</tr>';
+                  }
+                  first_row = false;
+                  result += '<tr>';
+                  columns = 0;
+                }
+                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') +
+                          '</pre></td>';
+                columns++;
+              }
+            }
+            while (columns < (description_column ? 3 : 2)) {
+              result += '<td></td>';
+              columns++;
+            }
+            result += '</tr></tbody>';
+            return hashBlock('<table class="sample_io">\n' + result +
+                             '\n</table>');
+          });
+    });
+
+    return converter;
+  },
 };
 
 export {UI as default};

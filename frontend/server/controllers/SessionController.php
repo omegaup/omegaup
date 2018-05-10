@@ -127,12 +127,14 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
         }
 
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
+        $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
         if (is_null($currentUser)) {
             // Means user has auth token, but does not exist in DB
@@ -140,6 +142,7 @@ class SessionController extends Controller {
                 'valid' => false,
                 'email' => null,
                 'user' => null,
+                'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
             ];
@@ -152,8 +155,9 @@ class SessionController extends Controller {
             'valid' => true,
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
+            'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
         ];
     }
 
@@ -176,49 +180,51 @@ class SessionController extends Controller {
         $this->InvalidateCache();
 
         $currentSession = self::apiCurrentSession()['session'];
-        $vo_AuthT = new AuthTokens(['token' => $currentSession['auth_token']]);
+        $authToken = new AuthTokens(['token' => $currentSession['auth_token']]);
 
         $this->InvalidateLocalCache();
 
         try {
-            AuthTokensDAO::delete($vo_AuthT);
+            AuthTokensDAO::delete($authToken);
         } catch (Exception $e) {
         }
 
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private function RegisterSession(Users $vo_User, $b_ReturnAuthTokenAsString = false) {
+    private function RegisterSession(Identities $identity, $b_ReturnAuthTokenAsString = false) {
         // Log the login.
-        UserLoginLogDAO::save(new UserLoginLog([
-            'user_id' => $vo_User->user_id,
+        IdentityLoginLogDAO::save(new IdentityLoginLog([
+            'identity_id' => $identity->identity_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
 
         $this->InvalidateLocalCache();
 
         //find if this user has older sessions
-        $vo_AuthT = new AuthTokens();
-        $vo_AuthT->user_id = $vo_User->user_id;
+        $authToken = new AuthTokens();
+        $authToken->user_id = $identity->user_id;
+        $authToken->identity_id = $identity->identity_id;
 
         //erase expired tokens
         try {
-            $tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->user_id);
+            $tokens_erased = AuthTokensDAO::expireAuthTokens($identity->identity_id);
         } catch (Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
 
         // Create the new token
-        $entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
-        $s_AuthT = $entropy . '-' . $vo_User->user_id . '-' . hash('sha256', OMEGAUP_MD5_SALT . $vo_User->user_id . $entropy);
+        $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
+        $s_AuthT = $entropy . '-' . $identity->user_id . '-' . hash('sha256', OMEGAUP_MD5_SALT . $identity->user_id . $entropy);
 
-        $vo_AuthT = new AuthTokens();
-        $vo_AuthT->user_id = $vo_User->user_id;
-        $vo_AuthT->token = $s_AuthT;
+        $authToken = new AuthTokens();
+        $authToken->user_id = $identity->user_id;
+        $authToken->identity_id = $identity->identity_id;
+        $authToken->token = $s_AuthT;
 
         try {
-            AuthTokensDAO::save($vo_AuthT);
+            AuthTokensDAO::save($authToken);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -384,7 +390,7 @@ class SessionController extends Controller {
      */
     public function NativeLogin(Request $r) {
         $c_Users = new UserController();
-        $vo_User = null;
+        $identity = null;
 
         if (null != $r['returnAuthToken']) {
             $returnAuthToken = $r['returnAuthToken'];
@@ -393,27 +399,28 @@ class SessionController extends Controller {
         }
 
         try {
-            $vo_User = UserController::resolveUser($r['usernameOrEmail']);
-            $r['user_id'] = $vo_User->user_id;
-            $r['user'] = $vo_User;
+            $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+            $r['user_id'] = $identity->user_id;
+            $r['identity_id'] = $identity->identity_id;
+            $r['user'] = $identity;
         } catch (ApiException $e) {
-            self::$log->warn('User ' . $r['usernameOrEmail'] . ' not found.');
+            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' not found.');
             return false;
         }
 
         $b_Valid = $c_Users->TestPassword($r);
 
         if (!$b_Valid) {
-            self::$log->warn('User ' . $r['usernameOrEmail'] . ' has introduced invalid credentials.');
+            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' has introduced invalid credentials.');
             return false;
         }
 
-        self::$log->info('User ' . $r['usernameOrEmail'] . ' has loged in natively.');
+        self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has loged in natively.');
 
         UserController::checkEmailVerification($r);
 
         try {
-            return $this->RegisterSession($vo_User, $returnAuthToken);
+            return $this->RegisterSession($identity, $returnAuthToken);
         } catch (Exception $e) {
             self::$log->error($e);
             return false;
@@ -458,11 +465,11 @@ class SessionController extends Controller {
     private function ThirdPartyLogin($provider, $email, $name = null) {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
-        $results = UsersDAO::FindByEmail($email);
+        $results = IdentitiesDAO::FindByEmail($email);
 
         if (!is_null($results)) {
             self::$log->info("User has been here before with $provider");
-            $vo_User = $results;
+            $identity = $results;
         } else {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
@@ -492,10 +499,10 @@ class SessionController extends Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $vo_User = UsersDAO::getByPK($res['user_id']);
+            $identity = IdentitiesDAO::FindByUsername($res['username']);
         }
 
-        $this->RegisterSession($vo_User);
+        $this->RegisterSession($identity);
         return ['status' => 'ok'];
     }
 }

@@ -66,19 +66,19 @@ class CoursesDAO extends CoursesDAOBase {
         return $ar;
     }
 
-    public static function getCoursesForStudent($user) {
+    public static function getCoursesForStudent($identity_id) {
         global  $conn;
         $sql = 'SELECT c.*
                 FROM Courses c
                 INNER JOIN (
                     SELECT g.group_id
-                    FROM Groups_Users gu
-                    INNER JOIN Groups g ON g.group_id = gu.group_id
-                    WHERE gu.user_id = ?
+                    FROM Groups_Identities gi
+                    INNER JOIN Groups g ON g.group_id = gi.group_id
+                    WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = $conn->Execute($sql, $user);
+        $rs = $conn->Execute($sql, $identity_id);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -95,16 +95,16 @@ class CoursesDAO extends CoursesDAOBase {
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
         global  $conn;
 
-        $sql = 'SELECT u.username, u.name, pr.alias as assignment_alias, pr.assignment_score
+        $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
                 FROM Groups g
-                INNER JOIN Groups_Users gu
-                    ON g.group_id = ? AND g.group_id = gu.group_id
-                INNER JOIN Users u
-                    ON u.user_id = gu.user_id
+                INNER JOIN Groups_Identities gi
+                    ON g.group_id = ? AND g.group_id = gi.group_id
+                INNER JOIN Identities i
+                    ON i.identity_id = gi.identity_id
                 LEFT JOIN (
-                    SELECT bpr.alias, bpr.user_id, sum(best_score_of_problem) as assignment_score
+                    SELECT bpr.alias, bpr.identity_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
@@ -114,11 +114,11 @@ class CoursesDAO extends CoursesDAOBase {
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
                         WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
                     ) bpr
-                    GROUP BY bpr.assignment_id, bpr.user_id
+                    GROUP BY bpr.assignment_id, bpr.identity_id
                 ) pr
-                ON pr.user_id = u.user_id';
+                ON pr.identity_id = i.identity_id';
 
         $rs = $conn->Execute($sql, [$group_id, $course_id]);
         $progress = [];
@@ -151,7 +151,7 @@ class CoursesDAO extends CoursesDAOBase {
      * @param  int $user_id
      * @return Array Students data
      */
-    public static function getAssignmentsProgress($course_id, $user_id) {
+    public static function getAssignmentsProgress($course_id, $identity_id) {
         global  $conn;
 
         $sql = 'SELECT a.alias as assignment, IFNULL(pr.total_score, 0) as score, a.max_points as max_score
@@ -160,23 +160,23 @@ class CoursesDAO extends CoursesDAOBase {
                     -- aggregate all runs per assignment
                     SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
                     FROM (
-                        -- get all runs belonging to an user and get the best score
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        -- get all runs belonging to an identity and get the best score
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemset_Problems psp
                             ON a.problemset_id = psp.problemset_id
                         INNER JOIN Runs r
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
-                        WHERE a.course_id = ? AND r.user_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                        WHERE a.course_id = ? AND r.identity_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id
                 ) pr
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = $conn->Execute($sql, [$course_id, $user_id, $course_id]);
+        $rs = $conn->Execute($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -191,10 +191,10 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     /**
-     * Returns all courses that a user can manage.
+     * Returns all courses that an identity can manage.
      */
-    final public static function getAllCoursesAdminedByUser(
-        $user_id,
+    final public static function getAllCoursesAdminedByIdentity(
+        $identity_id,
         $page = 1,
         $pageSize = 1000
     ) {
@@ -206,16 +206,20 @@ class CoursesDAO extends CoursesDAOBase {
                 Courses AS c
             INNER JOIN
                 ACLs AS a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Identities AS ai ON a.owner_id = ai.user_id
             LEFT JOIN
                 User_Roles ur ON ur.acl_id = c.acl_id
             LEFT JOIN
+                Identities uri ON ur.user_id = uri.identity_id
+            LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                ai.identity_id = ? OR
+                (ur.role_id = ? AND uri.identity_id = ?) OR
+                (gr.role_id = ? AND gi.identity_id = ?)
             GROUP BY
                 c.course_id
             ORDER BY
@@ -223,11 +227,11 @@ class CoursesDAO extends CoursesDAOBase {
             LIMIT
                 ?, ?';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             Authorization::ADMIN_ROLE,
-            $user_id,
+            $identity_id,
             $offset,
             $pageSize,
         ];
@@ -325,5 +329,30 @@ class CoursesDAO extends CoursesDAOBase {
         $conn->Execute($sql, $params);
 
         return $conn->Affected_Rows();
+    }
+
+    final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
+        $sql = '
+            SELECT
+                share_user_information
+            FROM
+                Groups_Identities AS gi
+            INNER JOIN
+                Courses AS c ON gi.group_id = c.group_id
+            WHERE
+                gi.identity_id = ?
+            AND
+                gi.group_id = ?
+            AND
+                c.course_id = ?
+            ';
+        $params = [
+            $identity_id,
+            $group->group_id,
+            $course->course_id
+        ];
+
+        global $conn;
+        return $conn->GetOne($sql, $params) == null;
     }
 }

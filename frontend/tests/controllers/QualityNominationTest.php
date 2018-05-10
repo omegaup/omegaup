@@ -1,7 +1,7 @@
 <?php
 
 class QualityNominationTest extends OmegaupTestCase {
-    public static function testGetNominationsHasAuthorAndNominatorSet() {
+    public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
 
@@ -21,7 +21,7 @@ class QualityNominationTest extends OmegaupTestCase {
         self::assertArrayHasKey('nominator', $nominations[0]);
     }
 
-    public static function testGetByIdHasAuthorAndNominatorSet() {
+    public function testGetByIdHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         $contestant = UserFactory::createUser();
 
@@ -355,7 +355,9 @@ class QualityNominationTest extends OmegaupTestCase {
      * Check that a demotion can be denied by a reviewer.
      */
     public function testDemotionCanBeDeniedByReviewer() {
-        $problemData = ProblemsFactory::createProblem(null /* zipName */, null /* title */, ProblemController::VISIBILITY_PUBLIC);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PUBLIC
+        ]));
         $user = UserFactory::createUser();
 
         $login = self::login($user);
@@ -452,7 +454,9 @@ class QualityNominationTest extends OmegaupTestCase {
      * then denied, and it keeps its original visibility
      */
     public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
-        $problemData = ProblemsFactory::createProblem(null, null, ProblemController::VISIBILITY_PRIVATE);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => ProblemController::VISIBILITY_PRIVATE
+        ]));
         $user = UserFactory::createUser();
 
         $login = self::login($user);
@@ -526,6 +530,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail('Missing "original" should have been caught');
         } catch (InvalidParameterException $e) {
+            // Expected.
         }
 
         try {
@@ -541,6 +546,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]));
             $this->fail('Invalid "original" should have been caught');
         } catch (NotFoundException $e) {
+            // Expected.
         }
 
         QualityNominationController::apiCreate(new Request([
@@ -627,6 +633,81 @@ class QualityNominationTest extends OmegaupTestCase {
                 return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
             }
         );
+    }
+
+    /**
+     * Duplicate tag test.
+     */
+    public function testTagsForDuplicate() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        $login = self::login($contestant);
+        try {
+            QualityNominationController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'promotion',
+                'contents' => json_encode([
+                    'rationale' => 'cool!',
+                    'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                    ],
+                    'source' => 'omegaUp',
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                ]),
+            ]));
+            $this->fail('Duplicate tags should be caught.');
+        } catch (DuplicatedEntryInArrayException $e) {
+            // Expected.
+        }
+
+        try {
+            QualityNominationController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    // No difficulty!
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                ]),
+            ]));
+            $this->fail('Duplicate tags should be caught.');
+        } catch (DuplicatedEntryInArrayException $e) {
+            // Expected.
+        }
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'promotion',
+            'contents' => json_encode([
+                'rationale' => 'cool!',
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'source' => 'omegaUp',
+                'tags' => ['ez-pz', 'ez'],
+            ]),
+        ]));
+
+        QualityNominationController::apiCreate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                // No difficulty!
+                'quality' => 3,
+                'tags' => ['ez-pz', 'ez'],
+            ]),
+        ]));
     }
 
     /**
@@ -720,6 +801,7 @@ class QualityNominationTest extends OmegaupTestCase {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -737,12 +819,14 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::search($key);
             $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
         } catch (PreconditionFailedException $e) {
+            // Expected.
         }
     }
 

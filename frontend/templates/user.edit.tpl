@@ -8,6 +8,13 @@
 			<div class="panel-body">
 				<form id="user_profile_form" class="form-horizontal" role="form">
 					<div class="form-group">
+						<label for="username" class="col-md-4 control-label">{#username#}</label>
+						<div class="col-md-7">
+							<input id='username' name='username' value='' type='text' size='30' class="form-control">
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label for="name" class="col-md-4 control-label">{#profile#}</label>
 						<div class="col-md-7">
 							<input id='name' name='name' value='' type='text' size='30' class="form-control">
@@ -67,7 +74,9 @@
 							<option value="es">{#wordsSpanish#}</option>
 							<option value="en">{#wordsEnglish#}</option>
 							<option value="pt">{#wordsPortuguese#}</option>
+							{if "OMEGAUP_ENVIRONMENT"|defined && $smarty.const.OMEGAUP_ENVIRONMENT != "production"}
 							<option value="pseudo">pseudo-loc</option>
+							{/if}
 						</select>
 						</div>
 					</div>
@@ -76,13 +85,17 @@
 						<label for="scholar_degree" class="col-md-4 control-label">{#userEditSchoolGrade#}</label>
 						<div class="col-md-7">
 							<select name="scholar_degree" id="scholar_degree" class="form-control">
-								<option value="Elementary">{#userEditElementary#}</option>
-								<option value="Middle school">{#userEditMiddleSchool#}</option>
-								<option value="High school">{#userEditHighSchool#}</option>
-								<option value="Bachelor's">{#userEditBachelors#}</option>
-								<option value="Master's">{#userEditMasters#}</option>
-								<option value="Doctorate">{#userEditDoctorate#}</option>
-								<option value="Post-doc">Post-doc</option>
+								<option value="none">{#userEditNone#}</option>
+								<option value="early_childhood">{#userEditEarlyChildhood#}</option>
+								<option value="pre_primary">{#userEditPrePrimary#}</option>
+								<option value="primary">{#userEditPrimary#}</option>
+								<option value="lower_secondary">{#userEditLowerSecondary#}</option>
+								<option value="upper_secondary">{#userEditUpperSecondary#}</option>
+								<option value="post_secondary">{#userEditPostSecondary#}</option>
+								<option value="tertiary">{#userEditTertiary#}</option>
+								<option value="bachelors">{#userEditBachelors#}</option>
+								<option value="master">{#userEditMaster#}</option>
+								<option value="doctorate">{#userEditDoctorate#}</option>
 							</select>
 						</div>
 					</div>
@@ -92,8 +105,14 @@
 						<div class="col-md-7">
 						<select id="programming_language" name="programming_language" class="form-control" >
 							<option value=""></option>
-							{foreach from=$PROGRAMMING_LANGUAGES item=programming_language}
-							<option value="{$programming_language}">{$programming_language}</option>
+							{foreach from=$PROGRAMMING_LANGUAGES key=extension item=name}
+							<option value="{$extension}">
+								{if $extension != 'cat'}
+									{$name}
+								{else}
+									{#outputOnly#}
+								{/if}
+							</option>
 							{/foreach}
 						</select>
 						</div>

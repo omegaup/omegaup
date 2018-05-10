@@ -11,9 +11,10 @@ class CourseCreateTest extends OmegaupTestCase {
         );
 
         self::$curator = UserFactory::createUser();
-        GroupsUsersDAO::save(new GroupsUsers([
+        $identity = IdentitiesDAO::getByPK(self::$curator->main_identity_id);
+        GroupsIdentitiesDAO::save(new GroupsIdentities([
             'group_id' => $curatorGroup->group_id,
-            'user_id' => self::$curator->user_id,
+            'identity_id' => $identity->identity_id,
             'role_id' => Authorization::ADMIN_ROLE,
         ]));
     }
@@ -124,7 +125,10 @@ class CourseCreateTest extends OmegaupTestCase {
         $assignment = $assignments[0];
 
         // Add a problem to the assignment.
-        $problemData = ProblemsFactory::createProblem(null, null, 1, $user, null, $login);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'user' => $user
+        ]), $login);
         $points = 1337;
         CourseController::apiAddProblem(new Request([
             'auth_token' => $login->auth_token,

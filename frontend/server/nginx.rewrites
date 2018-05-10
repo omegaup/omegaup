@@ -46,6 +46,7 @@ location /grader/ {
 }
 
 rewrite ^/admin/user/([a-zA-Z0-9_-]+)/?$ /admin/user.php?username=$1 last;
+rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
@@ -64,6 +65,7 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contestactivity.php?contest=$1 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contestedit.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;
 rewrite ^/course/?$ /courselist.php last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /courseactivity.php?course=$1 last;
 rewrite ^/course/new/?$ /coursenew.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1&assignment_alias=$2 last;

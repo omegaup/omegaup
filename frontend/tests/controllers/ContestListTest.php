@@ -138,7 +138,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login(UserFactory::createAdminUser());
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'page_size' => 50
+            'page_size' => 100
         ]);
         $response = ContestController::apiList($r);
 
@@ -217,6 +217,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Assert our contest is there
         $response = ContestController::apiList($r);
+
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',

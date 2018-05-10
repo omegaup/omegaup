@@ -107,6 +107,12 @@ class Problems extends VO {
         if (isset($data['quality'])) {
             $this->quality = $data['quality'];
         }
+        if (isset($data['quality_histogram'])) {
+            $this->quality_histogram = $data['quality_histogram'];
+        }
+        if (isset($data['difficulty_histogram'])) {
+            $this->difficulty_histogram = $data['difficulty_histogram'];
+        }
     }
 
     /**
@@ -310,4 +316,18 @@ class Problems extends VO {
       * @var double
       */
     public $quality;
+
+    /**
+      * Valores del histograma de calidad del problema.
+      * @access public
+      * @var text
+      */
+    public $quality_histogram;
+
+    /**
+      * Valores del histograma de dificultad del problema.
+      * @access public
+      * @var text
+      */
+    public $difficulty_histogram;
 }

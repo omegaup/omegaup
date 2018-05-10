@@ -46,6 +46,13 @@
 				"bin/karel_mdo_convert.py",
 				"frontend/tests/ui/integration-test.py"
 			]
+		},
+		"i18n": {
+			"whitelist": [
+				"frontend/templates/.*\\.lang$",
+				"frontend/www/js/omegaup/lang\\..*\\.json$",
+				"frontend/www/js/omegaup/lang\\..*\\.js$"
+			]
 		}
 	}
 }

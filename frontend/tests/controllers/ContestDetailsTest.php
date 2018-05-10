@@ -130,7 +130,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['languages' => ['c','cpp','java']]));
 
         // Get some problems into the contest
-        $problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp,java,py');
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'languages' => 'cpp,java,py'
+        ]));
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario
@@ -240,14 +243,15 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // We need to grab the access time from the ContestUsers table
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $firstAccessTime = $problemset_user->access_time;
+
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
         $response = ContestController::apiDetails($r);
 
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $this->assertEquals($firstAccessTime, $problemset_user->access_time);
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
     }
 
     /**
@@ -275,14 +279,14 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // We need to grab the access time from the ContestUsers table
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $firstAccessTime = $problemset_user->access_time;
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
         $response = ContestController::apiDetails($r);
 
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $this->assertEquals($firstAccessTime, $problemset_user->access_time);
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
     }
 
     /**
@@ -310,14 +314,14 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // We need to grab the access time from the ContestUsers table
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $firstAccessTime = $problemset_user->access_time;
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
         $response = ContestController::apiDetails($r);
 
-        $problemset_user = ProblemsetUsersDAO::getByPK($contestant->user_id, $contest->problemset_id);
-        $this->assertEquals($firstAccessTime, $problemset_user->access_time);
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK($contestant->main_identity_id, $contest->problemset_id);
+        $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
     }
 
     /**

@@ -1,8 +1,5 @@
 # Ignore objects
 *.o
-karel/lib/x86_64-linux/*
-karel/karel
-karel/kcl
 bin/mysql-connector-java-5.1.29.jar
 
 # Ignore temporary files
@@ -20,12 +17,13 @@ tags
 # Ignore configuration files
 *.conf
 
-# NetBeans-related stuff
+# IDE-related stuff
 build.xml
 nbproject/
 manifest.mf
 build/
 grader/lib/
+.idea/
 
 # Ignore SSL-related stuff
 *.jks
@@ -33,13 +31,6 @@ grader/lib/
 *.key
 *.pem
 *.srl
-
-# SBT-related stuff
-target/
-lib_managed/
-src_managed/
-project/target
-project/classes
 
 # ignore frontend config file
 config.php
@@ -65,6 +56,7 @@ templates_c
 bin/grader.sh
 frontend/www/runner-distrib.sh
 geckodriver.log
+yarn-error.log
 
 # Ignore Mac crap :P
 frontend/.DS_Store
@@ -76,6 +68,7 @@ frontend/www/coverage/
 frontend/www/img/
 frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
+frontend/www/phpminiadmin/
 frontend/www/templates/
 
 # Ignore sublime sftp config

@@ -88,13 +88,17 @@ class Session(object):
             self.jar[name] = value
         if req.status_code == 404:
             return None
-        result = req.json()
+        try:
+            result = req.json()
+        except:
+            logging.exception('Failed to parse json: %s', req.text)
+            raise
         logging.debug('Result: %s', result)
         return result
 
 
 def _process_one_request(s, request, now):
-    '''Invokes a single reqeust specified in |request|.'''
+    '''Invokes a single request specified in |request|.'''
     # First try to see if the resource has already been created.
     if request['api'] == '/problem/create':
         if s.request('/problem/details/',

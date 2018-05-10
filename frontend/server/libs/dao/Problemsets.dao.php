@@ -44,7 +44,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                (Time::get() > strtotime($container->finish_time));
     }
 
-    public static function insideSubmissionWindow($container, $user_id) {
+    public static function insideSubmissionWindow($container, $identity_id) {
         if (isset($container->finish_time)) {
             if (Time::get() > strtotime($container->finish_time) ||
                 Time::get() < strtotime($container->start_time)) {
@@ -56,11 +56,11 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             return true;
         }
 
-        $problemset_user = ProblemsetUsersDAO::getByPK(
-            $user_id,
+        $problemset_identity = ProblemsetIdentitiesDAO::getByPK(
+            $identity_id,
             $container->problemset_id
         );
-        $first_access_time = $problemset_user->access_time;
+        $first_access_time = $problemset_identity->access_time;
 
         return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }

@@ -49,10 +49,12 @@
 								<a class="nav-link" href="#list-past-contest" data-toggle="tab">
 									{#arenaOldContests#}</a>
 							</li>
+							{if $LOGGED_IN == 1}
 							<li class="nav-item">
 								<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
 									{#arenaMyActiveContests#}</a>
 							</li>
+							{/if}
 						</ul>
 
 						<div class="tab-content">
@@ -90,8 +92,6 @@
 				</div> <!-- panel -->
 			</div> <!-- panel-default -->
 		</div> <!-- container -->
-		{if $OMEGAUP_GA_TRACK eq 1}
-		<script type="text/javascript" src="{version_hash src="/js/google-analytics.js"}"></script>
-		{/if}
+{include file='common.analytics.tpl'}
 	</body>
 </html>
