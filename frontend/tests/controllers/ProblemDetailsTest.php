@@ -18,7 +18,10 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $author = UserFactory::createUser();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(null, null, 1, $author);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1,
+            'author' => $author
+        ]));
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -54,7 +57,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
         $this->assertEquals($response['source'], $problemDAO->source);
-        $this->assertContains('<h1>Entrada</h1>', $response['problem_statement']);
+        $this->assertContains('# Entrada', $response['problem_statement']);
         $this->assertEquals($response['order'], $problemDAO->order);
         $this->assertEquals($response['score'], 0);
 
@@ -126,7 +129,9 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
     public function testProblemDetailsNotInContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(null, null, 1 /* public */);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 1
+        ]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -148,7 +153,9 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -168,7 +175,9 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
 
         // Call api
         $response = ProblemController::apiDetails(new Request([

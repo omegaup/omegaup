@@ -41,18 +41,18 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return $admins;
     }
 
-    public static function hasRole($user_id, $acl_id, $role_id) {
+    public static function hasRole($identity_id, $acl_id, $role_id) {
         $sql = '
             SELECT
                 COUNT(*) > 0
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                gu.user_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
+                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
-            $user_id,
+            $identity_id,
             $role_id,
             Authorization::SYSTEM_ACL,
             $acl_id,
@@ -61,22 +61,18 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return $conn->GetOne($sql, $params);
     }
 
-    public static function isAdmin($user_id, $acl_id) {
-        return self::hasRole($user_id, $acl_id, Authorization::ADMIN_ROLE);
-    }
-
-    public static function isContestant($user_id, $acl_id) {
+    public static function isContestant($identity_id, $acl_id) {
         $sql = '
             SELECT
                 COUNT(*) > 0
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                gu.user_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
+                gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::CONTESTANT_ROLE,
             $acl_id,
         ];
@@ -96,24 +92,20 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return self::getAdmins($problem->acl_id);
     }
 
-    public static function isSystemAdmin($user_id) {
-        return self::hasRole($user_id, Authorization::SYSTEM_ACL, Authorization::ADMIN_ROLE);
-    }
-
-    public static function getSystemRoles($user_id) {
+    public static function getSystemRoles($identity_id) {
         $sql = '
             SELECT
                 r.name
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
+                Groups_Identities gi ON gi.group_id = gr.group_id
             INNER JOIN
                 Roles r ON r.role_id = gr.role_id
             WHERE
-                gu.user_id = ? AND gr.acl_id = ?;';
+                gi.identity_id = ? AND gr.acl_id = ?;';
         $params = [
-            $user_id,
+            $identity_id,
             Authorization::SYSTEM_ACL,
         ];
         global $conn;

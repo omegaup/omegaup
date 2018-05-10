@@ -56,13 +56,12 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<!-- Facebook like button -->
-				<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21&amp;appId=197705690257857" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
+                <div id="fb-root"></div>
+                <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="20" data-show-faces="false" data-share="true"></div>
 				<br/>
 				<!-- Twitter follow -->
-				<iframe allowtransparency="true" frameborder="0" scrolling="no"
-					src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
-					style="width:300px; height:20px;"></iframe>
-			</div>
+				<a href="https://twitter.com/omegaup?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-width="300px" data-height="20" data-show-screen-name="false" data-dnt="true" data-show-count="true">Follow @omegaup</a>
+                </div>
 		</div>
 
 		{if isset($coderOfTheMonthData)}

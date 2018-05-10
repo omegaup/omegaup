@@ -199,7 +199,9 @@ class CreateContestTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testCreatePublicContestWithPrivateProblems() {
-        $problem = ProblemsFactory::createProblem(null, null, 0);
+        $problem = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(

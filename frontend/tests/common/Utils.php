@@ -102,10 +102,11 @@ class Utils {
             'Courses',
             'Emails',
             'Group_Roles',
+            'Groups_Identities',
             'Groups_Scoreboards',
-            'Groups_Scoreboards_Contests',
-            'Groups_Users',
+            'Groups_Scoreboards_Problemsets',
             'Identities',
+            'Identity_Login_Log',
             'Interviews',
             'Problems',
             'Problems_Languages',
@@ -113,9 +114,9 @@ class Utils {
             'Problemset_Access_Log',
             'Problemset_Problem_Opened',
             'Problemset_Problems',
-            'Problemset_User_Request',
-            'Problemset_User_Request_History',
-            'Problemset_Users',
+            'Problemset_Identity_Request',
+            'Problemset_Identity_Request_History',
+            'Problemset_Identities',
             'Problemsets',
             'QualityNomination_Comments',
             'QualityNomination_Reviewers',
@@ -124,7 +125,6 @@ class Utils {
             'Schools',
             'Submission_Log',
             'Tags',
-            'User_Login_Log',
             'User_Roles',
             'Users',
             'Users_Experiments',
@@ -143,6 +143,9 @@ class Utils {
 
             // The format of the question changed from this id
             $conn->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+
+            // Make sure the user_id and identity_id never matches in tests.
+            $conn->Execute('ALTER TABLE Identities auto_increment = 100000;');
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());

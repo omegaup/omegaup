@@ -69,9 +69,7 @@ export default {
   Contest: {
     activityReport: _call('/api/contest/activityReport/',
                           function(result) {
-                            for (var idx in result.events) {
-                              if (!result.events.hasOwnProperty(idx)) continue;
-                              var ev = result.events[idx];
+                            for (let ev of result.events) {
                               ev.time =
                                   omegaup.OmegaUp.remoteTime(ev.time * 1000);
                             }
@@ -124,6 +122,8 @@ export default {
                           }),
 
     create: _call('/api/contest/create/'),
+
+    clone: _call('/api/contest/clone/'),
 
     details: _call('/api/contest/details/', _normalizeContestFields),
 
@@ -178,6 +178,15 @@ export default {
   },
 
   Course: {
+    activityReport: _call('/api/course/activityReport/',
+                          function(result) {
+                            for (let ev of result.events) {
+                              ev.time =
+                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
+                            }
+                            return result;
+                          }),
+
     addAdmin: _call('/api/course/addAdmin/'),
 
     addGroupAdmin: _call('/api/course/addGroupAdmin/'),
@@ -375,7 +384,7 @@ export default {
     delete: _call('/api/problem/delete/'),
 
     details: _call('/api/problem/details/', _convertRuntimes,
-                   {statement_type: 'html'}),
+                   {statement_type: 'markdown'}),
 
     list: _call('/api/problem/list/'),
 
@@ -428,6 +437,8 @@ export default {
 
   Reset: {
     create: _call('/api/reset/create/'),
+
+    generateToken: _call('/api/reset/generateToken/'),
 
     update: _call('/api/reset/update/'),
   },
@@ -495,6 +506,8 @@ export default {
 
     contestStats: _call('/api/user/conteststats/'),
 
+    coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
+
     /**
      * Creates a new user.
      * @param {string} email - The user's email address.
@@ -504,6 +517,8 @@ export default {
      * @return {Promise}
      */
     create: _call('/api/user/create/'),
+
+    extraInformation: _call('/api/user/extraInformation/'),
 
     interviewStats: _call('/api/user/interviewstats/'),
 

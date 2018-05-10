@@ -1,20 +1,25 @@
 <?php
 
 class CoursesFactory {
-    public static function createCourse(Users $admin = null, ScopedLoginToken $adminLogin = null, $public = false) {
+    public static function createCourse(
+        Users $admin = null,
+        ScopedLoginToken $adminLogin = null,
+        $public = false,
+        $requests_user_information = 'no'
+    ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-
+        $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = GroupsDAO::FindByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsUsersDAO::save(new GroupsUsers([
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'user_id' => $admin->user_id,
+                'identity_id' => $identity->identity_id,
                 'role_id' => Authorization::ADMIN_ROLE,
             ]));
         }
@@ -26,9 +31,10 @@ class CoursesFactory {
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'start_time' => (Utils::GetPhpUnixTimestamp()),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
-            'public' => $public
+            'public' => $public,
+            'requests_user_information' => $requests_user_information
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -93,7 +99,7 @@ class CoursesFactory {
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
                     'description' => Utils::CreateRandomString(),
-                    'start_time' => (Utils::GetPhpUnixTimestamp() - 60),
+                    'start_time' => (Utils::GetPhpUnixTimestamp()),
                     'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType

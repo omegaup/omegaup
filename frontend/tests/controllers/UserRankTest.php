@@ -50,6 +50,34 @@ class UserRankTest extends OmegaupTestCase {
     }
 
     /**
+     * Tests refreshUserRank not displaying private profiles
+     */
+    public function testPrivateUserInRanking() {
+        // Create a private user
+        $contestantPrivate = UserFactory::createUser(new UserParams(['is_private' => true]));
+        // Create one problem and a submission by the private user
+        $problemData = ProblemsFactory::createProblem();
+        $runDataPrivate = RunsFactory::createRunToProblem($problemData, $contestantPrivate);
+        RunsFactory::gradeRun($runDataPrivate);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        // Call API
+        $response = UserController::apiRankByProblemsSolved(new Request());
+
+        // Contestants should not appear in the rank as they're private.
+        $found = false;
+        foreach ($response['rank'] as $entry) {
+            if ($entry['username'] == $contestantPrivate->username) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertFalse($found);
+    }
+
+    /**
      * Tests apiRankByProblemsSolved
      */
     public function testFullRankByProblemSolvedNoPrivateProblems() {
@@ -61,7 +89,9 @@ class UserRankTest extends OmegaupTestCase {
 
         // Create a user and sumbit a run with him
         $contestant2 = UserFactory::createUser();
-        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0);
+        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
+            'visibility' => 0
+        ]));
         $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
         RunsFactory::gradeRun($runDataPrivate);
 
@@ -269,5 +299,22 @@ class UserRankTest extends OmegaupTestCase {
             'filter' => 'state'
         ]));
         $this->assertCount(1, $response['rank']);
+    }
+    public function testUserRankingClassName() {
+        // Create a user and sumbit a run with them
+        $contestant = UserFactory::createUser();
+        $problemData = ProblemsFactory::createProblem();
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        // Call API
+        $response = UserController::apiProfile(new Request([
+            'username' => $contestant->username
+        ]));
+
+        $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
     }
 }

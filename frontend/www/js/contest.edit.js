@@ -17,7 +17,8 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
-            .html(omegaup.T.contestEdit + ' ' + contest.title);
+            .html(omegaup.T.contestEdit + ' ' +
+                  omegaup.UI.escape(contest.title));
         $('.page-header h1 small')
             .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
                   omegaup.T.contestDetailsGoToContest + '</a>');
@@ -59,8 +60,29 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #basic-information-required')
             .prop('checked', contest.needs_basic_information);
 
-        $('.contest-publish-form #public').val(contest.public);
+        $('.new_contest_form #requests-user-information')
+            .val(contest.requests_user_information);
 
+        $('.contest-publish-form #public').val(contest.public);
+        $('.contest-admin-links #submissions')
+            .attr('href', '/arena/' + contestAlias + '/admin/');
+        $('.contest-admin-links #conteststats')
+            .attr('href', '/contest/' + contestAlias + '/stats/');
+        $('.contest-admin-links #activityreport')
+            .attr('href', '/contest/' + contestAlias + '/activity/');
+        $('.contest-admin-links #printableversion')
+            .attr('href', '/arena/' + contestAlias + '/print/');
+        $('.contest-admin-links #publicscoreboard')
+            .attr('href', '/arena/' + contestAlias + '/scoreboard/' +
+                              contest.scoreboard_url + '/');
+        $('.contest-admin-links #adminscoreboard')
+            .attr('href', '/arena/' + contestAlias + '/scoreboard/' +
+                              contest.scoreboard_url_admin + '/');
+        $('.clone_contest_form #title').val(contest.title);
+        $('.clone_contest_form #alias').val(contest.alias);
+        $('.clone_contest_form #start-time')
+            .val(omegaup.UI.formatDateTime(contest.start_time));
+        $('.clone_contest_form #description').val(contest.description);
         if (contest.contestant_must_register == null ||
             contest.contestant_must_register == '0') {
           $('#requests').hide();
@@ -124,6 +146,7 @@ omegaup.OmegaUp.on('ready', function() {
           contestant_must_register: $('#register').val(),
           basic_information:
               $('#basic-information-required').is(':checked') ? '1' : '0',
+          requests_user_information: $('#requests-user-information').val(),
         })
         .then(function(data) {
           if (data.status == 'ok') {
@@ -140,6 +163,27 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
     return false;
   }
+
+  // Clone contest
+  $('.clone_contest_form')
+      .on('submit', function() {
+        omegaup.API.Contest.clone({
+                             contest_alias: contestAlias,
+                             title: $('#title').val(),
+                             description: $('#description').val(),
+                             start_time:
+                                 (new Date($('#start-time').val()).getTime()) /
+                                     1000,
+                             alias: $('#alias_clone').val(),
+                           })
+            .then(function(response) {
+              omegaup.UI.success(
+                  omegaup.T.contestEditContestClonedSuccessfully);
+            })
+            .fail(omegaup.UI.apiError);
+
+        return false;
+      });
 
   // Edit problems
   function refreshContestProblems() {

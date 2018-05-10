@@ -4,6 +4,7 @@ import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
+import arena_RunDetails from '../components/arena/RunDetails.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -214,6 +215,9 @@ export class Arena {
     // The last known scoreboard event stream.
     self.currentEvents = null;
 
+    // The Markdown-to-HTML converter.
+    self.markdownConverter = UI.markdownConverter();
+
     // Currently opened notifications.
     self.notifications = new Notifications();
     OmegaUp.on('ready',
@@ -275,8 +279,23 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
+    // Setup run details view
+    self.runDetailsView = new Vue({
+      el: '#run-details',
+      render: function(createElement) {
+        return createElement('omegaup-arena-rundetails', {
+          props: {
+            data: this.data,
+          },
+        });
+      },
+      data: {data: null},
+      components: {
+        'omegaup-arena-rundetails': arena_RunDetails,
+      },
+    });
+
     // Setup any global hooks.
-    self.installLibinteractiveHooks();
     self.bindGlobalHandlers();
 
     // Contest summary view model
@@ -297,10 +316,11 @@ export class Arena {
 
   installLibinteractiveHooks() {
     let self = this;
-    $('#libinteractive-download')
+    $('.libinteractive-download form')
         .on('submit', function(e) {
           let form = $(e.target);
-          let alias = e.target.attributes['data-alias'].value;
+          e.preventDefault();
+          let alias = self.currentProblem.alias;
           let os = form.find('.download-os').val();
           let lang = form.find('.download-lang').val();
           let extension = (os == 'unix' ? '.tar.bz2' : '.zip');
@@ -312,11 +332,13 @@ export class Arena {
           return false;
         });
 
-    $('#libinteractive-download .download-lang')
+    $('.libinteractive-download .download-lang')
         .on('change', function(e) {
-          let form = $('#libinteractive-download');
-          form.find('.libinteractive-extension')
-              .html(form.find('.download-lang').val());
+          var form = e.target;
+          while (!form.classList.contains('libinteractive-download')) {
+            form = form.parentElement;
+          }
+          $(form).find('.libinteractive-extension').html($(e.target).val());
         });
   }
 
@@ -899,6 +921,9 @@ export class Arena {
     }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
+      if (clarification.receiver != null) {
+        $(r).addClass('direct-message');
+      }
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
@@ -1078,18 +1103,17 @@ export class Arena {
         $('#summary').hide();
         $('#problem').show();
         $('#problem > .title')
-            .html(problem.letter + '. ' + UI.escape(problem.title));
-        $('#problem .data .points').html(problem.points);
-        $('#problem .memory_limit').html(problem.memory_limit / 1024 + 'MB');
-        $('#problem .time_limit').html(problem.time_limit / 1000 + 's');
+            .text(problem.letter + '. ' + UI.escape(problem.title));
+        $('#problem .data .points').text(problem.points);
+        $('#problem .memory_limit').text(problem.memory_limit / 1024 + 'MB');
+        $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
-            .html(problem.overall_wall_time_limit / 1000 + 's');
-        $('#problem .statement').html(problem.problem_statement);
+            .text(problem.overall_wall_time_limit / 1000 + 's');
+        self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
-        let language_array = problem.languages;
         if (karel_langs.every(function(x) {
-              return language_array.indexOf(x) != -1;
+              return problem.languages.indexOf(x) != -1;
             })) {
           let original_href = $('#problem .karel-js-link a').attr('href');
           let hash_index = original_href.indexOf('#');
@@ -1123,12 +1147,8 @@ export class Arena {
         }
         $('#problem .runs tfoot td a')
             .attr('href', '#problems/' + problem.alias + '/new-run');
-        self.installLibinteractiveHooks();
 
         $('#problem tbody.added').remove();
-
-        self.updateAllowedLanguages(language_array);
-        self.selectDefaultLanguage();
 
         function updateRuns(runs) {
           if (runs) {
@@ -1147,9 +1167,6 @@ export class Arena {
           updateRuns(problem.runs);
         }
 
-        self.mountEditor(problem);
-        MathJax.Hub.Queue(
-            ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
         self.initSubmissionCountdown();
       }
 
@@ -1164,6 +1181,8 @@ export class Arena {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
                 problem.problem_statement = problem_ext.problem_statement;
+                problem.libinteractive_interface_name =
+                    problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
@@ -1216,6 +1235,28 @@ export class Arena {
         $('#clarifications-count').css('font-weight', 'normal');
       }
     }
+  }
+
+  renderProblem(problem) {
+    let self = this;
+    self.currentProblem = problem;
+    let statement = document.querySelector('#problem div.statement');
+    statement.innerHTML =
+        self.markdownConverter.makeHtml(problem.problem_statement);
+    let libinteractiveInterfaceName =
+        statement.querySelector('span.libinteractive-interface-name');
+    if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
+      libinteractiveInterfaceName.innerText =
+          problem.libinteractive_interface_name.replace(/\.idl$/, '');
+    }
+    self.installLibinteractiveHooks();
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
+
+    self.mountEditor(problem);
+
+    let languageArray = problem.languages;
+    self.updateAllowedLanguages(languageArray);
+    self.selectDefaultLanguage();
   }
 
   detectShowRun() {
@@ -1360,7 +1401,12 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        if (file.size >= 10 * 1024) {
+        // TODO(https://github.com/omegaup/omegaup/issues/1962): Remove.
+        if ((extension == 'kp' || extension == 'kj') &&
+            file.size >= 20 * 1024) {
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '20kB'}));
+          return false;
+        } else if (file.size >= 10 * 1024) {
           alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
         }
@@ -1469,68 +1515,25 @@ export class Arena {
   displayRunDetails(guid, data) {
     let self = this;
     let problemAdmin = data.admin;
-
     if (data.status == 'error') {
       self.hideOverlay();
       return;
     }
 
-    if (data.compile_error) {
-      $('#run-details .compile_error pre').html(UI.escape(data.compile_error));
-      $('#run-details .compile_error').show();
-    } else {
-      $('#run-details .compile_error').hide();
-      $('#run-details .compile_error pre').html('');
-    }
-    if (data.logs) {
-      $('#run-details .logs pre').html(UI.escape(data.logs));
-      $('#run-details .logs').show();
-    } else {
-      $('#run-details .logs').hide();
-      $('#run-details .logs pre').html('');
-    }
+    let sourceHTML, sourceLink = false;
     if (data.source.indexOf('data:') === 0) {
-      $('#run-details .source')
-          .html('<a href="' + data.source + '" download="data.zip">' +
-                T.wordsDownload + '</a>');
+      sourceLink = true;
+      sourceHTML = data.source;
     } else if (data.source == 'lockdownDetailsDisabled') {
-      $('#run-details .source')
-          .html(UI.escape((typeof(sessionStorage) !== 'undefined' &&
-                           sessionStorage.getItem('run:' + guid)) ||
-                          T.lockdownDetailsDisabled));
+      sourceHTML = (typeof(sessionStorage) !== 'undefined' &&
+                    sessionStorage.getItem('run:' + guid)) ||
+                   T.lockdownDetailsDisabled;
     } else {
-      $('#run-details .source').html(UI.escape(data.source));
-    }
-
-    if (data.judged_by) {
-      $('#run-details .judged_by pre').html(UI.escape(data.judged_by));
-      $('#run-details .judged_by').show();
-    } else {
-      $('#run-details .judged_by').hide();
-      $('#run-details .judged_by pre').html('');
-    }
-
-    $('#run-details .cases div').remove();
-    $('#run-details .cases table').remove();
-    $('#run-details .download a.sourcecode')
-        .attr('href', window.URL.createObjectURL(
-                          new Blob([data.source], {'type': 'text/plain'})))
-        .attr('download', 'Main.' + data.language);
-    if (problemAdmin) {
-      $('#run-details .download a.output')
-          .attr('href', '/api/run/download/run_alias/' + data.guid + '/');
-      $('#run-details .download a.details')
-          .attr('href',
-                '/api/run/download/run_alias/' + data.guid + '/complete/true/');
-      $('#run-details .download a').show();
-    } else {
-      $('#run-details .download a').hide();
-      $('#run-details .download a.sourcecode').show();
+      sourceHTML = data.source;
     }
 
     function numericSort(key) {
       function isDigit(x) { return '0' <= x && x <= '9'; }
-
       return function(x, y) {
         let i = 0, j = 0;
         for (; i < x[key].length && j < y[key].length; i++, j++) {
@@ -1552,122 +1555,30 @@ export class Arena {
         return (x[key].length - i) - (y[key].length - j);
       };
     }
-
-    // TODO(lhchavez): Use only data.details once backendv1 is deprecated.
-    let detailsGroups = data.groups;
-    if (data.details) {
-      detailsGroups = data.details.groups;
-    }
+    let detailsGroups = data.details && data.details.groups;
+    let groups = null;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
         detailsGroups[i].cases.sort(numericSort('name'));
       }
-
-      let groups =
-          $('<table></table>')
-              .append($('<thead></thead>')
-                          .append($('<tr></tr>')
-                                      .append('<th>' + T.wordsGroup + '</th>')
-                                      .append('<th>' + T.wordsCase + '</th>')
-                                      .append('<th>' + T.wordsVerdict + '</th>')
-                                      .append('<th colspan="3">' + T.rankScore +
-                                              '</th>')
-                                      .append('<th width="1"></th>')));
-
-      for (let i = 0; i < detailsGroups.length; i++) {
-        let g = detailsGroups[i];
-        let cases = $('<tbody></tbody>').hide();
-        groups.append(
-            $('<tbody></tbody>')
-                .append(
-                    $('<tr class="group"></tr>')
-                        .append('<th class="center">' + UI.escape(g.group) +
-                                '</th>')
-                        .append('<th colspan="2"></th>')
-                        .append('<th class="score">' +
-                                (g.contest_score !== undefined ?
-                                     g.contest_score :
-                                     g.score) +
-                                '</th>')
-                        .append('<th class="center" width="10">' +
-                                (g.max_score !== undefined ? '/' : '') +
-                                '</th>')
-                        .append('<th>' +
-                                (g.max_score !== undefined ? g.max_score : '') +
-                                '</th>')
-                        .append(
-                            $('<td></td>')
-                                .append(
-                                    $('<span class="collapse glyphicon ' +
-                                      'glyphicon-collapse-down"></span>')
-                                        .on('click', (function(cases) {
-                                              return function(ev) {
-                                                let target = $(ev.target);
-                                                if (target.hasClass(
-                                                        'glyphicon-collapse-down')) {
-                                                  target.removeClass(
-                                                      'glyphicon-collapse-down');
-                                                  target.addClass(
-                                                      'glyphicon-collapse-up');
-                                                } else {
-                                                  target.addClass(
-                                                      'glyphicon-collapse-down');
-                                                  target.removeClass(
-                                                      'glyphicon-collapse-up');
-                                                }
-                                                cases.toggle();
-                                                return false;
-                                              };
-                                            })(cases))))));
-        for (let j = 0; j < g.cases.length; j++) {
-          let c = g.cases[j];
-          let caseRow =
-              $('<tr></tr>')
-                  .append('<td></td>')
-                  .append('<td class="center">' + c.name + '</td>')
-                  .append('<td class="center">' + T['verdict' + c.verdict] +
-                          '</td>')
-                  .append('<td class="score">' +
-                          (c.contest_score !== undefined ? c.contest_score :
-                                                           c.score) +
-                          '</td>')
-                  .append('<td class="center" width="10">' +
-                          (c.max_score !== undefined ? '/' : '') + '</td>')
-                  .append('<td>' +
-                          (c.max_score !== undefined ? c.max_score : '') +
-                          '</td>');
-          cases.append(caseRow);
-          if (problemAdmin && c.meta) {
-            let metaRow =
-                $('<tr class="meta"></tr>')
-                    .append('<td colspan="6"><pre>' +
-                            JSON.stringify(c.meta, null, 2) + '</pre></td>')
-                    .hide();
-            caseRow.append(
-                $('<td></td>')
-                    .append(
-                        $('<span class="collapse glyphicon glyphicon-list-alt">' +
-                          '</span>')
-                            .on('click', (function(metaRow) {
-                                  return function(ev) {
-                                    metaRow.toggle();
-                                    return false;
-                                  };
-                                })(metaRow))));
-            cases.append(metaRow);
-          }
-        }
-        groups.append(cases);
-      }
-      $('#run-details .cases').append(groups);
-      $('#run-details .cases').show();
-    } else {
-      $('#run-details .cases').hide();
+      groups = detailsGroups;
     }
-    $('#overlay form').hide();
-    $('#overlay').show();
-    $('#run-details').show();
+    self.runDetailsView.data = {
+      compile_error: data.compile_error,
+      logs: data.logs,
+      judged_by: data.judged_by,
+      source: sourceHTML,
+      source_link: sourceLink,
+      source_url: window.URL.createObjectURL(
+          new Blob([data.source], {'type': 'text/plain'})),
+      source_name: 'Main.' + data.language,
+      problem_admin: data.admin,
+      guid: data.guid,
+      groups: groups,
+      language: data.language,
+    };
+    document.querySelector('.run-details-view').style.display = 'block';
   }
 
   trackRun(run) {
@@ -1796,9 +1707,15 @@ class RunView {
           self.filter_username('');
         });
 
-    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
+    if (self.arena.options.contestAlias) {
+      UI.problemContestTypeahead(
+          $('.runsproblem', elm), self.arena.problems,
+          function(event, item) { self.filter_problem(item.alias); });
+    } else {
+      UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+        self.filter_problem(item.alias);
+      });
+    }
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

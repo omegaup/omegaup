@@ -7,7 +7,8 @@
 			</div>
 		</div>
 		<div id="overlay">
-{include file='arena.rundetails.tpl'}
+			<div id="run-details"></div>
 		</div>
+{include file='common.analytics.tpl'}
 	</body>
 </html>

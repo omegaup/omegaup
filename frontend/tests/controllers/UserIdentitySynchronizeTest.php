@@ -33,46 +33,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
     }
 
     /**
-     * Reset password via admin
-     */
-    public function testResetPasswordViaAdmin() {
-        // Create an user in omegaup
-        $user = UserFactory::createUser();
-
-        // Create the admin who will change the password
-        $admin = UserFactory::createAdminUser();
-
-        $adminLogin = self::login($admin);
-        $r = new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
-        ]);
-
-        // Call api
-        UserController::apiChangePassword($r);
-
-        // Try to login with old password, should fail
-        try {
-            self::login($user);
-            $this->fail('Reset password failed');
-        } catch (Exception $e) {
-            // We are OK
-        }
-
-        // Set new password and try again, should succeed
-        $user->password = $r['password'];
-        self::login($user);
-
-        // Sanity check, admin should be able to login fine
-        self::login($admin);
-
-        $user = UsersDAO::FindByUsername($user->username);
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
-        $this->assertEquals($identity->password, $user->password);
-    }
-
-    /**
      * Reset my password
      */
     public function testResetMyPassword() {
@@ -122,7 +82,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
-            'scholar_degree' => 'Maestría',
+            'scholar_degree' => 'master',
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale[0]->name,
@@ -150,7 +110,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
-            'scholar_degree' => 'Primaria',
+            'scholar_degree' => 'primary',
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
             'locale' => $locale[0]->name,

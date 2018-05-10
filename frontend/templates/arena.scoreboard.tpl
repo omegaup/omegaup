@@ -9,5 +9,6 @@
 			</div>
 		</div>
 	</div>
+{include file='common.analytics.tpl'}
 </body>
 </html>

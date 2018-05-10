@@ -19,4 +19,33 @@ class IdentityController extends Controller {
             'school_id' => $user->school_id
         ]));
     }
+
+    /**
+     * Given a username or a email, returns the identity object
+     *
+     * @param type $userOrEmail
+     * @return Identity
+     * @throws ApiException
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     */
+    public static function resolveIdentity($userOrEmail) {
+        Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        try {
+            $identity = IdentitiesDAO::FindByEmail($userOrEmail);
+            if (!is_null($identity)) {
+                return $identity;
+            }
+
+            $identity = IdentitiesDAO::FindByUsername($userOrEmail);
+            if (!is_null($identity)) {
+                return $identity;
+            }
+            throw new NotFoundException('userOrMailNotFound');
+        } catch (ApiException $apiException) {
+            throw $apiException;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }

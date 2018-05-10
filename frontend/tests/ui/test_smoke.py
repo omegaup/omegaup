@@ -9,7 +9,7 @@ from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-_OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
+import ui.util as util
 
 
 @flaky
@@ -68,7 +68,7 @@ def test_create_problem(driver):
         contents_element = driver.browser.find_element_by_name(
             'problem_contents')
         contents_element.send_keys(os.path.join(
-            _OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
+            util.OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
         with driver.ajax_page_transition(wait_for_ajax=False):
             contents_element.submit()
 
