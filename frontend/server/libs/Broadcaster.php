@@ -13,7 +13,7 @@ class Broadcaster {
             $message = json_encode([
                 'message' => '/clarification/update/',
                 'clarification' => [
-                    'clarification_id' => (int)($r['clarification']->clarification_id),
+                    'clarification_id' => (int)$r['clarification']->clarification_id,
                     'problem_alias' => $r['problem']->alias,
                     'author' => $r['user']->username,
                     'message' => $r['clarification']->message,
