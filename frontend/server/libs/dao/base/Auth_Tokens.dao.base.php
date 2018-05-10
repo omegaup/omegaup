@@ -20,7 +20,7 @@ abstract class AuthTokensDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Auth_Tokens`.`user_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time`';
+    const FIELDS = '`Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class AuthTokensDAOBase extends DAO {
         if (is_null($token)) {
             return null;
         }
-        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM Auth_Tokens WHERE (token = ?) LIMIT 1;';
+        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM Auth_Tokens WHERE (token = ?) LIMIT 1;';
         $params = [$token];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class AuthTokensDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link AuthTokens}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` from Auth_Tokens';
+        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` from Auth_Tokens';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -131,6 +131,10 @@ abstract class AuthTokensDAOBase extends DAO {
             $clauses[] = '`user_id` = ?';
             $params[] = $Auth_Tokens->user_id;
         }
+        if (!is_null($Auth_Tokens->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Auth_Tokens->identity_id;
+        }
         if (!is_null($Auth_Tokens->token)) {
             $clauses[] = '`token` = ?';
             $params[] = $Auth_Tokens->token;
@@ -149,7 +153,7 @@ abstract class AuthTokensDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM `Auth_Tokens`';
+        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM `Auth_Tokens`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -173,9 +177,10 @@ abstract class AuthTokensDAOBase extends DAO {
       * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a actualizar.
       */
     final private static function update(AuthTokens $Auth_Tokens) {
-        $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `create_time` = ? WHERE `token` = ?;';
+        $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `identity_id` = ?, `create_time` = ? WHERE `token` = ?;';
         $params = [
             $Auth_Tokens->user_id,
+            $Auth_Tokens->identity_id,
             $Auth_Tokens->create_time,
             $Auth_Tokens->token,
         ];
@@ -200,9 +205,10 @@ abstract class AuthTokensDAOBase extends DAO {
         if (is_null($Auth_Tokens->create_time)) {
             $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Auth_Tokens (`user_id`, `token`, `create_time`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
             $Auth_Tokens->user_id,
+            $Auth_Tokens->identity_id,
             $Auth_Tokens->token,
             $Auth_Tokens->create_time,
         ];
@@ -259,6 +265,17 @@ abstract class AuthTokensDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`user_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Auth_TokensA->identity_id;
+        $b = $Auth_TokensB->identity_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
