@@ -21,7 +21,7 @@ class Broadcaster {
                     'time' => $time,
                     'public' => $r['clarification']->public != '0'
                 ]
-            ],JSON_NUMERIC_CHECK);
+            ]);
 
             $grader = new Grader();
             $this->log->debug("Sending update $message");
