@@ -1571,6 +1571,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
+      language: data.language,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

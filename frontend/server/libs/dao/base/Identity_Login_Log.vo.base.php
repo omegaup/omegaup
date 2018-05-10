@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table User_Login_Log.
+ * Value Object file for table Identity_Login_Log.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class UserLoginLog extends VO {
+class IdentityLoginLog extends VO {
     /**
-     * Constructor de UserLoginLog
+     * Constructor de IdentityLoginLog
      *
-     * Para construir un objeto de tipo UserLoginLog debera llamarse a el constructor
+     * Para construir un objeto de tipo IdentityLoginLog debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,8 +26,8 @@ class UserLoginLog extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
         if (isset($data['ip'])) {
             $this->ip = $data['ip'];
@@ -49,11 +49,11 @@ class UserLoginLog extends VO {
     }
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $identity_id;
 
     /**
       *  [Campo no documentado]
