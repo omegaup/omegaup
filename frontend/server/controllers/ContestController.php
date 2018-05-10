@@ -136,6 +136,8 @@ class ContestController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
+        self::forbiddenInVirtual($r);
+
         Validators::isNumber($r['page'], 'page', false);
         Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -845,14 +847,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Validate request
-        if (isset($r['virtual']) and $r['virtual'] == true) {
-            self::validateCreateVirtual($r);
-        } else {
-            //there is no rerun id in real contest
-            $r['rerun_id'] = 0;
-            $r['problemset_id'] = null;
-            self::validateCreateOrUpdate($r);
-        }
+        self::validateCreateOrUpdate($r);
 
         // Create and populate a new Contests object
         $contest = new Contests();
@@ -949,9 +944,8 @@ class ContestController extends Controller {
 
     private static function validateCreateVirtual(Request $r) {
         $real_contest = ContestsDAO::getByAlias($r['contest_alias']);
-        if (is_null($real_contest)) {
-            throw new NotFoundException('contestNotFound');
-        }
+        $r['contest'] = $real_contest;
+        self::canAccessContest($r);
         try {
             $r['contest'] = ContestsDAO::getVirtualByContest($real_contest, $r['current_user']);
         } catch (Exception $e) {
@@ -960,7 +954,7 @@ class ContestController extends Controller {
 
         if (!ContestsDAO::hasFinished($real_contest)) {
             throw new ForbiddenAccessException('realContestHasNotBeenEnded');
-        } elseif (!is_null($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
+        } elseif (ContestsDAO::isVirtual($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
             throw new ForbiddenAccessException('unfinishedVirtualContest');
         }
 
@@ -997,6 +991,15 @@ class ContestController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         // Is the parameter required?
         $is_required = true;
+
+        if (self::isVirtual($r)) {
+            self::validateCreateVirtual($r);
+            return;
+        }
+
+        //there is no rerun id in real contest
+        $r['rerun_id'] = 0;
+        $r['problemset_id'] = null;
 
         if ($is_update === true) {
             // In case of Update API, required parameters for Create API are not required
@@ -1171,6 +1174,7 @@ class ContestController extends Controller {
 
         // Authenticate user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest($r);
@@ -1264,6 +1268,7 @@ class ContestController extends Controller {
     public static function apiRemoveProblem(Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateRemoveFromContestRequest($r);
@@ -1400,6 +1405,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateAddUser($r);
 
         // Save the contest to the DB
@@ -1430,6 +1436,7 @@ class ContestController extends Controller {
     public static function apiRemoveUser(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateAddUser($r);
 
         try {
@@ -1459,6 +1466,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1493,6 +1501,7 @@ class ContestController extends Controller {
     public static function apiRemoveAdmin(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1536,6 +1545,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1574,6 +1584,7 @@ class ContestController extends Controller {
     public static function apiRemoveGroupAdmin(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1636,6 +1647,7 @@ class ContestController extends Controller {
      */
     public static function apiClarifications(Request $r) {
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateClarifications($r);
 
         $is_contest_director = Authorization::isContestAdmin(
@@ -2114,6 +2126,7 @@ class ContestController extends Controller {
 
         // Authenticate request
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate request
         self::validateCreateOrUpdate($r, true /* is update */);
@@ -2369,6 +2382,16 @@ class ContestController extends Controller {
         $response['status'] = 'ok';
 
         return $response;
+    }
+
+    public static function forbiddenInVirtual(Request $r) {
+        if (isset($r['virtual']) and $r['virtual'] == true) {
+            throw new ForbiddenAccessException();
+        }
+    }
+
+    public static function isVirtual(Request $r) {
+        return isset($r['virtual']) and $r['virtual'] == true;
     }
 
     /**

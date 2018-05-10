@@ -215,6 +215,10 @@ class ContestsDAO extends ContestsDAOBase {
         return $rs['total'];
     }
 
+    public static function isVirtual(Contests $contest) {
+        return $contest->rerun_id != 0;
+    }
+
     public static function hasStarted(Contests $contest) {
         return Time::get() >= strtotime($contest->start_time);
     }
