@@ -186,15 +186,11 @@ class ProblemController extends Controller {
             }
             $problem->slow = $problemDeployer->isSlow($problem);
 
-            // Calculate input and output limit.
+            // Calculate output limit.
             $output_limit = $problemDeployer->getOutputLimit();
-            $input_limit = $problemDeployer->getInputLimit();
 
             if ($output_limit != -1) {
                 $problem->output_limit = $output_limit;
-            }
-            if ($input_limit != -1) {
-                $problem->input_limit = $input_limit;
             }
 
             // Save the contest object with data sent by user to the database
