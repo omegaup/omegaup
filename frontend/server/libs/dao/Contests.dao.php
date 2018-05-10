@@ -215,7 +215,10 @@ class ContestsDAO extends ContestsDAOBase {
         return $rs['total'];
     }
 
-    public static function isVirtual(Contests $contest) {
+    public static function isVirtual($contest) {
+        if (is_null($contest) and !($contest instanceof Contests)) {
+            return null;
+        }
         return $contest->rerun_id != 0;
     }
 

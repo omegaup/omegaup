@@ -912,8 +912,9 @@ class ContestController extends Controller {
                 foreach ($r['problems'] as $problem) {
                     $problemset_problem = new ProblemsetProblems([
                                 'problemset_id' => $problemset->problemset_id,
-                                'problem_id' => $problem['id'],
-                                'points' => $problem['points']
+                                'problem_id' => $problem['id'] ?? $problem['problem_id'],
+                                'points' => $problem['points'],
+                                'order' => $problem['order'] ?? null
                             ]);
 
                     ProblemsetProblemsDAO::save($problemset_problem);
@@ -943,7 +944,11 @@ class ContestController extends Controller {
     }
 
     private static function validateCreateVirtual(Request $r) {
-        $real_contest = ContestsDAO::getByAlias($r['contest_alias']);
+        try {
+            $real_contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         $r['contest'] = $real_contest;
         self::canAccessContest($r);
         try {
@@ -954,14 +959,14 @@ class ContestController extends Controller {
 
         if (!ContestsDAO::hasFinished($real_contest)) {
             throw new ForbiddenAccessException('realContestHasNotBeenEnded');
-        } elseif (ContestsDAO::isVirtual($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
+        } elseif (isset($r['contest']) and ContestsDAO::isVirtual($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
             throw new ForbiddenAccessException('unfinishedVirtualContest');
         }
 
         $r['public'] = 0;
         $r['title'] = $real_contest->title;
         $r['description'] = $real_contest->description;
-        $r['problemset_id'] = $real_contest->problemset_id;
+        $r['problems'] = ProblemsetProblemsDAO::getProblems($real_contest->problemset_id);
         $r['start_time'] = time();
         $r['finish_time'] = time() + strtotime($real_contest->finish_time) - strtotime($real_contest->start_time);
         $r['window_length'] = $real_contest->window_length;
@@ -1135,6 +1140,9 @@ class ContestController extends Controller {
         // Only director is allowed to create problems in contest
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
+            if (self::isVirtual($r)) {
+                $contest = ContestsDAO::getVirtualByContest($contest, $r['current_user']);
+            }
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
