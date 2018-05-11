@@ -921,6 +921,9 @@ export class Arena {
     }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
+      if (clarification.receiver != null) {
+        $(r).addClass('direct-message');
+      }
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
@@ -1402,7 +1405,12 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        if (file.size >= 10 * 1024) {
+        // TODO(https://github.com/omegaup/omegaup/issues/1962): Remove.
+        if ((extension == 'kp' || extension == 'kj') &&
+            file.size >= 20 * 1024) {
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '20kB'}));
+          return false;
+        } else if (file.size >= 10 * 1024) {
           alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
         }
@@ -1572,6 +1580,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
+      language: data.language,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

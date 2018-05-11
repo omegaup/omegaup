@@ -69,9 +69,7 @@ export default {
   Contest: {
     activityReport: _call('/api/contest/activityReport/',
                           function(result) {
-                            for (var idx in result.events) {
-                              if (!result.events.hasOwnProperty(idx)) continue;
-                              var ev = result.events[idx];
+                            for (let ev of result.events) {
                               ev.time =
                                   omegaup.OmegaUp.remoteTime(ev.time * 1000);
                             }
@@ -180,6 +178,15 @@ export default {
   },
 
   Course: {
+    activityReport: _call('/api/course/activityReport/',
+                          function(result) {
+                            for (let ev of result.events) {
+                              ev.time =
+                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
+                            }
+                            return result;
+                          }),
+
     addAdmin: _call('/api/course/addAdmin/'),
 
     addGroupAdmin: _call('/api/course/addGroupAdmin/'),
@@ -498,6 +505,8 @@ export default {
     changePassword: _call('/api/user/changepassword/'),
 
     contestStats: _call('/api/user/conteststats/'),
+
+    coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
     /**
      * Creates a new user.

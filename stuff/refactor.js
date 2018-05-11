@@ -21,21 +21,33 @@ const ast = babylon.parse(buf, {
   sourceType: isModule ? 'module' : 'script',
 });
 
+function hasRefactorLintDisableComment(path) {
+  const comments = path.getStatementParent().trailingComments;
+  if (!comments || comments.length == 0) {
+    return false;
+  }
+  return comments[0].value.trim() == 'refactor-lint-disable';
+}
+
 const fixes = [];
 const promiseVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     const callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;
     }
-    if (callee.property.name != 'then' && callee.property.name != 'fail') {
+    if (callee.property.name != 'then' && callee.property.name != 'fail' &&
+        callee.property.name != 'catch') {
       return;
     }
     const p = path.getStatementParent();
     if (p.node.type != 'ExpressionStatement') {
       throw new Error('Unexpected statement type: ' + p.node.type);
     }
-    if (callee.property.name == 'fail') {
+    if (callee.property.name == 'fail' || callee.property.name == 'catch') {
       p.hasFail = true;
     } else if (callee.property.name == 'then') {
       if (p.visited) {
@@ -64,6 +76,9 @@ const jQueryBooleanProperties = [
 ];
 const jQueryRemoveAttrVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     let callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;
@@ -98,6 +113,9 @@ const jQueryDeprecatedFunctions = [
 ];
 const jQueryDeprecatedFunctionVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     let callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;
