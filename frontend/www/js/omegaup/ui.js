@@ -306,7 +306,7 @@ let UI = {
     document.body.appendChild(tempInput);
 
     try {
-      tempInput.select();
+      tempInput.select();  // refactor-lint-disable
       document.execCommand('copy');
     } finally {
       document.body.removeChild(tempInput);

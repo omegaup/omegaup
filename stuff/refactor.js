@@ -22,7 +22,7 @@ const ast = babylon.parse(buf, {
 });
 
 function hasRefactorLintDisableComment(path) {
-  const comments = path.getStatementParent().trailingComments;
+  const comments = path.getStatementParent().node.trailingComments;
   if (!comments || comments.length == 0) {
     return false;
   }
