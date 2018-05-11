@@ -94,6 +94,7 @@ class Utils {
         $tables = [
             'ACLs',
             'Assignments',
+            'Audit_Log',
             'Auth_Tokens',
             'Clarifications',
             'Coder_Of_The_Month',
