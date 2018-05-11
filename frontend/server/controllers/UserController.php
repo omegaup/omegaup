@@ -1198,7 +1198,6 @@ class UserController extends Controller {
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['is_private'] = $user->is_private;
         $response['userinfo']['verified'] = $user->verified == '1';
-        $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
         if (!is_null($user->language_id)) {
@@ -1837,10 +1836,6 @@ class UserController extends Controller {
             Validators::isNumber($r['is_private'], 'is_private', true);
         }
 
-        if (!is_null($r['recruitment_optin'])) {
-            Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
-        }
-
         if (!is_null($r['hide_problem_tags'])) {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
@@ -1865,7 +1860,6 @@ class UserController extends Controller {
             }],
             'gender',
             'is_private',
-            'recruitment_optin',
             'hide_problem_tags',
         ];
 
