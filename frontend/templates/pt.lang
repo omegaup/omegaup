@@ -707,6 +707,7 @@ unableToVerifyCaptcha = "Não pudemos verificar o captcha. Recarregue a página 
 unverifiedUser = "Usuário não confirmado."
 updateItemsError = "Ocorreu um erro ao atualizar itens"
 updateItemsSuccess = "Todos os itens selecionados foram atualizados"
+userAlreadyAcceptedPrivacyPolicies = "As políticas de privacidade já foram aceitas"
 userDoesNotHaveAnyPasswordChangeRequest = "O usuário não possui nenhuma solicitação de mudança de senha nas últimas 24 horas."
 userEditAddPassword = "Adicionar senha"
 userEditBachelors = "Grau"

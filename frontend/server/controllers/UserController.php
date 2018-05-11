@@ -2406,6 +2406,66 @@ class UserController extends Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
+
+    /**
+     * Gets the last privacy policy accepted by user
+     *
+     * @param Request $r
+     */
+    public static function apiLastPrivacyPolicyAccepted(Request $r) {
+        self::authenticateRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+
+        Validators::isStringNonEmpty($r['git_object_id'], 'git_object_id');
+
+        return [
+            'status' => 'ok',
+            'hasAccepted' => self::hasAcceptedLastPrivacyPolicy(
+                $identity->identity_id,
+                $r['git_object_id']
+            )
+        ];
+    }
+
+    /**
+     * Keeps a record of a user who accepts the privacy policies
+     *
+     * @param Request $r
+     */
+    public static function apiAcceptPrivacyPolicies(Request $r) {
+        self::authenticateRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+
+        Validators::isStringNonEmpty($r['git_object_id'], 'git_object_id');
+
+        $hasAccepted = self::hasAcceptedLastPrivacyPolicy(
+            $identity->identity_id,
+            $r['git_object_id']
+        );
+        if ($hasAccepted) {
+            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicies');
+        }
+
+        $auditLog = new AuditLog([
+            'identity_id' => $identity->identity_id,
+            'git_object_id' => $r['git_object_id'],
+        ]);
+        AuditLogDAO::save($auditLog);
+
+        return ['status' => 'ok'];
+    }
+
+    private static function hasAcceptedLastPrivacyPolicy($identity_id, $git_object_id) {
+        try {
+            $accepts_policies = AuditLogDAO::getByPK($identity_id, $git_object_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return count($accepts_policies) > 0;
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
