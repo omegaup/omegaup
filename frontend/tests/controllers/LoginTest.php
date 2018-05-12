@@ -13,10 +13,11 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByUserPositive() {
         // Create an user in omegaup
         $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(UserLoginLogDAO::search([
-            'user_id' => $user->user_id,
+        $this->assertEquals(0, count(IdentityLoginLogDAO::search([
+            'identity_id' => $identity->identity_id,
         ])));
 
         // Inflate request with user data
@@ -32,8 +33,8 @@ class LoginTest extends OmegaupTestCase {
         $this->assertLogin($user, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(UserLoginLogDAO::search([
-            'user_id' => $user->user_id,
+        $this->assertEquals(1, count(IdentityLoginLogDAO::search([
+            'identity_id' => $identity->identity_id,
         ])));
     }
 
