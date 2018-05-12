@@ -416,6 +416,9 @@ class ContestController extends Controller {
         if (is_null($r['token'])) {
             // Crack the request to get the current user
             self::authenticateRequest($r);
+            if (self::isVirtual($r)) {
+                $r['contest'] = ContestsDAO::getVirtualByContest($r['contest'], $r['current_user']);
+            }
             self::canAccessContest($r);
 
             $r['contest_admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);

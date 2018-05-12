@@ -174,6 +174,7 @@ class ContestsDAO extends ContestsDAOBase {
         if (count($rs) == 0) {
             return null;
         }
+        $rs['alias'] = $real_contest->alias;
         $contest = new Contests($rs);
         return $contest;
     }

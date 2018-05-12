@@ -23,6 +23,7 @@ class ScoreboardParams implements ArrayAccess {
         ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, false);
         ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
         ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter('virtual', $params, true);
 
         // Convert any string dates into timestamps.
         foreach (['start_time', 'finish_time'] as $time_param) {
@@ -65,7 +66,8 @@ class ScoreboardParams implements ArrayAccess {
                 'penalty' => $contest->penalty,
                 'penalty_calc_policy' => $contest->penalty_calc_policy,
                 'show_scoreboard_after' => $contest->show_scoreboard_after,
-                'scoreboard_pct' => $contest->scoreboard]);
+                'scoreboard_pct' => $contest->scoreboard,
+                'virtual' => ContestsDAO::isVirtual($contest)]);
     }
 
     /**
@@ -230,10 +232,10 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        if (!is_null($result)) {
+        /*if (!is_null($result)) {
             Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
-        }
+        }*/
 
         try {
             // Get all distinct contestants participating in the given contest
@@ -242,6 +244,16 @@ class Scoreboard {
                 $this->params['acl_id'],
                 $this->params['show_all_runs']
             );
+            //also add real contest participants if it is virtual contest
+            $real_contest = null;
+            if ($this->params['virtual']) {
+                $real_contest = ContestsDAO::getByAlias($this->params['alias']);
+                $raw_contest_users = $raw_contest_users + RunsDAO::getAllRelevantUsers(
+                    $real_contest->problemset_id,
+                    $real_contest->acl_id,
+                    false //Dont show others submissions
+                );
+            }
 
             // Get all problems given problemset
             $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
@@ -249,6 +261,14 @@ class Scoreboard {
                 ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
             $contest_runs = RunsDAO::getProblemsetRuns($problemset);
+            //also get the runs from real contest if it is virtual contest
+            //TODO get runs from also another users virtual contests
+            if ($this->params['virtual']) {
+                $real_contest_problemset = ProblemsetsDAO::getByPK($real_contest->problemset_id);
+                $raw_problemset_problems = $raw_problemset_problems + ProblemsetProblemsDAO::getRelevantProblems($real_contest_problemset);
+                $real_contest_runs = RunsDAO::getProblemsetRuns($real_contest_problemset);
+                $contest_runs = $contest_runs + RunsDAO::calibrateRuns($real_contest_runs, strtotime($real_contest->start_time), $this->params['start_time']);
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
