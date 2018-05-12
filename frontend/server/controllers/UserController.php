@@ -2388,6 +2388,23 @@ class UserController extends Controller {
         ];
     }
 
+    public static function getPrivacyPolicies(Request $r) {
+        // TODO: Get the redaction of the policies issue #1992
+        // TODO: Get the gitObjectId issue #1992
+        $lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+        return [
+            'status' => 'ok',
+            'privacy_policies' => $lorem_ipsum,
+            'git_object_id' => 'XXXXXXXXXXXXXXXX'
+        ];
+    }
+
+    public static function apiAcceptPrivacyPolicies(Request $r) {
+        // TODO: Remove this dummy when #1991 is merged
+        return ['status' => 'ok'];
+    }
+
     private static function getSelectedFilter($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (!$session['valid']) {

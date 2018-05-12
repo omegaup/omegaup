@@ -496,6 +496,8 @@ export default {
   },
 
   User: {
+    acceptPrivacyPolicies: _call('/api/user/acceptPrivacyPolicies'),
+
     addExperiment: _call('/api/user/addexperiment/'),
 
     addGroup: _call('/api/user/addgroup/'),
