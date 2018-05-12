@@ -23,7 +23,7 @@ class ScoreboardParams implements ArrayAccess {
         ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, false);
         ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
         ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
-        ScoreboardParams::validateParameter('virtual', $params, true);
+        ScoreboardParams::validateParameter('virtual', $params, false, false);
 
         // Convert any string dates into timestamps.
         foreach (['start_time', 'finish_time'] as $time_param) {
@@ -232,10 +232,10 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        /*if (!is_null($result)) {
+        if (!is_null($result)) {
             Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
-        }*/
+        }
 
         try {
             // Get all distinct contestants participating in the given contest
