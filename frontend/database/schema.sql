@@ -396,7 +396,6 @@ CREATE TABLE `Problem_Of_The_Week` (
   `difficulty` enum('easy','hard') NOT NULL COMMENT 'At some point we will have two problems of the week per week, an easy one and a hard one.',
   PRIMARY KEY (`problem_of_the_week_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `idx_time_difficulty` (`time`,`difficulty`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='List of problems of the week.';
 /*!40101 SET character_set_client = @saved_cs_client */;
