@@ -738,7 +738,6 @@ omegaup.OmegaUp.loadTranslations({
 	userEditPrimary: "Primaria",
 	userEditPrivateProfile: "\u00bfLe gustar\u00eda ocultar los detalles del perfil de otros?",
 	userEditProfileImage: "Imagen de perfil",
-	userEditRecruitmentOptin: "\u00bfDar\u00edas permiso a omegaUp de compartir tu informaci\u00f3n con terceros con fines de reclutamiento?",
 	userEditSchool: "Escuela",
 	userEditSchoolGrade: "Grado escolar",
 	userEditState: "Estado",
