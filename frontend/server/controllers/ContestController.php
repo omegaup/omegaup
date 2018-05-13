@@ -947,12 +947,7 @@ class ContestController extends Controller {
     }
 
     private static function validateCreateVirtual(Request $r) {
-        try {
-            $real_contest = ContestsDAO::getByAlias($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        $r['contest'] = $real_contest;
+        $real_contest = $r['contest'];
         self::canAccessContest($r);
         try {
             $r['contest'] = ContestsDAO::getVirtualByContest($real_contest, $r['current_user']);
@@ -978,7 +973,7 @@ class ContestController extends Controller {
         $r['scoreboard'] = 100; //TODO should this be $real_contest->scoreboard?
         $r['points_decay_factor'] = $real_contest->points_decay_factor;
         $r['partial_score'] = $real_contest->partial_score;
-        $r['feedback'] = $real_contest->feedback; //TODO should there be feedback in ghost mode?
+        $r['feedback'] = $real_contest->feedback;
         $r['penalty'] = $real_contest->penalty;
         $r['penalty_type'] = $real_contest->penalty_type;
         $r['penalty_calc_policy'] = $real_contest->penalty_calc_policy;
@@ -1000,16 +995,11 @@ class ContestController extends Controller {
         // Is the parameter required?
         $is_required = true;
 
-        if (self::isVirtual($r)) {
-            self::validateCreateVirtual($r);
-            return;
-        }
-
         //there is no rerun id in real contest
         $r['rerun_id'] = 0;
         $r['problemset_id'] = null;
 
-        if ($is_update === true) {
+        if ($is_update === true or self::isVirtual($r)) {
             // In case of Update API, required parameters for Create API are not required
             $is_required = false;
 
@@ -1021,6 +1011,11 @@ class ContestController extends Controller {
 
             if (is_null($r['contest'])) {
                 throw new NotFoundException('contestNotFound');
+            }
+
+            if (self::isVirtual($r)) {
+                self::validateCreateVirtual($r);
+                return;
             }
 
             if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
