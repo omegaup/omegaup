@@ -389,6 +389,19 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problem_Of_The_Week` (
+  `problem_of_the_week_id` int(11) NOT NULL AUTO_INCREMENT,
+  `problem_id` int(11) NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
+  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.',
+  `difficulty` enum('easy','hard') NOT NULL COMMENT 'En algún momento tendremos un problema fácil y uno difícil.',
+  PRIMARY KEY (`problem_of_the_week_id`),
+  UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
+  KEY `problem_id` (`problem_id`),
+  CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de problemas de la semana.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problem_Viewed` (
   `problem_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
