@@ -35,13 +35,13 @@ class QualityNominationFactory {
 
     public static function createSuggestion($login, $problemAlias, $difficulty, $quality, $tags) {
         $contents = [];
-        if ($difficulty != null) {
+        if ($difficulty !== null) {
             $contents['difficulty'] = $difficulty;
         }
-        if ($quality != null) {
+        if ($quality !== null) {
             $contents['quality'] = $quality;
         }
-        if ($tags != null) {
+        if ($tags !== null) {
             $contents['tags'] = $tags;
         }
         $contentsJson = json_encode($contents);
