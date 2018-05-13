@@ -900,9 +900,12 @@ class QualityNominationTest extends OmegaupTestCase {
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['problem_alias']);
         $this->assertEquals(3.48958, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(1.82051, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $this->assertEquals('[0, 0, 0, 3, 4]', $newProblem[0]->difficulty_histogram, 'Wrong difficulty histogram');
+        $this->assertEquals('[2, 2, 0, 1, 2]', $newProblem[0]->quality_histogram, 'Wrong quality histogram');
         $this->assertEquals(3.27678, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(1.71328, $newProblem[1]->quality, 'Wrong quality.', 0.001);
-
+        $this->assertEquals('[0, 1, 0, 4, 4]', $newProblem[1]->difficulty_histogram, 'Wrong difficulty histogram');
+        $this->assertEquals('[0, 4, 0, 2, 0]', $newProblem[1]->quality_histogram, 'Wrong quality histogram');
         $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
             $newProblem[0],
             false /* public_only */,
