@@ -156,7 +156,7 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
-    final public static function getVirtualByContest(Contests $real_contest, $user) {
+    final public static function getVirtualByContestAndUser(Contests $real_contest, $user) {
         $sql = 'SELECT
                     *
                 FROM

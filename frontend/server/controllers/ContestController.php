@@ -417,7 +417,7 @@ class ContestController extends Controller {
             // Crack the request to get the current user
             self::authenticateRequest($r);
             if (self::isVirtual($r)) {
-                $r['contest'] = ContestsDAO::getVirtualByContest($r['contest'], $r['current_user']);
+                $r['contest'] = ContestsDAO::getVirtualByContestAndUser($r['contest'], $r['current_user']);
             }
             self::canAccessContest($r);
 
@@ -950,7 +950,7 @@ class ContestController extends Controller {
         $real_contest = $r['contest'];
         self::canAccessContest($r);
         try {
-            $r['contest'] = ContestsDAO::getVirtualByContest($real_contest, $r['current_user']);
+            $r['contest'] = ContestsDAO::getVirtualByContestAndUser($real_contest, $r['current_user']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1139,7 +1139,7 @@ class ContestController extends Controller {
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
             if (self::isVirtual($r)) {
-                $contest = ContestsDAO::getVirtualByContest($contest, $r['current_user']);
+                $contest = ContestsDAO::getVirtualByContestAndUser($contest, $r['current_user']);
             }
         } catch (Exception $e) {
             // Operation failed in the data layer
