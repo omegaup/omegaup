@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Audit_Log.
+ * Value Object file for table Privacy_Consent_Log.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class AuditLog extends VO {
+class PrivacyConsentLog extends VO {
     /**
-     * Constructor de AuditLog
+     * Constructor de PrivacyConsentLog
      *
-     * Para construir un objeto de tipo AuditLog debera llamarse a el constructor
+     * Para construir un objeto de tipo PrivacyConsentLog debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -29,11 +29,11 @@ class AuditLog extends VO {
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
-        if (isset($data['git_object_id'])) {
-            $this->git_object_id = $data['git_object_id'];
+        if (isset($data['privacystatement_id'])) {
+            $this->privacystatement_id = $data['privacystatement_id'];
         }
-        if (isset($data['date'])) {
-            $this->date = $data['date'];
+        if (isset($data['timestamp'])) {
+            $this->timestamp = $data['timestamp'];
         }
     }
 
@@ -44,7 +44,7 @@ class AuditLog extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['date']);
+            parent::toUnixTime(['timestamp']);
         }
     }
 
@@ -57,17 +57,17 @@ class AuditLog extends VO {
     public $identity_id;
 
     /**
-      * Id de la versión del documento en el que se almacena la nueva política
+      * Id de la política de privacidad
       * Llave Primaria
       * @access public
-      * @var varchar(50)
+      * @var int(11)
       */
-    public $git_object_id;
+    public $privacystatement_id;
 
     /**
       * Fecha y hora en la que el usuario acepta las nuevas políticas
       * @access public
       * @var timestamp
       */
-    public $date;
+    public $timestamp;
 }

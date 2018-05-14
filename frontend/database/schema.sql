@@ -53,16 +53,6 @@ CREATE TABLE `Assignments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Audit_Log` (
-  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
-  `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario acepta las nuevas políticas',
-  PRIMARY KEY (`identity_id`,`git_object_id`),
-  CONSTRAINT `fk_ali_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Log para auditar las identidades que han aceptado las políticas ed omegaUp.';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Auth_Tokens` (
   `user_id` int(11) DEFAULT NULL,
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
@@ -396,6 +386,28 @@ CREATE TABLE `Permissions` (
   `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los roles.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Privacy_Consent_Log` (
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `privacystatement_id` int(11) NOT NULL COMMENT 'Id del estado de privacidad',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario acepta las nuevas políticas',
+  PRIMARY KEY (`identity_id`,`privacystatement_id`),
+  UNIQUE KEY `identity_privacy` (`identity_id`,`privacystatement_id`),
+  KEY `fk_pcp_privacystatement_id` (`privacystatement_id`),
+  CONSTRAINT `fk_pci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_pcp_privacystatement_id` FOREIGN KEY (`privacystatement_id`) REFERENCES `Privacy_Statements` (`privacystatement_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Log para auditar las identidades que han aceptado los estados de privacidad de omegaUp.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Privacy_Statements` (
+  `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del estado de privacidad',
+  `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
+  `type` enum('privacy_policy') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
+  PRIMARY KEY (`privacystatement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en GIT de las políticas de privacidad.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;

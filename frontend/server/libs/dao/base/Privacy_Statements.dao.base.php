@@ -8,69 +8,69 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** AuditLog Data Access Object (DAO) Base.
+/** PrivacyStatements Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link AuditLog }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link PrivacyStatements }.
  * @access public
  * @abstract
  *
  */
-abstract class AuditLogDAOBase extends DAO {
+abstract class PrivacyStatementsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Audit_Log`.`identity_id`, `Audit_Log`.`git_object_id`, `Audit_Log`.`date`';
+    const FIELDS = '`Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link AuditLog} pasado en la base de datos. La llave
+     * Este metodo guarda el estado actual del objeto {@link PrivacyStatements} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog
+     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(AuditLog $Audit_Log) {
-        if (!is_null(self::getByPK($Audit_Log->identity_id, $Audit_Log->git_object_id))) {
-            return AuditLogDAOBase::update($Audit_Log);
+    final public static function save(PrivacyStatements $Privacy_Statements) {
+        if (!is_null(self::getByPK($Privacy_Statements->privacystatement_id))) {
+            return PrivacyStatementsDAOBase::update($Privacy_Statements);
         } else {
-            return AuditLogDAOBase::create($Audit_Log);
+            return PrivacyStatementsDAOBase::create($Privacy_Statements);
         }
     }
 
     /**
-     * Obtener {@link AuditLog} por llave primaria.
+     * Obtener {@link PrivacyStatements} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link AuditLog} de la base de datos
+     * Este metodo cargara un objeto {@link PrivacyStatements} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link AuditLog Un objeto del tipo {@link AuditLog}. NULL si no hay tal registro.
+     * @return @link PrivacyStatements Un objeto del tipo {@link PrivacyStatements}. NULL si no hay tal registro.
      */
-    final public static function getByPK($identity_id, $git_object_id) {
-        if (is_null($identity_id) || is_null($git_object_id)) {
+    final public static function getByPK($privacystatement_id) {
+        if (is_null($privacystatement_id)) {
             return null;
         }
-        $sql = 'SELECT `Audit_Log`.`identity_id`, `Audit_Log`.`git_object_id`, `Audit_Log`.`date` FROM Audit_Log WHERE (identity_id = ? AND git_object_id = ?) LIMIT 1;';
-        $params = [$identity_id, $git_object_id];
+        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` FROM Privacy_Statements WHERE (privacystatement_id = ?) LIMIT 1;';
+        $params = [$privacystatement_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new AuditLog($rs);
+        return new PrivacyStatements($rs);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link AuditLog}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link PrivacyStatements}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +79,10 @@ abstract class AuditLogDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link AuditLog}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Audit_Log`.`identity_id`, `Audit_Log`.`git_object_id`, `Audit_Log`.`date` from Audit_Log';
+        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` from Privacy_Statements';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -93,7 +93,7 @@ abstract class AuditLogDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new AuditLog($row);
+            $allData[] = new PrivacyStatements($row);
         }
         return $allData;
     }
@@ -101,7 +101,7 @@ abstract class AuditLogDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link AuditLog} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PrivacyStatements} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,28 +116,28 @@ abstract class AuditLogDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog
+      * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Audit_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Audit_Log instanceof AuditLog)) {
-            $Audit_Log = new AuditLog($Audit_Log);
+    final public static function search($Privacy_Statements, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($Privacy_Statements instanceof PrivacyStatements)) {
+            $Privacy_Statements = new PrivacyStatements($Privacy_Statements);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Audit_Log->identity_id)) {
-            $clauses[] = '`identity_id` = ?';
-            $params[] = $Audit_Log->identity_id;
+        if (!is_null($Privacy_Statements->privacystatement_id)) {
+            $clauses[] = '`privacystatement_id` = ?';
+            $params[] = $Privacy_Statements->privacystatement_id;
         }
-        if (!is_null($Audit_Log->git_object_id)) {
+        if (!is_null($Privacy_Statements->git_object_id)) {
             $clauses[] = '`git_object_id` = ?';
-            $params[] = $Audit_Log->git_object_id;
+            $params[] = $Privacy_Statements->git_object_id;
         }
-        if (!is_null($Audit_Log->date)) {
-            $clauses[] = '`date` = ?';
-            $params[] = $Audit_Log->date;
+        if (!is_null($Privacy_Statements->type)) {
+            $clauses[] = '`type` = ?';
+            $params[] = $Privacy_Statements->type;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -149,7 +149,7 @@ abstract class AuditLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Audit_Log`.`identity_id`, `Audit_Log`.`git_object_id`, `Audit_Log`.`date` FROM `Audit_Log`';
+        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` FROM `Privacy_Statements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -161,7 +161,7 @@ abstract class AuditLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new AuditLog($row);
+            $ar[] = new PrivacyStatements($row);
         }
         return $ar;
     }
@@ -170,13 +170,14 @@ abstract class AuditLogDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog a actualizar.
+      * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a actualizar.
       */
-    final private static function update(AuditLog $Audit_Log) {
-        $sql = 'UPDATE `Audit_Log` SET `date` = ? WHERE `identity_id` = ? AND `git_object_id` = ?;';
+    final private static function update(PrivacyStatements $Privacy_Statements) {
+        $sql = 'UPDATE `Privacy_Statements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
         $params = [
-            $Audit_Log->date,
-            $Audit_Log->identity_id,$Audit_Log->git_object_id,
+            $Privacy_Statements->git_object_id,
+            $Privacy_Statements->type,
+            $Privacy_Statements->privacystatement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -187,23 +188,23 @@ abstract class AuditLogDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto AuditLog suministrado. Asegurese
+     * contenidos del objeto PrivacyStatements suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto AuditLog dentro de la misma transaccion.
+     * primaria generada en el objeto PrivacyStatements dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog a crear.
+     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a crear.
      */
-    final private static function create(AuditLog $Audit_Log) {
-        if (is_null($Audit_Log->date)) {
-            $Audit_Log->date = gmdate('Y-m-d H:i:s');
+    final private static function create(PrivacyStatements $Privacy_Statements) {
+        if (is_null($Privacy_Statements->type)) {
+            $Privacy_Statements->type = 'privacy_policy';
         }
-        $sql = 'INSERT INTO Audit_Log (`identity_id`, `git_object_id`, `date`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Privacy_Statements (`privacystatement_id`, `git_object_id`, `type`) VALUES (?, ?, ?);';
         $params = [
-            $Audit_Log->identity_id,
-            $Audit_Log->git_object_id,
-            $Audit_Log->date,
+            $Privacy_Statements->privacystatement_id,
+            $Privacy_Statements->git_object_id,
+            $Privacy_Statements->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -211,6 +212,7 @@ abstract class AuditLogDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
+        $Privacy_Statements->privacystatement_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -218,8 +220,8 @@ abstract class AuditLogDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link AuditLog} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link AuditLog}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PrivacyStatements} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link PrivacyStatements}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -241,28 +243,28 @@ abstract class AuditLogDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog
-     * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog
+     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
+     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(AuditLog $Audit_LogA, AuditLog $Audit_LogB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(PrivacyStatements $Privacy_StatementsA, PrivacyStatements $Privacy_StatementsB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Audit_LogA->identity_id;
-        $b = $Audit_LogB->identity_id;
+        $a = $Privacy_StatementsA->privacystatement_id;
+        $b = $Privacy_StatementsB->privacystatement_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
+            $clauses[] = '`privacystatement_id` >= ? AND `privacystatement_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`identity_id` = ?';
+            $clauses[] = '`privacystatement_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Audit_LogA->git_object_id;
-        $b = $Audit_LogB->git_object_id;
+        $a = $Privacy_StatementsA->git_object_id;
+        $b = $Privacy_StatementsB->git_object_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`git_object_id` >= ? AND `git_object_id` <= ?';
             $params[] = min($a, $b);
@@ -272,18 +274,18 @@ abstract class AuditLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Audit_LogA->date;
-        $b = $Audit_LogB->date;
+        $a = $Privacy_StatementsA->type;
+        $b = $Privacy_StatementsB->type;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`date` >= ? AND `date` <= ?';
+            $clauses[] = '`type` >= ? AND `type` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`date` = ?';
+            $clauses[] = '`type` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Audit_Log`';
+        $sql = 'SELECT * FROM `Privacy_Statements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -292,7 +294,7 @@ abstract class AuditLogDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new AuditLog($row);
+            $ar[] = new PrivacyStatements($row);
         }
         return $ar;
     }
@@ -301,21 +303,21 @@ abstract class AuditLogDAOBase extends DAO {
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto AuditLog suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto PrivacyStatements suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param AuditLog [$Audit_Log] El objeto de tipo AuditLog a eliminar
+     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a eliminar
      */
-    final public static function delete(AuditLog $Audit_Log) {
-        if (is_null(self::getByPK($Audit_Log->identity_id, $Audit_Log->git_object_id))) {
+    final public static function delete(PrivacyStatements $Privacy_Statements) {
+        if (is_null(self::getByPK($Privacy_Statements->privacystatement_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Audit_Log` WHERE identity_id = ? AND git_object_id = ?;';
-        $params = [$Audit_Log->identity_id, $Audit_Log->git_object_id];
+        $sql = 'DELETE FROM `Privacy_Statements` WHERE privacystatement_id = ?;';
+        $params = [$Privacy_Statements->privacystatement_id];
         global $conn;
 
         $conn->Execute($sql, $params);

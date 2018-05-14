@@ -546,7 +546,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
@@ -2410,55 +2410,56 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-
-        Validators::isStringNonEmpty($r['git_object_id'], 'git_object_id');
+        $latest_policy_id_published = PrivacyStatementsDAO::getLastPrivacyPolicyPublished();
 
         return [
             'status' => 'ok',
             'hasAccepted' => self::hasAcceptedLastPrivacyPolicy(
                 $identity->identity_id,
-                $r['git_object_id']
+                $latest_policy_id_published
             )
         ];
     }
 
     /**
-     * Keeps a record of a user who accepts the privacy policies
+     * Keeps a record of a user who accepts the privacy policy
      *
      * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     * @throws DuplicatedEntryInDatabaseException
      */
-    public static function apiAcceptPrivacyPolicies(Request $r) {
+    public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
+        $latest_policy_id_published = PrivacyStatementsDAO::getLastPrivacyPolicyPublished();
 
-        Validators::isStringNonEmpty($r['git_object_id'], 'git_object_id');
-
-        $hasAccepted = self::hasAcceptedLastPrivacyPolicy(
-            $identity->identity_id,
-            $r['git_object_id']
-        );
-        if ($hasAccepted) {
-            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicies');
+        try {
+            $response = PrivacyConsentLogDAO::save(new PrivacyConsentLog([
+                'identity_id' => $identity->identity_id,
+                'privacystatement_id' => $latest_policy_id_published
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
         }
-
-        $auditLog = new AuditLog([
-            'identity_id' => $identity->identity_id,
-            'git_object_id' => $r['git_object_id'],
-        ]);
-        AuditLogDAO::save($auditLog);
+        if (!$response) {
+            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+        }
 
         return ['status' => 'ok'];
     }
 
-    private static function hasAcceptedLastPrivacyPolicy($identity_id, $git_object_id) {
+    private static function hasAcceptedLastPrivacyPolicy($identity_id, $latest_policy_id_published) {
         try {
-            $accepts_policies = AuditLogDAO::getByPK($identity_id, $git_object_id);
+            $latest_policy_accepted = PrivacyConsentLogDAO::getByPK(
+                $identity_id,
+                $latest_policy_id_published
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return count($accepts_policies) > 0;
+        return count($latest_policy_accepted) > 0;
     }
 }
 
