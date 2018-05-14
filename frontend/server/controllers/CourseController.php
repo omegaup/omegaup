@@ -935,12 +935,11 @@ class CourseController extends Controller {
             'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
             'submit_delay'];
         foreach ($problems as &$problem) {
-            $keyrun = new Runs([
-                'user_id' => $r['identity']->user_id,
+            $runs_array = RunsDAO::search(new Runs([
+                'identity_id' => $r['identity']->identity_id,
                 'problem_id' => $problem['problem_id'],
                 'problemset_id' => $r['assignment']->problemset_id,
-            ]);
-            $runs_array = RunsDAO::search($keyrun);
+            ]));
             $runs_filtered_array = [];
             foreach ($runs_array as $run) {
                 $run->toUnixTime();

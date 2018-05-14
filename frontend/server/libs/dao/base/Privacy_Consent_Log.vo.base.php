@@ -57,7 +57,7 @@ class PrivacyConsentLog extends VO {
     public $identity_id;
 
     /**
-      * Id de la política de privacidad
+      * Id del estado de privacidad
       * Llave Primaria
       * @access public
       * @var int(11)

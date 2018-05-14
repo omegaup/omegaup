@@ -2574,8 +2574,8 @@ class ContestController extends Controller {
             'time', 'submit_delay', 'Users.username', 'Problems.alias'];
         try {
             $runs = RunsDAO::search(new Runs([
-                                'contest_id' => $r['contest']->contest_id
-                            ]), 'time', 'DESC', $relevant_columns);
+                'contest_id' => $r['contest']->contest_id
+            ]), 'time', 'DESC', $relevant_columns);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);

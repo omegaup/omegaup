@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Privacy_Statements.
+ * Value Object file for table Problem_Of_The_Week.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class PrivacyStatements extends VO {
+class ProblemOfTheWeek extends VO {
     /**
-     * Constructor de PrivacyStatements
+     * Constructor de ProblemOfTheWeek
      *
-     * Para construir un objeto de tipo PrivacyStatements debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemOfTheWeek debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,14 +26,17 @@ class PrivacyStatements extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = $data['privacystatement_id'];
+        if (isset($data['problem_of_the_week_id'])) {
+            $this->problem_of_the_week_id = $data['problem_of_the_week_id'];
         }
-        if (isset($data['git_object_id'])) {
-            $this->git_object_id = $data['git_object_id'];
+        if (isset($data['problem_id'])) {
+            $this->problem_id = $data['problem_id'];
         }
-        if (isset($data['type'])) {
-            $this->type = $data['type'];
+        if (isset($data['time'])) {
+            $this->time = $data['time'];
+        }
+        if (isset($data['difficulty'])) {
+            $this->difficulty = $data['difficulty'];
         }
     }
 
@@ -49,25 +52,32 @@ class PrivacyStatements extends VO {
     }
 
     /**
-      * Id del estado de privacidad
+      *  [Campo no documentado]
       * Llave Primaria
       * Auto Incremento
       * @access public
       * @var int(11)
       */
-    public $privacystatement_id;
+    public $problem_of_the_week_id;
 
     /**
-      * Id de la versión del documento en el que se almacena la nueva política
+      * El id del problema escogido como problema de la semana.
       * @access public
-      * @var varchar(50)
+      * @var int(11)
       */
-    public $git_object_id;
+    public $problem_id;
 
     /**
-      * Tipo de documento de privacidad
+      * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
       * @access public
-      * @var enum('privacy_policy')
+      * @var date
       */
-    public $type;
+    public $time;
+
+    /**
+      * En algún momento tendremos un problema fácil y uno difícil.
+      * @access public
+      * @var enum('easy','hard')
+      */
+    public $difficulty;
 }
