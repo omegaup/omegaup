@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
   `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
   `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
-  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
+  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',

@@ -587,6 +587,19 @@ class RunsDAO extends RunsDAOBase {
         return (Time::get() + $submission_gap);
     }
 
+    /**
+     *  This function is used to change the time in runs param relative
+     *  to new start time
+     *  param $runs array of Runs
+     */
+    public static function calibrateRuns($runs, $contest_start, $contest_new_start) {
+        foreach ($runs as $run) {
+            $delta = strtotime($run->time) - $contest_start;
+            $run->time = gmdate('Y-m-d H:i:s', $contest_new_start + $delta);
+        }
+        return $runs;
+    }
+
     public static function GetRunCountsToDate($date) {
         $sql = 'select count(*) as total from Runs where time <= ?';
         $val = [$date];

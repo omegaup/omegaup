@@ -24,6 +24,7 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
         ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
+        ContestParams::validateParameter('virtual', $this->params, false, false);
     }
 
     public function offsetGet($offset) {
@@ -161,6 +162,23 @@ class ContestsFactory {
 
         return [
             'director' => $contestData['director'],
+            'request' => $r,
+            'contest' => $contest
+        ];
+    }
+
+    public static function createVirtualContest($real_contest_alias = null, $login) {
+        $r = new Request();
+        $r['contest_alias'] = $real_contest_alias;
+        $r['virtual'] = 1;
+
+        $r['auth_token'] = $login->auth_token;
+
+        $response = ContestController::apiCreate($r);
+
+        $contest = ContestsDAO::getVirtualByContestAndUser($contestData['contest'], $contestData['director']);
+
+        return [
             'request' => $r,
             'contest' => $contest
         ];
@@ -304,6 +322,18 @@ class ContestsFactory {
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
+        ContestsDAO::save($contest);
+    }
+
+    public static function forceFinish($contestData) {
+        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+
+        //Get all submissions
+        $runs = RunsDAO::GetAllRuns($contest->problemset_id, null, null, null, null, null, null, null);
+
+        //find last submission
+        $last_run = $runs[0];
+        $contest->finish_time = gmdate('Y-m-d H:i:s', $last_run['time']); //End submission
         ContestsDAO::save($contest);
     }
 }

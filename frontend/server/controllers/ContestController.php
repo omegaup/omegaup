@@ -136,6 +136,8 @@ class ContestController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
+        self::forbiddenInVirtual($r);
+
         Validators::isNumber($r['page'], 'page', false);
         Validators::isNumber($r['page_size'], 'page_size', false);
 
@@ -414,6 +416,9 @@ class ContestController extends Controller {
         if (is_null($r['token'])) {
             // Crack the request to get the current user
             self::authenticateRequest($r);
+            if (self::isVirtual($r)) {
+                $r['contest'] = ContestsDAO::getVirtualByContestAndUser($r['contest'], $r['current_user']);
+            }
             self::canAccessContest($r);
 
             $r['contest_admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
@@ -855,7 +860,7 @@ class ContestController extends Controller {
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
-        $contest->rerun_id = 0; // NYI
+        $contest->rerun_id = $r['rerun_id'];
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
         $contest->points_decay_factor = $r['points_decay_factor'];
@@ -867,7 +872,12 @@ class ContestController extends Controller {
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
-        $contest->scoreboard_url_admin = SecurityTools::randomString(30);
+        //Contestant should have no access to admin scoreboard in ghost mode
+        $contest->scoreboard_url_admin = !self::isVirtual($r) ? SecurityTools::randomString(30) : null;
+
+        if (!is_null($r['problemset_id'])) {
+            $contest->problemset_id = $r['problemset_id'];
+        }
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
@@ -906,8 +916,9 @@ class ContestController extends Controller {
                 foreach ($r['problems'] as $problem) {
                     $problemset_problem = new ProblemsetProblems([
                                 'problemset_id' => $problemset->problemset_id,
-                                'problem_id' => $problem['id'],
-                                'points' => $problem['points']
+                                'problem_id' => $problem['id'] ?? $problem['problem_id'],
+                                'points' => $problem['points'],
+                                'order' => $problem['order'] ?? null
                             ]);
 
                     ProblemsetProblemsDAO::save($problemset_problem);
@@ -936,6 +947,41 @@ class ContestController extends Controller {
         return ['status' => 'ok'];
     }
 
+    private static function validateCreateVirtual(Request $r) {
+        $real_contest = $r['contest'];
+        self::canAccessContest($r);
+        try {
+            $r['contest'] = ContestsDAO::getVirtualByContestAndUser($real_contest, $r['current_user']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!ContestsDAO::hasFinished($real_contest)) {
+            throw new ForbiddenAccessException('realContestHasNotBeenEnded');
+        } elseif (isset($r['contest']) and ContestsDAO::isVirtual($r['contest']) and !ContestsDAO::hasFinished($r['contest'])) {
+            throw new ForbiddenAccessException('unfinishedVirtualContest');
+        }
+
+        $r['public'] = 0;
+        $r['title'] = $real_contest->title;
+        $r['description'] = $real_contest->description;
+        $r['problems'] = ProblemsetProblemsDAO::getProblems($real_contest->problemset_id);
+        $r['start_time'] = time();
+        $r['finish_time'] = time() + strtotime($real_contest->finish_time) - strtotime($real_contest->start_time);
+        $r['window_length'] = $real_contest->window_length;
+        $r['rerun_id'] = $real_contest->contest_id;
+        $r['alias'] = null;
+        $r['scoreboard'] = $real_contest->scoreboard;
+        $r['points_decay_factor'] = $real_contest->points_decay_factor;
+        $r['partial_score'] = $real_contest->partial_score;
+        $r['feedback'] = $real_contest->feedback;
+        $r['penalty'] = $real_contest->penalty;
+        $r['penalty_type'] = $real_contest->penalty_type;
+        $r['penalty_calc_policy'] = $real_contest->penalty_calc_policy;
+        $r['languages'] = $real_contest->languages;
+        $r['show_scoreboard_after'] = null;
+    }
+
     /**
      * Validates that Request contains expected data to create or update a contest
      * In case of update, everything is optional except the contest_alias
@@ -948,7 +994,11 @@ class ContestController extends Controller {
         // Is the parameter required?
         $is_required = true;
 
-        if ($is_update === true) {
+        //there is no rerun id in real contest
+        $r['rerun_id'] = 0;
+        $r['problemset_id'] = null;
+
+        if ($is_update === true or self::isVirtual($r)) {
             // In case of Update API, required parameters for Create API are not required
             $is_required = false;
 
@@ -960,6 +1010,11 @@ class ContestController extends Controller {
 
             if (is_null($r['contest'])) {
                 throw new NotFoundException('contestNotFound');
+            }
+
+            if (self::isVirtual($r)) {
+                self::validateCreateVirtual($r);
+                return;
             }
 
             if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
@@ -1082,6 +1137,9 @@ class ContestController extends Controller {
         // Only director is allowed to create problems in contest
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
+            if (self::isVirtual($r)) {
+                $contest = ContestsDAO::getVirtualByContestAndUser($contest, $r['current_user']);
+            }
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -1121,6 +1179,7 @@ class ContestController extends Controller {
 
         // Authenticate user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest($r);
@@ -1214,6 +1273,7 @@ class ContestController extends Controller {
     public static function apiRemoveProblem(Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateRemoveFromContestRequest($r);
@@ -1350,6 +1410,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateAddUser($r);
 
         // Save the contest to the DB
@@ -1380,6 +1441,7 @@ class ContestController extends Controller {
     public static function apiRemoveUser(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateAddUser($r);
 
         try {
@@ -1409,6 +1471,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1443,6 +1506,7 @@ class ContestController extends Controller {
     public static function apiRemoveAdmin(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1486,6 +1550,7 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1524,6 +1589,7 @@ class ContestController extends Controller {
     public static function apiRemoveGroupAdmin(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1586,6 +1652,7 @@ class ContestController extends Controller {
      */
     public static function apiClarifications(Request $r) {
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
         self::validateClarifications($r);
 
         $is_contest_director = Authorization::isContestAdmin(
@@ -2064,6 +2131,7 @@ class ContestController extends Controller {
 
         // Authenticate request
         self::authenticateRequest($r);
+        self::forbiddenInVirtual($r);
 
         // Validate request
         self::validateCreateOrUpdate($r, true /* is update */);
@@ -2319,6 +2387,16 @@ class ContestController extends Controller {
         $response['status'] = 'ok';
 
         return $response;
+    }
+
+    public static function forbiddenInVirtual(Request $r) {
+        if (isset($r['virtual']) and $r['virtual'] == true) {
+            throw new ForbiddenAccessException();
+        }
+    }
+
+    public static function isVirtual(Request $r) {
+        return isset($r['virtual']) and $r['virtual'] == true;
     }
 
     /**
