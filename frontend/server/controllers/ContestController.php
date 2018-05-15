@@ -872,7 +872,8 @@ class ContestController extends Controller {
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
         $contest->scoreboard_url = SecurityTools::randomString(30);
-        $contest->scoreboard_url_admin = SecurityTools::randomString(30);
+        //Contestant should have no access to admin scoreboard in ghost mode
+        $contest->scoreboard_url_admin = !self::isVirtual($r) ? SecurityTools::randomString(30) : null;
 
         if (!is_null($r['problemset_id'])) {
             $contest->problemset_id = $r['problemset_id'];
@@ -970,7 +971,7 @@ class ContestController extends Controller {
         $r['window_length'] = $real_contest->window_length;
         $r['rerun_id'] = $real_contest->contest_id;
         $r['alias'] = null;
-        $r['scoreboard'] = 100; //TODO should this be $real_contest->scoreboard?
+        $r['scoreboard'] = $real_contest->scoreboard;
         $r['points_decay_factor'] = $real_contest->points_decay_factor;
         $r['partial_score'] = $real_contest->partial_score;
         $r['feedback'] = $real_contest->feedback;
@@ -978,9 +979,7 @@ class ContestController extends Controller {
         $r['penalty_type'] = $real_contest->penalty_type;
         $r['penalty_calc_policy'] = $real_contest->penalty_calc_policy;
         $r['languages'] = $real_contest->languages;
-        $r['show_scoreboard_after'] = null; //TODO should this be $real_contest->show_scoreboard_after ?
-
-        //TODO scoreboard url admin and user?
+        $r['show_scoreboard_after'] = null;
     }
 
     /**

@@ -167,16 +167,11 @@ class ContestsFactory {
         ];
     }
 
-    public static function createVirtualContest($real_contest_params = null, $virtual_contest_params = null) {
-        $contestData = self::createContest(new ContestParams([
-            'start_time' => $real_contest_params['start_time'] ?? strtotime('2000-01-01 01:00:00'),
-            'finish_time' => $real_contest_params['finish_time'] ?? strtotime('2000-01-01 02:00:00')
-        ]));
+    public static function createVirtualContest($real_contest_alias = null, $login) {
         $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['contest_alias'] = $real_contest_alias;
         $r['virtual'] = 1;
 
-        $login = OmegaupTestCase::login($contestData['director']);
         $r['auth_token'] = $login->auth_token;
 
         $response = ContestController::apiCreate($r);
@@ -184,7 +179,6 @@ class ContestsFactory {
         $contest = ContestsDAO::getVirtualByContestAndUser($contestData['contest'], $contestData['director']);
 
         return [
-            'director' => $contestData['director'],
             'request' => $r,
             'contest' => $contest
         ];
