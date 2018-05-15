@@ -2388,19 +2388,29 @@ class UserController extends Controller {
         ];
     }
 
-    public static function getPrivacyPolicies(Request $r) {
-        // TODO: Get the redaction of the policies issue #1992
-        // TODO: Get the gitObjectId issue #1992
-        $lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    public static function getPrivacyPolicy(Request $r) {
+        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
+        $lang = 'en';
+        if ($user_session->language_id == 1) {
+            $lang = 'es';
+        } elseif ($user_session->language_id == 3) {
+            $lang = 'pt';
+        }
+
+        $git = new Git(OMEGAUP_ROOT);
+        $privacy_policy_path = 'frontend/privacy/privacy_policy/';
+        $privacy_policy_file = $privacy_policy_path . $lang . '.md';
+        $git_object_id = $git->get(['rev-parse', 'HEAD:' . $privacy_policy_path]);
+        $policy_markdown = $git->get(['cat-file', 'blob', 'HEAD:' . $privacy_policy_file]);
 
         return [
             'status' => 'ok',
-            'privacy_policies' => $lorem_ipsum,
-            'git_object_id' => 'XXXXXXXXXXXXXXXX'
+            'policy_markdown' => $policy_markdown,
+            'git_object_id' => $git_object_id,
         ];
     }
 
-    public static function apiAcceptPrivacyPolicies(Request $r) {
+    public static function apiAcceptPrivacyPolicy(Request $r) {
         // TODO: Remove this dummy when #1991 is merged
         return ['status' => 'ok'];
     }
