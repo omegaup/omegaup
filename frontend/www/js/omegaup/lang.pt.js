@@ -473,6 +473,7 @@ omegaup.OmegaUp.loadTranslations({
 	passwordResetResetTitle: "Password Reset",
 	passwordResetTokenWasGeneratedSuccessfully: "O token foi gerado com sucesso",
 	pendingRegistrations: "inscri\u00e7\u00f5es pendentes",
+	privacyPolicyNotAcceptedYet: "Voc\u00ea ainda n\u00e3o aceitou a pol\u00edtica de privacidade. Clique <a href=\"/privacypolicy\">aqui</a> para ler e aceitar",
 	privacyPolicyNotice: "Ao clicar em Registrar-se voc\u00ea est\u00e1 aceitando <a href=\"http://blog.omegaup.com/privacy-policy/\"> Uso e Pol\u00edtica de Privacidade do site</a>.",
 	probAliasAndContestAliasInvalid: "A combina\u00e7\u00e3o do alias do problema e do alias do concurso \u00e9 inv\u00e1lida.",
 	problemDeleted: "O problema foi exclu\u00eddo com sucesso",

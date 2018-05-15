@@ -150,6 +150,7 @@ class SessionController extends Controller {
 
         // Get email via their id
         $email = EmailsDAO::getByPK($currentUser->main_email_id);
+        $hasAccepted = UserController::apiLastPrivacyPolicyAccepted(new Request([]));
 
         return [
             'valid' => true,
@@ -157,6 +158,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
+            'has_accepted' => $hasAccepted['hasAccepted'],
             'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
         ];
     }

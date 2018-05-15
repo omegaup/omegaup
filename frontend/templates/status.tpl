@@ -19,5 +19,11 @@
 		{$smarty.const.OMEGAUP_MAINTENANCE}
 	</div>
 {/if}
+{if isset($CURRENT_USER_HAS_ACCEPTED_PRIVACY_POLICY) && !$CURRENT_USER_HAS_ACCEPTED_PRIVACY_POLICY}
+	<div class="alert alert-danger" id='status'>
+		<button type="button" class="close" id="alert-close"></button>
+		<span class="message">{#privacyPolicyNotAcceptedYet#}</span>
+	</div>
+{/if}
 
 <script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}"></script>

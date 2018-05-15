@@ -2400,6 +2400,20 @@ class UserController extends Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
+
+    /**
+     * Gets the last privacy policy accepted by user
+     *
+     * @param Request $r
+     */
+    public static function apiLastPrivacyPolicyAccepted(Request $r) {
+        // TODO: Change when #1991 is merged
+        $hasAccepted = 1;
+        return [
+            'status' => 'ok',
+            'hasAccepted' => $hasAccepted,
+        ];
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
