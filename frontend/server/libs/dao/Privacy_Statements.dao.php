@@ -1,7 +1,7 @@
 <?php
 
-include_once('base/Privacy_Statements.dao.base.php');
-include_once('base/Privacy_Statements.vo.base.php');
+include_once('base/PrivacyStatements.dao.base.php');
+include_once('base/PrivacyStatements.vo.base.php');
 /** PrivacyStatements Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -14,7 +14,7 @@ class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
         $sql = 'SELECT
                   privacystatement_id
                 FROM
-                  `Privacy_Statements`
+                  `PrivacyStatements`
                 WHERE
                   type = \'privacy_policy\'
                 ORDER BY

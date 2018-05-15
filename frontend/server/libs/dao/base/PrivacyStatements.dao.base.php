@@ -20,7 +20,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type`';
+    const FIELDS = '`PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type`';
 
     /**
      * Guardar registros.
@@ -32,14 +32,14 @@ abstract class PrivacyStatementsDAOBase extends DAO {
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(PrivacyStatements $Privacy_Statements) {
-        if (!is_null(self::getByPK($Privacy_Statements->privacystatement_id))) {
-            return PrivacyStatementsDAOBase::update($Privacy_Statements);
+    final public static function save(PrivacyStatements $PrivacyStatements) {
+        if (!is_null(self::getByPK($PrivacyStatements->privacystatement_id))) {
+            return PrivacyStatementsDAOBase::update($PrivacyStatements);
         } else {
-            return PrivacyStatementsDAOBase::create($Privacy_Statements);
+            return PrivacyStatementsDAOBase::create($PrivacyStatements);
         }
     }
 
@@ -56,7 +56,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
         if (is_null($privacystatement_id)) {
             return null;
         }
-        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` FROM Privacy_Statements WHERE (privacystatement_id = ?) LIMIT 1;';
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM PrivacyStatements WHERE (privacystatement_id = ?) LIMIT 1;';
         $params = [$privacystatement_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` from Privacy_Statements';
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` from PrivacyStatements';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -116,28 +116,28 @@ abstract class PrivacyStatementsDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
+      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Privacy_Statements, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Privacy_Statements instanceof PrivacyStatements)) {
-            $Privacy_Statements = new PrivacyStatements($Privacy_Statements);
+    final public static function search($PrivacyStatements, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($PrivacyStatements instanceof PrivacyStatements)) {
+            $PrivacyStatements = new PrivacyStatements($PrivacyStatements);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Privacy_Statements->privacystatement_id)) {
+        if (!is_null($PrivacyStatements->privacystatement_id)) {
             $clauses[] = '`privacystatement_id` = ?';
-            $params[] = $Privacy_Statements->privacystatement_id;
+            $params[] = $PrivacyStatements->privacystatement_id;
         }
-        if (!is_null($Privacy_Statements->git_object_id)) {
+        if (!is_null($PrivacyStatements->git_object_id)) {
             $clauses[] = '`git_object_id` = ?';
-            $params[] = $Privacy_Statements->git_object_id;
+            $params[] = $PrivacyStatements->git_object_id;
         }
-        if (!is_null($Privacy_Statements->type)) {
+        if (!is_null($PrivacyStatements->type)) {
             $clauses[] = '`type` = ?';
-            $params[] = $Privacy_Statements->type;
+            $params[] = $PrivacyStatements->type;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -149,7 +149,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Privacy_Statements`.`privacystatement_id`, `Privacy_Statements`.`git_object_id`, `Privacy_Statements`.`type` FROM `Privacy_Statements`';
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM `PrivacyStatements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -170,14 +170,14 @@ abstract class PrivacyStatementsDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a actualizar.
+      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a actualizar.
       */
-    final private static function update(PrivacyStatements $Privacy_Statements) {
-        $sql = 'UPDATE `Privacy_Statements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
+    final private static function update(PrivacyStatements $PrivacyStatements) {
+        $sql = 'UPDATE `PrivacyStatements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
         $params = [
-            $Privacy_Statements->git_object_id,
-            $Privacy_Statements->type,
-            $Privacy_Statements->privacystatement_id,
+            $PrivacyStatements->git_object_id,
+            $PrivacyStatements->type,
+            $PrivacyStatements->privacystatement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -194,17 +194,17 @@ abstract class PrivacyStatementsDAOBase extends DAO {
      * primaria generada en el objeto PrivacyStatements dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a crear.
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a crear.
      */
-    final private static function create(PrivacyStatements $Privacy_Statements) {
-        if (is_null($Privacy_Statements->type)) {
-            $Privacy_Statements->type = 'privacy_policy';
+    final private static function create(PrivacyStatements $PrivacyStatements) {
+        if (is_null($PrivacyStatements->type)) {
+            $PrivacyStatements->type = 'privacy_policy';
         }
-        $sql = 'INSERT INTO Privacy_Statements (`privacystatement_id`, `git_object_id`, `type`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO PrivacyStatements (`privacystatement_id`, `git_object_id`, `type`) VALUES (?, ?, ?);';
         $params = [
-            $Privacy_Statements->privacystatement_id,
-            $Privacy_Statements->git_object_id,
-            $Privacy_Statements->type,
+            $PrivacyStatements->privacystatement_id,
+            $PrivacyStatements->git_object_id,
+            $PrivacyStatements->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -212,7 +212,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
-        $Privacy_Statements->privacystatement_id = $conn->Insert_ID();
+        $PrivacyStatements->privacystatement_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -243,17 +243,17 @@ abstract class PrivacyStatementsDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
-     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(PrivacyStatements $Privacy_StatementsA, PrivacyStatements $Privacy_StatementsB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(PrivacyStatements $PrivacyStatementsA, PrivacyStatements $PrivacyStatementsB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Privacy_StatementsA->privacystatement_id;
-        $b = $Privacy_StatementsB->privacystatement_id;
+        $a = $PrivacyStatementsA->privacystatement_id;
+        $b = $PrivacyStatementsB->privacystatement_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`privacystatement_id` >= ? AND `privacystatement_id` <= ?';
             $params[] = min($a, $b);
@@ -263,8 +263,8 @@ abstract class PrivacyStatementsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Privacy_StatementsA->git_object_id;
-        $b = $Privacy_StatementsB->git_object_id;
+        $a = $PrivacyStatementsA->git_object_id;
+        $b = $PrivacyStatementsB->git_object_id;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`git_object_id` >= ? AND `git_object_id` <= ?';
             $params[] = min($a, $b);
@@ -274,8 +274,8 @@ abstract class PrivacyStatementsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Privacy_StatementsA->type;
-        $b = $Privacy_StatementsB->type;
+        $a = $PrivacyStatementsA->type;
+        $b = $PrivacyStatementsB->type;
         if (!is_null($a) && !is_null($b)) {
             $clauses[] = '`type` >= ? AND `type` <= ?';
             $params[] = min($a, $b);
@@ -285,7 +285,7 @@ abstract class PrivacyStatementsDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $sql = 'SELECT * FROM `Privacy_Statements`';
+        $sql = 'SELECT * FROM `PrivacyStatements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -310,14 +310,14 @@ abstract class PrivacyStatementsDAOBase extends DAO {
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param PrivacyStatements [$Privacy_Statements] El objeto de tipo PrivacyStatements a eliminar
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a eliminar
      */
-    final public static function delete(PrivacyStatements $Privacy_Statements) {
-        if (is_null(self::getByPK($Privacy_Statements->privacystatement_id))) {
+    final public static function delete(PrivacyStatements $PrivacyStatements) {
+        if (is_null(self::getByPK($PrivacyStatements->privacystatement_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Privacy_Statements` WHERE privacystatement_id = ?;';
-        $params = [$Privacy_Statements->privacystatement_id];
+        $sql = 'DELETE FROM `PrivacyStatements` WHERE privacystatement_id = ?;';
+        $params = [$PrivacyStatements->privacystatement_id];
         global $conn;
 
         $conn->Execute($sql, $params);

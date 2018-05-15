@@ -20,7 +20,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertFalse($response['hasAccepted'], 'User already has accepted privacy policy');
+        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
     }
 
     /**
@@ -44,7 +44,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertTrue($response['hasAccepted'], 'User does not have accepted privacy policy');
+        $this->assertTrue($response['hasAccepted'], 'User should have already accepted privacy policy');
     }
 
     /**
@@ -64,11 +64,11 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $this->assertEquals($response['status'], 'ok');
 
+        $this->expectException('DuplicatedEntryInDatabaseException');
+
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token
         ]));
-
-        $this->assertEquals($response['status'], 'ok');
     }
 
     /**
@@ -81,6 +81,12 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         // Create privacy policy
         $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
+
+        $response = UserController::apiLastPrivacyPolicyAccepted(new Request([
+            'auth_token' => $login->auth_token
+        ]));
+
+        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token
@@ -95,28 +101,6 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertFalse($response['hasAccepted'], 'User already has accepted privacy policy');
-
-        // Create other privacy policy
-        $privacy_poilcy_version_3 = UserFactory::createPrivacyStatement();
-
-        $response = UserController::apiLastPrivacyPolicyAccepted(new Request([
-            'auth_token' => $login->auth_token
-        ]));
-
-        $this->assertFalse($response['hasAccepted'], 'User already has accepted privacy policy');
-
-        // User accepts latest privacy policy
-        $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token
-        ]));
-
-        $this->assertEquals($response['status'], 'ok');
-
-        $response = UserController::apiLastPrivacyPolicyAccepted(new Request([
-            'auth_token' => $login->auth_token
-        ]));
-
-        $this->assertTrue($response['hasAccepted'], 'User does not have accepted privacy policy');
+        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
     }
 }

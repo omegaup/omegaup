@@ -2410,14 +2410,12 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        $latest_policy_id_published = PrivacyStatementsDAO::getLastPrivacyPolicyPublished();
-
+        $hasAccepted = PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
+            $identity->identity_id
+        );
         return [
             'status' => 'ok',
-            'hasAccepted' => self::hasAcceptedLastPrivacyPolicy(
-                $identity->identity_id,
-                $latest_policy_id_published
-            )
+            'hasAccepted' => $hasAccepted > 0,
         ];
     }
 
@@ -2425,41 +2423,20 @@ class UserController extends Controller {
      * Keeps a record of a user who accepts the privacy policy
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        $latest_policy_id_published = PrivacyStatementsDAO::getLastPrivacyPolicyPublished();
 
         try {
-            $response = PrivacyConsentLogDAO::save(new PrivacyConsentLog([
-                'identity_id' => $identity->identity_id,
-                'privacystatement_id' => $latest_policy_id_published
-            ]));
+            $response = PrivacyStatementConsentLogDAO::saveLog($identity->identity_id);
         } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (!$response) {
             throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
         }
 
         return ['status' => 'ok'];
-    }
-
-    private static function hasAcceptedLastPrivacyPolicy($identity_id, $latest_policy_id_published) {
-        try {
-            $latest_policy_accepted = PrivacyConsentLogDAO::getByPK(
-                $identity_id,
-                $latest_policy_id_published
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return count($latest_policy_accepted) > 0;
     }
 }
 
