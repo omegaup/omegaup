@@ -54,12 +54,13 @@ CREATE TABLE `Assignments` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Auth_Tokens` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `token` varchar(128) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorización para los logins.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -324,6 +325,16 @@ CREATE TABLE `Identities` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Identity_Login_Log` (
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `ip` int(10) unsigned NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Interviews` (
   `interview_id` int(11) NOT NULL AUTO_INCREMENT,
   `problemset_id` int(11) NOT NULL,
@@ -378,6 +389,19 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problem_Of_The_Week` (
+  `problem_of_the_week_id` int(11) NOT NULL AUTO_INCREMENT,
+  `problem_id` int(11) NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
+  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.',
+  `difficulty` enum('easy','hard') NOT NULL COMMENT 'En algún momento tendremos un problema fácil y uno difícil.',
+  PRIMARY KEY (`problem_of_the_week_id`),
+  UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
+  KEY `problem_id` (`problem_id`),
+  CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de problemas de la semana.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problem_Viewed` (
   `problem_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -419,6 +443,8 @@ CREATE TABLE `Problems` (
   `deprecated` tinyint(1) NOT NULL DEFAULT '0',
   `email_clarifications` tinyint(1) NOT NULL DEFAULT '0',
   `quality` double DEFAULT NULL,
+  `quality_histogram` text COMMENT 'Valores del histograma de calidad del problema.',
+  `difficulty_histogram` text COMMENT 'Valores del histograma de dificultad del problema.',
   PRIMARY KEY (`problem_id`),
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
@@ -667,7 +693,7 @@ CREATE TABLE `Run_Counts` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Runs` (
   `run_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `problem_id` int(11) NOT NULL,
   `problemset_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
@@ -685,12 +711,12 @@ CREATE TABLE `Runs` (
   `judged_by` char(32) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_r_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -742,16 +768,6 @@ CREATE TABLE `Tags` (
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `User_Login_Log` (
-  `user_id` int(11) NOT NULL,
-  `ip` int(10) unsigned NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_ullu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -820,7 +836,6 @@ CREATE TABLE `Users` (
   `verification_id` varchar(50) DEFAULT NULL,
   `reset_digest` varchar(45) DEFAULT NULL,
   `reset_sent_at` datetime DEFAULT NULL,
-  `recruitment_optin` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
   `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',

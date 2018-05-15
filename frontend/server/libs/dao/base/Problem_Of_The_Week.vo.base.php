@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Auth_Tokens.
+ * Value Object file for table Problem_Of_The_Week.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class AuthTokens extends VO {
+class ProblemOfTheWeek extends VO {
     /**
-     * Constructor de AuthTokens
+     * Constructor de ProblemOfTheWeek
      *
-     * Para construir un objeto de tipo AuthTokens debera llamarse a el constructor
+     * Para construir un objeto de tipo ProblemOfTheWeek debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,17 +26,17 @@ class AuthTokens extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['problem_of_the_week_id'])) {
+            $this->problem_of_the_week_id = $data['problem_of_the_week_id'];
         }
-        if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+        if (isset($data['problem_id'])) {
+            $this->problem_id = $data['problem_id'];
         }
-        if (isset($data['token'])) {
-            $this->token = $data['token'];
+        if (isset($data['time'])) {
+            $this->time = $data['time'];
         }
-        if (isset($data['create_time'])) {
-            $this->create_time = $data['create_time'];
+        if (isset($data['difficulty'])) {
+            $this->difficulty = $data['difficulty'];
         }
     }
 
@@ -47,36 +47,37 @@ class AuthTokens extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['create_time']);
+            parent::toUnixTime([]);
         }
     }
 
     /**
       *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
-
-    /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
-
-    /**
-      *  [Campo no documentado]
       * Llave Primaria
+      * Auto Incremento
       * @access public
-      * @var varchar(128)
+      * @var int(11)
       */
-    public $token;
+    public $problem_of_the_week_id;
 
     /**
-      *  [Campo no documentado]
+      * El id del problema escogido como problema de la semana.
       * @access public
-      * @var timestamp
+      * @var int(11)
       */
-    public $create_time;
+    public $problem_id;
+
+    /**
+      * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
+      * @access public
+      * @var date
+      */
+    public $time;
+
+    /**
+      * En algún momento tendremos un problema fácil y uno difícil.
+      * @access public
+      * @var enum('easy','hard')
+      */
+    public $difficulty;
 }

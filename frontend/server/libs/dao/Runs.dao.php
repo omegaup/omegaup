@@ -50,29 +50,29 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function GetBestSolvingRunsForProblem($problem_id) {
         $sql = '
-			SELECT u.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time FROM
+			SELECT i.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time FROM
 				(SELECT
-					MIN(r.run_id) run_id, r.user_id, r.runtime
+					MIN(r.run_id) run_id, r.identity_id, r.runtime
 				FROM
 					Runs r
 				INNER JOIN
 					(
 						SELECT
-							rr.user_id, MIN(rr.runtime) AS runtime
+							rr.identity_id, MIN(rr.runtime) AS runtime
 						FROM
 							Runs rr
 						WHERE
-							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.test = 0 GROUP BY rr.user_id
-					) AS sr ON sr.user_id = r.user_id AND sr.runtime = r.runtime
+							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.test = 0 GROUP BY rr.identity_id
+					) AS sr ON sr.identity_id = r.identity_id AND sr.runtime = r.runtime
 				WHERE
 					r.problem_id = ? AND r.verdict = \'AC\' AND r.test = 0
 				GROUP BY
-					r.user_id, r.runtime
+					r.identity_id, r.runtime
 				ORDER
 					BY r.runtime, run_id
 				LIMIT 0, 10) as runs
 			INNER JOIN
-				Users u ON u.user_id = runs.user_id
+				Identities i ON i.identity_id = runs.identity_id
 			INNER JOIN
 				Runs r ON r.run_id = runs.run_id;';
         $val = [$problem_id, $problem_id];
@@ -105,13 +105,13 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function GetAllRuns($problemset_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
+    final public static function GetAllRuns($problemset_id, $status, $verdict, $problem_id, $language, $identity_id, $offset, $rowcount) {
         $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
                 'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
-                'r.submit_delay, u.username, p.alias, u.country_id, c.alias AS contest_alias ' .
+                'r.submit_delay, i.username, p.alias, i.country_id, c.alias AS contest_alias ' .
                 'FROM Runs r USE INDEX(PRIMARY) ' .
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
-                'INNER JOIN Users u ON u.user_id = r.user_id ' .
+                'INNER JOIN Identities i ON i.identity_id = r.identity_id ' .
                 'LEFT JOIN Contests c ON c.problemset_id = r.problemset_id ';
         $where = [];
         $val = [];
@@ -137,9 +137,9 @@ class RunsDAO extends RunsDAOBase {
             $where[] = 'r.language = ?';
             $val[] = $language;
         }
-        if (!is_null($user_id)) {
-            $where[] = 'r.user_id = ?';
-            $val[] = $user_id;
+        if (!is_null($identity_id)) {
+            $where[] = 'r.identity_id = ?';
+            $val[] = $identity_id;
         }
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
@@ -279,7 +279,7 @@ class RunsDAO extends RunsDAOBase {
     /*
      * Gets the count of total runs sent to a given contest by verdict and by period of time
      */
-    final public static function CountRunsOfUserPerDatePerVerdict($user_id) {
+    final public static function CountRunsOfIdentityPerDatePerVerdict($identity_id) {
         // Build SQL statement.
         $sql = '
                 SELECT
@@ -293,14 +293,14 @@ class RunsDAO extends RunsDAOBase {
                     FROM
                         Runs
                     WHERE
-                        user_id = ? AND status = \'ready\'
+                        identity_id = ? AND status = \'ready\'
                 ) AS r
                 GROUP BY
                     r.date, r.verdict
                 ORDER BY
                   date ASC;';
 
-        $val = [$user_id];
+        $val = [$identity_id];
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
@@ -337,25 +337,25 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 *  getAllRelevantUsers
+	 *  getAllRelevantIdentities
 	 *
 	 */
 
-    final public static function getAllRelevantUsers($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null) {
+    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null) {
         // Build SQL statement
         if ($showAllRuns) {
             if (is_null($group_id)) {
                 $sql = '
                     SELECT
-                        u.user_id, u.username, u.name, u.country_id
+                        i.identity_id, i.username, i.name, i.country_id
                     FROM
-                        Users u
+                        Identities i
                     INNER JOIN
-                        Problemset_Identities pi ON u.main_identity_id = pi.identity_id
+                        Problemset_Identities pi ON i.identity_id = pi.identity_id
                     WHERE
                         pi.problemset_id = ? AND
-                        u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+                        i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
+                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [
                     $problemset_id,
                     $acl_id,
@@ -366,15 +366,15 @@ class RunsDAO extends RunsDAOBase {
             } else {
                 $sql = '
                     SELECT
-                        u.user_id, u.username, u.name, u.country_id
+                        i.identity_id, i.username, i.name, i.country_id
                     FROM
-                        Users u
+                        Identities i
                     INNER JOIN
-                        Groups_Identities gi ON u.main_identity_id = gi.identity_id
+                        Groups_Identities gi ON i.identity_id = gi.identity_id
                     WHERE
                         gi.group_id = ? AND
-                        u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+                        i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
+                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [
                     $group_id,
                     $acl_id,
@@ -386,22 +386,22 @@ class RunsDAO extends RunsDAOBase {
         } else {
             $sql = '
                 SELECT
-                    u.user_id, u.username, u.name, u.country_id
+                    i.identity_id, i.username, i.name, i.country_id
                 FROM
-                    Users u
+                    Identities i
                 INNER JOIN
                     (SELECT DISTINCT
-                        r.user_id
+                        r.identity_id
                     FROM
                         Runs r
                     WHERE
                         r.verdict NOT IN (\'CE\', \'JE\') AND
                         r.problemset_id = ? AND
                         r.status = \'ready\' AND
-                        r.test = 0) rc ON u.user_id = rc.user_id';
+                        r.test = 0) rc ON i.identity_id = rc.identity_id';
             $val = [$problemset_id];
             if (!is_null($filterUsersBy)) {
-                $sql .= ' WHERE u.username LIKE ?';
+                $sql .= ' WHERE i.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
             }
             $sql .= ';';
@@ -412,7 +412,7 @@ class RunsDAO extends RunsDAOBase {
 
         $ar = [];
         foreach ($rs as $row) {
-            array_push($ar, new Users($row));
+            array_push($ar, new Identities($row));
         }
 
         return $ar;
@@ -420,7 +420,7 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function getProblemsetRuns(Problemsets $problemset, $onlyAC = false) {
         $sql =    'SELECT '
-                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid '
+                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.identity_id, r.test, r.time, r.submit_delay, r.guid '
                 . 'FROM '
                     . 'Runs r '
                 . 'INNER JOIN '
@@ -455,14 +455,14 @@ class RunsDAO extends RunsDAOBase {
 	 * Get last run of a user
 	 *
 	 */
-    final public static function GetLastRun($problemset_id, $problem_id, $user_id) {
+    final public static function GetLastRun($problemset_id, $problem_id, $identity_id) {
         //Build SQL statement
         if (is_null($problemset_id)) {
-            $sql = 'SELECT * from Runs where user_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = [$user_id, $problem_id];
+            $sql = 'SELECT * from Runs where identity_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
+            $val = [$identity_id, $problem_id];
         } else {
-            $sql = 'SELECT * from Runs where user_id = ? and problemset_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = [$user_id, $problemset_id, $problem_id];
+            $sql = 'SELECT * from Runs where identity_id = ? and problemset_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
+            $val = [$identity_id, $problemset_id, $problem_id];
         }
 
         global $conn;
@@ -482,7 +482,7 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function GetBestRun($problemset_id, $problem_id, $user_id, $showAllRuns) {
+    final public static function GetBestRun($problemset_id, $problem_id, $identity_id, $showAllRuns) {
         $filterTest = $showAllRuns ? '' : ' AND test = 0';
         $sql = "
             SELECT
@@ -490,13 +490,13 @@ class RunsDAO extends RunsDAOBase {
             FROM
                 Runs
             WHERE
-                user_id = ? AND problemset_id = ? AND problem_id = ? AND
+                identity_id = ? AND problemset_id = ? AND problem_id = ? AND
                 status = 'ready'
                 $filterTest
             ORDER BY
                 contest_score DESC, penalty ASC
             LIMIT 1;";
-        $val = [$user_id, $problemset_id, $problem_id];
+        $val = [$identity_id, $problemset_id, $problem_id];
         global $conn;
         $rs = $conn->GetRow($sql, $val);
 
@@ -504,17 +504,17 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /**
-     * Returns best score for the given user and problem, between 0 and 100
+     * Returns best score for the given identity and problem, between 0 and 100
      *
      * @global type $conn
      * @param type $problem_id
-     * @param type $user_id
+     * @param type $identity_id
      * @return int
      */
-    final public static function GetBestScore($problem_id, $user_id) {
+    final public static function GetBestScore($problem_id, $identity_id) {
         //Build SQL statement
-        $sql = "SELECT score from Runs where user_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, penalty ASC  LIMIT 1";
-        $val = [$user_id, $problem_id];
+        $sql = "SELECT score from Runs where identity_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, penalty ASC  LIMIT 1";
+        $val = [$identity_id, $problem_id];
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);
@@ -527,12 +527,12 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Get runs of a user with verdict eq AC
+	 * Get runs of an identity with verdict eq AC
 	 */
-    final public static function GetRunsByUser($user_id) {
+    final public static function GetRunsByUser($identity_id) {
         // SQL sentence
-        $sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND verdict = 'AC'";
-        $val = [$user_id];
+        $sql = "SELECT DISTINCT * FROM Runs WHERE identity_id = ? AND verdict = 'AC'";
+        $val = [$identity_id];
 
         global $conn;
         //Get the rows
@@ -551,10 +551,10 @@ class RunsDAO extends RunsDAOBase {
         $problemset_id,
         $contest,
         $problem_id,
-        $user_id
+        $identity_id
     ) {
         // Get last run
-        $lastrun = self::GetLastRun($problemset_id, $problem_id, $user_id);
+        $lastrun = self::GetLastRun($problemset_id, $problem_id, $identity_id);
 
         if (is_null($lastrun)) {
             return true;
@@ -627,8 +627,8 @@ class RunsDAO extends RunsDAOBase {
         $sql = 'SELECT ' . $columns_str . '  from Runs ';
 
         if ($columnas != null) {
-            if (in_array('Users.username', $columnas)) {
-                $sql .= 'INNER JOIN Users ON Users.user_id = Runs.user_id ';
+            if (in_array('Identities.username', $columnas)) {
+                $sql .= 'INNER JOIN Identities ON Identities.identity_id = Runs.identity_id ';
             }
             if (in_array('Problems.alias', $columnas)) {
                 $sql .= 'INNER JOIN Problems ON Problems.problem_id = Runs.problem_id ';
@@ -641,9 +641,9 @@ class RunsDAO extends RunsDAOBase {
             array_push($val, $Runs->run_id);
         }
 
-        if ($Runs->user_id != null) {
-            $sql .= ' user_id = ? AND';
-            array_push($val, $Runs->user_id);
+        if ($Runs->identity_id != null) {
+            $sql .= ' identity_id = ? AND';
+            array_push($val, $Runs->identity_id);
         }
 
         if ($Runs->problem_id != null) {
@@ -792,8 +792,10 @@ class RunsDAO extends RunsDAOBase {
                     INNER JOIN
                         `Problemset_Problem_Opened` ppo
                         ON (ppo.problemset_id = r.problemset_id
-                            AND r.user_id = ppo.user_id
                             AND r.problem_id = ppo.problem_id)
+                    INNER JOIN
+                        `Identities` i
+                        ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
                     SET
                         r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
@@ -805,8 +807,10 @@ class RunsDAO extends RunsDAOBase {
                     INNER JOIN
                         `Problemset_Problem_Opened` ppo
                         ON (ppo.problemset_id = r.problemset_id
-                            AND r.user_id = ppo.user_id
                             AND r.problem_id = ppo.problem_id)
+                    INNER JOIN
+                        `Identities`
+                        ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
                     SET
                         r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)
