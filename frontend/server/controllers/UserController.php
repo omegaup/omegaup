@@ -2433,6 +2433,8 @@ class UserController extends Controller {
 
         try {
             $response = PrivacyStatementConsentLogDAO::saveLog($identity->identity_id);
+            $sessionController = new SessionController();
+            $sessionController->InvalidateCache();
         } catch (Exception $e) {
             throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
         }
