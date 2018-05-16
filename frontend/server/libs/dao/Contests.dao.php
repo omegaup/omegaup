@@ -770,8 +770,9 @@ class ContestsDAO extends ContestsDAOBase {
     public static function generateAlias($alias) {
         $original_contest = self::getByAlias($alias);
         $last_virtual_contest = self::getLastVirtualContest($original_contest);
-        if (is_null($last_virtual_contest)) $alias = $alias . '-virtual-1';
-        else {
+        if (is_null($last_virtual_contest)) {
+            $alias = $alias . '-virtual-1';
+        } else {
             $str = explode('-', $last_virtual_contest['alias']);
             $alias = $alias .'-virtual-' . strval(intval($str[2]) + 1);
         }
@@ -838,7 +839,6 @@ class ContestsDAO extends ContestsDAOBase {
         }
         return $rs;
     }
-
 
     /**
      * @param $query

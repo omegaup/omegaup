@@ -1115,7 +1115,6 @@ class ContestController extends Controller {
             }
         }
     }
-    
 
     /**
      * This function is used to restrict API in virtual contest
