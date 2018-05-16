@@ -711,7 +711,6 @@ omegaup.OmegaUp.loadTranslations({
 	unverifiedUser: "Usurio no verificado.",
 	updateItemsError: "Ocurri\u00f3 un error al actualizar los items",
 	updateItemsSuccess: "Todos los items han sido actualizados",
-	userAlreadyAcceptedPrivacyPolicies: "La pol\u00edtica de privacidad m\u00e1s reciente ya hab\u00eda sido aceptada",
 	userDoesNotHaveAnyPasswordChangeRequest: "El usuario no ha realizado la solicitud de cambio de contrase\u00f1a en las \u00faltimas 24 horas.",
 	userEditAddPassword: "Agregar contrase\u00f1a",
 	userEditBachelors: "Licenciatura",

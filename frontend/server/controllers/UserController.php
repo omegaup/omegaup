@@ -2410,12 +2410,13 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        $hasAccepted = PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
-            $identity->identity_id
-        );
+        $latest_policy = PrivacyStatementsDAO::getLastPrivacyPublishedPolicy();
         return [
             'status' => 'ok',
-            'hasAccepted' => $hasAccepted > 0,
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
+                $identity->identity_id,
+                $latest_policy
+            ),
         ];
     }
 

@@ -49,7 +49,7 @@ class PrivacyStatements extends VO {
     }
 
     /**
-      * Id del estado de privacidad
+      * Id del documento de privacidad
       * Llave Primaria
       * Auto Incremento
       * @access public
