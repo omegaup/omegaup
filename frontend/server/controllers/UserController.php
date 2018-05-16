@@ -21,6 +21,12 @@ class UserController extends Controller {
 
     const SENDY_SUCCESS = '1';
 
+    // Languages
+    const LANGUAGE_ES = 1;
+    const LANGUAGE_EN = 2;
+    const LANGUAGE_PT = 3;
+    const LANGUAGE_PSEUDO = 4;
+
     /**
      * Entry point for Create a User API
      *
@@ -2391,23 +2397,29 @@ class UserController extends Controller {
     public static function getPrivacyPolicy(Request $r) {
         $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $lang = 'en';
-        if ($user_session->language_id == 1) {
+        if ($user_session->language_id == UserController::LANGUAGE_ES) {
             $lang = 'es';
-        } elseif ($user_session->language_id == 3) {
+        } elseif ($user_session->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
 
         $git = new Git(OMEGAUP_ROOT);
         $privacy_policy_path = 'frontend/privacy/privacy_policy/';
-        $privacy_policy_file = $privacy_policy_path . $lang . '.md';
+        $privacy_policy_file = "{$privacy_policy_path}{$lang}.md";
         $git_object_id = $git->get(['rev-parse', 'HEAD:' . $privacy_policy_path]);
-        $policy_markdown = $git->get(['cat-file', 'blob', 'HEAD:' . $privacy_policy_file]);
+        $policy_markdown = file_get_contents(OMEGAUP_ROOT . '/../' .$privacy_policy_file);
+        $latest_policy_accepted = self::apiLastPrivacyPolicyAccepted(new Request([]));
 
         return [
             'status' => 'ok',
             'policy_markdown' => $policy_markdown,
-            'git_object_id' => $git_object_id,
+            'has_accepted' => $latest_policy_accepted['hasAccepted'],
         ];
+    }
+
+    public static function apiLastPrivacyPolicyAccepted(Request $r) {
+        // TODO: Remove this dummy when #1991 is merged
+        return ['status' => 'ok', 'hasAccepted' => false];
     }
 
     public static function apiAcceptPrivacyPolicy(Request $r) {

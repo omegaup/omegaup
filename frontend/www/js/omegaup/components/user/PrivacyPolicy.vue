@@ -11,12 +11,11 @@
       </div>
       <form v-on:submit.prevent="onSubmit">
         <div class="top-margin text-center">
-          <label v-show="!accepted"><input name="agree"
+          <label><input name="agreed"
                  type="checkbox"
-                 v-model="internalAgree"> {{ T.wordsAgree }}</label> <button class=
-                 "btn btn-primary"
-               v-bind:disabled="!internalAgree"
-               v-show="!accepted">{{ T.wordsSaveChanges }}</button>
+                 v-bind:disabled="accepted"
+                 v-model="agreed"> {{ T.wordsAgree }}</label> <button class="btn btn-primary"
+               v-bind:disabled="!agreed || accepted">{{ T.wordsSaveChanges }}</button>
         </div>
       </form>
     </div>
@@ -29,19 +28,20 @@ import UI from '../../ui.js';
 export default {
   props: {
     policy_markdown: String,
-    agree: Boolean,
+    initial_agreed: Boolean,
     accepted: Boolean,
-    git_object_id: String,
   },
   computed: {
     policyHtml: function() {
-      let markdownConverter = UI.markdownConverter({preview: true});
-      return markdownConverter.makeHtml(this.policy_markdown);
+      return this.markdownConverter.makeHtml(this.policy_markdown);
     }
   },
   methods: {onSubmit: function() { this.$emit('submit', this);}},
   data: function() {
-    return { T: T, internalAgree: this.agree }
+    return {
+      T: T, agreed: this.initial_agreed, accepted: this.accepted,
+          markdownConverter: UI.markdownConverter(),
+    }
   },
 }
 </script>

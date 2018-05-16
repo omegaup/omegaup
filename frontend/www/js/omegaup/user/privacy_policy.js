@@ -4,8 +4,7 @@ import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
-  const privacy_policy =
-      JSON.parse(document.getElementById('payload').innerText);
+  const payload = JSON.parse(document.getElementById('payload').innerText);
 
   let privacyPolicy = new Vue({
     el: '#privacy-policy',
@@ -14,12 +13,10 @@ OmegaUp.on('ready', function() {
         props: {
           policy_markdown: this.policy_markdown,
           accepted: this.accepted,
-          git_object_id: this.git_object_id,
         },
         on: {
           submit: function(ev) {
-            API.User.acceptPrivacyPolicy(
-                        {git_object_id: privacyPolicy.git_object_id})
+            API.User.acceptPrivacyPolicy({})
                 .then(function(data) {
                   UI.info(T.wordsPrivacyPolicyAccepted);
                   privacyPolicy.accepted = true;
@@ -30,9 +27,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      policy_markdown: privacy_policy.policy_markdown,
-      accepted: false,
-      git_object_id: privacy_policy.git_object_id
+      policy_markdown: payload.policy_markdown,
+      accepted: payload.has_accepted,
     },
     components: {
       'omegaup-privacy-policy': user_Privacy_Policy,
