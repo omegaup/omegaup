@@ -692,6 +692,9 @@ class ContestController extends Controller {
             $result['admin'] = $r['contest_admin'];
         }
 
+        //This rerun_id will be used in client side to retrive original contest scoreboard
+        $result['original_alias'] = ContestsDAO::isVirtual($r['contest']); //Virtual contest has rerun_id != 0
+
         $result['status'] = 'ok';
         return $result;
     }
@@ -828,6 +831,65 @@ class ContestController extends Controller {
         return ['status' => 'ok', 'alias' => $r['alias']];
     }
 
+    public static function apiCreateVirtual(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+        // Authenticate user
+        self::authenticateRequest($r);
+
+        try {
+            $original_contest = ContestsDAO::getByAlias($r['alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($original_contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
+        $virtual_contest_alias = ContestsDAO::generateAlias($r['alias']);
+
+        $contest_length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
+        $r = new Request();
+
+        $r['title'] = $original_contest->title;
+        $r['description'] = $original_contest->description;
+        $r['window_length'] = $original_contest->window_length;
+        $r['public'] = 0; //Virtual contest must be private
+        $r['start_time'] = Time::get();
+        $r['finish_time'] = $r['start_time'] + $contest_length;
+        $r['scoreboard'] = $original_contest->scoreboard;
+        $r['alias'] = $virtual_contest_alias;
+        $r['points_decay_factor'] = $original_contest->points_decay_factor;
+        $r['submissions_gap'] = $original_contest->submissions_gap;
+        $r['partial_score'] = $original_contest->partial_score;
+        $r['feedback'] = $original_contest->feedback;
+        $r['penalty_type'] = $original_contest->penalty_type;
+        $r['penalty_calc_policy'] = $original_contest->penalty_calc_policy;
+        $r['show_scoreboard_after'] = $original_contest->show_scoreboard_after;
+        $r['languages'] = $original_contest->languages;
+
+        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+        $r['auth_token'] = $auth_token;
+
+        $response = self::apiCreate($r);
+
+        try {
+            $virtual_contest = ContestsDAO::getByAlias($virtual_contest_alias);
+            ContestsDAO::updateContestToVirtual($virtual_contest, $original_contest);
+            ProblemsetProblemsDAO::copyProblemset($virtual_contest->problemset_id, $original_contest->problemset_id);
+        } catch (invalidparameterexception $e) {
+            throw $e;
+        } catch (duplicatedentryindatabaseexception $e) {
+            throw $e;
+        } catch (exception $e) {
+            throw new invaliddatabaseoperationexception($e);
+        }
+
+        return ['status' => 'ok', 'alias' => $r['alias']];
+    }
+
     /**
      * Creates a new contest
      *
@@ -901,18 +963,6 @@ class ContestController extends Controller {
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
-
-            if (!is_null($r['problems'])) {
-                foreach ($r['problems'] as $problem) {
-                    $problemset_problem = new ProblemsetProblems([
-                                'problemset_id' => $problemset->problemset_id,
-                                'problem_id' => $problem['id'],
-                                'points' => $problem['points']
-                            ]);
-
-                    ProblemsetProblemsDAO::save($problemset_problem);
-                }
-            }
 
             // End transaction transaction
             ContestsDAO::transEnd();
@@ -1065,6 +1115,20 @@ class ContestController extends Controller {
             }
         }
     }
+    
+
+    /**
+     * This function is used to restrict API in virtual contest
+     *
+     * @param Request $r
+     * @return void
+     * @throws ForbiddenAccessException
+     */
+    private static function forbiddenInVirtual(Contests $contest) {
+        if (ContestsDAO::isVirtual($contest)) {
+            throw new ForbiddenAccessException('forbiddenInGhostMode');
+        }
+    }
 
     /**
      * Gets the problems from a contest
@@ -1124,6 +1188,8 @@ class ContestController extends Controller {
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest($r);
+
+        self::forbiddenInVirtual($params['contest']);
 
         $problemset = ProblemsetsDAO::getByPK($params['contest']->problemset_id);
 
@@ -1217,6 +1283,8 @@ class ContestController extends Controller {
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateRemoveFromContestRequest($r);
+
+        self::forbiddenInVirtual($params['contest']);
 
         try {
             $relationship = new ProblemsetProblems([

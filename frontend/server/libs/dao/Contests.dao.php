@@ -763,6 +763,84 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     /**
+     * Generate alias of virtual contest / ghost mode
+     * @param string contest alias
+     * @return string of unique virtual contest alias
+     */
+    public static function generateAlias($alias) {
+        $original_contest = self::getByAlias($alias);
+        $last_virtual_contest = self::getLastVirtualContest($original_contest);
+        if (is_null($last_virtual_contest)) $alias = $alias . '-virtual-1';
+        else {
+            $str = explode('-', $last_virtual_contest['alias']);
+            $alias = $alias .'-virtual-' . strval(intval($str[2]) + 1);
+        }
+        return $alias;
+    }
+
+    /**
+     * Update contest table to virtual contest
+     *
+     * @param String alias, Number original contest
+     * @return void
+     */
+    public static function updateContestToVirtual($virtual_contest, $original_contest) {
+        $sql = 'UPDATE Contests SET Contests.rerun_id = ? WHERE Contests.contest_id = ?;';
+
+        global $conn;
+        $params = [$original_contest->contest_id, $virtual_contest->contest_id];
+        $conn->Execute($sql, $params);
+    }
+
+    /**
+     * Check if contest is virtual contest
+     * @param Contest $contest
+     * @return boolean
+     */
+    public static function isVirtual(Contests $contest) {
+        return $contest->rerun_id != 0;
+    }
+
+    /**
+     * Get last virtual contest from provided contestid
+     * @param Number contest_id
+     * @return array contest
+     */
+    public static function getLastVirtualContest($contest, $user = null) {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Contests
+        ';
+        $params = [];
+        if (!is_null($user)) {
+            $sql .= '
+                INNER JOIN
+                    ACLs ON ACLs.acl_id = Contests.acl_id
+                WHERE
+                    ACLs.owner_id = ? AND Contests.rerun_id = ?
+            ';
+            $params = [$user->user_id];
+        }
+        $sql .= '
+            WHERE
+                Contests.rerun_id = ?
+            ORDER BY
+                Contests.finish_time DESC
+            LIMIT 1;';
+        $params[] = $contest->contest_id;
+        global $conn;
+
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return $rs;
+    }
+
+
+    /**
      * @param $query
      * @return Array [type, query]
      */
