@@ -457,7 +457,7 @@ class ContestController extends Controller {
         }
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'description', 'start_time', 'finish_time', 'window_length', 'alias', 'scoreboard', 'points_decay_factor', 'partial_score', 'submissions_gap', 'feedback', 'penalty', 'time_start', 'penalty_type', 'penalty_calc_policy', 'public', 'show_scoreboard_after', 'contestant_must_register'];
+        $relevant_columns = ['title', 'description', 'start_time', 'finish_time', 'window_length', 'alias', 'scoreboard', 'points_decay_factor', 'partial_score', 'submissions_gap', 'feedback', 'penalty', 'time_start', 'penalty_type', 'penalty_calc_policy', 'public', 'show_scoreboard_after', 'contestant_must_register', 'rerun_id'];
 
         // Initialize response to be the contest information
         $result = $r['contest']->asFilteredArray($relevant_columns);
