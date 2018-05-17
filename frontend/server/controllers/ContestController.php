@@ -201,7 +201,8 @@ class ContestController extends Controller {
             'finish_time',
             'public',
             'scoreboard_url',
-            'scoreboard_url_admin'
+            'scoreboard_url_admin',
+            'rerun_id'
         ];
         $contests = null;
         $identity_id = $callback_user_function == 'ContestsDAO::getContestsParticipating'
