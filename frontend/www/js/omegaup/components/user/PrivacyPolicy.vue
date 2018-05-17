@@ -13,9 +13,9 @@
         <div class="top-margin text-center">
           <label><input name="agreed"
                  type="checkbox"
-                 v-bind:disabled="accepted"
+                 v-bind:disabled="saved"
                  v-model="agreed"> {{ T.wordsAgree }}</label> <button class="btn btn-primary"
-               v-bind:disabled="!agreed || accepted">{{ T.wordsSaveChanges }}</button>
+               v-bind:disabled="!agreed || saved">{{ T.wordsSaveChanges }}</button>
         </div>
       </form>
     </div>
@@ -29,7 +29,7 @@ export default {
   props: {
     policy_markdown: String,
     initial_agreed: Boolean,
-    accepted: Boolean,
+    saved: Boolean,
   },
   computed: {
     policyHtml: function() {
@@ -39,7 +39,7 @@ export default {
   methods: {onSubmit: function() { this.$emit('submit', this);}},
   data: function() {
     return {
-      T: T, agreed: this.initial_agreed, accepted: this.accepted,
+      T: T, agreed: this.initial_agreed, saved: this.saved,
           markdownConverter: UI.markdownConverter(),
     }
   },

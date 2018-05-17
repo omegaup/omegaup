@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitlePrivacyPolicy#}" inPolicy=true}
+{include file='head.tpl' htmlTitle="{#omegaupTitlePrivacyPolicy#}" loadMarkdown=true}
 
 <script type="text/json" id="payload">{$payload|json_encode}</script></script>
 <div id="privacy-policy"></div>

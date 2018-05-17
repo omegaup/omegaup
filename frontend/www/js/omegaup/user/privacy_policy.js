@@ -12,14 +12,14 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-privacy-policy', {
         props: {
           policy_markdown: this.policy_markdown,
-          accepted: this.accepted,
+          saved: this.saved,
         },
         on: {
           submit: function(ev) {
             API.User.acceptPrivacyPolicy({})
                 .then(function(data) {
                   UI.info(T.wordsPrivacyPolicyAccepted);
-                  privacyPolicy.accepted = true;
+                  privacyPolicy.saved = true;
                 })
                 .fail(UI.apiError);
           }
@@ -28,7 +28,7 @@ OmegaUp.on('ready', function() {
     },
     data: {
       policy_markdown: payload.policy_markdown,
-      accepted: payload.has_accepted,
+      saved: payload.has_accepted,
     },
     components: {
       'omegaup-privacy-policy': user_Privacy_Policy,
