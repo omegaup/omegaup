@@ -10,7 +10,7 @@ include_once('base/PrivacyStatement_Consent_Log.vo.base.php');
   *
   */
 class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
-    public static function hasAcceptedLatestPrivacyPolicy($identity_id, $privacystatement_id) {
+    public static function hasAcceptedLatestPrivacyPolicy($identity_id) {
         $sql = 'SELECT
                   COUNT(1)
                 FROM
@@ -19,12 +19,17 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   `PrivacyStatements` ps
                 ON
                   pscl.privacystatement_id = ps.privacystatement_id
+                  AND pscl.privacystatement_id = (
+                    SELECT
+                      MAX(privacystatement_id)
+                    FROM
+                      PrivacyStatements
+                    )
                 WHERE
                   pscl.identity_id = ?
-                  AND ps.privacystatement_id = ?
                ';
         global $conn;
-        return $conn->GetOne($sql, [$identity_id, $privacystatement_id]) > 0;
+        return $conn->GetOne($sql, [$identity_id]) > 0;
     }
 
     public static function saveLog($identity_id) {
