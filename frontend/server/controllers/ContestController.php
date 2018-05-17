@@ -848,11 +848,21 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
+        $start_time = strtotime($original_contest->start_time);
+        $finish_time = strtotime($original_contest->finish_time);
+
+        if ($finish_time < Time::get()) {
+            throw new ForbiddenAccessException('originalContestHasNotEnded');
+        }
+
         $virtual_contest_alias = ContestsDAO::generateAlias($r['alias']);
 
         $contest_length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
-        $r = new Request();
 
+        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+
+        //Initialiaze request
+        $r = new Request();
         $r['title'] = $original_contest->title;
         $r['description'] = $original_contest->description;
         $r['window_length'] = $original_contest->window_length;
@@ -865,12 +875,11 @@ class ContestController extends Controller {
         $r['submissions_gap'] = $original_contest->submissions_gap;
         $r['partial_score'] = $original_contest->partial_score;
         $r['feedback'] = $original_contest->feedback;
+        $r['penalty'] = $original_contest->penalty;
         $r['penalty_type'] = $original_contest->penalty_type;
         $r['penalty_calc_policy'] = $original_contest->penalty_calc_policy;
         $r['show_scoreboard_after'] = $original_contest->show_scoreboard_after;
         $r['languages'] = $original_contest->languages;
-
-        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
         $r['auth_token'] = $auth_token;
 
         $response = self::apiCreate($r);

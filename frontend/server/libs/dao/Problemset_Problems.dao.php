@@ -87,9 +87,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     public static function copyProblemset($new_problemset, $old_problemset) {
         $sql = '
             INSERT INTO
-                Problemset_Problems (problemset_id, problem_id, points)
+                Problemset_Problems (problemset_id, problem_id, points, `order`)
             SELECT
-                ?, problem_id, points
+                ?, problem_id, points, `order`
             FROM
                 Problemset_Problems
             WHERE
