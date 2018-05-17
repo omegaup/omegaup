@@ -70,9 +70,7 @@ def test_create_contest(driver):
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        errors = util.check_errors_log(driver)
-        if len(errors) != 0:
-            assert False, '\n'.join(errors)
+        util.assert_no_javascript_errors(driver)
 
 
 @flaky
@@ -131,9 +129,7 @@ def test_user_ranking_contest(driver):
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        errors = util.check_errors_log(driver)
-        if len(errors) != 0:
-            assert False, '\n'.join(errors)
+        util.assert_no_javascript_errors(driver)
 
 
 def create_contest_admin(driver, contest_alias, problem, users, user):

@@ -23,9 +23,7 @@ def test_create_user(driver):
     with driver.login(username, password):
         pass
 
-    errors = util.check_errors_log(driver)
-    if len(errors) != 0:
-        assert False, '\n'.join(errors)
+    util.assert_no_javascript_errors(driver)
 
 
 @flaky
@@ -38,9 +36,7 @@ def test_login(driver):
     with driver.login_admin():
         pass
 
-    errors = util.check_errors_log(driver)
-    if len(errors) != 0:
-        assert False, '\n'.join(errors)
+    util.assert_no_javascript_errors(driver)
 
 
 @flaky
@@ -83,9 +79,7 @@ def test_create_problem(driver):
         assert (('/problem/%s/edit/' % problem_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-        errors = util.check_errors_log(driver)
-        if len(errors) != 0:
-            assert False, '\n'.join(errors)
+        util.assert_no_javascript_errors(driver)
 
     with driver.login_user():
         driver.wait.until(
@@ -112,6 +106,4 @@ def test_create_problem(driver):
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
-        errors = util.check_errors_log(driver)
-        if len(errors) != 0:
-            assert False, '\n'.join(errors)
+        util.assert_no_javascript_errors(driver)

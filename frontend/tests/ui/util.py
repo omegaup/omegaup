@@ -3,6 +3,7 @@
 
 '''Utils for Selenium tests.'''
 
+import contextlib
 import os
 import sys
 
@@ -33,15 +34,25 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
         driver.wait_for_page_loaded()
 
 
-def check_errors_log(driver):
-    ''' Checks whether there is an error or warning in javascript console'''
+@contextlib.contextmanager
+def assert_no_javascript_errors(driver):
+    ''' Shows in a list unexpected errors in javascript console '''
+    previous_logs = get_console_logs(driver)
     try:
-        log = []
-        for entry in driver.browser.get_log('browser'):
-            if entry['level'] == 'SEVERE':
-                log.append('%s in %s' % (entry['message'],
-                                         driver.browser.current_url))
-    except:  # pylint: disable=bare-except
-        pass
+        yield
+    finally:
+        current_logs = get_console_logs(driver)
+        unexpected_errors = list(set(previous_logs) - set(current_logs))
+        if len(unexpected_errors) != 0:
+            assert False, '\n'.join(unexpected_errors)
+
+
+def get_console_logs(driver):
+    ''' Checks whether there is an error or warning in javascript console'''
+    log = []
+    for entry in driver.browser.get_log('browser'):
+        if entry['level'] != 'SEVERE':
+            continue
+        log.append((driver.browser.current_url, entry['message']))
 
     return log
