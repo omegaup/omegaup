@@ -2145,6 +2145,8 @@ class ContestController extends Controller {
         // Validate request
         self::validateCreateOrUpdate($r, true /* is update */);
 
+        self::forbiddenInVirtual($r['contest']);
+
         // Update contest DAO
         if (!is_null($r['public'])) {
             // If going public
