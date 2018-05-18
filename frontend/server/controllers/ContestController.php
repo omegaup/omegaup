@@ -116,7 +116,6 @@ class ContestController extends Controller {
 
             $contestInfo['duration'] = (is_null($c->window_length) ?
                                 $c->finish_time - $c->start_time : ($c->window_length * 60));
-            $contestInfo['virtual'] = $c->rerun_id != 0;
             $addedContests[] = $contestInfo;
         }
 
