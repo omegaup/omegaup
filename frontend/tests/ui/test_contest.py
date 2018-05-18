@@ -19,7 +19,7 @@ def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
     whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
-                 '/js/error_handler.js']
+                 '/js/error_handler.js', '/js/dist/omegaup.js']
     with util.assert_no_javascript_errors(driver, whitelist):
         run_id = driver.generate_id()
         contest_alias = 'unittest_contest_%s' % run_id
