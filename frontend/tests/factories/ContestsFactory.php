@@ -301,12 +301,6 @@ class ContestsFactory {
         ContestsDAO::save($contest);
     }
 
-    public static function forceFinish($contestData) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->finish_time = gmdate('Y-m-d H:i:s', Time::get());
-        ContestsDAO::save($contest);
-    }
-
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;

@@ -878,21 +878,36 @@ class ContestController extends Controller {
         $r['penalty'] = $original_contest->penalty;
         $r['penalty_type'] = $original_contest->penalty_type;
         $r['penalty_calc_policy'] = $original_contest->penalty_calc_policy;
-        $r['show_scoreboard_after'] = $original_contest->show_scoreboard_after;
+        $r['show_scoreboard_after'] = true;
         $r['languages'] = $original_contest->languages;
         $r['auth_token'] = $auth_token;
         $r['rerun_id'] = $original_contest->contest_id;
+
+        ContestsDAO::transBegin();
 
         $response = self::apiCreate($r);
 
         try {
             $virtual_contest = ContestsDAO::getByAlias($virtual_contest_alias);
+
+            // Copy problemset problems from original contest to virtual contest
             ProblemsetProblemsDAO::copyProblemset($virtual_contest->problemset_id, $original_contest->problemset_id);
+
+            ContestsDAO::transEnd();
         } catch (InvalidParameterException $e) {
+            // Operation failed in the data layer, rollback transaction
+            ContestsDAO::transRollback();
+
             throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
+            // Operation failed in the data layer, rollback transaction
+            ContestsDAO::transRollback();
+
             throw $e;
         } catch (exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            ContestsDAO::transRollback();
+
             throw new InvalidDatabaseOperationException($e);
         }
 
