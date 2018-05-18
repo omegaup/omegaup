@@ -7,6 +7,9 @@
 			<div id="ranking">
 				<div></div>
 			</div>
+			<div id="run-details">
+				<div></div>
+			</div>
 		</div>
 	</div>
 </body>

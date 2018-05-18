@@ -18,118 +18,116 @@ import ui.util as util
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
-    run_id = driver.generate_id()
-    contest_alias = 'unittest_contest_%s' % run_id
-    problem = 'sumas'
-    user = 'user'
-    user1 = 'unittest_user_1_%s' % run_id
-    user2 = 'unittest_user_2_%s' % run_id
-    password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
+    with util.assert_no_javascript_errors(driver):
+        run_id = driver.generate_id()
+        contest_alias = 'unittest_contest_%s' % run_id
+        problem = 'sumas'
+        user = 'user'
+        user1 = 'unittest_user_1_%s' % run_id
+        user2 = 'unittest_user_2_%s' % run_id
+        password = 'P@55w0rd'
+        users = '%s, %s' % (user1, user2)
 
-    driver.register_user(user1, password)
-    driver.register_user(user2, password)
+        driver.register_user(user1, password)
+        driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+        create_contest_admin(driver, contest_alias, problem, users, user)
 
-    with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
+        with driver.login(user1, password):
+            create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                            verdict='AC', score=1)
 
-    with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0)
+        with driver.login(user2, password):
+            create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+                            verdict='WA', score=0)
 
-    update_scoreboard_for_contest(driver, contest_alias)
+        update_scoreboard_for_contest(driver, contest_alias)
 
-    with driver.login_admin():
+        with driver.login_admin():
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.ID, 'nav-contests'))).click()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/mine/"]')))).click()
-        driver.wait_for_page_loaded()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+            driver.wait_for_page_loaded()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
-                  contest_alias)))).click()
-        driver.wait_for_page_loaded()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
+                      contest_alias)))).click()
+            driver.wait_for_page_loaded()
 
-        run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
-        assert run_accepted_user.text == user1, run_accepted_user
+            run_accepted_user = driver.browser.find_element_by_xpath(
+                '//td[@class="accepted"]/preceding-sibling::td[1]')
+            assert run_accepted_user.text == user1, run_accepted_user
 
-        run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
-        assert run_wrong_user.text == user2, run_wrong_user
-
-        util.assert_no_javascript_errors(driver)
+            run_wrong_user = driver.browser.find_element_by_xpath(
+                '//td[@class="wrong"]/preceding-sibling::td[1]')
+            assert run_wrong_user.text == user2, run_wrong_user
 
 
 @flaky
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
-    run_id = driver.generate_id()
-    contest_alias = 'utrank_contest_%s' % run_id
-    problem = 'sumas'
-    user = 'user'
-    user1 = 'ut_rank_user_1_%s' % run_id
-    user2 = 'ut_rank_user_2_%s' % run_id
-    password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
+    with util.assert_no_javascript_errors(driver):
+        run_id = driver.generate_id()
+        contest_alias = 'utrank_contest_%s' % run_id
+        problem = 'sumas'
+        user = 'user'
+        user1 = 'ut_rank_user_1_%s' % run_id
+        user2 = 'ut_rank_user_2_%s' % run_id
+        password = 'P@55w0rd'
+        users = '%s, %s' % (user1, user2)
 
-    driver.register_user(user1, password)
-    driver.register_user(user2, password)
+        driver.register_user(user1, password)
+        driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+        create_contest_admin(driver, contest_alias, problem, users, user)
 
-    with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
+        with driver.login(user1, password):
+            create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                            verdict='AC', score=1)
 
-    with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0)
+        with driver.login(user2, password):
+            create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+                            verdict='WA', score=0)
 
-    update_scoreboard_for_contest(driver, contest_alias)
+        update_scoreboard_for_contest(driver, contest_alias)
 
-    with driver.login_admin():
+        with driver.login_admin():
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/arena/"]'))).click()
-        driver.wait_for_page_loaded()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//a[@href = "/arena/"]'))).click()
+            driver.wait_for_page_loaded()
 
-        contest_url = '/arena/%s' % contest_alias
+            contest_url = '/arena/%s' % contest_alias
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '#current-contests a[href="%s"]' % contest_url))).click()
-        driver.wait_for_page_loaded()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '#current-contests a[href="%s"]' % contest_url))).click()
+            driver.wait_for_page_loaded()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "#ranking"]'))).click()
-        driver.wait_for_page_loaded()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//a[@href = "#ranking"]'))).click()
+            driver.wait_for_page_loaded()
 
-        run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
-        assert run_accepted_user.text == user1, run_accepted_user
+            run_accepted_user = driver.browser.find_element_by_xpath(
+                '//td[@class="accepted"]/preceding-sibling::td[1]')
+            assert run_accepted_user.text == user1, run_accepted_user
 
-        run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
-        assert run_wrong_user.text == user2, run_wrong_user
-
-        util.assert_no_javascript_errors(driver)
+            run_wrong_user = driver.browser.find_element_by_xpath(
+                '//td[@class="wrong"]/preceding-sibling::td[1]')
+            assert run_wrong_user.text == user2, run_wrong_user
 
 
 def create_contest_admin(driver, contest_alias, problem, users, user):
