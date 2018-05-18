@@ -14,9 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
-URL_WHITELIST = ('http://staticxx.facebook.com/',)
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ()
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/',)
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -41,15 +40,14 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
 
 
 @contextlib.contextmanager
-def assert_no_javascript_errors(driver, path_whitelist=(), url_whitelist=(),
+def assert_no_javascript_errors(driver, path_whitelist=(),
                                 message_whitelist=()):
     ''' Shows in a list unexpected errors in javascript console '''
-    previous_logs = get_console_logs(driver, path_whitelist, url_whitelist,
-                                     message_whitelist)
+    previous_logs = get_console_logs(driver, path_whitelist, message_whitelist)
     try:
         yield
     finally:
-        current_logs = get_console_logs(driver, path_whitelist, url_whitelist,
+        current_logs = get_console_logs(driver, path_whitelist,
                                         message_whitelist)
         unexpected_errors = []
 
@@ -59,7 +57,7 @@ def assert_no_javascript_errors(driver, path_whitelist=(), url_whitelist=(),
         assert not unexpected_errors, '\n'.join(unexpected_errors)
 
 
-def get_console_logs(driver, path_whitelist, url_whitelist, message_whitelist):
+def get_console_logs(driver, path_whitelist, message_whitelist):
     ''' Checks whether there is an error or warning in javascript console'''
 
     log = []
@@ -67,9 +65,8 @@ def get_console_logs(driver, path_whitelist, url_whitelist, message_whitelist):
         if entry['level'] != 'SEVERE':
             continue
         path_matches = match_path(entry['message'], path_whitelist)
-        url_matches = match_path(entry['message'], url_whitelist, True)
         message_matches = match_message(entry['message'], message_whitelist)
-        if path_matches or url_matches or message_matches:
+        if path_matches or message_matches:
             continue
 
         log.append(entry['message'])
@@ -77,15 +74,12 @@ def get_console_logs(driver, path_whitelist, url_whitelist, message_whitelist):
     return log
 
 
-def match_path(message, whitelist, full_url=False):
+def match_path(message, whitelist):
     '''
     Checks whether url in message is present in whitelist, it only compares
     params in the url if full_url is false
     '''
-    if not full_url:
-        full_whitelist = whitelist + PATH_WHITELIST
-    else:
-        full_whitelist = whitelist + URL_WHITELIST
+    full_whitelist = whitelist + PATH_WHITELIST
 
     if not full_whitelist:
         return False
@@ -96,14 +90,9 @@ def match_path(message, whitelist, full_url=False):
     if not url:
         return False
 
-    if not full_url:
-        for string in full_whitelist:  # Compares params in the url
-            if url.path == string:
-                return True
-    else:
-        for string in full_whitelist:
-            if url.geturl() == string:  # Compares full url
-                return True
+    for string in full_whitelist:
+        if url.path == string:  # Compares params in the url vs whitelist
+            return True
 
     return False
 
@@ -122,8 +111,8 @@ def match_message(message, message_whitelist):
     if not match:
         return False
 
-    for string in message_whitelist:
-        if match.group(1)[1:-1] == string:
+    for string in message_whitelist:  # Compares string in quotes
+        if match.group(1)[1:-1] == string:  # Removing quotes of match regex
             return True
 
     return False
