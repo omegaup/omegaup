@@ -102,8 +102,9 @@ def match_message(message, message_whitelist):
     Checks whether string in message is present in whitelist, it only compares
     strings between double quote or simple quote
     '''
+    full_whitelist = message_whitelist + MESSAGE_WHITELIST
 
-    if not message_whitelist:
+    if not full_whitelist:
         return False
 
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
@@ -111,7 +112,7 @@ def match_message(message, message_whitelist):
     if not match:
         return False
 
-    for string in message_whitelist:  # Compares string in quotes
+    for string in full_whitelist:  # Compares string in quotes
         if match.group(1)[1:-1] == string:  # Removing quotes of match regex
             return True
 
