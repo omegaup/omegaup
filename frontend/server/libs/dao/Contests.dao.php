@@ -138,7 +138,8 @@ class ContestsDAO extends ContestsDAOBase {
                                 alias,
                                 recommended,
                                 window_length,
-                                UNIX_TIMESTAMP (last_updated) as last_updated
+                                UNIX_TIMESTAMP (last_updated) as last_updated,
+                                rerun_id
                                 ';
 
     final public static function getByAlias($alias) {

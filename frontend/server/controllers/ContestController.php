@@ -106,7 +106,8 @@ class ContestController extends Controller {
             'alias',
             'window_length',
             'recommended',
-            'last_updated'
+            'last_updated',
+            'rerun_id'
             ];
 
         $addedContests = [];
@@ -115,7 +116,7 @@ class ContestController extends Controller {
 
             $contestInfo['duration'] = (is_null($c->window_length) ?
                                 $c->finish_time - $c->start_time : ($c->window_length * 60));
-
+            $contestInfo['virtual'] = $c->rerun_id != 0;
             $addedContests[] = $contestInfo;
         }
 
