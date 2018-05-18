@@ -764,16 +764,23 @@ class ContestsDAO extends ContestsDAOBase {
 
     /**
      * Generate alias of virtual contest / ghost mode
+     *
      * @param Contests $contest
      * @return string of unique virtual contest alias
      */
     public static function generateAlias(Contests $contest) {
+        // Get the last virtual contest to get virtual contest number
         $last_virtual_contest = self::getLastVirtualContest($contest);
+        // Virtual contest alias format (alias-virtual-n)
         $alias = $contest->alias;
+
         if (is_null($last_virtual_contest)) {
+            // No virtual contest? Assign alias as (alias-virtual-1)
             $alias = $alias . '-virtual-1';
         } else {
+            // ANother virtual contest exist. Take the last n of virtual contest
             $str = explode('-', $last_virtual_contest['alias']);
+            // Assign alias as (alias-virtual-n+1)
             $alias = $alias .'-virtual-' . strval(intval(end($str)) + 1);
         }
         return $alias;
