@@ -15,18 +15,16 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   COUNT(1)
                 FROM
                   `PrivacyStatement_Consent_Log` pscl
-                INNER JOIN
-                  `PrivacyStatements` ps
-                ON
-                  pscl.privacystatement_id = ps.privacystatement_id
+                WHERE
+                  pscl.identity_id = ?
                   AND pscl.privacystatement_id = (
                     SELECT
                       MAX(privacystatement_id)
                     FROM
-                      PrivacyStatements
+                      PrivacyStatements ps
+                    WHERE
+                      ps.type = \'privacy_policy\'
                     )
-                WHERE
-                  pscl.identity_id = ?
                ';
         global $conn;
         return $conn->GetOne($sql, [$identity_id]) > 0;
