@@ -764,17 +764,17 @@ class ContestsDAO extends ContestsDAOBase {
 
     /**
      * Generate alias of virtual contest / ghost mode
-     * @param string contest alias
+     * @param Contests $contest
      * @return string of unique virtual contest alias
      */
-    public static function generateAlias($alias) {
-        $original_contest = self::getByAlias($alias);
-        $last_virtual_contest = self::getLastVirtualContest($original_contest);
+    public static function generateAlias(Contests $contest) {
+        $last_virtual_contest = self::getLastVirtualContest($contest);
+        $alias = null;
         if (is_null($last_virtual_contest)) {
             $alias = $alias . '-virtual-1';
         } else {
             $str = explode('-', $last_virtual_contest['alias']);
-            $alias = $alias .'-virtual-' . strval(intval($str[2]) + 1);
+            $alias = $alias .'-virtual-' . strval(intval(end($str)) + 1);
         }
         return $alias;
     }
@@ -807,24 +807,12 @@ class ContestsDAO extends ContestsDAOBase {
      * @param Number contest_id
      * @return array contest
      */
-    public static function getLastVirtualContest($contest, $user = null) {
+    public static function getLastVirtualContest(Contests $contest) {
         $sql = '
             SELECT
                 *
             FROM
                 Contests
-        ';
-        $params = [];
-        if (!is_null($user)) {
-            $sql .= '
-                INNER JOIN
-                    ACLs ON ACLs.acl_id = Contests.acl_id
-                WHERE
-                    ACLs.owner_id = ? AND Contests.rerun_id = ?
-            ';
-            $params = [$user->user_id];
-        }
-        $sql .= '
             WHERE
                 Contests.rerun_id = ?
             ORDER BY

@@ -693,8 +693,7 @@ class ContestController extends Controller {
             $result['admin'] = $r['contest_admin'];
         }
 
-        //This rerun_id will be used in client side to retrive original contest scoreboard
-        $result['original_alias'] = ContestsDAO::isVirtual($r['contest']); //Virtual contest has rerun_id != 0
+        $result['is_virtual'] = ContestsDAO::isVirtual($r['contest']); //Virtual contest has rerun_id != 0
 
         $result['status'] = 'ok';
         return $result;
@@ -856,18 +855,18 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 
-        $virtual_contest_alias = ContestsDAO::generateAlias($r['alias']);
+        $virtual_contest_alias = ContestsDAO::generateAlias($original_contest);
 
         $contest_length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
 
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
-        //Initialiaze request
+        // Initialize request
         $r = new Request();
         $r['title'] = $original_contest->title;
         $r['description'] = $original_contest->description;
         $r['window_length'] = $original_contest->window_length;
-        $r['public'] = 0; //Virtual contest must be private
+        $r['public'] = 0; // Virtual contest must be private
         $r['start_time'] = Time::get();
         $r['finish_time'] = $r['start_time'] + $contest_length;
         $r['scoreboard'] = $original_contest->scoreboard;
@@ -882,19 +881,19 @@ class ContestController extends Controller {
         $r['show_scoreboard_after'] = $original_contest->show_scoreboard_after;
         $r['languages'] = $original_contest->languages;
         $r['auth_token'] = $auth_token;
+        $r['rerun_id'] = $original_contest->contest_id;
 
         $response = self::apiCreate($r);
 
         try {
             $virtual_contest = ContestsDAO::getByAlias($virtual_contest_alias);
-            ContestsDAO::updateContestToVirtual($virtual_contest, $original_contest);
             ProblemsetProblemsDAO::copyProblemset($virtual_contest->problemset_id, $original_contest->problemset_id);
-        } catch (invalidparameterexception $e) {
+        } catch (InvalidParameterException $e) {
             throw $e;
-        } catch (duplicatedentryindatabaseexception $e) {
+        } catch (DuplicatedEntryInDatabaseException $e) {
             throw $e;
         } catch (exception $e) {
-            throw new invaliddatabaseoperationexception($e);
+            throw new InvalidDatabaseOperationException($e);
         }
 
         return ['status' => 'ok', 'alias' => $r['alias']];
@@ -927,7 +926,7 @@ class ContestController extends Controller {
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
-        $contest->rerun_id = 0; // NYI
+        $contest->rerun_id = is_null($r['rerun_id']) ? 0 : $r['rerun_id'];
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
         $contest->points_decay_factor = $r['points_decay_factor'];
@@ -1135,7 +1134,7 @@ class ContestController extends Controller {
      */
     private static function forbiddenInVirtual(Contests $contest) {
         if (ContestsDAO::isVirtual($contest)) {
-            throw new ForbiddenAccessException('forbiddenInGhostMode');
+            throw new ForbiddenAccessException('forbiddenInVirtualContest');
         }
     }
 
@@ -1714,6 +1713,7 @@ class ContestController extends Controller {
         // Push scoreboard data in response
         $response = [];
         $response['events'] = $scoreboard->events();
+        $response['original_alias'] = $r['contest']->contest_id;
 
         return $response;
     }
