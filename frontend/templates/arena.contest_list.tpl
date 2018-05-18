@@ -10,6 +10,7 @@
 				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsEndTime#}</th>
 				<th class="col-md-2" data-bind="visible: showTimes">{#wordsDuration#}</th>
 				<th class="col-md-2" data-bind="visible: showPractice" ></th>
+                <th class="col-md-2" data-bind="visible: showVirtual" ></th>
 				<th class="col-md-2" data-bind="visible: showPublicUpdated" >{#wordsPublicUpdated#}</th>
 			</tr></thead>
 			<tbody data-bind="foreach: page" class="contest-list row">
@@ -29,6 +30,11 @@
 					<td class="col-md-2" data-bind="visible: $parent.showPractice">
 						<a data-bind="attr: { href: '/arena/' + alias + '/practice/' }">
 							<span>{#wordsPractice#}</span>
+						</a>
+					</td>
+					<td class="col-md-2" data-bind="visible: $parent.showVirtual">
+						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
+							<span>{#wordsVirtual#}</span>
 						</a>
 					</td>
 					<td class="no-wrap col-md-2" data-bind="visible: $parent.showPublicUpdated, text: publicUpdateText"></td>
