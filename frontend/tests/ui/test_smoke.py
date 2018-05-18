@@ -16,7 +16,9 @@ import ui.util as util
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
-    with util.assert_no_javascript_errors(driver):
+    whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
+                 '/js/error_handler.js']
+    with util.assert_no_javascript_errors(driver, whitelist):
         username = 'unittest_user_%s' % driver.generate_id()
         password = 'p@ssw0rd'
         driver.register_user(username, password)
@@ -29,7 +31,9 @@ def test_create_user(driver):
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
-    with util.assert_no_javascript_errors(driver):
+    whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
+                 '/js/error_handler.js']
+    with util.assert_no_javascript_errors(driver, whitelist):
         with driver.login_user():
             pass
 
@@ -41,7 +45,8 @@ def test_login(driver):
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
-    whitelist = ['/api/problem/details/', 'Unhandled exception ']
+    whitelist = ['/api/problem/details/', '/js/error_handler.js',
+                 'http://staticxx.facebook.com/', '/api/grader/status/']
     with util.assert_no_javascript_errors(driver, whitelist):
         problem_alias = 'unittest_problem_%s' % driver.generate_id()
 

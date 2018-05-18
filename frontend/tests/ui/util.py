@@ -75,7 +75,7 @@ def matches(message, whitelist):
             if match.group(5) == string:
                 return True
 
-    match = re.search(r' * *["]([^"]*)', message)
+    match = re.search(r' * *["\']([^"\']*)', message)
     if not match:
         return False
     for string in whitelist:

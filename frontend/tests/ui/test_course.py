@@ -16,7 +16,9 @@ import ui.util as util
 def test_create_course(driver):
     '''Tests creating an course and retrieving it.'''
 
-    with util.assert_no_javascript_errors(driver):
+    whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
+                 '/js/error_handler.js']
+    with util.assert_no_javascript_errors(driver, whitelist):
         run_id = driver.generate_id()
         course_alias = 'unittest_course_%s' % run_id
         school_name = 'unittest_school_%s' % run_id
@@ -44,7 +46,8 @@ def test_create_course(driver):
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
-    whitelist = ['/api/course/assignmentScoreboard/', 'Unhandled exception ']
+    whitelist = ['/api/course/assignmentScoreboard/', '/js/error_handler.js',
+                 'http://staticxx.facebook.com/', '/api/grader/status/']
     with util.assert_no_javascript_errors(driver, whitelist):
         run_id = driver.generate_id()
 
