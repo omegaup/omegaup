@@ -18,9 +18,8 @@ import ui.util as util
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
-    whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
-                 '/js/error_handler.js', '/js/dist/omegaup.js']
-    with util.assert_no_javascript_errors(driver, whitelist):
+    path_whitelist = ('/js/dist/omegaup.js',)
+    with util.assert_no_javascript_errors(driver, path_whitelist):
         run_id = driver.generate_id()
         contest_alias = 'unittest_contest_%s' % run_id
         problem = 'sumas'
@@ -78,9 +77,8 @@ def test_create_contest(driver):
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
-    whitelist = ['http://staticxx.facebook.com/', '/api/grader/status/',
-                 '/js/error_handler.js', '/js/dist/omegaup.js']
-    with util.assert_no_javascript_errors(driver, whitelist):
+    path_whitelist = ('/js/dist/omegaup.js',)
+    with util.assert_no_javascript_errors(driver, path_whitelist):
         run_id = driver.generate_id()
         contest_alias = 'utrank_contest_%s' % run_id
         problem = 'sumas'
