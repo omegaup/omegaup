@@ -851,7 +851,7 @@ class ContestController extends Controller {
         $start_time = strtotime($original_contest->start_time);
         $finish_time = strtotime($original_contest->finish_time);
 
-        if ($finish_time < Time::get()) {
+        if ($finish_time > Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 

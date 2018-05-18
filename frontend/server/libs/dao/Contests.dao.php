@@ -769,7 +769,7 @@ class ContestsDAO extends ContestsDAOBase {
      */
     public static function generateAlias(Contests $contest) {
         $last_virtual_contest = self::getLastVirtualContest($contest);
-        $alias = null;
+        $alias = $contest->alias;
         if (is_null($last_virtual_contest)) {
             $alias = $alias . '-virtual-1';
         } else {
