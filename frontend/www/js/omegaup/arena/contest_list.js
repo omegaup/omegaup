@@ -22,7 +22,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
         showTimes: (actualApiParams.active == 'ACTIVE' ||
                     actualApiParams.active == 'FUTURE'),
         showPractice: (actualApiParams.active == 'PAST'),
-		showVirtual: (actualApiParams.active == 'PAST'),
+        showVirtual: (actualApiParams.active == 'PAST'),
         showPublicUpdated: actualApiParams.public == 'YES'
       },
       uiParams);
@@ -53,7 +53,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
   self.pagerColumns = ko.computed(function() {
     var cols = 2;
     if (self.showPractice) cols += 1;
-	if (self.showVirtual) cols += 1;
+    if (self.showVirtual) cols += 1;
     if (self.showTimes) cols += 3;
     if (self.showPublicUpdated) cols += 1;
     return cols;
