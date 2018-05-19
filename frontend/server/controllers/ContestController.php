@@ -936,7 +936,6 @@ class ContestController extends Controller {
             if (strpos($e->getMessage(), '1062') !== false) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
-                var_dump($e);
                 throw new InvalidDatabaseOperationException($e);
             }
         }
