@@ -767,38 +767,16 @@ class ContestsDAO extends ContestsDAOBase {
      * Generate alias of virtual contest / ghost mode
      *
      * @param Contests $contest
+     * @param Users $user
      * @return string of unique virtual contest alias
      */
     public static function generateAlias(Contests $contest) {
-        // Get the last virtual contest to get virtual contest number
-        $last_virtual_contest = self::getLastVirtualContest($contest);
-        // Virtual contest alias format (alias-virtual-n)
+        // Virtual contest alias format (alias-virtual-random)
         $alias = $contest->alias;
 
-        if (is_null($last_virtual_contest)) {
-            // No virtual contest? Assign alias as (alias-virtual-1)
-            $alias = $alias . '-virtual-1';
-        } else {
-            // ANother virtual contest exist. Take the last n of virtual contest
-            $str = explode('-', $last_virtual_contest['alias']);
-            // Assign alias as (alias-virtual-n+1)
-            $alias = $alias .'-virtual-' . strval(intval(end($str)) + 1);
-        }
+        $alias = $alias . '-virtual-' . SecurityTools::randomString(10);
+
         return $alias;
-    }
-
-    /**
-     * Update contest table to virtual contest
-     *
-     * @param String alias, Number original contest
-     * @return void
-     */
-    public static function updateContestToVirtual($virtual_contest, $original_contest) {
-        $sql = 'UPDATE Contests SET Contests.rerun_id = ? WHERE Contests.contest_id = ?;';
-
-        global $conn;
-        $params = [$original_contest->contest_id, $virtual_contest->contest_id];
-        $conn->Execute($sql, $params);
     }
 
     /**
@@ -808,32 +786,6 @@ class ContestsDAO extends ContestsDAOBase {
      */
     public static function isVirtual(Contests $contest) {
         return $contest->rerun_id != 0;
-    }
-
-    /**
-     * Get last virtual contest from provided contestid
-     * @param Number contest_id
-     * @return array contest
-     */
-    public static function getLastVirtualContest(Contests $contest) {
-        $sql = '
-            SELECT
-                *
-            FROM
-                Contests
-            WHERE
-                Contests.rerun_id = ?
-            ORDER BY
-                Contests.finish_time DESC
-            LIMIT 1;';
-        $params[] = $contest->contest_id;
-        global $conn;
-
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
-            return null;
-        }
-        return $rs;
     }
 
     /**

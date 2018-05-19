@@ -840,6 +840,7 @@ class ContestController extends Controller {
 
         try {
             $original_contest = ContestsDAO::getByAlias($r['alias']);
+            $original_contest_problemset = ProblemsetsDAO::getByPK($original_contest->problemset_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -859,59 +860,92 @@ class ContestController extends Controller {
 
         $contest_length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
 
-        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+        Validators::isNumber($r['start_time'], 'start_time', false);
+        $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
 
-        // Initialize request
-        $r = new Request();
-        $r['title'] = $original_contest->title;
-        $r['description'] = $original_contest->description;
-        $r['window_length'] = $original_contest->window_length;
-        $r['public'] = 0; // Virtual contest must be private
-        $r['start_time'] = Time::get();
-        $r['finish_time'] = $r['start_time'] + $contest_length;
-        $r['scoreboard'] = $original_contest->scoreboard;
-        $r['alias'] = $virtual_contest_alias;
-        $r['points_decay_factor'] = $original_contest->points_decay_factor;
-        $r['submissions_gap'] = $original_contest->submissions_gap;
-        $r['partial_score'] = $original_contest->partial_score;
-        $r['feedback'] = $original_contest->feedback;
-        $r['penalty'] = $original_contest->penalty;
-        $r['penalty_type'] = $original_contest->penalty_type;
-        $r['penalty_calc_policy'] = $original_contest->penalty_calc_policy;
-        $r['show_scoreboard_after'] = true;
-        $r['languages'] = $original_contest->languages;
-        $r['auth_token'] = $auth_token;
-        $r['rerun_id'] = $original_contest->contest_id;
+        // Initialize contest
+        $contest = new Contests();
+        $contest->title = $original_contest->title;
+        $contest->description = $original_contest->description;
+        $contest->window_length = $original_contest->window_length;
+        $contest->public = 0; // Virtual contest must be private
+        $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
+        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contest_length);
+        $contest->scoreboard = $original_contest->scoreboard;
+        $contest->alias = $virtual_contest_alias;
+        $contest->points_decay_factor = $original_contest->points_decay_factor;
+        $contest->submissions_gap = $original_contest->submissions_gap;
+        $contest->partial_score = $original_contest->partial_score;
+        $contest->feedback = $original_contest->feedback;
+        $contest->penalty = $original_contest->penalty;
+        $contest->penalty_type = $original_contest->penalty_type;
+        $contest->penalty_calc_policy = $original_contest->penalty_calc_policy;
+        $contest->show_scoreboard_after = true;
+        $contest->languages = $original_contest->languages;
+        $contest->rerun_id = $original_contest->contest_id;
 
-        ContestsDAO::transBegin();
+        $acl = new ACLs();
+        $acl->owner_id = $r['current_user_id'];
 
-        $response = self::apiCreate($r);
+        $problemset = new Problemsets([
+            'needs_basic_information' => $original_contest_problemset->needs_basic_information,
+            'requests_user_information' => $original_contest_problemset->requests_user_information
+        ]);
+
+        self::createContest($acl, $problemset, $contest);
 
         try {
-            $virtual_contest = ContestsDAO::getByAlias($virtual_contest_alias);
-
             // Copy problemset problems from original contest to virtual contest
-            ProblemsetProblemsDAO::copyProblemset($virtual_contest->problemset_id, $original_contest->problemset_id);
-
-            ContestsDAO::transEnd();
+            ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_contest->problemset_id);
         } catch (InvalidParameterException $e) {
-            // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
-
             throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
-            // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
-
             throw $e;
         } catch (exception $e) {
-            // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
-
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok', 'alias' => $r['alias']];
+        return ['status' => 'ok', 'alias' => $contest->alias];
+    }
+
+    public static function createContest(ACLs $acl, Problemsets $problemset, Contests $contest) {
+        // Push changes
+        try {
+            // Begin a new transaction
+            ContestsDAO::transBegin();
+
+            ACLsDAO::save($acl);
+            $problemset->acl_id = $acl->acl_id;
+            $contest->acl_id = $acl->acl_id;
+
+            // Save the problemset object with data sent by user to the database
+            ProblemsetsDAO::save($problemset);
+
+            $contest->problemset_id = $problemset->problemset_id;
+
+            // Save the contest object with data sent by user to the database
+            ContestsDAO::save($contest);
+
+            // End transaction transaction
+            ContestsDAO::transEnd();
+        } catch (Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            ContestsDAO::transRollback();
+
+            // Alias may be duplicated, 1062 error indicates that
+            if (strpos($e->getMessage(), '1062') !== false) {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                var_dump($e);
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+
+        // Expire contest-list cache
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+
+        self::$log->info('New Contest Created: ' . $contest->alias);
     }
 
     /**
@@ -968,45 +1002,14 @@ class ContestController extends Controller {
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
 
-        // Push changes
-        try {
-            // Begin a new transaction
-            ContestsDAO::transBegin();
+        $problemset = new Problemsets([
+            'acl_id' => $acl->acl_id,
+            'needs_basic_information' => $r['needs_basic_information'] == 'true',
+            'requests_user_information' => $r['requests_user_information']
+        ]);
 
-            ACLsDAO::save($acl);
-            $contest->acl_id = $acl->acl_id;
+        self::createContest($acl, $problemset, $contest);
 
-            // Save the problemset object with data sent by user to the database
-            $problemset = new Problemsets([
-                'acl_id' => $acl->acl_id,
-                'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'requests_user_information' => $r['requests_user_information']
-            ]);
-            ProblemsetsDAO::save($problemset);
-            $contest->problemset_id = $problemset->problemset_id;
-
-            // Save the contest object with data sent by user to the database
-            ContestsDAO::save($contest);
-
-            // End transaction transaction
-            ContestsDAO::transEnd();
-        } catch (Exception $e) {
-            // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
-
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
-
-        // Expire contest-list cache
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
-
-        self::$log->info('New Contest Created: ' . $r['alias']);
         return ['status' => 'ok'];
     }
 
