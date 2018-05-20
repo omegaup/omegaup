@@ -888,27 +888,16 @@ class ContestController extends Controller {
         $acl->owner_id = $r['current_user_id'];
 
         $problemset = new Problemsets([
-            'needs_basic_information' => $original_contest_problemset->needs_basic_information,
-            'requests_user_information' => $original_contest_problemset->requests_user_information
+            'needs_basic_information' => false,
+            'requests_user_information' => 'no',
         ]);
 
-        self::createContest($acl, $problemset, $contest);
-
-        try {
-            // Copy problemset problems from original contest to virtual contest
-            ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_contest->problemset_id);
-        } catch (InvalidParameterException $e) {
-            throw $e;
-        } catch (DuplicatedEntryInDatabaseException $e) {
-            throw $e;
-        } catch (exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        self::createContest($acl, $problemset, $contest, $original_contest, $original_contest_problemset);
 
         return ['status' => 'ok', 'alias' => $contest->alias];
     }
 
-    public static function createContest(ACLs $acl, Problemsets $problemset, Contests $contest) {
+    private static function createContest(ACLs $acl, Problemsets $problemset, Contests $contest, $original_problemset = null) {
         // Push changes
         try {
             // Begin a new transaction
@@ -920,8 +909,10 @@ class ContestController extends Controller {
 
             // Save the problemset object with data sent by user to the database
             ProblemsetsDAO::save($problemset);
-
             $contest->problemset_id = $problemset->problemset_id;
+            if (!is_null($original_problemset)) {
+                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_problemset->problemset_id);
+            }
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
@@ -974,7 +965,7 @@ class ContestController extends Controller {
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
-        $contest->rerun_id = is_null($r['rerun_id']) ? 0 : $r['rerun_id'];
+        $contest->rerun_id = 0;
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
         $contest->points_decay_factor = $r['points_decay_factor'];
@@ -1730,7 +1721,7 @@ class ContestController extends Controller {
         // Push scoreboard data in response
         $response = [];
         $response['events'] = $scoreboard->events();
-        $response['original_alias'] = $r['contest']->contest_id;
+        $response['original_alias'] = $r['contest']->alias;
 
         return $response;
     }
