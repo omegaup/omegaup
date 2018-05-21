@@ -24,5 +24,5 @@ OmegaUp.on('ready', function() {
     components: {
       'omegaup-problem-list': problem_List,
     }
-  })
+  });
 });

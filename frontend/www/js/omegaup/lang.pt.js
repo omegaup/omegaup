@@ -929,7 +929,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsOptional: "Opcional",
 	wordsOrderBy: "Ordenar por",
 	wordsOther: "Outro",
-	wordsOutOf4: "%(Score) de 4",
+	wordsOutOf4: "de 4",
 	wordsOverallWallTimeLimit: "Prazo (total)",
 	wordsPartial: "parcial",
 	wordsPenalty: "Penaliza\u00e7\u00e3o",
