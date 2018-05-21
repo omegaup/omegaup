@@ -774,12 +774,7 @@ class ContestsDAO extends ContestsDAOBase {
         // Virtual contest alias format (alias-virtual-random)
         $alias = $contest->alias;
 
-        // Truncate alias
-        if (strlen($alias) > 20) {
-            $alias = substr($alias, 0, 20);
-        }
-
-        return $alias . '-virtual-' . SecurityTools::randomString(3);
+        return substr($alias, 0, 20) . '-virtual-' . SecurityTools::randomString(3);
     }
 
     /**

@@ -840,7 +840,6 @@ class ContestController extends Controller {
 
         try {
             $original_contest = ContestsDAO::getByAlias($r['alias']);
-            $original_contest_problemset = ProblemsetsDAO::getByPK($original_contest->problemset_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -884,20 +883,19 @@ class ContestController extends Controller {
         $contest->languages = $original_contest->languages;
         $contest->rerun_id = $original_contest->contest_id;
 
-        $acl = new ACLs();
-        $acl->owner_id = $r['current_user_id'];
-
         $problemset = new Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
         ]);
 
-        self::createContest($acl, $problemset, $contest, $original_contest, $original_contest_problemset);
+        self::createContest($r, $problemset, $contest, $original_contest->problemset_id);
 
         return ['status' => 'ok', 'alias' => $contest->alias];
     }
 
-    private static function createContest(ACLs $acl, Problemsets $problemset, Contests $contest, $original_problemset = null) {
+    private static function createContest(Request $r, Problemsets $problemset, Contests $contest, $original_problemset = null) {
+        $acl = new ACLs();
+        $acl->owner_id = $r['current_user_id'];
         // Push changes
         try {
             // Begin a new transaction
@@ -911,7 +909,7 @@ class ContestController extends Controller {
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
             if (!is_null($original_problemset)) {
-                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_problemset->problemset_id);
+                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_problemset);
             }
 
             // Save the contest object with data sent by user to the database
@@ -989,16 +987,12 @@ class ContestController extends Controller {
             throw new InvalidParameterException('contestPublicRequiresProblem');
         }
 
-        $acl = new ACLs();
-        $acl->owner_id = $r['current_user_id'];
-
         $problemset = new Problemsets([
-            'acl_id' => $acl->acl_id,
             'needs_basic_information' => $r['needs_basic_information'] == 'true',
             'requests_user_information' => $r['requests_user_information']
         ]);
 
-        self::createContest($acl, $problemset, $contest);
+        self::createContest($r, $problemset, $contest);
 
         return ['status' => 'ok'];
     }
