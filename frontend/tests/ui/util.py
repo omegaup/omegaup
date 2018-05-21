@@ -40,7 +40,7 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
 
 
 @contextlib.contextmanager
-def assert_no_javascript_errors(driver, path_whitelist=(),
+def assert_no_javascript_errors(driver, *, path_whitelist=(),
                                 message_whitelist=()):
     ''' Shows in a list unexpected errors in javascript console '''
     previous_logs = get_console_logs(driver, path_whitelist, message_whitelist)
@@ -64,9 +64,9 @@ def get_console_logs(driver, path_whitelist, message_whitelist):
     for entry in driver.browser.get_log('browser'):
         if entry['level'] != 'SEVERE':
             continue
-        path_matches = match_path(entry['message'], path_whitelist)
-        message_matches = match_message(entry['message'], message_whitelist)
-        if path_matches or message_matches:
+        if is_path_whitelisted(entry['message'], path_whitelist):
+            continue
+        if is_message_whitelisted(entry['message'], message_whitelist):
             continue
 
         log.append(entry['message'])
@@ -74,15 +74,8 @@ def get_console_logs(driver, path_whitelist, message_whitelist):
     return log
 
 
-def match_path(message, whitelist):
-    '''
-    Checks whether url in message is present in whitelist, it only compares
-    params in the url if full_url is false
-    '''
-    full_whitelist = whitelist + PATH_WHITELIST
-
-    if not full_whitelist:
-        return False
+def is_path_whitelisted(message, whitelist):
+    '''Checks whether URL in message is whitelisted.'''
 
     match = re.search(r'(https?://[^\s\'"]+)', message)
     url = urlparse(match.group(1))
@@ -90,30 +83,27 @@ def match_path(message, whitelist):
     if not url:
         return False
 
-    for string in full_whitelist:
-        if url.path == string:  # Compares params in the url vs whitelist
+    for whitelisted_path in whitelist + PATH_WHITELIST:
+        if url.path == whitelisted_path:  # Compares params in the url
             return True
 
     return False
 
 
-def match_message(message, message_whitelist):
-    '''
-    Checks whether string in message is present in whitelist, it only compares
-    strings between double quote or simple quote
-    '''
-    full_whitelist = message_whitelist + MESSAGE_WHITELIST
+def is_message_whitelisted(message, message_whitelist):
+    '''Checks whether string in message is whitelisted.
 
-    if not full_whitelist:
-        return False
+    It only compares strings between double or single quotes.
+    '''
 
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
 
     if not match:
         return False
 
-    for string in full_whitelist:  # Compares string in quotes
-        if match.group(1)[1:-1] == string:  # Removing quotes of match regex
+    quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
+    for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
+        if quoted_string == whitelisted_message:
             return True
 
     return False

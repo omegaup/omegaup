@@ -19,7 +19,8 @@ def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
     path_whitelist = ('/js/dist/omegaup.js',)
-    with util.assert_no_javascript_errors(driver, path_whitelist):
+    with util.assert_no_javascript_errors(driver,
+                                          path_whitelist=path_whitelist):
         run_id = driver.generate_id()
         contest_alias = 'unittest_contest_%s' % run_id
         problem = 'sumas'
@@ -78,7 +79,8 @@ def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
     path_whitelist = ('/js/dist/omegaup.js',)
-    with util.assert_no_javascript_errors(driver, path_whitelist):
+    with util.assert_no_javascript_errors(driver,
+                                          path_whitelist=path_whitelist):
         run_id = driver.generate_id()
         contest_alias = 'utrank_contest_%s' % run_id
         problem = 'sumas'

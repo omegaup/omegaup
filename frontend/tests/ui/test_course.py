@@ -18,7 +18,8 @@ def test_create_course(driver):
 
     path_whitelist = ('/api/course/assignmentScoreboard/',
                       '/js/dist/omegaup.js')
-    with util.assert_no_javascript_errors(driver, path_whitelist):
+    with util.assert_no_javascript_errors(driver,
+                                          path_whitelist=path_whitelist):
         run_id = driver.generate_id()
         course_alias = 'unittest_course_%s' % run_id
         school_name = 'unittest_school_%s' % run_id
@@ -48,7 +49,8 @@ def test_user_ranking_course(driver):
 
     path_whitelist = ('/api/course/assignmentScoreboard/',
                       '/js/dist/omegaup.js')
-    with util.assert_no_javascript_errors(driver, path_whitelist):
+    with util.assert_no_javascript_errors(driver,
+                                          path_whitelist=path_whitelist):
         run_id = driver.generate_id()
 
         course_alias = 'ut_rank_course_%s' % run_id

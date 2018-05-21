@@ -43,8 +43,9 @@ def test_create_problem(driver):
 
     message_whitelist = ('/api/problem/details/',)
     path_whitelist = ('/api/problem/details/',)
-    with util.assert_no_javascript_errors(driver, path_whitelist,
-                                          message_whitelist):
+    with util.assert_no_javascript_errors(driver,
+                                          path_whitelist=path_whitelist,
+                                          message_whitelist=message_whitelist):
         problem_alias = 'unittest_problem_%s' % driver.generate_id()
 
         with driver.login_admin():
