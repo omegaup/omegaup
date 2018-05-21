@@ -1,5 +1,5 @@
 <template>
-  <div class="wait_for_ajax panel panel-default" id="problems_list">
+  <div class="wait_for_ajax panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">{{ T.wordsProblems }}</h3>
     </div>
