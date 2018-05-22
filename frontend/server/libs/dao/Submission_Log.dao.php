@@ -12,8 +12,8 @@ include('base/Submission_Log.vo.base.php');
 class SubmissionLogDAO extends SubmissionLogDAOBase {
     public static function GetSubmissionsForProblemset($problemset_id) {
         $sql = 'SELECT
-                    u.user_id,
-                    u.username,
+                    i.user_id,
+                    i.username,
                     p.alias,
                     sl.ip,
                     UNIX_TIMESTAMP(sl.time) AS `time`,
@@ -26,7 +26,7 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                                 FROM
                                     `User_Rank` `ur`
                                 WHERE
-                                    `ur`.user_id = `u`.`user_id`
+                                    `ur`.user_id = `i`.`user_id`
                             )
                     ORDER BY
                         `urc`.percentile ASC
@@ -35,9 +35,9 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                 FROM
                     Submission_Log sl
                 INNER JOIN
-                    Users u
+                    Identities i
                 ON
-                    u.user_id = sl.user_id
+                    i.identity_id = sl.identity_id
                 INNER JOIN
                     Runs r
                 ON
@@ -58,17 +58,17 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
 
     final public static function GetSubmissionsForCourse($course_id) {
         $sql = 'SELECT
-                    u.user_id,
-                    u.username,
+                    i.user_id,
+                    i.username,
                     p.alias,
                     sl.ip,
                     UNIX_TIMESTAMP(sl.time) AS `time`
                 FROM
                     Submission_Log sl
                 INNER JOIN
-                    Users u
+                    Identities i
                 ON
-                    u.user_id = sl.user_id
+                    i.identity_id = sl.identity_id
                 INNER JOIN
                     Runs r
                 ON

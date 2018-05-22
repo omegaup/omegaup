@@ -333,7 +333,7 @@ class RunController extends Controller {
             RunsDAO::save($run);
 
             SubmissionLogDAO::save(new SubmissionLog([
-                'user_id' => $r['current_user_id'],
+                'identity_id' => $r['current_identity_id'],
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
