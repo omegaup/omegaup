@@ -18,11 +18,11 @@ VALUES
   ('CONTEST-OPTIONAL-HEAD', 'contest_optional_consent'),
   ('CONTEST-REQUIRED-HEAD', 'contest_required_consent'),
   ('COURSE-OPTIONAL-HEAD', 'course_optional_consent'),
-  ('COURSE-REQUIRED-HEAD', 'course_required_consent'); # There is nothing to get from GIT 
+  ('COURSE-REQUIRED-HEAD', 'course_required_consent'); # There is nothing to get from GIT
 
 -- Gets information of Groups_Identities table and inserts into PrivacyStatement_Consent_Log
 
-INSERT INTO 
+INSERT INTO
   `PrivacyStatement_Consent_Log` (`identity_id`, `privacystatement_id`, `acl_id`, `share_user_information`)
   SELECT
     `identity_id`,
@@ -48,7 +48,7 @@ INSERT INTO
 
 -- Gets information of Problemset_Identities table and inserts into PrivacyStatement_Consent_Log
 
-INSERT INTO 
+INSERT INTO
   `PrivacyStatement_Consent_Log` (`identity_id`, `privacystatement_id`, `acl_id`, `share_user_information`)
   SELECT
     `identity_id`,

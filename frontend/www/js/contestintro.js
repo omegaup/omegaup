@@ -4,9 +4,9 @@ omegaup.OmegaUp.on('ready', function() {
 
   if ($('.requests-user-information').length) {
     var markdownConverter = omegaup.UI.markdownConverter();
-    $('.requests-user-information').html(
-      markdownConverter.makeHtml($('.requests-user-information').html())
-    );
+    $('.requests-user-information')
+        .html(
+            markdownConverter.makeHtml($('.requests-user-information').html()));
   }
 
   $('#start-contest-form')
