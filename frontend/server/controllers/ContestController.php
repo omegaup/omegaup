@@ -839,56 +839,56 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         try {
-            $original_contest = ContestsDAO::getByAlias($r['alias']);
+            $originalContest = ContestsDAO::getByAlias($r['alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($original_contest)) {
+        if (is_null($originalContest)) {
             throw new NotFoundException('contestNotFound');
         }
 
-        $start_time = strtotime($original_contest->start_time);
-        $finish_time = strtotime($original_contest->finish_time);
+        $start_time = strtotime($originalContest->start_time);
+        $finish_time = strtotime($originalContest->finish_time);
 
         if ($finish_time > Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 
-        $virtual_contest_alias = ContestsDAO::generateAlias($original_contest);
+        $virtual_contest_alias = ContestsDAO::generateAlias($originalContest);
 
-        $contest_length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
+        $contest_length = strtotime($originalContest->finish_time) - strtotime($originalContest->start_time);
 
         Validators::isNumber($r['start_time'], 'start_time', false);
         $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
 
         // Initialize contest
         $contest = new Contests();
-        $contest->title = $original_contest->title;
-        $contest->description = $original_contest->description;
-        $contest->window_length = $original_contest->window_length;
+        $contest->title = $originalContest->title;
+        $contest->description = $originalContest->description;
+        $contest->window_length = $originalContest->window_length;
         $contest->public = 0; // Virtual contest must be private
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contest_length);
-        $contest->scoreboard = $original_contest->scoreboard;
+        $contest->scoreboard = $originalContest->scoreboard;
         $contest->alias = $virtual_contest_alias;
-        $contest->points_decay_factor = $original_contest->points_decay_factor;
-        $contest->submissions_gap = $original_contest->submissions_gap;
-        $contest->partial_score = $original_contest->partial_score;
-        $contest->feedback = $original_contest->feedback;
-        $contest->penalty = $original_contest->penalty;
-        $contest->penalty_type = $original_contest->penalty_type;
-        $contest->penalty_calc_policy = $original_contest->penalty_calc_policy;
+        $contest->points_decay_factor = $originalContest->points_decay_factor;
+        $contest->submissions_gap = $originalContest->submissions_gap;
+        $contest->partial_score = $originalContest->partial_score;
+        $contest->feedback = $originalContest->feedback;
+        $contest->penalty = $originalContest->penalty;
+        $contest->penalty_type = $originalContest->penalty_type;
+        $contest->penalty_calc_policy = $originalContest->penalty_calc_policy;
         $contest->show_scoreboard_after = true;
-        $contest->languages = $original_contest->languages;
-        $contest->rerun_id = $original_contest->contest_id;
+        $contest->languages = $originalContest->languages;
+        $contest->rerun_id = $originalContest->contest_id;
 
         $problemset = new Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
         ]);
 
-        self::createContest($r, $problemset, $contest, $original_contest->problemset_id);
+        self::createContest($r, $problemset, $contest, $originalContest->problemset_id);
 
         return ['status' => 'ok', 'alias' => $contest->alias];
     }
