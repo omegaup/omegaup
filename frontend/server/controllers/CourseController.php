@@ -1029,15 +1029,22 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-            'share_user_information' => $r['share_user_information']
-        ]);
-
+        CoursesDAO::transBegin();
         try {
-            GroupsIdentitiesDAO::save($groupIdentity);
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id,
+            ]));
+
+            PrivacyStatementConsentLogDAO::saveLog(
+                $r['identity']->identity_id,
+                'course_' . $r['course']->requests_user_information . '_consent',
+                $r['course']->acl_id,
+                $r['share_user_information']
+            );
+            CoursesDAO::transEnd();
         } catch (Exception $e) {
+            CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1297,7 +1304,23 @@ class CourseController extends Controller {
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
+
+        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
+        $lang = 'en';
+        if ($user_session->language_id == UserController::LANGUAGE_ES) {
+            $lang = 'es';
+        } elseif ($user_session->language_id == UserController::LANGUAGE_PT) {
+            $lang = 'pt';
+        }
+
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $request_info = $result['requests_user_information'] == 'no' ? null : $result['requests_user_information'];
+
+        if (!is_null($request_info)) {
+            $privacy_consent_path = "frontend/privacy/course_{$request_info}_consent/";
+            $privacy_consent_file = "{$privacy_consent_path}{$lang}.md";
+            $result['consent_markdown'] = file_get_contents(OMEGAUP_ROOT . '/../' . $privacy_consent_file);
+        }
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         $result['requests_user_information'] = $result['requests_user_information'];

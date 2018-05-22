@@ -2,6 +2,13 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   var contestObject = null;
 
+  if ($('.requests-user-information').length) {
+    var markdownConverter = omegaup.UI.markdownConverter();
+    $('.requests-user-information').html(
+      markdownConverter.makeHtml($('.requests-user-information').html())
+    );
+  }
+
   $('#start-contest-form')
       .on('submit', function(ev) {
         ev.preventDefault();

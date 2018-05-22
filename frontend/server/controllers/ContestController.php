@@ -354,6 +354,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         $result = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
+
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -361,6 +362,20 @@ class ContestController extends Controller {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
                 $r['current_identity_id'] = $session['identity']->identity_id;
+                $lang = 'en';
+                if ($session['user']->language_id == UserController::LANGUAGE_ES) {
+                    $lang = 'es';
+                } elseif ($session['user']->language_id == UserController::LANGUAGE_PT) {
+                    $lang = 'pt';
+                }
+
+                $request_info = $result['requests_user_information'] == 'no' ? null : $result['requests_user_information'];
+
+                if (!is_null($request_info)) {
+                    $privacy_consent_path = "frontend/privacy/contest_{$request_info}_consent/";
+                    $privacy_consent_file = "{$privacy_consent_path}{$lang}.md";
+                    $result['consent_markdown'] = file_get_contents(OMEGAUP_ROOT . '/../' . $privacy_consent_file);
+                }
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
@@ -378,8 +393,6 @@ class ContestController extends Controller {
             $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
             return $result;
         }
-
-        $cs = SessionController::apiCurrentSession()['session'];
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
@@ -525,7 +538,13 @@ class ContestController extends Controller {
         ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
             $r['current_identity_id'],
             $r['contest']->problemset_id,
-            true,
+            true
+        );
+
+        PrivacyStatementConsentLogDAO::saveLog(
+            $r['current_identity_id'],
+            'contest_' . $needsInformation['requests_user_information'] . '_consent',
+            $r['contest']->acl_id,
             $r['share_user_information']
         );
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");

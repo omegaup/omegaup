@@ -21,6 +21,12 @@ class UserController extends Controller {
 
     const SENDY_SUCCESS = '1';
 
+    // Languages
+    const LANGUAGE_ES = 1;
+    const LANGUAGE_EN = 2;
+    const LANGUAGE_PT = 3;
+    const LANGUAGE_PSEUDO = 4;
+
     /**
      * Entry point for Create a User API
      *
@@ -546,7 +552,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */

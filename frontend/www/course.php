@@ -19,7 +19,8 @@ try {
     header('HTTP/1.1 404 Not Found');
     die();
 }
-
+error_log('shouldShowResults: ' . $intro_details['shouldShowResults']);
+error_log('isFirstTimeAccess: ' .($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no'));
 if ($intro_details['shouldShowResults'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [
@@ -30,8 +31,10 @@ if ($intro_details['shouldShowResults'] ||
         'needsBasicInformation' => $intro_details['basic_information_required'] && !is_null($session['user']) && (
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         ),
-        'requestsUserInformation' => $intro_details['requests_user_information']
+        'requestsUserInformation' => $intro_details['requests_user_information'],
+        'consentMarkdown' => $intro_details['consent_markdown'],
     ]);
+
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);

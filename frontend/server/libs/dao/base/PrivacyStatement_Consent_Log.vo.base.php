@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Problemset_Identities.
+ * Value Object file for table PrivacyStatement_Consent_Log.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetIdentities extends VO {
+class PrivacyStatementConsentLog extends VO {
     /**
-     * Constructor de ProblemsetIdentities
+     * Constructor de PrivacyStatementConsentLog
      *
-     * Para construir un objeto de tipo ProblemsetIdentities debera llamarse a el constructor
+     * Para construir un objeto de tipo PrivacyStatementConsentLog debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -29,17 +29,17 @@ class ProblemsetIdentities extends VO {
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
-        if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+        if (isset($data['privacystatement_id'])) {
+            $this->privacystatement_id = $data['privacystatement_id'];
         }
-        if (isset($data['access_time'])) {
-            $this->access_time = $data['access_time'];
+        if (isset($data['acl_id'])) {
+            $this->acl_id = $data['acl_id'];
         }
-        if (isset($data['score'])) {
-            $this->score = $data['score'];
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = $data['share_user_information'];
         }
-        if (isset($data['time'])) {
-            $this->time = $data['time'];
+        if (isset($data['timestamp'])) {
+            $this->timestamp = $data['timestamp'];
         }
     }
 
@@ -50,7 +50,7 @@ class ProblemsetIdentities extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['timestamp']);
         }
     }
 
@@ -63,31 +63,31 @@ class ProblemsetIdentities extends VO {
     public $identity_id;
 
     /**
-      *  [Campo no documentado]
+      * Id del documento de privacidad
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $problemset_id;
+    public $privacystatement_id;
 
     /**
-      * Hora a la que entró el usuario al concurso
-      * @access public
-      * @var datetime
-      */
-    public $access_time;
-
-    /**
-      * Indica el puntaje que obtuvo el usuario en el concurso
+      * Id de la lista de acceso al que pertenece el usuario que acepta/deniega el consentimiento de compartir sus datos. Se obtiene si es un curso
       * @access public
       * @var int(11)
       */
-    public $score;
+    public $acl_id;
 
     /**
-      * Indica el tiempo que acumulo en usuario en el concurso
+      * Almacena la respuesta del participante de un concurso / curso si está de acuerdo en divulgar su información.
       * @access public
-      * @var int(11)
+      * @var tinyint(1)
       */
-    public $time;
+    public $share_user_information;
+
+    /**
+      * Fecha y hora en la que el usuario acepta las nuevas políticas
+      * @access public
+      * @var timestamp
+      */
+    public $timestamp;
 }

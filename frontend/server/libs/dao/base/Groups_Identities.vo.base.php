@@ -32,9 +32,6 @@ class GroupsIdentities extends VO {
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
-        if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'];
-        }
     }
 
     /**
@@ -63,11 +60,4 @@ class GroupsIdentities extends VO {
       * @var int(11)
       */
     public $identity_id;
-
-    /**
-      * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $share_user_information;
 }

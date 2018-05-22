@@ -38,6 +38,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
     /**
      * apiAddStudent test with a duplicate student.
+     * @expectedException InvalidDatabaseOperationException
      */
     public function testAddDuplicateStudentToCourse() {
         $courseData = CoursesFactory::createCourse(null, null, true, 'optional');
@@ -69,15 +70,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'share_user_information' => 1
         ]));
-
-        // User agrees sharing his information
-        $intro_details = CourseController::apiIntroDetails(new Request([
-            'auth_token' => $userLogin->auth_token,
-            'current_user_id' => $student->user_id,
-            'course_alias' => $courseData['request']['alias']
-        ]));
-        // Asserting shouldShowResults is off
-        $this->assertEquals(0, $intro_details['isFirstTimeAccess']);
     }
 
     /**

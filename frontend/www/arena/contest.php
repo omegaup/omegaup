@@ -26,6 +26,9 @@ if ($show_intro['shouldShowIntro']) {
         'requestsUserInformation',
         $show_intro['requests_user_information']
     );
+    if (isset($show_intro['consent_markdown'])) {
+        $smarty->assign('consentMarkdown', $show_intro['consent_markdown']);
+    }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');
