@@ -5,6 +5,7 @@ ALTER TABLE `Problem_Viewed`
   DROP KEY `user_id`,
   DROP PRIMARY KEY;
 
+-- Updating identity_id column
 UPDATE
   `Problem_Viewed`
 INNER JOIN
@@ -28,6 +29,7 @@ ALTER TABLE `Problemset_Access_Log`
   DROP FOREIGN KEY `fk_palu_user_id`,
   DROP KEY `fk_palu_user_id`;
 
+-- Updating identity_id column
 UPDATE
   `Problemset_Access_Log`
 INNER JOIN
@@ -51,6 +53,7 @@ ALTER TABLE `Problemset_Problem_Opened`
   DROP KEY `user_id`,
   DROP PRIMARY KEY;
 
+-- Updating identity_id column
 UPDATE
   `Problemset_Problem_Opened`
 INNER JOIN
