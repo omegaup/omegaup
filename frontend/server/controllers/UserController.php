@@ -546,7 +546,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidDatabaseOperationException
+     * @throws InvalidDatabaseOpertionException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
