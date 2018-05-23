@@ -27,6 +27,7 @@ module.exports = {
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
+    virtual: './frontend/www/js/omegaup/arena/virtual.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
