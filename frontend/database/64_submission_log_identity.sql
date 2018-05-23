@@ -1,12 +1,10 @@
 -- Adding identity_id column on Submission_Log table
-
 ALTER TABLE `Submission_Log`
   ADD COLUMN `identity_id` int(11) DEFAULT NULL COMMENT 'Identidad del usuario' AFTER `user_id`,
   DROP FOREIGN KEY `fk_slu_user_id`,
   DROP KEY `fk_slu_user_id`;
 
 -- Updating Submission_Log table
-
 UPDATE
   `Submission_Log`
 INNER JOIN
@@ -17,7 +15,6 @@ SET
   `Submission_Log`.`identity_id` = Identities.identity_id;
 
 -- Setting identity_id as NOT NULL and adding contraints
-
 ALTER TABLE `Submission_Log`
   MODIFY COLUMN `user_id` int(11) DEFAULT NULL,
   MODIFY COLUMN `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
