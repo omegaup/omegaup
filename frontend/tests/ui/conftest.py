@@ -407,7 +407,7 @@ def driver(request, browser_name):
             try:
                 browser.execute_script("sauce:job-result=%s" %
                                        str(_SUCCESS).lower())
-            except WebDriverException:
+            except WebDriverException as ex:
                 # Test is done. Just ignore the error.
-                pass
+                print(ex)
         browser.quit()
