@@ -848,16 +848,16 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        $start_time = strtotime($originalContest->start_time);
-        $finish_time = strtotime($originalContest->finish_time);
+        $startTime = strtotime($originalContest->start_time);
+        $finishTime = strtotime($originalContest->finish_time);
 
-        if ($finish_time > Time::get()) {
+        if ($finishTime > Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 
-        $virtual_contest_alias = ContestsDAO::generateAlias($originalContest);
+        $virtualContestAlias = ContestsDAO::generateAlias($originalContest);
 
-        $contest_length = strtotime($originalContest->finish_time) - strtotime($originalContest->start_time);
+        $contestLength = $finishTime - $startTime;
 
         Validators::isNumber($r['start_time'], 'start_time', false);
         $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
@@ -869,9 +869,9 @@ class ContestController extends Controller {
         $contest->window_length = $originalContest->window_length;
         $contest->public = 0; // Virtual contest must be private
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
-        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contest_length);
+        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contestLength);
         $contest->scoreboard = $originalContest->scoreboard;
-        $contest->alias = $virtual_contest_alias;
+        $contest->alias = $virtualContestAlias;
         $contest->points_decay_factor = $originalContest->points_decay_factor;
         $contest->submissions_gap = $originalContest->submissions_gap;
         $contest->partial_score = $originalContest->partial_score;
@@ -893,7 +893,7 @@ class ContestController extends Controller {
         return ['status' => 'ok', 'alias' => $contest->alias];
     }
 
-    private static function createContest(Request $r, Problemsets $problemset, Contests $contest, $original_problemset = null) {
+    private static function createContest(Request $r, Problemsets $problemset, Contests $contest, $originalProblemset = null) {
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
         // Push changes
@@ -908,8 +908,8 @@ class ContestController extends Controller {
             // Save the problemset object with data sent by user to the database
             ProblemsetsDAO::save($problemset);
             $contest->problemset_id = $problemset->problemset_id;
-            if (!is_null($original_problemset)) {
-                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $original_problemset);
+            if (!is_null($originalProblemset)) {
+                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $originalProblemset);
             }
 
             // Save the contest object with data sent by user to the database
