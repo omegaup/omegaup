@@ -10,4 +10,17 @@ include_once('base/PrivacyStatements.vo.base.php');
   *
   */
 class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
+    public static function getLastPrivacyPublishedPolicy() {
+        $sql = 'SELECT
+                  privacystatement_id
+                FROM
+                  `PrivacyStatements`
+                WHERE
+                  type = \'privacy_policy\'
+                ORDER BY
+                  privacystatement_id DESC
+                LIMIT 1';
+        global $conn;
+        return $conn->GetOne($sql);
+    }
 }

@@ -1036,6 +1036,12 @@ class CourseController extends Controller {
                 'identity_id' => $r['identity']->identity_id,
             ]));
 
+            // Only users adding themselves are saved in consent log
+            $share_user_information = null;
+            if ($r['identity']->identity_id === $r['current_identity_id']) {
+                $share_user_information = $r['share_user_information'];
+            }
+
             PrivacyStatementConsentLogDAO::saveLog(
                 $r['identity']->identity_id,
                 'course_' . $r['course']->requests_user_information . '_consent',

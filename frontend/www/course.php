@@ -19,8 +19,6 @@ try {
     header('HTTP/1.1 404 Not Found');
     die();
 }
-error_log('shouldShowResults: ' . $intro_details['shouldShowResults']);
-error_log('isFirstTimeAccess: ' .($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no'));
 if ($intro_details['shouldShowResults'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [

@@ -2406,6 +2406,48 @@ class UserController extends Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
+
+    /**
+     * Gets the last privacy policy accepted by user
+     *
+     * @param Request $r
+     */
+    public static function apiLastPrivacyPolicyAccepted(Request $r) {
+        self::authenticateRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+        return [
+            'status' => 'ok',
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPolicyOrConsent(
+                $identity->identity_id
+            ),
+        ];
+    }
+
+    /**
+     * Keeps a record of a user who accepts the privacy policy
+     *
+     * @param Request $r
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiAcceptPrivacyPolicy(Request $r) {
+        self::authenticateRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+
+        try {
+            $response = PrivacyStatementConsentLogDAO::saveLog(
+                $identity->identity_id,
+                'privacy_policy'
+            );
+            $sessionController = new SessionController();
+            $sessionController->InvalidateCache();
+        } catch (Exception $e) {
+            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+        }
+
+        return ['status' => 'ok'];
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
