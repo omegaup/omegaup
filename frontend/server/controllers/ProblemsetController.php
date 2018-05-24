@@ -103,12 +103,12 @@ class ProblemsetController extends Controller {
      */
     public static function apiScoreboard(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
-        ProblemsetController::validateDetails($r);
+        $response = ProblemsetController::validateDetails($r);
 
         if ($r['problemset']['type'] == 'Contest') {
             $scoreboard = ContestController::apiScoreboard(
                 new Request([
-                    'contest_alias' => $r['problemset']['contest_alias']
+                    'contest_alias' => $response['contest']->alias
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
@@ -136,7 +136,7 @@ class ProblemsetController extends Controller {
      */
     public static function apiScoreboardEvents(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
-        ProblemsetController::validateDetails($r);
+        $response = ProblemsetController::validateDetails($r);
 
         if ($r['problemset']['type'] != 'Contest') {
             // Not implemented in courses nor interviews yet
@@ -144,7 +144,7 @@ class ProblemsetController extends Controller {
         } else {
             $scoreboardEvents = ContestController::apiScoreboardEvents(
                 new Request([
-                    'contest_alias' => $r['problemset']['contest_alias']
+                    'contest_alias' => $response['contest']->alias
                 ])
             );
         }
@@ -171,7 +171,8 @@ class ProblemsetController extends Controller {
         }
         if ($r['problemset']['type'] == 'Contest') {
             $request = new Request([
-                'contest_alias' => $r['problemset']['contest_alias'],
+                'problemset_id' => $r['problemset_id'],
+                'parent_id' => $r['problemset']['parent_id'],
             ]);
             if (isset($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];

@@ -48,6 +48,10 @@ class InterviewController extends Controller {
             $interview->problemset_id = $problemset->problemset_id;
             InterviewsDAO::save($interview);
 
+            // Update parent_id in problemset object
+            $problemset->parent_id = $interview->interview_id;
+            ProblemsetsDAO::save($problemset);
+
             InterviewsDAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction

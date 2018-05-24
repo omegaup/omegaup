@@ -68,28 +68,9 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     public static function getWithTypeByPK($problemset_id) {
         $sql = 'SELECT
                     type,
-                    c.alias AS contest_alias,
-                    a.alias AS assignment,
-                    cu.alias AS course,
-                    i.alias AS interview_alias
+                    parent_id
                 FROM
                     Problemsets p
-                LEFT JOIN
-                    Assignments a
-                ON
-                    p.problemset_id = a.problemset_id
-                LEFT JOIN
-                    Courses cu
-                ON
-                    a.course_id = cu.course_id
-                LEFT JOIN
-                    Contests c
-                ON
-                    p.problemset_id = c.problemset_id
-                LEFT JOIN
-                    Interviews i
-                ON
-                    p.problemset_id = i.problemset_id
                 WHERE
                     p.problemset_id = ?
                 LIMIT
@@ -97,11 +78,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
         $params = [$problemset_id];
 
         global $conn;
-        $problemset = $conn->GetRow($sql, $params);
-        if (count($problemset) == 0) {
-            return null;
-        }
-
-        return $problemset;
+        return $conn->GetRow($sql, $params);
     }
 }

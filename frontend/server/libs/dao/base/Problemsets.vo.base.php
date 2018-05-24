@@ -47,6 +47,9 @@ class Problemsets extends VO {
         if (isset($data['type'])) {
             $this->type = $data['type'];
         }
+        if (isset($data['parent_id'])) {
+            $this->parent_id = $data['parent_id'];
+        }
     }
 
     /**
@@ -110,4 +113,11 @@ class Problemsets extends VO {
       * @var enum('contest','assignment','interview')
       */
     public $type;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
+    public $parent_id;
 }

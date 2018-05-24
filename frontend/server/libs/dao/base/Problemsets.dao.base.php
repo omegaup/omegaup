@@ -20,7 +20,7 @@ abstract class ProblemsetsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type`';
+    const FIELDS = '`Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type`, `Problemsets`.`parent_id`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (is_null($problemset_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type`, `Problemsets`.`parent_id` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ProblemsetsDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Problemsets}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type` from Problemsets';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type`, `Problemsets`.`parent_id` from Problemsets';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -155,6 +155,10 @@ abstract class ProblemsetsDAOBase extends DAO {
             $clauses[] = '`type` = ?';
             $params[] = $Problemsets->type;
         }
+        if (!is_null($Problemsets->parent_id)) {
+            $clauses[] = '`parent_id` = ?';
+            $params[] = $Problemsets->parent_id;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -165,7 +169,7 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type` FROM `Problemsets`';
+        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`type`, `Problemsets`.`parent_id` FROM `Problemsets`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -189,7 +193,7 @@ abstract class ProblemsetsDAOBase extends DAO {
       * @param Problemsets [$Problemsets] El objeto de tipo Problemsets a actualizar.
       */
     final private static function update(Problemsets $Problemsets) {
-        $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `type` = ? WHERE `problemset_id` = ?;';
+        $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `type` = ?, `parent_id` = ? WHERE `problemset_id` = ?;';
         $params = [
             $Problemsets->acl_id,
             $Problemsets->access_mode,
@@ -197,6 +201,7 @@ abstract class ProblemsetsDAOBase extends DAO {
             $Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->type,
+            $Problemsets->parent_id,
             $Problemsets->problemset_id,
         ];
         global $conn;
@@ -229,7 +234,7 @@ abstract class ProblemsetsDAOBase extends DAO {
         if (is_null($Problemsets->type)) {
             $Problemsets->type = 'Contest';
         }
-        $sql = 'INSERT INTO Problemsets (`problemset_id`, `acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemsets (`problemset_id`, `acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `type`, `parent_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Problemsets->problemset_id,
             $Problemsets->acl_id,
@@ -238,6 +243,7 @@ abstract class ProblemsetsDAOBase extends DAO {
             $Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->type,
+            $Problemsets->parent_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -359,6 +365,17 @@ abstract class ProblemsetsDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`type` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $ProblemsetsA->parent_id;
+        $b = $ProblemsetsB->parent_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`parent_id` >= ? AND `parent_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`parent_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

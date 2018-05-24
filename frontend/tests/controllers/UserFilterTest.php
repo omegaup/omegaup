@@ -113,7 +113,7 @@ class UserFilterTest extends OmegaupTestCase {
         $login = self::login($user);
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]);
         UserController::apiValidateFilter($r);
     }
@@ -137,7 +137,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest()['contest'];
 
         $r = new Request([
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]);
         UserController::apiValidateFilter($r);
     }
@@ -161,7 +161,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]);
         UserController::apiValidateFilter($r);
     }
@@ -181,7 +181,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
-            'filter' => '/contest/' . $contest->alias . '/' .
+            'filter' => '/problemset/' . $contest->problemset_id . '/' .
                         $contest->scoreboard_url,
         ]);
         $response = UserController::apiValidateFilter($r);
@@ -204,7 +204,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
 
         $r = new Request([
-            'filter' => '/contest/' . $contest->alias . '/' .
+            'filter' => '/problemset/' . $contest->problemset_id . '/' .
                         $contest->scoreboard_url_admin,
         ]);
         $response = UserController::apiValidateFilter($r);

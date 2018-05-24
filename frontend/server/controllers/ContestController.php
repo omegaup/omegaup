@@ -312,10 +312,14 @@ class ContestController extends Controller {
      *
      */
     private static function validateBasicDetails(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
-        // If the contest is private, verify that our user is invited
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            if (!is_null($r['parent_id'])) {
+                $r['contest'] = ContestsDAO::getByPK($r['parent_id']);
+            } else {
+                Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+                // If the contest is private, verify that our user is invited
+                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -427,6 +431,7 @@ class ContestController extends Controller {
         } else {
             if ($r['token'] === $r['contest']->scoreboard_url_admin) {
                 $r['contest_admin'] = true;
+                $r['contest_alias'] = $r['contest']->alias;
             } elseif ($r['token'] !== $r['contest']->scoreboard_url) {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
             }
@@ -985,6 +990,10 @@ class ContestController extends Controller {
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
+
+            // Update parent_id in problemset object
+            $problemset->parent_id = $contest->contest_id;
+            ProblemsetsDAO::save($problemset);
 
             if (!is_null($r['problems'])) {
                 foreach ($r['problems'] as $problem) {
