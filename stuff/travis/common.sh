@@ -11,6 +11,13 @@ init_submodules() {
 		frontend/server/libs/third_party/google-api-php-client
 }
 
+init_frontend_submodules() {
+	git submodule update --init --recursive \
+		frontend/www/third_party/js/pagedown \
+		frontend/www/third_party/js/mathjax \
+		frontend/www/third_party/wenk
+}
+
 wait_for_mysql() {
 	# Workaround for Travis' flaky MySQL connection.
 	for _ in `seq 30`; do

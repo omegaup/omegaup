@@ -338,6 +338,7 @@ def _get_browser(request, browser_name):
                 os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
+            'extendedDebugging': 'true',
         }
         # Add browser configuration
         capabilities.update({

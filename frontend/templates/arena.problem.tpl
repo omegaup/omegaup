@@ -1,4 +1,5 @@
 {include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true}
+			<script type="text/json" id="payload">{$payload|json_encode}</script>
 			{if $problem_admin}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblem#}</a></li>
@@ -8,7 +9,6 @@
 			{/if}
 			<div id="problems" class="tab">
 				<div id="problem" class="main">
-					<script type="text/json" id="problem-json">{$problem}</script>
 					<h1 class="title">
 						{if $visibility < 0}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
 						{if $visibility == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
@@ -37,7 +37,7 @@
 						<a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
 					</div>
 {/if}
-					<div class="statement">{$problem_statement}</div>
+					<div class="statement"></div>
 					<hr />
 {if $source}
 					<div class="source">{#wordsSource#}: <span class="source-data">{$source|escape}</span></div>
@@ -92,5 +92,6 @@
 		</div>
 		<div id="footer">
 		</div>
+{include file='common.analytics.tpl'}
 	</body>
 </html>

@@ -57,7 +57,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
         $this->assertEquals($response['source'], $problemDAO->source);
-        $this->assertContains('<h1>Entrada</h1>', $response['problem_statement']);
+        $this->assertContains('# Entrada', $response['problem_statement']);
         $this->assertEquals($response['order'], $problemDAO->order);
         $this->assertEquals($response['score'], 0);
 

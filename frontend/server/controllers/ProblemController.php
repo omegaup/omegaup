@@ -126,7 +126,7 @@ class ProblemController extends Controller {
         Validators::isValidSubset(
             $r['languages'],
             'languages',
-            RunController::$kSupportedLanguages,
+            array_keys(RunController::$kSupportedLanguages),
             $is_required
         );
     }
@@ -659,8 +659,8 @@ class ProblemController extends Controller {
         $runs = [];
         try {
             $runs = RunsDAO::search(new Runs([
-                                'problem_id' => $r['problem']->problem_id
-                            ]));
+                'problem_id' => $r['problem']->problem_id
+            ]));
 
             $guids = [];
             foreach ($runs as $run) {
@@ -809,6 +809,7 @@ class ProblemController extends Controller {
             Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
         }
         Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
+        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
 
         return $response;
     }
@@ -1025,14 +1026,38 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Gets the libinteractive interface name from the filesystem.
+     *
+     * @param Request $r
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getLibinteractiveInterfaceName(Request $r) {
+        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+
+        $interactive_files = [];
+        try {
+            $interactive_files = $problemArtifacts->lsTree('interactive');
+        } catch (Exception $e) {
+            // Most problems won't have interactive files
+        }
+
+        foreach ($interactive_files as $filename) {
+            if (strrpos($filename, '.idl') == strlen($filename) - 4) {
+                return $filename;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the format of statement that was requested.
-     * HTML is the default if statement_type unspecified in the request.
+     * Markdown is the default if statement_type unspecified in the request.
      *
      * @param Request $r
      */
     private static function getStatementFormat(Request $r) {
         if (!isset($r['statement_type'])) {
-            return 'html';
+            return 'markdown';
         }
         return $r['statement_type'];
     }
@@ -1164,6 +1189,11 @@ class ProblemController extends Controller {
 
         // Validate request
         self::validateDetails($r);
+        if ($r['statement_type'] != 'markdown') {
+            // Remove this and just refuse to serve after a few weeks.
+            $e = new Exception('Deprecated call to view non-markdown statement.');
+            self::$log->error($e);
+        }
 
         $response = [];
 
@@ -1198,6 +1228,21 @@ class ProblemController extends Controller {
         if (!empty($sample_input)) {
             $response['sample_input'] = $sample_input;
         }
+
+        // Add the libinteractive interface name.
+        $libinteractive_interface_name = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME,
+            $r['problem']->alias,
+            $r,
+            'ProblemController::getLibinteractiveInterfaceName',
+            $libinteractive_interface_name,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        if (!empty($libinteractive_interface_name)) {
+            $response['libinteractive_interface_name'] = $libinteractive_interface_name;
+        }
+
         // Add preferred language of the user.
         $user_data = [];
         $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
@@ -1244,15 +1289,14 @@ class ProblemController extends Controller {
                 'submit_delay'];
 
             // Search the relevant runs from the DB
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id,
-                'problemset_id' => $problemset_id
-            ]);
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id,
+                    'problemset_id' => $problemset_id
+                ]));
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -1380,7 +1424,7 @@ class ProblemController extends Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['user'] = UsersDAO::FindByUsername($r['username']);
+                    $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new NotFoundException('userNotFound');
                 }
@@ -1392,7 +1436,7 @@ class ProblemController extends Controller {
                     $r['verdict'],
                     $r['problem']->problem_id,
                     $r['language'],
-                    !is_null($r['user']) ? $r['user']->user_id : null,
+                    !is_null($r['identity']) ? $r['identity']->identity_id : null,
                     $r['offset'],
                     $r['rowcount']
                 );
@@ -1414,14 +1458,12 @@ class ProblemController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         } else {
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id
-            ]);
-
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id
+                ]));
 
                 // Create array of relevant columns for list of runs
                 $relevant_columns = ['guid', 'language', 'status', 'verdict',
@@ -1655,6 +1697,7 @@ class ProblemController extends Controller {
         $response = [];
         $response['results'] = [];
         $author_identity_id = null;
+        $author_user_id = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
@@ -1662,6 +1705,7 @@ class ProblemController extends Controller {
         $identity_type = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
             $author_identity_id = intval($r['current_identity_id']);
+            $author_user_id = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1700,6 +1744,7 @@ class ProblemController extends Controller {
             $rowcount,
             $query,
             $author_identity_id,
+            $author_user_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             $total
@@ -1812,11 +1857,11 @@ class ProblemController extends Controller {
         // Uses same params as apiDetails, except for lang, which is optional
         self::validateDetails($r);
 
-        // If username is set in the request, we use that user as target.
+        // If username is set in the request, we use that identity as target.
         // else, we query using current_user
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        $response['score'] = self::bestScore($r, $user);
+        $response['score'] = self::bestScore($r, $identity);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1833,10 +1878,10 @@ class ProblemController extends Controller {
      * @return float
      * @throws InvalidDatabaseOperationException
      */
-    private static function bestScore(Request $r, Users $user = null) {
-        $current_user_id = (is_null($user) ? $r['current_user_id'] : $user->user_id);
+    private static function bestScore(Request $r, Identities $identity = null) {
+        $current_identity_id = (is_null($identity) ? $r['current_identity_id'] : $identity->identity_id);
 
-        if (is_null($current_user_id)) {
+        if (is_null($current_identity_id)) {
             return 0;
         }
 
@@ -1844,12 +1889,12 @@ class ProblemController extends Controller {
         try {
             // Add best score info
             if (!self::validateProblemset($r)) {
-                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
+                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_identity_id);
             } else {
                 $bestRun = RunsDAO::GetBestRun(
                     $r['problemset']->problemset_id,
                     $r['problem']->problem_id,
-                    $current_user_id,
+                    $current_identity_id,
                     false /*showAllRuns*/
                 );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;

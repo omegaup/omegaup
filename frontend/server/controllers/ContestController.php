@@ -1,6 +1,7 @@
 <?php
 
 require_once('libs/dao/Contests.dao.php');
+require_once('libs/ActivityReport.php');
 
 /**
  * ContestController
@@ -757,75 +758,10 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($problemset);
-        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($problemset);
+        $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($r['contest']->problemset_id);
+        $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($r['contest']->problemset_id);
 
-        // Merge both logs.
-        $result['events'] = [];
-        $lenAccesses = count($accesses);
-        $lenSubmissions = count($submissions);
-        $iAccesses = 0;
-        $iSubmissions = 0;
-
-        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
-            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($result['events'], ContestController::processAccess(
-                    $accesses[$iAccesses++]
-                ));
-            } else {
-                array_push($result['events'], ContestController::processSubmission(
-                    $submissions[$iSubmissions++]
-                ));
-            }
-        }
-
-        while ($iAccesses < $lenAccesses) {
-            array_push($result['events'], ContestController::processAccess(
-                $accesses[$iAccesses++]
-            ));
-        }
-
-        while ($iSubmissions < $lenSubmissions) {
-            array_push($result['events'], ContestController::processSubmission(
-                $submissions[$iSubmissions++]
-            ));
-        }
-
-        // Anonimize data.
-        $ipMapping = [];
-        foreach ($result['events'] as &$entry) {
-            if (!array_key_exists($entry['ip'], $ipMapping)) {
-                $ipMapping[$entry['ip']] = count($ipMapping);
-            }
-            $entry['ip'] = $ipMapping[$entry['ip']];
-        }
-
-        $result['status'] = 'ok';
-        return $result;
-    }
-
-    private static function processAccess(&$access) {
-        return [
-            'username' => $access['username'],
-            'time' => (int)$access['time'],
-            'ip' => (int)$access['ip'],
-            'event' => [
-                'name' => 'open',
-            ],
-        ];
-    }
-
-    private static function processSubmission(&$submission) {
-        return [
-            'username' => $submission['username'],
-            'time' => (int)$submission['time'],
-            'ip' => (int)$submission['ip'],
-            'event' => [
-                'name' => 'submit',
-                'problem' => $submission['alias'],
-            ],
-        ];
+        return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
     /**
@@ -1137,7 +1073,7 @@ class ContestController extends Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                Validators::isInEnum($language, 'languages', RunController::$kSupportedLanguages, false);
+                Validators::isInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
             }
         }
 
@@ -2058,7 +1994,7 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns ALL users participating in a contest
+     * Returns ALL identities participating in a contest
      *
      * @param Request $r
      * @return array
@@ -2084,28 +2020,16 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        // Get users from DB
-        $problemset_user = new ProblemsetIdentities();
-        $problemset_user->problemset_id = $contest->problemset_id;
-
+        // Get identities from DB
         try {
-            $db_results = ProblemsetIdentitiesDAO::search($problemset_user);
+            $identities = ProblemsetIdentitiesDAO::getWithExtraInformation($contest->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $users = [];
-
-        // Add all users to an array
-        foreach ($db_results as $result) {
-            $identity_id = $result->identity_id;
-            $user = IdentitiesDAO::getByPK($identity_id);
-            $users[] = ['user_id' => $identity_id, 'username' => $user->username, 'access_time' => $result->access_time, 'country' => $user->country_id];
-        }
-
         $response = [];
-        $response['users'] = $users;
+        $response['users'] = $identities;
         $response['status'] = 'ok';
 
         return $response;
@@ -2371,11 +2295,11 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', RunController::$kSupportedLanguages, false);
+        Validators::isInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
-            $r['user'] = UserController::resolveUser($r['username']);
+            $r['identity'] = IdentityController::resolveIdentity($r['username']);
         }
     }
 
@@ -2401,7 +2325,7 @@ class ContestController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );
@@ -2679,8 +2603,8 @@ class ContestController extends Controller {
             'time', 'submit_delay', 'Users.username', 'Problems.alias'];
         try {
             $runs = RunsDAO::search(new Runs([
-                                'contest_id' => $r['contest']->contest_id
-                            ]), 'time', 'DESC', $relevant_columns);
+                'contest_id' => $r['contest']->contest_id
+            ]), 'time', 'DESC', $relevant_columns);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
