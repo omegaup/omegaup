@@ -3,8 +3,6 @@
         <div class="panel-body">
             <div class="text-center">
                 <h2>{{detail.title + ' - ' + T.wordsVirtual}}</h2>
-                <div class="">
-                    <span>{{T.contestDuration + ': '}}</span>
                     <span>{{detail.contestDurationString}}</span>
                     <form>
                         <div class="row">

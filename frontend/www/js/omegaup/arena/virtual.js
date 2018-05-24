@@ -1,6 +1,6 @@
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
-import virtual from '../components/arena/virtual.vue';
+import virtual from '../components/arena/Virtual.vue';
 
 OmegaUp.on('ready', function() {
   let virtual_ = new Vue({
