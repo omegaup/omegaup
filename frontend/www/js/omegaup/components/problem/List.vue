@@ -42,19 +42,19 @@
           <td class="tooltip_column"
               v-else=""><span data-wenk-pos="right"
                 v-bind:data-wenk=
-                "`${UI.formatString(T.wordsOutOf4, {Score: parseFloat(problem.quality).toFixed(1)})}`">{{
+                "`${UI.formatString(T.wordsOutOf4, {Score: problem.quality.toFixed(1)})}`">{{
                 qualityTags[parseInt(problem.quality)] }}</span></td>
           <td class="numericColumn"
               v-if="problem.difficulty === null">—</td>
           <td class="tooltip_column"
               v-else=""><span data-wenk-pos="right"
                 v-bind:data-wenk=
-                "`${UI.formatString(T.wordsOutOf4, {Score: parseFloat(problem.difficulty).toFixed(1)})}`">
-          {{ difficultyTags[parseInt(problem.difficulty)] }}</span></td>
-          <td class="numericColumn">{{ parseFloat(100.0 * problem.ratio).toFixed(2) }}%</td>
-          <td class="numericColumn">{{ parseFloat(problem.points).toFixed(2) }}</td>
+                "`${UI.formatString(T.wordsOutOf4, {Score: problem.difficulty.toFixed(1)})}`">{{
+                difficultyTags[parseInt(problem.difficulty)] }}</span></td>
+          <td class="numericColumn">{{ (100.0 * problem.ratio).toFixed(2) }}%</td>
+          <td class="numericColumn">{{ problem.points.toFixed(2) }}</td>
           <td class="numericColumn"
-              v-if="loggedIn">{{ parseFloat(problem.score).toFixed(2) }}</td>
+              v-if="loggedIn">{{ problem.score.toFixed(2) }}</td>
         </tr>
       </tbody>
     </table>
