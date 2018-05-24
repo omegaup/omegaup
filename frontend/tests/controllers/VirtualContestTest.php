@@ -32,35 +32,35 @@ class VirtualContestTest extends OmegaupTestCase {
         $response = ContestController::apiCreateVirtual($r);
 
         // Get generated virtual contest alias
-        $virtual_contest_alias = $response['alias'];
+        $virtualContestAlias = $response['alias'];
 
-        $virtual_contest = ContestsDAO::getByAlias($virtual_contest_alias);
+        $virtualContest = ContestsDAO::getByAlias($virtualContestAlias);
 
-        $original_contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $originalContest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         // Assert virtual contest
-        $this->assertEquals($original_contest->contest_id, $virtual_contest->rerun_id);
-        $this->assertEquals($original_contest->title, $virtual_contest->title);
-        $this->assertEquals($original_contest->description, $virtual_contest->description);
-        $this->assertEquals(0, $virtual_contest->public); // Virtual contest must be private
-        $this->assertEquals($original_contest->scoreboard, $virtual_contest->scoreboard);
-        $this->assertEquals($original_contest->points_decay_factor, $virtual_contest->points_decay_factor);
-        $this->assertEquals($original_contest->partial_score, $virtual_contest->partial_score);
-        $this->assertEquals($original_contest->submissions_gap, $virtual_contest->submissions_gap);
-        $this->assertEquals($original_contest->feedback, $virtual_contest->feedback);
-        $this->assertEquals($original_contest->penalty, $virtual_contest->penalty);
-        $this->assertEquals($original_contest->penalty_type, $virtual_contest->penalty_type);
-        $this->assertEquals($original_contest->penalty_calc_policy, $virtual_contest->penalty_calc_policy);
-        $this->assertEquals($original_contest->languages, $virtual_contest->languages);
+        $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
+        $this->assertEquals($originalContest->title, $virtualContest->title);
+        $this->assertEquals($originalContest->description, $virtualContest->description);
+        $this->assertEquals(0, $virtualContest->public); // Virtual contest must be private
+        $this->assertEquals($originalContest->scoreboard, $virtualContest->scoreboard);
+        $this->assertEquals($originalContest->points_decay_factor, $virtualContest->points_decay_factor);
+        $this->assertEquals($originalContest->partial_score, $virtualContest->partial_score);
+        $this->assertEquals($originalContest->submissions_gap, $virtualContest->submissions_gap);
+        $this->assertEquals($originalContest->feedback, $virtualContest->feedback);
+        $this->assertEquals($originalContest->penalty, $virtualContest->penalty);
+        $this->assertEquals($originalContest->penalty_type, $virtualContest->penalty_type);
+        $this->assertEquals($originalContest->penalty_calc_policy, $virtualContest->penalty_calc_policy);
+        $this->assertEquals($originalContest->languages, $virtualContest->languages);
 
         // Assert virtual contest problenset problems
-        $original_problems = ProblemsetProblemsDAO::getProblems($original_contest->problemset_id);
-        $virtual_problems = ProblemsetProblemsDAO::getProblems($virtual_contest->problemset_id);
+        $originalProblems = ProblemsetProblemsDAO::getProblems($originalContest->problemset_id);
+        $virtualProblems = ProblemsetProblemsDAO::getProblems($virtualContest->problemset_id);
         // Number of problems must be equal
-        $this->assertEquals(count($original_problems), count($virtual_problems));
+        $this->assertEquals(count($originalProblems), count($virtualProblems));
 
         // Because we only put one problem in contest we can assert only the first element
-        $this->assertEquals($original_problems[0], $virtual_problems[0]);
+        $this->assertEquals($originalProblems[0], $virtualProblems[0]);
     }
 
     public function testCreateVirtualContestBeforeTheOriginalEnded() {
@@ -104,12 +104,12 @@ class VirtualContestTest extends OmegaupTestCase {
 
         $response = ContestController::apiCreateVirtual($r);
 
-        $virtual_contest_alias = $response['alias'];
+        $virtualContestAlias = $response['alias'];
 
         $this->expectException(ForbiddenAccessException::class);
 
         $r = new Request([
-            'contest_alias' => $virtual_contest_alias,
+            'contest_alias' => $virtualContestAlias,
             'problem_alias' => $problemData['problem']->alias,
             'points' => 100,
             'auth_token' => $login->auth_token
@@ -142,12 +142,12 @@ class VirtualContestTest extends OmegaupTestCase {
 
         $response = ContestController::apiCreateVirtual($r);
 
-        $virtual_contest_alias = $response['alias'];
+        $virtualContestAlias = $response['alias'];
 
         $this->expectException(ForbiddenAccessException::class);
 
         $r = new Request([
-            'contest_alias' => $virtual_contest_alias,
+            'contest_alias' => $virtualContestAlias,
             'problem_alias' => $problemData['problem']->alias,
             'auth_token' => $login->auth_token
         ]);
@@ -173,12 +173,12 @@ class VirtualContestTest extends OmegaupTestCase {
 
         $response = ContestController::apiCreateVirtual($r);
 
-        $virtual_contest_alias = $response['alias'];
+        $virtualContestAlias = $response['alias'];
 
         $this->expectException(ForbiddenAccessException::class);
 
         $r = new Request([
-            'contest_alias' => $virtual_contest_alias,
+            'contest_alias' => $virtualContestAlias,
             'title' => 'testtest',
             'auth_token' => $login->auth_token
         ]);
