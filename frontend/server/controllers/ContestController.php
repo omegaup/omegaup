@@ -565,7 +565,8 @@ class ContestController extends Controller {
                 'show_scoreboard_after',
                 'contestant_must_register',
                 'languages',
-                'problemset_id'];
+                'problemset_id',
+                'rerun_id'];
 
             // Initialize response to be the contest information
             $result = $r['contest']->asFilteredArray($relevant_columns);
@@ -665,6 +666,10 @@ class ContestController extends Controller {
                     $r['current_identity_id'],
                     $r['contest']->problemset_id
                 );
+            } catch (ForbiddenAccessException $e) {
+                if (!ContestsDAO::hasFinished($r['contest'])) {
+                    throw $e;
+                }
             } catch (ApiException $e) {
                 throw $e;
             } catch (Exception $e) {
