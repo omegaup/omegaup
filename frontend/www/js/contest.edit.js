@@ -95,6 +95,7 @@ omegaup.OmegaUp.on('ready', function() {
           $('a[href="#publish"]').parent().remove();
           $('a[href="#links"]').parent().remove();
           $('a[href="#clone"]').parent().remove();
+          $('a[href="#contestants"]').trigger('click');
         }
       })
       .fail(omegaup.UI.apiError);
