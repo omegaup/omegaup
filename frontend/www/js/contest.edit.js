@@ -90,11 +90,11 @@ omegaup.OmegaUp.on('ready', function() {
         }
 
         if (contest.rerun_id != 0) {
-            $('a[href="#edit"]').parent().remove();
-            $('a[href="#problems"]').parent().remove();
-            $('a[href="#publish"]').parent().remove();
-            $('a[href="#links"]').parent().remove();
-            $('a[href="#clone"]').parent().remove();
+          $('a[href="#edit"]').parent().remove();
+          $('a[href="#problems"]').parent().remove();
+          $('a[href="#publish"]').parent().remove();
+          $('a[href="#links"]').parent().remove();
+          $('a[href="#clone"]').parent().remove();
         }
       })
       .fail(omegaup.UI.apiError);
