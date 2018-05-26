@@ -53,8 +53,8 @@ class ProblemList extends OmegaupTestCase {
                 break;
             }
             // Check if quality_histogram and difficulty_histogram fields are being returned also
-            $this -> assertTrue(array_key_exists('quality_histogram', $problemResponse));
-            $this -> assertTrue(array_key_exists('difficulty_histogram', $problemResponse));
+            $this->assertTrue(array_key_exists('quality_histogram', $problemResponse));
+            $this->assertTrue(array_key_exists('difficulty_histogram', $problemResponse));
         }
 
         if ($exists) {
