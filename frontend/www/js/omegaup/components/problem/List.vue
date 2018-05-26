@@ -123,15 +123,10 @@ export default {
         return T.wordsHighQualityProblem;
     },
     hrefForProblemTag: function(currentTags, problemTag) {
-      let href = '/problem/?tag[]=';
-      if (currentTags) {
-        href += currentTags.join('&tag[]=');
-        if (currentTags.includes(problemTag))
-          return href;
-        else
-          return href + `&tag[]=${problemTag}`;
-      } else
-        return href + problemTag;
+      if (!currentTags) return `/problem/?tag[]=${problemTag}`;
+      let tags = currentTags.slice();
+      if (!tags.includes(problemTag)) tags.push(problemTag);
+      return `/problem/?tag[]=${tags.join('&tag[]=')}`;
     },
   }
 }
