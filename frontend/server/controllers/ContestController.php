@@ -666,10 +666,6 @@ class ContestController extends Controller {
                     $r['current_identity_id'],
                     $r['contest']->problemset_id
                 );
-            } catch (ForbiddenAccessException $e) {
-                if (!ContestsDAO::hasFinished($r['contest'])) {
-                    throw $e;
-                }
             } catch (ApiException $e) {
                 throw $e;
             } catch (Exception $e) {
