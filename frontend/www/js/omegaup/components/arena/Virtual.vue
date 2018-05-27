@@ -50,7 +50,7 @@ export default {
   created: function() {
     var self = this;
 
-    API.Contest.details({contest_alias: this.contest_alias})
+    API.Contest.publicDetails({contest_alias: this.contest_alias})
         .then(function(response) {
           var detail = response;
 
