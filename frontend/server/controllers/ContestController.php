@@ -319,17 +319,15 @@ class ContestController extends Controller {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
-            error_log(print_r($r['contest_alias'], true));
             $contest_problemset = ContestsDAO::getByAliasWithExtraInformation($r['contest_alias']);
-            $r['contest'] = new Contests($contest_problemset);
-            $r['problemset'] = new Problemsets($contest_problemset);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        if (is_null($r['contest'])) {
+        if (is_null($contest_problemset)) {
             throw new NotFoundException('contestNotFound');
         }
+        $r['contest'] = new Contests($contest_problemset);
+        $r['problemset'] = new Problemsets($contest_problemset);
     }
 
     /**
@@ -576,7 +574,6 @@ class ContestController extends Controller {
                 'rerun_id'];
 
             // Initialize response to be the contest information
-            error_log(print_r($r['contest'], true));
             $result = $r['contest']->asFilteredArray($relevant_columns);
 
             $result['start_time'] = strtotime($result['start_time']);
@@ -895,6 +892,8 @@ class ContestController extends Controller {
         $problemset = new Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
+            'scoreboard_url' => SecurityTools::randomString(30),
+            'scoreboard_url_admin' => SecurityTools::randomString(30),
         ]);
 
         self::createContest($r, $problemset, $contest, $originalContest->problemset_id);
