@@ -80,32 +80,29 @@ def get_problem_aggregates(dbconn, problem_id):
                          AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
-        quality_sum = 0
-        quality_n = 0
-        difficulty_sum = 0
-        difficulty_n = 0
+        quality_votes = [0, 0, 0, 0, 0]
+        difficulty_votes = [0, 0, 0, 0, 0]
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
             if 'quality' in contents:
-                quality_sum += contents['quality']
-                quality_n += 1
+                quality_votes[contents['quality']] += 1
             if 'difficulty' in contents:
-                difficulty_sum += contents['difficulty']
-                difficulty_n += 1
+                difficulty_votes[contents['difficulty']] += 1
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += 1
                     problem_tag_votes_n += 1
 
-    return (quality_sum, quality_n, difficulty_sum, difficulty_n,
+    return (quality_votes, difficulty_votes,
             problem_tag_votes, problem_tag_votes_n)
 
 
-def bayesian_average(apriori_average, value_sum, values_n):
+def bayesian_average(apriori_average, values):
     '''Gets the Bayesian average of an observation based on a prior value.'''
-
+    values_n = sum(values)
+    value_sum = sum(score * n for score, n in enumerate(values))
     if values_n < CONFIDENCE or apriori_average is None:
         return None
     return (CONFIDENCE * apriori_average + value_sum) / (CONFIDENCE + values_n)
@@ -193,26 +190,29 @@ def aggregate_feedback(dbconn):
             problem_id = row[0]
             logging.debug('Aggregating feedback for problem %d', problem_id)
 
-            (problem_quality_sum, problem_quality_n,
-             problem_difficulty_sum, problem_difficulty_n,
+            (problem_quality_votes, problem_difficulty_votes,
              problem_tag_votes,
              problem_tag_votes_n) = get_problem_aggregates(dbconn, problem_id)
 
             problem_quality = bayesian_average(
-                global_quality_average, problem_quality_sum, problem_quality_n)
+                global_quality_average, problem_quality_votes)
             problem_difficulty = bayesian_average(global_difficulty_average,
-                                                  problem_difficulty_sum,
-                                                  problem_difficulty_n)
+                                                  problem_difficulty_votes)
             if problem_quality is not None and problem_difficulty is not None:
                 logging.debug('Updating problem %d. quality=%f, difficulty=%f',
                               problem_id, problem_quality, problem_difficulty)
                 cur.execute("""UPDATE
                                    `Problems` as p
                                SET
-                                   p.`quality` = %s, p.`difficulty` = %s
+                                   p.`quality` = %s, p.`difficulty` = %s,
+                                   p.`quality_histogram` = %s,
+                                   p.`difficulty_histogram` = %s
                                WHERE
                                    p.`problem_id` = %s;""",
-                            (problem_quality, problem_difficulty, problem_id))
+                            (problem_quality, problem_difficulty,
+                             json.dumps(problem_quality_votes),
+                             json.dumps(problem_difficulty_votes),
+                             problem_id))
                 dbconn.commit()
             else:
                 logging.debug('Not enough information for problem %d',

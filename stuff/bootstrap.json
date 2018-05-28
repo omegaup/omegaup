@@ -64,9 +64,31 @@
 					"feedback": "yes",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",
-					"public": 1,
-					"problems": "[{\"problem\":\"triangulos\",\"points\":100},{\"problem\":\"sumas\",\"points\":100}]",
+					"public": 0,
 					"show_scoreboard_after": 1
+				}
+			},
+			{
+				"api": "/contest/addProblem",
+				"params": {
+					"contest_alias": "prueba",
+					"problem_alias": "triangulos",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem",
+				"params": {
+					"contest_alias": "prueba",
+					"problem_alias": "sumas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/update",
+				"params": {
+					"contest_alias": "prueba",
+					"public": 1
 				}
 			},
 			{
