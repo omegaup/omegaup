@@ -41,6 +41,7 @@ test_config.php
 # and log
 omegaup.log
 frontend/log/omegaup.log
+yarn-error.log
 
 #ignore crated-by-test stuff
 frontend/server/api/tests/problems/

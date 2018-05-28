@@ -139,7 +139,8 @@ class ContestsDAO extends ContestsDAOBase {
                                 alias,
                                 recommended,
                                 window_length,
-                                UNIX_TIMESTAMP (last_updated) as last_updated
+                                UNIX_TIMESTAMP (last_updated) as last_updated,
+                                rerun_id
                                 ';
 
     final public static function getByAlias($alias) {
@@ -751,6 +752,29 @@ class ContestsDAO extends ContestsDAOBase {
             'needs_basic_information' => $rs['needs_basic_information'] == '1',
             'requests_user_information' => $rs['requests_user_information']
         ];
+    }
+
+    /**
+     * Generate alias of virtual contest / ghost mode
+     *
+     * @param Contests $contest
+     * @param Users $user
+     * @return string of unique virtual contest alias
+     */
+    public static function generateAlias(Contests $contest) {
+        // Virtual contest alias format (alias-virtual-random)
+        $alias = $contest->alias;
+
+        return substr($alias, 0, 20) . '-virtual-' . SecurityTools::randomString(3);
+    }
+
+    /**
+     * Check if contest is virtual contest
+     * @param Contest $contest
+     * @return boolean
+     */
+    public static function isVirtual(Contests $contest) {
+        return $contest->rerun_id != 0;
     }
 
     /**
