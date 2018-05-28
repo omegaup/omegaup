@@ -83,9 +83,6 @@ class Users extends VO {
         if (isset($data['reset_sent_at'])) {
             $this->reset_sent_at = $data['reset_sent_at'];
         }
-        if (isset($data['recruitment_optin'])) {
-            $this->recruitment_optin = $data['recruitment_optin'];
-        }
         if (isset($data['hide_problem_tags'])) {
             $this->hide_problem_tags = $data['hide_problem_tags'];
         }
@@ -245,13 +242,6 @@ class Users extends VO {
       * @var datetime
       */
     public $reset_sent_at;
-
-    /**
-      * Determina si el usuario puede ser contactado con fines de reclutamiento.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $recruitment_optin;
 
     /**
       * Determina si el usuario quiere ocultar las etiquetas de los problemas

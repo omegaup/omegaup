@@ -659,8 +659,8 @@ class ProblemController extends Controller {
         $runs = [];
         try {
             $runs = RunsDAO::search(new Runs([
-                                'problem_id' => $r['problem']->problem_id
-                            ]));
+                'problem_id' => $r['problem']->problem_id
+            ]));
 
             $guids = [];
             foreach ($runs as $run) {
@@ -1289,15 +1289,14 @@ class ProblemController extends Controller {
                 'submit_delay'];
 
             // Search the relevant runs from the DB
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id,
-                'problemset_id' => $problemset_id
-            ]);
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id,
+                    'problemset_id' => $problemset_id
+                ]));
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -1459,14 +1458,12 @@ class ProblemController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         } else {
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id
-            ]);
-
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id
+                ]));
 
                 // Create array of relevant columns for list of runs
                 $relevant_columns = ['guid', 'language', 'status', 'verdict',

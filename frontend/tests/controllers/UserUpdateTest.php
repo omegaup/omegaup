@@ -24,7 +24,6 @@ class UserUpdateTest extends OmegaupTestCase {
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale[0]->name,
-            'recruitment_optin' => 1,
         ]);
 
         UserController::apiUpdate($r);
@@ -37,7 +36,6 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
         $this->assertEquals($locale[0]->language_id, $user_db->language_id);
 
         // Edit all fields again with diff values
@@ -52,7 +50,6 @@ class UserUpdateTest extends OmegaupTestCase {
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
             'locale' => $locale[0]->name,
-            'recruitment_optin' => 0,
         ]);
 
         UserController::apiUpdate($r);
@@ -65,7 +62,6 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
         $this->assertEquals($locale[0]->language_id, $user_db->language_id);
 
         // Double check language update with the appropiate API
@@ -86,7 +82,6 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-            'recruitment_optin' => 1,
             // Invalid state_id
             'state_id' => -1,
         ]);
@@ -161,31 +156,6 @@ class UserUpdateTest extends OmegaupTestCase {
         ]);
 
         UserController::apiUpdate($r);
-    }
-
-    /**
-     * Exercising valid values for the recruitment flag while updating an user
-     */
-    public function testRecruitmentOptionUpdate() {
-        $user = UserFactory::createUser();
-
-        $login = self::login($user);
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
-        ]);
-
-        // Set recruitment_optin to true
-        $r['recruitment_optin'] = 1;
-        UserController::apiUpdate($r);
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->recruitment_optin, $r['recruitment_optin']);
-
-        // Set recruitment_optin to false
-        $r['recruitment_optin'] = 0;
-        UserController::apiUpdate($r);
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->recruitment_optin, $r['recruitment_optin']);
     }
 
     /**
