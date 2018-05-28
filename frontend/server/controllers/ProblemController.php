@@ -754,13 +754,9 @@ class ProblemController extends Controller {
 
                 // Calculate input and output limit.
                 $output_limit = $problemDeployer->getOutputLimit();
-                $input_limit = $problemDeployer->getInputLimit();
 
                 if ($output_limit != -1) {
                     $r['problem']->output_limit = $output_limit;
-                }
-                if ($input_limit != -1) {
-                    $r['problem']->input_limit = $input_limit;
                 }
 
                 $response['uploaded_files'] = $problemDeployer->filesToUnzip;
