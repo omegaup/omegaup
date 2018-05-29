@@ -21,9 +21,20 @@ const ast = babylon.parse(buf, {
   sourceType: isModule ? 'module' : 'script',
 });
 
+function hasRefactorLintDisableComment(path) {
+  const comments = path.getStatementParent().node.trailingComments;
+  if (!comments || comments.length == 0) {
+    return false;
+  }
+  return comments[0].value.trim() == 'refactor-lint-disable';
+}
+
 const fixes = [];
 const promiseVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     const callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;
@@ -65,6 +76,9 @@ const jQueryBooleanProperties = [
 ];
 const jQueryRemoveAttrVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     let callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;
@@ -99,6 +113,9 @@ const jQueryDeprecatedFunctions = [
 ];
 const jQueryDeprecatedFunctionVisitor = {
   CallExpression(path) {
+    if (hasRefactorLintDisableComment(path)) {
+      return;
+    }
     let callee = path.node.callee;
     if (callee.type != 'MemberExpression') {
       return;

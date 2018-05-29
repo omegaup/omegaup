@@ -86,7 +86,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale[0]->name,
-            'recruitment_optin' => 1,
         ]);
 
         UserController::apiUpdate($r);
@@ -99,7 +98,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
         $this->assertEquals($locale[0]->language_id, $user_db->language_id);
 
         // Edit all fields again with diff values
@@ -114,7 +112,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
             'locale' => $locale[0]->name,
-            'recruitment_optin' => 0,
         ]);
 
         UserController::apiUpdate($r);
@@ -127,7 +124,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($r['recruitment_optin'], $user_db->recruitment_optin);
         $this->assertEquals($locale[0]->language_id, $user_db->language_id);
 
         // Double check language update with the appropiate API
