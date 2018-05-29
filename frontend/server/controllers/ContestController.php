@@ -225,7 +225,7 @@ class ContestController extends Controller {
             $addedContests[] = $contest;
             foreach ($contest as $key => $item) {
                 if ($key ==  'start_time' || $key ==  'finish_time' || $key ==  'last_updated') {
-                    $contests[$key] = strtotime($item);
+                    $addedContests[$index][$key] = strtotime($item);
                 }
             }
         }
