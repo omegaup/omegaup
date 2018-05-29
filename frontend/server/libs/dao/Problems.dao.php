@@ -243,7 +243,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.
-        $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
+        $filters = ['title','quality', 'difficulty', 'alias', 'visibility', 'quality_histogram', 'difficulty_histogram'];
         $problems = [];
         $hiddenTags = $identity_type !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
         if (!is_null($result)) {
