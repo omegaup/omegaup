@@ -1109,7 +1109,7 @@ export class Arena {
         $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
             .text(problem.overall_wall_time_limit / 1000 + 's');
-        $('#problem .input_limit').text(problem.input_limit / 1024 + 'Kib');
+        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
@@ -1410,7 +1410,7 @@ export class Arena {
         if (file.size >= self.currentProblem.input_limit) {
           alert(UI.formatString(
               T.arenaRunSubmitFilesize,
-              {limit: (self.currentProblem.input_limit / 1024 + 'kiB')}));
+              {limit: (self.currentProblem.input_limit / 1024 + ' KiB')}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');

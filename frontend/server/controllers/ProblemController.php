@@ -752,7 +752,7 @@ class ProblemController extends Controller {
                 // This must come before the commit in case isSlow throws an exception.
                 $problem->slow = $problemDeployer->isSlow($problem);
 
-                // Calculate input and output limit.
+                // Calculate output limit.
                 $output_limit = $problemDeployer->getOutputLimit();
 
                 if ($output_limit != -1) {
