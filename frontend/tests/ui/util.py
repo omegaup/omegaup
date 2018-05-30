@@ -7,6 +7,7 @@ import contextlib
 import os
 import sys
 import re
+import functools
 
 from urllib.parse import urlparse
 from selenium.webdriver.common.by import By
@@ -39,10 +40,21 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
         driver.wait_for_page_loaded()
 
 
+def no_javascript_errors(f, *, path_whitelist=(), message_whitelist=()):
+    '''Decorator for javascript errors'''
+    @functools.wraps
+    def wrapper(driver, *args, **kwargs):
+        '''Wrapper for javascript errors'''
+        with assert_no_javascript_errors(driver, path_whitelist=path_whitelist,
+                                         message_whitelist=message_whitelist):
+            return f(driver, *args, **kwargs)
+    return wrapper
+
+
 @contextlib.contextmanager
 def assert_no_javascript_errors(driver, *, path_whitelist=(),
                                 message_whitelist=()):
-    ''' Shows in a list unexpected errors in javascript console '''
+    '''Shows in a list unexpected errors in javascript console'''
     previous_logs = get_console_logs(driver, path_whitelist, message_whitelist)
     try:
         yield
@@ -58,7 +70,7 @@ def assert_no_javascript_errors(driver, *, path_whitelist=(),
 
 
 def get_console_logs(driver, path_whitelist, message_whitelist):
-    ''' Checks whether there is an error or warning in javascript console'''
+    '''Checks whether there is an error or warning in javascript console'''
 
     log = []
     for entry in driver.browser.get_log('browser'):
@@ -74,7 +86,7 @@ def get_console_logs(driver, path_whitelist, message_whitelist):
     return log
 
 
-def is_path_whitelisted(message, whitelist):
+def is_path_whitelisted(message, path_whitelist):
     '''Checks whether URL in message is whitelisted.'''
 
     match = re.search(r'(https?://[^\s\'"]+)', message)
@@ -83,7 +95,7 @@ def is_path_whitelisted(message, whitelist):
     if not url:
         return False
 
-    for whitelisted_path in whitelist + PATH_WHITELIST:
+    for whitelisted_path in path_whitelist + PATH_WHITELIST:
         if url.path == whitelisted_path:  # Compares params in the url
             return True
 

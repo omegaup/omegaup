@@ -279,8 +279,8 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
-    // Setup run details view
-    if (options.scoreboardToken === null) {
+    // Setup run details view, if available.
+    if (document.getElementById('run-details') != null) {
       self.runDetailsView = new Vue({
         el: '#run-details',
         render: function(createElement) {
