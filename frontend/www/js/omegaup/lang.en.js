@@ -280,6 +280,7 @@ omegaup.OmegaUp.loadTranslations({
 	errorEc2TerminateInstance: "Error executing ec2-terminate-instances. Please check log for details.",
 	errorWhileSendingMail: "There was an error sending the verification email. Please try again later or contact omegaup-soporte@googlegroups.com for support. Your email is not verified yet.",
 	forSelectedItems: "For selected items",
+	forbiddenInVirtualContest: "Forbidden in virtual contest",
 	frontPageCreateContestButton: "Create your own contest!",
 	frontPageDescription: "omegaUp is a web project aimed at raising the level of competitiveness of software developers through problem solving with a fun and competitive approach.",
 	frontPageDevelopers: "Developers",
