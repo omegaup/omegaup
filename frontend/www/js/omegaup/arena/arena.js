@@ -968,7 +968,8 @@ export class Arena {
     $('option', self.elements.submitForm.language)
         .each(function(index, item) {
           item = $(item);
-          item.toggle(lang_array.indexOf(item.val()) >= 0);
+          const isOptionAllowed = lang_array.indexOf(item.val()) >= 0;
+          if (!isOptionAllowed) item.remove();
         });
   }
 
@@ -979,7 +980,6 @@ export class Arena {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
             return false;
@@ -990,11 +990,10 @@ export class Arena {
     $('option', langElement)
         .each(function() {
           let option = $(this);
-          if (option.css('display') != 'none') {
-            option.prop('selected', true);
-            langElement.trigger('change');
-            return false;
-          }
+
+          option.prop('selected', true);
+          langElement.trigger('change');
+          return false;
         });
   }
 
