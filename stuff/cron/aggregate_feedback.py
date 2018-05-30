@@ -275,21 +275,21 @@ def update_problem_of_the_week(dbconn, difficulty):
     of the week, has been previously identified as being Easy, and has the
     largest sum of quality votes over the past week as the problem of the week.
     '''
-    
+
     # First check if last Friday's problem has already been computed and stored.
     last_friday = get_last_friday()
-    with dbconn.cursor() as cur:                         
+    with dbconn.cursor() as cur:
         cur.execute("""SELECT COUNT(*)
                        FROM `Problem_Of_The_Week`
                        WHERE `time` = %s
                          AND `difficulty` = %s;""",
                     (last_friday.strftime("%Y-%m-%d"), difficulty))
         if cur.fetchone()[0] > 0:
-            return    
+            return
 
     # If last Friday's problem hasn't been computed, we compute it and store it in the DB.
     friday_before_last = last_friday - datetime.timedelta(weeks = 1)
-    with dbconn.cursor() as cur:                         
+    with dbconn.cursor() as cur:
         cur.execute("""SELECT qn.`problem_id`, qn.`contents`
                        FROM `QualityNominations` AS qn
                        LEFT JOIN `Problems` AS p ON p.`problem_id` = qn.`problem_id`
@@ -320,10 +320,10 @@ def update_problem_of_the_week(dbconn, difficulty):
                 if problem_id not in quality_map:
                     quality_map[problem_id] = 0
                 quality_map[problem_id] += contents['quality']
-                
+
         if not quality_map:
             raise Exception('No problem of the week found')
-            
+
         problem_of_the_week_problem_id = max(quality_map.items(), key=operator.itemgetter(1))[0]
         logging.debug('Inserting problem of the week %d for week of %s',
                               problem_of_the_week_problem_id, last_friday.strftime("%Y-%m-%d"))

@@ -935,13 +935,13 @@ class QualityNominationTest extends OmegaupTestCase {
     // with difficulty < 2.
     public function testUpdateProblemOfTheWeek() {
         self::setUpSyntheticSuggestionsForProblemOfTheWeek();
-        
+
         // Set date for all quality nominations as 1 week ago, so that they are eligible for
         // current problem of the week.
         $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
         global $conn;
         $conn->Execute("UPDATE `QualityNominations` SET `time` = ?", $dateOneWeekAgo);
-        
+
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
@@ -990,7 +990,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Hard problem with low quality.
         $difficultyRatings[3] = array(3, 2, 4, 4, 4, 4, 2, 4, 3, 4); // Average = 3.4
         $qualityRatings[3] = array(0, 2, 2, 3, 1, 2, 2, 1, 1, 2); // Average = 1.6
-        
+
         for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
             for ($userIdx = 0; $userIdx < 10; $userIdx++) {
                 QualityNominationFactory::createSuggestion(
@@ -1196,7 +1196,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ['Geometry', 'Math']
         );
     }
-    
+
     private static function deleteAllSuggestions() {
         $filter = new QualityNominations([
             'nomination' => 'suggestion',
