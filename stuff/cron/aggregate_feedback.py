@@ -15,7 +15,6 @@ import json
 import operator
 import logging
 import os
-import time
 import warnings
 
 import MySQLdb
@@ -259,14 +258,20 @@ def mysql_connect(args):
         db=args.database
     )
 
-def get_last_friday():
-    current_date = datetime.datetime.now().date()
-    last_friday = current_date - datetime.timedelta(days = current_date.weekday()) + datetime.timedelta(days = 4)
 
-    if current_date.weekday() < 4: # If day of the week is before Friday.
-        last_friday -= datetime.timedelta(weeks = 1)
+def get_last_friday():
+    '''Returns datetime object corresponding to last Friday.
+    '''
+    current_date = datetime.datetime.now().date()
+    last_friday = current_date\
+        - datetime.timedelta(days=current_date.weekday())\
+        + datetime.timedelta(days=4)
+
+    if current_date.weekday() < 4:  # If day of the week is before Friday.
+        last_friday -= datetime.timedelta(weeks=1)
 
     return last_friday
+
 
 def update_problem_of_the_week(dbconn, difficulty):
     '''Computes and records the problem of the past week.
@@ -276,7 +281,7 @@ def update_problem_of_the_week(dbconn, difficulty):
     largest sum of quality votes over the past week as the problem of the week.
     '''
 
-    # First check if last Friday's problem has already been computed and stored.
+    # First check if last Friday's problem has already been computed and stored
     last_friday = get_last_friday()
     with dbconn.cursor() as cur:
         cur.execute("""SELECT COUNT(*)
@@ -287,13 +292,16 @@ def update_problem_of_the_week(dbconn, difficulty):
         if cur.fetchone()[0] > 0:
             return
 
-    # If last Friday's problem hasn't been computed, we compute it and store it in the DB.
-    friday_before_last = last_friday - datetime.timedelta(weeks = 1)
+    # If last Friday's problem hasn't been computed, we compute it and store it
+    # in the DB.
+    friday_before_last = last_friday - datetime.timedelta(weeks=1)
     with dbconn.cursor() as cur:
         cur.execute("""SELECT qn.`problem_id`, qn.`contents`
                        FROM `QualityNominations` AS qn
-                       LEFT JOIN `Problems` AS p ON p.`problem_id` = qn.`problem_id`
-                       LEFT JOIN `Problem_Of_The_Week` AS pw ON pw.`problem_id` = qn.`problem_id`
+                       LEFT JOIN `Problems`
+                         AS p ON p.`problem_id` = qn.`problem_id`
+                       LEFT JOIN `Problem_Of_The_Week`
+                         AS pw ON pw.`problem_id` = qn.`problem_id`
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`time` >= %s
                          AND qn.`time` < %s
@@ -324,15 +332,19 @@ def update_problem_of_the_week(dbconn, difficulty):
         if not quality_map:
             raise Exception('No problem of the week found')
 
-        problem_of_the_week_problem_id = max(quality_map.items(), key=operator.itemgetter(1))[0]
+        problem_of_the_week_problem_id =\
+            max(quality_map.items(), key=operator.itemgetter(1))[0]
         logging.debug('Inserting problem of the week %d for week of %s',
-                              problem_of_the_week_problem_id, last_friday.strftime("%Y-%m-%d"))
-        cur.execute("""INSERT INTO `Problem_Of_The_Week` (`problem_id`, `time`, `difficulty`)
+                      problem_of_the_week_problem_id,
+                      last_friday.strftime("%Y-%m-%d"))
+        cur.execute("""INSERT INTO `Problem_Of_The_Week`
+                       (`problem_id`, `time`, `difficulty`)
                        VALUES (%s, %s, %s);""",
                     (problem_of_the_week_problem_id,
                      last_friday.strftime("%Y-%m-%d"),
                      difficulty))
         dbconn.commit()
+
 
 def main():
     '''Main entrypoint.'''
@@ -370,14 +382,17 @@ def main():
         try:
             aggregate_feedback(dbconn)
         except:  # pylint: disable=bare-except
-            logging.exception('Failed to aggregate feedback and update problem tags.')
+            logging.exception(
+                'Failed to aggregate feedback and update problem tags.')
             raise
 
         try:
-            # Problem of the week HAS to be computed AFTER feedback has been aggregated. It uses
-            # tifficulty tags computed from feedback to pick a problem of the given difficulty.
+            # Problem of the week HAS to be computed AFTER feedback has been
+            # aggregated. It uses difficulty tags computed from feedback to
+            # pick a problem of the given difficulty.
             update_problem_of_the_week(dbconn, "easy")
-            # TODO(heduenas): Compute "hard" problem of the week when we get enough feedback records.
+            # TODO(heduenas): Compute "hard" problem of the week when we get
+            # enough feedback records.
         except:  # pylint: disable=bare-except
             logging.exception('Failed to update problem of the week')
             raise
