@@ -26,17 +26,14 @@ class PrivacyStatementConsentLog extends VO {
         if (is_null($data)) {
             return;
         }
+        if (isset($data['privacystatement_consent_id'])) {
+            $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
+        }
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
         if (isset($data['privacystatement_id'])) {
             $this->privacystatement_id = $data['privacystatement_id'];
-        }
-        if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
-        }
-        if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'];
         }
         if (isset($data['timestamp'])) {
             $this->timestamp = $data['timestamp'];
@@ -55,8 +52,16 @@ class PrivacyStatementConsentLog extends VO {
     }
 
     /**
-      * Identidad del usuario
+      * Id del consentimiento de privacidad almacenado en el log
       * Llave Primaria
+      * Auto Incremento
+      * @access public
+      * @var int(11)
+      */
+    public $privacystatement_consent_id;
+
+    /**
+      * Identidad del usuario
       * @access public
       * @var int(11)
       */
@@ -64,25 +69,10 @@ class PrivacyStatementConsentLog extends VO {
 
     /**
       * Id del documento de privacidad
-      * Llave Primaria
       * @access public
       * @var int(11)
       */
     public $privacystatement_id;
-
-    /**
-      * Id de la lista de acceso al que pertenece el usuario que acepta/deniega el consentimiento de compartir sus datos. Se obtiene si es un curso
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
-
-    /**
-      * Almacena la respuesta del participante de un concurso / curso si está de acuerdo en divulgar su información.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $share_user_information;
 
     /**
       * Fecha y hora en la que el usuario acepta las nuevas políticas

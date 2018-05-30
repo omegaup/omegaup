@@ -10,7 +10,7 @@ include_once('base/PrivacyStatement_Consent_Log.vo.base.php');
   *
   */
 class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
-    public static function hasAcceptedLatestPolicyOrConsent(
+    public static function hasAcceptedLatestPolicy(
         $identity_id,
         $type = 'privacy_policy'
     ) {
@@ -33,49 +33,25 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
         return $conn->GetOne($sql, [$identity_id, $type]) > 0;
     }
 
-    public static function saveLog($identity_id, $type, $acl_id = null, $share_user_information = null) {
-        if (self::hasAcceptedLatestPolicyOrConsent($identity_id, $type)) {
-            $sql = 'UPDATE
-                      PrivacyStatement_Consent_Log
-                    SET
-                      `share_user_information` = ?
-                    WHERE
-                      `identity_id` = ?
-                      AND `privacystatement_id` = (
-                        SELECT
-                          `privacystatement_id`
-                        FROM
-                          `PrivacyStatements`
-                        WHERE
-                          `type` = ?
-                        ORDER BY
-                          privacystatement_id DESC
-                        LIMIT 1);';
-            $params = [$share_user_information, $identity_id, $type];
-        } else {
-            $sql = 'INSERT INTO
-                      PrivacyStatement_Consent_Log (
-                        `identity_id`,
-                        `privacystatement_id`,
-                        `acl_id`,
-                        `share_user_information`
-                      )
-                    SELECT
-                      ?,
-                      privacystatement_id,
-                      ?,
-                      ?
-                    FROM
-                      `PrivacyStatements`
-                    WHERE
-                      `type` = ?
-                    ORDER BY
-                      privacystatement_id DESC
-                    LIMIT 1;';
-            $params = [$identity_id, $acl_id, $share_user_information, $type];
-        }
+    public static function saveLog($identity_id, $type) {
+        $sql = 'INSERT INTO
+                  PrivacyStatement_Consent_Log (
+                    `identity_id`,
+                    `privacystatement_id`
+                  )
+                SELECT
+                  ?,
+                  privacystatement_id
+                FROM
+                  `PrivacyStatements`
+                WHERE
+                  `type` = ?
+                ORDER BY
+                  privacystatement_id DESC
+                LIMIT 1;';
+        $params = [$identity_id, $type];
         global $conn;
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        return $conn->Insert_ID();
     }
 }

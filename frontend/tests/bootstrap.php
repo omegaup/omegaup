@@ -34,6 +34,7 @@ require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
 
+require_once(OMEGAUP_ROOT . '/server/libs/Consent.php');
 require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
 
 // Clean previous log

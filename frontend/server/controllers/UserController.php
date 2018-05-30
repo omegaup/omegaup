@@ -2418,7 +2418,7 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
-            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPolicyOrConsent(
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPolicy(
                 $identity->identity_id
             ),
         ];

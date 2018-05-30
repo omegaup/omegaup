@@ -334,13 +334,17 @@ class CoursesDAO extends CoursesDAOBase {
     final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
         $sql = '
             SELECT
-                pcl.share_user_information
+                gi.share_user_information
             FROM
                 Groups_Identities AS gi
             INNER JOIN
-                Courses AS c ON gi.group_id = c.group_id
+                Courses AS c
+            ON
+                gi.group_id = c.group_id
             INNER JOIN
-                PrivacyStatement_Consent_Log AS pcl ON pcl.acl_id = c.acl_id
+                PrivacyStatement_Consent_Log AS pcl
+            ON
+                gi.privacystatement_consent_id = pcl.privacystatement_consent_id
             WHERE
                 gi.identity_id = ?
             AND
@@ -353,7 +357,6 @@ class CoursesDAO extends CoursesDAOBase {
             $group->group_id,
             $course->course_id
         ];
-
         global $conn;
         return $conn->GetOne($sql, $params) == null;
     }

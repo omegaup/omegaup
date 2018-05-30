@@ -261,10 +261,14 @@ CREATE TABLE `Groups` (
 CREATE TABLE `Groups_Identities` (
   `group_id` int(11) NOT NULL,
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
+  `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
+  KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_gipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -389,17 +393,15 @@ CREATE TABLE `Permissions` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PrivacyStatement_Consent_Log` (
+  `privacystatement_consent_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `privacystatement_id` int(11) NOT NULL COMMENT 'Id del documento de privacidad',
-  `acl_id` int(11) DEFAULT NULL COMMENT 'Id de la lista de acceso al que pertenece el usuario que acepta/deniega el consentimiento de compartir sus datos. Se obtiene si es un curso',
-  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso / curso si está de acuerdo en divulgar su información.',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario acepta las nuevas políticas',
-  PRIMARY KEY (`identity_id`,`privacystatement_id`),
-  UNIQUE KEY `identity_privacy` (`identity_id`,`privacystatement_id`),
+  PRIMARY KEY (`privacystatement_consent_id`),
+  UNIQUE KEY `identity_privacy` (`privacystatement_consent_id`,`identity_id`,`privacystatement_id`),
   KEY `fk_pcp_privacystatement_id` (`privacystatement_id`),
-  KEY `fk_pcla_acl_id` (`acl_id`),
+  KEY `fk_pci_identity_id` (`identity_id`),
   CONSTRAINT `fk_pci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pcla_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pcp_privacystatement_id` FOREIGN KEY (`privacystatement_id`) REFERENCES `PrivacyStatements` (`privacystatement_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Log para auditar las identidades que han aceptado los documentos de privacidad de omegaUp.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -536,10 +538,14 @@ CREATE TABLE `Problemset_Identities` (
   `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
+  `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
+  KEY `fk_pipc_privacystatement_consent_id` (`privacystatement_consent_id`),
   CONSTRAINT `fk_pii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_pipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_puc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden interactuar con una lista de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;

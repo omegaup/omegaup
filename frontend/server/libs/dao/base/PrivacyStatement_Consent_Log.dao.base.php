@@ -20,7 +20,7 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`acl_id`, `PrivacyStatement_Consent_Log`.`share_user_information`, `PrivacyStatement_Consent_Log`.`timestamp`';
+    const FIELDS = '`PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp`';
 
     /**
      * Guardar registros.
@@ -36,7 +36,7 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
-        if (!is_null(self::getByPK($PrivacyStatement_Consent_Log->identity_id, $PrivacyStatement_Consent_Log->privacystatement_id))) {
+        if (!is_null(self::getByPK($PrivacyStatement_Consent_Log->privacystatement_consent_id))) {
             return PrivacyStatementConsentLogDAOBase::update($PrivacyStatement_Consent_Log);
         } else {
             return PrivacyStatementConsentLogDAOBase::create($PrivacyStatement_Consent_Log);
@@ -52,12 +52,12 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
      * @static
      * @return @link PrivacyStatementConsentLog Un objeto del tipo {@link PrivacyStatementConsentLog}. NULL si no hay tal registro.
      */
-    final public static function getByPK($identity_id, $privacystatement_id) {
-        if (is_null($identity_id) || is_null($privacystatement_id)) {
+    final public static function getByPK($privacystatement_consent_id) {
+        if (is_null($privacystatement_consent_id)) {
             return null;
         }
-        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`acl_id`, `PrivacyStatement_Consent_Log`.`share_user_information`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (identity_id = ? AND privacystatement_id = ?) LIMIT 1;';
-        $params = [$identity_id, $privacystatement_id];
+        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (privacystatement_consent_id = ?) LIMIT 1;';
+        $params = [$privacystatement_consent_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -82,7 +82,7 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatementConsentLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`acl_id`, `PrivacyStatement_Consent_Log`.`share_user_information`, `PrivacyStatement_Consent_Log`.`timestamp` from PrivacyStatement_Consent_Log';
+        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` from PrivacyStatement_Consent_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -127,6 +127,10 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
 
         $clauses = [];
         $params = [];
+        if (!is_null($PrivacyStatement_Consent_Log->privacystatement_consent_id)) {
+            $clauses[] = '`privacystatement_consent_id` = ?';
+            $params[] = $PrivacyStatement_Consent_Log->privacystatement_consent_id;
+        }
         if (!is_null($PrivacyStatement_Consent_Log->identity_id)) {
             $clauses[] = '`identity_id` = ?';
             $params[] = $PrivacyStatement_Consent_Log->identity_id;
@@ -134,14 +138,6 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
         if (!is_null($PrivacyStatement_Consent_Log->privacystatement_id)) {
             $clauses[] = '`privacystatement_id` = ?';
             $params[] = $PrivacyStatement_Consent_Log->privacystatement_id;
-        }
-        if (!is_null($PrivacyStatement_Consent_Log->acl_id)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = $PrivacyStatement_Consent_Log->acl_id;
-        }
-        if (!is_null($PrivacyStatement_Consent_Log->share_user_information)) {
-            $clauses[] = '`share_user_information` = ?';
-            $params[] = $PrivacyStatement_Consent_Log->share_user_information;
         }
         if (!is_null($PrivacyStatement_Consent_Log->timestamp)) {
             $clauses[] = '`timestamp` = ?';
@@ -157,7 +153,7 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`acl_id`, `PrivacyStatement_Consent_Log`.`share_user_information`, `PrivacyStatement_Consent_Log`.`timestamp` FROM `PrivacyStatement_Consent_Log`';
+        $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM `PrivacyStatement_Consent_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -181,12 +177,12 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
       * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog a actualizar.
       */
     final private static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
-        $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `acl_id` = ?, `share_user_information` = ?, `timestamp` = ? WHERE `identity_id` = ? AND `privacystatement_id` = ?;';
+        $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
-            $PrivacyStatement_Consent_Log->acl_id,
-            $PrivacyStatement_Consent_Log->share_user_information,
+            $PrivacyStatement_Consent_Log->identity_id,
+            $PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,
-            $PrivacyStatement_Consent_Log->identity_id,$PrivacyStatement_Consent_Log->privacystatement_id,
+            $PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -209,12 +205,11 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
         if (is_null($PrivacyStatement_Consent_Log->timestamp)) {
             $PrivacyStatement_Consent_Log->timestamp = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `acl_id`, `share_user_information`, `timestamp`) VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`privacystatement_consent_id`, `identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?, ?);';
         $params = [
+            $PrivacyStatement_Consent_Log->privacystatement_consent_id,
             $PrivacyStatement_Consent_Log->identity_id,
             $PrivacyStatement_Consent_Log->privacystatement_id,
-            $PrivacyStatement_Consent_Log->acl_id,
-            $PrivacyStatement_Consent_Log->share_user_information,
             $PrivacyStatement_Consent_Log->timestamp,
         ];
         global $conn;
@@ -223,6 +218,7 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
+        $PrivacyStatement_Consent_Log->privacystatement_consent_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -262,6 +258,17 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
         $clauses = [];
         $params = [];
 
+        $a = $PrivacyStatement_Consent_LogA->privacystatement_consent_id;
+        $b = $PrivacyStatement_Consent_LogB->privacystatement_consent_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`privacystatement_consent_id` >= ? AND `privacystatement_consent_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`privacystatement_consent_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
         $a = $PrivacyStatement_Consent_LogA->identity_id;
         $b = $PrivacyStatement_Consent_LogB->identity_id;
         if (!is_null($a) && !is_null($b)) {
@@ -281,28 +288,6 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`privacystatement_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $PrivacyStatement_Consent_LogA->acl_id;
-        $b = $PrivacyStatement_Consent_LogB->acl_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`acl_id` >= ? AND `acl_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $PrivacyStatement_Consent_LogA->share_user_information;
-        $b = $PrivacyStatement_Consent_LogB->share_user_information;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`share_user_information` >= ? AND `share_user_information` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`share_user_information` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -345,11 +330,11 @@ abstract class PrivacyStatementConsentLogDAOBase extends DAO {
      * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog a eliminar
      */
     final public static function delete(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
-        if (is_null(self::getByPK($PrivacyStatement_Consent_Log->identity_id, $PrivacyStatement_Consent_Log->privacystatement_id))) {
+        if (is_null(self::getByPK($PrivacyStatement_Consent_Log->privacystatement_consent_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE identity_id = ? AND privacystatement_id = ?;';
-        $params = [$PrivacyStatement_Consent_Log->identity_id, $PrivacyStatement_Consent_Log->privacystatement_id];
+        $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE privacystatement_consent_id = ?;';
+        $params = [$PrivacyStatement_Consent_Log->privacystatement_consent_id];
         global $conn;
 
         $conn->Execute($sql, $params);

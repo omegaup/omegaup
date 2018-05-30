@@ -72,6 +72,18 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'share_user_information' => 1
         ]));
 
+        // Asserting shouldShowResults is on, because admin cannot update share_user_information
+        $this->assertEquals(1, $intro_details['isFirstTimeAccess']);
+
+        // User joins course and agrees sharing his information.
+        // It only updates share_user_information field.
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+            'share_user_information' => 1
+        ]));
+
         // User agrees sharing his information
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,

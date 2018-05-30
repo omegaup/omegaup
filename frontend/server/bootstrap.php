@@ -57,6 +57,7 @@ require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');
+require_once('libs/Consent.php');
 require_once('libs/Email.php');
 require_once('libs/Experiments.php');
 require_once('libs/Git.php');

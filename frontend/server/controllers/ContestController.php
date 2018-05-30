@@ -362,20 +362,12 @@ class ContestController extends Controller {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
                 $r['current_identity_id'] = $session['identity']->identity_id;
-                $lang = 'en';
-                if ($session['user']->language_id == UserController::LANGUAGE_ES) {
-                    $lang = 'es';
-                } elseif ($session['user']->language_id == UserController::LANGUAGE_PT) {
-                    $lang = 'pt';
-                }
 
-                $request_info = $result['requests_user_information'] == 'no' ? null : $result['requests_user_information'];
-
-                if (!is_null($request_info)) {
-                    $privacy_consent_path = "frontend/privacy/contest_{$request_info}_consent/";
-                    $privacy_consent_file = "{$privacy_consent_path}{$lang}.md";
-                    $result['consent_markdown'] = file_get_contents(OMEGAUP_ROOT . '/../' . $privacy_consent_file);
-                }
+                $result['consent_markdown'] = Consent::get(
+                    $session['user']->language_id,
+                    'contest',
+                    $result['requests_user_information']
+                );
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
@@ -535,18 +527,39 @@ class ContestController extends Controller {
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
-        ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-            $r['current_identity_id'],
-            $r['contest']->problemset_id,
-            true
-        );
 
-        PrivacyStatementConsentLogDAO::saveLog(
-            $r['current_identity_id'],
-            'contest_' . $needsInformation['requests_user_information'] . '_consent',
-            $r['contest']->acl_id,
-            $r['share_user_information']
-        );
+        CoursesDAO::transBegin();
+        try {
+            ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                $r['current_identity_id'],
+                $r['contest']->problemset_id,
+                true,
+                $r['share_user_information']
+            );
+
+            // Insert into PrivacyStatement_Consent_Log whether request
+            // user info is optional or required
+            if ($needsInformation['requests_user_information'] != 'no') {
+                $privacystatement_id = PrivacyStatementConsentLogDAO::saveLog(
+                    $r['current_identity_id'],
+                    'contest_' . $needsInformation['requests_user_information'] . '_consent'
+                );
+
+                ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+                    'identity_id' => $r['current_identity_id'],
+                    'problemset_id' => $r['contest']->problemset_id,
+                    'score' => 0,
+                    'time' => 0,
+                    'privacystatement_consent_id' => $privacystatement_id
+                ]));
+            }
+
+            CoursesDAO::transEnd();
+        } catch (Exception $e) {
+            CoursesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
     }

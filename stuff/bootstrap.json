@@ -87,7 +87,7 @@
 					"public": 0,
 					"school_id": 1,
 					"needs_basic_information": 0,
-					"requests_user_information": "no"
+					"requests_user_information": "required"
 				}
 			},
 			{
@@ -214,6 +214,13 @@
 					"username": "course_test_user_2",
 					"email": "course_test_user_2@localhost.localdomain",
 					"password": "course_test_user_2"
+				}
+			},
+			{
+				"api": "/course/addStudent",
+				"params": {
+					"usernameOrEmail": "user",
+					"course_alias": "curso-prueba"
 				}
 			},
 			{
