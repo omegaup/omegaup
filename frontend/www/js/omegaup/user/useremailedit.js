@@ -1,8 +1,7 @@
 import Vue from 'vue';
-import {OmegaUp, T, API} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const userEmail_edit = Vue.component(
+  const user_EmailEdit = Vue.component(
       'userEmailEdit', require('../components/user/useremailedit.vue'));
   const user_profile = JSON.parse(document.getElementById('profile').innerText);
   let userEmailedit = new Vue({
@@ -17,6 +16,6 @@ OmegaUp.on('ready', function() {
     data: {
       profile: user_profile,
     },
-    components: {'userEmailEdit': userEmail_edit}
+    components: {'userEmailEdit': user_EmailEdit}
   });
 });
