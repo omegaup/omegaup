@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import {OmegaUp} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   const user_EmailEdit = Vue.component(
