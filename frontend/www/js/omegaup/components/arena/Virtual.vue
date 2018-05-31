@@ -40,8 +40,7 @@ import DateTimePicker from '../DateTimePicker.vue';
 
 export default {
   props: {
-    detail: Object,
-    contestAlias: /\/arena\/([^\/]+)\/virtual/.exec(window.location.pathname)[1]
+    detail: Object
   },
   data: function() {
     return { T: T, UI: UI, startTime: new Date(), }
@@ -71,15 +70,7 @@ export default {
   },
   methods: {
     onSubmit: function() {
-      API.Contest.createVirtual({
-                   alias: this.contest_alias,
-                   start_time: this.start_time.getTime() / 1000
-                 })
-          .then(function(response) {
-            let virtual_contest_alias = response.alias;
-            window.location = "/contest/" + virtual_contest_alias + "/edit/";
-          })
-          .fail(UI.apiError);
+        this.$emit('submit', this);
     }
   },
   components: {'omegaup-datetimepicker': DateTimePicker}
