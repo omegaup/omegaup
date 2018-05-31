@@ -7,11 +7,11 @@ var Markdown =
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {
     it('Should handle zeroes', function() {
-      expect(omegaup.arena.FormatDelta(0)).toEqual('00:00:00');
+      expect(omegaup.UI.formatDelta(0)).toEqual('00:00:00');
     });
 
     it('Should handle large deltas', function() {
-      expect(omegaup.arena.FormatDelta(31 * 24 * 3600 * 1000))
+      expect(omegaup.UI.formatDelta(31 * 24 * 3600 * 1000))
           .toEqual('31:00:00:00');
     });
   });

@@ -10,30 +10,6 @@ import Vue from 'vue';
 
 export {ArenaAdmin};
 
-export function FormatDelta(delta) {
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-  delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
-  delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
-  delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
-
-  let clock = '';
-
-  if (days > 0) {
-    clock += days + ':';
-  }
-  if (hours < 10) clock += '0';
-  clock += hours + ':';
-  if (minutes < 10) clock += '0';
-  clock += minutes + ':';
-  if (seconds < 10) clock += '0';
-  clock += seconds;
-
-  return clock;
-}
-
 let ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
@@ -433,7 +409,7 @@ export class Arena {
           return function() {
             let t = new Date();
             self.elements.loadingOverlay.html(
-                x + ' ' + FormatDelta(y.getTime() - t.getTime()));
+                x + ' ' + UI.formatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
@@ -530,7 +506,7 @@ export class Arena {
     let clock = '';
 
     if (now < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() - now);
+      clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -550,7 +526,7 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      clock = FormatDelta(countdownTime.getTime() - now);
+      clock = UI.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }
@@ -1505,7 +1481,7 @@ export class Arena {
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(
-        FormatDelta((contest.window_length * 60000) || duration));
+        UI.formatDelta((contest.window_length * 60000) || duration));
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(Highcharts.dateFormat(
         '%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
