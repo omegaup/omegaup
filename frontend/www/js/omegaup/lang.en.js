@@ -999,7 +999,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsValidator: "Validator",
 	wordsVerdict: "Verdict",
 	wordsVeryEasy: "VeryEasy",
-	wordsVirtual: "Virtual contest",
 	wordsYes: "Yes",
 	youMustOpenBeforeSubmit: "You must open the problem before trying to submit a solution.",
 });

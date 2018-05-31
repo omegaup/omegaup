@@ -999,7 +999,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsValidator: "Validador",
 	wordsVerdict: "Veredicto",
 	wordsVeryEasy: "Muy f\u00e1cil",
-	wordsVirtual: "Concurso virtual",
 	wordsYes: "S\u00ed",
 	youMustOpenBeforeSubmit: "Debes abrir el problema antes de hacer un envio",
 });

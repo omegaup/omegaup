@@ -34,7 +34,7 @@
 					</td>
 					<td class="col-md-2" data-bind="visible: $parent.showVirtual">
 						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
-							<span>{#wordsVirtual#}</span>
+							<span>{#virtualContest#}</span>
 						</a>
 					</td>
 					<td class="no-wrap col-md-2" data-bind="visible: $parent.showPublicUpdated, text: publicUpdateText"></td>
