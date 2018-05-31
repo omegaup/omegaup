@@ -10,7 +10,7 @@
 				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsEndTime#}</th>
 				<th class="col-md-2" data-bind="visible: showTimes">{#wordsDuration#}</th>
 				<th class="col-md-2" data-bind="visible: showPractice" ></th>
-                <th class="col-md-2" data-bind="visible: showVirtual" ></th>
+				<th class="col-md-2" data-bind="visible: showVirtual" ></th>
 				<th class="col-md-2" data-bind="visible: showPublicUpdated" >{#wordsPublicUpdated#}</th>
 			</tr></thead>
 			<tbody data-bind="foreach: page" class="contest-list row">
