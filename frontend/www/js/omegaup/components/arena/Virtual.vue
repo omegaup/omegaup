@@ -39,9 +39,7 @@ import {Arena} from '../../arena/arena.js';
 import DateTimePicker from '../DateTimePicker.vue';
 
 export default {
-  props: {
-    detail: Object
-  },
+  props: {detail: Object},
   data: function() {
     return { T: T, UI: UI, startTime: new Date(), }
   },
@@ -68,11 +66,7 @@ export default {
                              {window_length: Math.floor(submissionsGap / 60)});
     }
   },
-  methods: {
-    onSubmit: function() {
-        this.$emit('submit', this);
-    }
-  },
+  methods: {onSubmit: function() { this.$emit('submit', this);}},
   components: {'omegaup-datetimepicker': DateTimePicker}
 }
 </script>

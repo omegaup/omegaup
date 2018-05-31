@@ -13,19 +13,21 @@ OmegaUp.on('ready', function() {
           el: '#virtual',
           render: function(createElement) {
             return createElement('virtual', {
-                props: {
-                    detail: detail
-                },
-                on: {
-                    submit: function(ev) {
-                        API.Contest.createVirtual({alias: contestAlias,
-                            start_time: ev.startTime.getTime() / 1000})
-                            .then(function(response) {
-                                let virtual_contest_alias = response.alias;
-                                window.location = "/contest/" + virtual_contest_alias + "/edit/";
-                            }).fail(UI.apiError);
-                    }
+              props: {detail: detail},
+              on: {
+                submit: function(ev) {
+                  API.Contest.createVirtual({
+                               alias: contestAlias,
+                               start_time: ev.startTime.getTime() / 1000
+                             })
+                      .then(function(response) {
+                        let virtual_contest_alias = response.alias;
+                        window.location =
+                            '/contest/' + virtual_contest_alias + '/edit/';
+                      })
+                      .fail(UI.apiError);
                 }
+              }
             });
           },
           components: {'virtual': virtual}
