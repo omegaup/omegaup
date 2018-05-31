@@ -2,15 +2,15 @@
   <div class="contest panel">
     <div class="panel-body">
       <div class="text-center">
-        <h2>{{detail.title + ' - ' +
-        T.wordsVirtual}}</h2><span>{{contestDurationString}}</span>
+        <h2>{{UI.formatString(T.virtualTitle, {title:
+        detail.title})}}</h2><span>{{contestDurationString}}</span>
         <form class="form"
               v-on:submit.prevent="onSubmit">
           <div class="row">
             <div class="form-group col-md-4"></div>
             <div class="form-group col-md-4">
-              <label>{{T.contestNewFormStartDate}}</label>
-              <omegaup-datetimepicker v-model="startTime"></omegaup-datetimepicker>
+              <label>{{T.contestNewFormStartDate}}</label> <omegaup-datetimepicker v-model=
+              "startTime"></omegaup-datetimepicker>
             </div>
             <div class="form-group col-md-4"></div>
           </div><button class="btn btn-primary"
@@ -40,37 +40,34 @@ import DateTimePicker from '../DateTimePicker.vue';
 
 export default {
   props: {
-      detail: Object,
-      contestAlias: /\/arena\/([^\/]+)\/virtual/.exec(window.location.pathname)[1]
+    detail: Object,
+    contestAlias: /\/arena\/([^\/]+)\/virtual/.exec(window.location.pathname)[1]
   },
   data: function() {
-    return {
-      T: T,
-      UI: UI,
-      startTime: new Date(),
-    }
+    return { T: T, UI: UI, startTime: new Date(), }
   },
   computed: {
-      contestDurationString: function() {
-          let detail = this.detail;
-          let deltaTime = UI.formatDelta(detail.finish_time - detail.start_time);
-          // convert time to H:i:s
-          let delta = deltaTime.split(":");
+    contestDurationString: function() {
+      let detail = this.detail;
+      let deltaTime = UI.formatDelta(detail.finish_time - detail.start_time);
+      // convert time to H:i:s
+      let delta = deltaTime.split(":");
 
-          return delta[0] + ' ' + T.wordsHours + ' ' + delta[1] + ' ' + T.wordsMinutes + ' ' + delta[2] + ' ' + T.wordsSecond;
-      },
-      scoreboardTimeString: function() {
-          let detail = this.detail;
-          let scoreboard = detail.scoreboard;
-          return UI.formatString(T.contestIntroScoreboardTimePercent,
-            {window_length: scoreboard});
-      },
-      submissionGapString: function() {
-          let detail = this.detail;
-          let submissionsGap = detail.submission_gap;
-          return UI.formatString(T.contestIntroSubmissionsSeparationDesc,
-              {window_length: Math.floor(submissionsGap / 60)});
-      }
+      return delta[0] + ' ' + T.wordsHours + ' ' + delta[1] + ' ' +
+             T.wordsMinutes + ' ' + delta[2] + ' ' + T.wordsSecond;
+    },
+    scoreboardTimeString: function() {
+      let detail = this.detail;
+      let scoreboard = detail.scoreboard;
+      return UI.formatString(T.contestIntroScoreboardTimePercent,
+                             {window_length: scoreboard});
+    },
+    submissionGapString: function() {
+      let detail = this.detail;
+      let submissionsGap = detail.submission_gap;
+      return UI.formatString(T.contestIntroSubmissionsSeparationDesc,
+                             {window_length: Math.floor(submissionsGap / 60)});
+    }
   },
   methods: {
     onSubmit: function() {

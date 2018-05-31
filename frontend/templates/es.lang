@@ -800,6 +800,7 @@ verificationEmailBody = "Bienvenido a omegaUp! Por favor ingresa a la siguiente 
 verificationEmailSubject = "Bienvenido a omegaUp!"
 verificationIdInvalid = "La información de verificación suministrada no es válida."
 virtualContest = "Concurso virtual"
+virtualTitle = "%(title) - Concurso virtual"
 wordAccepted = "Aceptado"
 wordsAccepted = "Resueltos"
 wordsActions = "Acciones"

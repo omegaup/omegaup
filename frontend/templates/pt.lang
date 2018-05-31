@@ -800,6 +800,7 @@ verificationEmailBody = "Bem-vindo ao omegaUp! Por favor, clique no seguinte lin
 verificationEmailSubject = "Bem-vindo ao omegaUp!"
 verificationIdInvalid = "A informação sobre a verificação fornecida não é válido."
 virtualContest = "Concurso virtual"
+virtualTitle = "%(title) - Concurso virtual"
 wordAccepted = "Aceitado"
 wordsAccepted = "Resolvidos"
 wordsActions = "Ações"
