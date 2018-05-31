@@ -390,7 +390,7 @@ def _get_browser(request, browser_name):
 @pytest.yield_fixture(scope='session')
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
-
+    print(browser_name)
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,

@@ -40,20 +40,21 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
         driver.wait_for_page_loaded()
 
 
-def no_javascript_errors(f, *, path_whitelist=(), message_whitelist=()):
+def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
     '''Decorator for javascript errors'''
-    @functools.wraps
-    def wrapper(driver, *args, **kwargs):
-        '''Wrapper for javascript errors'''
-        with assert_no_javascript_errors(driver, path_whitelist=path_whitelist,
-                                         message_whitelist=message_whitelist):
-            return f(driver, *args, **kwargs)
-    return wrapper
+    def _internal(f):
+        @functools.wraps(f)
+        def _wrapper(driver, *args, **kwargs):
+            '''Wrapper for javascript errors'''
+            with assert_no_js_errors(driver, path_whitelist=path_whitelist,
+                                     message_whitelist=message_whitelist):
+                return f(driver, *args, **kwargs)
+        return _wrapper
+    return _internal
 
 
 @contextlib.contextmanager
-def assert_no_javascript_errors(driver, *, path_whitelist=(),
-                                message_whitelist=()):
+def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     '''Shows in a list unexpected errors in javascript console'''
     previous_logs = get_console_logs(driver, path_whitelist, message_whitelist)
     try:

@@ -13,32 +13,32 @@ import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
-    with util.assert_no_javascript_errors(driver):
-        username = 'unittest_user_%s' % driver.generate_id()
-        password = 'p@ssw0rd'
-        driver.register_user(username, password)
+    username = 'unittest_user_%s' % driver.generate_id()
+    password = 'p@ssw0rd'
+    driver.register_user(username, password)
 
-        with driver.login(username, password):
-            pass
+    with driver.login(username, password):
+        pass
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
-    with util.assert_no_javascript_errors(driver):
-        with driver.login_user():
-            pass
+    with driver.login_user():
+        pass
 
-        with driver.login_admin():
-            pass
+    with driver.login_admin():
+        pass
 
 
 @flaky
-@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',),
+@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
                            message_whitelist=('/api/problem/details/',))
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
