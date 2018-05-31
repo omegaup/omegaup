@@ -46,12 +46,7 @@ export default {
   computed: {
     contestDurationString: function() {
       let detail = this.detail;
-      let deltaTime = UI.formatDelta(detail.finish_time - detail.start_time);
-      // convert time to H:i:s
-      let delta = deltaTime.split(":");
-
-      return delta[0] + ' ' + T.wordsHours + ' ' + delta[1] + ' ' +
-             T.wordsMinutes + ' ' + delta[2] + ' ' + T.wordsSecond;
+      return UI.formatDelta(detail.finish_time - detail.start_time);
     },
     scoreboardTimeString: function() {
       let detail = this.detail;

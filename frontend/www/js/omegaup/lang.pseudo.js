@@ -972,7 +972,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsSaveChanges: "(Sav3 chang35)",
 	wordsScoreboard: "(Sc0r3b0ard)",
 	wordsSearch: "(S3arch)",
-	wordsSecond: "(53c0nd)",
 	wordsSelectFilter: "(S313c7 a fi173r)",
 	wordsSend: "(S3nd)",
 	wordsShowSiteAdmins: "(Sh0w 5i73-admin5)",

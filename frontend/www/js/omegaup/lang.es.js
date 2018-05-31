@@ -972,7 +972,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsSaveChanges: "Guardar cambios",
 	wordsScoreboard: "Lista de estudiantes",
 	wordsSearch: "Buscar",
-	wordsSecond: "segundos",
 	wordsSelectFilter: "Selecciona un filtro",
 	wordsSend: "Enviar",
 	wordsShowSiteAdmins: "Mostrar site-admins",

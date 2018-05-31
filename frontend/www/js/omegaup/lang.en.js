@@ -972,7 +972,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsSaveChanges: "Save changes",
 	wordsScoreboard: "Scoreboard",
 	wordsSearch: "Search",
-	wordsSecond: "second",
 	wordsSelectFilter: "Select a filter",
 	wordsSend: "Send",
 	wordsShowSiteAdmins: "Show site-admins",
