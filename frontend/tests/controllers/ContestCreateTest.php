@@ -152,7 +152,8 @@ class CreateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Public contest with problems is valid.
+     * Public contest with problems NOW is NOT valid. You need
+     * to create the contest first and then, you can add problems
      */
     public function testCreatePublicContestWithProblems() {
         $problem = ProblemsFactory::createProblem();
@@ -185,11 +186,7 @@ class CreateContestTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
         $response = ContestController::apiProblems($r);
-        $this->assertEquals(1, count($response['problems']));
-        $this->assertEquals(
-            $problem['problem']->alias,
-            $response['problems'][0]['alias']
-        );
+        $this->assertEquals(0, count($response['problems']));
     }
 
     /**

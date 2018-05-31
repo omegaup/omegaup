@@ -261,4 +261,16 @@ class UserFactory {
             'group_id' => $support_group->group_id,
         ]));
     }
+
+    /**
+     * creates privacy statement
+     * @param $type
+     * @return Boolean
+     */
+    public static function createPrivacyStatement($type = 'privacy_policy') {
+        return PrivacyStatementsDAO::save(new PrivacyStatements([
+            'git_object_id' => Utils::CreateRandomString(),
+            'type' => $type,
+        ]));
+    }
 }
