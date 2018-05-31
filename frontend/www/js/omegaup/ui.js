@@ -10,27 +10,27 @@ let UI = {
   },
 
   formatDelta: function(delta) {
-      let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-      delta -= days * (24 * 60 * 60 * 1000);
-      let hours = Math.floor(delta / (60 * 60 * 1000));
-      delta -= hours * (60 * 60 * 1000);
-      let minutes = Math.floor(delta / (60 * 1000));
-      delta -= minutes * (60 * 1000);
-      let seconds = Math.floor(delta / 1000);
+    let days = Math.floor(delta / (24 * 60 * 60 * 1000));
+    delta -= days * (24 * 60 * 60 * 1000);
+    let hours = Math.floor(delta / (60 * 60 * 1000));
+    delta -= hours * (60 * 60 * 1000);
+    let minutes = Math.floor(delta / (60 * 1000));
+    delta -= minutes * (60 * 1000);
+    let seconds = Math.floor(delta / 1000);
 
-      let clock = '';
+    let clock = '';
 
-      if (days > 0) {
-        clock += days + ':';
-      }
-      if (hours < 10) clock += '0';
-      clock += hours + ':';
-      if (minutes < 10) clock += '0';
-      clock += minutes + ':';
-      if (seconds < 10) clock += '0';
-      clock += seconds;
+    if (days > 0) {
+      clock += days + ':';
+    }
+    if (hours < 10) clock += '0';
+    clock += hours + ':';
+    if (minutes < 10) clock += '0';
+    clock += minutes + ':';
+    if (seconds < 10) clock += '0';
+    clock += seconds;
 
-      return clock;
+    return clock;
   },
 
   formatString: function(template, values) {
