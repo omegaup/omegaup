@@ -12,7 +12,6 @@ include('base/Submission_Log.vo.base.php');
 class SubmissionLogDAO extends SubmissionLogDAOBase {
     public static function GetSubmissionsForProblemset($problemset_id) {
         $sql = 'SELECT
-                    i.user_id,
                     i.username,
                     p.alias,
                     sl.ip,
@@ -58,7 +57,6 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
 
     final public static function GetSubmissionsForCourse($course_id) {
         $sql = 'SELECT
-                    i.user_id,
                     i.username,
                     p.alias,
                     sl.ip,
