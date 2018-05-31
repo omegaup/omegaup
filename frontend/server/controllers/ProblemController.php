@@ -1359,7 +1359,7 @@ class ProblemController extends Controller {
             $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
         }
 
-        if (!is_null($r['current_user_id'])) {
+        if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
                 $r['current_identity_id'],
                 $r['problem']->problem_id

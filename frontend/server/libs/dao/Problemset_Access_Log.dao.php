@@ -12,7 +12,6 @@ include('base/Problemset_Access_Log.vo.base.php');
 class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
     public static function GetAccessForProblemset($problemset_id) {
         $sql = 'SELECT
-                    i.user_id,
                     i.username,
                     pal.ip,
                     UNIX_TIMESTAMP(pal.time) AS `time`,
@@ -48,7 +47,6 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
 
     final public static function GetAccessForCourse($course_id) {
         $sql = 'SELECT
-                    i.user_id,
                     i.username,
                     pal.ip,
                     UNIX_TIMESTAMP(pal.time) AS `time`
