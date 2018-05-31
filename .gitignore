@@ -47,6 +47,7 @@ yarn-error.log
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
 frontend/tests/controllers/img/
+frontend/tests/controllers/grade/
 frontend/tests/ui/results/
 omegaup_test.log
 

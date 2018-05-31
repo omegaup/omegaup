@@ -269,7 +269,7 @@ class RunController extends Controller {
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
                             $problemset_id,
                             $r['problem']->problem_id,
-                            $r['current_user_id']
+                            $r['current_identity_id']
                         );
 
                         if (is_null($opened)) {
@@ -617,11 +617,13 @@ class RunController extends Controller {
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
         $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
+        $showDetails = $response['admin'] ||
+            ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
-        // Get the error
+        // Get the details and/or compile error.
         $grade_dir = RunController::getGradePath($r['run']);
         $details = null;
-        if (($response['admin'] || $r['run']->verdict == 'CE') &&
+        if (($showDetails || $r['run']->verdict == 'CE') &&
             file_exists("$grade_dir/details.json")) {
             $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
         }
@@ -630,17 +632,17 @@ class RunController extends Controller {
         } elseif (file_exists("$grade_dir/compile_error.log")) {
             $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
         }
+        if ($showDetails && !is_null($details)) {
+            if (count(array_filter(array_keys($details), 'is_string')) > 0) {
+                $response['details'] = $details;
+            } else {
+                // TODO(lhchavez): Remove this backwards-compatibility shim
+                // with backendv1.
+                $response['groups'] = $details;
+            }
+        }
 
         if ($response['admin']) {
-            if (!is_null($details)) {
-                if (count(array_filter(array_keys($details), 'is_string')) > 0) {
-                    $response['details'] = $details;
-                } else {
-                    // TODO(lhchavez): Remove this backwards-compatibility shim
-                    // with backendv1.
-                    $response['groups'] = $details;
-                }
-            }
             if (file_exists("$grade_dir/logs.txt.gz")) {
                 $response['logs'] = file_get_contents("compress.zlib://$grade_dir/logs.txt.gz");
             } elseif (file_exists("$grade_dir/run.log")) {
