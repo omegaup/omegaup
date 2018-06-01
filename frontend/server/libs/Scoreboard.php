@@ -23,6 +23,7 @@ class ScoreboardParams implements ArrayAccess {
         ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, false);
         ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
         ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter('unique', $params, false /*is_required*/, true);
 
         // Convert any string dates into timestamps.
         foreach (['start_time', 'finish_time'] as $time_param) {
@@ -714,11 +715,11 @@ class Scoreboard {
 
             $problem_data = &$identity_problems_score[$identity_id][$problem_id];
 
-            if ($problem_data['points'] >= $contest_score) {
+            if ($problem_data['points'] >= $contest_score and $params['unique']) {
                 continue;
             }
 
-            $problem_data['points'] = round((float) $contest_score, 2);
+            $problem_data['points'] = max($problem_data['points'], round((float) $contest_score, 2));
             $problem_data['penalty'] = 0;
 
             $identity = &$contest_identities[$identity_id];

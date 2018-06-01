@@ -833,12 +833,10 @@ class ContestController extends Controller {
     }
 
     public static function apiCreateVirtual(Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -1713,7 +1711,8 @@ class ContestController extends Controller {
         self::validateDetails($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
+        $params['show_all_runs'] = (Authorization::isContestAdmin($r['current_identity_id'], $r['contest']) and !ContestsDAO::isVirtual($r['contest']));
+        $params['unique'] = !ContestsDAO::isVirtual($r['contest']);
         $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
