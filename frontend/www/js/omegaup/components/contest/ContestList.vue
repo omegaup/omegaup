@@ -37,7 +37,7 @@
           <th>{{ T.wordsTitle }}</th>
           <th>{{ T.arenaPracticeStartTime }}</th>
           <th>{{ T.arenaPracticeEndtime }}</th>
-          <th v-if="isAdmin">{{ T.contestNewFormModality }}</th>
+          <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
           <th colspan="2"
               v-if="isAdmin">Scoreboard</th>
           <th v-if="isAdmin"></th>

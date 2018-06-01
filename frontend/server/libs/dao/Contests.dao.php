@@ -401,7 +401,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Contests
             WHERE
                 $recommended_check  AND $end_check AND $query_check
-                AND `admission_mode` = 'public'
+                AND `admission_mode` != 'private'
             ORDER BY
                 `last_updated` DESC,
                 `recommended` DESC,

@@ -130,9 +130,8 @@ class CreateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Public contest without problems is not valid.
+     * Public contest without problems NOW is valid.
      *
-     * @expectedException InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
@@ -149,6 +148,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Call the API
         $response = ContestController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
     }
 
     /**

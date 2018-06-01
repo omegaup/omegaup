@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
             fillContestsTable();
           },
           'bulk-update':
-              (admission_mode) => this.changeModality(admission_mode),
+              (admission_mode) => this.changeAdmissionMode(admission_mode),
         }
       });
     },
@@ -45,10 +45,10 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      changeModality: function(admission_mode) {
+      changeAdmissionMode: function(admissionMode) {
         UI.bulkOperation(function(alias, resolve, reject) {
           API.Contest
-              .update({contest_alias: alias, 'admission_mode': admission_mode})
+              .update({contest_alias: alias, 'admission_mode': admissionMode})
               .then(resolve)
               .fail(reject);
         }, fillContestsTable);

@@ -83,14 +83,14 @@ class ContestLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(20)
+      * @var enum('private','registration','public')
       */
     public $from_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(20)
+      * @var enum('private','registration','public')
       */
     public $to_admission_mode;
 

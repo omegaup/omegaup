@@ -8,7 +8,7 @@
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#edit" data-toggle="tab">{#contestEdit#}</a></li>
 	<li><a href="#problems" data-toggle="tab">{#wordsAddProblem#}</a></li>
-	<li><a href="#publish" data-toggle="tab">{#contestNewFormModality#}</a></li>
+	<li><a href="#publish" data-toggle="tab">{#contestNewFormAdmissionMode#}</a></li>
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
@@ -32,16 +32,16 @@
 
 					<div class="form-group">
 						<label for="points">{#contestAddproblemProblemPoints#}</label>
-						<input id='points' name='points' size="3" value="100" class="form-control" />
+						<input id="points" name="points" size="3" value="100" class="form-control" />
 					</div>
 
 					<div class="form-group">
 						<label for="order">{#contestAddproblemContestOrder#}</label>
-						<input id='order' name='order' value='1' size="2" class="form-control" />
+						<input id="order" name="order" value="1" size="2" class="form-control" />
 					</div>
 
 					<div class="form-group">
-						<input id='' name='request' value='submit' type='hidden'>
+						<input id="" name="request" value="submit" type="hidden">
 						<button type="submit" class="btn btn-primary">{#wordsAddProblem#}</button>
 					</div>
 				</form>
@@ -59,18 +59,18 @@
 		</div>
 	</div>
 
-	<div class='tab-pane' id='publish'>
+	<div class="tab-pane" id="publish">
 		<div class="panel panel-primary">
-			<div class='panel-body'>
-				<form class='contest-publish-form'>
+			<div class="panel-body">
+				<form class="contest-publish-form">
 					<div class="form-group">
-						<label for="public">{#contestNewFormModality#}</label>
-						<select name='admission_mode' id='admission_mode' class="form-control">
-							<option value='private' selected="selected">{#wordsPrivate#}</option>
-							<option value='registration'>{#wordsRegistration#}</option>
-							<option value='public'>{#wordsPublic#}</option>
+						<label for="admission_mode">{#contestNewFormAdmissionMode#}</label>
+						<select name="admission_mode" id="admission_mode" class="form-control">
+							<option value="private" selected="selected">{#wordsPrivate#}</option>
+							<option value="registration">{#wordsRegistration#}</option>
+							<option value="public">{#wordsPublic#}</option>
 						</select>
-						<p class="help-block">{#contestNewFormModalityDesc#}</p>
+						<p class="help-block">{#contestNewFormAdmissionModeDescription#}</p>
 					</div>
 
 					<button class="btn btn-primary" type="submit">{#wordsSaveChanges#}</button>

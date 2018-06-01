@@ -48,13 +48,19 @@ class ContestController extends Controller {
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
-            $public = $r['admission_mode'] == 'public'; #self::isPublic($r['admission_mode']);
+            Validators::isInEnum($r['admission_mode'], 'admission_mode', [
+                'public',
+                'private',
+                'registration'
+            ], false);
+
+            // admission mode status in contest is public
+            $public = isset($r['admission_mode'])
+                ? self::isPublic($r['admission_mode'])
+                : false;
 
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
-            }
-            if (is_null($public)) {
-                throw new InvalidParameterException('parameterInvalid', 'admission_mode');
             }
             $query = $r['query'];
             Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
@@ -72,7 +78,7 @@ class ContestController extends Controller {
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
                 $contests = ContestsDAO::getContestsParticipating($r['current_identity_id'], $page, $page_size, $query);
-            } elseif ($public == PublicStatus::YES) {
+            } elseif ($public) {
                 $contests = ContestsDAO::getRecentPublicContests($r['current_identity_id'], $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r['current_identity_id'])) {
                 // Get all contests
@@ -292,14 +298,15 @@ class ContestController extends Controller {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
             }
-        } else {
-            if ($r['contest']->admission_mode == 'registration') {
-                if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
-                    $req = ProblemsetIdentityRequestDAO::getByPK($r['current_identity_id'], $r['contest']->problemset_id);
-                    if (is_null($req) || ($req->accepted === '0')) {
-                        throw new ForbiddenAccessException('contestNotRegistered');
-                    }
-                }
+        } elseif ($r['contest']->admission_mode == 'registration' &&
+            !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])
+        ) {
+            $req = ProblemsetIdentityRequestDAO::getByPK(
+                $r['current_identity_id'],
+                $r['contest']->problemset_id
+            );
+            if (is_null($req) || ($req->accepted === '0')) {
+                throw new ForbiddenAccessException('contestNotRegistered');
             }
         }
     }
@@ -479,7 +486,6 @@ class ContestController extends Controller {
         $result = $r['contest']->asFilteredArray($relevant_columns);
 
         $current_ses = SessionController::getCurrentSession($r);
-        $result['admission_mode'] = $result['admission_mode'];
 
         if ($current_ses['valid'] && $result['admission_mode'] == 'registration') {
             $registration = ProblemsetIdentityRequestDAO::getByPK($current_ses['identity']->identity_id, $r['contest']->problemset_id);
@@ -998,10 +1004,6 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
         } else {
             $contest->show_scoreboard_after = '1';
-        }
-
-        if (self::isPublic($contest->admission_mode) && is_null($r['problems'])) {
-            throw new InvalidParameterException('contestPublicRequiresProblem');
         }
 
         $problemset = new Problemsets([
