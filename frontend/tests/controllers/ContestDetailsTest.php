@@ -97,7 +97,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Assert the log is empty.
         $this->assertEquals(0, count(ProblemsetAccessLogDAO::search([
             'problemset_id' => $contestData['contest']->problemset_id,
-            'user_id' => $contestant->user_id,
+            'identity_id' => $contestant->main_identity_id,
         ])));
 
         // Prepare our request
@@ -118,7 +118,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Assert the log is not empty.
         $this->assertEquals(1, count(ProblemsetAccessLogDAO::search([
             'problemset_id' => $contestData['contest']->problemset_id,
-            'user_id' => $contestant->user_id,
+            'identity_id' => $contestant->main_identity_id,
         ])));
     }
 

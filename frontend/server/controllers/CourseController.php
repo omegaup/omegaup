@@ -1483,7 +1483,7 @@ class CourseController extends Controller {
         }
         // Log the operation.
         ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
-            'user_id' => $r['current_user_id'],
+            'identity_id' => $r['current_identity_id'],
             'problemset_id' => $r['assignment']->problemset_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
