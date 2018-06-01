@@ -833,9 +833,12 @@ class ContestController extends Controller {
     }
 
     public static function apiCreateVirtual(Request $r) {
+        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
+
+        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 

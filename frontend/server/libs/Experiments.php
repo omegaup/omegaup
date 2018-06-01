@@ -38,7 +38,9 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
+    const VIRTUAL = 'virtual';
     private static $kKnownExperiments = [
+        self::VIRTUAL
     ];
 
     /**
