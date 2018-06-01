@@ -1243,8 +1243,12 @@ export class Arena {
     let self = this;
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
+
     statement.innerHTML =
         self.markdownConverter.makeHtml(problem.problem_statement);
+
+    UI.renderSampleToClipboardButton();
+
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
     if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
@@ -1403,7 +1407,12 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        if (file.size >= 10 * 1024) {
+        // TODO(https://github.com/omegaup/omegaup/issues/1962): Remove.
+        if ((extension == 'kp' || extension == 'kj') &&
+            file.size >= 20 * 1024) {
+          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '20kB'}));
+          return false;
+        } else if (file.size >= 10 * 1024) {
           alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
           return false;
         }
@@ -1573,6 +1582,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
+      language: data.language,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

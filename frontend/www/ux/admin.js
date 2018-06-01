@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
             if (!omegaup.OmegaUp.loggedIn) {
               window.location = '/login/?redirect=' + escape(window.location);
             } else {
-              $('#loading').html('404');
+              window.location = '/';
             }
             return;
           } else if (arena.options.isPractice && contest.finish_time &&
@@ -103,7 +103,7 @@ omegaup.OmegaUp.on('ready', function() {
           if (!omegaup.OmegaUp.loggedIn) {
             window.location = '/login/?redirect=' + escape(window.location);
           } else {
-            $('#loading').html('404');
+            window.location = '/';
           }
         });
   }

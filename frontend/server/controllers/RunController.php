@@ -140,7 +140,7 @@ class RunController extends Controller {
                         null,
                         null,
                         $r['problem']->problem_id,
-                        $r['current_user_id']
+                        $r['current_identity_id']
                     )
                             && !Authorization::isSystemAdmin($r['current_identity_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
@@ -206,7 +206,7 @@ class RunController extends Controller {
                     $problemset_id,
                     isset($r['contest']) ? $r['contest'] : null,
                     $r['problem']->problem_id,
-                    $r['current_user_id']
+                    $r['current_identity_id']
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
                 }
@@ -269,7 +269,7 @@ class RunController extends Controller {
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
                             $problemset_id,
                             $r['problem']->problem_id,
-                            $r['current_user_id']
+                            $r['current_identity_id']
                         );
 
                         if (is_null($opened)) {
@@ -310,7 +310,7 @@ class RunController extends Controller {
 
         // Populate new run object
         $run = new Runs([
-                    'user_id' => $r['current_user_id'],
+                    'identity_id' => $r['current_identity_id'],
                     'problem_id' => $r['problem']->problem_id,
                     'problemset_id' => $problemset_id,
                     'language' => $r['language'],
@@ -333,7 +333,7 @@ class RunController extends Controller {
             RunsDAO::save($run);
 
             SubmissionLogDAO::save(new SubmissionLog([
-                'user_id' => $run->user_id,
+                'user_id' => $r['current_user_id'],
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
@@ -490,7 +490,7 @@ class RunController extends Controller {
         if ($filtered['contest_score'] != null) {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
-        if ($r['run']->user_id == $r['current_user_id']) {
+        if ($r['run']->identity_id == $r['current_identity_id']) {
             $filtered['username'] = $r['current_user']->username;
         }
 
@@ -617,11 +617,13 @@ class RunController extends Controller {
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
         $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
+        $showDetails = $response['admin'] ||
+            ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
-        // Get the error
+        // Get the details and/or compile error.
         $grade_dir = RunController::getGradePath($r['run']);
         $details = null;
-        if (($response['admin'] || $r['run']->verdict == 'CE') &&
+        if (($showDetails || $r['run']->verdict == 'CE') &&
             file_exists("$grade_dir/details.json")) {
             $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
         }
@@ -630,17 +632,17 @@ class RunController extends Controller {
         } elseif (file_exists("$grade_dir/compile_error.log")) {
             $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
         }
+        if ($showDetails && !is_null($details)) {
+            if (count(array_filter(array_keys($details), 'is_string')) > 0) {
+                $response['details'] = $details;
+            } else {
+                // TODO(lhchavez): Remove this backwards-compatibility shim
+                // with backendv1.
+                $response['groups'] = $details;
+            }
+        }
 
         if ($response['admin']) {
-            if (!is_null($details)) {
-                if (count(array_filter(array_keys($details), 'is_string')) > 0) {
-                    $response['details'] = $details;
-                } else {
-                    // TODO(lhchavez): Remove this backwards-compatibility shim
-                    // with backendv1.
-                    $response['groups'] = $details;
-                }
-            }
             if (file_exists("$grade_dir/logs.txt.gz")) {
                 $response['logs'] = file_get_contents("compress.zlib://$grade_dir/logs.txt.gz");
             } elseif (file_exists("$grade_dir/run.log")) {
@@ -906,11 +908,11 @@ class RunController extends Controller {
         // Get user if we have something in username
         if (!is_null($r['username'])) {
             try {
-                $r['user'] = UserController::resolveUser($r['username']);
+                $r['identity'] = IdentityController::resolveIdentity($r['username']);
             } catch (NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;
-                $r['user'] = null;
+                $r['identity'] = null;
             }
         }
     }
@@ -934,7 +936,7 @@ class RunController extends Controller {
                 $r['verdict'],
                 !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->user_id : null,
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
                 $r['offset'],
                 $r['rowcount']
             );

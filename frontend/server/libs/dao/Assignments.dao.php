@@ -11,13 +11,26 @@ include('base/Assignments.vo.base.php');
   *
   */
 class AssignmentsDAO extends AssignmentsDAOBase {
-    public static function GetProblemset($courseId, $assignmentAlias) {
-        $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ? and a.course_id = ?;';
-        $params = [$assignmentAlias, $courseId];
-
+    public static function GetProblemset($courseId, $assignmentAlias = null) {
+        $sql = 'SELECT
+                    p.*
+                FROM
+                    Assignments a
+                INNER JOIN
+                    Problemsets p
+                ON
+                    a.problemset_id = p.problemset_id
+                WHERE
+                    a.course_id = ?';
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $params = [$courseId];
+        if (is_null($assignmentAlias)) {
+            return $conn->GetAll($sql, $params);
+        }
+        $sql .= ' AND a.alias = ?';
+        $params[] = $assignmentAlias;
 
+        $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }

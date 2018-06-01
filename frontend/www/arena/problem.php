@@ -12,7 +12,7 @@ try {
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
-            $session['user']
+            $session['identity']
         );
     } else {
         $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissed' => false];
