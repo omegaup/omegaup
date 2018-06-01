@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
             fillContestsTable();
           },
           'bulk-update':
-              (admission_mode) => this.changeAdmissionMode(admission_mode),
+              (admissionMode) => this.changeAdmissionMode(admissionMode),
         }
       });
     },

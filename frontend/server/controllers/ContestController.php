@@ -1006,6 +1006,10 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = '1';
         }
 
+        if ($r['admission_mode'] == 'public' && is_null($r['problems'])) {
+            throw new InvalidParameterException('contestPublicRequiresProblem');
+        }
+
         $problemset = new Problemsets([
             'needs_basic_information' => $r['needs_basic_information'] == 'true',
             'requests_user_information' => $r['requests_user_information']

@@ -125,8 +125,8 @@ export default {
       return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
              date.toISOString();
     },
-    onBulkUpdate: function(admission_mode) {
-      this.$emit('bulk-update', admission_mode);
+    onBulkUpdate: function(admissionMode) {
+      this.$emit('bulk-update', admissionMode);
     },
     onShowAdmin: function() {
       this.$emit('toggle-show-admin',

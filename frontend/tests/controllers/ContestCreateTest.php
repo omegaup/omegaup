@@ -130,8 +130,9 @@ class CreateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Public contest without problems NOW is valid.
+     * Public contest without problems is not valid.
      *
+     * @expectedException InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
