@@ -810,4 +810,62 @@ class RunCreateTest extends OmegaupTestCase {
              'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
         ]));
     }
+
+    /**
+     * User can send runs and view details of it after they have solved it.
+     */
+    public function testRunDetailsAfterSolving() {
+        // Create public problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Create contestant
+        $contestant = UserFactory::createUser();
+
+        $login = self::login($contestant);
+        $waRunData = RunsFactory::createRunToProblem($problemData, $contestant, $login);
+        RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
+
+        // Contestant should be able to view run (but not the run details).
+        $this->assertFalse(Authorization::isProblemAdmin(
+            $contestant->main_identity_id,
+            $problemData['problem']
+        ));
+        $response = RunController::apiDetails(new Request([
+            'run_alias' => $waRunData['response']['guid'],
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertFalse(array_key_exists('details', $response));
+
+        $acRunData = RunsFactory::createRunToProblem($problemData, $contestant, $login);
+        RunsFactory::gradeRun($acRunData, 1, 'AC', 65);
+
+        // Contestant should be able to view run and details after solving it.
+        $response = RunController::apiDetails(new Request([
+            'run_alias' => $acRunData['response']['guid'],
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertTrue(array_key_exists('details', $response));
+        $response = RunController::apiDetails(new Request([
+            'run_alias' => $waRunData['response']['guid'],
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertTrue(array_key_exists('details', $response));
+
+        // But having solved a problem does not grant permission to view
+        // details to runs that the user would otherwise not had permission to
+        // view.
+        $contestant2 = UserFactory::createUser();
+        $login2 = self::login($contestant2);
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant2, $login2);
+        RunsFactory::gradeRun($runData, 1, 'AC', 30);
+        try {
+            RunController::apiDetails(new Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('User should not have been able to view another users\' run details');
+        } catch (ForbiddenAccessException $e) {
+            // OK
+        }
+    }
 }

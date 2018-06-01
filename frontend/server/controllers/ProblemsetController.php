@@ -74,7 +74,7 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         ProblemsetController::validateDetails($r);
 
-        if ($r['problemset']['type'] == 'Contest') {
+        if (!is_null($r['problemset']->contest_id)) {
             return ContestController::apiDetails(
                 new Request([
                     'contest_alias' => $r['problemset']['contest_alias']
@@ -105,25 +105,22 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $response = ProblemsetController::validateDetails($r);
 
-        if ($r['problemset']['type'] == 'Contest') {
-            $scoreboard = ContestController::apiScoreboard(
+        if (!is_null($r['problemset']->contest_id)) {
+            return ContestController::apiScoreboard(
                 new Request([
                     'contest_alias' => $response['contest']->alias
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Assignment') {
-            $scoreboard = CourseController::apiAssignmentScoreboard(
+        }
+        if ($r['problemset']['type'] == 'Assignment') {
+            return CourseController::apiAssignmentScoreboard(
                 new Request([
                     'course_alias' => $r['problemset']['course'],
                     'assignment_alias' => $r['problemset']['assignment'],
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Interview') {
-            // There in no scoreboard for interviews yet
-            return [];
         }
-
-        return $scoreboard;
+        return [];
     }
 
     /**
@@ -138,21 +135,23 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $response = ProblemsetController::validateDetails($r);
 
-        if ($r['problemset']['type'] != 'Contest') {
+        if (!is_null($r['problemset']->contest_id)) {
             // Not implemented in courses nor interviews yet
             return ['events' => []];
-        } else {
-            $scoreboardEvents = ContestController::apiScoreboardEvents(
-                new Request([
-                    'contest_alias' => $response['contest']->alias
-                ])
-            );
         }
-        return $scoreboardEvents;
+        return ContestController::apiScoreboardEvents(
+            new Request([
+                'contest_alias' => $response['contest']->alias
+            ])
+        );
     }
 
     /**
      * @param Request $r
+     * $r['tokens'][0] = invalid filter
+     * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
+     * $r['tokens'][2] = Id of entity ($tokens[2])
+     * $r['tokens'][3] = Token given by the filter
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
@@ -160,7 +159,7 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
 
         try {
-            $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
+            $r['problemset'] = ProblemsetsDAO::getByPK($r['problemset_id']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -169,10 +168,10 @@ class ProblemsetController extends Controller {
         if (is_null($r['problemset'])) {
             throw new NotFoundException('problemsetNotFound');
         }
-        if ($r['problemset']['type'] == 'Contest') {
+        if (!is_null($r['problemset']->contest_id)) {
             $request = new Request([
                 'problemset_id' => $r['problemset_id'],
-                'parent_id' => $r['problemset']['parent_id'],
+                'contest_id' => $r['problemset']->contest_id,
             ]);
             if (isset($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];

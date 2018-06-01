@@ -64,20 +64,4 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
         return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
     }
-
-    public static function getWithTypeByPK($problemset_id) {
-        $sql = 'SELECT
-                    type,
-                    parent_id
-                FROM
-                    Problemsets p
-                WHERE
-                    p.problemset_id = ?
-                LIMIT
-                    1;';
-        $params = [$problemset_id];
-
-        global $conn;
-        return $conn->GetRow($sql, $params);
-    }
 }

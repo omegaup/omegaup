@@ -97,30 +97,42 @@ class Session(object):
         return result
 
 
-def _process_one_request(s, request, now):
-    '''Invokes a single request specified in |request|.'''
-    # First try to see if the resource has already been created.
+def _does_resource_exist(s, request):
+    '''Returns whether a resource already exist.'''
     if request['api'] == '/problem/create':
         if s.request('/problem/details/',
                      {'problem_alias':
                       request['params']['problem_alias']}):
             logging.warning('Problem %s exists, skipping',
                             request['params']['problem_alias'])
-            return
+            return True
     if request['api'] == '/contest/create':
         if s.request('/contest/adminDetails/',
                      {'contest_alias':
                       request['params']['alias']}):
             logging.warning('Contest %s exists, skipping',
                             request['params']['alias'])
-            return
+            return True
+    if request['api'] == '/course/create':
+        if s.request('/course/adminDetails/',
+                     {'alias': request['params']['alias']}):
+            logging.warning('Course %s exists, skipping',
+                            request['params']['alias'])
+            return True
     if request['api'] == '/user/create':
         if s.request('/user/profile',
                      {'username':
                       request['params']['username']}):
             logging.warning('User %s exists, skipping',
                             request['params']['username'])
-            return
+            return True
+    return False
+
+
+def _process_one_request(s, request, now):
+    '''Invokes a single request specified in |request|.'''
+    if _does_resource_exist(s, request):
+        return
     # Date parameters need some special handling
     for key, val in request['params'].items():
         if isinstance(val, str) and val.startswith('$NOW$'):
@@ -136,12 +148,15 @@ def _process_one_request(s, request, now):
         request['api'], data=request['params'],
         files=(request['files'] if 'files' in request else None))
     fail_ok = 'fail_ok' in request and request['fail_ok']
-    if result['status'] != 'ok':
+    status = 'error'
+    if result and 'status' in result:
+        status = result['status']
+    if status != 'ok':
         if fail_ok:
             logging.warning('Request %r failed, continuing. '
                             'Result is %r', request, result)
         else:
-            assert result['status'] == 'ok', (request, result)
+            assert status == 'ok', (request, result)
 
 
 def _run_script(path, args, now):

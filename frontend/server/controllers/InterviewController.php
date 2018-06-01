@@ -48,8 +48,8 @@ class InterviewController extends Controller {
             $interview->problemset_id = $problemset->problemset_id;
             InterviewsDAO::save($interview);
 
-            // Update parent_id in problemset object
-            $problemset->parent_id = $interview->interview_id;
+            // Update interview_id in problemset object
+            $problemset->interview_id = $interview->interview_id;
             ProblemsetsDAO::save($problemset);
 
             InterviewsDAO::transEnd();

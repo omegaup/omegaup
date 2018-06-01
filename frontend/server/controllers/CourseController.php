@@ -376,8 +376,8 @@ class CourseController extends Controller {
 
             AssignmentsDAO::save($assignment);
 
-            // Update parent_id in problemset object
-            $problemset->parent_id = $assignment->assignment_id;
+            // Update assignment_id in problemset object
+            $problemset->assignment_id = $assignment->assignment_id;
             ProblemsetsDAO::save($problemset);
 
             AssignmentsDAO::transEnd();
@@ -1489,7 +1489,7 @@ class CourseController extends Controller {
         }
         // Log the operation.
         ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
-            'user_id' => $r['current_user_id'],
+            'identity_id' => $r['current_identity_id'],
             'problemset_id' => $r['assignment']->problemset_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));

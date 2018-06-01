@@ -140,7 +140,7 @@ CREATE TABLE `Contests` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
   `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizó de privado a público un concurso o viceversa',
   `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
-  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
+  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
@@ -426,13 +426,13 @@ CREATE TABLE `Problem_Of_The_Week` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problem_Viewed` (
   `problem_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `view_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`problem_id`,`user_id`),
+  PRIMARY KEY (`problem_id`,`identity_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `user_id` (`user_id`),
+  KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_pv_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pv_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_pvi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de vistas de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -516,13 +516,13 @@ CREATE TABLE `Problems_Tags` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Problemset_Access_Log` (
   `problemset_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `ip` int(10) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `problemset_id` (`problemset_id`),
-  KEY `fk_palu_user_id` (`user_id`),
+  KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_palc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_palu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_pali_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a listas de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -578,15 +578,15 @@ CREATE TABLE `Problemset_Identity_Request_History` (
 CREATE TABLE `Problemset_Problem_Opened` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `open_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`problemset_id`,`problem_id`,`user_id`),
+  PRIMARY KEY (`problemset_id`,`problem_id`,`identity_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `user_id` (`user_id`),
   KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_ppo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ppo_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ppo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_ppoi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Registro de primer acceso a problemas de un conjunto.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -614,9 +614,18 @@ CREATE TABLE `Problemsets` (
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `type` enum('Contest','Assignment','Interview') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
-  `parent_id` int(11) DEFAULT NULL,
+  `contest_id` int(11) DEFAULT NULL COMMENT 'Id del concurso',
+  `assignment_id` int(11) DEFAULT NULL COMMENT 'Id del curso',
+  `interview_id` int(11) DEFAULT NULL COMMENT 'Id de la entrevista',
   PRIMARY KEY (`problemset_id`),
+  UNIQUE KEY `problemset_id` (`problemset_id`,`contest_id`,`assignment_id`,`interview_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `contest_id` (`contest_id`),
+  KEY `assignment_id` (`assignment_id`),
+  KEY `interview_id` (`interview_id`),
+  CONSTRAINT `Problemsets_ibfk_1` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `Problemsets_ibfk_2` FOREIGN KEY (`assignment_id`) REFERENCES `Assignments` (`assignment_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `Problemsets_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `Interviews` (`interview_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
