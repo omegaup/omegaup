@@ -269,7 +269,7 @@ class RunController extends Controller {
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
                             $problemset_id,
                             $r['problem']->problem_id,
-                            $r['current_user_id']
+                            $r['current_identity_id']
                         );
 
                         if (is_null($opened)) {
