@@ -60,5 +60,10 @@ $result['user'] = [
 $smarty->assign('problem_admin', $result['user']['admin']);
 
 $smarty->assign('payload', $result);
+$problem = json_decode($problem, true);
+$smarty->assign('histograms', [
+    'difficulty_histogram' => $problem['difficulty_histogram'],
+    'quality_histogram' => $problem['quality_histogram'],
+]);
 
 $smarty->display('../../templates/arena.problem.tpl');
