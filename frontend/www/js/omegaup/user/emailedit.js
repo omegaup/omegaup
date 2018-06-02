@@ -1,31 +1,26 @@
+import user_EmailEdit from '../components/user/EmailEdit.vue';
 import Vue from 'vue';
 import {OmegaUp} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const user_EmailEdit = Vue.component(
-      'userEmailEdit', require('../components/user/EmailEdit.vue'));
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  console.log(payload);
-  let userEmailedit = new Vue({
-    el: '#userEmailEdit',
+  let EmailEdit = new Vue({
+    el: '#user-email-edit',
     render: function(createElement) {
       return createElement('userEmailEdit', {
         props: {
-          currentemail: this.currentemail,
+          currentEmail: this.currentEmail,
         },
         on: {
-          'submit': function(emailid){
-            $('#wait').show();
-            omegaup.API.User.updateMainEmail({email: emailid })
+          'submit': function(emailId) {
+            omegaup.API.User.updateMainEmail({email: emailId})
                 .then(function(response) {
                   $('#status')
                       .text(omegaup.T.userEditSuccessfulEmailUpdate)
                       .addClass('alert-success')
                       .slideDown();
                 })
-                .fail(omegaup.UI.apiError)
-                .always(function() { $('#wait')
-                                         .hide(); });
+                .fail(omegaup.UI.apiError);
 
             // Prevent page refresh on submit
             return false;
@@ -34,7 +29,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      currentemail: payload.email,
+      currentEmail: payload.email,
     },
     components: {
       'userEmailEdit': user_EmailEdit,
