@@ -183,6 +183,7 @@
 	"contestsCreateNew": "Create a new contest",
 	"contestsJoinScoreboards": "Merge scoreboards",
 	"contestsTablePublic": "Public",
+	"copySampleCaseTooltip": "Copy this sample input",
 	"countryNotFound": "Country not found",
 	"courseAddProblemsAdd": "Add problems",
 	"courseAddProblemsAssignmentsDesc": "Type the name of the problem to be added to selected assignment.",
