@@ -28,7 +28,7 @@ module.exports = {
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
-    user_edit_email_form : './frontend/www/js/omegaup/user/useremailedit.js',
+    user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
