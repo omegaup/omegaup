@@ -5,11 +5,10 @@ require_once('../server/bootstrap.php');
 UITools::redirectToLoginIfNotLoggedIn();
 UITools::setProfile($smarty);
 
-$ses = SessionController::apiCurrentSession()['session'];
+$currentSession = SessionController::apiCurrentSession()['session'];
 
-$payload = [
-    'email' => $ses['email'],
-];
-$smarty->assign('payload', $payload);
+$smarty->assign('payload', [
+    'email' => $currentSession['email'],
+]);
 
 $smarty->display('../templates/user.email.edit.tpl');
