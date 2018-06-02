@@ -61,13 +61,15 @@
           <td v-if="!isAdmin"></td>
           <td v-else-if="contest.public == '1'">{{ T.wordsYes }}</td>
           <td v-else="">{{ T.wordsNo }}</td>
-          <td v-if="contest.scoreboard_url &amp;&amp; isAdmin">
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
+                v-if="contest.scoreboard_url"
                 v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
                 v-bind:title="T.contestScoreboardLink">Public</a>
           </td>
-          <td v-if="contest.scoreboard_url_admin &amp;&amp; isAdmin">
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
+                v-if="contest.scoreboard_url_admin"
                 v-bind:href=
                 "'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url_admin"
                 v-bind:title="T.contestScoreboardAdminLink">Admin</a>
