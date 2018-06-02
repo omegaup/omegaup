@@ -21,7 +21,7 @@
             <div class="col-md-offset-3 col-md-7">
               <button class="btn btn-primary"
                    type="button"
-                   v-on:click="change">{{ T.wordsSaveChanges }}</button>
+                   v-on:click.prevent="change">{{ T.wordsSaveChanges }}</button>
             </div>
           </div>
         </form>
@@ -39,7 +39,7 @@ export default {
   },
 
   data: function() {
-    return { T: T, wait: "wait", changeEmail: this.currentEmail, }
+    return { T: T, changeEmail: this.currentEmail, }
   },
   methods: {change: function() { this.$emit('submit', this.changeEmail);}}
 }
