@@ -10,6 +10,7 @@ if (!function_exists('try_define')) {
 # ####################################
 # EXPERIMENTS
 # ####################################
+try_define('EXPERIMENT_VIRTUAL', true);
 
 # ####################################
 # DATABASE CONFIG
