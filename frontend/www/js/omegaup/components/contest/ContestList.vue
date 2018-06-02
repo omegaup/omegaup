@@ -63,16 +63,16 @@
           <td v-else="">{{ T.wordsNo }}</td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
-                v-if="contest.scoreboard_url"
                 v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
-                v-bind:title="T.contestScoreboardLink">Public</a>
+                v-bind:title="T.contestScoreboardLink"
+                v-if="contest.scoreboard_url">Public</a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
-                v-if="contest.scoreboard_url_admin"
                 v-bind:href=
                 "'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url_admin"
-                v-bind:title="T.contestScoreboardAdminLink">Admin</a>
+                v-bind:title="T.contestScoreboardAdminLink"
+                v-if="contest.scoreboard_url_admin">Admin</a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-edit"
@@ -81,9 +81,9 @@
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-dashboard"
-                v-if="contest.rerun_id == 0"
                 v-bind:href="'/arena/' + contest.alias + '/admin/'"
-                v-bind:title="T.contestListSubmissions"></a>
+                v-bind:title="T.contestListSubmissions"
+                v-if="contest.rerun_id == 0"></a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-stats"
