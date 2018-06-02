@@ -20,7 +20,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`user_id`, `Problemset_Problem_Opened`.`open_time`';
+    const FIELDS = '`Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time`';
 
     /**
      * Guardar registros.
@@ -36,7 +36,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (!is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->user_id))) {
+        if (!is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))) {
             return ProblemsetProblemOpenedDAOBase::update($Problemset_Problem_Opened);
         } else {
             return ProblemsetProblemOpenedDAOBase::create($Problemset_Problem_Opened);
@@ -52,12 +52,12 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * @static
      * @return @link ProblemsetProblemOpened Un objeto del tipo {@link ProblemsetProblemOpened}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id, $user_id) {
-        if (is_null($problemset_id) || is_null($problem_id) || is_null($user_id)) {
+    final public static function getByPK($problemset_id, $problem_id, $identity_id) {
+        if (is_null($problemset_id) || is_null($problem_id) || is_null($identity_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`user_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND user_id = ?) LIMIT 1;';
-        $params = [$problemset_id, $problem_id, $user_id];
+        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
+        $params = [$problemset_id, $problem_id, $identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -82,7 +82,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblemOpened}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`user_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
+        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -135,9 +135,9 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
             $clauses[] = '`problem_id` = ?';
             $params[] = $Problemset_Problem_Opened->problem_id;
         }
-        if (!is_null($Problemset_Problem_Opened->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Problemset_Problem_Opened->user_id;
+        if (!is_null($Problemset_Problem_Opened->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Problemset_Problem_Opened->identity_id;
         }
         if (!is_null($Problemset_Problem_Opened->open_time)) {
             $clauses[] = '`open_time` = ?';
@@ -153,7 +153,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`user_id`, `Problemset_Problem_Opened`.`open_time` FROM `Problemset_Problem_Opened`';
+        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM `Problemset_Problem_Opened`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -177,10 +177,10 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
       * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a actualizar.
       */
     final private static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `user_id` = ?;';
+        $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problemset_Problem_Opened->open_time,
-            $Problemset_Problem_Opened->problemset_id,$Problemset_Problem_Opened->problem_id,$Problemset_Problem_Opened->user_id,
+            $Problemset_Problem_Opened->problemset_id,$Problemset_Problem_Opened->problem_id,$Problemset_Problem_Opened->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -203,11 +203,11 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         if (is_null($Problemset_Problem_Opened->open_time)) {
             $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `user_id`, `open_time`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
             $Problemset_Problem_Opened->problemset_id,
             $Problemset_Problem_Opened->problem_id,
-            $Problemset_Problem_Opened->user_id,
+            $Problemset_Problem_Opened->identity_id,
             $Problemset_Problem_Opened->open_time,
         ];
         global $conn;
@@ -277,14 +277,14 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_Problem_OpenedA->user_id;
-        $b = $Problemset_Problem_OpenedB->user_id;
+        $a = $Problemset_Problem_OpenedA->identity_id;
+        $b = $Problemset_Problem_OpenedB->identity_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -327,11 +327,11 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a eliminar
      */
     final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->user_id))) {
+        if (is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND user_id = ?;';
-        $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->user_id];
+        $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
+        $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id];
         global $conn;
 
         $conn->Execute($sql, $params);
