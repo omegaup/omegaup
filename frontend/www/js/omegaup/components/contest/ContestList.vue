@@ -81,6 +81,7 @@
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-dashboard"
+                v-if="contest.rerun_id == 0"
                 v-bind:href="'/arena/' + contest.alias + '/admin/'"
                 v-bind:title="T.contestListSubmissions"></a>
           </td>

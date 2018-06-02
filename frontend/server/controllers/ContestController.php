@@ -2108,6 +2108,8 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        self::forbiddenInVirtual($contest);
+
         if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
