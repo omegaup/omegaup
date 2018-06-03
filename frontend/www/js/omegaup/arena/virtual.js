@@ -1,19 +1,25 @@
 import {API, UI, OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
-import virtual from '../components/arena/Virtual.vue';
+import arena_virtual from '../components/arena/Virtual.vue';
 
 OmegaUp.on('ready', function() {
   let contestAlias =
       /\/arena\/([^\/]+)\/virtual/.exec(window.location.pathname)[1];
   let detail;
   API.Contest.publicDetails({contest_alias: contestAlias})
-      .then(function(response) {
-        let detail = response;
+      .then(function(detail) {
         let virtual_ = new Vue({
-          el: '#virtual',
+          el: '#arena-virtual',
           render: function(createElement) {
-            return createElement('virtual', {
-              props: {detail: detail},
+            return createElement('omegaup-arena-virtual', {
+              props: {
+                title: detail.title,
+                description: detail.description,
+                startTime: detail.start_time,
+                finishTime: detail.finish_time,
+                scoreboard: detail.scoreboard,
+                submissionGap: detail.submission_gap
+              },
               on: {
                 submit: function(ev) {
                   API.Contest.createVirtual({
@@ -21,16 +27,16 @@ OmegaUp.on('ready', function() {
                                start_time: ev.startTime.getTime() / 1000
                              })
                       .then(function(response) {
-                        let virtual_contest_alias = response.alias;
+                        let virtualContestAlias = response.alias;
                         window.location =
-                            '/contest/' + virtual_contest_alias + '/edit/';
+                            '/contest/' + virtualContestAlias + '/edit/';
                       })
                       .fail(UI.apiError);
                 }
               }
             });
           },
-          components: {'virtual': virtual}
+          components: {'omegaup-arena-virtual': arena_virtual}
         });
       })
       .fail(UI.apiError);

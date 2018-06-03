@@ -3,14 +3,14 @@
     <div class="panel-body">
       <div class="text-center">
         <h2>{{UI.formatString(T.virtualTitle, {title:
-        detail.title})}}</h2><span>{{contestDurationString}}</span>
+        title})}}</h2><span>{{contestDurationString}}</span>
         <form class="form"
               v-on:submit.prevent="onSubmit">
           <div class="row">
             <div class="form-group col-md-4"></div>
             <div class="form-group col-md-4">
               <label>{{T.contestNewFormStartDate}}</label> <omegaup-datetimepicker v-model=
-              "startTime"></omegaup-datetimepicker>
+              "virtualContestStartTime"></omegaup-datetimepicker>
             </div>
             <div class="form-group col-md-4"></div>
           </div><button class="btn btn-primary"
@@ -20,7 +20,7 @@
       <hr>
       <div class="">
         <h1>{{T.registerForContestChallenges}}</h1>
-        <p>{{detail.description}}</p>
+        <p>{{description}}</p>
       </div>
       <div class="">
         <h1>{{T.RegisterForContestRules}}</h1>
@@ -39,26 +39,29 @@ import {Arena} from '../../arena/arena.js';
 import DateTimePicker from '../DateTimePicker.vue';
 
 export default {
-  props: {detail: Object},
+  props: {
+    title: String,
+    description: String,
+    startTime: Date,
+    finishTime: Date,
+    scoreboard: String,
+    submissionGap: Number
+  },
   data: function() {
-    return { T: T, UI: UI, startTime: new Date(), }
+    return { T: T, UI: UI, virtualContestStartTime: new Date(), }
   },
   computed: {
     contestDurationString: function() {
-      let detail = this.detail;
-      return UI.formatDelta(detail.finish_time - detail.start_time);
+      return UI.formatDelta(this.finishTime - this.startTime);
     },
     scoreboardTimeString: function() {
-      let detail = this.detail;
-      let scoreboard = detail.scoreboard;
       return UI.formatString(T.contestIntroScoreboardTimePercent,
-                             {window_length: scoreboard});
+                             {window_length: this.scoreboard});
     },
     submissionGapString: function() {
-      let detail = this.detail;
-      let submissionsGap = detail.submission_gap;
-      return UI.formatString(T.contestIntroSubmissionsSeparationDesc,
-                             {window_length: Math.floor(submissionsGap / 60)});
+      return UI.formatString(
+          T.contestIntroSubmissionsSeparationDesc,
+          {window_length: Math.floor(this.submissionsGap / 60)});
     }
   },
   methods: {onSubmit: function() { this.$emit('submit', this);}},

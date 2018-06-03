@@ -10,9 +10,9 @@
 				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsEndTime#}</th>
 				<th class="col-md-2" data-bind="visible: showTimes">{#wordsDuration#}</th>
 				<th class="col-md-2" data-bind="visible: showPractice" ></th>
-			{if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
+{if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
 				<th class="col-md-2" data-bind="visible: showVirtual" ></th>
-			{/if}
+{/if}
 				<th class="col-md-2" data-bind="visible: showPublicUpdated" >{#wordsPublicUpdated#}</th>
 			</tr></thead>
 			<tbody data-bind="foreach: page" class="contest-list row">
@@ -34,13 +34,13 @@
 							<span>{#wordsPractice#}</span>
 						</a>
 					</td>
-				{if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
+{if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
 					<td class="col-md-2" data-bind="visible: $parent.showVirtual">
 						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
 							<span>{#virtualContest#}</span>
 						</a>
 					</td>
-				{/if}
+{/if}
 					<td class="no-wrap col-md-2" data-bind="visible: $parent.showPublicUpdated, text: publicUpdateText"></td>
 				<tr>
 					<td colspan="5" class="forcebreaks forcebreaks-arena"

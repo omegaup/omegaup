@@ -565,10 +565,9 @@ export class Arena {
   refreshRanking() {
     let self = this;
     if (self.options.originalContestAlias != null) {
-      let events = [];
       API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
           .then(function(response) {
-            events = events.concat(response.events);
+            let events = response.events;
             for (var i in events) {
               events[i].username += '-(virtual)';
               events[i].name += '-(virtual)';
@@ -608,37 +607,35 @@ export class Arena {
     let problems = [];
     let initialScores = [];
 
-    let count = 0;
     for (var key in self.problems) {
-      problemOrder[self.problems[key].alias] = count;
+      problemOrder[self.problems[key].alias] = problems.length + 1;
       problems.push({order: count, alias: self.problems[key].alias});
-      count++;
     }
 
     data.forEach(function(env) {
-      if (env.delta <= delta) {
-        if (!rank.hasOwnProperty(env.username)) {
-          rank[env.username] = [];
-          rank[env.username].country = env.country;
-          rank[env.username].name = env.name;
-          rank[env.username].username = env.username;
-          rank[env.username].place = 0;
-          rank[env.username].problems = [];
-          for (let j = 0; j < problems.length; j++) {
-            rank[env.username].problems.push(
-                {penalty: 0, percent: 0, points: 0, runs: 0});
-          }
-          rank[env.username].total = {points: 0, penalty: 0};
-        }
-        let problem =
-            rank[env.username].problems[problemOrder[env.problem.alias]];
-        rank[env.username].problems[problemOrder[env.problem.alias]] = {
-          penalty: env.problem.penalty,
-          points: env.problem.points,
-          runs: problem.runs + 1
+      if (env.delta > delta) return;
+      if (!rank.hasOwnProperty(env.username)) {
+        rank[env.username] = {
+          country: env.country,
+          name: env.name,
+          username: env.username,
+          place: 0,
+          problems: []
         };
-        rank[env.username].total = env.total;
+        for (let j = 0; j < problems.length; j++) {
+          rank[env.username].problems.push(
+              {penalty: 0, percent: 0, points: 0, runs: 0});
+        }
+        rank[env.username].total = {points: 0, penalty: 0};
       }
+      let problem =
+          rank[env.username].problems[problemOrder[env.problem.alias]];
+      rank[env.username].problems[problemOrder[env.problem.alias]] = {
+        penalty: env.problem.penalty,
+        points: env.problem.points,
+        runs: problem.runs + 1
+      };
+      rank[env.username].total = env.total;
     });
 
     let ranking = [];
