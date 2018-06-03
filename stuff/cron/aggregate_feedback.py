@@ -395,7 +395,7 @@ def main():
         except:  # pylint: disable=bare-except
             logging.exception('Failed to update problem of the week')
             raise
-    except:
+    except:  # pylint: disable=bare-except
         pass
     finally:
         dbconn.close()
