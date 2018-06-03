@@ -9,11 +9,11 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('userEmailEdit', {
         props: {
-          currentEmail: this.currentEmail,
+          initialEmail: this.email,
         },
         on: {
-          'submit': function(emailId) {
-            omegaup.API.User.updateMainEmail({email: emailId})
+          'submit': function(newEmail) {
+            omegaup.API.User.updateMainEmail({email: newEmail})
                 .then(function(response) {
                   $('#status')
                       .text(omegaup.T.userEditSuccessfulEmailUpdate)
@@ -21,14 +21,12 @@ OmegaUp.on('ready', function() {
                       .slideDown();
                 })
                 .fail(UI.apiError);
-
-            return false;
           }
         },
       });
     },
     data: {
-      currentEmail: payload.email,
+      email: payload.email,
     },
     components: {
       'userEmailEdit': user_EmailEdit,

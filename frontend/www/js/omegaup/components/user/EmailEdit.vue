@@ -14,7 +14,7 @@
                    name='email'
                    size='30'
                    type='text'
-                   v-model="changeEmail">
+                   v-model="email">
             </div>
           </div>
           <div class="form-group">
@@ -35,13 +35,12 @@ import {T} from '../../omegaup.js';
 
 export default {
   props: {
-    currentEmail: String,
+    initialEmail: String,
   },
-
   data: function() {
-    return { T: T, changeEmail: this.currentEmail, }
+    return { T: T, email: this.initialEmail, }
   },
-  methods: {change: function() { this.$emit('submit', this.changeEmail);}}
+  methods: {change: function() { this.$emit('submit', this.email);}}
 }
 
 </script>
