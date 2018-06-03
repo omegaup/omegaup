@@ -934,10 +934,11 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals(count($problemOfTheWeek), 1);
         $this->assertEquals(
             $problemOfTheWeek[0]->problem_id,
-            $syntheticProblems[1]['problem']->problem_id);
+            $syntheticProblems[1]['problem']->problem_id
+        );
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
     }
-    
+
     private function runCronjobScript() {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
@@ -1001,7 +1002,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
         global $conn;
         $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', $dateOneWeekAgo);
-        
+
         return $problemData;
     }
 
