@@ -7,6 +7,7 @@ and rating based on bayesian averages.
 '''
 
 import argparse
+import calendar
 import collections
 import configparser
 import datetime
@@ -51,8 +52,6 @@ def get_global_quality_and_difficulty_average(dbconn):
             try:
                 contents = json.loads(row[0])
             except json.JSONDecodeError:  # pylint: disable=no-member
-                # Travis uses Python <3.5, which does not yet have
-                # json.JSONDecodeError.
                 logging.exception('Failed to parse contents')
                 continue
 
@@ -263,11 +262,13 @@ def get_last_friday():
     '''Returns datetime object corresponding to last Friday.
     '''
     current_date = datetime.datetime.now().date()
-    last_friday = current_date\
-        - datetime.timedelta(days=current_date.weekday())\
-        + datetime.timedelta(days=4)
+    last_friday = (
+        current_date
+        - datetime.timedelta(days=current_date.weekday())
+        + datetime.timedelta(days=calendar.FRIDAY))
 
-    if current_date.weekday() < 4:  # If day of the week is before Friday.
+    # If day of the week is before Friday substract a week from the date.
+    if current_date.weekday() < calendar.FRIDAY:
         last_friday -= datetime.timedelta(weeks=1)
 
     return last_friday
@@ -319,8 +320,6 @@ def update_problem_of_the_week(dbconn, difficulty):
             try:
                 contents = json.loads(row[1])
             except json.JSONDecodeError:  # pylint: disable=no-member
-                # Travis uses Python <3.5, which does not yet have
-                # json.JSONDecodeError.
                 logging.exception('Failed to parse contents')
                 continue
 
@@ -332,8 +331,8 @@ def update_problem_of_the_week(dbconn, difficulty):
         if not quality_map:
             raise Exception('No problem of the week found')
 
-        problem_of_the_week_problem_id =\
-            max(quality_map.items(), key=operator.itemgetter(1))[0]
+        problem_of_the_week_problem_id = (
+            max(quality_map.items(), key=operator.itemgetter(1))[0])
         logging.debug('Inserting problem of the week %d for week of %s',
                       problem_of_the_week_problem_id,
                       last_friday.strftime("%Y-%m-%d"))
