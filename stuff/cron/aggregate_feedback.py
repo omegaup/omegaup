@@ -263,9 +263,9 @@ def get_last_friday():
     '''
     current_date = datetime.datetime.now().date()
     last_friday = (
-        current_date
-        - datetime.timedelta(days=current_date.weekday())
-        + datetime.timedelta(days=calendar.FRIDAY))
+        current_date -
+        datetime.timedelta(days=current_date.weekday()) +
+        datetime.timedelta(days=calendar.FRIDAY))
 
     # If day of the week is before Friday substract a week from the date.
     if current_date.weekday() < calendar.FRIDAY:
