@@ -20,9 +20,8 @@ OmegaUp.on('ready', function() {
                       .addClass('alert-success')
                       .slideDown();
                 })
-                .fail(omegaup.UI.apiError);
+                .fail(UI.apiError);
 
-            // Prevent page refresh on submit
             return false;
           }
         },
