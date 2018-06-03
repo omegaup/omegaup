@@ -8,6 +8,7 @@ module.exports = {
     admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
+    arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
@@ -28,7 +29,6 @@ module.exports = {
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
-    virtual: './frontend/www/js/omegaup/arena/virtual.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),
