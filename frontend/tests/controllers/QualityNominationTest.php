@@ -1192,18 +1192,13 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     private static function deleteAllSuggestions() {
-        $filter = new QualityNominations([
-            'nomination' => 'suggestion',
-        ]);
-        $allNominations = QualityNominationsDAO::search($filter);
-        foreach ($allNominations as $nomination) {
-            QualityNominationsDAO::delete($nomination);
-        }
+        global $conn;
+        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
     }
 
     private static function deleteAllProblemsOfTheWeek() {
         global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`');
+        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     private static function commit() {

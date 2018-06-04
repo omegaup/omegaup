@@ -299,7 +299,7 @@ def update_problem_of_the_week(dbconn, difficulty):
     with dbconn.cursor() as cur:
         cur.execute("""SELECT qn.`problem_id`, qn.`contents`
                        FROM `QualityNominations` AS qn
-                       LEFT JOIN `Problems`
+                       INNER JOIN `Problems`
                          AS p ON p.`problem_id` = qn.`problem_id`
                        LEFT JOIN `Problem_Of_The_Week`
                          AS pw ON pw.`problem_id` = qn.`problem_id`
@@ -314,7 +314,7 @@ def update_problem_of_the_week(dbconn, difficulty):
                      0.0 if difficulty == 'easy' else 2.0,
                      2.0 if difficulty == 'easy' else 4.0))
 
-        quality_map = {}
+        quality_map = collections.defaultdict(int)
         for row in cur:
             problem_id = row[0]
             try:
@@ -323,13 +323,14 @@ def update_problem_of_the_week(dbconn, difficulty):
                 logging.exception('Failed to parse contents')
                 continue
 
-            if 'quality' in contents:
-                if problem_id not in quality_map:
-                    quality_map[problem_id] = 0
-                quality_map[problem_id] += contents['quality']
+            if 'quality' not in contents:
+                continue
+
+            quality_map[problem_id] += contents['quality']
 
         if not quality_map:
-            raise Exception('No problem of the week found')
+            logger.warning('No problem of the week found')
+            return
 
         problem_of_the_week_problem_id = (
             max(quality_map.items(), key=operator.itemgetter(1))[0])
@@ -395,8 +396,6 @@ def main():
         except:  # pylint: disable=bare-except
             logging.exception('Failed to update problem of the week')
             raise
-    except:  # pylint: disable=bare-except
-        pass
     finally:
         dbconn.close()
         logging.info('Done')
