@@ -958,6 +958,27 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
+    const allowedLanguages = {
+      '': { data: T.wordsAll, order: 0 },
+      'cpp11': { data: 'C++11', order: 1 },
+      'cpp': { data: 'C++', order: 2 },
+      'c': { data: 'C', order: 3 },
+      'cs': { data: 'C#', order: 4 },
+      'hs': { data: 'Haskell', order: 5 },
+      'java': { data: 'Java', order: 6 },
+      'pas': { data: 'Pascal', order: 7 },
+      'py': { data: 'Python', order: 8 },
+      'rb': { data: 'Ruby', order: 9 },
+      'lua': { data: 'Lua', order: 10 },
+      'kp': { data: 'Karel (Pascal)', order: 11 },
+      'kj': { data: 'Karel (Java)', order: 12 },
+      'cat': { data: T.wordJustOutput, order: 13 },
+    };
+
+    const byOrderId = (a, b) => {
+      return (allowedLanguages[a].order > allowedLanguages[b].order);
+    };
+
     let self = this;
 
     let can_submit = lang_array.length != 0;
@@ -965,17 +986,24 @@ export class Arena {
     $('.runs').toggle(can_submit);
     $('.data').toggle(can_submit);
     $('.best-solvers').toggle(can_submit);
-    $('option', self.elements.submitForm.language)
-        .each(function(index, item) {
-          item = $(item);
-          const isOptionAllowed = lang_array.indexOf(item.val()) >= 0;
-          if (!isOptionAllowed) item.remove();
-        });
+    
+    // refresh options in select
+    const languageSelect = document.getElementsByName('language')[0];
+    languageSelect.innerHTML = '';
+
+    const items = typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+    
+    const languageOptions = items.sort(byOrderId).map((item) => {
+      return `<option value="${item}">${allowedLanguages[item].data}</option>`;
+    }).join('');
+    
+    languageSelect.innerHTML = languageOptions;
   }
 
   selectDefaultLanguage() {
     let self = this;
     let langElement = self.elements.submitForm.language;
+    
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
