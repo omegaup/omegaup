@@ -329,7 +329,7 @@ def update_problem_of_the_week(dbconn, difficulty):
             quality_map[problem_id] += contents['quality']
 
         if not quality_map:
-            logger.warning('No problem of the week found')
+            logging.warning('No problem of the week found')
             return
 
         problem_of_the_week_problem_id = (
