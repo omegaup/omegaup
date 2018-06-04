@@ -20,7 +20,7 @@ abstract class ProblemViewedDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problem_Viewed`.`problem_id`, `Problem_Viewed`.`user_id`, `Problem_Viewed`.`view_time`';
+    const FIELDS = '`Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time`';
 
     /**
      * Guardar registros.
@@ -36,7 +36,7 @@ abstract class ProblemViewedDAOBase extends DAO {
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
     final public static function save(ProblemViewed $Problem_Viewed) {
-        if (!is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->user_id))) {
+        if (!is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->identity_id))) {
             return ProblemViewedDAOBase::update($Problem_Viewed);
         } else {
             return ProblemViewedDAOBase::create($Problem_Viewed);
@@ -52,12 +52,12 @@ abstract class ProblemViewedDAOBase extends DAO {
      * @static
      * @return @link ProblemViewed Un objeto del tipo {@link ProblemViewed}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_id, $user_id) {
-        if (is_null($problem_id) || is_null($user_id)) {
+    final public static function getByPK($problem_id, $identity_id) {
+        if (is_null($problem_id) || is_null($identity_id)) {
             return null;
         }
-        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`user_id`, `Problem_Viewed`.`view_time` FROM Problem_Viewed WHERE (problem_id = ? AND user_id = ?) LIMIT 1;';
-        $params = [$problem_id, $user_id];
+        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` FROM Problem_Viewed WHERE (problem_id = ? AND identity_id = ?) LIMIT 1;';
+        $params = [$problem_id, $identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -82,7 +82,7 @@ abstract class ProblemViewedDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemViewed}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`user_id`, `Problem_Viewed`.`view_time` from Problem_Viewed';
+        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` from Problem_Viewed';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -131,9 +131,9 @@ abstract class ProblemViewedDAOBase extends DAO {
             $clauses[] = '`problem_id` = ?';
             $params[] = $Problem_Viewed->problem_id;
         }
-        if (!is_null($Problem_Viewed->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Problem_Viewed->user_id;
+        if (!is_null($Problem_Viewed->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Problem_Viewed->identity_id;
         }
         if (!is_null($Problem_Viewed->view_time)) {
             $clauses[] = '`view_time` = ?';
@@ -149,7 +149,7 @@ abstract class ProblemViewedDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`user_id`, `Problem_Viewed`.`view_time` FROM `Problem_Viewed`';
+        $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` FROM `Problem_Viewed`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -173,10 +173,10 @@ abstract class ProblemViewedDAOBase extends DAO {
       * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed a actualizar.
       */
     final private static function update(ProblemViewed $Problem_Viewed) {
-        $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `user_id` = ?;';
+        $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problem_Viewed->view_time,
-            $Problem_Viewed->problem_id,$Problem_Viewed->user_id,
+            $Problem_Viewed->problem_id,$Problem_Viewed->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -199,10 +199,10 @@ abstract class ProblemViewedDAOBase extends DAO {
         if (is_null($Problem_Viewed->view_time)) {
             $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `user_id`, `view_time`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
             $Problem_Viewed->problem_id,
-            $Problem_Viewed->user_id,
+            $Problem_Viewed->identity_id,
             $Problem_Viewed->view_time,
         ];
         global $conn;
@@ -261,14 +261,14 @@ abstract class ProblemViewedDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problem_ViewedA->user_id;
-        $b = $Problem_ViewedB->user_id;
+        $a = $Problem_ViewedA->identity_id;
+        $b = $Problem_ViewedB->identity_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
@@ -311,11 +311,11 @@ abstract class ProblemViewedDAOBase extends DAO {
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed a eliminar
      */
     final public static function delete(ProblemViewed $Problem_Viewed) {
-        if (is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->user_id))) {
+        if (is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->identity_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Problem_Viewed` WHERE problem_id = ? AND user_id = ?;';
-        $params = [$Problem_Viewed->problem_id, $Problem_Viewed->user_id];
+        $sql = 'DELETE FROM `Problem_Viewed` WHERE problem_id = ? AND identity_id = ?;';
+        $params = [$Problem_Viewed->problem_id, $Problem_Viewed->identity_id];
         global $conn;
 
         $conn->Execute($sql, $params);

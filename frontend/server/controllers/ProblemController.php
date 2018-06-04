@@ -1343,7 +1343,7 @@ class ProblemController extends Controller {
             if (!ProblemsetProblemOpenedDAO::getByPK(
                 $problemset_id,
                 $r['problem']->problem_id,
-                $r['current_user_id']
+                $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
@@ -1351,7 +1351,7 @@ class ProblemController extends Controller {
                         'problemset_id' => $problemset_id,
                         'problem_id' => $r['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
-                        'user_id' => $r['current_user_id']
+                        'identity_id' => $r['current_identity_id']
                     ]));
                 } catch (Exception $e) {
                     // Operation failed in the data layer
@@ -1362,9 +1362,9 @@ class ProblemController extends Controller {
             $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
         }
 
-        if (!is_null($r['current_user_id'])) {
+        if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
-                $r['current_user_id'],
+                $r['current_identity_id'],
                 $r['problem']->problem_id
             );
         }

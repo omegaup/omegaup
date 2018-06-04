@@ -12,8 +12,7 @@ include('base/Problemset_Access_Log.vo.base.php');
 class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
     public static function GetAccessForProblemset($problemset_id) {
         $sql = 'SELECT
-                    u.user_id,
-                    u.username,
+                    i.username,
                     pal.ip,
                     UNIX_TIMESTAMP(pal.time) AS `time`,
                     (SELECT `urc`.classname FROM
@@ -25,7 +24,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                                 FROM
                                     `User_Rank` `ur`
                                 WHERE
-                                    `ur`.user_id = `u`.`user_id`
+                                    `ur`.user_id = `i`.`user_id`
                             )
                     ORDER BY
                         `urc`.percentile ASC
@@ -34,9 +33,9 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
-                    Users u
+                    Identities i
                 ON
-                    u.user_id = pal.user_id
+                    i.identity_id = pal.identity_id
                 WHERE
                     pal.problemset_id = ?
                 ORDER BY `time`;';
@@ -48,16 +47,15 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
 
     final public static function GetAccessForCourse($course_id) {
         $sql = 'SELECT
-                    u.user_id,
-                    u.username,
+                    i.username,
                     pal.ip,
                     UNIX_TIMESTAMP(pal.time) AS `time`
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
-                    Users u
+                    Identities i
                 ON
-                    u.user_id = pal.user_id
+                    i.identity_id = pal.identity_id
                 INNER JOIN
                     Assignments a
                 ON

@@ -132,5 +132,14 @@ class RunsFactory {
         }
 
         RunsDAO::save($run);
+
+        $gradeDir = RunController::getGradePath($run);
+        mkdir($gradeDir, 0755, true);
+        file_put_contents("$gradeDir/details.json", json_encode([
+            'verdict' => $verdict,
+            'contest_score' => $points,
+            'score' => $points,
+            'judged_by' => 'RunsFactory.php',
+        ]));
     }
 }

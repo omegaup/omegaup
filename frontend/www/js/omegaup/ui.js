@@ -319,7 +319,7 @@ let UI = {
           let inputValue = item.querySelector('pre').innerHTML;
 
           let clipboardButton = document.createElement('button');
-
+          clipboardButton.title = T.copySampleCaseTooltip;
           clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
 
           clipboardButton.addEventListener('click', function(event) {
