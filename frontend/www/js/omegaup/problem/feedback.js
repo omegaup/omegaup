@@ -10,12 +10,15 @@ OmegaUp.on('ready', function() {
     el: '#problem-feedback',
     render: function(createElement) {
       return createElement('omegaup-problem-feedback', {
-
+        props: {
+          qualityHistogram: this.qualityHistogram,
+          difficultyHistogram: this.difficultyHistogram,
+        }
       });
     },
     data: {
-      qualityHistogram: histograms.quality_histogram,
-      difficultyHistogram: histograms.difficultyHistogram,
+      qualityHistogram: JSON.parse(histograms.quality_histogram),
+      difficultyHistogram: JSON.parse(histograms.difficulty_histogram),
     },
     components: {
       'omegaup-problem-feedback': problem_Feedback,
