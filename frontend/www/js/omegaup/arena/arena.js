@@ -958,6 +958,22 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
+    const allowedLanguages = [
+      {language: 'cpp11', name: 'C++11'},
+      {language: 'cpp', name: 'C++'},
+      {language: 'c', name: 'C'},
+      {language: 'cs', name: 'C#'},
+      {language: 'hs', name: 'Haskell'},
+      {language: 'java', name: 'Java'},
+      {language: 'pas', name: 'Pascal'},
+      {language: 'py', name: 'Python'},
+      {language: 'rb', name: 'Ruby'},
+      {language: 'lua', name: 'Lua'},
+      {language: 'kp', name: 'Karel (Pascal)'},
+      {language: 'kj', name: 'Karel (Java)'},
+      {language: 'cat', name: T.wordJustOutput},
+    ];
+
     let self = this;
 
     let can_submit = lang_array.length != 0;
@@ -965,21 +981,34 @@ export class Arena {
     $('.runs').toggle(can_submit);
     $('.data').toggle(can_submit);
     $('.best-solvers').toggle(can_submit);
-    $('option', self.elements.submitForm.language)
-        .each(function(index, item) {
-          item = $(item);
-          item.toggle(lang_array.indexOf(item.val()) >= 0);
+
+    // refresh options in select
+    const languageSelect = document.querySelector('select[name="language"]');
+    while (languageSelect.firstChild)
+      languageSelect.removeChild(languageSelect.firstChild);
+
+    const languageArray =
+        typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+
+    allowedLanguages.filter(item => {
+                      return languageArray.includes(item.language);
+                    })
+        .forEach(optionItem => {
+          let optionNode = document.createElement('option');
+          optionNode.value = optionItem.language;
+          optionNode.appendChild(document.createTextNode(optionItem.name));
+          languageSelect.appendChild(optionNode);
         });
   }
 
   selectDefaultLanguage() {
     let self = this;
     let langElement = self.elements.submitForm.language;
+
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
             return false;
@@ -990,11 +1019,10 @@ export class Arena {
     $('option', langElement)
         .each(function() {
           let option = $(this);
-          if (option.css('display') != 'none') {
-            option.prop('selected', true);
-            langElement.trigger('change');
-            return false;
-          }
+
+          option.prop('selected', true);
+          langElement.trigger('change');
+          return false;
         });
   }
 
