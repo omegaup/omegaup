@@ -19,6 +19,7 @@ module.exports = {
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
+    problem_list: './frontend/www/js/omegaup/problem/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
@@ -27,6 +28,7 @@ module.exports = {
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
+    user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

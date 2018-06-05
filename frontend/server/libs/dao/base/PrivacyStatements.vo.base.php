@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Problemset_Access_Log.
+ * Value Object file for table PrivacyStatements.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetAccessLog extends VO {
+class PrivacyStatements extends VO {
     /**
-     * Constructor de ProblemsetAccessLog
+     * Constructor de PrivacyStatements
      *
-     * Para construir un objeto de tipo ProblemsetAccessLog debera llamarse a el constructor
+     * Para construir un objeto de tipo PrivacyStatements debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,17 +26,14 @@ class ProblemsetAccessLog extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+        if (isset($data['privacystatement_id'])) {
+            $this->privacystatement_id = $data['privacystatement_id'];
         }
-        if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+        if (isset($data['git_object_id'])) {
+            $this->git_object_id = $data['git_object_id'];
         }
-        if (isset($data['ip'])) {
-            $this->ip = $data['ip'];
-        }
-        if (isset($data['time'])) {
-            $this->time = $data['time'];
+        if (isset($data['type'])) {
+            $this->type = $data['type'];
         }
     }
 
@@ -47,35 +44,30 @@ class ProblemsetAccessLog extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['time']);
+            parent::toUnixTime([]);
         }
     }
 
     /**
-      *  [Campo no documentado]
+      * Id del documento de privacidad
+      * Llave Primaria
+      * Auto Incremento
       * @access public
       * @var int(11)
       */
-    public $problemset_id;
+    public $privacystatement_id;
 
     /**
-      * Identidad del usuario
+      * Id de la versión del documento en el que se almacena la nueva política
       * @access public
-      * @var int(11)
+      * @var varchar(50)
       */
-    public $identity_id;
+    public $git_object_id;
 
     /**
-      *  [Campo no documentado]
+      * Tipo de documento de privacidad
       * @access public
-      * @var int(10)
+      * @var enum('privacy_policy')
       */
-    public $ip;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+    public $type;
 }

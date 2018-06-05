@@ -8,69 +8,69 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ProblemsetProblemOpened Data Access Object (DAO) Base.
+/** PrivacyStatements Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetProblemOpened }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link PrivacyStatements }.
  * @access public
  * @abstract
  *
  */
-abstract class ProblemsetProblemOpenedDAOBase extends DAO {
+abstract class PrivacyStatementsDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time`';
+    const FIELDS = '`PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type`';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ProblemsetProblemOpened} pasado en la base de datos. La llave
+     * Este metodo guarda el estado actual del objeto {@link PrivacyStatements} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (!is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))) {
-            return ProblemsetProblemOpenedDAOBase::update($Problemset_Problem_Opened);
+    final public static function save(PrivacyStatements $PrivacyStatements) {
+        if (!is_null(self::getByPK($PrivacyStatements->privacystatement_id))) {
+            return PrivacyStatementsDAOBase::update($PrivacyStatements);
         } else {
-            return ProblemsetProblemOpenedDAOBase::create($Problemset_Problem_Opened);
+            return PrivacyStatementsDAOBase::create($PrivacyStatements);
         }
     }
 
     /**
-     * Obtener {@link ProblemsetProblemOpened} por llave primaria.
+     * Obtener {@link PrivacyStatements} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link ProblemsetProblemOpened} de la base de datos
+     * Este metodo cargara un objeto {@link PrivacyStatements} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link ProblemsetProblemOpened Un objeto del tipo {@link ProblemsetProblemOpened}. NULL si no hay tal registro.
+     * @return @link PrivacyStatements Un objeto del tipo {@link PrivacyStatements}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id, $identity_id) {
-        if (is_null($problemset_id) || is_null($problem_id) || is_null($identity_id)) {
+    final public static function getByPK($privacystatement_id) {
+        if (is_null($privacystatement_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
-        $params = [$problemset_id, $problem_id, $identity_id];
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM PrivacyStatements WHERE (privacystatement_id = ?) LIMIT 1;';
+        $params = [$privacystatement_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new ProblemsetProblemOpened($rs);
+        return new PrivacyStatements($rs);
     }
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link ProblemsetProblemOpened}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link PrivacyStatements}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +79,10 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblemOpened}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` from PrivacyStatements';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -93,7 +93,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new ProblemsetProblemOpened($row);
+            $allData[] = new PrivacyStatements($row);
         }
         return $allData;
     }
@@ -101,7 +101,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetProblemOpened} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PrivacyStatements} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,32 +116,28 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
+      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Problemset_Problem_Opened, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Problemset_Problem_Opened instanceof ProblemsetProblemOpened)) {
-            $Problemset_Problem_Opened = new ProblemsetProblemOpened($Problemset_Problem_Opened);
+    final public static function search($PrivacyStatements, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!($PrivacyStatements instanceof PrivacyStatements)) {
+            $PrivacyStatements = new PrivacyStatements($PrivacyStatements);
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Problemset_Problem_Opened->problemset_id)) {
-            $clauses[] = '`problemset_id` = ?';
-            $params[] = $Problemset_Problem_Opened->problemset_id;
+        if (!is_null($PrivacyStatements->privacystatement_id)) {
+            $clauses[] = '`privacystatement_id` = ?';
+            $params[] = $PrivacyStatements->privacystatement_id;
         }
-        if (!is_null($Problemset_Problem_Opened->problem_id)) {
-            $clauses[] = '`problem_id` = ?';
-            $params[] = $Problemset_Problem_Opened->problem_id;
+        if (!is_null($PrivacyStatements->git_object_id)) {
+            $clauses[] = '`git_object_id` = ?';
+            $params[] = $PrivacyStatements->git_object_id;
         }
-        if (!is_null($Problemset_Problem_Opened->identity_id)) {
-            $clauses[] = '`identity_id` = ?';
-            $params[] = $Problemset_Problem_Opened->identity_id;
-        }
-        if (!is_null($Problemset_Problem_Opened->open_time)) {
-            $clauses[] = '`open_time` = ?';
-            $params[] = $Problemset_Problem_Opened->open_time;
+        if (!is_null($PrivacyStatements->type)) {
+            $clauses[] = '`type` = ?';
+            $params[] = $PrivacyStatements->type;
         }
         global $conn;
         if (!is_null($likeColumns)) {
@@ -153,7 +149,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM `Problemset_Problem_Opened`';
+        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM `PrivacyStatements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -165,7 +161,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ProblemsetProblemOpened($row);
+            $ar[] = new PrivacyStatements($row);
         }
         return $ar;
     }
@@ -174,13 +170,14 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a actualizar.
+      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a actualizar.
       */
-    final private static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
+    final private static function update(PrivacyStatements $PrivacyStatements) {
+        $sql = 'UPDATE `PrivacyStatements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
         $params = [
-            $Problemset_Problem_Opened->open_time,
-            $Problemset_Problem_Opened->problemset_id,$Problemset_Problem_Opened->problem_id,$Problemset_Problem_Opened->identity_id,
+            $PrivacyStatements->git_object_id,
+            $PrivacyStatements->type,
+            $PrivacyStatements->privacystatement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -191,24 +188,23 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ProblemsetProblemOpened suministrado. Asegurese
+     * contenidos del objeto PrivacyStatements suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto ProblemsetProblemOpened dentro de la misma transaccion.
+     * primaria generada en el objeto PrivacyStatements dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a crear.
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a crear.
      */
-    final private static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s');
+    final private static function create(PrivacyStatements $PrivacyStatements) {
+        if (is_null($PrivacyStatements->type)) {
+            $PrivacyStatements->type = 'privacy_policy';
         }
-        $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO PrivacyStatements (`privacystatement_id`, `git_object_id`, `type`) VALUES (?, ?, ?);';
         $params = [
-            $Problemset_Problem_Opened->problemset_id,
-            $Problemset_Problem_Opened->problem_id,
-            $Problemset_Problem_Opened->identity_id,
-            $Problemset_Problem_Opened->open_time,
+            $PrivacyStatements->privacystatement_id,
+            $PrivacyStatements->git_object_id,
+            $PrivacyStatements->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -216,6 +212,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
+        $PrivacyStatements->privacystatement_id = $conn->Insert_ID();
 
         return $ar;
     }
@@ -223,8 +220,8 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetProblemOpened} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ProblemsetProblemOpened}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link PrivacyStatements} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link PrivacyStatements}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -246,60 +243,49 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(ProblemsetProblemOpened $Problemset_Problem_OpenedA, ProblemsetProblemOpened $Problemset_Problem_OpenedB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange(PrivacyStatements $PrivacyStatementsA, PrivacyStatements $PrivacyStatementsB, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Problemset_Problem_OpenedA->problemset_id;
-        $b = $Problemset_Problem_OpenedB->problemset_id;
+        $a = $PrivacyStatementsA->privacystatement_id;
+        $b = $PrivacyStatementsB->privacystatement_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
+            $clauses[] = '`privacystatement_id` >= ? AND `privacystatement_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problemset_id` = ?';
+            $clauses[] = '`privacystatement_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_Problem_OpenedA->problem_id;
-        $b = $Problemset_Problem_OpenedB->problem_id;
+        $a = $PrivacyStatementsA->git_object_id;
+        $b = $PrivacyStatementsB->git_object_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problem_id` >= ? AND `problem_id` <= ?';
+            $clauses[] = '`git_object_id` >= ? AND `git_object_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problem_id` = ?';
+            $clauses[] = '`git_object_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_Problem_OpenedA->identity_id;
-        $b = $Problemset_Problem_OpenedB->identity_id;
+        $a = $PrivacyStatementsA->type;
+        $b = $PrivacyStatementsB->type;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
+            $clauses[] = '`type` >= ? AND `type` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`identity_id` = ?';
+            $clauses[] = '`type` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_Problem_OpenedA->open_time;
-        $b = $Problemset_Problem_OpenedB->open_time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`open_time` >= ? AND `open_time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`open_time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Problemset_Problem_Opened`';
+        $sql = 'SELECT * FROM `PrivacyStatements`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -308,7 +294,7 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ProblemsetProblemOpened($row);
+            $ar[] = new PrivacyStatements($row);
         }
         return $ar;
     }
@@ -317,21 +303,21 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto ProblemsetProblemOpened suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto PrivacyStatements suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a eliminar
+     * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a eliminar
      */
-    final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))) {
+    final public static function delete(PrivacyStatements $PrivacyStatements) {
+        if (is_null(self::getByPK($PrivacyStatements->privacystatement_id))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
-        $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id];
+        $sql = 'DELETE FROM `PrivacyStatements` WHERE privacystatement_id = ?;';
+        $params = [$PrivacyStatements->privacystatement_id];
         global $conn;
 
         $conn->Execute($sql, $params);

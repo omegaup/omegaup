@@ -886,15 +886,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        // Ensure all suggestions are written to the database before invoking
-        // the external script.
-        self::commit();
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        self::runCronjobScript();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['problem_alias']);
@@ -925,6 +917,95 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals($tags2, ['dp', 'math', 'geometry', 'search']);
     }
 
+    // Creates 4 problems:
+    // * An easy one with low quality.
+    // * An easy one with high quality.
+    // * A hard one with very high quality.
+    // * A hard one with low quality.
+    // The problem of the week should be the second one because we choose the highest-quality one
+    // with difficulty < 2.
+    public function testUpdateProblemOfTheWeek() {
+        $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
+        self::runCronjobScript();
+
+        $problemOfTheWeek = ProblemOfTheWeekDAO::search(
+            new ProblemOfTheWeek(['difficulty' => 'easy'])
+        );
+        $this->assertEquals(count($problemOfTheWeek), 1);
+        $this->assertEquals(
+            $problemOfTheWeek[0]->problem_id,
+            $syntheticProblems[1]['problem']->problem_id
+        );
+        // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
+    }
+
+    private function runCronjobScript() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+    }
+
+    public function setUpSyntheticSuggestionsForProblemOfTheWeek() {
+        // Delete existing suggestions and problems of the week.
+        self::deleteAllSuggestions();
+        self::deleteAllProblemsOfTheWeek();
+
+        // Setup synthetic data.
+        $numberOfProblems = 4;
+        for ($i = 0; $i < $numberOfProblems; $i++) {
+            $problemData[$i] = ProblemsFactory::createProblem();
+        }
+        $login = [];
+        for ($i = 0; $i < 10; $i++) {
+            $contestant = UserFactory::createUser();
+            for ($j = 0; $j < $numberOfProblems; $j++) {
+                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
+                RunsFactory::gradeRun($runData);
+            }
+            $login[] = self::login($contestant);
+        }
+
+        // Easy problem with low quality.
+        $difficultyRatings[0] = [0, 0, 0, 1, 0, 0, 1, 0, 1, 2]; // Average = 0.5.
+        $qualityRatings[0] = [0, 2, 3, 2, 2, 2, 1, 2, 1, 1]; // Average = 1.6.
+        // Easy problem with high quality.
+        $difficultyRatings[1] = [0, 1, 2, 1, 0, 0, 0, 1, 2, 2]; // Average = 0.9
+        $qualityRatings[1] = [4, 4, 3, 3, 4, 3, 4, 2, 4, 3]; // Average = 3.4.
+        // Hard problem with very high quality.
+        $difficultyRatings[2] = [4, 3, 1, 1, 4, 4, 4, 3, 4, 4]; // Average = 3.2.
+        $qualityRatings[2] = [4, 4, 4, 4, 3, 4, 4, 3, 4, 4]; // Average = 3.8.
+        // Hard problem with low quality.
+        $difficultyRatings[3] = [3, 2, 4, 4, 4, 4, 2, 4, 3, 4]; // Average = 3.4
+        $qualityRatings[3] = [0, 2, 2, 3, 1, 2, 2, 1, 1, 2]; // Average = 1.6
+
+        for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
+            for ($userIdx = 0; $userIdx < 10; $userIdx++) {
+                QualityNominationFactory::createSuggestion(
+                    $login[$userIdx],
+                    $problemData[$problemIdx]['request']['problem_alias'],
+                    $difficultyRatings[$problemIdx][$userIdx],
+                    $qualityRatings[$problemIdx][$userIdx],
+                    [] // No tags.
+                );
+            }
+        }
+
+        // Set date for all quality nominations as 1 week ago, so that they are eligible for
+        // current problem of the week.
+        $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
+        global $conn;
+        $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', $dateOneWeekAgo);
+
+        return $problemData;
+    }
+
     public function testAutogeneratedTagsWithConflicts() {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
@@ -941,15 +1022,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ));
         $this->assertEquals($tags, ['dp']);
 
-        // Ensure all suggestions are written to the database before invoking
-        // the external script.
-        self::commit();
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        self::runCronjobScript();
 
         $tags = array_map(function ($tag) {
             return $tag['name'];
@@ -962,14 +1035,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function setUpSyntheticSuggestions($problemData) {
-        // First, remove all suggestions.
-        $filter = new QualityNominations([
-            'nomination' => 'suggestion',
-        ]);
-        $allNominations = QualityNominationsDAO::search($filter);
-        foreach ($allNominations as $nomination) {
-            QualityNominationsDAO::delete($nomination);
-        }
+        self::deleteAllSuggestions();
 
         // Setup synthetic data.
         $login = [];
@@ -1123,6 +1189,16 @@ class QualityNominationTest extends OmegaupTestCase {
             3,
             ['Geometry', 'Math']
         );
+    }
+
+    private static function deleteAllSuggestions() {
+        global $conn;
+        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+    }
+
+    private static function deleteAllProblemsOfTheWeek() {
+        global $conn;
+        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     private static function commit() {

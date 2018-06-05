@@ -46,6 +46,14 @@ $pager_items = Pager::paginate(
     $params
 );
 
+foreach ($response['results'] as $key => $problem) {
+    $response['results'][$key]['difficulty'] = floatval($problem['difficulty']);
+    $response['results'][$key]['quality'] = floatval($problem['quality']);
+    $response['results'][$key]['points'] = floatval($problem['points']);
+    $response['results'][$key]['ratio'] = floatval($problem['ratio']);
+    $response['results'][$key]['score'] = floatval($problem['score']);
+}
+
 $smarty->assign('KEYWORD', $keyword);
 $smarty->assign('MODE', $mode);
 $smarty->assign('ORDER_BY', $order_by);

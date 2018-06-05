@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Problemset_Access_Log.
+ * Value Object file for table PrivacyStatement_Consent_Log.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetAccessLog extends VO {
+class PrivacyStatementConsentLog extends VO {
     /**
-     * Constructor de ProblemsetAccessLog
+     * Constructor de PrivacyStatementConsentLog
      *
-     * Para construir un objeto de tipo ProblemsetAccessLog debera llamarse a el constructor
+     * Para construir un objeto de tipo PrivacyStatementConsentLog debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,17 +26,14 @@ class ProblemsetAccessLog extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
-        }
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
-        if (isset($data['ip'])) {
-            $this->ip = $data['ip'];
+        if (isset($data['privacystatement_id'])) {
+            $this->privacystatement_id = $data['privacystatement_id'];
         }
-        if (isset($data['time'])) {
-            $this->time = $data['time'];
+        if (isset($data['timestamp'])) {
+            $this->timestamp = $data['timestamp'];
         }
     }
 
@@ -47,35 +44,30 @@ class ProblemsetAccessLog extends VO {
         if (count($fields) > 0) {
             parent::toUnixTime($fields);
         } else {
-            parent::toUnixTime(['time']);
+            parent::toUnixTime(['timestamp']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
-
-    /**
       * Identidad del usuario
+      * Llave Primaria
       * @access public
       * @var int(11)
       */
     public $identity_id;
 
     /**
-      *  [Campo no documentado]
+      * Id del documento de privacidad
+      * Llave Primaria
       * @access public
-      * @var int(10)
+      * @var int(11)
       */
-    public $ip;
+    public $privacystatement_id;
 
     /**
-      *  [Campo no documentado]
+      * Fecha y hora en la que el usuario acepta las nuevas políticas
       * @access public
       * @var timestamp
       */
-    public $time;
+    public $timestamp;
 }
