@@ -1139,6 +1139,7 @@ export class Arena {
         $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
             .text(problem.overall_wall_time_limit / 1000 + 's');
+        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
@@ -1214,6 +1215,7 @@ export class Arena {
                 problem.libinteractive_interface_name =
                     problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
+                problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
                 self.preferredLanguage = problem_ext.preferred_language;
@@ -1435,13 +1437,10 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        // TODO(https://github.com/omegaup/omegaup/issues/1962): Remove.
-        if ((extension == 'kp' || extension == 'kj') &&
-            file.size >= 20 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '20kB'}));
-          return false;
-        } else if (file.size >= 10 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
+        if (file.size >= self.currentProblem.input_limit) {
+          alert(UI.formatString(
+              T.arenaRunSubmitFilesize,
+              {limit: (self.currentProblem.input_limit / 1024 + ' KiB')}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');

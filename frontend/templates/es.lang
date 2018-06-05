@@ -505,6 +505,7 @@ problemEditFormFirstTimeCreatingAProblem = "¿Es la primera vez que creas un pro
 problemEditFormHelp = "Ayuda"
 problemEditFormHereIsHowToWriteProblems = "Aquí está cómo crear el archivo"
 problemEditFormHowToWriteProblems = "Cómo crear el archivo"
+problemEditFormInputLimit = "Límite de entrada (bytes)"
 problemEditFormLanguages = "Lenguajes"
 problemEditFormLiteral = "Interpretar salida estándar como puntaje"
 problemEditFormMemoryLimit = "Límite de memoria (KiB)"
