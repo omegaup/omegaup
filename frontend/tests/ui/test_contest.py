@@ -140,8 +140,8 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
                 driver.browser.current_url), driver.browser.current_url
 
         add_problem_to_contest(driver, problem)
-
-        add_students_bulk(driver, users)
+        if users != '':
+            add_students_bulk(driver, users)
         add_students_contest(driver, [user])
 
         contest_url = '/arena/%s' % contest_alias
