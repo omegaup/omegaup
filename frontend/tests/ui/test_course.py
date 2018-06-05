@@ -13,6 +13,8 @@ import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
+                                           '/js/dist/omegaup.js'))
 def test_create_course(driver):
     '''Tests creating an course and retrieving it.'''
 
@@ -40,6 +42,8 @@ def test_create_course(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
+                                           '/js/dist/omegaup.js'))
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
@@ -60,10 +64,11 @@ def test_user_ranking_course(driver):
     with driver.login(user, user):
         enter_course(driver, course_alias, assignment_alias)
 
+        xpath_problem = '//a[contains(@href, "#problems/%s")]' % problem
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
+                 (xpath_problem)))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
