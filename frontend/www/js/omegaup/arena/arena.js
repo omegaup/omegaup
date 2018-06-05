@@ -279,21 +279,23 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
-    // Setup run details view
-    self.runDetailsView = new Vue({
-      el: '#run-details',
-      render: function(createElement) {
-        return createElement('omegaup-arena-rundetails', {
-          props: {
-            data: this.data,
-          },
-        });
-      },
-      data: {data: null},
-      components: {
-        'omegaup-arena-rundetails': arena_RunDetails,
-      },
-    });
+    // Setup run details view, if available.
+    if (document.getElementById('run-details') != null) {
+      self.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: {data: null},
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+    }
 
     // Setup any global hooks.
     self.bindGlobalHandlers();
