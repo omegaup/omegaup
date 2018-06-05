@@ -124,7 +124,7 @@ def test_single_problem(driver):
 
 
 @flaky
-@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_contest_problem(driver):
     '''Tests creating one submission of a problem in a contest.'''
 
