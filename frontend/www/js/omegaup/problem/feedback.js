@@ -4,8 +4,7 @@ import {OmegaUp} from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
-  const histograms =
-      JSON.parse(document.getElementById('histograms').innerText);
+  const payload = JSON.parse(document.getElementById('payload').innerText);
   let problemFeedback = new Vue({
     el: '#problem-feedback',
     render: function(createElement) {
@@ -19,10 +18,10 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      qualityHistogram: JSON.parse(histograms.quality_histogram),
-      difficultyHistogram: JSON.parse(histograms.difficulty_histogram),
-      quality: histograms.quality,
-      difficulty: histograms.difficulty,
+      qualityHistogram: JSON.parse(payload.histogram.quality_histogram),
+      difficultyHistogram: JSON.parse(payload.histogram.difficulty_histogram),
+      quality: payload.histogram.quality,
+      difficulty: payload.histogram.difficulty,
     },
     components: {
       'omegaup-problem-feedback': problem_Feedback,

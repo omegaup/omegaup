@@ -1,14 +1,14 @@
 <template>
   <div class="row omegaup-feedback-row"
        v-if="qualityHistogram || difficultyHistogram">
-    <h5 class="omegaup-feedback-title">Opiniones de los usuarios</h5>
-    <div v-bind:class="difficultyHistogram ? 'col-md-6' : 'col-lg-12'"
+    <h5 class="omegaup-feedback-title">{{ T.wordsUsersFeedback }}</h5>
+    <div v-bind:class="containerClass"
          v-if="qualityHistogram">
       <omegaup-problem-histogram v-bind:histogram="qualityHistogram"
            v-bind:score="qualityScore"
            v-bind:type="quality"></omegaup-problem-histogram>
     </div>
-    <div v-bind:class="qualityHistogram ? 'col-md-6' : 'col-lg-12'"
+    <div v-bind:class="containerClass"
          v-if="difficultyHistogram">
       <omegaup-problem-histogram v-bind:histogram="difficultyHistogram"
            v-bind:score="difficultyScore"
@@ -40,6 +40,12 @@ export default {
   },
   data: function() {
     return { T, quality: T.wordsQuality, difficulty: T.wordsDifficulty, }
+  },
+  computed: {
+    containerClass: function() {
+      return this.qualityHistogram && this.difficultyHistogram ? 'col-md-6' :
+                                                                 'col-md-12';
+    }
   },
   components: {
     'omegaup-problem-histogram': problemHistogram,

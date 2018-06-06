@@ -8,46 +8,46 @@
       </div>
       <div class="omegaup-histogram-2">
         <div class="omegaup-histogram-item">
-          <div class="omegaup-bar-name">
+          <div class="omegaup-histogram-bar-name">
             {{ tags[0] }}
           </div>
-          <div class="omegaup-bar omegaup-bar-1"
+          <div class="omegaup-histogram-bar omegaup-histogram-bar-1"
                v-bind:style="`width:${barsWidth[0]}%`">
             {{`${customHistogram[0]}`}}
           </div>
         </div>
         <div class="omegaup-histogram-item">
-          <div class="omegaup-bar-name">
+          <div class="omegaup-histogram-bar-name">
             {{ tags[1] }}
           </div>
-          <div class="omegaup-bar omegaup-bar-2"
+          <div class="omegaup-histogram-bar omegaup-histogram-bar-2"
                v-bind:style="`width:${barsWidth[1]}%`">
             {{`${customHistogram[1]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
-          <div class="omegaup-bar-name">
+          <div class="omegaup-histogram-bar-name">
             {{ tags[2] }}
           </div>
-          <div class="omegaup-bar omegaup-bar-3"
+          <div class="omegaup-histogram-bar omegaup-histogram-bar-3"
                v-bind:style="`width:${barsWidth[2]}%`">
             {{`${customHistogram[2]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
-          <div class="omegaup-bar-name">
+          <div class="omegaup-histogram-bar-name">
             {{ tags[3] }}
           </div>
-          <div class="omegaup-bar omegaup-bar-4"
+          <div class="omegaup-histogram-bar omegaup-histogram-bar-4"
                v-bind:style="`width:${barsWidth[3]}%`">
             {{`${customHistogram[3]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
-          <div class="omegaup-bar-name">
+          <div class="omegaup-histogram-bar-name">
             {{ tags[4] }}
           </div>
-          <div class="omegaup-bar omegaup-bar-5"
+          <div class="omegaup-histogram-bar omegaup-histogram-bar-5"
                v-bind:style="`width:${barsWidth[4]}%`">
             {{`${customHistogram[4]}` }}
           </div>
@@ -109,7 +109,7 @@
   grid-gap: 10px;
 }
 
-.omegaup-bar-name {
+.omegaup-histogram-bar-name {
   font-size: 12px;
 }
 
@@ -119,7 +119,7 @@
   }
 }
 
-.omegaup-bar {
+.omegaup-histogram-bar {
   display: flex;
   align-items: center;
   font-size: 15px;
@@ -129,23 +129,23 @@
   animation: leftToRight .5s ease .65s forwards;
 }
 
-.omegaup-bar-1 {
+.omegaup-histogram-bar-1 {
   background-image: linear-gradient(to right, #4FA2EB 50%, transparent 50%);
 }
 
-.omegaup-bar-2 {
+.omegaup-histogram-bar-2 {
   background-image: linear-gradient(to right, #C2DDEB 50%, transparent 50%);
 }
 
-.omegaup-bar-3 {
+.omegaup-histogram-bar-3 {
   background-image: linear-gradient(to right, #DDDCDB 50%, transparent 50%);
 }
 
-.omegaup-bar-4 {
+.omegaup-histogram-bar-4 {
   background-image: linear-gradient(to right, #FACCB4 50%, transparent 50%);
 }
 
-.omegaup-bar-5 {
+.omegaup-histogram-bar-5 {
   background-image: linear-gradient(to right, #DF3E4B 50%, transparent 50%);
 }
 </style>
@@ -185,8 +185,8 @@ export default {
     },
     totalVotes: function() { return this.histogram.reduce((a, b) => a + b);},
     barsWidth: function() {
-      const max = Math.max(...this.histogram);
-      return this.histogram.map(value => (value / max * 100));
+      const maxValue = Math.max(...this.histogram);
+      return this.histogram.map(value => (value / maxValue * 100));
     }
   }
 }

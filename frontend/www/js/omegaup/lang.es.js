@@ -993,6 +993,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsTotalVotes: "votos en total",
 	wordsUnimplemented: "Esta caracter\u00edstica no ha sido implementada a\u00fan :(",
 	wordsUser: "Usuario",
+	wordsUsersFeedback: "Opiniones de los usuarios",
 	wordsValidator: "Validador",
 	wordsVerdict: "Veredicto",
 	wordsVeryEasy: "Muy f\u00e1cil",
