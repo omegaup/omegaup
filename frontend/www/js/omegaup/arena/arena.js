@@ -605,10 +605,9 @@ export class Arena {
     let problems = [];
     let initialScores = [];
 
-    for (var key in self.problems) {
-      problemOrder[self.problems[key].alias] = problems.length + 1;
-      problems.push(
-          {order: problems.length + 1, alias: self.problems[key].alias});
+    for (let problem of Object.values(self.problems)) {
+      problemOrder[problem.alias] = problems.length + 1;
+      problems.push({order: problems.length + 1, alias: problem.alias});
     }
 
     data.forEach(function(env) {
@@ -637,9 +636,7 @@ export class Arena {
       rank[env.username].total = env.total;
     });
 
-    let ranking = [];
-
-    for (var username in rank) ranking.push(rank[username]);
+    let ranking = Object.values(rank);
 
     ranking.sort(function(rank1, rank2) {
       return rank2.total.points - rank1.total.points;
