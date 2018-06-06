@@ -11,6 +11,7 @@ $smarty->assign('VALIDATOR_TIME_LIMIT', '1000');
 $smarty->assign('OVERALL_WALL_TIME_LIMIT', '60000');
 $smarty->assign('EXTRA_WALL_TIME', '0');
 $smarty->assign('OUTPUT_LIMIT', '10240');
+$smarty->assign('INPUT_LIMIT', '10240');
 $smarty->assign('MEMORY_LIMIT', '32768');
 $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
@@ -29,6 +30,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'extra_wall_time' => $_POST['extra_wall_time'],
                 'memory_limit' => $_POST['memory_limit'],
                 'output_limit' => $_POST['output_limit'],
+                'input_limit' => $_POST['input_limit'],
                 'source' => $_POST['source'],
                 'visibility' => $_POST['visibility'],
                 'languages' => $_POST['languages'],
@@ -53,6 +55,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('EXTRA_WALL_TIME', $_POST['extra_wall_time']);
         $smarty->assign('MEMORY_LIMIT', $_POST['memory_limit']);
         $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);
+        $smarty->assign('INPUT_LIMIT', $_POST['input_limit']);
         $smarty->assign('SOURCE', $_POST['source']);
         $smarty->assign('LANGUAGES', $_POST['languages']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
