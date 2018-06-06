@@ -14,7 +14,7 @@ import ui.util as util
 
 @flaky
 @util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
-                                           '/api/problemset/scoreboard/'
+                                           '/api/problemset/scoreboard/',
                                            '/js/dist/omegaup.js'))
 def test_create_course(driver):
     '''Tests creating an course and retrieving it.'''
