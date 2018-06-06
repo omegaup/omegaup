@@ -1604,7 +1604,7 @@ class CourseController extends Controller {
                 'finish_time' => $r['assignment']->finish_time,
                 'acl_id' => $r['assignment']->acl_id,
                 'group_id' => $r['course']->group_id,
-                'show_all_runs' => true
+                'admin' => true
             ])
         );
 
