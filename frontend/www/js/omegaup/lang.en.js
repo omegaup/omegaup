@@ -990,6 +990,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsTitle: "Title",
 	wordsTopics: "Topics",
 	wordsTotal: "Total",
+	wordsTotalVotes: "total votes",
 	wordsUnimplemented: "This feature has not been implemented yet :(",
 	wordsUser: "User",
 	wordsValidator: "Validator",

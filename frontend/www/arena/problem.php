@@ -64,6 +64,8 @@ $problem = json_decode($problem, true);
 $smarty->assign('histograms', [
     'difficulty_histogram' => $problem['difficulty_histogram'],
     'quality_histogram' => $problem['quality_histogram'],
+    'quality' => floatval($problem['quality']),
+    'difficulty' => floatval($problem['difficulty']),
 ]);
 
 $smarty->display('../../templates/arena.problem.tpl');

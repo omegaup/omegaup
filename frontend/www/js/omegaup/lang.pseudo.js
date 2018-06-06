@@ -990,6 +990,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsTitle: "(Ti713)",
 	wordsTopics: "(T0pic5)",
 	wordsTotal: "(T07a1)",
+	wordsTotalVotes: "(707a1 v0735)",
 	wordsUnimplemented: "(Thi5 f3a7ur3 ha5 n07 b33n imp13m3n73d y37 :()",
 	wordsUser: "(U53r)",
 	wordsValidator: "(Va1ida70r)",

@@ -1,40 +1,68 @@
 <template>
-<div class="omegaup-histogram-container">
-  <p class="omegaup-histogram-title">Calidad</p>
-  <div class="omegaup-histogram">
-    <div class="omegaup-histogram-1">
-      <p class="omegaup-histogram-score">4.2</p>
-      <p class="omegaup-histogram-votes">👥 29 en total</p>
-    </div>
-    <div class="omegaup-histogram-2">
-      <div class="omegaup-histogram-item">
-        <div class="omegaup-bar-name">Very Good</div>
-        <div class="omegaup-bar omegaup-bar-1">2</div>
+  <div class="omegaup-histogram-container">
+    <p class="omegaup-histogram-title">{{ type }}</p>
+    <div class="omegaup-histogram">
+      <div class="omegaup-histogram-1">
+        <p class="omegaup-histogram-score">{{ score.toFixed(1) }}</p>
+        <p class="omegaup-histogram-votes">👥 {{ totalVotes + ' ' + T.wordsTotalVotes }}</p>
       </div>
-      <div class="omegaup-histogram-item">
-        <div class="omegaup-bar-name">Good</div>
-        <div class="omegaup-bar omegaup-bar-2">7</div>
-      </div>
-      <div class="omegaup-histogram-item">
-        <div class="omegaup-bar-name">Regular</div>
-        <div class="omegaup-bar omegaup-bar-3">10</div>
-      </div>
-      <div class="omegaup-histogram-item">
-        <div class="omegaup-bar-name">Bad</div>
-        <div class="omegaup-bar omegaup-bar-4">4</div>
-      </div>
-      <div class="omegaup-histogram-item">
-        <div class="omegaup-bar-name">Very Bad</div>
-        <div class="omegaup-bar omegaup-bar-5">6</div>
+      <div class="omegaup-histogram-2">
+        <div class="omegaup-histogram-item">
+          <div class="omegaup-bar-name">
+            {{ tags[0] }}
+          </div>
+          <div class="omegaup-bar omegaup-bar-1"
+               v-bind:style="`width:${barsWidth[0]}%`">
+            {{`${customHistogram[0]}`}}
+          </div>
+        </div>
+        <div class="omegaup-histogram-item">
+          <div class="omegaup-bar-name">
+            {{ tags[1] }}
+          </div>
+          <div class="omegaup-bar omegaup-bar-2"
+               v-bind:style="`width:${barsWidth[1]}%`">
+            {{`${customHistogram[1]}` }}
+          </div>
+        </div>
+        <div class="omegaup-histogram-item">
+          <div class="omegaup-bar-name">
+            {{ tags[2] }}
+          </div>
+          <div class="omegaup-bar omegaup-bar-3"
+               v-bind:style="`width:${barsWidth[2]}%`">
+            {{`${customHistogram[2]}` }}
+          </div>
+        </div>
+        <div class="omegaup-histogram-item">
+          <div class="omegaup-bar-name">
+            {{ tags[3] }}
+          </div>
+          <div class="omegaup-bar omegaup-bar-4"
+               v-bind:style="`width:${barsWidth[3]}%`">
+            {{`${customHistogram[3]}` }}
+          </div>
+        </div>
+        <div class="omegaup-histogram-item">
+          <div class="omegaup-bar-name">
+            {{ tags[4] }}
+          </div>
+          <div class="omegaup-bar omegaup-bar-5"
+               v-bind:style="`width:${barsWidth[4]}%`">
+            {{`${customHistogram[4]}` }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <style>
+.omegaup-histogram-container {
+  margin: 50px 0;
+}
+
 .omegaup-histogram-title {
-  margin: 30px 0 10px;
   font-size: 1.25em;
   font-weight: bold;
   text-align: center;
@@ -55,10 +83,10 @@
 
 .omegaup-histogram-1 p {
   margin: 0;
+  text-align: center;
 }
 
-.omegaup-histogram-score,
-.omegaup-histogram-votes {
+.omegaup-histogram-score {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,7 +122,6 @@
 .omegaup-bar {
   display: flex;
   align-items: center;
-  padding: 0 0 0 5px;
   font-size: 15px;
   font-weight: bold;
   background-size: 200% 100%;
@@ -104,27 +131,22 @@
 
 .omegaup-bar-1 {
   background-image: linear-gradient(to right, #4FA2EB 50%, transparent 50%);
-  width: 10%;
 }
 
 .omegaup-bar-2 {
   background-image: linear-gradient(to right, #C2DDEB 50%, transparent 50%);
-  width: 80%;
 }
 
 .omegaup-bar-3 {
   background-image: linear-gradient(to right, #DDDCDB 50%, transparent 50%);
-  width: 100%;
 }
 
 .omegaup-bar-4 {
   background-image: linear-gradient(to right, #FACCB4 50%, transparent 50%);
-  width: 50%;
 }
 
 .omegaup-bar-5 {
   background-image: linear-gradient(to right, #DF3E4B 50%, transparent 50%);
-  width: 75%;
 }
 </style>
 
@@ -132,15 +154,40 @@
 import {T} from '../../omegaup.js';
 export default {
   props: {
-    size: String,
     type: String,
-
+    histogram: Array,
+    score: Number,
   },
   data: function() {
-    return {
-      T,
-    }
+    return { T, }
   },
+  computed: {
+    tags: function() {
+      return this.type === 'Quality' ?
+                 [
+                   T.qualityFormQualityVeryGood,
+                   T.qualityFormQualityGood,
+                   T.qualityFormQualityFair,
+                   T.qualityFormQualityBad,
+                   T.qualityFormQualityVeryBad
+                 ] :
+                 [
+                   T.qualityFormDifficultyVeryEasy,
+                   T.qualityFormDifficultyEasy,
+                   T.qualityFormDifficultyMedium,
+                   T.qualityFormDifficultyHard,
+                   T.qualityFormDifficultyVeryHard
+                 ]
+    },
+    customHistogram: function() {
+      return this.type === 'Quality' ? this.histogram.reverse() :
+                                       this.histogram;
+    },
+    totalVotes: function() { return this.histogram.reduce((a, b) => a + b);},
+    barsWidth: function() {
+      const max = Math.max(...this.histogram);
+      return this.histogram.map(value => (value / max * 100));
+    }
+  }
 }
 </script>
-
