@@ -18,7 +18,7 @@
           '' }} <omegaup-user-username v-bind:classname="profile.classname"
                                  v-bind:username="profile.username"></omegaup-user-username>
                                  <img height="11"
-               v-bind:src="`/media/flags/${profile.country_id}.png`"
+               v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
                v-bind:title="profile.country_id"
                v-if="profile.country_id"
                width="16"></h2>

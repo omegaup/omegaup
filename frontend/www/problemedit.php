@@ -22,6 +22,7 @@ if (isset($_POST['request'])) {
                     'extra_wall_time' => $_POST['extra_wall_time'],
                     'memory_limit' => $_POST['memory_limit'],
                     'output_limit' => $_POST['output_limit'],
+                    'input_limit' => $_POST['input_limit'],
                     'source' => $_POST['source'],
                     'visibility' => $_POST['visibility'],
                     'languages' => $_POST['languages'],

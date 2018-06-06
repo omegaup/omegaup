@@ -15,6 +15,7 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -338,6 +339,8 @@ def _get_browser(request, browser_name):
                 os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
+            'extendedDebugging': 'true',
+            'loggingPrefs': {'browser': 'ALL'},
         }
         # Add browser configuration
         capabilities.update({
@@ -360,17 +363,26 @@ def _get_browser(request, browser_name):
         chrome_options.add_argument('--lang=en-US')
         if request.config.option.headless:
             chrome_options.add_argument('--headless')
-        chrome_browser = webdriver.Chrome(chrome_options=chrome_options)
+        chrome_capabilities = DesiredCapabilities.CHROME
+        chrome_capabilities['loggingPrefs'] = {'browser': 'ALL'}
+        chrome_browser = webdriver.Chrome(
+            chrome_options=chrome_options,
+            desired_capabilities=chrome_capabilities)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    # pylint: disable=line-too-long
-    firefox_capabilities = webdriver.common.desired_capabilities.DesiredCapabilities.FIREFOX  # NOQA
+    firefox_capabilities = DesiredCapabilities.FIREFOX
     firefox_capabilities['marionette'] = True
+    firefox_capabilities['loggingPrefs'] = {'browser': 'ALL'}
     firefox_options = webdriver.firefox.options.Options()
+    firefox_profile = webdriver.FirefoxProfile()
+    firefox_profile.set_preference(
+        'webdriver.log.file', '/tmp/firefox_console')
     if request.config.option.headless:
         firefox_options.add_argument('-headless')
     firefox_browser = webdriver.Firefox(
-        capabilities=firefox_capabilities, firefox_options=firefox_options)
+        capabilities=firefox_capabilities,
+        firefox_options=firefox_options,
+        firefox_profile=firefox_profile)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 

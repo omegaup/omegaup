@@ -186,7 +186,7 @@ class Contests extends VO {
     public $window_length;
 
     /**
-      * Este campo es para las repeticiones de algún concurso
+      * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.
       * @access public
       * @var int(11)
       */

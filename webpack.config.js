@@ -4,9 +4,11 @@ var webpack = require('webpack')
 module.exports = {
   entry: {
     omegaup: ['babel-polyfill', './frontend/www/js/omegaup/omegaup.js'],
+    activity_feed: './frontend/www/js/omegaup/activity/feed.js',
     admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
+    coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant: './frontend/www/js/omegaup/contest/list_participant.js',
@@ -17,6 +19,7 @@ module.exports = {
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
+    problem_list: './frontend/www/js/omegaup/problem/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
@@ -25,6 +28,7 @@ module.exports = {
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
+    user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
   },
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist'),

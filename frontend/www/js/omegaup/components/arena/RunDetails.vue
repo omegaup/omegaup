@@ -47,15 +47,13 @@
           </tbody>
         </table>
       </div>
-      <h3>{{ T.wordsSource }}</h3>
-      <pre class="source"
-           v-if="data.source_link">
-        <a download="data.zip"
-     v-bind:href="data.source">{{ T.wordsDownload }}</a>
-      </pre>
-      <pre class="source"
-           v-else=""
-           v-text="data.source"></pre>
+      <h3>{{ T.wordsSource }}</h3><a download="data.zip"
+           v-bind:href="data.source"
+           v-if="data.source_link">{{ T.wordsDownload }}</a>
+           <omegaup-arena-code-view v-bind:language="data.language"
+           v-bind:readonly="true"
+           v-bind:value="data.source"
+           v-else></omegaup-arena-code-view>
       <div class="compile_error"
            v-if="data.compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
@@ -98,9 +96,14 @@
 
 <script>
 import {T} from '../../omegaup.js';
+import arena_CodeView from './CodeView.vue';
+
 export default {
   props: {
     data: Object,
+  },
+  components: {
+    'omegaup-arena-code-view': arena_CodeView,
   },
   data: function() {
     return {

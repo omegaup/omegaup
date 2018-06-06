@@ -61,14 +61,14 @@ class SchoolsDAO extends SchoolsDAOBase {
             SELECT
               s.name,
               s.country_id,
-              COUNT(DISTINCT u.user_id) as distinct_users,
+              COUNT(DISTINCT i.identity_id) as distinct_users,
               COUNT(DISTINCT p.problem_id) AS distinct_problems
             FROM
-              Users u
+              Identities i
             INNER JOIN
-              Runs r ON u.user_id = r.user_id
+              Runs r ON i.identity_id = r.identity_id
             INNER JOIN
-              Schools s ON u.school_id = s.school_id
+              Schools s ON i.school_id = s.school_id
             INNER JOIN
               Problems p ON p.problem_id = r.problem_id
             WHERE

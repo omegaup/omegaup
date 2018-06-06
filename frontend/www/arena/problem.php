@@ -3,7 +3,7 @@ require_once('../../server/bootstrap.php');
 
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
-$r['statement_type'] = 'html';
+$r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
@@ -12,7 +12,7 @@ try {
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
-            $session['user']
+            $session['identity']
         );
     } else {
         $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissed' => false];
@@ -21,8 +21,6 @@ try {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
-$smarty->assign('problem_statement', $result['problem_statement']);
-$smarty->assign('problem_statement_language', $result['problem_statement_language']);
 $smarty->assign('problem_alias', $result['alias']);
 $smarty->assign('visibility', $result['visibility']);
 $smarty->assign('source', $result['source']);
@@ -34,6 +32,7 @@ $smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
 $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 . 's');
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
+$smarty->assign('input_limit', $result['input_limit'] / 1024 . ' KiB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
@@ -61,8 +60,6 @@ $result['user'] = [
 ];
 $smarty->assign('problem_admin', $result['user']['admin']);
 
-// Remove the largest element to reduce the payload.
-unset($result['problem_statement']);
-$smarty->assign('problem', json_encode($result));
+$smarty->assign('payload', $result);
 
 $smarty->display('../../templates/arena.problem.tpl');

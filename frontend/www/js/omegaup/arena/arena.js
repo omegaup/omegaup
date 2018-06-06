@@ -215,6 +215,9 @@ export class Arena {
     // The last known scoreboard event stream.
     self.currentEvents = null;
 
+    // The Markdown-to-HTML converter.
+    self.markdownConverter = UI.markdownConverter();
+
     // Currently opened notifications.
     self.notifications = new Notifications();
     OmegaUp.on('ready',
@@ -276,24 +279,25 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
-    // Setup run details view
-    self.runDetailsView = new Vue({
-      el: '#run-details',
-      render: function(createElement) {
-        return createElement('omegaup-arena-rundetails', {
-          props: {
-            data: this.data,
-          },
-        });
-      },
-      data: {data: null},
-      components: {
-        'omegaup-arena-rundetails': arena_RunDetails,
-      },
-    });
+    // Setup run details view, if available.
+    if (document.getElementById('run-details') != null) {
+      self.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: {data: null},
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+    }
 
     // Setup any global hooks.
-    self.installLibinteractiveHooks();
     self.bindGlobalHandlers();
 
     // Contest summary view model
@@ -314,10 +318,11 @@ export class Arena {
 
   installLibinteractiveHooks() {
     let self = this;
-    $('#libinteractive-download')
+    $('.libinteractive-download form')
         .on('submit', function(e) {
           let form = $(e.target);
-          let alias = e.target.attributes['data-alias'].value;
+          e.preventDefault();
+          let alias = self.currentProblem.alias;
           let os = form.find('.download-os').val();
           let lang = form.find('.download-lang').val();
           let extension = (os == 'unix' ? '.tar.bz2' : '.zip');
@@ -329,11 +334,13 @@ export class Arena {
           return false;
         });
 
-    $('#libinteractive-download .download-lang')
+    $('.libinteractive-download .download-lang')
         .on('change', function(e) {
-          let form = $('#libinteractive-download');
-          form.find('.libinteractive-extension')
-              .html(form.find('.download-lang').val());
+          var form = e.target;
+          while (!form.classList.contains('libinteractive-download')) {
+            form = form.parentElement;
+          }
+          $(form).find('.libinteractive-extension').html($(e.target).val());
         });
   }
 
@@ -905,6 +912,9 @@ export class Arena {
     }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
+      if (clarification.receiver != null) {
+        $(r).addClass('direct-message');
+      }
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
@@ -939,6 +949,22 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
+    const allowedLanguages = [
+      {language: 'cpp11', name: 'C++11'},
+      {language: 'cpp', name: 'C++'},
+      {language: 'c', name: 'C'},
+      {language: 'cs', name: 'C#'},
+      {language: 'hs', name: 'Haskell'},
+      {language: 'java', name: 'Java'},
+      {language: 'pas', name: 'Pascal'},
+      {language: 'py', name: 'Python'},
+      {language: 'rb', name: 'Ruby'},
+      {language: 'lua', name: 'Lua'},
+      {language: 'kp', name: 'Karel (Pascal)'},
+      {language: 'kj', name: 'Karel (Java)'},
+      {language: 'cat', name: T.wordJustOutput},
+    ];
+
     let self = this;
 
     let can_submit = lang_array.length != 0;
@@ -946,21 +972,34 @@ export class Arena {
     $('.runs').toggle(can_submit);
     $('.data').toggle(can_submit);
     $('.best-solvers').toggle(can_submit);
-    $('option', self.elements.submitForm.language)
-        .each(function(index, item) {
-          item = $(item);
-          item.toggle(lang_array.indexOf(item.val()) >= 0);
+
+    // refresh options in select
+    const languageSelect = document.querySelector('select[name="language"]');
+    while (languageSelect.firstChild)
+      languageSelect.removeChild(languageSelect.firstChild);
+
+    const languageArray =
+        typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+
+    allowedLanguages.filter(item => {
+                      return languageArray.includes(item.language);
+                    })
+        .forEach(optionItem => {
+          let optionNode = document.createElement('option');
+          optionNode.value = optionItem.language;
+          optionNode.appendChild(document.createTextNode(optionItem.name));
+          languageSelect.appendChild(optionNode);
         });
   }
 
   selectDefaultLanguage() {
     let self = this;
     let langElement = self.elements.submitForm.language;
+
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
             return false;
@@ -971,11 +1010,10 @@ export class Arena {
     $('option', langElement)
         .each(function() {
           let option = $(this);
-          if (option.css('display') != 'none') {
-            option.prop('selected', true);
-            langElement.trigger('change');
-            return false;
-          }
+
+          option.prop('selected', true);
+          langElement.trigger('change');
+          return false;
         });
   }
 
@@ -1084,18 +1122,18 @@ export class Arena {
         $('#summary').hide();
         $('#problem').show();
         $('#problem > .title')
-            .html(problem.letter + '. ' + UI.escape(problem.title));
-        $('#problem .data .points').html(problem.points);
-        $('#problem .memory_limit').html(problem.memory_limit / 1024 + 'MB');
-        $('#problem .time_limit').html(problem.time_limit / 1000 + 's');
+            .text(problem.letter + '. ' + UI.escape(problem.title));
+        $('#problem .data .points').text(problem.points);
+        $('#problem .memory_limit').text(problem.memory_limit / 1024 + 'MB');
+        $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
-            .html(problem.overall_wall_time_limit / 1000 + 's');
-        $('#problem .statement').html(problem.problem_statement);
+            .text(problem.overall_wall_time_limit / 1000 + 's');
+        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
+        self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
-        let language_array = problem.languages;
         if (karel_langs.every(function(x) {
-              return language_array.indexOf(x) != -1;
+              return problem.languages.indexOf(x) != -1;
             })) {
           let original_href = $('#problem .karel-js-link a').attr('href');
           let hash_index = original_href.indexOf('#');
@@ -1129,12 +1167,8 @@ export class Arena {
         }
         $('#problem .runs tfoot td a')
             .attr('href', '#problems/' + problem.alias + '/new-run');
-        self.installLibinteractiveHooks();
 
         $('#problem tbody.added').remove();
-
-        self.updateAllowedLanguages(language_array);
-        self.selectDefaultLanguage();
 
         function updateRuns(runs) {
           if (runs) {
@@ -1153,9 +1187,6 @@ export class Arena {
           updateRuns(problem.runs);
         }
 
-        self.mountEditor(problem);
-        MathJax.Hub.Queue(
-            ['Typeset', MathJax.Hub, $('#problem .statement').get(0)]);
         self.initSubmissionCountdown();
       }
 
@@ -1170,7 +1201,10 @@ export class Arena {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
                 problem.problem_statement = problem_ext.problem_statement;
+                problem.libinteractive_interface_name =
+                    problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
+                problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
                 self.preferredLanguage = problem_ext.preferred_language;
@@ -1222,6 +1256,32 @@ export class Arena {
         $('#clarifications-count').css('font-weight', 'normal');
       }
     }
+  }
+
+  renderProblem(problem) {
+    let self = this;
+    self.currentProblem = problem;
+    let statement = document.querySelector('#problem div.statement');
+
+    statement.innerHTML =
+        self.markdownConverter.makeHtml(problem.problem_statement);
+
+    UI.renderSampleToClipboardButton();
+
+    let libinteractiveInterfaceName =
+        statement.querySelector('span.libinteractive-interface-name');
+    if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
+      libinteractiveInterfaceName.innerText =
+          problem.libinteractive_interface_name.replace(/\.idl$/, '');
+    }
+    self.installLibinteractiveHooks();
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
+
+    self.mountEditor(problem);
+
+    let languageArray = problem.languages;
+    self.updateAllowedLanguages(languageArray);
+    self.selectDefaultLanguage();
   }
 
   detectShowRun() {
@@ -1366,8 +1426,10 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        if (file.size >= 10 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
+        if (file.size >= self.currentProblem.input_limit) {
+          alert(UI.formatString(
+              T.arenaRunSubmitFilesize,
+              {limit: (self.currentProblem.input_limit / 1024 + ' KiB')}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');
@@ -1536,6 +1598,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
+      language: data.language,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }
@@ -1666,9 +1729,15 @@ class RunView {
           self.filter_username('');
         });
 
-    UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
-      self.filter_problem(item.alias);
-    });
+    if (self.arena.options.contestAlias) {
+      UI.problemContestTypeahead(
+          $('.runsproblem', elm), self.arena.problems,
+          function(event, item) { self.filter_problem(item.alias); });
+    } else {
+      UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+        self.filter_problem(item.alias);
+      });
+    }
 
     $('.runsproblem-clear', elm)
         .on('click', function() {

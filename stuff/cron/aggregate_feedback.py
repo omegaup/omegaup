@@ -7,10 +7,13 @@ and rating based on bayesian averages.
 '''
 
 import argparse
+import calendar
 import collections
 import configparser
+import datetime
 import getpass
 import json
+import operator
 import logging
 import os
 import warnings
@@ -49,8 +52,6 @@ def get_global_quality_and_difficulty_average(dbconn):
             try:
                 contents = json.loads(row[0])
             except json.JSONDecodeError:  # pylint: disable=no-member
-                # Travis uses Python <3.5, which does not yet have
-                # json.JSONDecodeError.
                 logging.exception('Failed to parse contents')
                 continue
 
@@ -80,32 +81,29 @@ def get_problem_aggregates(dbconn, problem_id):
                          AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
-        quality_sum = 0
-        quality_n = 0
-        difficulty_sum = 0
-        difficulty_n = 0
+        quality_votes = [0, 0, 0, 0, 0]
+        difficulty_votes = [0, 0, 0, 0, 0]
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
             if 'quality' in contents:
-                quality_sum += contents['quality']
-                quality_n += 1
+                quality_votes[contents['quality']] += 1
             if 'difficulty' in contents:
-                difficulty_sum += contents['difficulty']
-                difficulty_n += 1
+                difficulty_votes[contents['difficulty']] += 1
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += 1
                     problem_tag_votes_n += 1
 
-    return (quality_sum, quality_n, difficulty_sum, difficulty_n,
+    return (quality_votes, difficulty_votes,
             problem_tag_votes, problem_tag_votes_n)
 
 
-def bayesian_average(apriori_average, value_sum, values_n):
+def bayesian_average(apriori_average, values):
     '''Gets the Bayesian average of an observation based on a prior value.'''
-
+    values_n = sum(values)
+    value_sum = sum(score * n for score, n in enumerate(values))
     if values_n < CONFIDENCE or apriori_average is None:
         return None
     return (CONFIDENCE * apriori_average + value_sum) / (CONFIDENCE + values_n)
@@ -193,26 +191,29 @@ def aggregate_feedback(dbconn):
             problem_id = row[0]
             logging.debug('Aggregating feedback for problem %d', problem_id)
 
-            (problem_quality_sum, problem_quality_n,
-             problem_difficulty_sum, problem_difficulty_n,
+            (problem_quality_votes, problem_difficulty_votes,
              problem_tag_votes,
              problem_tag_votes_n) = get_problem_aggregates(dbconn, problem_id)
 
             problem_quality = bayesian_average(
-                global_quality_average, problem_quality_sum, problem_quality_n)
+                global_quality_average, problem_quality_votes)
             problem_difficulty = bayesian_average(global_difficulty_average,
-                                                  problem_difficulty_sum,
-                                                  problem_difficulty_n)
+                                                  problem_difficulty_votes)
             if problem_quality is not None and problem_difficulty is not None:
                 logging.debug('Updating problem %d. quality=%f, difficulty=%f',
                               problem_id, problem_quality, problem_difficulty)
                 cur.execute("""UPDATE
                                    `Problems` as p
                                SET
-                                   p.`quality` = %s, p.`difficulty` = %s
+                                   p.`quality` = %s, p.`difficulty` = %s,
+                                   p.`quality_histogram` = %s,
+                                   p.`difficulty_histogram` = %s
                                WHERE
                                    p.`problem_id` = %s;""",
-                            (problem_quality, problem_difficulty, problem_id))
+                            (problem_quality, problem_difficulty,
+                             json.dumps(problem_quality_votes),
+                             json.dumps(problem_difficulty_votes),
+                             problem_id))
                 dbconn.commit()
             else:
                 logging.debug('Not enough information for problem %d',
@@ -257,6 +258,94 @@ def mysql_connect(args):
     )
 
 
+def get_last_friday():
+    '''Returns datetime object corresponding to last Friday.
+    '''
+    current_date = datetime.datetime.now().date()
+    last_friday = (
+        current_date -
+        datetime.timedelta(days=current_date.weekday()) +
+        datetime.timedelta(days=calendar.FRIDAY))
+
+    # If day of the week is before Friday substract a week from the date.
+    if current_date.weekday() < calendar.FRIDAY:
+        last_friday -= datetime.timedelta(weeks=1)
+
+    return last_friday
+
+
+def update_problem_of_the_week(dbconn, difficulty):
+    '''Computes and records the problem of the past week.
+
+    We will choose the problem that has not previously been chosen as problem
+    of the week, has been previously identified as being Easy, and has the
+    largest sum of quality votes over the past week as the problem of the week.
+    '''
+
+    # First check if last Friday's problem has already been computed and stored
+    last_friday = get_last_friday()
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT COUNT(*)
+                       FROM `Problem_Of_The_Week`
+                       WHERE `time` = %s
+                         AND `difficulty` = %s;""",
+                    (last_friday.strftime("%Y-%m-%d"), difficulty))
+        if cur.fetchone()[0] > 0:
+            return
+
+    # If last Friday's problem hasn't been computed, we compute it and store it
+    # in the DB.
+    friday_before_last = last_friday - datetime.timedelta(weeks=1)
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT qn.`problem_id`, qn.`contents`
+                       FROM `QualityNominations` AS qn
+                       INNER JOIN `Problems`
+                         AS p ON p.`problem_id` = qn.`problem_id`
+                       LEFT JOIN `Problem_Of_The_Week`
+                         AS pw ON pw.`problem_id` = qn.`problem_id`
+                       WHERE qn.`nomination` = 'suggestion'
+                         AND qn.`time` >= %s
+                         AND qn.`time` < %s
+                         AND pw.`problem_of_the_week_id` IS NULL
+                         AND p.`difficulty` >= %s
+                         AND p.`difficulty` < %s;""",
+                    (friday_before_last.strftime("%Y-%m-%d %H:%M:%S"),
+                     last_friday.strftime("%Y-%m-%d %H:%M:%S"),
+                     0.0 if difficulty == 'easy' else 2.0,
+                     2.0 if difficulty == 'easy' else 4.0))
+
+        quality_map = collections.defaultdict(int)
+        for row in cur:
+            problem_id = row[0]
+            try:
+                contents = json.loads(row[1])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+
+            if 'quality' not in contents:
+                continue
+
+            quality_map[problem_id] += contents['quality']
+
+        if not quality_map:
+            logging.warning('No problem of the week found')
+            return
+
+        problem_of_the_week_problem_id = (
+            max(quality_map.items(), key=operator.itemgetter(1))[0])
+        logging.debug('Inserting problem of the week %d for week of %s',
+                      problem_of_the_week_problem_id,
+                      last_friday.strftime("%Y-%m-%d"))
+        cur.execute("""INSERT INTO `Problem_Of_The_Week`
+                       (`problem_id`, `time`, `difficulty`)
+                       VALUES (%s, %s, %s);""",
+                    (problem_of_the_week_problem_id,
+                     last_friday.strftime("%Y-%m-%d"),
+                     difficulty))
+        dbconn.commit()
+
+
 def main():
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
@@ -290,9 +379,23 @@ def main():
     dbconn = mysql_connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        aggregate_feedback(dbconn)
-    except:  # pylint: disable=bare-except
-        logging.exception('Failed to update user ranking')
+        try:
+            aggregate_feedback(dbconn)
+        except:  # pylint: disable=bare-except
+            logging.exception(
+                'Failed to aggregate feedback and update problem tags.')
+            raise
+
+        try:
+            # Problem of the week HAS to be computed AFTER feedback has been
+            # aggregated. It uses difficulty tags computed from feedback to
+            # pick a problem of the given difficulty.
+            update_problem_of_the_week(dbconn, "easy")
+            # TODO(heduenas): Compute "hard" problem of the week when we get
+            # enough feedback records.
+        except:  # pylint: disable=bare-except
+            logging.exception('Failed to update problem of the week')
+            raise
     finally:
         dbconn.close()
         logging.info('Done')
