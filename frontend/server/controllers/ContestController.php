@@ -1713,7 +1713,10 @@ class ContestController extends Controller {
         self::validateDetails($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = (Authorization::isContestAdmin($r['current_identity_id'], $r['contest']) and !ContestsDAO::isVirtual($r['contest']));
+        $params['show_all_runs'] = (
+            Authorization::isContestAdmin($r['current_identity_id'], $r['contest']) &&
+            !ContestsDAO::isVirtual($r['contest'])
+        );
         $params['unique'] = !ContestsDAO::isVirtual($r['contest']);
         $scoreboard = new Scoreboard($params);
 
@@ -2107,8 +2110,6 @@ class ContestController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        self::forbiddenInVirtual($contest);
 
         if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
             throw new ForbiddenAccessException();

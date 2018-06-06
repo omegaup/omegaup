@@ -575,11 +575,9 @@ export class Arena {
             API.Contest.scoreboardEvents(
                            {contest_alias: self.options.originalContestAlias})
                 .then(function(response) {
-                  var original_events = response.events;
-                  events = events.concat(original_events);
-                  var data = {events: events};
+                  events.push.apply(response.events);
                   self.virtualRankingChange(events);
-                  self.onRankingEvents(data);
+                  self.onRankingEvents({events: events});
                 })
                 .fail(UI.ignoreError);
           })
@@ -609,7 +607,8 @@ export class Arena {
 
     for (var key in self.problems) {
       problemOrder[self.problems[key].alias] = problems.length + 1;
-      problems.push({order: count, alias: self.problems[key].alias});
+      problems.push(
+          {order: problems.length + 1, alias: self.problems[key].alias});
     }
 
     data.forEach(function(env) {
