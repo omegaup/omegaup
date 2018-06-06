@@ -1713,11 +1713,11 @@ class ContestController extends Controller {
         self::validateDetails($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = (
+        $params['admin'] = (
             Authorization::isContestAdmin($r['current_identity_id'], $r['contest']) &&
             !ContestsDAO::isVirtual($r['contest'])
         );
-        $params['unique'] = !ContestsDAO::isVirtual($r['contest']);
+        $params['show_all_runs'] = !ContestsDAO::isVirtual($r['contest']);
         $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
@@ -1773,7 +1773,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = $showAllRuns;
+        $params['admin'] = $showAllRuns;
         $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate();
@@ -2513,7 +2513,7 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = true;
+        $params['admin'] = true;
         $params['auth_token'] = $r['auth_token'];
         $scoreboard = new Scoreboard($params);
 
