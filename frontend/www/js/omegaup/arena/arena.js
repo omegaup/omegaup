@@ -568,9 +568,9 @@ export class Arena {
       API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
           .then(function(response) {
             let events = response.events;
-            for (var i in events) {
-              events[i].username += '-(virtual)';
-              events[i].name += '-(virtual)';
+            for (let event of events) {
+              event.username += '-(virtual)';
+              event.name += '-(virtual)';
             }
             API.Contest.scoreboardEvents(
                            {contest_alias: self.options.originalContestAlias})
@@ -642,7 +642,7 @@ export class Arena {
     for (var username in rank) ranking.push(rank[username]);
 
     ranking.sort(function(rank1, rank2) {
-      return rank1.total.points < rank2.total.points;
+      return rank2.total.points - rank1.total.points;
     });
 
     for (var index = 0; index < ranking.length; index++)
