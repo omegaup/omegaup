@@ -186,6 +186,7 @@ export default {
     totalVotes: function() { return this.histogram.reduce((a, b) => a + b);},
     barsWidth: function() {
       const maxValue = Math.max(...this.histogram);
+      if (maxValue == 0) return [0, 0, 0, 0, 0];
       return this.histogram.map(value => (value / maxValue * 100));
     }
   }
