@@ -48,4 +48,120 @@ class IdentityController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
+
+    /**
+     * Entry point for Create a User API
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiCreate(Request $r) {
+        self::authenticateRequest($r);
+        if (!Authorization::isOrganizer($r['current_identity_id'])) {
+            throw new ForbiddenAccessException();
+        }
+        // Validate request
+        Validators::isValidUsername($r['username'], 'username');
+
+        // Does identity already exists?
+        try {
+            $identity = IdentitiesDAO::FindByUsername($r['username']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!is_null($identity)) {
+            throw new DuplicatedEntryInDatabaseException('usernameInUse');
+        }
+
+        // Check password
+        SecurityTools::testStrongPassword($r['password']);
+        $hashedPassword = SecurityTools::hashString($r['password']);
+
+        if (!is_null($r['name'])) {
+            $r['name'] = trim($r['name']);
+            Validators::isStringNonEmpty($r['name'], 'name', true);
+            Validators::isStringOfMaxLength($r['name'], 'name', 50);
+        }
+
+        $state = null;
+        if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
+            // Both state and country must be specified together.
+            $r['country_id'] = trim($r['country_id']);
+            $r['state_id'] = trim($r['state_id']);
+            Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
+            Validators::isStringNonEmpty($r['state_id'], 'state_id', false);
+
+            try {
+                $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if (is_null($state)) {
+                throw new InvalidParameterException('parameterInvalid', 'state_id');
+            }
+        }
+        $r['gender'] = trim($r['gender']);
+        if (!empty($r['gender'])) {
+            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+        }
+        $r['school_name'] = trim($r['school_name']);
+        if (empty($r['school_name'])) {
+            $r['school_id'] = null;
+        } else {
+            try {
+                $response = SchoolController::apiCreate(new Request([
+                    'name' => $r['school_name'],
+                    'country_id' => $state != null ? $state->country_id : null,
+                    'state_id' => $state != null ? $state->state_id : null,
+                    'auth_token' => $r['auth_token'],
+                ]));
+                $r['school_id'] = $response['school_id'];
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+
+        // Prepare DAOs
+        $user_data = [
+            'username' => $r['username'],
+            'name' => $r['name'],
+            'password' => $hashedPassword,
+            'country_id' => $r['country_id'],
+            'state_id' => $r['state_id'],
+            'gender' => $r['gender'],
+            'school_id' => $r['school_id']
+        ];
+
+        if (isset($r['name'])) {
+            $user_data['name'] = $r['name'];
+        }
+
+        $identity = new Identities($user_data);
+
+        // Save objects into DB
+        try {
+            DAO::transBegin();
+
+            IdentitiesDAO::save($identity);
+            $r['usernameOrEmail'] = $r['username'];
+
+            if (!empty($r['group_alias'])) {
+                GroupController::apiAddUser($r);
+            }
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'username' => $identity->username,
+        ];
+    }
 }

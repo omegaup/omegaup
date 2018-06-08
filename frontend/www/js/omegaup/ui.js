@@ -78,7 +78,8 @@ let UI = {
   dismissNotifications: function() { $('#status')
                                          .slideUp(); },
 
-  bulkOperation: function(operation, onOperationFinished, options) {
+  bulkOperation: function(operation, onOperationFinished, options,
+                          iterator = null) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
@@ -88,12 +89,19 @@ let UI = {
       success = false;
       error = data.error;
     };
+
     $('input[type=checkbox]')
         .each(function() {
           if (this.checked) {
             operation(this.id, resolve, reject);
           }
         });
+
+    if (iterator) {
+      for (const[i, identity] of iterator.entries()) {
+        operation(identity, resolve, reject);
+      }
+    }
 
     // Wait for all
     $(document)

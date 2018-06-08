@@ -352,6 +352,10 @@ export default {
     removeContest: _call('/api/groupScoreboard/removeContest/'),
   },
 
+  Identity: {
+    create: _call('/api/identity/create/'),
+  },
+
   Interview: {
     addUsers: _call('/api/interview/addUsers/'),
 
