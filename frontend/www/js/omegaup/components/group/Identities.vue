@@ -2,13 +2,17 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div>
-        <div class="panel-heading">{{ T.groupsUploadCsv }}
-          <input type="file" name="identities" /></div>
-        <div class="panel-heading"><a class="btn btn-primary"
-           v-on:click.prevent="readCsv">{{ T.groupsUploadFile }}</a></div>
-      </div>
-      <br>
-      <div class="panel panel-default no-bottom-margin" v-show="identities">
+        <div class="panel-heading">
+          {{ T.groupsUploadCsv }} <input name="identities"
+               type="file">
+        </div>
+        <div class="panel-heading">
+          <a class="btn btn-primary"
+               v-on:click.prevent="readCsv">{{ T.groupsUploadFile }}</a>
+        </div>
+      </div><br>
+      <div class="panel panel-default no-bottom-margin"
+           v-show="identities">
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
         </div>
@@ -36,10 +40,13 @@
             </tr>
           </tbody>
         </table>
-        <div class="panel-heading"><a class="btn btn-primary"
-             v-on:click.prevent="bulkIdentities">{{ T.groupEditIdentities }}</a>
-           </div>
-        <div>{{ T.groupsIdentityWarning }}</div>
+        <div class="panel-heading">
+          <a class="btn btn-primary"
+               v-on:click.prevent="bulkIdentities">{{ T.groupEditIdentities }}</a>
+        </div>
+        <div>
+          {{ T.groupsIdentityWarning }}
+        </div>
       </div>
     </div>
   </div>
@@ -49,9 +56,7 @@
 import {T, UI} from '../../omegaup.js';
 
 export default {
-  data: function() {
-    return { T: T, identities: this.identities};
-  },
+  data: function() { return {T: T, identities: this.identities};},
   methods: {
     readCsv: function() {
       let self = this;
@@ -61,15 +66,15 @@ export default {
         UI.error(T.groupsInvalidCsv);
         return;
       }
-      if (typeof (FileReader) == "undefined") {
+      if (typeof(FileReader) == "undefined") {
         UI.error(T.wordsBrowserDoesNotSupportHtml5);
         return;
       }
       let reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = function(e) {
         let rows = e.target.result.split("\n");
         self.identities = [];
-        for (let [index, row] of rows.entries()) {
+        for (let[index, row] of rows.entries()) {
           let cells = row.split(',');
           if (cells[0] != '') {
             self.identities[index] = [];
@@ -82,7 +87,7 @@ export default {
             self.identities[index]['school_name'] = cells[5];
           }
         }
-      }
+      };
       reader.readAsText(fileUpload[0].files[0]);
     },
     bulkIdentities: function() {
@@ -92,10 +97,10 @@ export default {
     generatePassword: function() {
       let string = '';
       let validChars =
-         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&%$#_-';
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&%$#_-';
       for (var i = 0; i < 8; i++) {
         string +=
-               validChars.charAt(Math.floor(Math.random() * validChars.length));
+            validChars.charAt(Math.floor(Math.random() * validChars.length));
       }
       return string;
     },
