@@ -1,5 +1,6 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path');
+const webpack = require('webpack');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   entry: {
@@ -46,6 +47,7 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'omegaup',
     }),
+    new VueLoaderPlugin(),
   ],
   module: {
     rules: [
@@ -79,7 +81,7 @@ module.exports = {
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.common.js',
-			'vue-async-computed': 'vue-async-computed/dist/index.js',
+			'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
 			jszip: 'jszip/dist/jszip.js',
     }
   },
