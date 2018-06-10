@@ -12,3 +12,10 @@ if (window.NodeList && !window.NodeList.prototype.forEach) {
     }
   };
 }
+
+if (window.Node && !window.Node.prototype.innerText && Object.defineProperty) {
+  Object.defineProperty(window.Node.prototype, 'innerText', {
+    get: function() { return this.textContent; },
+    set: function(value) { this.textContent = value; },
+  });
+}
