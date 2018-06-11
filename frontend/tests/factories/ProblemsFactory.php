@@ -119,6 +119,7 @@ class ProblemsFactory {
         $r['order'] = 'normal';
         $r['visibility'] = $params['visibility'];
         $r['output_limit'] = 10240;
+        $r['input_limit'] = 10240;
         $r['languages'] = $params['languages'];
 
         // Set file upload context

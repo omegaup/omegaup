@@ -31,6 +31,10 @@
 							<td>{#wordsOverallWallTimeLimit#}</td>
 							<td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
 						</tr>
+						<tr>
+							<td>{#problemEditFormInputLimit#}</td>
+							<td class="input_limit">{$input_limit|escape}</td>
+						</tr>
 					</table>
 {if $karel_problem}
 					<div class="karel-js-link">
