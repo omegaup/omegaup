@@ -10,30 +10,6 @@ import Vue from 'vue';
 
 export {ArenaAdmin};
 
-export function FormatDelta(delta) {
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-  delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
-  delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
-  delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
-
-  let clock = '';
-
-  if (days > 0) {
-    clock += days + ':';
-  }
-  if (hours < 10) clock += '0';
-  clock += hours + ':';
-  if (minutes < 10) clock += '0';
-  clock += minutes + ':';
-  if (seconds < 10) clock += '0';
-  clock += seconds;
-
-  return clock;
-}
-
 let ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
@@ -279,21 +255,23 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
-    // Setup run details view
-    self.runDetailsView = new Vue({
-      el: '#run-details',
-      render: function(createElement) {
-        return createElement('omegaup-arena-rundetails', {
-          props: {
-            data: this.data,
-          },
-        });
-      },
-      data: {data: null},
-      components: {
-        'omegaup-arena-rundetails': arena_RunDetails,
-      },
-    });
+    // Setup run details view, if available.
+    if (document.getElementById('run-details') != null) {
+      self.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: {data: null},
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+    }
 
     // Setup any global hooks.
     self.bindGlobalHandlers();
@@ -433,7 +411,7 @@ export class Arena {
           return function() {
             let t = new Date();
             self.elements.loadingOverlay.html(
-                x + ' ' + FormatDelta(y.getTime() - t.getTime()));
+                x + ' ' + UI.formatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
@@ -457,6 +435,10 @@ export class Arena {
 
     if (problemset.hasOwnProperty('problemset_id')) {
       self.options.problemsetId = problemset.problemset_id;
+    }
+
+    if (problemset.hasOwnProperty('original_contest_alias')) {
+      self.options.originalContestAlias = problemset.original_contest_alias;
     }
 
     $('#title .contest-title')
@@ -530,7 +512,7 @@ export class Arena {
     let clock = '';
 
     if (now < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() - now);
+      clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -550,7 +532,7 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      clock = FormatDelta(countdownTime.getTime() - now);
+      clock = UI.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }
@@ -584,12 +566,99 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
-    API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
-        .then(self.rankingChange.bind(self))
-        .fail(UI.ignoreError);
+    if (self.options.originalContestAlias != null) {
+      API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
+          .then(function(response) {
+            let events = response.events;
+            for (let event of events) {
+              event.username += '-(virtual)';
+              event.name += '-(virtual)';
+            }
+            API.Contest.scoreboardEvents(
+                           {contest_alias: self.options.originalContestAlias})
+                .then(function(response) {
+                  events.push.apply(response.events);
+                  self.virtualRankingChange(events);
+                  self.onRankingEvents({events: events});
+                })
+                .fail(UI.ignoreError);
+          })
+          .fail(UI.ignoreError);
+    } else if (self.options.contestAlias) {
+      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
+          .then(self.rankingChange.bind(self))
+          .fail(UI.ignoreError);
+    } else if (self.options.assignmentAlias) {
+      API.Course.assignmentScoreboard({
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias
+                })
+          .then(self.rankingChange.bind(self))
+          .fail(UI.ignoreError);
+    }
   }
 
-  rankingChange(data) {
+  virtualRankingChange(data) {
+    let self = this;
+    let delta = (new Date()).getTime() - self.startTime.getTime();
+    let rank = [];
+
+    let problemOrder = [];
+    let problems = [];
+    let initialScores = [];
+
+    for (let problem of Object.values(self.problems)) {
+      problemOrder[problem.alias] = problems.length + 1;
+      problems.push({order: problems.length + 1, alias: problem.alias});
+    }
+
+    data.forEach(function(env) {
+      if (env.delta > delta) return;
+      if (!rank.hasOwnProperty(env.username)) {
+        rank[env.username] = {
+          country: env.country,
+          name: env.name,
+          username: env.username,
+          place: 0,
+          problems: []
+        };
+        for (let j = 0; j < problems.length; j++) {
+          rank[env.username].problems.push(
+              {penalty: 0, percent: 0, points: 0, runs: 0});
+        }
+        rank[env.username].total = {points: 0, penalty: 0};
+      }
+      let problem =
+          rank[env.username].problems[problemOrder[env.problem.alias]];
+      rank[env.username].problems[problemOrder[env.problem.alias]] = {
+        penalty: env.problem.penalty,
+        points: env.problem.points,
+        runs: problem.runs + 1
+      };
+      rank[env.username].total = env.total;
+    });
+
+    let ranking = Object.values(rank);
+
+    ranking.sort(function(rank1, rank2) {
+      return rank2.total.points - rank1.total.points;
+    });
+
+    for (var index = 0; index < ranking.length; index++)
+      ranking[index].place = index + 1;
+
+    let scoreboard = {
+      finish_time: self.finishTime.getTime(),
+      start_time: self.startTime.getTime(),
+      time: Date.now(),
+      problems: problems,
+      ranking: ranking
+    };
+
+    self.rankingChange(scoreboard, false);
+  }
+
+  rankingChange(data, rankingEvent = true) {
     let self = this;
     self.onRankingChanged(data);
     let params = {
@@ -598,9 +667,12 @@ export class Arena {
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;
     }
-    API.Problemset.scoreboardEvents(params)
-        .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
+
+    if (rankingEvent) {
+      API.Problemset.scoreboardEvents(params)
+          .then(self.onRankingEvents.bind(self))
+          .fail(UI.ignoreError);
+    }
   }
 
   onRankingChanged(data) {
@@ -947,6 +1019,22 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
+    const allowedLanguages = [
+      {language: 'cpp11', name: 'C++11'},
+      {language: 'cpp', name: 'C++'},
+      {language: 'c', name: 'C'},
+      {language: 'cs', name: 'C#'},
+      {language: 'hs', name: 'Haskell'},
+      {language: 'java', name: 'Java'},
+      {language: 'pas', name: 'Pascal'},
+      {language: 'py', name: 'Python'},
+      {language: 'rb', name: 'Ruby'},
+      {language: 'lua', name: 'Lua'},
+      {language: 'kp', name: 'Karel (Pascal)'},
+      {language: 'kj', name: 'Karel (Java)'},
+      {language: 'cat', name: T.wordJustOutput},
+    ];
+
     let self = this;
 
     let can_submit = lang_array.length != 0;
@@ -954,21 +1042,34 @@ export class Arena {
     $('.runs').toggle(can_submit);
     $('.data').toggle(can_submit);
     $('.best-solvers').toggle(can_submit);
-    $('option', self.elements.submitForm.language)
-        .each(function(index, item) {
-          item = $(item);
-          item.toggle(lang_array.indexOf(item.val()) >= 0);
+
+    // refresh options in select
+    const languageSelect = document.querySelector('select[name="language"]');
+    while (languageSelect.firstChild)
+      languageSelect.removeChild(languageSelect.firstChild);
+
+    const languageArray =
+        typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+
+    allowedLanguages.filter(item => {
+                      return languageArray.includes(item.language);
+                    })
+        .forEach(optionItem => {
+          let optionNode = document.createElement('option');
+          optionNode.value = optionItem.language;
+          optionNode.appendChild(document.createTextNode(optionItem.name));
+          languageSelect.appendChild(optionNode);
         });
   }
 
   selectDefaultLanguage() {
     let self = this;
     let langElement = self.elements.submitForm.language;
+
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
             return false;
@@ -979,11 +1080,10 @@ export class Arena {
     $('option', langElement)
         .each(function() {
           let option = $(this);
-          if (option.css('display') != 'none') {
-            option.prop('selected', true);
-            langElement.trigger('change');
-            return false;
-          }
+
+          option.prop('selected', true);
+          langElement.trigger('change');
+          return false;
         });
   }
 
@@ -1098,6 +1198,7 @@ export class Arena {
         $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
             .text(problem.overall_wall_time_limit / 1000 + 's');
+        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
@@ -1173,6 +1274,7 @@ export class Arena {
                 problem.libinteractive_interface_name =
                     problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
+                problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
                 self.preferredLanguage = problem_ext.preferred_language;
@@ -1394,13 +1496,10 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        // TODO(https://github.com/omegaup/omegaup/issues/1962): Remove.
-        if ((extension == 'kp' || extension == 'kj') &&
-            file.size >= 20 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '20kB'}));
-          return false;
-        } else if (file.size >= 10 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
+        if (file.size >= self.currentProblem.input_limit) {
+          alert(UI.formatString(
+              T.arenaRunSubmitFilesize,
+              {limit: (self.currentProblem.input_limit / 1024 + ' KiB')}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');
@@ -1494,7 +1593,7 @@ export class Arena {
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(
-        FormatDelta((contest.window_length * 60000) || duration));
+        UI.formatDelta((contest.window_length * 60000) || duration));
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(Highcharts.dateFormat(
         '%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
