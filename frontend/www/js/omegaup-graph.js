@@ -68,7 +68,7 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
       type: 'spline',
       animation: Highcharts.svg,  // don't animate in old IE
       marginRight: 10,
-      renderTo: 'pending-runs-chart',
+      renderTo: $('.pending-runs-chart')[0],
       events: {
         load: function() {
           // set up the updating of the chart each second
@@ -130,7 +130,6 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
     categories_vals[val] = separator;
     separator += stats.size_of_bucket;
   }
-  console.log(renderTo);
 
   return new Highcharts.Chart({
     chart: {type: 'column', renderTo: renderTo},

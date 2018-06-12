@@ -30,7 +30,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function drawCharts() {
-    $('#total-runs')
+    $($('.total-runs')[0])
         .text(omegaup.UI.formatString(omegaup.T.totalRuns,
                                       {numRuns: stats.total_runs}));
 
@@ -42,7 +42,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     // Draw verdict counts pie chart
     window.run_counts_chart =
-        oGraph.verdictCounts('verdict-chart', contestAlias, stats);
+        oGraph.verdictCounts($('.verdict-chart')[0], contestAlias, stats);
 
     // Draw distribution of scores chart
     window.distribution_chart =
