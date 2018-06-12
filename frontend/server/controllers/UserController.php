@@ -253,7 +253,7 @@ class UserController extends Controller {
      *
      * */
     public function TestPassword(Request $r) {
-        $user_id = $email = $username = $password = null;
+        $user_id = $email = $username = $password = $identity_id = null;
 
         if (null != $r['user_id']) {
             $user_id = $r['user_id'];
@@ -271,7 +271,10 @@ class UserController extends Controller {
             $password = $r['password'];
         }
 
-        if (is_null($user_id) && is_null($email) && is_null($username)) {
+        if (null != $r['identity_id']) {
+            $identity_id = $r['identity_id'];
+        }
+        if (is_null($user_id) && is_null($email) && is_null($username) && is_null($identity_id)) {
             throw new ApiException('mustProvideUSerIdEmailOrUsername');
         }
 
@@ -282,8 +285,10 @@ class UserController extends Controller {
             $vo_UserToTest = UsersDAO::getByPK($user_id);
         } elseif (!is_null($email)) {
             $vo_UserToTest = $this->FindByEmail();
-        } else {
+        } elseif (!is_null($username)) {
             $vo_UserToTest = $this->FindByUserName();
+        } else {
+            $vo_UserToTest = IdentitiesDAO::getByPK($identity_id);
         }
 
         if (is_null($vo_UserToTest)) {
@@ -1196,108 +1201,6 @@ class UserController extends Controller {
     }
 
     /**
-     * Returns the profile of the user given
-     *
-     * @param Users $user
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     */
-    private static function getProfileImpl(Users $user) {
-        $response = [];
-        $response['userinfo'] = [];
-        $response['problems'] = [];
-
-        $response['userinfo']['username'] = $user->username;
-        $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
-        $response['userinfo']['gender'] = $user->gender;
-        $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
-        $response['userinfo']['scholar_degree'] = $user->scholar_degree;
-        $response['userinfo']['preferred_language'] = $user->preferred_language;
-        $response['userinfo']['is_private'] = $user->is_private;
-        $response['userinfo']['verified'] = $user->verified == '1';
-        $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
-
-        if (!is_null($user->language_id)) {
-            $query = LanguagesDAO::getByPK($user->language_id);
-            if (!is_null($query)) {
-                $response['userinfo']['locale'] =
-                    UserController::convertToSupportedLanguage($query->name);
-            }
-        }
-
-        try {
-            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
-
-            $response['userinfo']['email'] = $user_db['email'];
-            $response['userinfo']['country'] = $user_db['country'];
-            $response['userinfo']['country_id'] = $user->country_id;
-            $response['userinfo']['state'] = $user_db['state'];
-            $response['userinfo']['state_id'] = $user->state_id;
-            $response['userinfo']['school'] = $user_db['school'];
-            $response['userinfo']['school_id'] = $user->school_id;
-
-            if (!is_null($user->language_id)) {
-                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
-
-        return $response;
-    }
-
-    /**
-     * Get user profile from cache
-     * Requires $r["user"] to be an actual User
-     *
-     * @param Request $r
-     * @param array $response
-     * @param Request $r
-     * @return type
-     */
-    public static function getProfile(Request $r) {
-        if (is_null($r['user'])) {
-            throw new InvalidParameterException('parameterNotFound', 'User');
-        }
-
-        $response = [];
-
-        Cache::getFromCacheOrSet(
-            Cache::USER_PROFILE,
-            $r['user']->username,
-            $r,
-            function (Request $r) {
-                    return UserController::getProfileImpl($r['user']);
-            },
-            $response
-        );
-
-        if (is_null($r['omit_rank']) || !$r['omit_rank']) {
-            $response['userinfo']['rankinfo'] = self::getRankByProblemsSolved($r);
-        } else {
-            $response['userinfo']['rankinfo'] = [];
-        }
-
-        // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_identity_id'])
-              || $r['user']->user_id == $r['current_user_id']) {
-            return $response;
-        }
-
-        // Mentors can see current coder of the month email.
-        if (Authorization::canViewEmail($r['current_identity_id']) &&
-              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
-            return $response;
-        }
-        unset($response['userinfo']['email']);
-        return $response;
-    }
-
-    /**
      * Get general user info
      *
      * @param Request $r
@@ -1307,16 +1210,17 @@ class UserController extends Controller {
     public static function apiProfile(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
+        $r['identity'] = self::resolveTargetIdentity($r);
         $r['user'] = self::resolveTargetUser($r);
 
-        $response = self::getProfile($r);
-        if ((is_null($r['current_user']) || $r['current_user']->username != $r['user']->username)
-            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+        $response = IdentityController::getProfile($r);
+        if ((is_null($r['current_identity']) || $r['current_identity']->username != $r['identity']->username)
+            && (isset($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
             }
-            $response['userinfo']['username'] = $r['user']->username;
+            $response['userinfo']['username'] = $r['identity']->username;
             $response['userinfo']['rankinfo'] = [
                 'name' => null,
                 'problems_solved' => null,
@@ -1325,7 +1229,7 @@ class UserController extends Controller {
             ];
             $response['userinfo']['is_private'] = true;
         }
-        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['user']->user_id);
+        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['identity']->user_id);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1440,7 +1344,7 @@ class UserController extends Controller {
         $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
-        $response = self::getProfileImpl($user);
+        $response = IdentityController::getProfileImpl($user);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
@@ -1685,11 +1589,14 @@ class UserController extends Controller {
      */
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
-        $user = self::resolveTargetUser($r);
         $identity = self::resolveTargetIdentity($r);
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = self::resolveTargetUser($r);
+        }
 
         if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
-            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -1952,10 +1859,10 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidDatabaseOperationException
      */
-    private static function getRankByProblemsSolved(Request $r) {
+    public static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
             $selectedFilter = self::getSelectedFilter($r);
-            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'] . '-' . $selectedFilter['value'];
+            $rankCacheName =  "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];

@@ -136,7 +136,7 @@ class SessionController extends Controller {
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
-        if (is_null($currentUser)) {
+        if (is_null($currentUser) && is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
                 'valid' => false,
@@ -149,12 +149,16 @@ class SessionController extends Controller {
         }
 
         // Get email via their id
-        $email = EmailsDAO::getByPK($currentUser->main_email_id);
+        if (!is_null($currentUser)) {
+            $email = EmailsDAO::getByPK($currentUser->main_email_id);
+        }
 
         return [
             'valid' => true,
-            'email' => !is_null($email) ? $email->email : '',
+            'email' => !empty($email) ? $email->email : '',
             'user' => $currentUser,
+            'username' => $currentIdentity->username,
+            'verified' => !empty($currentUser) ? $currentUser->verified : '1',
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
             'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
@@ -216,7 +220,8 @@ class SessionController extends Controller {
 
         // Create the new token
         $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
-        $s_AuthT = $entropy . '-' . $identity->user_id . '-' . hash('sha256', OMEGAUP_MD5_SALT . $identity->user_id . $entropy);
+        $hashAuth = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
+        $s_AuthT = "{$entropy}-{$identity->identity_id}-{$hashAuth}";
 
         $authToken = new AuthTokens();
         $authToken->user_id = $identity->user_id;

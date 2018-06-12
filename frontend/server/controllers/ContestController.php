@@ -358,10 +358,13 @@ class ContestController extends Controller {
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
-            if ($session['valid'] && !is_null($session['user'])) {
-                $r['current_user'] = $session['user'];
-                $r['current_user_id'] = $session['user']->user_id;
+            if ($session['valid'] && !is_null($session['identity'])) {
+                $r['current_identity'] = $session['identity'];
                 $r['current_identity_id'] = $session['identity']->identity_id;
+                if (!is_null($session['user'])) {
+                    $r['current_user'] = $session['user'];
+                    $r['current_user_id'] = $session['user']->user_id;
+                }
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
@@ -508,7 +511,7 @@ class ContestController extends Controller {
     }
 
     /**
-     * Joins a contest - explicitly adds a user to a contest.
+     * Joins a contest - explicitly adds a identity to a contest.
      *
      * @param Request $r
      * @throws ForbiddenAccessException
@@ -518,8 +521,8 @@ class ContestController extends Controller {
         $needsInformation = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
         $session = SessionController::apiCurrentSession($r)['session'];
 
-        if ($needsInformation['needs_basic_information'] && !is_null($session['user']) &&
-              (!$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id)
+        if ($needsInformation['needs_basic_information'] && !is_null($session['identity']) &&
+              (!$session['identity']->country_id || !$session['identity']->state_id || !$session['identity']->school_id)
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
@@ -529,7 +532,7 @@ class ContestController extends Controller {
             true,
             $r['share_user_information']
         );
-        self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
+        self::$log->info("User '{$r['current_identity']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
     }
 

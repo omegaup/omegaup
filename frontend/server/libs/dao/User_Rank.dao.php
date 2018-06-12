@@ -47,6 +47,7 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_from .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $sql_limit = '';
+        $params_limit = [];
         if (!is_null($page)) {
             $params_limit[] = (($page - 1) * $colsPerPage); // Offset
             $params_limit[] = (int)$colsPerPage;

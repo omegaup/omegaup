@@ -114,4 +114,41 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return $rs['verified'];
     }
+
+    final public static function getExtendedProfileDataByPk($identity_id) {
+        if (is_null($identity_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    c.`name` AS country,
+                    s.`name` AS state,
+                    sc.`name` AS school,
+                    e.`email`,
+                    l.`name` AS locale
+                FROM
+                    Identities i
+                LEFT JOIN
+                    Users u ON u.user_id = i.user_id
+                LEFT JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                LEFT JOIN
+                    Countries c ON i.country_id = c.country_id
+                LEFT JOIN
+                    States s ON i.state_id = s.state_id AND s.country_id = c.country_id
+                LEFT JOIN
+                    Schools sc ON i.school_id = sc.school_id
+                LEFT JOIN
+                    Languages l ON u.language_id = l.language_id
+                WHERE
+                    i.`identity_id` = ?
+                LIMIT
+                    1;';
+        $params = [$identity_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return $rs;
+    }
 }
