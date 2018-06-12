@@ -46,7 +46,7 @@ omegaup.OmegaUp.on('ready', function() {
 
     // Draw distribution of scores chart
     window.distribution_chart =
-        oGraph.distributionChart('distribution-chart', contestAlias, stats);
+        oGraph.distributionChart($('.distribution-chart')[0], contestAlias, stats);
   }
 
   getStats();

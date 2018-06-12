@@ -130,6 +130,7 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
     categories_vals[val] = separator;
     separator += stats.size_of_bucket;
   }
+  console.log(renderTo);
 
   return new Highcharts.Chart({
     chart: {type: 'column', renderTo: renderTo},

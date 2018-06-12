@@ -6,7 +6,7 @@
 		<h1>Estadísticas en vivo</h1>
 		<h2><div id="total-runs"></div> </h2>
 		<div id="verdict-chart"></div>
-		<div id="distribution-chart"></div>
+		<div class="distribution-chart"></div>
 		<div id="pending-runs-chart"></div>
 	</div>
 </div>
