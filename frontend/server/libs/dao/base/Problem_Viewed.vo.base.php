@@ -29,8 +29,8 @@ class ProblemViewed extends VO {
         if (isset($data['problem_id'])) {
             $this->problem_id = $data['problem_id'];
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
         }
         if (isset($data['view_time'])) {
             $this->view_time = $data['view_time'];
@@ -57,12 +57,12 @@ class ProblemViewed extends VO {
     public $problem_id;
 
     /**
-      *  [Campo no documentado]
+      * Identidad del usuario
       * Llave Primaria
       * @access public
       * @var int(11)
       */
-    public $user_id;
+    public $identity_id;
 
     /**
       *  [Campo no documentado]

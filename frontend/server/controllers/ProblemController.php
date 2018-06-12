@@ -115,6 +115,7 @@ class ProblemController extends Controller {
         Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
         Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
         Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -155,6 +156,7 @@ class ProblemController extends Controller {
         $problem->extra_wall_time = $r['extra_wall_time'];
         $problem->memory_limit = $r['memory_limit'];
         $problem->output_limit = $r['output_limit'];
+        $problem->input_limit = $r['input_limit'];
         $problem->visits = 0;
         $problem->submissions = 0;
         $problem->accepted = 0;
@@ -715,6 +717,7 @@ class ProblemController extends Controller {
             'extra_wall_time' => ['important' => true], // requires rejudge
             'memory_limit'  => ['important' => true], // requires rejudge
             'output_limit'  => ['important' => true], // requires rejudge
+            'input_limit'  => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
@@ -1200,9 +1203,9 @@ class ProblemController extends Controller {
         // Create array of relevant columns
         $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
-            'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
-            'languages', 'slow', 'email_clarifications'];
+            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
+            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
+            'visibility','languages', 'slow', 'email_clarifications'];
 
         $language = $r['lang'];
         $file_content = ProblemController::getProblemStatement(
@@ -1340,7 +1343,7 @@ class ProblemController extends Controller {
             if (!ProblemsetProblemOpenedDAO::getByPK(
                 $problemset_id,
                 $r['problem']->problem_id,
-                $r['current_user_id']
+                $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
@@ -1348,7 +1351,7 @@ class ProblemController extends Controller {
                         'problemset_id' => $problemset_id,
                         'problem_id' => $r['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
-                        'user_id' => $r['current_user_id']
+                        'identity_id' => $r['current_identity_id']
                     ]));
                 } catch (Exception $e) {
                     // Operation failed in the data layer
@@ -1359,9 +1362,9 @@ class ProblemController extends Controller {
             $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
         }
 
-        if (!is_null($r['current_user_id'])) {
+        if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
-                $r['current_user_id'],
+                $r['current_identity_id'],
                 $r['problem']->problem_id
             );
         }

@@ -782,7 +782,7 @@ class RunsDAO extends RunsDAOBase {
                             AND r.problem_id = ppo.problem_id)
                     INNER JOIN
                         `Identities` i
-                        ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
+                        ON (i.identity_id = ppo.identity_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
                     SET
                         r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
@@ -797,7 +797,7 @@ class RunsDAO extends RunsDAOBase {
                             AND r.problem_id = ppo.problem_id)
                     INNER JOIN
                         `Identities`
-                        ON (i.user_id = ppo.user_id AND r.identity_id = i.identity_id)
+                        ON (i.identity_id = ppo.identity_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
                     SET
                         r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)

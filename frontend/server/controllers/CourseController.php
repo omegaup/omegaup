@@ -1485,7 +1485,7 @@ class CourseController extends Controller {
         }
         // Log the operation.
         ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
-            'user_id' => $r['current_user_id'],
+            'identity_id' => $r['current_identity_id'],
             'problemset_id' => $r['assignment']->problemset_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
@@ -1597,11 +1597,16 @@ class CourseController extends Controller {
         }
 
         $scoreboard = new Scoreboard(
-            ScoreboardParams::fromAssignment(
-                $r['assignment'],
-                $r['course']->group_id,
-                true /*show_all_runs*/
-            )
+            new ScoreboardParams([
+                'alias' => $r['assignment']->alias,
+                'title' => $r['assignment']->name,
+                'problemset_id' => $r['assignment']->problemset_id,
+                'start_time' => $r['assignment']->start_time,
+                'finish_time' => $r['assignment']->finish_time,
+                'acl_id' => $r['assignment']->acl_id,
+                'group_id' => $r['course']->group_id,
+                'admin' => true
+            ])
         );
 
         return $scoreboard->generate(

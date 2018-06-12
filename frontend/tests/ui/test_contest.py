@@ -15,6 +15,7 @@ import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
@@ -72,6 +73,7 @@ def test_create_contest(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
