@@ -47,8 +47,8 @@ $pager_items = Pager::paginate(
 );
 
 foreach ($response['results'] as $key => $problem) {
-    $response['results'][$key]['difficulty'] = floatval($problem['difficulty']);
-    $response['results'][$key]['quality'] = floatval($problem['quality']);
+    $response['results'][$key]['difficulty'] = $response['results'][$key]['difficulty'] ? floatval($problem['difficulty']) : NULL;
+    $response['results'][$key]['quality'] = $response['results'][$key]['quality'] ? floatval($problem['quality']) : NULL;
     $response['results'][$key]['points'] = floatval($problem['points']);
     $response['results'][$key]['ratio'] = floatval($problem['ratio']);
     $response['results'][$key]['score'] = floatval($problem['score']);
