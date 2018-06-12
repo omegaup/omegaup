@@ -45,8 +45,8 @@ omegaup.OmegaUp.on('ready', function() {
         oGraph.verdictCounts($('.verdict-chart')[0], contestAlias, stats);
 
     // Draw distribution of scores chart
-    window.distribution_chart =
-        oGraph.distributionChart($('.distribution-chart')[0], contestAlias, stats);
+    window.distribution_chart = oGraph.distributionChart(
+        $('.distribution-chart')[0], contestAlias, stats);
   }
 
   getStats();
