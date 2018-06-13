@@ -1,13 +1,19 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path');
+const webpack = require('webpack');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   entry: {
-    omegaup: ['babel-polyfill', './frontend/www/js/omegaup/omegaup.js'],
+    omegaup: [
+      'babel-polyfill',
+      './frontend/www/js/omegaup/polyfills.js',
+      './frontend/www/js/omegaup/omegaup.js'
+    ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.js',
     admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
+    arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
@@ -19,6 +25,7 @@ module.exports = {
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
+    problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
@@ -41,6 +48,7 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'omegaup',
     }),
+    new VueLoaderPlugin(),
   ],
   module: {
     rules: [
@@ -74,7 +82,7 @@ module.exports = {
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.common.js',
-			'vue-async-computed': 'vue-async-computed/dist/index.js',
+			'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
 			jszip: 'jszip/dist/jszip.js',
     }
   },

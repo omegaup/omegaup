@@ -10,30 +10,6 @@ import Vue from 'vue';
 
 export {ArenaAdmin};
 
-export function FormatDelta(delta) {
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-  delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
-  delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
-  delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
-
-  let clock = '';
-
-  if (days > 0) {
-    clock += days + ':';
-  }
-  if (hours < 10) clock += '0';
-  clock += hours + ':';
-  if (minutes < 10) clock += '0';
-  clock += minutes + ':';
-  if (seconds < 10) clock += '0';
-  clock += seconds;
-
-  return clock;
-}
-
 let ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
@@ -435,7 +411,7 @@ export class Arena {
           return function() {
             let t = new Date();
             self.elements.loadingOverlay.html(
-                x + ' ' + FormatDelta(y.getTime() - t.getTime()));
+                x + ' ' + UI.formatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
@@ -460,6 +436,10 @@ export class Arena {
 
     if (contest.hasOwnProperty('problemset_id')) {
       self.options.problemsetId = contest.problemset_id;
+    }
+
+    if (contest.hasOwnProperty('original_contest_alias')) {
+      self.options.originalContestAlias = contest.original_contest_alias;
     }
 
     $('#title .contest-title').html(UI.escape(contest.title));
@@ -532,7 +512,7 @@ export class Arena {
     let clock = '';
 
     if (now < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() - now);
+      clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -552,7 +532,7 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      clock = FormatDelta(countdownTime.getTime() - now);
+      clock = UI.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }
@@ -586,7 +566,25 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
-    if (self.options.contestAlias) {
+    if (self.options.originalContestAlias != null) {
+      API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
+          .then(function(response) {
+            let events = response.events;
+            for (let event of events) {
+              event.username += '-(virtual)';
+              event.name += '-(virtual)';
+            }
+            API.Contest.scoreboardEvents(
+                           {contest_alias: self.options.originalContestAlias})
+                .then(function(response) {
+                  events.push.apply(response.events);
+                  self.virtualRankingChange(events);
+                  self.onRankingEvents({events: events});
+                })
+                .fail(UI.ignoreError);
+          })
+          .fail(UI.ignoreError);
+    } else if (self.options.contestAlias) {
       API.Contest.scoreboard({contest_alias: self.options.contestAlias})
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
@@ -600,7 +598,67 @@ export class Arena {
     }
   }
 
-  rankingChange(data) {
+  virtualRankingChange(data) {
+    let self = this;
+    let delta = (new Date()).getTime() - self.startTime.getTime();
+    let rank = [];
+
+    let problemOrder = [];
+    let problems = [];
+    let initialScores = [];
+
+    for (let problem of Object.values(self.problems)) {
+      problemOrder[problem.alias] = problems.length + 1;
+      problems.push({order: problems.length + 1, alias: problem.alias});
+    }
+
+    data.forEach(function(env) {
+      if (env.delta > delta) return;
+      if (!rank.hasOwnProperty(env.username)) {
+        rank[env.username] = {
+          country: env.country,
+          name: env.name,
+          username: env.username,
+          place: 0,
+          problems: []
+        };
+        for (let j = 0; j < problems.length; j++) {
+          rank[env.username].problems.push(
+              {penalty: 0, percent: 0, points: 0, runs: 0});
+        }
+        rank[env.username].total = {points: 0, penalty: 0};
+      }
+      let problem =
+          rank[env.username].problems[problemOrder[env.problem.alias]];
+      rank[env.username].problems[problemOrder[env.problem.alias]] = {
+        penalty: env.problem.penalty,
+        points: env.problem.points,
+        runs: problem.runs + 1
+      };
+      rank[env.username].total = env.total;
+    });
+
+    let ranking = Object.values(rank);
+
+    ranking.sort(function(rank1, rank2) {
+      return rank2.total.points - rank1.total.points;
+    });
+
+    for (var index = 0; index < ranking.length; index++)
+      ranking[index].place = index + 1;
+
+    let scoreboard = {
+      finish_time: self.finishTime.getTime(),
+      start_time: self.startTime.getTime(),
+      time: Date.now(),
+      problems: problems,
+      ranking: ranking
+    };
+
+    self.rankingChange(scoreboard, false);
+  }
+
+  rankingChange(data, rankingEvent = true) {
     let self = this;
     self.onRankingChanged(data);
 
@@ -610,9 +668,12 @@ export class Arena {
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;
     }
-    API.Contest.scoreboardEvents(params)
-        .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
+
+    if (rankingEvent) {
+      API.Contest.scoreboardEvents(params)
+          .then(self.onRankingEvents.bind(self))
+          .fail(UI.ignoreError);
+    }
   }
 
   onRankingChanged(data) {
@@ -1534,7 +1595,7 @@ export class Arena {
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(
-        FormatDelta((contest.window_length * 60000) || duration));
+        UI.formatDelta((contest.window_length * 60000) || duration));
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(Highcharts.dateFormat(
         '%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
