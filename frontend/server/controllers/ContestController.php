@@ -573,6 +573,7 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
+            $result['original_contest_alias'] = ($result['rerun_id'] != 0 ? ContestsDAO::getByPK($result['rerun_id'])->alias : null);
 
             try {
                 $acl = ACLsDAO::getByPK($r['contest']->acl_id);
@@ -657,6 +658,7 @@ class ContestController extends Controller {
         self::getCachedDetails($r, $result);
         unset($result['scoreboard_url']);
         unset($result['scoreboard_url_admin']);
+        unset($result['rerun_id']);
         if (is_null($r['token'])) {
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody
@@ -693,8 +695,6 @@ class ContestController extends Controller {
         } else {
             $result['admin'] = $r['contest_admin'];
         }
-
-        $result['is_virtual'] = ContestsDAO::isVirtual($r['contest']); //Virtual contest has rerun_id != 0
 
         $result['status'] = 'ok';
         return $result;
@@ -833,9 +833,12 @@ class ContestController extends Controller {
     }
 
     public static function apiCreateVirtual(Request $r) {
+        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
+
+        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -1710,13 +1713,16 @@ class ContestController extends Controller {
         self::validateDetails($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
+        $params['admin'] = (
+            Authorization::isContestAdmin($r['current_identity_id'], $r['contest']) &&
+            !ContestsDAO::isVirtual($r['contest'])
+        );
+        $params['show_all_runs'] = !ContestsDAO::isVirtual($r['contest']);
         $scoreboard = new Scoreboard($params);
 
         // Push scoreboard data in response
         $response = [];
         $response['events'] = $scoreboard->events();
-        $response['original_alias'] = $r['contest']->alias;
 
         return $response;
     }
@@ -1767,7 +1773,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = $showAllRuns;
+        $params['admin'] = $showAllRuns;
         $scoreboard = new Scoreboard($params);
 
         return $scoreboard->generate();
@@ -2507,7 +2513,7 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $params = ScoreboardParams::fromContest($r['contest']);
-        $params['show_all_runs'] = true;
+        $params['admin'] = true;
         $params['auth_token'] = $r['auth_token'];
         $scoreboard = new Scoreboard($params);
 
