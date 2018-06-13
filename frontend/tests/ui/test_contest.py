@@ -26,12 +26,12 @@ def test_create_contest(driver):
     user1 = 'unittest_user_1_%s' % run_id
     user2 = 'unittest_user_2_%s' % run_id
     password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
+    users = [user, user1, user2]
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+    create_contest_admin(driver, contest_alias, problem, users)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
@@ -84,12 +84,12 @@ def test_user_ranking_contest(driver):
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
+    users = [user, user1, user2]
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+    create_contest_admin(driver, contest_alias, problem, users)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
@@ -130,7 +130,7 @@ def test_user_ranking_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-def create_contest_admin(driver, contest_alias, problem, users, user):
+def create_contest_admin(driver, contest_alias, problem, users):
     '''Creates a contest as an admin.'''
 
     with driver.login_admin():
@@ -140,9 +140,10 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
                 driver.browser.current_url), driver.browser.current_url
 
         add_problem_to_contest(driver, problem)
-        if users != '':
-            add_students_bulk(driver, users)
-        add_students_contest(driver, [user])
+
+        add_students_bulk(driver, users)
+
+        add_students_contest(driver, users)
 
         contest_url = '/arena/%s' % contest_alias
         driver.wait.until(
@@ -255,10 +256,11 @@ def add_students_bulk(driver, users):
         EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "#contestants")]')))).click()
 
+    user = (','.join(users))
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, (
-                '//textarea[contains(@name, "usernames")]')))).send_keys(users)
+                '//textarea[contains(@name, "usernames")]')))).send_keys(user)
 
     driver.wait.until(
         EC.element_to_be_clickable(

@@ -45,6 +45,14 @@ def test_create_problem(driver):
 
     problem_alias = 'unittest_problem_%s' % driver.generate_id()
 
+    create_problem(driver, problem_alias)
+
+    with driver.login_user():
+        enter_problem(driver, problem_alias)
+
+
+def create_problem(driver, problem_alias):
+    '''Creates a problem'''
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -64,6 +72,12 @@ def test_create_problem(driver):
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
+        input_limit = driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "input_limit"]')))
+        input_limit.clear()
+        input_limit.send_keys('1024')
         # Alias should be set automatically
         driver.browser.find_element_by_name('source').send_keys('test')
         # Make the problem public
@@ -79,27 +93,29 @@ def test_create_problem(driver):
         assert (('/problem/%s/edit/' % problem_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-    with driver.login_user():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-problems"]'
-                  '//a[@href = "/problem/"]')))).click()
-        driver.wait_for_page_loaded()
 
-        search_box_element = driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.ID, 'problem-search-box')))
-        search_box_element.send_keys(problem_alias)
-        with driver.ajax_page_transition():
-            search_box_element.submit()
+def enter_problem(driver, problem_alias):
+    '''Logged user enter a single problem'''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-problems'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//li[@id = "nav-problems"]'
+              '//a[@href = "/problem/"]')))).click()
+    driver.wait_for_page_loaded()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[text() = "%s"]' % problem_alias))).click()
-        assert (problem_alias in driver.browser.find_element_by_xpath(
-            '//h1[@class="title"]').get_attribute('innerText'))
+    search_box_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.ID, 'problem-search-box')))
+    search_box_element.send_keys(problem_alias)
+    with driver.ajax_page_transition():
+        search_box_element.submit()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//a[text() = "%s"]' % problem_alias))).click()
+    assert (problem_alias in driver.browser.find_element_by_xpath(
+        '//h1[@class="title"]').get_attribute('innerText'))
