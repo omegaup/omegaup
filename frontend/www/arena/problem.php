@@ -60,6 +60,11 @@ $result['user'] = [
 ];
 $smarty->assign('problem_admin', $result['user']['admin']);
 
+$result['histogram'] = [
+    'difficulty_histogram' => $problem->difficulty_histogram,
+    'quality_histogram' => $problem->quality_histogram,
+    'quality' => floatval($problem->quality),
+    'difficulty' => floatval($problem->difficulty)];
 $smarty->assign('payload', $result);
 
 $smarty->display('../../templates/arena.problem.tpl');
