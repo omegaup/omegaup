@@ -1,4 +1,15 @@
-omegaup.OmegaUp.on('ready', function() {
+import contest_Stats from '../components/contest/Stats.vue';
+import Vue from 'vue';
+import {OmegaUp} from '../omegaup.js';
+
+OmegaUp.on('ready', function() {
+  let Stats = new Vue({
+    el: '#contest-stats',
+    render: function(createElement) { return createElement('contestStats'); },
+    components: {
+      'contestStats': contest_Stats,
+    },
+  });
   var contestAlias =
       /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
 
