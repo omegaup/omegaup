@@ -87,18 +87,18 @@ export default {
     return {
       T: T, UI: UI, qualityTags:
                         [
-                          T.wordsPoor,
-                          T.wordsFair,
-                          T.wordsGood,
-                          T.wordsExcellent,
-                          T.wordsExcellent
+                          T.qualityFormQualityVeryBad,
+                          T.qualityFormQualityBad,
+                          T.qualityFormQualityFair,
+                          T.qualityFormQualityGood,
+                          T.qualityFormQualityVeryGood,
                         ],
           difficultyTags:[
-            T.wordsVeryEasy,
-            T.wordsEasy,
-            T.wordsMedium,
-            T.wordsHard,
-            T.wordsHard
+            T.qualityFormDifficultyVeryEasy,
+            T.qualityFormDifficultyEasy,
+            T.qualityFormDifficultyMedium,
+            T.qualityFormDifficultyHard,
+            T.qualityFormDifficultyVeryHard
           ],
     }
   },

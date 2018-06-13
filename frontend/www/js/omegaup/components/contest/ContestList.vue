@@ -66,16 +66,18 @@
           <td v-else-if="contest.admission_mode == 'private'">{{ T.wordsPrivate }}</td>
           <td v-else-if="contest.admission_mode == 'registration'">{{ T.wordsRegistration }}</td>
           <td v-else=""></td>
-          <td v-if="contest.scoreboard_url &amp;&amp; isAdmin">
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
-                v-bind:title="T.contestScoreboardLink">Public</a>
+                v-bind:title="T.contestScoreboardLink"
+                v-if="contest.scoreboard_url">Public</a>
           </td>
-          <td v-if="contest.scoreboard_url_admin &amp;&amp; isAdmin">
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href=
                 "'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url_admin"
-                v-bind:title="T.contestScoreboardAdminLink">Admin</a>
+                v-bind:title="T.contestScoreboardAdminLink"
+                v-if="contest.scoreboard_url_admin">Admin</a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-edit"

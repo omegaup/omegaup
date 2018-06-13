@@ -22,6 +22,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.page-header h1 small')
             .html('&ndash; <a href="/arena/' + contestAlias + '/">' +
                   omegaup.T.contestDetailsGoToContest + '</a>');
+
         $('.new_contest_form #title').val(contest.title);
         $('.new_contest_form #alias').val(contest.alias);
         $('.new_contest_form #description').val(contest.description);
@@ -84,6 +85,15 @@ omegaup.OmegaUp.on('ready', function() {
         $('.clone_contest_form #description').val(contest.description);
         if (contest.admission_mode != 'registration') {
           $('#requests').hide();
+        }
+
+        if (contest.rerun_id != 0) {
+          $('a[href="#edit"]').parent().remove();
+          $('a[href="#problems"]').parent().remove();
+          $('a[href="#publish"]').parent().remove();
+          $('a[href="#links"]').parent().remove();
+          $('a[href="#clone"]').parent().remove();
+          $('a[href="#contestants"]').trigger('click');
         }
       })
       .fail(omegaup.UI.apiError);
