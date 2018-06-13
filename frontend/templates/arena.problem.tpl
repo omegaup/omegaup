@@ -31,6 +31,10 @@
 							<td>{#wordsOverallWallTimeLimit#}</td>
 							<td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
 						</tr>
+						<tr>
+							<td>{#problemEditFormInputLimit#}</td>
+							<td class="input_limit">{$input_limit|escape}</td>
+						</tr>
 					</table>
 {if $karel_problem}
 					<div class="karel-js-link">
@@ -56,6 +60,9 @@
 						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
 					</div>
 {include file='arena.runs.tpl' show_submit=true show_details=true}
+					<script type="text/json" id="histograms">{$histograms|json_encode}</script>
+					<div id="problem-feedback"></div>
+					<script type="text/javascript" src="{version_hash src="/js/dist/problem_feedback.js"}"></script>
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
 						<thead>

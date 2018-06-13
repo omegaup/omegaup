@@ -1055,13 +1055,31 @@ class UserController extends Controller {
             $keys = [
                 'PYE-AGS18' => 40,
             ];
+        } elseif ($r['contest_type'] == 'CAPKnuth') {
+            if ($r['current_user']->username != 'galloska'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'ESCOM2018' => 50,
+            ];
+        } elseif ($r['contest_type'] == 'CAPVirtualKnuth') {
+            if ($r['current_user']->username != 'galloska'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'Virtual-ESCOM2018' => 50,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth',
                 ]
             );
         }

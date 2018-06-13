@@ -13,6 +13,7 @@ case class Problem(
 	alias: String,
 	validator: String,
 	time_limit: String,
+	input_limit: String,
 	memory_limit: String,
 	visits: String,
 	submissions: String,
