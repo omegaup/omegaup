@@ -111,10 +111,10 @@ class ContestController extends Controller {
             ];
 
         $addedContests = [];
-        foreach ($contests as $c) {
-            $contestInfo = $c;
-            $contestInfo['duration'] = (is_null($c['window_length']) ?
-                            $c['finish_time'] - $c['start_time'] : ($c['window_length'] * 60));
+        foreach ($contests as $contestInfo) {
+            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+                            $contestInfo['finish_time'] - $contestInfo['start_time'] :
+                            ($contestInfo['window_length'] * 60));
 
             $addedContests[] = $contestInfo;
         }
@@ -220,14 +220,11 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $addedContests = [];
-        foreach ($contests as $index => $contest) {
+        foreach ($contests as $contest) {
+            $contest['start_time'] = strtotime($contest['start_time']);
+            $contest['finish_time'] = strtotime($contest['finish_time']);
+            $contest['last_updated'] = strtotime($contest['last_updated']);
             $addedContests[] = $contest;
-            foreach ($contest as $key => $item) {
-                if ($key ==  'start_time' || $key ==  'finish_time' || $key ==  'last_updated') {
-                    $addedContests[$index][$key] = strtotime($item);
-                }
-            }
         }
 
         // Expire contest-list cache

@@ -1569,8 +1569,12 @@ class UserController extends Controller {
                     break;
                 }
             }
-
             $contests[$contest['alias']]['data'] = $contest;
+            foreach ($contest as $key => $item) {
+                if ($key ==  'start_time' || $key ==  'finish_time' || $key ==  'last_updated') {
+                    $contests[$contest['alias']][$key] = strtotime($item);
+                }
+            }
         }
 
         $response['contests'] = $contests;

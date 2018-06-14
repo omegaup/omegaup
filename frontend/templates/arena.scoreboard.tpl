@@ -1,4 +1,5 @@
-{include file='head.tpl' jsfile=$jsfile inArena=true}
+{include file='head.tpl' inArena=true}
+        <script type="text/javascript" src="{version_hash src="/js/dist/course_scoreboard.js"}"></script>
 		<div>
 			<div id="title">
 				<h1>

@@ -22,6 +22,7 @@ module.exports = {
     course_edit: './frontend/www/js/omegaup/course/edit.js',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_new: './frontend/www/js/omegaup/course/new.js',
+    course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
     group_list: './frontend/www/js/omegaup/group/list.js',

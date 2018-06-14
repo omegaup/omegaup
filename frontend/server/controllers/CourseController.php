@@ -1638,9 +1638,8 @@ class CourseController extends Controller {
         );
 
         // Push scoreboard data in response
-        $response = [];
-        $response['events'] = $scoreboard->events();
-
-        return $response;
+        return [
+            'events' => $scoreboard->events()
+        ];
     }
 }
