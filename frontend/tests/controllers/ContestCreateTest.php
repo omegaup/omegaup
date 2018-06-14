@@ -154,7 +154,9 @@ class CreateContestTest extends OmegaupTestCase {
 
     /**
      * Public contest with problems NOW is NOT valid. You need
-     * to create the contest first and then, you can add problems
+     * to create the contest first and then you can add problems
+     *
+     * @expectedException InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
         $problem = ProblemsFactory::createProblem();
@@ -177,17 +179,6 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Call the API
         $response = ContestController::apiCreate($r);
-
-        // Assert status of new contest
-        $this->assertEquals('ok', $response['status']);
-
-        // Assert problem was added.
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-        ]);
-        $response = ContestController::apiProblems($r);
-        $this->assertEquals(0, count($response['problems']));
     }
 
     /**

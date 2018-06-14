@@ -118,6 +118,7 @@ omegaup.OmegaUp.loadTranslations({
 	contestListAddContestants: "Add contestants",
 	contestListShowAdminContests: "Also show contests I manage",
 	contestListSubmissions: "Submissions",
+	contestMustBeCreatedInPrivateMode: "Contest must be created in private mode",
 	contestMyActiveContests: "Contests I am participating in",
 	contestNew: "New contest",
 	contestNewCreatedContestSuccesfully: "Your contest hast been created!",

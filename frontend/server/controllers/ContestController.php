@@ -55,9 +55,7 @@ class ContestController extends Controller {
             ], false);
 
             // admission mode status in contest is public
-            $public = isset($r['admission_mode'])
-                ? self::isPublic($r['admission_mode'])
-                : false;
+            $public = isset($r['admission_mode']) && self::isPublic($r['admission_mode']);
 
             if (is_null($participating)) {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
@@ -1009,8 +1007,8 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = '1';
         }
 
-        if ($r['admission_mode'] == 'public' && is_null($r['problems'])) {
-            throw new InvalidParameterException('contestPublicRequiresProblem');
+        if ($contest->admission_mode != 'private') {
+            throw new InvalidParameterException('contestMustBeCreatedInPrivateMode');
         }
 
         $problemset = new Problemsets([
@@ -2795,9 +2793,6 @@ class ContestController extends Controller {
     }
 
     public static function isPublic($admission_mode) {
-        if ($admission_mode == 'private') {
-            return false;
-        }
-        return true;
+        return $admission_mode != 'private';
     }
 }
