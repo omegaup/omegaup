@@ -12,6 +12,7 @@
     "cross-env": "^5.1.6",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
+    "highcharts": "^6.1.0",
     "jasmine": "^3.1.0",
     "jquery": "3.2.1",
     "jsdom": "^11.11.0",
@@ -20,6 +21,7 @@
     "vue-codemirror-lite": "^1.0.4",
     "vue-loader": "^15.2.4",
     "vue-template-compiler": "^2.5.16",
+    "vue2-highcharts": "^1.2.4",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.3.0"
   },
