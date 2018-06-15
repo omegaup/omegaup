@@ -2412,27 +2412,21 @@ class UserController extends Controller {
      */
     public static function getPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
-        $lang = 'en';
-        if (is_null($user_session)) {
-            throw new ForbiddenAccessException();
-        }
-        if ($user_session->language_id == UserController::LANGUAGE_ES) {
-            $lang = 'es';
-        } elseif ($user_session->language_id == UserController::LANGUAGE_PT) {
+        $user = SessionController::apiCurrentSession($r)['session']['user'];
+        $lang = 'es';
+        if ($user->language_id == UserController::LANGUAGE_EN ||
+            $user->language_id == UserController::LANGUAGE_PSEUDO) {
+            $lang = 'en';
+        } elseif ($user->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
 
-        $git = new Git(OMEGAUP_ROOT);
-        $privacy_policy_path = 'frontend/privacy/privacy_policy/';
-        $privacy_policy_file = "{$privacy_policy_path}{$lang}.md";
-        $git_object_id = $git->get(['rev-parse', 'HEAD:' . $privacy_policy_path]);
-        $policy_markdown = file_get_contents(OMEGAUP_ROOT . '/../' .$privacy_policy_file);
         $latest_policy_accepted = self::apiLastPrivacyPolicyAccepted(new Request([]));
-
+error_log(OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md");
         return [
             'status' => 'ok',
-            'policy_markdown' => $policy_markdown,
+            'policy_markdown' => file_get_contents(
+                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"),
             'has_accepted' => $latest_policy_accepted['hasAccepted'],
         ];
     }

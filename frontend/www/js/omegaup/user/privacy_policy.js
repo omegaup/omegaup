@@ -11,7 +11,7 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-privacy-policy', {
         props: {
-          policy_markdown: this.policy_markdown,
+          policyMarkdown: this.policyMarkdown,
           saved: this.saved,
         },
         on: {
@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      policy_markdown: payload.policy_markdown,
+      policyMarkdown: payload.policy_markdown,
       saved: payload.has_accepted,
     },
     components: {

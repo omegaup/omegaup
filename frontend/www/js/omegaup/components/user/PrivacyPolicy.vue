@@ -27,19 +27,19 @@ import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
 export default {
   props: {
-    policy_markdown: String,
-    initial_agreed: Boolean,
+    policyMarkdown: String,
+    initialAgreed: Boolean,
     saved: Boolean,
   },
   computed: {
     policyHtml: function() {
-      return this.markdownConverter.makeHtml(this.policy_markdown);
+      return this.markdownConverter.makeHtml(this.policyMarkdown);
     }
   },
   methods: {onSubmit: function() { this.$emit('submit', this);}},
   data: function() {
     return {
-      T: T, agreed: this.initial_agreed,
+      T: T, agreed: this.initialAgreed,
           markdownConverter: UI.markdownConverter(),
     }
   },
