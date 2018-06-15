@@ -364,7 +364,7 @@ class ContestController extends Controller {
                 $r['current_user_id'] = $session['user']->user_id;
                 $r['current_identity_id'] = $session['identity']->identity_id;
 
-                $result['consent_markdown'] = Consent::get(
+                $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
                     $session['user']->language_id,
                     'contest',
                     $result['requests_user_information']
@@ -546,11 +546,9 @@ class ContestController extends Controller {
                     'contest_' . $needsInformation['requests_user_information'] . '_consent'
                 );
 
-                ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+                ProblemsetIdentitiesDAO::updatePrivacyStatementConsent(new ProblemsetIdentities([
                     'identity_id' => $r['current_identity_id'],
                     'problemset_id' => $r['contest']->problemset_id,
-                    'score' => 0,
-                    'time' => 0,
                     'privacystatement_consent_id' => $privacystatement_id
                 ]));
             }

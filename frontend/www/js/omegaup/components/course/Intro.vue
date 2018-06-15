@@ -37,11 +37,11 @@ export default {
     description: String,
     needsBasicInformation: Boolean,
     requestsUserInformation: String,
-    consentMarkdown: String
+    privacyStatementMarkdown: String
   },
   computed: {
     consentHtml: function() {
-      return this.markdownConverter.makeHtml(this.consentMarkdown);
+      return this.markdownConverter.makeHtml(this.privacyStatementMarkdown);
     }
   },
   data: function() {

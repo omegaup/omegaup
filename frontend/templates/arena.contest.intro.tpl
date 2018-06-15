@@ -25,7 +25,7 @@
 					    <p class="basic-information-needed">{#courseBasicInformationNeeded#}</p>
 					{/if}
 					{if $requestsUserInformation != 'no'}
-					 <script type="text/json" id="payload">{$consentMarkdown|json_encode}</script>
+					 <script type="text/json" id="payload">{$privacyStatementMarkdown|json_encode}</script>
 						<p class="requests-user-information requests-user-information-{$requestsUserInformation}">
 						</p>
 						<p>

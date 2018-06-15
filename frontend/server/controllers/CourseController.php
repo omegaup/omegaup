@@ -1318,7 +1318,7 @@ class CourseController extends Controller {
         $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
 
-        $result['consent_markdown'] = Consent::get(
+        $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
             $user_session->language_id,
             'course',
             $result['requests_user_information']

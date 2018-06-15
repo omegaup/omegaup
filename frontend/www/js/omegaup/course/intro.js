@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
           description: coursePayload.description,
           needsBasicInformation: coursePayload.needsBasicInformation,
           requestsUserInformation: coursePayload.requestsUserInformation,
-          consentMarkdown: coursePayload.consentMarkdown,
+          privacyStatementMarkdown: coursePayload.privacyStatementMarkdown,
         },
         on: {
           submit: function(ev) {

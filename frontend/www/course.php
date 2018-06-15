@@ -30,7 +30,7 @@ if ($intro_details['shouldShowResults'] ||
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
-        'consentMarkdown' => $intro_details['consent_markdown'],
+        'privacyStatementMarkdown' => $intro_details['privacy_statement_markdown'],
     ]);
 
     $smarty->display('../templates/arena.course.intro.tpl');
