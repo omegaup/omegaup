@@ -9,6 +9,30 @@ let UI = {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
 
+  formatDelta: function(delta) {
+    let days = Math.floor(delta / (24 * 60 * 60 * 1000));
+    delta -= days * (24 * 60 * 60 * 1000);
+    let hours = Math.floor(delta / (60 * 60 * 1000));
+    delta -= hours * (60 * 60 * 1000);
+    let minutes = Math.floor(delta / (60 * 1000));
+    delta -= minutes * (60 * 1000);
+    let seconds = Math.floor(delta / 1000);
+
+    let clock = '';
+
+    if (days > 0) {
+      clock += days + ':';
+    }
+    if (hours < 10) clock += '0';
+    clock += hours + ':';
+    if (minutes < 10) clock += '0';
+    clock += minutes + ':';
+    if (seconds < 10) clock += '0';
+    clock += seconds;
+
+    return clock;
+  },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;
@@ -297,6 +321,41 @@ let UI = {
 
   formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
 
+  copyToClipboard: function(value) {
+    let tempInput = document.createElement('textarea');
+
+    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
+    tempInput.value = value;
+
+    document.body.appendChild(tempInput);
+
+    try {
+      tempInput.select();  // refactor-lint-disable
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(tempInput);
+    }
+  },
+
+  renderSampleToClipboardButton: function() {
+    document.querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
+        .forEach(function(item, index) {
+          let inputValue = item.querySelector('pre').innerHTML;
+
+          let clipboardButton = document.createElement('button');
+          clipboardButton.title = T.copySampleCaseTooltip;
+          clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
+
+          clipboardButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            UI.copyToClipboard(inputValue);
+          });
+
+          item.appendChild(clipboardButton);
+        });
+  },
+
   markdownConverter: function(options) {
     options = options || {};
 
@@ -429,6 +488,7 @@ let UI = {
               columns++;
             }
             result += '</tr></tbody>';
+
             return hashBlock('<table class="sample_io">\n' + result +
                              '\n</table>');
           });

@@ -20,7 +20,7 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time`';
+    const FIELDS = '`Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time`';
 
     /**
      * Guardar registros.
@@ -53,7 +53,7 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetAccessLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
+        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -102,9 +102,9 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
             $clauses[] = '`problemset_id` = ?';
             $params[] = $Problemset_Access_Log->problemset_id;
         }
-        if (!is_null($Problemset_Access_Log->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Problemset_Access_Log->user_id;
+        if (!is_null($Problemset_Access_Log->identity_id)) {
+            $clauses[] = '`identity_id` = ?';
+            $params[] = $Problemset_Access_Log->identity_id;
         }
         if (!is_null($Problemset_Access_Log->ip)) {
             $clauses[] = '`ip` = ?';
@@ -124,7 +124,7 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`user_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` FROM `Problemset_Access_Log`';
+        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` FROM `Problemset_Access_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -157,10 +157,10 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
         if (is_null($Problemset_Access_Log->time)) {
             $Problemset_Access_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `user_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
             $Problemset_Access_Log->problemset_id,
-            $Problemset_Access_Log->user_id,
+            $Problemset_Access_Log->identity_id,
             $Problemset_Access_Log->ip,
             $Problemset_Access_Log->time,
         ];
@@ -220,14 +220,14 @@ abstract class ProblemsetAccessLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Problemset_Access_LogA->user_id;
-        $b = $Problemset_Access_LogB->user_id;
+        $a = $Problemset_Access_LogA->identity_id;
+        $b = $Problemset_Access_LogB->identity_id;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
+            $clauses[] = '`identity_id` >= ? AND `identity_id` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
+            $clauses[] = '`identity_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

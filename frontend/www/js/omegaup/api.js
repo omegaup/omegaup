@@ -123,6 +123,8 @@ export default {
 
     create: _call('/api/contest/create/'),
 
+    createVirtual: _call('/api/contest/createvirtual'),
+
     clone: _call('/api/contest/clone/'),
 
     details: _call('/api/contest/details/', _normalizeContestFields),

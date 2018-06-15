@@ -13,6 +13,7 @@ import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
@@ -25,6 +26,7 @@ def test_create_user(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
@@ -36,6 +38,8 @@ def test_login(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
+                           message_whitelist=('/api/problem/details/',))
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 

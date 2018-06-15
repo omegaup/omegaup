@@ -39,7 +39,7 @@ export default {
   methods: {onSubmit: function() { this.$emit('submit', this);}},
   data: function() {
     return {
-      T: T, agreed: this.initial_agreed, saved: this.saved,
+      T: T, agreed: this.initial_agreed,
           markdownConverter: UI.markdownConverter(),
     }
   },

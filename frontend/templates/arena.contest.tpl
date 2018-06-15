@@ -93,6 +93,8 @@
 						<tr>
 							<td>{#wordsInOut#}</td>
 							<td>{#wordsConsole#}</td>
+							<td>{#problemEditFormInputLimit#}</td>
+							<td class="input_limit"></td>
 						</tr>
 					</table>
 {if $admin}
