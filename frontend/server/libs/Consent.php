@@ -14,9 +14,9 @@ class PrivacyStatement {
             'requests_user_information',
             ['required', 'optional']
         );
-        $language = 'en';
-        if ($language_id == UserController::LANGUAGE_ES) {
-            $language = 'es';
+        $language = 'es';
+        if ($language_id == UserController::LANGUAGE_EN || $language_id == UserController::LANGUAGE_PSEUDO) {
+            $language = 'en';
         } elseif ($language_id == UserController::LANGUAGE_PT) {
             $language = 'pt';
         }

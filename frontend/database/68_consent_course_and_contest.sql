@@ -38,7 +38,7 @@ BEGIN
   DECLARE done INT DEFAULT FALSE;
   DECLARE privacystatementconsentid, groupid, identityid INT(11);
   DECLARE requestsuserinformation VARCHAR(8);
-  DECLARE cur CURSOR FOR SELECT `Groups_Identities`.`group_id`, `identity_id`, `requests_user_information` FROM `Groups_Identities` INNER JOIN `Courses` ON `Courses`.`group_id` = `Groups_Identities`.`group_id`;
+  DECLARE cur CURSOR FOR SELECT `Groups_Identities`.`group_id`, `identity_id`, `requests_user_information` FROM `Groups_Identities` INNER JOIN `Courses` ON `Courses`.`group_id` = `Groups_Identities`.`group_id` WHERE `requests_user_information` <> 'no';
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
   DECLARE EXIT HANDLER FOR SQLWARNING ROLLBACK;
@@ -93,7 +93,7 @@ BEGIN
   DECLARE done INT DEFAULT FALSE;
   DECLARE privacystatementconsentid, problemsetid, identityid INT(11);
   DECLARE requestsuserinformation VARCHAR(8);
-  DECLARE cur CURSOR FOR SELECT `Problemset_Identities`.`problemset_id`, `identity_id`, `requests_user_information` FROM `Problemset_Identities` INNER JOIN `Problemsets` ON `Problemsets`.`problemset_id` = `Problemset_Identities`.`problemset_id`;
+  DECLARE cur CURSOR FOR SELECT `Problemset_Identities`.`problemset_id`, `identity_id`, `requests_user_information` FROM `Problemset_Identities` INNER JOIN `Problemsets` ON `Problemsets`.`problemset_id` = `Problemset_Identities`.`problemset_id` WHERE `requests_user_information` <> 'no';
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
   DECLARE EXIT HANDLER FOR SQLWARNING ROLLBACK;
