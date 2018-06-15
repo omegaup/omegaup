@@ -16,8 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/',
-                     'https://www.facebook.com/')
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -117,7 +116,7 @@ def is_message_whitelisted(message, message_whitelist):
 
     quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
     for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if whitelisted_message in quoted_string:
+        if quoted_string == whitelisted_message:
             return True
 
     return False
