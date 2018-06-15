@@ -73,7 +73,7 @@ def test_create_contest(driver):
 
 
 @flaky
-@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js', '/jot.html'))
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
