@@ -2422,11 +2422,12 @@ class UserController extends Controller {
         }
 
         $latest_policy_accepted = self::apiLastPrivacyPolicyAccepted(new Request([]));
-error_log(OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md");
+        error_log(OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md");
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
-                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"),
+                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
+            ),
             'has_accepted' => $latest_policy_accepted['hasAccepted'],
         ];
     }
