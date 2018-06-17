@@ -11,8 +11,6 @@ omegaup.OmegaUp.on('ready', function() {
         $(this).tab('show');
       });
 
-  var contestAlias =
-      /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
