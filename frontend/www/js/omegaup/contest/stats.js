@@ -3,9 +3,13 @@ import Vue from 'vue';
 import {OmegaUp} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
+  var verdict = null;
   let Stats = new Vue({
     el: '#contest-stats',
     render: function(createElement) { return createElement('contestStats'); },
+    mounted: function() {
+      verdict = this.$el.querySelector('.copy').querySelectorAll('div')[0];
+    },
     components: {
       'contestStats': contest_Stats,
     },
@@ -19,7 +23,6 @@ OmegaUp.on('ready', function() {
   var callStatsApiTimeout = 10 * 1000;
   var updateRunCountsChartTimeout = callStatsApiTimeout;
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
-
   function getStats() {
     omegaup.API.Contest.stats({contest_alias: contestAlias})
         .then(function(s) {
@@ -53,7 +56,7 @@ OmegaUp.on('ready', function() {
 
     // Draw verdict counts pie chart
     window.run_counts_chart =
-        oGraph.verdictCounts($('.verdict-chart')[0], contestAlias, stats);
+        oGraph.verdictCounts(verdict, contestAlias, stats);
 
     // Draw distribution of scores chart
     window.distribution_chart = oGraph.distributionChart(
