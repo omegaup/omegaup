@@ -1,5 +1,9 @@
 var path = require('path')
 var webpack = require('webpack')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
+
+var omegaupStylesRegExp = /omegaup_styles\.js/;
 
 module.exports = {
   entry: {
@@ -30,11 +34,12 @@ module.exports = {
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
+    omegaup_styles: './frontend/www/sass/main.scss',
   },
   output: {
-    path: path.resolve(__dirname, './frontend/www/js/dist'),
-    publicPath: '/js/dist/',
-    filename: '[name].js',
+    path: path.resolve(__dirname, './frontend/www/'),
+    publicPath: 'frontend/www/',
+    filename: 'js/dist/[name].js',
     library: '[name]',
     libraryTarget: 'umd'
   },
@@ -42,6 +47,11 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'omegaup',
     }),
+    new ExtractTextPlugin({
+      filename: 'css/dist/[name].css',
+      allChunks: true,
+    }),
+    new RemoveSourceWebpackPlugin([omegaupStylesRegExp]),
   ],
   module: {
     rules: [
@@ -68,7 +78,17 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: 'style-loader!css-loader',
+      },
+      {
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            'sass-loader'
+          ],
+        })
       }
     ],
   },
