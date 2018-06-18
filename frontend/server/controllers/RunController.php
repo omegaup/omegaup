@@ -248,7 +248,7 @@ class RunController extends Controller {
             }
             $submit_delay = 0;
             $problemset_id = null;
-            $test = 0;
+            $test = "normal";
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
@@ -307,7 +307,7 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
+            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? "test" : "normal";
         }
 
         // Populate new run object

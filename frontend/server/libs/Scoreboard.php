@@ -686,7 +686,7 @@ class Scoreboard {
 
         // Calculate score for each contestant x problem x run
         foreach ($contest_runs as $run) {
-            if (!$params['admin'] && $run->test != 0) {
+            if (!$params['admin'] && $run->test != "normal") {
                 continue;
             }
 
