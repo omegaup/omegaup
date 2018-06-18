@@ -730,7 +730,7 @@ CREATE TABLE `Runs` (
   `contest_score` double DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
-  `test` tinyint(1) NOT NULL DEFAULT '0',
+  `test` enum('normal','test','disqualify') DEFAULT 'normal',
   `judged_by` char(32) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
