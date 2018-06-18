@@ -17,6 +17,7 @@
     "jquery": "3.2.1",
     "jsdom": "^9.8.3",
     "node-sass": "^4.9.0",
+    "remove-source-webpack-plugin": "^0.1.1",
     "sass-loader": "^7.0.3",
     "sortablejs": "^1.7.0",
     "style-loader": "^0.18.2",
