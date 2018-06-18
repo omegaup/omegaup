@@ -1,10 +1,10 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
+const webpack = require('webpack')
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
 
-var omegaupStylesRegExp = /omegaup_styles\.js/;
+const omegaupStylesRegExp = /omegaup_styles\.js/;
 
 module.exports = {
   entry: {
