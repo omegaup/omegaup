@@ -10,4 +10,26 @@ include_once('base/Problem_Of_The_Week.vo.base.php');
   *
   */
 class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
+    final public static function getListOfProblemsOfTheWeek($offset, $rowcount, &$total) {
+        global $conn;
+
+        $sql = 'SELECT p.difficulty, p.title, p.alias, u.username as author
+                FROM `Problem_Of_The_Week` as pw
+                    INNER JOIN Problems as p on pw.problem_id = p.problem_id
+                    INNER JOIN ACLs as acl on acl.acl_id = p.acl_id
+                    INNER JOIN Users as u on u.user_id = acl.owner_id
+                ORDER BY pw.time DESC LIMIT ?, ?;';
+
+        $args[] = intval(mysqli_real_escape_string($conn->_connectionID, $offset));
+        $args[] = intval(mysqli_real_escape_string($conn->_connectionID, $rowcount));
+
+        $result = $conn->Execute($sql, $args);
+
+        $problemsOfTheWeek = [];
+        foreach ($result as $row) {
+            $problemsOfTheWeek[] = $row;
+        }
+
+        return $problemsOfTheWeek;
+    }
 }
