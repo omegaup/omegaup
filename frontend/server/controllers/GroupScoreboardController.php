@@ -140,10 +140,11 @@ class GroupScoreboardController extends Controller {
             $i = 0;
             $contest_params = [];
             foreach ($r['gscs'] as $gsc) {
-                $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
-                if (is_null($contest)) {
+                $contests = ContestsDAO::getByProblemset($gsc->problemset_id);
+                if (is_null($contests) || sizeof($contests) !== 1) {
                     throw new NotFoundException('contestNotFound');
                 }
+                $contest = $contests[0];
                 $response['contests'][$i] = $contest->asArray();
                 $response['contests'][$i]['only_ac'] = $gsc->only_ac;
                 $response['contests'][$i]['weight'] = $gsc->weight;

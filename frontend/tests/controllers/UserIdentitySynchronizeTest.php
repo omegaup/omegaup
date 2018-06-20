@@ -75,8 +75,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $locale = LanguagesDAO::search(['name' => 'pt']);
-        $states = StatesDAO::search(['country_id' => 'MX']);
+        $locale = LanguagesDAO::getByName('pt');
+        $states = StatesDAO::getByCountry('MX');
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -101,8 +101,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($locale[0]->language_id, $user_db->language_id);
 
         // Edit all fields again with diff values
-        $locale = LanguagesDAO::search(['name' => 'pseudo']);
-        $states = StatesDAO::search(['country_id' => 'US']);
+        $locale = LanguagesDAO::getByName('pseudo');
+        $states = StatesDAO::getByCountry('US');
         $r = new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),

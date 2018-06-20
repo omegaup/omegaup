@@ -95,10 +95,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(ProblemsetAccessLogDAO::search([
-            'problemset_id' => $contestData['contest']->problemset_id,
-            'identity_id' => $contestant->main_identity_id,
-        ])));
+        $this->assertEquals(0, count(ProblemsetAccessLogDAO::getByProblemsetIdentityId(
+            $contestData['contest']->problemset_id,
+            $contestant->main_identity_id
+        )));
 
         // Prepare our request
         $login = self::login($contestant);
@@ -116,10 +116,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertContestDetails($contestData, $problems, $response);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(ProblemsetAccessLogDAO::search([
-            'problemset_id' => $contestData['contest']->problemset_id,
-            'identity_id' => $contestant->main_identity_id,
-        ])));
+        $this->assertEquals(1, count(ProblemsetAccessLogDAO::getByProblemsetIdentityId(
+            $contestData['contest']->problemset_id,
+            $contestant->main_identity_id
+        )));
     }
 
     /**

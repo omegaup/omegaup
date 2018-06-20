@@ -33,9 +33,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -102,9 +100,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -144,9 +140,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -295,9 +289,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('cases/1.in', $response['uploaded_files'][0]);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -359,9 +351,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Get problem info from DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
         $this->assertEquals(1, count($problems));
         $problem = $problems[0];
 
@@ -464,9 +454,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));

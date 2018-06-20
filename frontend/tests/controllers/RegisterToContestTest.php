@@ -266,7 +266,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // Updates contestant, with basic information
         $contestantLogin = self::login($contestant);
-        $states = StatesDAO::search(['country_id' => 'MX']);
+        $states = StatesDAO::getByCountry('MX');
         UserController::apiUpdate(new Request([
             'auth_token' => $contestantLogin->auth_token,
             'country_id' => 'MX',

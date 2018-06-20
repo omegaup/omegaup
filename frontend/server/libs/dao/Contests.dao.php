@@ -157,18 +157,29 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
-    final public static function getByProblemset($problemset_id) {
-        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 1;';
+    final public static function getByTitle($title) {
+        $sql = 'SELECT * FROM Contests WHERE title = ?;';
 
         global $conn;
-        $rs = $conn->GetRow($sql, [$problemset_id]);
-        if (count($rs) == 0) {
-            return null;
+        $rs = $conn->Execute($sql, [$title]);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
         }
+        return $contests;
+    }
 
-        $contest = new Contests($rs);
+    final public static function getByProblemset($problemset_id) {
+        $sql = 'SELECT * FROM Contests WHERE problemset_id = ?;';
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemset_id]);
 
-        return $contest;
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
     }
 
     public static function getPrivateContestsCount(Users $user) {
@@ -725,11 +736,9 @@ class ContestsDAO extends ContestsDAOBase {
         }
 
         try {
-            $contests = ContestsDAO::search(new Contests([
-                'problemset_id' => $problemset_id,
-            ]));
-            if (count($contests) === 1) {
-                return $contests[0];
+            $contest = ContestsDAO::getByProblemset($problemset_id);
+            if (!is_null($contest) && sizeof($contest) === 1) {
+                return $contest;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

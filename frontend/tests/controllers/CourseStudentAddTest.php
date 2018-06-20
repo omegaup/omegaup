@@ -27,10 +27,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $identity->identity_id
-            ]));
+        $studentsInGroup = GroupsIdentitiesDAO::getByPK(
+            $course->group_id,
+            $identity->identity_id
+        );
 
         $this->assertNotNull($studentsInGroup);
         $this->assertEquals(1, count($studentsInGroup));
@@ -106,10 +106,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $student->user_id
-        ]));
+        $studentsInGroup = GroupsIdentitiesDAO::getByGroupId($course->group_id);
 
         $this->assertNotNull($studentsInGroup);
         $this->assertEquals(0, count($studentsInGroup));
@@ -170,10 +167,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::search(new GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $identity->identity_id
-            ]));
+        $studentsInGroup = GroupsIdentitiesDAO::getByPK(
+            $course->group_id,
+            $identity->identity_id
+        );
 
         $this->assertNotNull($studentsInGroup);
         $this->assertEquals(1, count($studentsInGroup));

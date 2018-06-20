@@ -814,7 +814,13 @@ class QualityNominationTest extends OmegaupTestCase {
             'contents' => json_encode([]), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-        $problem_dismissed = QualityNominationsDAO::search($key);
+        $problem_dismissed = QualityNominationsDAO::getByUserAndProblem(
+            $r['current_user_id'],
+            $problem->problem_id,
+            $r['nomination'],
+            json_encode([]), // re-encoding it for normalization.
+            'open'
+        );
         RunsFactory::gradeRun($runData);
         try {
             $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
@@ -823,7 +829,13 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         try {
             QualityNominationController::apiCreate($r);
-            $pd = QualityNominationsDAO::search($key);
+            $pd = QualityNominationsDAO::getByUserAndProblem(
+                $r['current_user_id'],
+                $problem->problem_id,
+                $r['nomination'],
+                json_encode([]), // re-encoding it for normalization.
+                'open'
+            );
             $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
         } catch (PreconditionFailedException $e) {
             // Expected.
@@ -928,9 +940,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
         self::runCronjobScript();
 
-        $problemOfTheWeek = ProblemOfTheWeekDAO::search(
-            new ProblemOfTheWeek(['difficulty' => 'easy'])
-        );
+        $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
         $this->assertEquals(count($problemOfTheWeek), 1);
         $this->assertEquals(
             $problemOfTheWeek[0]->problem_id,

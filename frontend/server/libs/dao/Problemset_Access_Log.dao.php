@@ -67,4 +67,24 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
         global $conn;
         return $conn->GetAll($sql, [$course_id]);
     }
+
+    final public static function getByProblemsetIdentityId($problemset_id, $identity_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problemset_Access_Log
+                WHERE
+                    problemset_id = ?
+                AND
+                    identity_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemset_id, $identity_id]);
+
+        $problemset_access_log = [];
+        foreach ($rs as $row) {
+            array_push($problemset_access_log, new ProblemsetAccessLog($row));
+        }
+        return $problemset_access_log;
+    }
 }

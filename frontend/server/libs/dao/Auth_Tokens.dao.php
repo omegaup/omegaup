@@ -68,4 +68,22 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+
+    final public static function getByIdentityId($identity_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Auth_Tokens
+                WHERE
+                    identity_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$identity_id]);
+
+        $auth_tokens = [];
+        foreach ($rs as $row) {
+            array_push($auth_tokens, new AuthTokens($row));
+        }
+        return $auth_tokens;
+    }
 }
