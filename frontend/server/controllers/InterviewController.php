@@ -208,9 +208,7 @@ class InterviewController extends Controller {
         $thisResult['problemset_id'] = $interview->problemset_id;
 
         try {
-            $db_results = ProblemsetIdentitiesDAO::search(new ProblemsetIdentities([
-                'problemset_id' => $interview->problemset_id,
-            ]));
+            $problemset_identities = ProblemsetIdentitiesDAO::getByProblemset($interview->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -219,7 +217,7 @@ class InterviewController extends Controller {
         $users = [];
 
         // Add all users to an array
-        foreach ($db_results as $result) {
+        foreach ($problemset_identities as $result) {
             // @TODO: Slow queries ahead
             $user_id = $result->user_id;
             $user = UsersDAO::getByPK($user_id);

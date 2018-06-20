@@ -583,15 +583,8 @@ class ContestController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            // Get problems of the contest
-            $key_problemsInContest = new ProblemsetProblems(
-                [
-                        'problemset_id' => $r['contest']->problemset_id
-                    ]
-            );
-
             try {
-                $problemsInContest = ProblemsetProblemsDAO::search($key_problemsInContest, 'order');
+                $problemsInContest = ProblemsetProblemsDAO::getByProblemset($r['contest']->problemset_id);
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -2217,8 +2210,7 @@ class ContestController extends Controller {
 
             if (!is_null($r['problems'])) {
                 // Get current problems
-                $p_key = new Problems(['contest_id' => $r['contest']->contest_id]);
-                $current_problems = ProblemsDAO::search($p_key);
+                $current_problems = ProblemsDAO::getByContest($r['contest']->contest_id);
                 $current_problems_id = [];
 
                 foreach ($current_problems as $p) {
@@ -2230,22 +2222,18 @@ class ContestController extends Controller {
                 $to_add = array_diff(self::$problems_id, $current_problems_id);
 
                 foreach ($to_add as $problem) {
-                    $contest_problem = new ProblemsetProblems([
-                                'problemset_id' => $r['contest']->problemset_id,
-                                'problem_id' => $problem,
-                                'points' => $r['problems'][$problem]['points']
-                            ]);
-
-                    ProblemsetProblemsDAO::save($contest_problem);
+                    ProblemsetProblemsDAO::save(new ProblemsetProblems([
+                        'problemset_id' => $r['contest']->problemset_id,
+                        'problem_id' => $problem,
+                        'points' => $r['problems'][$problem]['points']
+                    ]));
                 }
 
                 foreach ($to_delete as $problem) {
-                    $contest_problem = new ProblemsetProblems([
-                                'problemset_id' => $r['contest']->problemset_id,
-                                'problem_id' => $problem,
-                            ]);
-
-                    ProblemsetProblemsDAO::delete(ProblemsetProblemsDAO::search($contest_problem));
+                    ProblemsetProblemsDAO::delete(new ProblemsetProblems([
+                        'problemset_id' => $r['contest']->problemset_id,
+                        'problem_id' => $problem,
+                    ]));
                 }
             }
 
@@ -2464,8 +2452,7 @@ class ContestController extends Controller {
             }
 
             // Get max points posible for contest
-            $key = new ProblemsetProblems(['problemset_id' => $r['contest']->problemset_id]);
-            $problemsetProblems = ProblemsetProblemsDAO::search($key);
+            $problemsetProblems = ProblemsetProblemsDAO::getByProblemset($r['contest']->problemset_id);
             $totalPoints = 0;
             foreach ($problemsetProblems as $cP) {
                 $totalPoints += $cP->points;
@@ -2657,13 +2644,8 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         // Get our runs
-        $relevant_columns = ['run_id', 'guid', 'language', 'status',
-            'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
-            'time', 'submit_delay', 'Users.username', 'Problems.alias'];
         try {
-            $runs = RunsDAO::search(new Runs([
-                'contest_id' => $r['contest']->contest_id
-            ]), 'time', 'DESC', $relevant_columns);
+            $runs = RunsDAO::getByContest($r['contest']->contest_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);

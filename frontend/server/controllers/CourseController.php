@@ -571,10 +571,7 @@ class CourseController extends Controller {
         // Update assignments order
         $assignments = $r['assignments'];
         foreach ($assignments as $assignment) {
-            $currentAssignment = AssignmentsDAO::search(new Assignments([
-                'alias' => $assignment['alias'],
-                'course_id' => $r['course']->course_id
-            ]));
+            $currentAssignment = AssignmentsDAO::getByAliasAndCourse($assignment['alias'], $r['course']->course_id);
 
             if (empty($currentAssignment) || is_null($currentAssignment[0])) {
                 throw new NotFoundException('assignmentNotFound');
@@ -919,10 +916,7 @@ class CourseController extends Controller {
             );
         }
 
-        $assignments = AssignmentsDAO::search(new Assignments([
-            'course_id' => $r['course']->course_id,
-            'alias' => $r['assignment'],
-        ]));
+        $assignments = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
         if (count($assignments) != 1) {
             throw new NotFoundException('assignmentNotFound');
         }
@@ -935,11 +929,11 @@ class CourseController extends Controller {
             'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
             'submit_delay'];
         foreach ($problems as &$problem) {
-            $runs_array = RunsDAO::search(new Runs([
-                'identity_id' => $r['identity']->identity_id,
-                'problem_id' => $problem['problem_id'],
-                'problemset_id' => $r['assignment']->problemset_id,
-            ]));
+            $runs_array = RunsDAO::getByKeys(
+                $problem['problem_id'],
+                $r['assignment']->problemset_id,
+                $r['identity']->identity_id
+            );
             $runs_filtered_array = [];
             foreach ($runs_array as $run) {
                 $run->toUnixTime();
@@ -1415,10 +1409,7 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
-        $assignments = AssignmentsDAO::search(new Assignments([
-            'course_id' => $r['course']->course_id,
-            'alias' => $r['assignment'],
-        ]));
+        $assignments = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
         if (count($assignments) != 1) {
             throw new NotFoundException('assignmentNotFound');
         }

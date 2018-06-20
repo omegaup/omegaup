@@ -53,6 +53,30 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     }
 
     /*
+     * Get problemset problems including problemset alias, points, and order
+     */
+    final public static function getByProblemset($problemset_id) {
+        // Build SQL statement
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problemset_Problems
+                WHERE
+                    problemset_id = ?
+                ORDER BY
+                    `order` ASC;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemset_id]);
+
+        $problemset_problems = [];
+        foreach ($rs as $row) {
+            array_push($problemset_problems, new ProblemsetProblems($row));
+        }
+        return $problemset_problems;
+    }
+
+    /*
      *
      * Get relevant problems including problemset alias
      */

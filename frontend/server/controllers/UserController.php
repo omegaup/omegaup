@@ -506,9 +506,7 @@ class UserController extends Controller {
             Validators::isStringNonEmpty($r['id'], 'id');
 
             try {
-                $users = UsersDAO::search(new Users([
-                                    'verification_id' => $r['id']
-                                ]));
+                $users = UsersDAO::getByVerification($r['id']);
 
                 $user = (is_array($users) && count($users) > 0) ? $users[0] : null;
             } catch (Exception $e) {
@@ -560,10 +558,10 @@ class UserController extends Controller {
         $usersAdded = [];
 
         try {
-            $usersMissing = UsersDAO::search(new Users([
-                'verified' => true,
-                'in_mailing_list' => false
-            ]));
+            $usersMissing = UsersDAO::getVerified(
+                true, // verified
+                false // in_mailing_list
+            );
 
             foreach ($usersMissing as $user) {
                 $registered = self::registerToSendy($user);
@@ -1407,7 +1405,7 @@ class UserController extends Controller {
         }
 
         try {
-            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndRank($firstDay, 1);
 
             if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
                 // Generate the coder
@@ -1842,7 +1840,7 @@ class UserController extends Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            $query = LanguagesDAO::search(new Languages(['name' => $r['locale']]));
+            $query = LanguagesDAO::getByName($r['locale']);
             if (sizeof($query) != 1) {
                 throw new InvalidParameterException('invalidLanguage', 'locale');
             }
@@ -2194,9 +2192,7 @@ class UserController extends Controller {
         self::validateUser($r);
 
         Validators::isStringNonEmpty($r['role'], 'role');
-        $role = RolesDAO::search(new Roles([
-            'name' => $r['role'],
-        ]));
+        $role = RolesDAO::getByName($r['role']);
         if (sizeof($role) != 1) {
             throw new InvalidParameterException('parameterNotFound', 'role');
         }
@@ -2216,13 +2212,10 @@ class UserController extends Controller {
         self::validateUser($r);
 
         Validators::isStringNonEmpty($r['group'], 'group');
-        $group = GroupsDAO::search(new Groups([
-            'name' => $r['group'],
-        ]));
-        if (sizeof($group) != 1) {
+        $r['group'] = GroupsDAO::getByName($r['group']);
+        if (is_null($r['group'])) {
             throw new InvalidParameterException('parameterNotFound', 'group');
         }
-        $r['group'] = $group[0];
     }
 
     /**

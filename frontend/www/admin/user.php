@@ -10,12 +10,8 @@ if (is_null($user)) {
     header('HTTP/1.1 404 Not found');
     die();
 }
-$emails = EmailsDAO::search(new Emails([
-    'user_id' => $user->user_id,
-]));
-$userExperiments = UsersExperimentsDAO::search(new UsersExperiments([
-    'user_id' => $user->user_id,
-]));
+$emails = EmailsDAO::getByUserId($user->user_id);
+$userExperiments = UsersExperimentsDAO::getByUserId($user->user_id);
 // TODO: Also support GroupRoles.
 $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
 $roles = RolesDAO::getAll();

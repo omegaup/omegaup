@@ -31,13 +31,19 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function FindByUsername($username) {
-        $result = IdentitiesDAO::search(new Identities([
-            'username' => $username
-        ]));
-        if (sizeof($result) != 1) {
+        global  $conn;
+        $sql = 'SELECT
+                   i.*
+                FROM
+                  `Identities` i
+                WHERE
+                  i.username = ?';
+        $params = [ $username ];
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
             return null;
         }
-        return array_pop($result);
+        return new Identities($rs);
     }
 
     public static function FindByUserId($user_id) {

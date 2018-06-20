@@ -249,10 +249,7 @@ class Authorization {
         if (Authorization::isSystemAdmin($identity_id)) {
             return true;
         }
-        $groupUsers = GroupsIdentitiesDAO::search(new GroupsIdentities([
-            'identity_id' => $identity_id,
-            'group_id' => $group->group_id
-        ]));
+        $groupUsers = GroupsIdentitiesDAO::getByPK($group->group_id, $identity_id);
 
         return !is_null($groupUsers) && count($groupUsers) > 0;
     }

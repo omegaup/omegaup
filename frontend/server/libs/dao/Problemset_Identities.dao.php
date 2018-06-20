@@ -65,4 +65,21 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         global $conn;
         return $conn->GetAll($sql, [$problemset_id]);
     }
+
+    final public static function getByProblemset($problemset_id) {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Problemset_Identities
+            WHERE
+                problemset_id = ?;';
+
+        global $conn;
+        $problemset_identities = [];
+        foreach ($conn->Execute($sql, [$problemset_id]) as $row) {
+            array_push($problemset_identities, new ProblemsetIdentities($row));
+        }
+        return $problemset_identities;
+    }
 }

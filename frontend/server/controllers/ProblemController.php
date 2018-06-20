@@ -660,9 +660,7 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            $runs = RunsDAO::search(new Runs([
-                'problem_id' => $r['problem']->problem_id
-            ]));
+            $runs = RunsDAO::getByKeys($r['problem']->problem_id);
 
             $guids = [];
             foreach ($runs as $run) {
@@ -1295,11 +1293,11 @@ class ProblemController extends Controller {
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::search(new Runs([
-                    'identity_id' => $r['current_identity_id'],
-                    'problem_id' => $r['problem']->problem_id,
-                    'problemset_id' => $problemset_id
-                ]));
+                $runs_array = RunsDAO::getByKeys(
+                    $r['problem']->problem_id,
+                    $problemset_id,
+                    $r['current_identity_id']
+                );
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -1463,10 +1461,7 @@ class ProblemController extends Controller {
         } else {
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::search(new Runs([
-                    'identity_id' => $r['current_identity_id'],
-                    'problem_id' => $r['problem']->problem_id
-                ]));
+                $runs_array = RunsDAO::getByKeys($r['problem']->problem_id, null, $r['current_identity_id']);
 
                 // Create array of relevant columns for list of runs
                 $relevant_columns = ['guid', 'language', 'status', 'verdict',

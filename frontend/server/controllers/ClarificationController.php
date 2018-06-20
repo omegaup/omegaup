@@ -230,9 +230,7 @@ class ClarificationController extends Controller {
             }
             if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
                 $r['problemset'] = ProblemsetsDAO::GetByPK($r['clarification']->problemset_id);
-                $contests = ContestsDAO::search(new Contests([
-                    'problemset_id' => $r['problemset']->problemset_id,
-                ]));
+                $contests = ContestsDAO::getByProblemset($r['problemset']->problemset_id);
                 if (count($contests) === 1) {
                     $r['contest'] = $contests[0];
                 }
