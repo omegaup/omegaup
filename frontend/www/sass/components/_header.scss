@@ -17,6 +17,62 @@
   }
 
   & .navbar-header {
+    // Navbar hamburguer
+    .navbar-toggle {
+      border: 0;
+      margin-right: 30px;
+      background-color: $primary-color--darker;
+
+      &:focus {
+        background-color: $primary-color;
+        width: 35px;
+      }
+      
+      &:hover {
+        background-color: $primary-color--darker;
+      }
+
+      .icon-bar {
+        background-color: $white;
+        width: 22px;
+        transition: all 0.2s;
+      }
+
+      // abajo
+      .icon-bar:last-child {
+        transform: rotate(-45deg);
+        transform-origin: 10% 90%;
+      }
+
+      // arriba
+      .icon-bar:nth-child(2) {
+        transform: rotate(45deg);
+        transform-origin: 10% 10%;
+      }
+
+      // medio
+      .icon-bar:nth-child(3) {
+        opacity: 0;
+      }
+      
+      &.collapsed {
+        width: auto;
+        background-color: $primary-color;
+        
+        .icon-bar:last-child {
+          transform: rotate(0);
+        }
+
+        .icon-bar:nth-child(2) {
+          transform: rotate(0);
+        }
+        
+        .icon-bar:nth-child(3) {
+          opacity: 1;
+        }
+      }
+    }
+
     img {
       height: 20px;
     }
@@ -24,6 +80,10 @@
     .navbar-brand {
       background-color: $white;
       background-image: linear-gradient(to bottom,$white 0,#ddd 100%);
+
+      @include breakpoint(xs) {
+        padding-left: 30px;
+      }
     }
   }
 
