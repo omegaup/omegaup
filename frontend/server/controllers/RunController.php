@@ -248,7 +248,7 @@ class RunController extends Controller {
             }
             $submit_delay = 0;
             $problemset_id = null;
-            $test = "normal";
+            $test = 'normal';
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
@@ -307,7 +307,7 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? "test" : "normal";
+            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
 
         // Populate new run object
@@ -555,6 +555,33 @@ class RunController extends Controller {
         // Expire ranks
         UserController::deleteProblemsSolvedRankCacheList();
 
+        return $response;
+    }
+
+    /**
+     * Disqualify a submission
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiDisqualify(Request $r) {
+        // Get the user who is calling this API
+        self::authenticateRequest($r);
+
+        self::validateDetailsRequest($r);
+
+        if (!(Authorization::canEditRun($r['current_identity_id'], $r['run']))) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        $r['run']->test = 'disqualify';
+        RunsDAO::save($r['run']);
+
+        $response = [];
+        $response['status'] = 'ok';
+
+        // Expire ranks
+        UserController::deleteProblemsSolvedRankCacheList();
         return $response;
     }
 
