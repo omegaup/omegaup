@@ -66,7 +66,7 @@
         .icon-bar:nth-child(2) {
           transform: rotate(0);
         }
-        
+
         .icon-bar:nth-child(3) {
           opacity: 1;
         }
@@ -161,6 +161,35 @@
     margin-right: auto;
     padding-left: 0;
     padding-right: 0;
+
+    .navbar-collapse {
+      @include breakpoint(xs) {
+        width: 75%;
+        background-color: $primary-color--darker;
+        top: 50px;
+      }
+    }
+
+
+    .collapsing {
+      top: 0 !important;
+      position: relative;
+      height: auto;
+      overflow: hidden;
+      // -webkit-transition-timing-function:ease;
+      // -o-transition-timing-function:ease;
+      transition-timing-function: ease;
+      // -webkit-transition-duration:.35s;
+      // -o-transition-duration:.35s;
+      transition-duration: .35s;
+      // -webkit-transition-property:width;
+      // -o-transition-property:width;
+      transition-property: width, visibility;
+    }
+
+    @include breakpoint(xs) {
+      height: 50px;
+    }
   }
 
   #grader-status {
