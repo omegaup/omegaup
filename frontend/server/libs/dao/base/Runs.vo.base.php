@@ -71,11 +71,11 @@ class Runs extends VO {
         if (isset($data['submit_delay'])) {
             $this->submit_delay = $data['submit_delay'];
         }
-        if (isset($data['test'])) {
-            $this->test = $data['test'];
-        }
         if (isset($data['judged_by'])) {
             $this->judged_by = $data['judged_by'];
+        }
+        if (isset($data['test'])) {
+            $this->test = $data['test'];
         }
     }
 
@@ -200,14 +200,14 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
+      * @var char(32)
       */
-    public $test;
+    public $judged_by;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(32)
+      * @var enum('normal','test','disqualify')
       */
-    public $judged_by;
+    public $test;
 }
