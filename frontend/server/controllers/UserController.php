@@ -2412,7 +2412,10 @@ class UserController extends Controller {
      */
     public static function getPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-        $user = SessionController::apiCurrentSession($r)['session']['user'];
+
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+
         $lang = 'es';
         if ($user->language_id == UserController::LANGUAGE_EN ||
             $user->language_id == UserController::LANGUAGE_PSEUDO) {
@@ -2420,15 +2423,17 @@ class UserController extends Controller {
         } elseif ($user->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
-
-        $latest_policy_accepted = self::apiLastPrivacyPolicyAccepted(new Request([]));
-        error_log(OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md");
+        $latest_privacy_policy = PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy();
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
                 OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
             ),
-            'has_accepted' => $latest_policy_accepted['hasAccepted'],
+            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
+                $identity->identity_id,
+                $latest_privacy_policy
+            ),
+            'latest_privacy_policy' => $latest_privacy_policy,
         ];
     }
 
@@ -2463,7 +2468,8 @@ class UserController extends Controller {
         return [
             'status' => 'ok',
             'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
-                $identity->identity_id
+                $identity->identity_id,
+                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()
             ),
         ];
     }
@@ -2476,11 +2482,14 @@ class UserController extends Controller {
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-
+        Validators::isNumber($r['privacystatement_id'], 'privacystatement_id', true);
         $identity = self::resolveTargetIdentity($r);
 
         try {
-            $response = PrivacyStatementConsentLogDAO::saveLog($identity->identity_id);
+            $response = PrivacyStatementConsentLogDAO::saveLog(
+                $identity->identity_id,
+                $r['privacystatement_id']
+            );
             $sessionController = new SessionController();
             $sessionController->InvalidateCache();
         } catch (Exception $e) {
