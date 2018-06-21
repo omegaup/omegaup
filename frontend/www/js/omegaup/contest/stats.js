@@ -3,23 +3,30 @@ import Vue from 'vue';
 import {OmegaUp} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  var verdict = null;
-  let Stats = new Vue({
+  var stats = null;
+  var contestAlias =
+      /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
+  var StatsVue = new Vue({
     el: '#contest-stats',
-    render: function(createElement) { return createElement('contestStats'); },
-    mounted: function() {
-      verdict = this.$el.querySelector('.copy').querySelectorAll('div')[0];
+    render: function(createElement) {
+      return createElement('contestStats', {
+        props: {
+          stats: this.stats,
+          contestAlias: this.contestAlias,
+        }
+      });
+    },
+    data: {
+      stats: stats,
+      contestAlias: contestAlias,
     },
     components: {
       'contestStats': contest_Stats,
     },
   });
-  var contestAlias =
-      /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
 
   Highcharts.setOptions({global: {useUTC: false}});
 
-  var stats = null;
   var callStatsApiTimeout = 10 * 1000;
   var updateRunCountsChartTimeout = callStatsApiTimeout;
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
@@ -27,6 +34,7 @@ OmegaUp.on('ready', function() {
     omegaup.API.Contest.stats({contest_alias: contestAlias})
         .then(function(s) {
           stats = s;
+          StatsVue.stats = stats;
           drawCharts();
         })
         .fail(omegaup.UI.apiError);
@@ -50,13 +58,13 @@ OmegaUp.on('ready', function() {
 
     // This function is called after we call getStats multiple times. We
     // just need to draw once.
-    if (window.run_counts_chart != null) {
-      return;
-    }
+    // if (window.run_counts_chart != null) {
+    //   return;
+    // }
 
-    // Draw verdict counts pie chart
-    window.run_counts_chart =
-        oGraph.verdictCounts(verdict, contestAlias, stats);
+    // // Draw verdict counts pie chart
+    // window.run_counts_chart =
+    //     oGraph.verdictCounts($('.verdict-chart')[0], contestAlias, stats);
 
     // Draw distribution of scores chart
     window.distribution_chart = oGraph.distributionChart(
