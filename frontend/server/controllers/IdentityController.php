@@ -116,7 +116,6 @@ class IdentityController extends Controller {
 
                 $response['userinfo']['username'] = $identity->username;
                 $response['userinfo']['name'] = $identity->name;
-                //$response['userinfo']['gender'] = $identity->gender;
                 $response['userinfo']['preferred_language'] = null;
                 $response['userinfo']['country'] = $identity_db['country'];
                 $response['userinfo']['country_id'] = $identity->country_id;
