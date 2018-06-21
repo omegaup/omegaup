@@ -397,7 +397,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-contestant-form')
       .on('submit', function(evt) {
-        evt.preventDefault;
+        evt.preventDefault();
         isBulk =
             document.activeElement.className.indexOf('user-add-bulk') !== -1;
         if (isBulk) {
@@ -410,7 +410,7 @@ omegaup.OmegaUp.on('ready', function() {
                                  usernameOrEmail: $.trim(username),
                                });
                              });
-          $.when.apply(promises)
+          $.when.apply($, promises)
               .then(function() {
                 omegaup.UI.success(omegaup.T.bulkUserAddSuccess);
               })
@@ -418,7 +418,6 @@ omegaup.OmegaUp.on('ready', function() {
                 omegaup.UI.error(omegaup.T.bulkUserAddError);
               })
               .always(refreshContestContestants);
-          return false;
         } else {
           var username = $('#username-contestant').val();
           omegaup.API.Contest.addUser({
@@ -427,11 +426,9 @@ omegaup.OmegaUp.on('ready', function() {
                              })
               .then(function(response) {
                 omegaup.UI.success(omegaup.T.successfulAddUser);
-                $('div.post.footer').show();
-                refreshContestContestants();
               })
-              .fail(omegaup.UI.apiError);
-          return false;
+              .fail(omegaup.UI.apiError)
+              .always(refreshContestContestants);
         }
       });
 

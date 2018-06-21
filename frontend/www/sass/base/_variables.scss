@@ -1,8 +1,6 @@
-/*
- * Variables are one of the more straightforward features of Sass but are still on occasion
- * used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
- * Without one, they become harder to understand and re-use.
- */
+// Variables are one of the more straightforward features of Sass but are still on occasion
+// used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
+// Without one, they become harder to understand and re-use.
 
 $white: white;
 $black: black;
@@ -19,7 +17,6 @@ $primary-color--darker: #466AAF;
 $header-primary-color: #678DD7;
 $header-active-color: #5F87D4;
 $header-accent-color: #577DC7;
-
 
 $header-font-primary-color: #fff;
 $header-font-secondary-color: #333;
