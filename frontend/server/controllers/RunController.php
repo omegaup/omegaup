@@ -570,19 +570,18 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditRun($r['current_identity_id'], $r['run']))) {
+        if (!Authorization::canEditRun($r['current_identity_id'], $r['run'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
         $r['run']->test = 'disqualify';
         RunsDAO::save($r['run']);
 
-        $response = [];
-        $response['status'] = 'ok';
-
         // Expire ranks
         UserController::deleteProblemsSolvedRankCacheList();
-        return $response;
+        return [
+            'status' => 'ok'
+        ];
     }
 
     /**
