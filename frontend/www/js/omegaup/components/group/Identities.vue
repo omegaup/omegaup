@@ -56,53 +56,63 @@
 import {T, UI} from '../../omegaup.js';
 
 export default {
-  data: function() { return {T: T, identities: this.identities};},
+  props: {groupAlias: String},
+  data: function() { return {T: T, identities: []};},
   methods: {
     readCsv: function() {
       let self = this;
-      let fileUpload = document.getElementsByName("identities");
-      let regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+      let fileUpload = document.getElementsByName('identities');
+      let regex = /.*\.(?:csv|txt)$/;
       if (!regex.test(fileUpload[0].value.toLowerCase())) {
         UI.error(T.groupsInvalidCsv);
         return;
       }
-      if (typeof(FileReader) == "undefined") {
+      if (typeof(FileReader) == 'undefined') {
         UI.error(T.wordsBrowserDoesNotSupportHtml5);
         return;
       }
-      let reader = new FileReader();
-      reader.onload = function(e) {
-        let rows = e.target.result.split("\n");
-        self.identities = [];
-        for (let[index, row] of rows.entries()) {
-          let cells = row.split(',');
-          if (cells[0] != '') {
-            self.identities[index] = [];
-            self.identities[index]['username'] = cells[0];
-            self.identities[index]['name'] = cells[1];
-            self.identities[index]['password'] = self.generatePassword();
-            self.identities[index]['country_id'] = cells[2];
-            self.identities[index]['state_id'] = cells[3];
-            self.identities[index]['gender'] = cells[4];
-            self.identities[index]['school_name'] = cells[5];
-          }
-        }
-      };
-      reader.readAsText(fileUpload[0].files[0]);
+      self.identities = [];
+      CSV.fetch({
+           file: fileUpload[0].files[0],
+         })
+          .done(function(dataset) {
+            for (let cells of dataset.records) {
+              if (cells.length != 6) continue;
+              self.identities.push({
+                username: self.groupAlias + ':' + cells[0],
+                name: cells[1],
+                password: self.generatePassword(),
+                country_id: cells[2],
+                state_id: cells[3],
+                gender: cells[4],
+                school_name: cells[5],
+              });
+            }
+          });
     },
     bulkIdentities: function() {
       self = this;
       self.$emit('bulk-identities', self.identities);
     },
-    generatePassword: function() {
-      let string = '';
+    generatePassword: function(len) {
+      // Browser supports window.crypto
+      if (typeof window.crypto == 'object') {
+        let arr = new Uint8Array((len || 8) / 2);
+        window.crypto.getRandomValues(arr);
+        return Array.from(arr, function(dec) {
+                      return ('0' + dec.toString(16)).substr(-2);
+                    }).join('');
+      }
+
+      // Browser does not support window.crypto
+      let password = '';
       let validChars =
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&%$#_-';
+          'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       for (var i = 0; i < 8; i++) {
-        string +=
+        password +=
             validChars.charAt(Math.floor(Math.random() * validChars.length));
       }
-      return string;
+      return password;
     },
   },
 };

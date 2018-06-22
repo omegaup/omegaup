@@ -2,7 +2,7 @@
 INSERT INTO
   `Roles` (`role_id`,`name`,`description`)
 VALUES
-  (6,'Organizer','Miembro del equipo de organizadores');
+  (6,'Organizer','Miembro del equipo de organizadores de concursos');
 
 INSERT INTO `ACLs` (`owner_id`) VALUES (1);
 

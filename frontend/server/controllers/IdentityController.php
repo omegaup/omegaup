@@ -58,10 +58,6 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        self::authenticateRequest($r);
-        if (!Authorization::isOrganizer($r['current_identity_id'])) {
-            throw new ForbiddenAccessException();
-        }
         // Validate request
         Validators::isValidUsername($r['username'], 'username');
 
@@ -162,6 +158,48 @@ class IdentityController extends Controller {
         return [
             'status' => 'ok',
             'username' => $identity->username,
+        ];
+    }
+
+    /**
+     * Entry point for Create bulk Identities API
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiBulkCreate(Request $r) {
+        self::authenticateRequest($r);
+        if (!Authorization::isOrganizer($r['current_identity_id'])) {
+            throw new ForbiddenAccessException();
+        }
+        GroupController::validateGroup(new Request(['group_alias' => $r['group_alias']]));
+        if (!is_array($r['identities'])) {
+            throw new InvalidParameterException('parameterInvalid', 'identities');
+        }
+        // Save objects into DB
+        try {
+            DAO::transBegin();
+
+            foreach ($r['identities'] as $identity) {
+                $group_alias = explode(':', $identity['username'])[0];
+                if ($group_alias != $r['group_alias']) {
+                    throw new InvalidParameterException('parameterInvalid', 'username');
+                }
+                $identity['group_alias'] = $r['group_alias'];
+                self::apiCreate(new Request($identity));
+            }
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok'
         ];
     }
 }
