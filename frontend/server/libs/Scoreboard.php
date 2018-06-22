@@ -529,7 +529,7 @@ class Scoreboard {
             $problem_id = $run->problem_id;
             $contest_score = $run->contest_score;
             $score = $run->score;
-            $is_test = $run->test == 'test';
+            $is_test = ($run->test == 'test');
 
             $problem =
                 &$identities_info[$identity_id]['problems'][$problem_mapping[$problem_id]['order']];
