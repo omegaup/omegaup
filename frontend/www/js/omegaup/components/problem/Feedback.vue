@@ -39,7 +39,7 @@ export default {
     difficultyScore: Number,
   },
   data: function() {
-    return { T, quality: T.wordsQuality, difficulty: T.wordsDifficulty, }
+    return { T, quality: 'Quality', difficulty: 'Difficulty', }
   },
   computed: {
     containerClass: function() {
