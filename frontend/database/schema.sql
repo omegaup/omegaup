@@ -731,7 +731,7 @@ CREATE TABLE `Runs` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
   `judged_by` char(32) DEFAULT NULL,
-  `test` enum('normal','test','disqualify') DEFAULT 'normal',
+  `type` enum('normal','test','disqualify') DEFAULT 'normal',
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
   KEY `problem_id` (`problem_id`),

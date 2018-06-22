@@ -53,7 +53,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 					FROM
 						Runs r
 					WHERE
-						r.verdict = 'AC' AND r.test = 'normal' AND
+						r.verdict = 'AC' AND r.type= 'normal' AND
 						r.time >= ? AND
 						r.time <= ?
 				) AS up

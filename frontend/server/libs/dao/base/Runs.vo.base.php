@@ -74,8 +74,8 @@ class Runs extends VO {
         if (isset($data['judged_by'])) {
             $this->judged_by = $data['judged_by'];
         }
-        if (isset($data['test'])) {
-            $this->test = $data['test'];
+        if (isset($data['type'])) {
+            $this->type = $data['type'];
         }
     }
 
@@ -209,5 +209,5 @@ class Runs extends VO {
       * @access public
       * @var enum('normal','test','disqualify')
       */
-    public $test;
+    public $type;
 }

@@ -248,7 +248,7 @@ class RunController extends Controller {
             }
             $submit_delay = 0;
             $problemset_id = null;
-            $test = 'normal';
+            $type = 'normal';
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
@@ -307,7 +307,7 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
+            $type = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
 
         // Populate new run object
@@ -327,7 +327,7 @@ class RunController extends Controller {
                     'submit_delay' => $submit_delay, /* based on penalty_type */
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',
-                    'test' => $test
+                    'type' => $type
                 ]);
 
         try {
@@ -574,7 +574,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $r['run']->test = 'disqualify';
+        $r['run']->type = 'disqualify';
         RunsDAO::save($r['run']);
 
         // Expire ranks
