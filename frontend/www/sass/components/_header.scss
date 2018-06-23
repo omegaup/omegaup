@@ -116,6 +116,10 @@
         // navbar items
         a {
           color: $white;
+
+          &:hover {
+            background-color: $header-color--hover;
+          }
         }
 
         // submenu on navbar
