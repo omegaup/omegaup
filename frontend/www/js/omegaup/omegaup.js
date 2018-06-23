@@ -93,9 +93,11 @@ export let OmegaUp = {
                     new ko.secureBindingsProvider({attribute: 'data-bind'});
               },
               function() {
-                var collapseButton = document.getElementById('collapse-sidenav-button');
+                var collapseButton =
+                    document.getElementById('collapse-sidenav-button');
                 if (collapseButton) {
-                  collapseButton.addEventListener('click', omegaup.UI.openSidebar);
+                  collapseButton.addEventListener('click',
+                                                  omegaup.UI.openSidebar);
                 }
               }
             ]),
