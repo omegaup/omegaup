@@ -8,6 +8,9 @@ OmegaUp.on('ready', function() {
       /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
   var StatsVue = new Vue({
     el: '#contest-stats',
+    props: {
+      abc: String,
+    },
     render: function(createElement) {
       return createElement('contestStats', {
         props: {
@@ -26,7 +29,6 @@ OmegaUp.on('ready', function() {
   });
 
   Highcharts.setOptions({global: {useUTC: false}});
-
   var callStatsApiTimeout = 10 * 1000;
   var updateRunCountsChartTimeout = callStatsApiTimeout;
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
@@ -46,7 +48,7 @@ OmegaUp.on('ready', function() {
   }
 
   function updateRunCountsData() {
-    window.run_counts_chart.series[0].setData(oGraph.normalizeRunCounts(stats));
+    // window.run_counts_chart.series[0].setData(oGraph.normalizeRunCounts(stats));
     window.distribution_chart.series[0].setData(oGraph.getDistribution(stats));
     setTimeout(updateRunCountsData, updateRunCountsChartTimeout);
   }
