@@ -85,11 +85,18 @@ export let OmegaUp = {
 
       _listeners:
           {
+            // Listeners functions that are executed once the page is loaded.
             'ready': new EventListenerList([
               function() { OmegaUp.experiments = Experiments.loadGlobal(); },
               function() {
                 ko.bindingProvider.instance =
                     new ko.secureBindingsProvider({attribute: 'data-bind'});
+              },
+              function() {
+                var collapseButton = document.getElementById('collapse-sidenav-button');
+                if (collapseButton) {
+                  collapseButton.addEventListener('click', omegaup.UI.openSidebar);
+                }
               }
             ]),
           },
