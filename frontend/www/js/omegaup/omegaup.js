@@ -97,7 +97,7 @@ export let OmegaUp = {
                     document.getElementById('collapse-sidenav-button');
                 if (collapseButton) {
                   collapseButton.addEventListener('click',
-                                                  omegaup.UI.openSidebar);
+                                                  omegaup.UI.handleSidebarAction);
                 }
               }
             ]),
