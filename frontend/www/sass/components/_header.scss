@@ -3,7 +3,7 @@
   margin: 0;
   border-bottom-width: 0;
 
-  background-color: $header-primary-color;
+  background-color: $header-color--primary;
 
   & .caret {
     border-top-color: $white;
@@ -12,7 +12,7 @@
 
   & .active {
     a {
-      background-color: $header-active-color;
+      background-color: $header-color--active;
     }
   }
 
@@ -22,6 +22,7 @@
       border: 0;
       margin-right: 30px;
       background-color: $primary-color--darker;
+      width: 35px;
 
       &:focus {
         background-color: $primary-color;
@@ -56,7 +57,7 @@
       }
       
       &.collapsed {
-        width: auto;
+        width: 42px;
         background-color: $primary-color;
         
         .icon-bar:last-child {
@@ -79,14 +80,88 @@
 
     .navbar-brand {
       background-color: $white;
-      background-image: linear-gradient(to bottom,$white 0,#ddd 100%);
+      background-image: linear-gradient(to bottom,$white 0,$gray-lighter-2 100%);
 
-      @include breakpoint(xs) {
+      @include breakpoint(mobile) {
         padding-left: 30px;
       }
     }
   }
 
+  & .navbar-collapse {
+    @include breakpoint(desktop) {
+      width: 100% !important;
+    }
+
+    & .collapse {
+      @include breakpoint(mobile) {
+        & .in {
+          li {
+            a {
+              color: $header-fontcolor--primary;
+              background-color: $primary-color--darker;
+              margin-left: 5px;
+      
+              &:hover {
+                background-color: $header-color--hover;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-nav {
+      li {
+        // navbar items
+        a {
+          color: $white;
+        }
+
+        // submenu on navbar
+        &.dropdown {
+          &:hover {
+            .dropdown-menu {
+              display: block;
+            }
+          }
+
+          .dropdown-menu {
+            li {
+              a {
+                color: $black;
+              }
+            }
+          }
+  
+          @include breakpoint(mobile) {
+            &:hover {
+              position: inherit;
+            }
+  
+            &.open {
+              & > a {
+                background-color: $header-color--active;
+              }
+  
+              .dropdown-menu {
+                li {
+                  &:hover {
+                    background-color: $header-color--hover;
+                  }
+  
+                  a {
+                    color: $white;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   & #user-dropdown {
     // Elimina el padding del elemento dropdown del nombre
     // del usuario para la redimesion de la imagen de perfil.
@@ -112,47 +187,7 @@
   }
 
   & .navbar-text {
-    color: $header-font-primary-color;
-  }
-
-  & .navbar-nav {
-    li {
-      a {
-        color: $header-font-primary-color;
-
-        &:hover {
-          background-color: $header-accent-color;
-        }
-      }
-    }
-  }
-
-  & .nav {
-    li {
-      a {
-        &:hover {
-          background-color: $header-accent-color;
-        }
-
-        &:focus {
-          background-color: $header-accent-color;
-        }
-      }
-    }
-
-    & .open {
-      .dropdown-menu {
-        li {
-          a {
-            color: $header-font-secondary-color;
-            
-            &:hover {
-              background-color: $header-dropdown-active-item;
-            }
-          }
-        }
-      }
-    }
+    color: $header-fontcolor--primary;
   }
 
   .navbar-inner {
@@ -162,33 +197,21 @@
     padding-left: 0;
     padding-right: 0;
 
-    .navbar-collapse {
-      @include breakpoint(xs) {
-        width: 75%;
-        background-color: $primary-color--darker;
-        top: 50px;
-      }
-    }
-
-
-    .collapsing {
-      top: 0 !important;
-      position: relative;
-      height: auto;
-      overflow: hidden;
-      // -webkit-transition-timing-function:ease;
-      // -o-transition-timing-function:ease;
-      transition-timing-function: ease;
-      // -webkit-transition-duration:.35s;
-      // -o-transition-duration:.35s;
-      transition-duration: .35s;
-      // -webkit-transition-property:width;
-      // -o-transition-property:width;
-      transition-property: width, visibility;
-    }
-
-    @include breakpoint(xs) {
+    @include breakpoint(mobile) {
       height: 50px;
+
+      .navbar-collapse {
+        height: 100%; 
+        width: 0; 
+        position: fixed;
+        z-index: 1;
+        right: 0;
+        background-color: $blue-darker-1;
+        overflow-x: hidden;
+        padding-left: 0;
+        padding-right: 0;
+        transition: 0.5s;
+      }
     }
   }
 
@@ -198,21 +221,21 @@
       color: $black;
 
       &.grader-error {
-        color: $status-error;
-        background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%);
-        background-color: rgb(242, 222, 222);
+        color: $status-color--error;
+        background-image: linear-gradient($status-color--error--lighter-2 0px, $status-color--error--lighter-1 100%);
+        background-color: $status-color--error--lighter-2;
       }
 
       &.grader-ok {
-        color: $status-success;
-        background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%);
-        background-color: rgb(223, 240, 216);
+        color: $status-color--success;
+        background-image: linear-gradient($status-color--success--lighter-2 0px, $status-color--success--lighter-1 100%);
+        background-color: $status-color--success--lighter-2;
       }
 
       &.grader-warning {
-        color: $status-warning;
-        background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
-        border-color: #f5e79e;
+        color: $status-color--warning;
+        background-image: linear-gradient(to bottom,$status-color--warning--lighter-2 0px, $status-color--warning--lighter-1 100%);
+        background-color: $status-color--warning--lighter-2;
       }
     }
 
@@ -220,6 +243,17 @@
       border-top-color: $black;
       border-bottom-color: $black;
     }
+  }
+}
 
+.navbar-fixed-top {
+  .navbar-collapse {
+    @include breakpoint(mobile) {
+      max-height: 100% !important;
+
+      .navbar-nav {
+        margin-left: 5px;
+      }
+    }
   }
 }
