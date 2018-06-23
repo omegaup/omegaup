@@ -510,20 +510,17 @@ let UI = {
   },
 
   // TODO: (Jonathan) prevent to use JS in sidebar
-  openSidebar: function() {
-    let collapseButton = document.getElementById('collapse-sidenav-button');
-    document.getElementById('collapsible-navbar').style.width = '50%';
-    collapseButton.removeEventListener('click', omegaup.UI.openSidebar, false);
-    collapseButton.addEventListener('click', omegaup.UI.closeSidebar);
-    collapseButton.classList.remove('collapsed');
-  },
+  handleSidebarAction: function() {
+    const collapseButton = document.getElementById('collapse-sidenav-button');
+    const collapsible = document.getElementById('collapsible-navbar');
 
-  closeSidebar: function() {
-    let collapseButton = document.getElementById('collapse-sidenav-button');
-    document.getElementById('collapsible-navbar').style.width = '0';
-    collapseButton.removeEventListener('click', omegaup.UI.closeSidebar, false);
-    collapseButton.addEventListener('click', omegaup.UI.openSidebar);
-    collapseButton.classList.add('collapsed');
+    if (collapseButton.classList.contains('collapsed')) {
+      collapsible.classList.add('open-sidebar');
+      collapseButton.classList.remove('collapsed');
+    } else {
+      collapsible.classList.remove('open-sidebar');
+      collapseButton.classList.add('collapsed');
+    }
   },
 };
 
