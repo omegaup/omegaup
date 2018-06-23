@@ -1,7 +1,7 @@
 			<div id="header" class="navbar navbar-default navbar-fixed-top" role="navigation">
 				<div class="container navbar-inner">
 					<div class="navbar-header">
-						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
+						<button type="button" class="navbar-toggle collapsed" id="collapse-sidenav-button">
 							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
@@ -14,7 +14,7 @@
 							{/if}
 						</a>
 					</div>
-					<div class="navbar-collapse collapse" id="collapsible-navbar" aria-expanded="false" >
+					<div class="navbar-collapse" id="collapsible-navbar" aria-expanded="false" >
 						<ul class="nav navbar-nav">
 						{if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
 							<li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
