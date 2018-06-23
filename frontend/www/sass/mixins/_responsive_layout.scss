@@ -1,4 +1,5 @@
 @mixin breakpoint($screen) {
+  // helpers according screen size
   @if $screen == xs {
     @media only screen and (max-width: 767px) { @content; }
   }
@@ -10,5 +11,12 @@
   }
   @else if $screen == lg {
     @media only screen and (min-width: 1200px) { @content; }
+  }
+  // helpers to be used only for mobile and desktop
+  @else if $screen == desktop {
+    @media only screen and (min-width: 768px) { @content; }
+  }
+  @else if $screen == mobile {
+    @media only screen and (max-width: 767px) { @content; }
   }
 }
