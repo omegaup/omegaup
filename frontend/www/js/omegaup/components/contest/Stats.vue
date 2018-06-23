@@ -5,7 +5,8 @@
       <div class="total-runs">
         <h2></h2>
       </div><!-- <div class="verdict-chart"></div> -->
-      <verdict-chart v-bind:stats="stats" v-bind:contestAlias="contestAlias"></verdict-chart>
+      <verdict-chart v-bind:contestalias="contestAlias"
+           v-bind:stats="stats"></verdict-chart>
       <div class="distribution-chart"></div>
       <div class="pending-runs-chart"></div>
     </div>
