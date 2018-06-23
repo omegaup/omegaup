@@ -130,10 +130,18 @@
             }
           }
 
-          .dropdown-menu {
+          ul.dropdown-menu {
             li {
               a {
                 color: $black;
+
+                &:hover {
+                  background-color: $gray-lighter-2;
+
+                  @include breakpoint(mobile) {
+                    background-color: $header-color--hover;
+                  }
+                }
               }
             }
           }
@@ -150,10 +158,6 @@
   
               .dropdown-menu {
                 li {
-                  &:hover {
-                    background-color: $header-color--hover;
-                  }
-  
                   a {
                     color: $white;
                   }
