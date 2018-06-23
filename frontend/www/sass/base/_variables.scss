@@ -1,23 +1,15 @@
+@import './_colors.scss';
 // Variables are one of the more straightforward features of Sass but are still on occasion
 // used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
 // Without one, they become harder to understand and re-use.
 
-$white: white;
-$black: black;
+// Brand colors
+$primary-color: $blue-lighter-1;
+$primary-color--darker: $blue-darker-1;
 
-// STATUS
-$status-success: #468847;
-$status-error: #b94a48;
-$status-warning: #c09853;
+// Header
+$header-fontcolor--primary: $white;
+$header-fontcolor--secondary: $black-lighter-1;
+$header-dropdown--item--active: $white;
 
-$primary-color: #678DD7;
-$primary-color--darker: #466AAF;
-
-// HEADER
-$header-primary-color: #678DD7;
-$header-active-color: #5F87D4;
-$header-accent-color: #577DC7;
-
-$header-font-primary-color: #fff;
-$header-font-secondary-color: #333;
-$header-dropdown-active-item: #f5f5f5;
+// Font Sizes
