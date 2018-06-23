@@ -34,6 +34,6 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
         $params = [$identity_id, $privacystatement_id];
         global $conn;
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        return $conn->Insert_ID();
     }
 }

@@ -67,7 +67,7 @@ class PrivacyStatements extends VO {
     /**
       * Tipo de documento de privacidad
       * @access public
-      * @var enum('privacy_policy')
+      * @var enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent')
       */
     public $type;
 }

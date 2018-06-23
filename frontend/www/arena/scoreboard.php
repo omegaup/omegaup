@@ -1,3 +1,3 @@
 <?php
 require_once('../../server/bootstrap.php');
-$smarty->display('../../templates/arena.scoreboard.tpl');
+$smarty->display('../../templates/contest.scoreboard.tpl');
