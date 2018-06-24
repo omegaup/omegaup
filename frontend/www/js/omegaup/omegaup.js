@@ -124,6 +124,7 @@ export let OmegaUp = {
                   OmegaUp.ready = true;
                   if (OmegaUp._documentReady) {
                     OmegaUp._notify('ready');
+                    UI.dropdownHover();
                   }
                 })
                 .fail(UI.apiError);
