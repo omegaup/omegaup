@@ -41,6 +41,10 @@ darle focus. */
 .nav-tabs.nav-justified > li > a:focus {
         background-color: #FFFFFF;
 }
+/*Clase para remover el color gris que se añade al momento de desplegar los submenus*/
+.navItemColor{
+	background-color: #678DD7 !important;
+}
 
 #header {
 	background-color: #678DD7;
