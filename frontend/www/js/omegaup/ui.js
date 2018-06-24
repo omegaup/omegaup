@@ -155,16 +155,16 @@ let UI = {
   },
 
   dropdownHover: function() {
-    var navItems = document.querySelectorAll(".dropdown-menu");
-    for(var i = 0; i<navItems.length; i++){
-      navItems[i].parentNode.addEventListener("mouseenter",function(){
-        this.classList.add("open");
-        var anchorElement = this.querySelector("a.dropdown-toggle");
-        anchorElement.classList.add("navItemColor");
+    var navItems = document.querySelectorAll('.dropdown-menu');
+    for (var i = 0; i < navItems.length; i++) {
+      navItems[i].parentNode.addEventListener('mouseenter', function() {
+        this.classList.add('open');
+        var anchorElement = this.querySelector('a.dropdown-toggle');
+        anchorElement.classList.add('navItemColor');
       });
-      navItems[i].parentNode.addEventListener("mouseleave",function(){
-        if(this.classList.contains("open")){
-          this.classList.remove("open");
+      navItems[i].parentNode.addEventListener('mouseleave', function() {
+        if (this.classList.contains('open')) {
+          this.classList.remove('open');
         }
       });
     }
