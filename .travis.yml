@@ -52,7 +52,7 @@ install: stuff/travis/run.sh "${TEST_SUITE}" install
 
 before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
 
-script: stuff/travis/run.sh "${TEST_SUITE}" script
+script: travis_wait stuff/travis/run.sh "${TEST_SUITE}" script
 
 after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
 

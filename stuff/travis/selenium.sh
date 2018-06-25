@@ -54,5 +54,5 @@ stage_before_script() {
 
 stage_script() {
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
-	travis_wait 30 /usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" -s --browser=chrome
+	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" -s --browser=chrome
 }
