@@ -53,6 +53,13 @@ stage_before_script() {
 }
 
 stage_script() {
+	# Make sure the output of the PHP log gets output to the Travis log.
+	touch /tmp/omegaup.log
+	tail -n0 -f /tmp/omegaup.log &
+	local tail_pid=$!
+
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
-	/usr/bin/python3 -m pytest --verbose "${OMEGAUP_ROOT}/frontend/tests/ui/" --capture=no --browser=chrome
+	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" --verbose --capture=no --browser=chrome
+
+	kill "${tail_pid}"
 }

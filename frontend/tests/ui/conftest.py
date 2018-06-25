@@ -5,6 +5,7 @@
 
 import contextlib
 import json
+import logging
 import os.path
 import sys
 import time
@@ -78,8 +79,10 @@ class Driver(object):
         '''Waits for an AJAX-initiated page transition to finish.'''
 
         prev_url = self.browser.current_url
+        logging.debug('Waiting for the URL to change from %s', prev_url)
         yield
         self.wait.until(lambda _: self.browser.current_url != prev_url)
+        logging.debug('New URL: %s', self.browser.current_url)
         if wait_for_ajax:
             self.wait_for_page_loaded()
 
@@ -87,18 +90,26 @@ class Driver(object):
         '''Waits for the page to be loaded.'''
 
         try:
-            self.wait.until(
-                lambda _: self.browser.execute_script(
-                    'return document.readyState;') == 'complete')
+            def _is_page_loaded():
+                return self.browser.execute_script(
+                    'return document.readyState;') == 'complete'
+            if _is_page_loaded():
+                return
+            logging.debug('Waiting for the page to finish loading...')
+            self.wait.until(_is_page_loaded)
+            logging.debug('Page loaded')
         except TimeoutException as ex:
             raise Exception('document ready state still %s' %
                             self.browser.execute_script(
                                 'return document.readyState;')) from ex
         t0 = time.time()
         try:
-            self.wait.until(
-                lambda _: self.browser.execute_script(
-                    'return jQuery.active;') == 0)
+            def _is_jquery_done():
+                return self.browser.execute_script(
+                    'return jQuery.active;') == 0
+            logging.debug('Waiting for all the pending AJAXcalls to finish...')
+            self.wait.until(_is_jquery_done)
+            logging.debug('AJAX calls done.')
         except TimeoutException as ex:
             raise Exception('%d AJAX calls still active after %f s' %
                             (self.browser.execute_script(
@@ -391,6 +402,8 @@ def _get_browser(request, browser_name):
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
+    if request.config.option.verbose:
+        logging.basicConfig(level=logging.DEBUG)
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
