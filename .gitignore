@@ -88,3 +88,6 @@ frontend/www/js/dist/
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
+
+#Ignore VSCODE json
+.vscode/*
