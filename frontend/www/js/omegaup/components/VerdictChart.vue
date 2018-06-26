@@ -9,11 +9,7 @@ export default {
     contestAlias: String,
   },
   mounted: function() { this.draw_pie_chart();},
-  watch: {
-    stats: function() {
-      setTimeout(this.draw_pie_chart, 1000);
-    }
-  },
+  watch: {stats: function() { setTimeout(this.draw_pie_chart, 1000);}},
   methods: {
     draw_pie_chart: function() {
       if (this.stats != null) {
