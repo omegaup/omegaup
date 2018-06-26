@@ -6,13 +6,13 @@
          v-if="qualityHistogram">
       <omegaup-problem-histogram v-bind:histogram="qualityHistogram"
            v-bind:score="qualityScore"
-           v-bind:type="quality"></omegaup-problem-histogram>
+           v-bind:type="`Quality`"></omegaup-problem-histogram>
     </div>
     <div v-bind:class="containerClass"
          v-if="difficultyHistogram">
       <omegaup-problem-histogram v-bind:histogram="difficultyHistogram"
            v-bind:score="difficultyScore"
-           v-bind:type="difficulty"></omegaup-problem-histogram>
+           v-bind:type="`Difficulty`"></omegaup-problem-histogram>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@ export default {
     difficultyScore: Number,
   },
   data: function() {
-    return { T, quality: 'Quality', difficulty: 'Difficulty', }
+    return { T, }
   },
   computed: {
     containerClass: function() {
