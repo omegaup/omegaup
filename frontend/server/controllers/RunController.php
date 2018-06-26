@@ -307,7 +307,9 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
+            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) &&
+                !is_null($r['contest']) &&
+                !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
         }
 
         // Populate new run object
