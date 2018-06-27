@@ -26,7 +26,9 @@
           <td><img v-bind:src="coder.gravatar_32"></td>
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
-          <td>{{coder.username}}</td>
+          <td>
+            <a v-bind:href="'/profile/' + coder.username">{{coder.username}}</a>
+          </td>
           <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
       </tbody>
