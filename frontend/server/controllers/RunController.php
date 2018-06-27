@@ -575,7 +575,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $r['run']->type = 'disqualify';
+        $r['run']->type = 'disqualified';
         RunsDAO::save($r['run']);
 
         // Expire ranks

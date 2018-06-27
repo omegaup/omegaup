@@ -1963,7 +1963,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
-    if (self.type() == 'disqualify') return T['wordsDisqualify'];
+    if (self.type() == 'disqualified') return T['wordsDisqualify'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -1992,7 +1992,7 @@ class ObservableRun {
 
     if (self.status() != 'ready') return '';
 
-    if (self.type() == "disqualify") return '#F00';
+    if (self.type() == "disqualified") return '#F00';
 
     if (self.verdict() == 'AC') {
       return '#CF6';
@@ -2044,7 +2044,7 @@ class ObservableRun {
     let self = this;
     API.Run.disqualify({run_alias: self.guid})
         .then(function(data) {
-          self.type('disqualify');
+          self.type('disqualifed');
           self.arena.updateRunFallback(self.guid);
         })
         .fail(UI.ignoreError);
