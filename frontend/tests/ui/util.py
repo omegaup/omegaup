@@ -10,6 +10,7 @@ import re
 import functools
 
 from urllib.parse import urlparse
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -74,7 +75,12 @@ def get_console_logs(driver, path_whitelist, message_whitelist):
     '''Checks whether there is an error or warning in javascript console'''
 
     log = []
-    for entry in driver.browser.get_log('browser'):
+    try:
+        browser_logs = driver.browser.get_log('browser')
+    except WebDriverException:
+        # Firefox does not support getting console logs.
+        browser_logs = []
+    for entry in browser_logs:
         if entry['level'] != 'SEVERE':
             continue
         if is_path_whitelisted(entry['message'], path_whitelist):
