@@ -27,7 +27,7 @@
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
           <td>
-            <a v-bind:href="'/profile/' + coder.username">{{coder.username}}</a>
+            <a v-bind:href="usernameUrl">{{coder.username}}</a>
           </td>
           <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
@@ -46,6 +46,11 @@ export default {
     visibleCoders: function() {
       return this.showCurrentMonth ? this.codersOfCurrentMonth :
                                      this.codersOfPreviousMonth;
+    },
+    usernameUrl: function() {
+      return this.visibleCoders.map(function(coder) {
+        return '/profile/' + coder.username;
+      });
     }
   },
   data: function() {
