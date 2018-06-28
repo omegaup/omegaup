@@ -307,7 +307,9 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
+            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) &&
+                !is_null($r['contest']) &&
+                !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
         }
 
         // Populate new run object
@@ -336,6 +338,7 @@ class RunController extends Controller {
 
             SubmissionLogDAO::save(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
+                'identity_id' => $r['current_identity_id'],
                 'run_id' => $run->run_id,
                 'problemset_id' => $run->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
