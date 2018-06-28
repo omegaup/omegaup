@@ -340,6 +340,8 @@ def _get_browser(request, browser_name):
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
             'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
             'extendedDebugging': 'true',
+            # TODO(https://github.com/omegaup/omegaup/issues/2110): Remove.
+            'chromedriverVersion': '2.40',
             'loggingPrefs': {'browser': 'ALL'},
         }
         # Add browser configuration
