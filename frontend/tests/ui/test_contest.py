@@ -3,14 +3,11 @@
 
 '''Run Selenium contest tests.'''
 
-import logging
-import os
 import urllib
 
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 
 import ui.util as util
 
@@ -182,35 +179,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
     enter_contest(driver, contest_alias)
 
-    logging.debug('Trying to submit new run...')
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
-    logging.debug('Clicking "New submission" button...')
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "new-run")]')))).click()
-
-    logging.debug('Changing language to C++11...')
-    Select(driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "language"]')))).select_by_visible_text(
-                 'C++11')
-
-    logging.debug('Trying to upload file...')
-    contents_element = driver.browser.find_element_by_css_selector(
-        '#submit input[type="file"]')
-    logging.debug('Choosing the file to upload...')
-    contents_element.send_keys(os.path.join(
-        util.OMEGAUP_ROOT, 'frontend/tests/resources/%s' % filename))
-    with driver.ajax_page_transition():
-        logging.debug('Submitting...')
-        contents_element.submit()
-
-    logging.debug('Run submitted.')
+    util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)
 
     driver.wait.until(

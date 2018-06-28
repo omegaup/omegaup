@@ -21,10 +21,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from ui.util import database_utils as database_utils
+from ui.util import CI
 
 
 _DEFAULT_TIMEOUT = 10  # seconds
-_CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
@@ -153,6 +153,7 @@ class Driver(object):
         '''Logs in as :username, and logs out when out of scope.'''
 
         # Home page
+        logging.debug('Logging in as %s...', username)
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
         self.wait_for_page_loaded()
@@ -288,7 +289,7 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if 'driver' not in pyfuncitem.funcargs:
         return
-    if _CI:
+    if CI:
         # When running in CI, we have movies, screenshots and logs in
         # Sauce Labs.
         return
@@ -317,7 +318,7 @@ def pytest_addoption(parser):
 
     parser.addoption('--browser', action='append', type=str, dest='browsers',
                      help='The browsers that the test will run against')
-    parser.addoption('--url', default=('http://localhost/' if not _CI else
+    parser.addoption('--url', default=('http://localhost/' if not CI else
                                        'http://localhost:8000/'),
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
@@ -343,7 +344,7 @@ def pytest_generate_tests(metafunc):
 def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
-    if _CI:
+    if CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -360,7 +361,7 @@ def _get_browser(request, browser_name):
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
-        hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
+        hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
@@ -402,8 +403,6 @@ def _get_browser(request, browser_name):
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
-    if request.config.option.verbose:
-        logging.basicConfig(level=logging.DEBUG)
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
@@ -413,7 +412,7 @@ def driver(request, browser_name):
         yield Driver(browser, wait, request.config.option.url,
                      request.config.option)
     finally:
-        if _CI:
+        if CI:
             print(('\n\nYou can see the report at '
                    'https://saucelabs.com/beta/tests/%s/commands') %
                   browser.session_id, file=sys.stderr)
