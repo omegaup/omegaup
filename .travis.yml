@@ -13,11 +13,6 @@ branches:
 php:
   - 7.0.7
 
-env:
-  - TEST_SUITE=phpunit
-  - TEST_SUITE=lint
-  - TEST_SUITE=selenium
-
 addons:
   apt:
     sources:
@@ -25,17 +20,31 @@ addons:
       - llvm-toolchain-precise-3.7
       - deadsnakes
     packages:
-      - clang-format-3.7
       - libmysqlclient-dev
-      - nginx
       - python-pip
       - python3.5
       - python3-pip
       - realpath
-  sauce_connect:
-    username: lhchavez
-  jwt:
-    secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
+
+matrix:
+  include:
+    - env: TEST_SUITE=phpunit
+    - env: TEST_SUITE=lint
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-format-3.7
+    - env: TEST_SUITE=selenium
+      addons:
+        apt:
+          packages:
+            - nginx
+        sauce_connect:
+          username: lhchavez
+        jwt:
+          secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
 
 cache:
   directories:
