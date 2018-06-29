@@ -1,5 +1,9 @@
 <?php
 
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+    class PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase {
+    }
+}
 class ExperimentsTest extends PHPUnit_Framework_TestCase {
     const TEST = 'experiment_test';
 
