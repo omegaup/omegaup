@@ -272,7 +272,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user_id) && is_null($email) && is_null($username)) {
-            throw new ApiException('mustProvideUSerIdEmailOrUsername');
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         $vo_UserToTest = null;
