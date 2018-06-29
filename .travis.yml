@@ -13,13 +13,16 @@ branches:
 php:
   - 7.0.7
 
+# Common sources and packages. If a matrix entry needs these, it should
+# explicitly add both of the sources and package YAML references in its addons
+# section.
 addons:
   apt:
-    sources:
+    sources: &common_sources
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.7
       - deadsnakes
-    packages:
+    packages: &common_packages
       - libmysqlclient-dev
       - python-pip
       - python3.5
@@ -33,14 +36,19 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-precise-3.7
+            - *common_sources
+            - [llvm-toolchain-precise-3.7]
           packages:
-            - clang-format-3.7
+            - *common_packages
+            - [clang-format-3.7]
     - env: TEST_SUITE=selenium
       addons:
         apt:
+          sources:
+            - *common_sources
           packages:
-            - nginx
+            - *common_packages
+            - [nginx]
         sauce_connect:
           username: lhchavez
         jwt:
