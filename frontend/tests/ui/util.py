@@ -97,6 +97,18 @@ def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
     return _internal
 
 
+def annotate(f):
+    '''Decorator to add annotations around the function call.'''
+    @functools.wraps(f)
+    def _wrapper(driver, *args, **kwargs):
+        driver.annotate('begin %s' % f.__name__)
+        try:
+            return f(driver, *args, **kwargs)
+        finally:
+            driver.annotate('end %s' % f.__name__)
+    return _wrapper
+
+
 @contextlib.contextmanager
 def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     '''Shows in a list unexpected errors in javascript console'''

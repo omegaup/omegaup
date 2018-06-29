@@ -12,6 +12,7 @@ import ui.util as util
 
 @util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
                                            '/js/dist/omegaup.js'))
+@util.annotate
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
@@ -70,6 +71,7 @@ def test_user_ranking_course(driver):
             'td.score').text == '100'
 
 
+@util.annotate
 def create_course(driver, course_alias, school_name):
     '''Creates one course with a new school.'''
 
@@ -105,6 +107,7 @@ def create_course(driver, course_alias, school_name):
             driver.browser.current_url), driver.browser.current_url
 
 
+@util.annotate
 def add_assignment(driver, assignment_alias):
     '''Add assignments to a recently created course.'''
 
@@ -145,6 +148,7 @@ def add_assignment(driver, assignment_alias):
              '//a[text()="%s"]' % assignment_alias)))
 
 
+@util.annotate
 def add_problem_to_assignment(driver, assignment_alias, problem):
     '''Add problems to an assignment given.'''
 
@@ -178,6 +182,7 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
              '.omegaup-course-problemlist .panel-footer')))
 
 
+@util.annotate
 def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
@@ -188,6 +193,7 @@ def add_students_course(driver, users):
                         '.omegaup-course-addstudent form button[type=submit]'))
 
 
+@util.annotate
 def enter_course(driver, course_alias, assignment_alias):
     '''Enter to course previously created.'''
 

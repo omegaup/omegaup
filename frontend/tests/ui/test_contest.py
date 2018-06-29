@@ -11,7 +11,10 @@ from selenium.webdriver.support import expected_conditions as EC
 import ui.util as util
 
 
-@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
+@util.no_javascript_errors(path_whitelist=('/api/contest/clarifications/',
+                                           '/api/contest/scoreboard/',
+                                           '/js/dist/omegaup.js'))
+@util.annotate
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
@@ -66,7 +69,10 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
+@util.no_javascript_errors(path_whitelist=('/api/contest/clarifications/',
+                                           '/api/contest/scoreboard/',
+                                           '/js/dist/omegaup.js'))
+@util.annotate
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
@@ -122,6 +128,7 @@ def test_user_ranking_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
+@util.annotate
 def create_contest_admin(driver, contest_alias, problem, users, user):
     '''Creates a contest as an admin.'''
 
@@ -159,6 +166,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
                 driver.browser.current_url), driver.browser.current_url
 
 
+@util.annotate
 def update_scoreboard_for_contest(driver, contest_alias):
     '''Updates the scoreboard for a contest.
 
@@ -172,6 +180,7 @@ def update_scoreboard_for_contest(driver, contest_alias):
     assert '{"status":"ok"}' in driver.browser.page_source
 
 
+@util.annotate
 def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     '''Makes the user join a course and then creates a run.'''
 
@@ -184,11 +193,11 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
              'button.details'))).click()
-
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
 
 
+@util.annotate
 def create_contest(driver, contest_alias):
     '''Creates a new contest.'''
 
@@ -214,6 +223,7 @@ def create_contest(driver, contest_alias):
         driver.browser.find_element_by_tag_name('form').submit()
 
 
+@util.annotate
 def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
@@ -223,6 +233,7 @@ def add_students_contest(driver, users):
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
 
+@util.annotate
 def add_students_bulk(driver, users):
     '''Add students to a recently created contest.'''
 
@@ -247,6 +258,7 @@ def add_students_bulk(driver, users):
                 (By.XPATH, '//*[@id="contest-users"]//a[text()="%s"]' % user)))
 
 
+@util.annotate
 def add_problem_to_contest(driver, problem):
     '''Add problems to a contest given.'''
 
@@ -264,6 +276,7 @@ def add_problem_to_contest(driver, problem):
             (By.XPATH, '//*[@id="problems"]//a[text()="%s"]' % problem)))
 
 
+@util.annotate
 def enter_contest(driver, contest_alias):
     '''Enter contest previously created.'''
 
