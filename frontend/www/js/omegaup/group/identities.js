@@ -10,8 +10,14 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-group-identites', {
         props: {identities: this.identities, groupAlias: this.groupAlias},
         on: {
-          'bulk-identities': (identities) =>
-                                 this.createIdentities(identities, groupAlias),
+          'bulk-identities': function(identities) {
+            API.Identity.bulkCreate(
+                            {identities: identities, group_alias: groupAlias})
+                .then(function(data) {
+                  UI.success(T.groupsIdentitiesSuccessfullyCreated);
+                })
+                .fail(UI.apiError);
+          },
         },
       });
     },
@@ -19,15 +25,5 @@ OmegaUp.on('ready', function() {
     components: {
       'omegaup-group-identites': group_Identities,
     },
-    methods: {
-      createIdentities: function(identities, groupAlias) {
-        API.Identity.bulkCreate(
-                        {identities: identities, group_alias: groupAlias})
-            .then(function(data) {
-              UI.success(T.groupsIdentitiesSuccessfullyCreated);
-            })
-            .fail(UI.apiError);
-      }
-    }
   });
 });

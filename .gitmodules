@@ -39,6 +39,6 @@
 [submodule "tiaanduplessis/wenk"]
 	path = frontend/www/third_party/wenk
 	url = https://github.com/tiaanduplessis/wenk.git
-[submodule "_okfn/csv.js"]
+[submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/

@@ -58,6 +58,77 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
+        self::validateIdentity($r);
+
+        // Check password
+        SecurityTools::testStrongPassword($r['password']);
+        $hashedPassword = SecurityTools::hashString($r['password']);
+
+        // Prepare DAOs
+        $identity = self::createIdentity($r, $hashedPassword);
+
+        // Save in DB
+        self::saveIdentityGroup($r, $identity);
+
+        return [
+            'status' => 'ok',
+            'username' => $identity->username,
+        ];
+    }
+
+    /**
+     * Entry point for Create bulk Identities API
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiBulkCreate(Request $r) {
+        self::authenticateRequest($r);
+        if (!Authorization::isOrganizer($r['current_identity_id'])) {
+            throw new ForbiddenAccessException();
+        }
+        GroupController::validateGroup(new Request(['group_alias' => $r['group_alias']]));
+        if (!is_array($r['identities'])) {
+            throw new InvalidParameterException('parameterInvalid', 'identities');
+        }
+        // Save objects into DB
+        try {
+            DAO::transBegin();
+
+            foreach ($r['identities'] as $identity) {
+                $identity_group = new Request($identity);
+                self::validateIdentity($identity_group);
+                $group_alias = explode(':', $identity_group['username'])[0];
+                if ($group_alias != $r['group_alias']) {
+                    throw new InvalidParameterException('parameterInvalid', 'username');
+                }
+
+                // Check password
+                SecurityTools::testStrongPassword($identity_group['password']);
+                $hashedPassword = SecurityTools::hashString($identity_group['password']);
+
+                // Prepare DAOs
+                $identity = self::createIdentity($identity_group, $hashedPassword);
+
+                $identity_group['group_alias'] = $r['group_alias'];
+                self::saveIdentityGroup($identity_group, $identity);
+            }
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    private static function validateIdentity(Request $r) {
         // Validate request
         Validators::isValidUsername($r['username'], 'username');
 
@@ -71,10 +142,6 @@ class IdentityController extends Controller {
         if (!is_null($identity)) {
             throw new DuplicatedEntryInDatabaseException('usernameInUse');
         }
-
-        // Check password
-        SecurityTools::testStrongPassword($r['password']);
-        $hashedPassword = SecurityTools::hashString($r['password']);
 
         if (!is_null($r['name'])) {
             $r['name'] = trim($r['name']);
@@ -120,8 +187,9 @@ class IdentityController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
+    }
 
-        // Prepare DAOs
+    private static function createIdentity(Request $r, $hashedPassword) {
         $user_data = [
             'username' => $r['username'],
             'name' => $r['name'],
@@ -129,15 +197,13 @@ class IdentityController extends Controller {
             'country_id' => $r['country_id'],
             'state_id' => $r['state_id'],
             'gender' => $r['gender'],
-            'school_id' => $r['school_id']
+            'school_id' => $r['school_id'],
         ];
 
-        if (isset($r['name'])) {
-            $user_data['name'] = $r['name'];
-        }
+        return new Identities($user_data);
+    }
 
-        $identity = new Identities($user_data);
-
+    private static function saveIdentityGroup(Request $r, $identity) {
         // Save objects into DB
         try {
             DAO::transBegin();
@@ -154,52 +220,5 @@ class IdentityController extends Controller {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
-
-        return [
-            'status' => 'ok',
-            'username' => $identity->username,
-        ];
-    }
-
-    /**
-     * Entry point for Create bulk Identities API
-     *
-     * @param Request $r
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     * @throws InvalidParameterException
-     * @throws DuplicatedEntryInDatabaseException
-     */
-    public static function apiBulkCreate(Request $r) {
-        self::authenticateRequest($r);
-        if (!Authorization::isOrganizer($r['current_identity_id'])) {
-            throw new ForbiddenAccessException();
-        }
-        GroupController::validateGroup(new Request(['group_alias' => $r['group_alias']]));
-        if (!is_array($r['identities'])) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
-        }
-        // Save objects into DB
-        try {
-            DAO::transBegin();
-
-            foreach ($r['identities'] as $identity) {
-                $group_alias = explode(':', $identity['username'])[0];
-                if ($group_alias != $r['group_alias']) {
-                    throw new InvalidParameterException('parameterInvalid', 'username');
-                }
-                $identity['group_alias'] = $r['group_alias'];
-                self::apiCreate(new Request($identity));
-            }
-
-            DAO::transEnd();
-        } catch (Exception $e) {
-            DAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return [
-            'status' => 'ok'
-        ];
     }
 }

@@ -61,9 +61,9 @@ export default {
   methods: {
     readCsv: function() {
       let self = this;
-      let fileUpload = document.getElementsByName('identities');
+      let fileUpload = self.$el.querySelector('input[type=file]');
       let regex = /.*\.(?:csv|txt)$/;
-      if (!regex.test(fileUpload[0].value.toLowerCase())) {
+      if (!regex.test(fileUpload.value.toLowerCase())) {
         UI.error(T.groupsInvalidCsv);
         return;
       }
@@ -73,11 +73,14 @@ export default {
       }
       self.identities = [];
       CSV.fetch({
-           file: fileUpload[0].files[0],
+           file: fileUpload.files[0],
          })
           .done(function(dataset) {
+            if (dataset.fields.length != 6) {
+              UI.error(T.groupsInvalidCsv);
+              return;
+            }
             for (let cells of dataset.records) {
-              if (cells.length != 6) continue;
               self.identities.push({
                 username: self.groupAlias + ':' + cells[0],
                 name: cells[1],
@@ -95,19 +98,26 @@ export default {
       self.$emit('bulk-identities', self.identities);
     },
     generatePassword: function(len) {
+      let password = '';
+      let validChars =
+          'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       // Browser supports window.crypto
       if (typeof window.crypto == 'object') {
-        let arr = new Uint8Array((len || 8) / 2);
+        let arr = new Uint8Array(len || 8);
         window.crypto.getRandomValues(arr);
         return Array.from(arr, function(dec) {
-                      return ('0' + dec.toString(16)).substr(-2);
+                      let randomNumber =
+                          parseInt(('0' + dec.toString(10)).substr(-2));
+                      if (randomNumber > validChars.length) {
+                        randomNumber = parseInt(
+                            ('0' + randomNumber.toString(10)).substr(-1));
+                        ;
+                      }
+                      return validChars[randomNumber];
                     }).join('');
       }
 
       // Browser does not support window.crypto
-      let password = '';
-      let validChars =
-          'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       for (var i = 0; i < 8; i++) {
         password +=
             validChars.charAt(Math.floor(Math.random() * validChars.length));
