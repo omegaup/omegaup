@@ -2431,7 +2431,7 @@ class UserController extends Controller {
             'policy_markdown' => file_get_contents(
                 OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
             ),
-            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
+            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
                 $latest_privacy_policy['privacystatement_id']
             ),
@@ -2470,7 +2470,7 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
-            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
                 PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()['privacystatement_id']
             ),

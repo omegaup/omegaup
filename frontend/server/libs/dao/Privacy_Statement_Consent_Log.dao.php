@@ -10,7 +10,7 @@ include_once('base/PrivacyStatement_Consent_Log.vo.base.php');
   *
   */
 class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
-    public static function hasAcceptedLatestPrivacyPolicy($identity_id, $privacystatement_id) {
+    public static function hasAcceptedPrivacyStatement($identity_id, $privacystatement_id) {
         $sql = 'SELECT
                   COUNT(1)
                 FROM
