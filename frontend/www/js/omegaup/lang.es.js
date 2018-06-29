@@ -856,6 +856,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsDescription: "Descripci&oacute;n",
 	wordsDetails: "Detalles",
 	wordsDifficulty: "Dificultad",
+	wordsDisqualify: "Descalificar",
 	wordsDownload: "Descargar",
 	wordsDownloadCode: "Descargar c\u00f3digo",
 	wordsDownloadDetails: "Descargar .zip con salidas",

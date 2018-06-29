@@ -856,6 +856,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsDescription: "(D35crip7i0n)",
 	wordsDetails: "(D37ai15)",
 	wordsDifficulty: "(Difficu17y)",
+	wordsDisqualify: "(Di5qua1ify)",
 	wordsDownload: "(D0wn10ad)",
 	wordsDownloadCode: "(D0wn10ad c0d3)",
 	wordsDownloadDetails: "(D0wn10ad .zip wi7h 0u7pu75)",

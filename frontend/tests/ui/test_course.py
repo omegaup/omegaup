@@ -3,7 +3,6 @@
 
 '''Run Selenium course tests.'''
 
-import os
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -64,31 +63,7 @@ def test_user_ranking_course(driver):
     with driver.login(user, user):
         enter_course(driver, course_alias, assignment_alias)
 
-        xpath_problem = '//a[contains(@href, "#problems/%s")]' % problem
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 (xpath_problem)))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "new-run")]')))).click()
-
-        language = 'C++11'
-
-        Select(driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//select[@name = "language"]')))).select_by_visible_text(
-                     language)
-
-        contents_element = driver.browser.find_element_by_css_selector(
-            '#submit input[type="file"]')
-        contents_element.send_keys(os.path.join(
-            util.OMEGAUP_ROOT, 'frontend/tests/resources/Main.cpp11'))
-        with driver.ajax_page_transition():
-            contents_element.submit()
-
+        util.create_run(driver, problem, 'Main.cpp11')
         driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(

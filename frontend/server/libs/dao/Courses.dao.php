@@ -344,13 +344,13 @@ class CoursesDAO extends CoursesDAOBase {
                 PrivacyStatement_Consent_Log AS pcl
             ON
                 gi.privacystatement_consent_id = pcl.privacystatement_consent_id
-                AND gi.group_id = ?
             WHERE
                 gi.identity_id = ?
+                AND gi.group_id = ?
             ';
         $params = [
-            $group->group_id,
             $identity_id,
+            $group->group_id,
         ];
         global $conn;
         return $conn->GetOne($sql, $params) == null;

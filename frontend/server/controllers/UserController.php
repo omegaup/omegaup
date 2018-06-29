@@ -278,7 +278,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user_id) && is_null($email) && is_null($username)) {
-            throw new ApiException('mustProvideUSerIdEmailOrUsername');
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         $vo_UserToTest = null;
@@ -2025,6 +2025,8 @@ class UserController extends Controller {
      */
     public static function deleteProblemsSolvedRankCacheList() {
         Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
+        Cache::invalidateAllKeys(Cache::CONTESTANT_SCOREBOARD_PREFIX);
+        Cache::invalidateAllKeys(Cache::ADMIN_SCOREBOARD_PREFIX);
     }
 
     /**
