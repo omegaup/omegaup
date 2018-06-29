@@ -20,7 +20,6 @@ def test_create_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'unittest_contest_%s' % run_id
     problem = 'sumas'
-    user = driver.user_username
     user1 = 'unittest_user_1_%s' % run_id
     user2 = 'unittest_user_2_%s' % run_id
     password = 'P@55w0rd'
@@ -29,7 +28,8 @@ def test_create_contest(driver):
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+    create_contest_admin(driver, contest_alias, problem, users,
+                         driver.user_username)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
@@ -78,7 +78,6 @@ def test_user_ranking_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'utrank_contest_%s' % run_id
     problem = 'sumas'
-    user = driver.user_username
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     password = 'P@55w0rd'
@@ -87,7 +86,8 @@ def test_user_ranking_contest(driver):
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users, user)
+    create_contest_admin(driver, contest_alias, problem, users,
+                         driver.user_username)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',

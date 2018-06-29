@@ -21,7 +21,6 @@ def test_create_course(driver):
     course_alias = 'unittest_course_%s' % run_id
     school_name = 'unittest_school_%s' % run_id
     assignment_alias = 'unittest_homework_%s' % run_id
-    user = driver.user_username
     problem = 'sumas'
 
     with driver.login_admin():
@@ -30,7 +29,7 @@ def test_create_course(driver):
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
-        add_students_course(driver, [user])
+        add_students_course(driver, [driver.user_username])
 
         add_assignment(driver, assignment_alias)
 
@@ -52,15 +51,14 @@ def test_user_ranking_course(driver):
     school_name = 'ut_rank_school_%s' % run_id
     assignment_alias = 'ut_rank_homework_%s' % run_id
     problem = 'sumas'
-    user = driver.user_username
 
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
-        add_students_course(driver, [user])
+        add_students_course(driver, [driver.user_username])
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
 
-    with driver.login(user, user):
+    with driver.login_user():
         enter_course(driver, course_alias, assignment_alias)
 
         util.create_run(driver, problem, 'Main.cpp11')
@@ -146,7 +144,7 @@ def add_assignment(driver, assignment_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, ('.tab-pane.active .new button')))).click()
+            (By.CSS_SELECTOR, ('#assignments .new button')))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -180,16 +178,22 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.tab-pane.active .problemlist button'))).click()
-    driver.wait_for_page_loaded()
+             '#problems .problemlist button'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '.omegaup-course-problemlist .panel-footer')))
 
     driver.typeahead_helper(
-        '*[contains(@class, "omegaup-course-problemlist")]', problem)
+        '*[contains(@class, "panel-footer")]', problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist form button[type=submit]'))).click()
-    driver.wait_for_page_loaded()
+             '.omegaup-course-problemlist .panel-footer form button[type=submit]'))).click()
+    driver.wait.until(
+        EC.invisibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '.omegaup-course-problemlist .panel-footer')))
 
 
 def add_students_course(driver, users):
