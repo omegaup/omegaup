@@ -90,7 +90,7 @@ class Driver(object):
         '''Waits for the page to be loaded.'''
 
         try:
-            def _is_page_loaded():
+            def _is_page_loaded(*_):
                 return self.browser.execute_script(
                     'return document.readyState;') == 'complete'
             if _is_page_loaded():
@@ -104,7 +104,7 @@ class Driver(object):
                                 'return document.readyState;')) from ex
         t0 = time.time()
         try:
-            def _is_jquery_done():
+            def _is_jquery_done(*_):
                 return self.browser.execute_script(
                     'return jQuery.active;') == 0
             logging.debug('Waiting for all the pending AJAXcalls to finish...')
@@ -123,8 +123,8 @@ class Driver(object):
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
                  '%s input.tt-input' % parent_selector)))
-        for value_char in value:
-            tt_input.send_keys(value_char)
+        tt_input.click()
+        tt_input.send_keys(value)
 
         if not select_suggestion:
             return
