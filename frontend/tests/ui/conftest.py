@@ -5,6 +5,7 @@
 
 import contextlib
 import json
+import logging
 import os.path
 import sys
 import time
@@ -20,10 +21,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from ui.util import database_utils as database_utils
+from ui.util import CI
 
 
 _DEFAULT_TIMEOUT = 10  # seconds
-_CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
@@ -78,8 +79,10 @@ class Driver(object):
         '''Waits for an AJAX-initiated page transition to finish.'''
 
         prev_url = self.browser.current_url
+        logging.debug('Waiting for the URL to change from %s', prev_url)
         yield
         self.wait.until(lambda _: self.browser.current_url != prev_url)
+        logging.debug('New URL: %s', self.browser.current_url)
         if wait_for_ajax:
             self.wait_for_page_loaded()
 
@@ -87,18 +90,26 @@ class Driver(object):
         '''Waits for the page to be loaded.'''
 
         try:
-            self.wait.until(
-                lambda _: self.browser.execute_script(
-                    'return document.readyState;') == 'complete')
+            def _is_page_loaded():
+                return self.browser.execute_script(
+                    'return document.readyState;') == 'complete'
+            if _is_page_loaded():
+                return
+            logging.debug('Waiting for the page to finish loading...')
+            self.wait.until(_is_page_loaded)
+            logging.debug('Page loaded')
         except TimeoutException as ex:
             raise Exception('document ready state still %s' %
                             self.browser.execute_script(
                                 'return document.readyState;')) from ex
         t0 = time.time()
         try:
-            self.wait.until(
-                lambda _: self.browser.execute_script(
-                    'return jQuery.active;') == 0)
+            def _is_jquery_done():
+                return self.browser.execute_script(
+                    'return jQuery.active;') == 0
+            logging.debug('Waiting for all the pending AJAXcalls to finish...')
+            self.wait.until(_is_jquery_done)
+            logging.debug('AJAX calls done.')
         except TimeoutException as ex:
             raise Exception('%d AJAX calls still active after %f s' %
                             (self.browser.execute_script(
@@ -142,6 +153,7 @@ class Driver(object):
         '''Logs in as :username, and logs out when out of scope.'''
 
         # Home page
+        logging.debug('Logging in as %s...', username)
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
         self.wait_for_page_loaded()
@@ -277,7 +289,7 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if 'driver' not in pyfuncitem.funcargs:
         return
-    if _CI:
+    if CI:
         # When running in CI, we have movies, screenshots and logs in
         # Sauce Labs.
         return
@@ -306,7 +318,7 @@ def pytest_addoption(parser):
 
     parser.addoption('--browser', action='append', type=str, dest='browsers',
                      help='The browsers that the test will run against')
-    parser.addoption('--url', default=('http://localhost/' if not _CI else
+    parser.addoption('--url', default=('http://localhost/' if not CI else
                                        'http://localhost:8000/'),
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
@@ -332,7 +344,7 @@ def pytest_generate_tests(metafunc):
 def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
-    if _CI:
+    if CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -349,7 +361,7 @@ def _get_browser(request, browser_name):
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
-        hub_url = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
+        hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
@@ -393,6 +405,10 @@ def driver(request, browser_name):
 
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
+    if browser_name != 'firefox':
+        # Ensure that getting browser logs is supported in non-Firefox
+        # browsers.
+        assert isinstance(browser.get_log('browser'), list)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
 
@@ -400,7 +416,7 @@ def driver(request, browser_name):
         yield Driver(browser, wait, request.config.option.url,
                      request.config.option)
     finally:
-        if _CI:
+        if CI:
             print(('\n\nYou can see the report at '
                    'https://saucelabs.com/beta/tests/%s/commands') %
                   browser.session_id, file=sys.stderr)
