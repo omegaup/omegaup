@@ -30,12 +30,14 @@ _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
 
 
-class Driver(object):
+class Driver(object):  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
-    def __init__(self, browser, wait, url, options):
+    # pylint: disable=too-many-arguments
+    def __init__(self, browser, wait, url, worker_id, options):
         self.browser = browser
         self.wait = wait
+        self._worker_id = worker_id
         self._next_id = 0
         self._url = url
         self.options = options
@@ -46,7 +48,7 @@ class Driver(object):
         '''Generates a relatively unique id.'''
 
         self._next_id += 1
-        return '%d_%d' % (int(time.time()), self._next_id)
+        return '%s_%d_%d' % (self._worker_id, int(time.time()), self._next_id)
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -474,6 +476,7 @@ def driver(request, browser_name):
 
         try:
             yield Driver(browser, wait, request.config.option.url,
+                         os.environ.get('PYTEST_XDIST_WORKER', 'master'),
                          request.config.option)
         finally:
             if CI:
