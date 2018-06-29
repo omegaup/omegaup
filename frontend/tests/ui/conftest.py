@@ -457,27 +457,33 @@ def _get_browser(request, browser_name):
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
-    browser = _get_browser(request, browser_name)
-    browser.implicitly_wait(_DEFAULT_TIMEOUT)
-    if browser_name != 'firefox':
-        # Ensure that getting browser logs is supported in non-Firefox
-        # browsers.
-        assert isinstance(browser.get_log('browser'), list)
-    wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
-                         poll_frequency=0.1)
-
     try:
-        yield Driver(browser, wait, request.config.option.url,
-                     request.config.option)
-    finally:
+        browser = _get_browser(request, browser_name)
         if CI:
             print(('\n\nYou can see the report at '
                    'https://saucelabs.com/beta/tests/%s/commands') %
                   browser.session_id, file=sys.stderr)
-            try:
-                browser.execute_script("sauce:job-result=%s" %
-                                       str(_SUCCESS).lower())
-            except WebDriverException:
-                # Test is done. Just ignore the error.
-                pass
-        browser.quit()
+
+        browser.implicitly_wait(_DEFAULT_TIMEOUT)
+        if browser_name != 'firefox':
+            # Ensure that getting browser logs is supported in non-Firefox
+            # browsers.
+            assert isinstance(browser.get_log('browser'), list)
+        wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
+                             poll_frequency=0.1)
+
+        try:
+            yield Driver(browser, wait, request.config.option.url,
+                         request.config.option)
+        finally:
+            if CI:
+                try:
+                    browser.execute_script("sauce:job-result=%s" %
+                                           str(_SUCCESS).lower())
+                except WebDriverException:
+                    # Test is done. Just ignore the error.
+                    pass
+            browser.quit()
+    except:
+        logging.exception('Failed to initialize')
+        raise
