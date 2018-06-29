@@ -69,6 +69,7 @@ try_define('OMEGAUP_GRADER_RELOAD_CONFIG_URL', 'https://localhost:21680/reload-c
 try_define('OMEGAUP_GRADER_STATUS_URL', 'https://localhost:21680/grader/status/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_BROADCAST_URL', 'https://localhost:21680/broadcast/');
+try_define('OMEGAUP_GRADER_FAKE', false);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG
