@@ -248,7 +248,7 @@ class RunController extends Controller {
             }
             $submit_delay = 0;
             $problemset_id = null;
-            $test = 0;
+            $type = 'normal';
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
@@ -307,7 +307,9 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $test = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) and !ContestsDAO::isVirtual($r['contest'])) ? 1 : 0;
+            $type = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) &&
+                !is_null($r['contest']) &&
+                !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
 
         // Populate new run object
@@ -327,7 +329,7 @@ class RunController extends Controller {
                     'submit_delay' => $submit_delay, /* based on penalty_type */
                     'guid' => md5(uniqid(rand(), true)),
                     'verdict' => 'JE',
-                    'test' => $test
+                    'type' => $type
                 ]);
 
         try {
@@ -557,6 +559,32 @@ class RunController extends Controller {
         UserController::deleteProblemsSolvedRankCacheList();
 
         return $response;
+    }
+
+    /**
+     * Disqualify a submission
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiDisqualify(Request $r) {
+        // Get the user who is calling this API
+        self::authenticateRequest($r);
+
+        self::validateDetailsRequest($r);
+
+        if (!Authorization::canEditRun($r['current_identity_id'], $r['run'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        $r['run']->type = 'disqualified';
+        RunsDAO::save($r['run']);
+
+        // Expire ranks
+        UserController::deleteProblemsSolvedRankCacheList();
+        return [
+            'status' => 'ok'
+        ];
     }
 
     /**

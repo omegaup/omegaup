@@ -84,6 +84,9 @@ class Grader {
      * @throws Exception
      */
     public function Grade($runGuids, $rejudge, $debug) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return;
+        }
         return $this->multiCurlRequest(
             explode(',', OMEGAUP_GRADER_URL),
             [
@@ -101,6 +104,9 @@ class Grader {
      * @return string
      */
     public function reloadConfig($request) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return;
+        }
         $curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
         // Execute call
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
@@ -114,12 +120,28 @@ class Grader {
      * @return array json array
      */
     public function status() {
+        if (OMEGAUP_GRADER_FAKE) {
+            return [
+                'status' => 'ok',
+                'broadcaster_sockets' => 0,
+                'embedded_runner' => false,
+                'queue' => [
+                    'running' => [],
+                    'run_queue_length' => 0,
+                    'runner_queue_length' => 0,
+                    'runners' => []
+                ],
+            ];
+        }
         $curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
 
         return $this->executeCurl($curl);
     }
 
     public function broadcast($contest_alias, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return;
+        }
         return $this->multiCurlRequest(
             explode(',', OMEGAUP_GRADER_BROADCAST_URL),
             [
