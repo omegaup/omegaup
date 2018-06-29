@@ -91,9 +91,13 @@
 					<input id='memory_limit' name='memory_limit' value='{if $IS_UPDATE eq 0}{$MEMORY_LIMIT}{/if}' type='text' class="form-control" />
 				</div>
 
-				<div class="form-group  col-md-6">
+				<div class="form-group col-md-3 col-sm-6">
 					<label for="output_limit">{#problemEditFormOutputLimit#}</label>
 					<input id="output_limit" name="output_limit" value="{if $IS_UPDATE eq 0}{$OUTPUT_LIMIT}{/if}" type='text' class="form-control" />
+				</div>
+				<div class="form-group col-md-3 col-sm-6">
+					<label for="input_limit">{#problemEditFormInputLimit#}</label>
+					<input id="input_limit" name="input_limit" value="{if $IS_UPDATE eq 0}{$INPUT_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
 			</div>
 

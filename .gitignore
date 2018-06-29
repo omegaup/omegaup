@@ -6,6 +6,7 @@ bin/mysql-connector-java-5.1.29.jar
 *~
 *.swp
 *.pyc
+.pytest_cache/
 .cache
 tags
 nohup.out
@@ -41,11 +42,13 @@ test_config.php
 # and log
 omegaup.log
 frontend/log/omegaup.log
+yarn-error.log
 
 #ignore crated-by-test stuff
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
 frontend/tests/controllers/img/
+frontend/tests/controllers/grade/
 frontend/tests/ui/results/
 omegaup_test.log
 
@@ -83,6 +86,12 @@ node_modules
 # Ignore JavaScript build files.
 frontend/www/js/dist/
 
+# Ignore SASS-CSS build files.
+frontend/www/css/dist/
+
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
+
+# Ignore VS Code json
+.vscode/*

@@ -243,7 +243,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.
-        $filters = ['title','quality', 'difficulty', 'alias', 'visibility'];
+        $filters = ['title','quality', 'difficulty', 'alias', 'visibility', 'quality_histogram', 'difficulty_histogram'];
         $problems = [];
         $hiddenTags = $identity_type !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
         if (!is_null($result)) {
@@ -334,7 +334,7 @@ class ProblemsDAO extends ProblemsDAOBase {
     final public static function getProblemsSolved($identity_id) {
         global $conn;
 
-        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
+        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.type = 'normal' and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
         $val = [$identity_id];
         $rs = $conn->Execute($sql, $val);
 

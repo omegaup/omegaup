@@ -36,20 +36,6 @@
 
 							<label>{#wordsLanguage#}:
 								<select class="runslang" name="runslang" data-bind="value: filter_language">
-									<option value="">{#wordsAll#}</option>
-									<option value="cpp11">C++11</option>
-									<option value="cpp">C++</option>
-									<option value="c">C</option>
-									<option value="cs">C#</option>
-									<option value="hs">Haskell</option>
-									<option value="java">Java</option>
-									<option value="pas">Pascal</option>
-									<option value="py">Python</option>
-									<option value="rb">Ruby</option>
-									<option value="lua">Lua</option>
-									<option value="kp">Karel (Pascal)</option>
-									<option value="kj">Karel (Java)</option>
-									<option value="cat">{#wordsJustOutput#}</option>
 								</select>
 							</label>
 
@@ -95,6 +81,9 @@
 							<th class="numeric">{#wordsRuntime#}</th>
 {if isset($show_rejudge)}
 							<th>{#wordsRejudge#}</th>
+{/if}
+{if isset($show_disqualify)}
+							<th>{#wordsDisqualify#}</th>
 {/if}
 {if isset($show_details)}
 							<th>{#wordsDetails#}</th>
@@ -144,6 +133,9 @@
 							<td class="runtime numeric" data-bind="text: runtime_text"></td>
 {if isset($show_rejudge)}
 							<td class="rejudge"><button type="button" class="glyphicon glyphicon-repeat" title="rejudge" data-bind="click: rejudge" /><button type="button" class="glyphicon glyphicon-flag" title="debug" data-bind="click: debug_rejudge" /></td>
+{/if}
+{if isset($show_disqualify)}
+							<td class="disqualify"><button type="button" class="glyphicon glyphicon-ban-circle" title="disqualify" data-bind="click: disqualify"/></td>
 {/if}
 {if isset($show_details)}
 							<td><button type="button" class="details glyphicon glyphicon-zoom-in" data-bind="click: details"></button></td>

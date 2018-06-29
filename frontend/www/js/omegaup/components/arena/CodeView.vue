@@ -36,7 +36,7 @@ for (const mode of modeList) {
 export default {
   props: {
     language: String,
-    readOnly: Boolean,
+    readonly: Boolean,
     value: String,
   },
   data: function() {
@@ -45,7 +45,7 @@ export default {
   computed: {
     editorOptions: function() {
       return {
-        tabSize: 2, lineNumbers: true, mode: this.mode, readOnly: this.readOnly
+        tabSize: 2, lineNumbers: true, mode: this.mode, readOnly: this.readonly
       }
     }
   },

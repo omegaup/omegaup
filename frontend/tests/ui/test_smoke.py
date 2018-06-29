@@ -5,6 +5,8 @@
 
 import os
 
+import pytest
+
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,6 +15,7 @@ import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
@@ -25,6 +28,7 @@ def test_create_user(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
@@ -36,6 +40,10 @@ def test_login(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
+                           message_whitelist=('/api/problem/details/',))
+@pytest.mark.skipif(util.CI,
+                    reason='https://github.com/omegaup/omegaup/issues/2110')
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 

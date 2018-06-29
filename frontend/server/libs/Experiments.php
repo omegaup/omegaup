@@ -36,9 +36,15 @@
  */
 class Experiments {
     /**
+     * Support for virtual contest (a.k.a. Ghost mode).
+     */
+    const VIRTUAL = 'virtual';
+
+    /**
      * An array with all the known experiments.
      */
     private static $kKnownExperiments = [
+        self::VIRTUAL
     ];
 
     /**

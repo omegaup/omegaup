@@ -93,6 +93,8 @@
 						<tr>
 							<td>{#wordsInOut#}</td>
 							<td>{#wordsConsole#}</td>
+							<td>{#problemEditFormInputLimit#}</td>
+							<td class="input_limit"></td>
 						</tr>
 					</table>
 {if $admin}
@@ -122,7 +124,7 @@
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
+{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true show_disqualify=true}
 			</div>
 {/if}
 {if $showRanking}

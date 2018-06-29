@@ -3,18 +3,17 @@
 
 '''Run Selenium contest tests.'''
 
-import os
 import urllib
 
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 
 import ui.util as util
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
@@ -72,6 +71,7 @@ def test_create_contest(driver):
 
 
 @flaky
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
@@ -179,28 +179,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
     enter_contest(driver, contest_alias)
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' % problem)))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "new-run")]')))).click()
-
-    Select(driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "language"]')))).select_by_visible_text(
-                 'C++11')
-
-    contents_element = driver.browser.find_element_by_css_selector(
-        '#submit input[type="file"]')
-    contents_element.send_keys(os.path.join(
-        util.OMEGAUP_ROOT, 'frontend/tests/resources/%s' % filename))
-    with driver.ajax_page_transition():
-        contents_element.submit()
-
+    util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)
 
     driver.wait.until(

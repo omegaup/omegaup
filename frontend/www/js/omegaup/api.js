@@ -123,6 +123,8 @@ export default {
 
     create: _call('/api/contest/create/'),
 
+    createVirtual: _call('/api/contest/createvirtual'),
+
     clone: _call('/api/contest/clone/'),
 
     details: _call('/api/contest/details/', _normalizeContestFields),
@@ -457,6 +459,8 @@ export default {
     list: _call('/api/run/list/', _convertRuntimes),
 
     rejudge: _call('/api/run/rejudge/'),
+
+    disqualify: _call('/api/run/disqualify'),
 
     status: _call('/api/run/status/',
                   function(data) {
