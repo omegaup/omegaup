@@ -20,7 +20,7 @@ def test_create_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'unittest_contest_%s' % run_id
     problem = 'sumas'
-    user = 'user'
+    user = driver.user_username
     user1 = 'unittest_user_1_%s' % run_id
     user2 = 'unittest_user_2_%s' % run_id
     password = 'P@55w0rd'
@@ -78,7 +78,7 @@ def test_user_ranking_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'utrank_contest_%s' % run_id
     problem = 'sumas'
-    user = 'user'
+    user = driver.user_username
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     password = 'P@55w0rd'

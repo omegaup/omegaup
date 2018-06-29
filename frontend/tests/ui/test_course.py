@@ -21,7 +21,7 @@ def test_create_course(driver):
     course_alias = 'unittest_course_%s' % run_id
     school_name = 'unittest_school_%s' % run_id
     assignment_alias = 'unittest_homework_%s' % run_id
-    user = 'user'
+    user = driver.user_username
     problem = 'sumas'
 
     with driver.login_admin():
@@ -52,7 +52,7 @@ def test_user_ranking_course(driver):
     school_name = 'ut_rank_school_%s' % run_id
     assignment_alias = 'ut_rank_homework_%s' % run_id
     problem = 'sumas'
-    user = 'user'
+    user = driver.user_username
 
     with driver.login_admin():
         create_course(driver, course_alias, school_name)

@@ -39,6 +39,8 @@ class Driver(object):
         self._next_id = 0
         self._url = url
         self.options = options
+        self.user_username = self.create_user()
+        self.admin_username = self.create_user(admin=True)
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
@@ -138,14 +140,14 @@ class Driver(object):
     def login_user(self):
         '''Logs in as a user, and logs out when out of scope.'''
 
-        with self.login('user', 'user'):
+        with self.login(self.user_username, 'user'):
             yield
 
     @contextlib.contextmanager
     def login_admin(self):
         '''Logs in as an admin, and logs out when out of scope.'''
 
-        with self.login('omegaup', 'omegaup'):
+        with self.login(self.admin_username, 'omegaup'):
             yield
 
     @contextlib.contextmanager
@@ -274,6 +276,57 @@ class Driver(object):
             ''') % (problem_alias, contest_alias),
             dbname='omegaup', auth=self.mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
+
+    def create_user(self, admin=False):
+        '''Create a user, with optional admin privileges.'''
+
+        if admin:
+            username = 'admin_%s' % self.generate_id()
+            password = (
+                '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a')
+        else:
+            username = 'user_%s' % self.generate_id()
+            password = (
+                '$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy')
+
+        user_id = database_utils.mysql(
+            ('''
+            INSERT INTO
+                Users(`username`, `password`, `verified`, `name`)
+            VALUES
+                ('%s', '%s', 1, '%s');
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username),
+            dbname='omegaup', auth=self.mysql_auth())
+        identity_id = database_utils.mysql(
+            ('''
+            INSERT INTO
+                Identities(`username`, `password`, `name`, `user_id`)
+            VALUES
+                ('%s', '%s', '%s', %s);
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        database_utils.mysql(
+            ('''
+            UPDATE
+                Users
+            SET
+                main_identity_id = %s
+            WHERE
+                user_id = %s;
+            ''') % (identity_id, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        if admin:
+            database_utils.mysql(
+                ('''
+                INSERT INTO
+                    User_Roles(`user_id`, `role_id`, `acl_id`)
+                VALUES
+                    (%s, 1, 1);
+                ''') % (user_id,),
+                dbname='omegaup', auth=self.mysql_auth())
+        return username
 
 
 @pytest.hookimpl(hookwrapper=True)
