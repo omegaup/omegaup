@@ -6,6 +6,7 @@ bin/mysql-connector-java-5.1.29.jar
 *~
 *.swp
 *.pyc
+.pytest_cache/
 .cache
 tags
 nohup.out
@@ -92,5 +93,5 @@ frontend/www/css/dist/
 frontend/www/docs/cpp
 frontend/www/docs/pas
 
-#Ignore VSCODE json
+# Ignore VS Code json
 .vscode/*
