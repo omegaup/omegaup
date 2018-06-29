@@ -5,6 +5,8 @@
 
 import os
 
+import pytest
+
 from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,6 +42,8 @@ def test_login(driver):
 @flaky
 @util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
                            message_whitelist=('/api/problem/details/',))
+@pytest.mark.skipif(util.CI,
+                    reason='https://github.com/omegaup/omegaup/issues/2110')
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 

@@ -13,12 +13,13 @@ OmegaUp.on('ready', function() {
         props: {
           policyMarkdown: this.policyMarkdown,
           saved: this.saved,
-          latestPolicy: this.latestPolicy,
         },
         on: {
           submit: function(ev) {
-            API.User.acceptPrivacyPolicy(
-                        {privacystatement_id: payload.latest_privacy_policy})
+            API.User.acceptPrivacyPolicy({
+                      git_object_id: payload.git_object_id,
+                      statement_type: payload.statement_type
+                    })
                 .then(function(data) {
                   UI.info(T.wordsPrivacyPolicyAccepted);
                   privacyPolicy.saved = true;
@@ -31,7 +32,6 @@ OmegaUp.on('ready', function() {
     data: {
       policyMarkdown: payload.policy_markdown,
       saved: payload.has_accepted,
-      latestPolicy: payload.latest_privacy_policy,
     },
     components: {
       'omegaup-privacy-policy': user_Privacy_Policy,

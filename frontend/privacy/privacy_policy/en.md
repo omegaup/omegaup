@@ -1,4 +1,3 @@
-
 This Privacy Policy governs the manner in which OmegaUp collects, uses, maintains and discloses information collected from users (each, a “User”) of the [omegaUp](https://www.omegaup.com) website (“Site”).
 
 # Personal identification information

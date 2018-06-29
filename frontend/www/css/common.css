@@ -42,6 +42,10 @@ darle focus. */
         background-color: #FFFFFF;
 }
 
+.dropdown:hover .dropdown-menu {
+	display: block;
+}
+
 #header {
 	background-color: #678DD7;
 	border-color:transparent;

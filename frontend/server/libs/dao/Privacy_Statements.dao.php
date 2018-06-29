@@ -12,7 +12,9 @@ include_once('base/PrivacyStatements.vo.base.php');
 class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
     public static function getLatestPublishedPrivacyPolicy() {
         $sql = 'SELECT
-                  privacystatement_id
+                  privacystatement_id,
+                  git_object_id,
+                  type
                 FROM
                   `PrivacyStatements`
                 WHERE
@@ -21,6 +23,21 @@ class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
                   privacystatement_id DESC
                 LIMIT 1';
         global $conn;
-        return $conn->GetOne($sql);
+        return $conn->GetRow($sql);
+    }
+
+    public static function getId($git_object_id, $statement_type) {
+        $sql = 'SELECT
+                  privacystatement_id
+                FROM
+                  `PrivacyStatements`
+                WHERE
+                  git_object_id = ?
+                  AND type = ?
+                ORDER BY
+                  privacystatement_id DESC
+                LIMIT 1';
+        global $conn;
+        return $conn->GetOne($sql, [$git_object_id, $statement_type]);
     }
 }

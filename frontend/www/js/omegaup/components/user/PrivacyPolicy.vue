@@ -30,7 +30,6 @@ export default {
     policyMarkdown: String,
     initialAgreed: Boolean,
     saved: Boolean,
-    latestPolicy: String,
   },
   computed: {
     policyHtml: function() {

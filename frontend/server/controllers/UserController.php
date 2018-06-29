@@ -278,7 +278,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user_id) && is_null($email) && is_null($username)) {
-            throw new ApiException('mustProvideUSerIdEmailOrUsername');
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         $vo_UserToTest = null;
@@ -2025,6 +2025,8 @@ class UserController extends Controller {
      */
     public static function deleteProblemsSolvedRankCacheList() {
         Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
+        Cache::invalidateAllKeys(Cache::CONTESTANT_SCOREBOARD_PREFIX);
+        Cache::invalidateAllKeys(Cache::ADMIN_SCOREBOARD_PREFIX);
     }
 
     /**
@@ -2431,9 +2433,10 @@ class UserController extends Controller {
             ),
             'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
                 $identity->identity_id,
-                $latest_privacy_policy
+                $latest_privacy_policy['privacystatement_id']
             ),
-            'latest_privacy_policy' => $latest_privacy_policy,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['type'],
         ];
     }
 
@@ -2469,7 +2472,7 @@ class UserController extends Controller {
             'status' => 'ok',
             'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
                 $identity->identity_id,
-                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()
+                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()['privacystatement_id']
             ),
         ];
     }
@@ -2482,13 +2485,16 @@ class UserController extends Controller {
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-        Validators::isNumber($r['privacystatement_id'], 'privacystatement_id', true);
+        $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+        if (is_null($privacystatement_id)) {
+            throw new NotFoundException('privacyStatementNotFound');
+        }
         $identity = self::resolveTargetIdentity($r);
 
         try {
             $response = PrivacyStatementConsentLogDAO::saveLog(
                 $identity->identity_id,
-                $r['privacystatement_id']
+                $privacystatement_id
             );
             $sessionController = new SessionController();
             $sessionController->InvalidateCache();

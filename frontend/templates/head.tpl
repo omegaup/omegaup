@@ -67,6 +67,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 {/if}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/common.css"}" />
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 

@@ -35,11 +35,12 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
         $privacy_poilcy = UserFactory::createPrivacyStatement();
         $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-        ]))['latest_privacy_policy'];
+        ]));
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'privacystatement_id' => $latest_privacy_policy,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
@@ -63,11 +64,12 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
         $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
         $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-        ]))['latest_privacy_policy'];
+        ]));
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'privacystatement_id' => $latest_privacy_policy,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
@@ -76,7 +78,8 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'privacystatement_id' => $latest_privacy_policy,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
     }
 
@@ -92,7 +95,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
         $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
         $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-        ]))['latest_privacy_policy'];
+        ]));
 
         $response = UserController::apiLastPrivacyPolicyAccepted(new Request([
             'auth_token' => $login->auth_token,
@@ -103,7 +106,8 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'privacystatement_id' => $latest_privacy_policy,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
