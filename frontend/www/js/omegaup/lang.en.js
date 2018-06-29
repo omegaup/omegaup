@@ -860,6 +860,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsDescription: "Description",
 	wordsDetails: "Details",
 	wordsDifficulty: "Difficulty",
+	wordsDisqualify: "Disqualify",
 	wordsDownload: "Download",
 	wordsDownloadCode: "Download code",
 	wordsDownloadDetails: "Download .zip with outputs",
