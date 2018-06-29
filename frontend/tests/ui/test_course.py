@@ -189,7 +189,8 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer form button[type=submit]'))).click()
+             '.omegaup-course-problemlist .panel-footer '
+             'button[type=submit]'))).click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR,
