@@ -192,8 +192,8 @@ let UI = {
               display: 'label',
               templates: {
                 suggestion: function(val) {
-                  return UI.formatString('<div data-value="%(value)">%(label)</div>',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
                 },
               },
             })
@@ -214,8 +214,9 @@ let UI = {
               display: 'alias',
               templates: {
                 suggestion: function(val) {
-                  return UI.formatString('<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+                      val);
                 }
               }
             })
@@ -257,8 +258,8 @@ let UI = {
               display: 'alias',
               templates: {
                 suggestion: function(val) {
-                  return UI.formatString('<div data-value="%(alias)">%(alias)</div>',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(alias)">%(alias)</div>', val);
                 },
               },
             })
@@ -280,8 +281,8 @@ let UI = {
               templates: {
                 empty: T.schoolToBeAdded,
                 suggestion: function(val) {
-                  return UI.formatString('<div data-value="%(value)">%(label)</div>',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
                 },
               }
             })
