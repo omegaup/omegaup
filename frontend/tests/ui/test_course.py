@@ -3,7 +3,6 @@
 
 '''Run Selenium course tests.'''
 
-from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
@@ -11,7 +10,6 @@ from selenium.webdriver.support.select import Select
 import ui.util as util
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
                                            '/js/dist/omegaup.js'))
 def test_create_course(driver):
@@ -37,7 +35,6 @@ def test_create_course(driver):
         enter_course(driver, course_alias, assignment_alias)
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
                                            '/js/dist/omegaup.js'))
 def test_user_ranking_course(driver):
@@ -71,29 +68,29 @@ def test_user_ranking_course(driver):
                 driver.browser.current_url), driver.browser.current_url
 
     with driver.login_admin():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//a[@href = "/schools/"]'))).click()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/"]')))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
-        course_url = '/course/%s' % course_alias
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[@href = "%s"]' % course_url))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            course_url = '/course/%s' % course_alias
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[@href = "%s"]' % course_url))).click()
 
-        progress_url = '/course/%s/students/' % course_alias
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[@href = "%s"]' % progress_url)))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            progress_url = '/course/%s/students/' % course_alias
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//a[@href = "%s"]' % progress_url)))).click()
 
         assert driver.browser.find_element_by_css_selector(
             'td.score').text == '100'
@@ -102,17 +99,17 @@ def test_user_ranking_course(driver):
 def create_course(driver, course_alias, school_name):
     '''Creates one course with a new school.'''
 
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
 
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, ('//a[@href = "/course/new/"]')))).click()
@@ -128,7 +125,7 @@ def create_course(driver, course_alias, school_name):
     driver.browser.find_element_by_tag_name('textarea').send_keys(
         'course description')
 
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
 
 
@@ -206,7 +203,7 @@ def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
     util.add_students(
-        driver, users, selector='students',
+        driver, users, container_id='students',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
@@ -215,31 +212,31 @@ def add_students_course(driver, users):
 def enter_course(driver, course_alias, assignment_alias):
     '''Enter to course previously created.'''
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "/schools/"]'))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "/schools/"]'))).click()
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, ('//a[@href = "/course/"]')))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
     course_url = '/course/%s' % course_alias
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//a[starts-with(@href, "%s")]' % course_url))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[starts-with(@href, "%s")]' % course_url))).click()
     assert (course_url in
             driver.browser.current_url), driver.browser.current_url
 
     assignment_url = '/course/%s/assignment/%s' % (course_alias,
                                                    assignment_alias)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[starts-with(@href, "%s")]' % assignment_url)))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[starts-with(@href, "%s")]' % assignment_url)))).click()
     assert (assignment_url in
             driver.browser.current_url), driver.browser.current_url

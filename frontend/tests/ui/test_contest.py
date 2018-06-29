@@ -5,14 +5,12 @@
 
 import urllib
 
-from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 import ui.util as util
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
@@ -23,12 +21,11 @@ def test_create_contest(driver):
     user1 = 'ut_user_1_%s' % run_id
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users,
+    create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
 
     with driver.login(user1, password):
@@ -42,24 +39,23 @@ def test_create_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
-
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'nav-contests'))).click()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/mine/"]')))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
-                  contest_alias)))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
+                      contest_alias)))).click()
 
         run_accepted_user = driver.browser.find_element_by_xpath(
             '//td[@class="accepted"]/preceding-sibling::td[1]')
@@ -70,7 +66,6 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
@@ -81,12 +76,11 @@ def test_user_ranking_contest(driver):
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     password = 'P@55w0rd'
-    users = '%s, %s' % (user1, user2)
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
 
-    create_contest_admin(driver, contest_alias, problem, users,
+    create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
 
     with driver.login(user1, password):
@@ -100,24 +94,24 @@ def test_user_ranking_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//a[@href = "/arena/"]'))).click()
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/arena/"]'))).click()
-        driver.wait_for_page_loaded()
-
-        contest_url = '/arena/%s' % contest_alias
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '#current-contests a[href="%s"]' % contest_url))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            contest_url = '/arena/%s' % contest_alias
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '#current-contests a[href="%s"]' % contest_url))).click()
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "#ranking"]'))).click()
-        driver.wait_for_page_loaded()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#ranking')))
 
         run_accepted_user = driver.browser.find_element_by_xpath(
             '//td[@class="accepted"]/preceding-sibling::td[1]')
@@ -143,20 +137,24 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
         add_students_contest(driver, [user])
 
         contest_url = '/arena/%s' % contest_alias
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[starts-with(@href, "%s")]' % contest_url))).click()
-        driver.wait_for_page_loaded()
-
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[starts-with(@href, "%s")]' % contest_url))).click()
         assert (contest_alias in
                 driver.browser.current_url), driver.browser.current_url
 
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.ID, 'start-contest-submit'))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'start-contest-submit'))).click()
-        driver.wait_for_page_loaded()
-
+                (By.XPATH, '//a[@href = "#ranking"]'))).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#ranking')))
         assert ((contest_url) in
                 driver.browser.current_url), driver.browser.current_url
 
@@ -197,12 +195,12 @@ def create_contest(driver, contest_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.ID, 'nav-contests'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//li[@id = "nav-contests"]'
-              '//a[@href = "/contest/new/"]')))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-contests"]'
+                  '//a[@href = "/contest/new/"]')))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -212,7 +210,7 @@ def create_contest(driver, contest_alias):
     driver.browser.find_element_by_id('description').send_keys(
         'contest description')
 
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
 
 
@@ -220,7 +218,7 @@ def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
     util.add_students(
-        driver, users, selector='#contestants',
+        driver, users, container_id='contestants',
         parent_xpath='*[@id="contestants"]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
@@ -231,17 +229,22 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, ('//a[contains(@href, "#contestants")]')))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#contestants')))
 
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, (
-                '//textarea[contains(@name, "usernames")]')))).send_keys(users)
-
+                '//textarea[contains(@name, "usernames")]')))).send_keys(
+                    ', '.join(users))
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CLASS_NAME, ('user-add-bulk')))).click()
-
-    driver.wait_for_page_loaded()
+    for user in users:
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, '//*[@id="contest-users"]//a[text()="%s"]' % user)))
 
 
 def add_problem_to_contest(driver, problem):
@@ -256,39 +259,44 @@ def add_problem_to_contest(driver, problem):
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
              '#add-problem-form button[type="submit"]'))).click()
-    driver.wait_for_page_loaded()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//*[@id="problems"]//a[text()="%s"]' % problem)))
 
 
 def enter_contest(driver, contest_alias):
     '''Enter contest previously created.'''
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "/arena/"]'))).click()
-    driver.wait_for_page_loaded()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "/arena/"]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//a[contains(@href, "#list-past-contest")]'))).click()
-    driver.wait_for_page_loaded()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#list-past-contest')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
              '//a[contains(@href, "#list-current-contest")]'))).click()
-    driver.wait_for_page_loaded()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#list-current-contest')))
 
     contest_url = '/arena/%s' % contest_alias
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             '#current-contests a[href="%s"]' % contest_url))).click()
-    driver.wait_for_page_loaded()
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.ID, 'start-contest-submit'))).click()
-    driver.wait_for_page_loaded()
-
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '#current-contests a[href="%s"]' % contest_url))).click()
     assert (contest_url in
             driver.browser.current_url), driver.browser.current_url
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'start-contest-submit'))).click()

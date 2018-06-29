@@ -79,8 +79,8 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def ajax_page_transition(self, wait_for_ajax=True):
-        '''Waits for an AJAX-initiated page transition to finish.'''
+    def page_transition(self, wait_for_ajax=True):
+        '''Waits for a page transition to finish.'''
 
         prev_url = self.browser.current_url
         logging.debug('Waiting for the URL to change from %s', prev_url)
@@ -88,9 +88,9 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != prev_url)
         logging.debug('New URL: %s', self.browser.current_url)
         if wait_for_ajax:
-            self.wait_for_page_loaded()
+            self._wait_for_page_loaded()
 
-    def wait_for_page_loaded(self):
+    def _wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''
 
         try:
@@ -161,7 +161,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         logging.debug('Logging in as %s...', username)
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
@@ -169,13 +169,13 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 (By.ID, 'user'))).send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('login_form').submit()
 
         try:
@@ -184,7 +184,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             self.browser.get(self.url('/logout/?redirect=/'))
             self.wait.until(lambda _: self.browser.current_url ==
                             home_page_url)
-            self.wait_for_page_loaded()
+            self._wait_for_page_loaded()
 
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''
@@ -192,7 +192,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         # Home page
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
@@ -205,13 +205,13 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             'email_%s@localhost.localdomain' % user)
         self.browser.find_element_by_id('reg_pass').send_keys(passw)
         self.browser.find_element_by_id('reg_pass2').send_keys(passw)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('register-form').submit()
 
         # Home screen
         self.browser.get(self.url('/logout/?redirect=/'))
         self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
 
     def update_run_score(self, run_id, verdict, score):
         '''Set verdict and score of specified run'''

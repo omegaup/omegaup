@@ -7,14 +7,12 @@ import os
 
 import pytest
 
-from flaky import flaky
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 import ui.util as util
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_create_user(driver):
     '''Tests basic functionality.'''
@@ -27,7 +25,6 @@ def test_create_user(driver):
         pass
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=(), message_whitelist=())
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
@@ -39,7 +36,6 @@ def test_login(driver):
         pass
 
 
-@flaky
 @util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
                            message_whitelist=('/api/problem/details/',))
 @pytest.mark.skipif(util.CI,
@@ -53,12 +49,12 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'nav-problems'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-problems"]'
-                  '//a[@href = "/problem/new/"]')))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-problems"]'
+                      '//a[@href = "/problem/new/"]')))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(
@@ -77,7 +73,7 @@ def test_create_problem(driver):
             'problem_contents')
         contents_element.send_keys(os.path.join(
             util.OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
-        with driver.ajax_page_transition(wait_for_ajax=False):
+        with driver.page_transition(wait_for_ajax=False):
             contents_element.submit()
 
         assert (('/problem/%s/edit/' % problem_alias) in
@@ -87,18 +83,18 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'nav-problems'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-problems"]'
-                  '//a[@href = "/problem/"]')))).click()
-        driver.wait_for_page_loaded()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-problems"]'
+                      '//a[@href = "/problem/"]')))).click()
 
         search_box_element = driver.wait.until(
             EC.visibility_of_element_located(
                 (By.ID, 'problem-search-box')))
         search_box_element.send_keys(problem_alias)
-        with driver.ajax_page_transition():
+        with driver.page_transition():
             search_box_element.submit()
 
         driver.wait.until(
