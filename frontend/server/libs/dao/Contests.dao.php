@@ -218,7 +218,7 @@ class ContestsDAO extends ContestsDAOBase {
                 ON
                     c2.problemset_id = r.problemset_id
                 WHERE
-                    r.identity_id = ? AND r.test = 0 AND r.problemset_id IS NOT NULL
+                    r.identity_id = ? AND r.type= \'normal\' AND r.problemset_id IS NOT NULL
             )
             ORDER BY
                 contest_id DESC;';

@@ -456,6 +456,8 @@ export default {
 
     rejudge: _call('/api/run/rejudge/'),
 
+    disqualify: _call('/api/run/disqualify'),
+
     status: _call('/api/run/status/',
                   function(data) {
                     data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
