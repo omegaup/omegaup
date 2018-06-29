@@ -4,6 +4,7 @@
 '''Utils for Selenium tests.'''
 
 import contextlib
+import logging
 import os
 import sys
 import re
@@ -12,7 +13,9 @@ import functools
 from urllib.parse import urlparse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 
+CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
@@ -38,6 +41,40 @@ def add_students(driver, users, selector, typeahead_helper, submit_locator):
         driver.wait.until(
             EC.element_to_be_clickable(submit_locator)).click()
         driver.wait_for_page_loaded()
+
+
+def create_run(driver, problem_alias, filename):
+    '''Utility function to create a new run.'''
+    logging.debug('Trying to submit new run for %s...', problem_alias)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "#problems/%s")]' %
+              problem_alias)))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "new-run")]')))).click()
+
+    _, language = os.path.splitext(filename)
+    language = language.lstrip('.')
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//select[@name = "language"]')))).select_by_value(language)
+
+    resource_path = os.path.join(OMEGAUP_ROOT,
+                                 'frontend/tests/resources/%s' % filename)
+    with open(resource_path, 'r') as f:
+        driver.browser.execute_script(
+            'document.querySelector("#submit .CodeMirror")'
+            '.CodeMirror.setValue(arguments[0]);',
+            f.read())
+    with driver.ajax_page_transition():
+        driver.browser.find_element_by_css_selector(
+            '#submit input[type="submit"]').submit()
+
+    logging.debug('Run submitted.')
 
 
 def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
