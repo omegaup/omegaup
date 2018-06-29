@@ -1,6 +1,6 @@
 <template>
   <div class="omegaup-histogram-container">
-    <p class="omegaup-histogram-title">{{ type }}</p>
+    <p class="omegaup-histogram-title">{{ title }}</p>
     <div class="omegaup-histogram">
       <div class="omegaup-histogram-1">
         <p class="omegaup-histogram-score">{{ score.toFixed(1) }}</p>
@@ -163,7 +163,7 @@ export default {
   },
   computed: {
     tags: function() {
-      return this.type === 'Quality' ?
+      return this.type === 'quality' ?
                  [
                    T.qualityFormQualityVeryGood,
                    T.qualityFormQualityGood,
@@ -179,8 +179,11 @@ export default {
                    T.qualityFormDifficultyVeryHard
                  ]
     },
+    title: function() {
+      return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
+    },
     customHistogram: function() {
-      return this.type === 'Quality' ? this.histogram.reverse() :
+      return this.type === 'quality' ? this.histogram.reverse() :
                                        this.histogram;
     },
     totalVotes: function() { return this.histogram.reduce((a, b) => a + b);},
