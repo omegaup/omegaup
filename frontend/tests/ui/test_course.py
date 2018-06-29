@@ -12,36 +12,10 @@ import ui.util as util
 
 @util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
                                            '/js/dist/omegaup.js'))
-def test_create_course(driver):
-    '''Tests creating an course and retrieving it.'''
-
-    run_id = driver.generate_id()
-    course_alias = 'ut_course_%s' % run_id
-    school_name = 'ut_school_%s' % run_id
-    assignment_alias = 'ut_homework_%s' % run_id
-    problem = 'sumas'
-
-    with driver.login_admin():
-        create_course(driver, course_alias, school_name)
-
-        assert (('/course/%s/edit/' % course_alias) in
-                driver.browser.current_url), driver.browser.current_url
-
-        add_students_course(driver, [driver.user_username])
-        add_assignment(driver, assignment_alias)
-        add_problem_to_assignment(driver, assignment_alias, problem)
-
-    with driver.login_user():
-        enter_course(driver, course_alias, assignment_alias)
-
-
-@util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
-                                           '/js/dist/omegaup.js'))
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
     run_id = driver.generate_id()
-
     course_alias = 'ut_rank_course_%s' % run_id
     school_name = 'ut_rank_school_%s' % run_id
     assignment_alias = 'ut_rank_homework_%s' % run_id
@@ -127,6 +101,8 @@ def create_course(driver, course_alias, school_name):
 
     with driver.page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
+    assert (('/course/%s/edit/' % course_alias) in
+            driver.browser.current_url), driver.browser.current_url
 
 
 def add_assignment(driver, assignment_alias):
@@ -136,6 +112,8 @@ def add_assignment(driver, assignment_alias):
         EC.element_to_be_clickable(
             (By.XPATH, (
                 '//a[contains(@href, "#assignments")]')))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -161,9 +139,10 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector(
         'button[type=submit]').click()
     driver.wait.until(
-        EC.invisibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-assignmentdetails')))
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//*[contains(@class, "omegaup-course-assignmentlist")]'
+             '//a[text()="%s"]' % assignment_alias)))
 
 
 def add_problem_to_assignment(driver, assignment_alias, problem):
