@@ -407,6 +407,10 @@ def driver(request, browser_name):
 
     browser = _get_browser(request, browser_name)
     browser.implicitly_wait(_DEFAULT_TIMEOUT)
+    if browser_name != 'firefox':
+        # Ensure that getting browser logs is supported in non-Firefox
+        # browsers.
+        assert isinstance(browser.get_log('browser'), list)
     wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
                          poll_frequency=0.1)
 
