@@ -126,7 +126,8 @@ def create_course(driver, course_alias, school_name):
             (By.CLASS_NAME, ('name')))).send_keys(course_alias)
     driver.browser.find_element_by_class_name('alias').send_keys(
         course_alias)
-    driver.typeahead_helper('.omegaup-course-details', school_name,
+    driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
+                            school_name,
                             select_suggestion=False)
     driver.browser.find_element_by_tag_name('textarea').send_keys(
         'course description')
@@ -182,7 +183,8 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
              '.tab-pane.active .problemlist button'))).click()
     driver.wait_for_page_loaded()
 
-    driver.typeahead_helper('.omegaup-course-problemlist', problem)
+    driver.typeahead_helper(
+        '*[contains(@class, "omegaup-course-problemlist")]', problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
@@ -195,7 +197,7 @@ def add_students_course(driver, users):
 
     util.add_students(
         driver, users, selector='students',
-        typeahead_helper='.omegaup-course-addstudent',
+        parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
 

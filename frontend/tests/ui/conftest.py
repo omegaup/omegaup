@@ -118,13 +118,13 @@ class Driver(object):
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_selector, value, select_suggestion=True):
+    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR,
-                 '%s input.tt-input' % parent_selector)))
+                (By.XPATH,
+                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
         for value_char in value:
             tt_input.send_keys(value_char)
 
@@ -133,8 +133,9 @@ class Driver(object):
 
         self.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '%s .tt-suggestion.tt-selectable' % parent_selector))).click()
+                (By.XPATH,
+                 '//%s//div[@data-value = "%s"]' %
+                 (parent_xpath, value)))).click()
 
     @contextlib.contextmanager
     def login_user(self):

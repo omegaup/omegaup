@@ -221,7 +221,7 @@ def add_students_contest(driver, users):
 
     util.add_students(
         driver, users, selector='#contestants',
-        typeahead_helper='#contestants',
+        parent_xpath='*[@id="contestants"]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
 
@@ -251,7 +251,7 @@ def add_problem_to_contest(driver, problem):
         EC.element_to_be_clickable(
             (By.XPATH, '//a[@href = "#problems"]'))).click()
 
-    driver.typeahead_helper('#problems', problem)
+    driver.typeahead_helper('*[@id="problems"]', problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
