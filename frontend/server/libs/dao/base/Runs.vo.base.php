@@ -207,7 +207,7 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('normal','test','disqualify')
+      * @var enum('normal','test','disqualified')
       */
     public $type;
 }
