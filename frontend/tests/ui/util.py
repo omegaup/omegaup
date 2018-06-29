@@ -101,11 +101,17 @@ def annotate(f):
     '''Decorator to add annotations around the function call.'''
     @functools.wraps(f)
     def _wrapper(driver, *args, **kwargs):
-        driver.annotate('begin %s' % f.__name__)
+        string_args = []
+        for arg in args:
+            string_args.append(repr(arg))
+        for k, val in kwargs.items():
+            string_args.append('%s=%r' % (k, val))
+        funcstring = '%s(%s)' % (f.__name__, ', '.join(string_args))
+        driver.annotate('begin %s' % funcstring)
         try:
             return f(driver, *args, **kwargs)
         finally:
-            driver.annotate('end %s' % f.__name__)
+            driver.annotate('end %s' % funcstring)
     return _wrapper
 
 

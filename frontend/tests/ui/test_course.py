@@ -19,7 +19,7 @@ def test_user_ranking_course(driver):
     run_id = driver.generate_id()
     course_alias = 'ut_rank_course_%s' % run_id
     school_name = 'ut_rank_school_%s' % run_id
-    assignment_alias = 'ut_rank_homework_%s' % run_id
+    assignment_alias = 'ut_rank_hw_%s' % run_id
     problem = 'sumas'
 
     with driver.login_admin():
@@ -141,6 +141,8 @@ def add_assignment(driver, assignment_alias):
 
     new_assignment_form.find_element_by_css_selector(
         'button[type=submit]').click()
+    driver.wait.until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
