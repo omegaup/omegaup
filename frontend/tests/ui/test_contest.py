@@ -18,10 +18,10 @@ def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
     run_id = driver.generate_id()
-    contest_alias = 'unittest_contest_%s' % run_id
+    contest_alias = 'ut_contest_%s' % run_id
     problem = 'sumas'
-    user1 = 'unittest_user_1_%s' % run_id
-    user2 = 'unittest_user_2_%s' % run_id
+    user1 = 'ut_user_1_%s' % run_id
+    user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
     users = '%s, %s' % (user1, user2)
 

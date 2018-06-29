@@ -476,7 +476,7 @@ def driver(request, browser_name):
 
         try:
             yield Driver(browser, wait, request.config.option.url,
-                         os.environ.get('PYTEST_XDIST_WORKER', 'master'),
+                         os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
             if CI:
