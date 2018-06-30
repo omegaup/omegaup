@@ -182,8 +182,11 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             yield
         finally:
             # Wait until there are no more pending requests to avoid races
-            # where those requests return 401.
+            # where those requests return 401. Navigate to about:blank just for
+            # good measure and to enforce that there are two URL changes.
             self._wait_for_page_loaded()
+            with self.page_transition():
+                self.browser.get('about:blank')
             with self.page_transition():
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (

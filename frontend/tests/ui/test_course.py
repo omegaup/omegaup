@@ -124,8 +124,7 @@ def add_assignment(driver, assignment_alias):
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-assignmentdetails')))
+            (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, ('.schedule .name')))).send_keys(
@@ -142,7 +141,8 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector(
         'button[type=submit]').click()
     driver.wait.until(
-        EC.invisibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
+        EC.invisibility_of_element_located(
+            (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,

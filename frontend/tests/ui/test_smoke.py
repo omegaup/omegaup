@@ -14,6 +14,7 @@ import ui.util as util
 
 
 @util.no_javascript_errors(path_whitelist=(), message_whitelist=())
+@util.annotate
 def test_create_user(driver):
     '''Tests basic functionality.'''
 
@@ -26,6 +27,7 @@ def test_create_user(driver):
 
 
 @util.no_javascript_errors(path_whitelist=(), message_whitelist=())
+@util.annotate
 def test_login(driver):
     '''Tests login with a normal and an admin user.'''
 
@@ -40,6 +42,7 @@ def test_login(driver):
                            message_whitelist=('/api/problem/details/',))
 @pytest.mark.skipif(util.CI,
                     reason='https://github.com/omegaup/omegaup/issues/2110')
+@util.annotate
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
