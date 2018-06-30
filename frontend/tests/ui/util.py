@@ -7,9 +7,10 @@ import contextlib
 import inspect
 import logging
 import os
-import sys
-import re
 import functools
+import re
+import sys
+import traceback
 
 from urllib.parse import urlparse
 from selenium.common.exceptions import WebDriverException
@@ -103,16 +104,22 @@ def annotate(f):
     @functools.wraps(f)
     def _wrapper(driver, *args, **kwargs):
         signature = inspect.signature(f)
+        args_names = [param.name for param in signature.parameters.values()]
         string_args = []
         # Skipping the first arg, since it was already captured by driver.
-        for param, val in zip(signature.parameters.values()[1:], args):
-            string_args.append('%s=%r' % (param.name, val))
+        for param, val in zip(args_names[1:], args):
+            string_args.append('%s=%r' % (param, val))
         for k, val in kwargs.items():
             string_args.append('%s=%r' % (k, val))
         funcstring = '%s(%s)' % (f.__name__, ', '.join(string_args))
         driver.annotate('begin %s' % funcstring)
         try:
             return f(driver, *args, **kwargs)
+        except:
+            driver.annotate(
+                ''.join(traceback.format_exception(*sys.exc_info())).rstrip(),
+                level=logging.ERROR)
+            raise
         finally:
             driver.annotate('end %s' % funcstring)
     return _wrapper

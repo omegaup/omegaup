@@ -217,12 +217,12 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url == home_page_url)
         self._wait_for_page_loaded()
 
-    def annotate(self, text):
+    def annotate(self, message, level=logging.INFO):
         '''Add an annotation to the run's log.'''
 
         if CI:
-            self.browser.execute_script("sauce:context=%s" % text)
-        logging.info(text)
+            self.browser.execute_script("sauce:context=%s" % message)
+        logging.log(level, message)
 
     def update_run_score(self, run_id, verdict, score):
         '''Set verdict and score of specified run'''
