@@ -26,10 +26,9 @@
           <td><img v-bind:src="coder.gravatar_32"></td>
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
-          <td>
-            <!-- <a v-bind:href="usernameUrl">{{coder.username}}</a> -->
-            <omegaup-user-username v-bind:username="coder.username" v-bind:linkify=true></omegaup-user-username>
-          </td>
+          <td><!-- <a v-bind:href="usernameUrl">{{coder.username}}</a> -->
+          <omegaup-user-username v-bind:linkify="true"
+                                 v-bind:username="coder.username"></omegaup-user-username></td>
           <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
       </tbody>
@@ -82,7 +81,7 @@ export default {
         .fail(UI.apiError);
   },
   components: {
-  	'omegaup-user-username':user_Username,
+    'omegaup-user-username': user_Username,
   }
 };
 </script>
