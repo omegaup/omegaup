@@ -30,21 +30,25 @@ _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
 
 
-class Driver(object):
+class Driver(object):  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
-    def __init__(self, browser, wait, url, options):
+    # pylint: disable=too-many-arguments
+    def __init__(self, browser, wait, url, worker_id, options):
         self.browser = browser
         self.wait = wait
+        self._worker_id = worker_id
         self._next_id = 0
         self._url = url
         self.options = options
+        self.user_username = self.create_user()
+        self.admin_username = self.create_user(admin=True)
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
 
         self._next_id += 1
-        return '%d_%d' % (int(time.time()), self._next_id)
+        return '%s_%d_%d' % (self._worker_id, int(time.time()), self._next_id)
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -75,8 +79,8 @@ class Driver(object):
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def ajax_page_transition(self, wait_for_ajax=True):
-        '''Waits for an AJAX-initiated page transition to finish.'''
+    def page_transition(self, wait_for_ajax=True):
+        '''Waits for a page transition to finish.'''
 
         prev_url = self.browser.current_url
         logging.debug('Waiting for the URL to change from %s', prev_url)
@@ -84,9 +88,9 @@ class Driver(object):
         self.wait.until(lambda _: self.browser.current_url != prev_url)
         logging.debug('New URL: %s', self.browser.current_url)
         if wait_for_ajax:
-            self.wait_for_page_loaded()
+            self._wait_for_page_loaded()
 
-    def wait_for_page_loaded(self):
+    def _wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''
 
         try:
@@ -116,13 +120,13 @@ class Driver(object):
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_selector, value, select_suggestion=True):
+    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR,
-                 '%s input.tt-input' % parent_selector)))
+                (By.XPATH,
+                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
         tt_input.click()
         tt_input.send_keys(value)
 
@@ -131,21 +135,22 @@ class Driver(object):
 
         self.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '%s .tt-suggestion.tt-selectable' % parent_selector))).click()
+                (By.XPATH,
+                 '//%s//div[@data-value = "%s"]' %
+                 (parent_xpath, value)))).click()
 
     @contextlib.contextmanager
     def login_user(self):
         '''Logs in as a user, and logs out when out of scope.'''
 
-        with self.login('user', 'user'):
+        with self.login(self.user_username, 'user'):
             yield
 
     @contextlib.contextmanager
     def login_admin(self):
         '''Logs in as an admin, and logs out when out of scope.'''
 
-        with self.login('omegaup', 'omegaup'):
+        with self.login(self.admin_username, 'omegaup'):
             yield
 
     @contextlib.contextmanager
@@ -156,7 +161,7 @@ class Driver(object):
         logging.debug('Logging in as %s...', username)
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
@@ -164,22 +169,29 @@ class Driver(object):
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 (By.ID, 'user'))).send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('login_form').submit()
 
         try:
             yield
         finally:
-            self.browser.get(self.url('/logout/?redirect=/'))
-            self.wait.until(lambda _: self.browser.current_url ==
-                            home_page_url)
-            self.wait_for_page_loaded()
+            # Wait until there are no more pending requests to avoid races
+            # where those requests return 401. Navigate to about:blank just for
+            # good measure and to enforce that there are two URL changes.
+            self._wait_for_page_loaded()
+            with self.page_transition():
+                self.browser.get('about:blank')
+            with self.page_transition():
+                self.browser.get(self.url('/logout/?redirect=/'))
+            assert self.browser.current_url == home_page_url, (
+                'Invalid URL redirect. Expected %s, got %s' % (
+                    home_page_url, self.current.browser_url))
 
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''
@@ -187,7 +199,7 @@ class Driver(object):
         # Home page
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
@@ -200,13 +212,20 @@ class Driver(object):
             'email_%s@localhost.localdomain' % user)
         self.browser.find_element_by_id('reg_pass').send_keys(passw)
         self.browser.find_element_by_id('reg_pass2').send_keys(passw)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('register-form').submit()
 
         # Home screen
         self.browser.get(self.url('/logout/?redirect=/'))
         self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
+
+    def annotate(self, message, level=logging.INFO):
+        '''Add an annotation to the run's log.'''
+
+        if CI:
+            self.browser.execute_script("sauce:context=%s" % message)
+        logging.log(level, message)
 
     def update_run_score(self, run_id, verdict, score):
         '''Set verdict and score of specified run'''
@@ -274,6 +293,61 @@ class Driver(object):
             ''') % (problem_alias, contest_alias),
             dbname='omegaup', auth=self.mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
+
+    def create_user(self, admin=False):
+        '''Create a user, with optional admin privileges.'''
+
+        if admin:
+            username = 'admin_%s' % self.generate_id()
+            # password = 'omegaup'
+            password = (
+                '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a')
+        else:
+            username = 'user_%s' % self.generate_id()
+            # password = 'user'
+            password = (
+                '$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy')
+
+        # Add the user directly to the database to make this fast and avoid UI
+        # flake.
+        user_id = database_utils.mysql(
+            ('''
+            INSERT INTO
+                Users(`username`, `password`, `verified`, `name`)
+            VALUES
+                ('%s', '%s', 1, '%s');
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username),
+            dbname='omegaup', auth=self.mysql_auth())
+        identity_id = database_utils.mysql(
+            ('''
+            INSERT INTO
+                Identities(`username`, `password`, `name`, `user_id`)
+            VALUES
+                ('%s', '%s', '%s', %s);
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        database_utils.mysql(
+            ('''
+            UPDATE
+                Users
+            SET
+                main_identity_id = %s
+            WHERE
+                user_id = %s;
+            ''') % (identity_id, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        if admin:
+            database_utils.mysql(
+                ('''
+                INSERT INTO
+                    User_Roles(`user_id`, `role_id`, `acl_id`)
+                VALUES
+                    (%s, 1, 1);
+                ''') % (user_id,),
+                dbname='omegaup', auth=self.mysql_auth())
+        return username
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -420,6 +494,7 @@ def driver(request, browser_name):
 
         try:
             yield Driver(browser, wait, request.config.option.url,
+                         os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
             if CI:

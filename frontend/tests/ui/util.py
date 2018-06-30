@@ -4,11 +4,13 @@
 '''Utils for Selenium tests.'''
 
 import contextlib
+import inspect
 import logging
 import os
-import sys
-import re
 import functools
+import re
+import sys
+import traceback
 
 from urllib.parse import urlparse
 from selenium.common.exceptions import WebDriverException
@@ -29,19 +31,25 @@ sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 import database_utils  # NOQA
 
 
-def add_students(driver, users, selector, typeahead_helper, submit_locator):
+def add_students(driver, users, container_id, parent_xpath, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "%s")]' % selector)))).click()
+            (By.XPATH, ('//a[contains(@href, "%s")]' % container_id)))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#%s' % container_id)))
 
     for user in users:
-        driver.typeahead_helper(typeahead_helper, user)
+        driver.typeahead_helper(parent_xpath, user)
 
         driver.wait.until(
             EC.element_to_be_clickable(submit_locator)).click()
-        driver.wait_for_page_loaded()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//*[@id="%s"]//a[text()="%s"]' % (container_id, user))))
 
 
 def create_run(driver, problem_alias, filename):
@@ -71,7 +79,7 @@ def create_run(driver, problem_alias, filename):
             'document.querySelector("#submit .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
-    with driver.ajax_page_transition():
+    with driver.page_transition():
         driver.browser.find_element_by_css_selector(
             '#submit input[type="submit"]').submit()
 
@@ -89,6 +97,32 @@ def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
                 return f(driver, *args, **kwargs)
         return _wrapper
     return _internal
+
+
+def annotate(f):
+    '''Decorator to add annotations around the function call.'''
+    @functools.wraps(f)
+    def _wrapper(driver, *args, **kwargs):
+        signature = inspect.signature(f)
+        args_names = [param.name for param in signature.parameters.values()]
+        string_args = []
+        # Skipping the first arg, since it was already captured by driver.
+        for param, val in zip(args_names[1:], args):
+            string_args.append('%s=%r' % (param, val))
+        for k, val in kwargs.items():
+            string_args.append('%s=%r' % (k, val))
+        funcstring = '%s(%s)' % (f.__name__, ', '.join(string_args))
+        driver.annotate('begin %s' % funcstring)
+        try:
+            return f(driver, *args, **kwargs)
+        except:
+            driver.annotate(
+                ''.join(traceback.format_exception(*sys.exc_info())).rstrip(),
+                level=logging.ERROR)
+            raise
+        finally:
+            driver.annotate('end %s' % funcstring)
+    return _wrapper
 
 
 @contextlib.contextmanager
