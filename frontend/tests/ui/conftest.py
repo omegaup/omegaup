@@ -20,14 +20,46 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ui.util import database_utils as database_utils
-from ui.util import CI
+import ui.util as util
 
 
 _DEFAULT_TIMEOUT = 10  # seconds
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
+
+
+class JavaScriptLogCollector(object):
+    '''Collects JavaScript errors from the log.'''
+
+    def __init__(self, dr):
+        self.driver = dr
+        self._log_index = 0
+        self._log_stack = [[]]
+
+    def push(self):
+        '''Pushes a new error list.'''
+        self._log_stack[-1].extend(self._get_last_console_logs())
+        self._log_stack.append([])
+
+    def pop(self):
+        '''Grabs the last error list.'''
+        self._log_stack[-1].extend(self._get_last_console_logs())
+        return self._log_stack.pop()
+
+    def _get_last_console_logs(self):
+        '''Grabs the latest set of JavaScript logs and clears them.'''
+        try:
+            browser_logs = self.driver.browser.get_log('browser')
+        except WebDriverException:
+            # Firefox does not support getting console logs.
+            browser_logs = []
+        current_index, self._log_index = self._log_index, len(browser_logs)
+        for entry in browser_logs[current_index:]:
+            if entry['level'] != 'SEVERE':
+                continue
+            logging.info(entry)
+            yield entry
 
 
 class Driver(object):  # pylint: disable=too-many-instance-attributes
@@ -43,6 +75,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         self.options = options
         self.user_username = self.create_user()
         self.admin_username = self.create_user(admin=True)
+        self.log_collector = JavaScriptLogCollector(self)
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
@@ -58,7 +91,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
     def mysql_auth(self):
         '''Gets the authentication string for MySQL.'''
 
-        return database_utils.authentication(
+        return util.database_utils.authentication(
             config_file=self.options.mysql_config_file,
             username=self.options.username, password=self.options.password)
 
@@ -193,20 +226,24 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
                 'Invalid URL redirect. Expected %s, got %s' % (
                     home_page_url, self.current.browser_url))
 
+    @util.no_javascript_errors()
+    @util.annotate
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''
 
         # Home page
         home_page_url = self.url('/')
-        self.browser.get(home_page_url)
-        self._wait_for_page_loaded()
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[contains(@href, "/login/")]'))).click()
+        with self.page_transition():
+            self.browser.get('about:blank')
+        with self.page_transition():
+            self.browser.get(home_page_url)
+        with self.page_transition():
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self.browser.find_element_by_id('reg_username').send_keys(user)
         self.browser.find_element_by_id('reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
@@ -216,21 +253,25 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             self.browser.find_element_by_id('register-form').submit()
 
         # Home screen
-        self.browser.get(self.url('/logout/?redirect=/'))
-        self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self._wait_for_page_loaded()
+        with self.page_transition():
+            self.browser.get('about:blank')
+        with self.page_transition():
+            self.browser.get(self.url('/logout/?redirect=/'))
+        assert self.browser.current_url == home_page_url, (
+            'Invalid URL redirect. Expected %s, got %s' % (
+                home_page_url, self.current.browser_url))
 
     def annotate(self, message, level=logging.INFO):
         '''Add an annotation to the run's log.'''
 
-        if CI:
+        if util.CI:
             self.browser.execute_script("sauce:context=%s" % message)
         logging.log(level, message)
 
     def update_run_score(self, run_id, verdict, score):
         '''Set verdict and score of specified run'''
 
-        database_utils.mysql(
+        util.database_utils.mysql(
             ('''
             UPDATE
                 `Runs`
@@ -248,7 +289,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
                                verdict='AC', score=1):
         '''Set verdict and score of latest run'''
 
-        run_id = database_utils.mysql(
+        run_id = util.database_utils.mysql(
             ('''
             SELECT
                 MAX(`r`.`run_id`)
@@ -273,7 +314,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
                                 verdict='AC', score=1):
         '''Set verdict and score of latest run'''
 
-        run_id = database_utils.mysql(
+        run_id = util.database_utils.mysql(
             ('''
             SELECT
                 MAX(`r`.`run_id`)
@@ -310,7 +351,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
 
         # Add the user directly to the database to make this fast and avoid UI
         # flake.
-        user_id = database_utils.mysql(
+        user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
                 Users(`username`, `password`, `verified`, `name`)
@@ -319,7 +360,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             SELECT LAST_INSERT_ID();
             ''') % (username, password, username),
             dbname='omegaup', auth=self.mysql_auth())
-        identity_id = database_utils.mysql(
+        identity_id = util.database_utils.mysql(
             ('''
             INSERT INTO
                 Identities(`username`, `password`, `name`, `user_id`)
@@ -328,7 +369,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             SELECT LAST_INSERT_ID();
             ''') % (username, password, username, user_id),
             dbname='omegaup', auth=self.mysql_auth())
-        database_utils.mysql(
+        util.database_utils.mysql(
             ('''
             UPDATE
                 Users
@@ -339,7 +380,7 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
             ''') % (identity_id, user_id),
             dbname='omegaup', auth=self.mysql_auth())
         if admin:
-            database_utils.mysql(
+            util.database_utils.mysql(
                 ('''
                 INSERT INTO
                     User_Roles(`user_id`, `role_id`, `acl_id`)
@@ -363,7 +404,7 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if 'driver' not in pyfuncitem.funcargs:
         return
-    if CI:
+    if util.CI:
         # When running in CI, we have movies, screenshots and logs in
         # Sauce Labs.
         return
@@ -392,13 +433,13 @@ def pytest_addoption(parser):
 
     parser.addoption('--browser', action='append', type=str, dest='browsers',
                      help='The browsers that the test will run against')
-    parser.addoption('--url', default=('http://localhost/' if not CI else
+    parser.addoption('--url', default=('http://localhost/' if not util.CI else
                                        'http://localhost:8000/'),
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
                      dest='headless', help='Show the browser window')
     parser.addoption('--mysql-config-file',
-                     default=database_utils.default_config_file(),
+                     default=util.database_utils.default_config_file(),
                      help='.my.cnf file that stores credentials')
     parser.addoption('--username', default='root', help='MySQL root username')
     parser.addoption('--password', default='omegaup', help='MySQL password')
@@ -418,7 +459,7 @@ def pytest_generate_tests(metafunc):
 def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
-    if CI:
+    if util.CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -479,7 +520,7 @@ def driver(request, browser_name):
 
     try:
         browser = _get_browser(request, browser_name)
-        if CI:
+        if util.CI:
             print(('\n\nYou can see the report at '
                    'https://saucelabs.com/beta/tests/%s/commands') %
                   browser.session_id, file=sys.stderr)
@@ -497,7 +538,7 @@ def driver(request, browser_name):
                          os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
-            if CI:
+            if util.CI:
                 try:
                     browser.execute_script("sauce:job-result=%s" %
                                            str(_SUCCESS).lower())

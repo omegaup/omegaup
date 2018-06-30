@@ -10,8 +10,7 @@ from selenium.webdriver.support.select import Select
 import ui.util as util
 
 
-@util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
-                                           '/js/dist/omegaup.js'))
+@util.no_javascript_errors
 @util.annotate
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''

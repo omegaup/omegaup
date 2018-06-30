@@ -514,6 +514,11 @@ export {UI as default};
 
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {
+      if (xhr.status == 499 || xhr.readyState != 4) {
+        // If we cancel the connection, let's just swallow the error since
+        // the user is not going to see it.
+        return;
+      }
       try {
         var responseText = xhr.responseText;
         var response = {};
