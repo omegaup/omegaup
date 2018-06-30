@@ -181,10 +181,14 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
         try:
             yield
         finally:
-            self.browser.get(self.url('/logout/?redirect=/'))
-            self.wait.until(lambda _: self.browser.current_url ==
-                            home_page_url)
+            # Wait until there are no more pending requests to avoid races
+            # where those requests return 401.
             self._wait_for_page_loaded()
+            with self.page_transition():
+                self.browser.get(self.url('/logout/?redirect=/'))
+            assert self.browser.current_url == home_page_url, (
+                'Invalid URL redirect. Expected %s, got %s' % (
+                    home_page_url, self.current.browser_url))
 
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''

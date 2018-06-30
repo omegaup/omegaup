@@ -11,9 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import ui.util as util
 
 
-@util.no_javascript_errors(path_whitelist=('/api/contest/clarifications/',
-                                           '/api/contest/scoreboard/',
-                                           '/js/dist/omegaup.js'))
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 @util.annotate
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
@@ -69,9 +67,7 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-@util.no_javascript_errors(path_whitelist=('/api/contest/clarifications/',
-                                           '/api/contest/scoreboard/',
-                                           '/js/dist/omegaup.js'))
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 @util.annotate
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''

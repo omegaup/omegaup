@@ -4,6 +4,7 @@
 '''Utils for Selenium tests.'''
 
 import contextlib
+import inspect
 import logging
 import os
 import sys
@@ -101,9 +102,11 @@ def annotate(f):
     '''Decorator to add annotations around the function call.'''
     @functools.wraps(f)
     def _wrapper(driver, *args, **kwargs):
+        signature = inspect.signature(f)
         string_args = []
-        for arg in args:
-            string_args.append(repr(arg))
+        # Skipping the first arg, since it was already captured by driver.
+        for param, val in zip(signature.parameters.values()[1:], args):
+            string_args.append('%s=%r' % (param.name, val))
         for k, val in kwargs.items():
             string_args.append('%s=%r' % (k, val))
         funcstring = '%s(%s)' % (f.__name__, ', '.join(string_args))
