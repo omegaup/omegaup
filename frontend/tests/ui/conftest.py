@@ -299,13 +299,17 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
 
         if admin:
             username = 'admin_%s' % self.generate_id()
+            # password = 'omegaup'
             password = (
                 '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a')
         else:
             username = 'user_%s' % self.generate_id()
+            # password = 'user'
             password = (
                 '$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy')
 
+        # Add the user directly to the database to make this fast and avoid UI
+        # flake.
         user_id = database_utils.mysql(
             ('''
             INSERT INTO
