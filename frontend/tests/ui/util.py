@@ -133,6 +133,9 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     finally:
         unexpected_errors = []
         for entry in driver.log_collector.pop():
+            if 'WebSocket' in entry['message']:
+                # Travis does not have broadcaster yet.
+                continue
             if is_path_whitelisted(entry['message'], path_whitelist):
                 continue
             if is_message_whitelisted(entry['message'], message_whitelist):
