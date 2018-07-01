@@ -13,7 +13,6 @@ import sys
 import traceback
 
 from urllib.parse import urlparse
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
@@ -128,40 +127,21 @@ def annotate(f):
 @contextlib.contextmanager
 def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     '''Shows in a list unexpected errors in javascript console'''
-    previous_logs = get_console_logs(driver, path_whitelist, message_whitelist)
+    driver.log_collector.push()
     try:
         yield
     finally:
-        current_logs = get_console_logs(driver, path_whitelist,
-                                        message_whitelist)
         unexpected_errors = []
-
-        if current_logs[:len(previous_logs)] == previous_logs:
-            unexpected_errors = current_logs[len(previous_logs):]
-
+        for entry in driver.log_collector.pop():
+            if 'WebSocket' in entry['message']:
+                # Travis does not have broadcaster yet.
+                continue
+            if is_path_whitelisted(entry['message'], path_whitelist):
+                continue
+            if is_message_whitelisted(entry['message'], message_whitelist):
+                continue
+            unexpected_errors.append(entry['message'])
         assert not unexpected_errors, '\n'.join(unexpected_errors)
-
-
-def get_console_logs(driver, path_whitelist, message_whitelist):
-    '''Checks whether there is an error or warning in javascript console'''
-
-    log = []
-    try:
-        browser_logs = driver.browser.get_log('browser')
-    except WebDriverException:
-        # Firefox does not support getting console logs.
-        browser_logs = []
-    for entry in browser_logs:
-        if entry['level'] != 'SEVERE':
-            continue
-        if is_path_whitelisted(entry['message'], path_whitelist):
-            continue
-        if is_message_whitelisted(entry['message'], message_whitelist):
-            continue
-
-        log.append(entry['message'])
-
-    return log
 
 
 def is_path_whitelisted(message, path_whitelist):

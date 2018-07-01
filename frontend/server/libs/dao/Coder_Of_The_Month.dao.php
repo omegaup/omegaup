@@ -138,12 +138,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 100
         ';
         global $conn;
-        $results = $conn->getAll($sql, [$date]);
-        if (count($results) == 0) {
-            return null;
-        }
-
-        return $results;
+        return $conn->getAll($sql, [$date]);
     }
 
     /**
