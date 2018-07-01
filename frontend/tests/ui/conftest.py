@@ -233,8 +233,9 @@ class Driver(object):  # pylint: disable=too-many-instance-attributes
 
         # Home page
         home_page_url = self.url('/')
-        with self.page_transition():
-            self.browser.get('about:blank')
+        if self.browser.current_url != 'about:blank':
+            with self.page_transition():
+                self.browser.get('about:blank')
         with self.page_transition():
             self.browser.get(home_page_url)
         with self.page_transition():
