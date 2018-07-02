@@ -28,7 +28,7 @@ class RunsDAO extends RunsDAOBase {
         $sql = "SELECT guid, UNIX_TIMESTAMP(time) AS time FROM Runs WHERE status != 'ready'";
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         $sql .= ' ORDER BY run_id;';
@@ -62,10 +62,10 @@ class RunsDAO extends RunsDAOBase {
 						FROM
 							Runs rr
 						WHERE
-							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.test = 0 GROUP BY rr.identity_id
+							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.type = \'normal\' GROUP BY rr.identity_id
 					) AS sr ON sr.identity_id = r.identity_id AND sr.runtime = r.runtime
 				WHERE
-					r.problem_id = ? AND r.verdict = \'AC\' AND r.test = 0
+					r.problem_id = ? AND r.verdict = \'AC\' AND r.type= \'normal\'
 				GROUP BY
 					r.identity_id, r.runtime
 				ORDER
@@ -91,7 +91,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problemset_id];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -108,7 +108,7 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetAllRuns($problemset_id, $status, $verdict, $problem_id, $language, $identity_id, $offset, $rowcount) {
         $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
                 'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
-                'r.submit_delay, i.username, p.alias, i.country_id, c.alias AS contest_alias ' .
+                'r.submit_delay, r.type, i.username, p.alias, i.country_id, c.alias AS contest_alias ' .
                 'FROM Runs r USE INDEX(PRIMARY) ' .
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
                 'INNER JOIN Identities i ON i.identity_id = r.identity_id ' .
@@ -166,7 +166,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problem_id];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -203,7 +203,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problemset_id];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -220,7 +220,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problem_id];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -235,7 +235,7 @@ class RunsDAO extends RunsDAOBase {
      */
     final public static function CountTotalRunsOfProblemInProblemset($problem_id, $problemset_id) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND problemset_id = ? AND test = 0';
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND problemset_id = ? AND `type` = \'normal\'';
         $val = [$problem_id, $problemset_id];
 
         global $conn;
@@ -252,7 +252,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problemset_id, $verdict];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -269,7 +269,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problem_id, $verdict];
 
         if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
+            $sql .= ' AND `type` = \'normal\'';
         }
 
         global $conn;
@@ -398,7 +398,7 @@ class RunsDAO extends RunsDAOBase {
                         r.verdict NOT IN (\'CE\', \'JE\') AND
                         r.problemset_id = ? AND
                         r.status = \'ready\' AND
-                        r.test = 0) rc ON i.identity_id = rc.identity_id';
+                        r.type = \'normal\') rc ON i.identity_id = rc.identity_id';
             $val = [$problemset_id];
             if (!is_null($filterUsersBy)) {
                 $sql .= ' WHERE i.username LIKE ?';
@@ -420,7 +420,7 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function getProblemsetRuns(Problemsets $problemset, $onlyAC = false) {
         $sql =    'SELECT '
-                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.identity_id, r.test, r.time, r.submit_delay, r.guid '
+                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.identity_id, r.type, r.time, r.submit_delay, r.guid '
                 . 'FROM '
                     . 'Runs r '
                 . 'INNER JOIN '
@@ -431,7 +431,7 @@ class RunsDAO extends RunsDAOBase {
                 . 'WHERE '
                     . 'pp.problemset_id = ? '
                     . "AND r.status = 'ready' "
-                    . "AND r.test = '0' " .
+                    . "AND r.type = 'normal' " .
                     (($onlyAC === false) ?
                         "AND r.verdict NOT IN ('CE', 'JE') " :
                         "AND r.verdict IN ('AC') ")
@@ -483,7 +483,7 @@ class RunsDAO extends RunsDAOBase {
 	 */
 
     final public static function GetBestRun($problemset_id, $problem_id, $identity_id, $showAllRuns) {
-        $filterTest = $showAllRuns ? '' : ' AND test = 0';
+        $filterTest = $showAllRuns ? '' : ' AND `type` = \'normal\'';
         $sql = "
             SELECT
                 contest_score, penalty, submit_delay, guid, run_id
@@ -765,9 +765,9 @@ class RunsDAO extends RunsDAOBase {
             array_push($val, $Runs->time);
         }
 
-        if ($Runs->test !== null) {
-            $sql .= ' test = ?  AND';
-            array_push($val, $Runs->test);
+        if ($Runs->type !== null) {
+            $sql .= ' `type` = ?  AND';
+            array_push($val, $Runs->type);
         }
 
         $sql .= ' run_id > ?  AND';
