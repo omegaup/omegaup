@@ -13,7 +13,6 @@ stage_install() {
 	# Install pre-dependencies
 	pip3 install --user selenium
 	pip3 install --user pytest
-	pip3 install --user pytest-xdist
 	pip3 install --user flaky
 
 	# Expand all templates
@@ -60,7 +59,7 @@ stage_script() {
 	for browser in chrome firefox; do
 		/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 			--verbose --capture=no --log-cli-level=INFO "--browser=${browser}" \
-			--force-flaky --max-runs=2 --min-passes=1 --numprocesses=2 &
+			--force-flaky --max-runs=2 --min-passes=1 &
 		pids+=($!)
 	done
 	local result=0
