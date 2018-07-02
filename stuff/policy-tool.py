@@ -55,7 +55,7 @@ def validate(args, auth):  # pylint: disable=unused-argument
         if int(database_utils.mysql(
                 'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
                 '`type` = "%s" AND `git_object_id` = "%s";' %
-                (statement_type, git_object_id), dbname='omegaup',
+                (statement_type, git_object_id), dbname=args.database,
                 auth=auth)) != 1:
             print('Missing database entry for type %s and object id %s' %
                   (statement_type, git_object_id))
@@ -86,6 +86,7 @@ def main():
     parser.add_argument('--mysql-config-file',
                         default=database_utils.default_config_file(),
                         help='.my.cnf file that stores credentials')
+    parser.add_argument('--database', default='omegaup', help='MySQL database')
     parser.add_argument('--username', default='root',
                         help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
