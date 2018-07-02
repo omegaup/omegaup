@@ -54,7 +54,16 @@ stage_before_script() {
 }
 
 stage_script() {
-	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
-		--verbose --capture=no --log-cli-level=INFO \
-		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
+	local pids=()
+	for browser in chrome firefox; do
+		/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
+			--verbose --capture=no --log-cli-level=INFO "--browsers=${browser}" \
+			--force-flaky --max-runs=2 --min-passes=1 --numprocesses=2 &
+		pids+=($!)
+	done
+	local result=0
+	for pid in "${pids[@]}"; do
+		wait "${pid}" || result=$?
+	done
+	exit "${result}"
 }
