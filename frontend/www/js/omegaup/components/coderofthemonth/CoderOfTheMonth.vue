@@ -26,7 +26,8 @@
           <td><img v-bind:src="coder.gravatar_32"></td>
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
-          <td><omegaup-user-username v-bind:linkify="true"
+          <td><omegaup-user-username v-bind:classname="coder.rank"
+                                 v-bind:linkify="true"
                                  v-bind:username="coder.username"></omegaup-user-username></td>
           <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
@@ -51,7 +52,8 @@ export default {
       return this.visibleCoders.map(function(coder) {
         return '/profile/' + coder.username;
       });
-    }
+    },
+    rank: function() {}
   },
   data: function() {
     return {

@@ -1,7 +1,6 @@
 <template>
-  <span v-bind:class="classname"
-        v-if="linkify"><a v-bind:href="usernameUrl">{{ username }}</a></span> <span v-bind:class=
-        "classname"
+  <span v-if="linkify"><a v-bind:class="classname"
+     v-bind:href="usernameUrl">{{ username }}</a></span> <span v-bind:class="classname"
         v-else="">{{ username }}</span>
 </template>
 
