@@ -37,7 +37,9 @@ stage_install() {
 stage_before_script() {
 	wait_for_mysql
 
+	# Setup php, bug disable xdebug to speed things up.
 	setup_phpenv
+	phpenv config-rm xdebug.ini
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"

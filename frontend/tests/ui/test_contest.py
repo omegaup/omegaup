@@ -172,7 +172,8 @@ def update_scoreboard_for_contest(driver, contest_alias):
     scoreboard_refresh_url = driver.url(
         '/api/scoreboard/refresh/alias/%s/token/secret' %
         urllib.parse.quote(contest_alias, safe=''))
-    driver.browser.get(scoreboard_refresh_url)
+    with driver.page_transition():
+        driver.browser.get(scoreboard_refresh_url)
     assert '{"status":"ok"}' in driver.browser.page_source
 
 

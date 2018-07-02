@@ -476,6 +476,8 @@ def _get_browser(request, browser_name):
             'version': 'latest',
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
+            'recordScreenshots': False,
+            'recordVideo': False,
         })
         hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
