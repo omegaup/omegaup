@@ -57,7 +57,7 @@ stage_script() {
 	local pids=()
 	for browser in chrome firefox; do
 		/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
-			--verbose --capture=no --log-cli-level=INFO "--browsers=${browser}" \
+			--verbose --capture=no --log-cli-level=INFO "--browser=${browser}" \
 			--force-flaky --max-runs=2 --min-passes=1 --numprocesses=2 &
 		pids+=($!)
 	done
