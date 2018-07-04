@@ -584,7 +584,7 @@ class ContestController extends Controller {
             }
 
             try {
-                $problemsInContest = ProblemsetProblemsDAO::getByProblemset($r['contest']->problemset_id);
+                $problemsInContest = ProblemsetProblemsDAO::getProblemsByProblemset($r['contest']->problemset_id);
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -593,25 +593,10 @@ class ContestController extends Controller {
             // Add info of each problem to the contest
             $problemsResponseArray = [];
 
-            // Set of columns that we want to show through this API. Doesn't include the SOURCE
-            $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
-                'overall_wall_time_limit', 'extra_wall_time', 'memory_limit',
-                'visits', 'submissions', 'accepted', 'dificulty', 'order',
-                'languages'];
             $letter = 0;
 
-            foreach ($problemsInContest as $problemkey) {
-                try {
-                    // Get the data of the problem
-                    $temp_problem = ProblemsDAO::getByPK($problemkey->problem_id);
-                } catch (Exception $e) {
-                    // Operation failed in the data layer
-                    throw new InvalidDatabaseOperationException($e);
-                }
-
+            foreach ($problemsInContest as $temp_array) {
                 // Add the 'points' value that is stored in the ContestProblem relationship
-                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                $temp_array['points'] = $problemkey->points;
                 $temp_array['letter'] = ContestController::columnName($letter++);
                 if (!empty($result['languages'])) {
                     $temp_array['languages'] = join(',', array_intersect(
@@ -2210,13 +2195,7 @@ class ContestController extends Controller {
 
             if (!is_null($r['problems'])) {
                 // Get current problems
-                $current_problems = ProblemsDAO::getByContest($r['contest']->contest_id);
-                $current_problems_id = [];
-
-                foreach ($current_problems as $p) {
-                    array_push($current_problems_id, $p->problem_id);
-                }
-
+                $current_problems_id = ProblemsetProblemsDAO::getIdByProblemset($r['contest']->problemset_id);
                 // Check who needs to be deleted and who needs to be added
                 $to_delete = array_diff($current_problems_id, self::$problems_id);
                 $to_add = array_diff(self::$problems_id, $current_problems_id);
@@ -2452,11 +2431,7 @@ class ContestController extends Controller {
             }
 
             // Get max points posible for contest
-            $problemsetProblems = ProblemsetProblemsDAO::getByProblemset($r['contest']->problemset_id);
-            $totalPoints = 0;
-            foreach ($problemsetProblems as $cP) {
-                $totalPoints += $cP->points;
-            }
+            $totalPoints = ProblemsetProblemsDAO::getMaxPointsByProblemset($r['contest']->problemset_id);
 
             // Get scoreboard to calculate distribution
             $distribution = [];

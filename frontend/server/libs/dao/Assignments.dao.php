@@ -104,16 +104,16 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 WHERE
                     course_id = ?
                 AND
-                    alias = ?;';
+                    alias = ?
+                LIMIT 1;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$course_id, $assignment_alias]);
-
-        $assignments = [];
-        foreach ($rs as $row) {
-            array_push($assignments, new Assignments($row));
+        $row = $conn->GetRow($sql, [$course_id, $assignment_alias]);
+        if (empty($row)) {
+            return null;
         }
-        return $assignments;
+
+        return new Assignments($row);
     }
 
     /**

@@ -679,30 +679,4 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         return $conn->GetOne($sql, $problem->problem_id);
     }
-
-    final public static function getByContest($contest_id) {
-        $sql = 'SELECT
-                    p.*
-                FROM
-                    Problems p
-                INNER JOIN
-                    Problemset_Problems pp
-                ON
-                    p.problem_id = pp.problem_id
-                INNER JOIN
-                    Contests c
-                ON
-                    c.problemset_id = pp.problemset_id
-                WHERE
-                    c.contest_id = ?;';
-
-        global $conn;
-        $rs = $conn->Execute($sql, [$contest_id]);
-
-        $problems = [];
-        foreach ($rs as $row) {
-            array_push($problems, new Problems($row));
-        }
-        return $problems;
-    }
 }

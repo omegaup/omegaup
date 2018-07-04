@@ -251,7 +251,7 @@ class Authorization {
         }
         $groupUsers = GroupsIdentitiesDAO::getByPK($group->group_id, $identity_id);
 
-        return !is_null($groupUsers) && count($groupUsers) > 0;
+        return !empty($groupUsers);
     }
 
     public static function isCourseCurator($identity_id) {

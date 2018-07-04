@@ -27,12 +27,11 @@ class RolesDAO extends RolesDAOBase {
                     name = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$name]);
-
-        $roles = [];
-        foreach ($rs as $row) {
-            array_push($roles, new Roles($row));
+        $row = $conn->GetRow($sql, [$name]);
+        if (count($row) == 0) {
+            return null;
         }
-        return $roles;
+
+        return new Roles($row);
     }
 }

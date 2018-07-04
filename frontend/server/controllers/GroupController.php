@@ -79,12 +79,10 @@ class GroupController extends Controller {
 
         Validators::isStringNonEmpty($r['group_alias'], 'group_alias');
         try {
-            $groups = GroupsDAO::FindByAlias($r['group_alias']);
+            $r['group'] = GroupsDAO::FindByAlias($r['group_alias']);
 
-            if (is_null($groups)) {
+            if (empty($r['group'])) {
                 throw new InvalidParameterException('parameterNotFound', 'Group');
-            } else {
-                $r['group'] = $groups;
             }
         } catch (ApiException $ex) {
             throw $ex;

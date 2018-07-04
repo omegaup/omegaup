@@ -208,38 +208,26 @@ class InterviewController extends Controller {
         $thisResult['problemset_id'] = $interview->problemset_id;
 
         try {
-            $problemset_identities = ProblemsetIdentitiesDAO::getByProblemset($interview->problemset_id);
+            $problemset_identities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $users = [];
+        $thisResult['users'] = [];
 
         // Add all users to an array
-        foreach ($problemset_identities as $result) {
-            // @TODO: Slow queries ahead
-            $user_id = $result->user_id;
-            $user = UsersDAO::getByPK($user_id);
-
-            try {
-                $email = EmailsDAO::getByPK($user->main_email_id);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            $problemsetOpened = UserController::userOpenedProblemset($interview->problemset_id, $user_id);
-            $users[] = [
-                        'user_id' => $user_id,
-                        'username' => $user->username,
-                        'access_time' => $result->access_time,
-                        'email' => $email->email,
+        foreach ($problemset_identities as $identity) {
+            $problemsetOpened = UserController::userOpenedProblemset($interview->problemset_id, $identity['user_id']);
+            $thisResult['users'][] = [
+                        'user_id' => $identity['user_id'],
+                        'username' => $identity['username'],
+                        'access_time' => $identity['access_time'],
+                        'email' => $identity['email'],
                         'opened_interview' => $problemsetOpened,
-                        'country' => $user->country_id];
+                        'country' => $identity['country_id'],
+                    ];
         }
-
-        $thisResult['users'] = $users;
-
         return $thisResult;
     }
 

@@ -569,16 +569,15 @@ class CourseController extends Controller {
         }
 
         // Update assignments order
-        $assignments = $r['assignments'];
-        foreach ($assignments as $assignment) {
+        foreach ($r['assignments'] as $assignment) {
             $currentAssignment = AssignmentsDAO::getByAliasAndCourse($assignment['alias'], $r['course']->course_id);
 
-            if (empty($currentAssignment) || is_null($currentAssignment[0])) {
+            if (empty($currentAssignment)) {
                 throw new NotFoundException('assignmentNotFound');
             }
 
             AssignmentsDAO::updateAssignmentsOrder(
-                $currentAssignment[0]->assignment_id,
+                $currentAssignment->assignment_id,
                 (int)$assignment['order']
             );
         }
@@ -1409,11 +1408,10 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
-        $assignments = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
-        if (count($assignments) != 1) {
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
 
         Validators::isNumberInRange(
