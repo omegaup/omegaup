@@ -74,13 +74,16 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $this->assertEquals($response['status'], 'ok');
 
-        $this->expectException('DuplicatedEntryInDatabaseException');
-
-        $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token,
-            'git_object_id' => $latest_privacy_policy['git_object_id'],
-            'statement_type' => $latest_privacy_policy['statement_type'],
-        ]));
+        try {
+            UserController::apiAcceptPrivacyPolicy(new Request([
+                'auth_token' => $login->auth_token,
+                'git_object_id' => $latest_privacy_policy['git_object_id'],
+                'statement_type' => $latest_privacy_policy['statement_type'],
+            ]));
+            $this->fail('Should have thrown a DuplicatedEntryInDatabaseException');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            // OK.
+        }
     }
 
     /**
