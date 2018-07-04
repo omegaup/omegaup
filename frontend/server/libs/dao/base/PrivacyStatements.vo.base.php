@@ -32,9 +32,6 @@ class PrivacyStatements extends VO {
         if (isset($data['git_object_id'])) {
             $this->git_object_id = $data['git_object_id'];
         }
-        if (isset($data['type'])) {
-            $this->type = $data['type'];
-        }
     }
 
     /**
@@ -50,7 +47,6 @@ class PrivacyStatements extends VO {
 
     /**
       * Id del documento de privacidad
-      * Llave Primaria
       * Auto Incremento
       * @access public
       * @var int(11)
@@ -63,11 +59,4 @@ class PrivacyStatements extends VO {
       * @var varchar(50)
       */
     public $git_object_id;
-
-    /**
-      * Tipo de documento de privacidad
-      * @access public
-      * @var enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent')
-      */
-    public $type;
 }

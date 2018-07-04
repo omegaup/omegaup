@@ -33,33 +33,43 @@ OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 def _latest():
     '''Gets the latest versions of all privacy statements.'''
 
-    privacy_path = 'frontend/privacy'
-    entries = []
-    if not os.path.isdir(os.path.join(OMEGAUP_ROOT, privacy_path)):
-        return entries
-    for statement_type in os.listdir(
-            os.path.join(OMEGAUP_ROOT, privacy_path)):
-        statement_path = os.path.join(privacy_path, statement_type)
+    git_privacy_path = 'frontend/privacy'
+    privacy_path = os.path.join(OMEGAUP_ROOT, git_privacy_path)
+    if not os.path.isdir(privacy_path):
+        return
+    for statement_type in os.listdir(privacy_path):
+        statement_path = os.path.join(git_privacy_path, statement_type)
+        print(statement_path)
+        print(subprocess.check_output(
+            ['/usr/bin/git', 'ls-tree', '-d', 'HEAD^{tree}', statement_path],
+            cwd=OMEGAUP_ROOT, universal_newlines=True).strip().split())
         git_object_id = subprocess.check_output(
             ['/usr/bin/git', 'ls-tree', '-d', 'HEAD^{tree}', statement_path],
             cwd=OMEGAUP_ROOT, universal_newlines=True).strip().split()[2]
-        entries.append((statement_type, git_object_id))
-    return entries
+        yield (statement_type, git_object_id)
+
+
+def _missing(args, auth):
+    '''Gets all the missing privacy statements.'''
+
+    for statement_type, git_object_id in _latest():
+        if int(database_utils.mysql(
+                'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
+                '`type` = "%s" AND `git_object_id` = "%s";' %
+                (statement_type, git_object_id), dbname=args.database,
+                auth=auth)) != 0:
+            continue
+        yield (statement_type, git_object_id)
 
 
 def validate(args, auth):  # pylint: disable=unused-argument
     '''Validates that the latest statements are present in the database.'''
 
     valid = True
-    for statement_type, git_object_id in _latest():
-        if int(database_utils.mysql(
-                'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
-                '`type` = "%s" AND `git_object_id` = "%s";' %
-                (statement_type, git_object_id), dbname='omegaup',
-                auth=auth)) != 1:
-            print('Missing database entry for type %s and object id %s' %
-                  (statement_type, git_object_id))
-            valid = False
+    for statement_type, git_object_id in _missing(args, auth):
+        print('Missing database entry for type %s and object id %s' %
+              (statement_type, git_object_id))
+        valid = False
     if not valid:
         print('Run `./stuff/policy-tool.py upgrade` to generate '
               'the upgrade script.')
@@ -69,14 +79,14 @@ def validate(args, auth):  # pylint: disable=unused-argument
 def upgrade(args, auth):  # pylint: disable=unused-argument
     '''Creates the database upgrade script for the latest policies.'''
 
-    latest = _latest()
-    if not latest:
+    missing = list(_missing(args, auth))
+    if not missing:
         return
 
     print('-- PrivacyStatements')
     print('INSERT INTO `PrivacyStatements` (`type`, `git_object_id`) VALUES ')
     print(','.join('  (\'%s\', \'%s\')' %
-                   entry for entry in latest) + ';')
+                   entry for entry in missing) + ';')
 
 
 def main():
@@ -86,6 +96,7 @@ def main():
     parser.add_argument('--mysql-config-file',
                         default=database_utils.default_config_file(),
                         help='.my.cnf file that stores credentials')
+    parser.add_argument('--database', default='omegaup', help='MySQL database')
     parser.add_argument('--username', default='root',
                         help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')

@@ -2408,6 +2408,38 @@ class UserController extends Controller {
         ];
     }
 
+    /**
+     * Gets the last privacy policy saved in the data base
+     * @throws ForbiddenAccessException
+     */
+    public static function getPrivacyPolicy(Request $r) {
+        self::authenticateRequest($r);
+
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+
+        $lang = 'es';
+        if ($user->language_id == UserController::LANGUAGE_EN ||
+            $user->language_id == UserController::LANGUAGE_PSEUDO) {
+            $lang = 'en';
+        } elseif ($user->language_id == UserController::LANGUAGE_PT) {
+            $lang = 'pt';
+        }
+        $latest_privacy_policy = PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy();
+        return [
+            'status' => 'ok',
+            'policy_markdown' => file_get_contents(
+                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
+            ),
+            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                $latest_privacy_policy['privacystatement_id']
+            ),
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['type'],
+        ];
+    }
+
     private static function getSelectedFilter($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
@@ -2438,8 +2470,9 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
-            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPolicy(
-                $identity->identity_id
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()['privacystatement_id']
             ),
         ];
     }
@@ -2452,13 +2485,16 @@ class UserController extends Controller {
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-
+        $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+        if (is_null($privacystatement_id)) {
+            throw new NotFoundException('privacyStatementNotFound');
+        }
         $identity = self::resolveTargetIdentity($r);
 
         try {
             $response = PrivacyStatementConsentLogDAO::saveLog(
                 $identity->identity_id,
-                'privacy_policy'
+                $privacystatement_id
             );
             $sessionController = new SessionController();
             $sessionController->InvalidateCache();

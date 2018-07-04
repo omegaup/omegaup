@@ -411,7 +411,8 @@ CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
   `type` enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
-  PRIMARY KEY (`privacystatement_id`)
+  PRIMARY KEY (`privacystatement_id`),
+  UNIQUE KEY `type_git_object_id` (`type`,`git_object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
