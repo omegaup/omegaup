@@ -1,6 +1,6 @@
 <template>
   <span v-if="linkify"><a v-bind:class="classname"
-     v-bind:href="usernameUrl">{{ username }}</a></span> <span v-bind:class="classname"
+     v-bind:href="`/profile/${username}/`">{{ username }}</a></span> <span v-bind:class="classname"
         v-else="">{{ username }}</span>
 </template>
 
@@ -11,7 +11,6 @@ export default {
     classname: String,
     linkify: Boolean,
   },
-  computed: {usernameUrl: function() { return '/profile/' + this.username;}}
 }
 </script>
 
