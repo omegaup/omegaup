@@ -33,9 +33,14 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         // Create privacy policy
         $privacy_poilcy = UserFactory::createPrivacyStatement();
+        $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token
+            'auth_token' => $login->auth_token,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
@@ -57,18 +62,28 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         // Create privacy policy
         $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
+        $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token
+            'auth_token' => $login->auth_token,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
 
-        $this->expectException('DuplicatedEntryInDatabaseException');
-
-        $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token
-        ]));
+        try {
+            UserController::apiAcceptPrivacyPolicy(new Request([
+                'auth_token' => $login->auth_token,
+                'git_object_id' => $latest_privacy_policy['git_object_id'],
+                'statement_type' => $latest_privacy_policy['statement_type'],
+            ]));
+            $this->fail('Should have thrown a DuplicatedEntryInDatabaseException');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            // OK.
+        }
     }
 
     /**
@@ -81,15 +96,21 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         // Create privacy policy
         $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
+        $latest_privacy_policy = UserController::getPrivacyPolicy(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         $response = UserController::apiLastPrivacyPolicyAccepted(new Request([
-            'auth_token' => $login->auth_token
+            'auth_token' => $login->auth_token,
+            'privacystatement_id' => $latest_privacy_policy,
         ]));
 
         $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
-            'auth_token' => $login->auth_token
+            'auth_token' => $login->auth_token,
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
         $this->assertEquals($response['status'], 'ok');
