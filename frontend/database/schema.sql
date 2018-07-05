@@ -407,7 +407,8 @@ CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
   `type` enum('privacy_policy') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
-  PRIMARY KEY (`privacystatement_id`)
+  PRIMARY KEY (`privacystatement_id`),
+  UNIQUE KEY `type_git_object_id` (`type`,`git_object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -731,8 +732,8 @@ CREATE TABLE `Runs` (
   `contest_score` double DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
-  `test` tinyint(1) NOT NULL DEFAULT '0',
   `judged_by` char(32) DEFAULT NULL,
+  `type` enum('normal','test','disqualified') DEFAULT 'normal',
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
   KEY `problem_id` (`problem_id`),

@@ -20,8 +20,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ui.util import database_utils as database_utils
-from ui.util import CI
+import ui.util as util
 
 
 _DEFAULT_TIMEOUT = 10  # seconds
@@ -30,21 +29,59 @@ _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
 
 
-class Driver(object):
+class JavaScriptLogCollector(object):
+    '''Collects JavaScript errors from the log.'''
+
+    def __init__(self, dr):
+        self.driver = dr
+        self._log_index = 0
+        self._log_stack = [[]]
+
+    def push(self):
+        '''Pushes a new error list.'''
+        self._log_stack[-1].extend(self._get_last_console_logs())
+        self._log_stack.append([])
+
+    def pop(self):
+        '''Grabs the last error list.'''
+        self._log_stack[-1].extend(self._get_last_console_logs())
+        return self._log_stack.pop()
+
+    def _get_last_console_logs(self):
+        '''Grabs the latest set of JavaScript logs and clears them.'''
+        try:
+            browser_logs = self.driver.browser.get_log('browser')
+        except WebDriverException:
+            # Firefox does not support getting console logs.
+            browser_logs = []
+        current_index, self._log_index = self._log_index, len(browser_logs)
+        for entry in browser_logs[current_index:]:
+            if entry['level'] != 'SEVERE':
+                continue
+            logging.info(entry)
+            yield entry
+
+
+class Driver(object):  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
-    def __init__(self, browser, wait, url, options):
+    # pylint: disable=too-many-arguments
+    def __init__(self, browser, wait, url, worker_id, options):
         self.browser = browser
         self.wait = wait
+        self._worker_id = worker_id
         self._next_id = 0
         self._url = url
         self.options = options
+        self.user_username = self.create_user()
+        self.admin_username = self.create_user(admin=True)
+        self.log_collector = JavaScriptLogCollector(self)
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
 
         self._next_id += 1
-        return '%d_%d' % (int(time.time()), self._next_id)
+        return '%s_%d_%d' % (self._worker_id, int(time.time()), self._next_id)
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -54,7 +91,7 @@ class Driver(object):
     def mysql_auth(self):
         '''Gets the authentication string for MySQL.'''
 
-        return database_utils.authentication(
+        return util.database_utils.authentication(
             config_file=self.options.mysql_config_file,
             username=self.options.username, password=self.options.password)
 
@@ -75,8 +112,8 @@ class Driver(object):
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def ajax_page_transition(self, wait_for_ajax=True):
-        '''Waits for an AJAX-initiated page transition to finish.'''
+    def page_transition(self, wait_for_ajax=True):
+        '''Waits for a page transition to finish.'''
 
         prev_url = self.browser.current_url
         logging.debug('Waiting for the URL to change from %s', prev_url)
@@ -84,13 +121,13 @@ class Driver(object):
         self.wait.until(lambda _: self.browser.current_url != prev_url)
         logging.debug('New URL: %s', self.browser.current_url)
         if wait_for_ajax:
-            self.wait_for_page_loaded()
+            self._wait_for_page_loaded()
 
-    def wait_for_page_loaded(self):
+    def _wait_for_page_loaded(self):
         '''Waits for the page to be loaded.'''
 
         try:
-            def _is_page_loaded():
+            def _is_page_loaded(*_):
                 return self.browser.execute_script(
                     'return document.readyState;') == 'complete'
             if _is_page_loaded():
@@ -104,7 +141,7 @@ class Driver(object):
                                 'return document.readyState;')) from ex
         t0 = time.time()
         try:
-            def _is_jquery_done():
+            def _is_jquery_done(*_):
                 return self.browser.execute_script(
                     'return jQuery.active;') == 0
             logging.debug('Waiting for all the pending AJAXcalls to finish...')
@@ -116,36 +153,37 @@ class Driver(object):
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_selector, value, select_suggestion=True):
+    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR,
-                 '%s input.tt-input' % parent_selector)))
-        for value_char in value:
-            tt_input.send_keys(value_char)
+                (By.XPATH,
+                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
+        tt_input.click()
+        tt_input.send_keys(value)
 
         if not select_suggestion:
             return
 
         self.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '%s .tt-suggestion.tt-selectable' % parent_selector))).click()
+                (By.XPATH,
+                 '//%s//div[@data-value = "%s"]' %
+                 (parent_xpath, value)))).click()
 
     @contextlib.contextmanager
     def login_user(self):
         '''Logs in as a user, and logs out when out of scope.'''
 
-        with self.login('user', 'user'):
+        with self.login(self.user_username, 'user'):
             yield
 
     @contextlib.contextmanager
     def login_admin(self):
         '''Logs in as an admin, and logs out when out of scope.'''
 
-        with self.login('omegaup', 'omegaup'):
+        with self.login(self.admin_username, 'omegaup'):
             yield
 
     @contextlib.contextmanager
@@ -156,7 +194,7 @@ class Driver(object):
         logging.debug('Logging in as %s...', username)
         home_page_url = self.url('/')
         self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
@@ -164,54 +202,76 @@ class Driver(object):
 
         # Login screen
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
-        self.wait_for_page_loaded()
+        self._wait_for_page_loaded()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 (By.ID, 'user'))).send_keys(username)
         self.browser.find_element_by_id('pass').send_keys(password)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('login_form').submit()
 
         try:
             yield
         finally:
-            self.browser.get(self.url('/logout/?redirect=/'))
-            self.wait.until(lambda _: self.browser.current_url ==
-                            home_page_url)
-            self.wait_for_page_loaded()
+            # Wait until there are no more pending requests to avoid races
+            # where those requests return 401. Navigate to about:blank just for
+            # good measure and to enforce that there are two URL changes.
+            self._wait_for_page_loaded()
+            with self.page_transition():
+                self.browser.get('about:blank')
+            with self.page_transition():
+                self.browser.get(self.url('/logout/?redirect=/'))
+            assert self.browser.current_url == home_page_url, (
+                'Invalid URL redirect. Expected %s, got %s' % (
+                    home_page_url, self.current.browser_url))
 
+    @util.no_javascript_errors()
+    @util.annotate
     def register_user(self, user, passw):
         '''Creates user :user and logs out when out of scope.'''
 
         # Home page
         home_page_url = self.url('/')
-        self.browser.get(home_page_url)
-        self.wait_for_page_loaded()
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[contains(@href, "/login/")]'))).click()
+        with self.page_transition():
+            self.browser.get('about:blank')
+        with self.page_transition():
+            self.browser.get(home_page_url)
+        with self.page_transition():
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self.browser.find_element_by_id('reg_username').send_keys(user)
         self.browser.find_element_by_id('reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
         self.browser.find_element_by_id('reg_pass').send_keys(passw)
         self.browser.find_element_by_id('reg_pass2').send_keys(passw)
-        with self.ajax_page_transition():
+        with self.page_transition():
             self.browser.find_element_by_id('register-form').submit()
 
         # Home screen
-        self.browser.get(self.url('/logout/?redirect=/'))
-        self.wait.until(lambda _: self.browser.current_url == home_page_url)
-        self.wait_for_page_loaded()
+        with self.page_transition():
+            self.browser.get('about:blank')
+        with self.page_transition():
+            self.browser.get(self.url('/logout/?redirect=/'))
+        assert self.browser.current_url == home_page_url, (
+            'Invalid URL redirect. Expected %s, got %s' % (
+                home_page_url, self.current.browser_url))
+
+    def annotate(self, message, level=logging.INFO):
+        '''Add an annotation to the run's log.'''
+
+        if util.CI:
+            self.browser.execute_script("sauce:context=%s" % message)
+        logging.log(level, message)
 
     def update_run_score(self, run_id, verdict, score):
         '''Set verdict and score of specified run'''
 
-        database_utils.mysql(
+        util.database_utils.mysql(
             ('''
             UPDATE
                 `Runs`
@@ -229,7 +289,7 @@ class Driver(object):
                                verdict='AC', score=1):
         '''Set verdict and score of latest run'''
 
-        run_id = database_utils.mysql(
+        run_id = util.database_utils.mysql(
             ('''
             SELECT
                 MAX(`r`.`run_id`)
@@ -254,7 +314,7 @@ class Driver(object):
                                 verdict='AC', score=1):
         '''Set verdict and score of latest run'''
 
-        run_id = database_utils.mysql(
+        run_id = util.database_utils.mysql(
             ('''
             SELECT
                 MAX(`r`.`run_id`)
@@ -275,6 +335,61 @@ class Driver(object):
             dbname='omegaup', auth=self.mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
+    def create_user(self, admin=False):
+        '''Create a user, with optional admin privileges.'''
+
+        if admin:
+            username = 'admin_%s' % self.generate_id()
+            # password = 'omegaup'
+            password = (
+                '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a')
+        else:
+            username = 'user_%s' % self.generate_id()
+            # password = 'user'
+            password = (
+                '$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy')
+
+        # Add the user directly to the database to make this fast and avoid UI
+        # flake.
+        user_id = util.database_utils.mysql(
+            ('''
+            INSERT INTO
+                Users(`username`, `password`, `verified`, `name`)
+            VALUES
+                ('%s', '%s', 1, '%s');
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username),
+            dbname='omegaup', auth=self.mysql_auth())
+        identity_id = util.database_utils.mysql(
+            ('''
+            INSERT INTO
+                Identities(`username`, `password`, `name`, `user_id`)
+            VALUES
+                ('%s', '%s', '%s', %s);
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        util.database_utils.mysql(
+            ('''
+            UPDATE
+                Users
+            SET
+                main_identity_id = %s
+            WHERE
+                user_id = %s;
+            ''') % (identity_id, user_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        if admin:
+            util.database_utils.mysql(
+                ('''
+                INSERT INTO
+                    User_Roles(`user_id`, `role_id`, `acl_id`)
+                VALUES
+                    (%s, 1, 1);
+                ''') % (user_id,),
+                dbname='omegaup', auth=self.mysql_auth())
+        return username
+
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
@@ -289,7 +404,7 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if 'driver' not in pyfuncitem.funcargs:
         return
-    if CI:
+    if util.CI:
         # When running in CI, we have movies, screenshots and logs in
         # Sauce Labs.
         return
@@ -318,13 +433,13 @@ def pytest_addoption(parser):
 
     parser.addoption('--browser', action='append', type=str, dest='browsers',
                      help='The browsers that the test will run against')
-    parser.addoption('--url', default=('http://localhost/' if not CI else
+    parser.addoption('--url', default=('http://localhost/' if not util.CI else
                                        'http://localhost:8000/'),
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
                      dest='headless', help='Show the browser window')
     parser.addoption('--mysql-config-file',
-                     default=database_utils.default_config_file(),
+                     default=util.database_utils.default_config_file(),
                      help='.my.cnf file that stores credentials')
     parser.addoption('--username', default='root', help='MySQL root username')
     parser.addoption('--password', default='omegaup', help='MySQL password')
@@ -344,7 +459,7 @@ def pytest_generate_tests(metafunc):
 def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
-    if CI:
+    if util.CI:
         capabilities = {
             'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -403,27 +518,34 @@ def _get_browser(request, browser_name):
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
-    browser = _get_browser(request, browser_name)
-    browser.implicitly_wait(_DEFAULT_TIMEOUT)
-    if browser_name != 'firefox':
-        # Ensure that getting browser logs is supported in non-Firefox
-        # browsers.
-        assert isinstance(browser.get_log('browser'), list)
-    wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
-                         poll_frequency=0.1)
-
     try:
-        yield Driver(browser, wait, request.config.option.url,
-                     request.config.option)
-    finally:
-        if CI:
+        browser = _get_browser(request, browser_name)
+        if util.CI:
             print(('\n\nYou can see the report at '
                    'https://saucelabs.com/beta/tests/%s/commands') %
                   browser.session_id, file=sys.stderr)
-            try:
-                browser.execute_script("sauce:job-result=%s" %
-                                       str(_SUCCESS).lower())
-            except WebDriverException:
-                # Test is done. Just ignore the error.
-                pass
-        browser.quit()
+
+        browser.implicitly_wait(_DEFAULT_TIMEOUT)
+        if browser_name != 'firefox':
+            # Ensure that getting browser logs is supported in non-Firefox
+            # browsers.
+            assert isinstance(browser.get_log('browser'), list)
+        wait = WebDriverWait(browser, _DEFAULT_TIMEOUT,
+                             poll_frequency=0.1)
+
+        try:
+            yield Driver(browser, wait, request.config.option.url,
+                         os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
+                         request.config.option)
+        finally:
+            if util.CI:
+                try:
+                    browser.execute_script("sauce:job-result=%s" %
+                                           str(_SUCCESS).lower())
+                except WebDriverException:
+                    # Test is done. Just ignore the error.
+                    pass
+            browser.quit()
+    except:
+        logging.exception('Failed to initialize')
+        raise

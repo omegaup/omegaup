@@ -53,7 +53,7 @@ def update_user_rank(cur):
             FROM
               Runs r
             WHERE
-              r.verdict = 'AC' AND r.test = 0
+              r.verdict = 'AC' AND r.type = 'normal'
         ) AS up
         INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
