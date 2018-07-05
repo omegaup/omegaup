@@ -87,6 +87,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
                 'git_object_id' => $intro_details['git_object_id'],
                 'statement_type' => $intro_details['statement_type'],
             ]));
+            $this->fail('Should have thrown an InvalidDatabaseOperationException');
         } catch (InvalidDatabaseOperationException $e) {
             // OK!
         }
