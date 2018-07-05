@@ -31,6 +31,8 @@ if ($intro_details['shouldShowResults'] ||
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
         'privacyStatementMarkdown' => $intro_details['privacy_statement_markdown'],
+        'gitObjectId' => $intro_details['git_object_id'],
+        'statementType' => $intro_details['statement_type'],
     ]);
 
     $smarty->display('../templates/arena.course.intro.tpl');

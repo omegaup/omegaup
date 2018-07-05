@@ -364,11 +364,17 @@ class ContestController extends Controller {
                 $r['current_user_id'] = $session['user']->user_id;
                 $r['current_identity_id'] = $session['identity']->identity_id;
 
+                // Privacy Statement Information
                 $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
                     $session['user']->language_id,
                     'contest',
                     $result['requests_user_information']
                 );
+                if (!is_null($result['privacy_statement_markdown'])) {
+                    $statement_type = "contest_{$result['requests_user_information']}_consent";
+                    $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
+                    $result['statement_type'] = $statement_type;
+                }
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
@@ -541,15 +547,16 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($needsInformation['requests_user_information'] != 'no') {
-                $privacystatement_id = PrivacyStatementConsentLogDAO::saveLog(
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['current_identity_id'],
-                    'contest_' . $needsInformation['requests_user_information'] . '_consent'
+                    $privacystatement_id
                 );
 
                 ProblemsetIdentitiesDAO::updatePrivacyStatementConsent(new ProblemsetIdentities([
                     'identity_id' => $r['current_identity_id'],
                     'problemset_id' => $r['contest']->problemset_id,
-                    'privacystatement_consent_id' => $privacystatement_id
+                    'privacystatement_consent_id' => $privacystatement_consent_id
                 ]));
             }
 

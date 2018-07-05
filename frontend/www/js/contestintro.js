@@ -6,7 +6,7 @@ omegaup.OmegaUp.on('ready', function() {
     var markdownConverter = omegaup.UI.markdownConverter();
     var payload = JSON.parse(document.getElementById('payload').innerText);
     document.getElementsByClassName('requests-user-information')[0].innerHTML =
-        markdownConverter.makeHtml(payload);
+        markdownConverter.makeHtml(payload['markdown']);
   }
 
   $('#start-contest-form')
@@ -20,7 +20,9 @@ omegaup.OmegaUp.on('ready', function() {
                              contest_alias: contestAlias,
                              share_user_information:
                                  $('input[name=share-user-information]:checked')
-                                     .val()
+                                     .val(),
+                             git_object_id: payload['gitObjectId'],
+                             statement_type: payload['statementType']
                            })
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);

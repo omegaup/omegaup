@@ -22,6 +22,8 @@ OmegaUp.on('ready', function() {
             API.Course.addStudent({
                         'course_alias': coursePayload.alias,
                         'usernameOrEmail': coursePayload.currentUsername,
+                        'statement_type': coursePayload.statementType,
+                        'git_object_id': coursePayload.gitObjectId,
                         'share_user_information': ev.shareUserInformation
                       })
                 .then(function(data) {

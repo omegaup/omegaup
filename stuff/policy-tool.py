@@ -39,10 +39,6 @@ def _latest():
         return
     for statement_type in os.listdir(privacy_path):
         statement_path = os.path.join(git_privacy_path, statement_type)
-        print(statement_path)
-        print(subprocess.check_output(
-            ['/usr/bin/git', 'ls-tree', '-d', 'HEAD^{tree}', statement_path],
-            cwd=OMEGAUP_ROOT, universal_newlines=True).strip().split())
         git_object_id = subprocess.check_output(
             ['/usr/bin/git', 'ls-tree', '-d', 'HEAD^{tree}', statement_path],
             cwd=OMEGAUP_ROOT, universal_newlines=True).strip().split()[2]

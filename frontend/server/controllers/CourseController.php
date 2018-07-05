@@ -1039,16 +1039,17 @@ class CourseController extends Controller {
             // Only users adding themselves are saved in consent log
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && $r['course']->requests_user_information != 'no') {
-                $privacystatement_id = PrivacyStatementConsentLogDAO::saveLog(
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['identity']->identity_id,
-                    'course_' . $r['course']->requests_user_information . '_consent'
+                    $privacystatement_id
                 );
 
                 GroupsIdentitiesDAO::save(new GroupsIdentities([
                     'group_id' => $r['course']->group_id,
                     'identity_id' => $r['identity']->identity_id,
                     'share_user_information' => $r['share_user_information'],
-                    'privacystatement_consent_id' => $privacystatement_id
+                    'privacystatement_consent_id' => $privacystatement_consent_id
                 ]));
             }
 
@@ -1318,11 +1319,17 @@ class CourseController extends Controller {
         $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
 
+        // Privacy Statement Information
         $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
             $user_session->language_id,
             'course',
             $result['requests_user_information']
         );
+        if (!is_null($result['privacy_statement_markdown'])) {
+            $statement_type = "course_{$result['requests_user_information']}_consent";
+            $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
+            $result['statement_type'] = $statement_type;
+        }
 
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;

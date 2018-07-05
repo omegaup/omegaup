@@ -146,7 +146,7 @@ ALTER TABLE `PrivacyStatement_Consent_Log`
   MODIFY COLUMN `privacystatement_consent_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   DROP PRIMARY KEY,
   ADD PRIMARY KEY (`privacystatement_consent_id`),
-  ADD UNIQUE KEY `identity_privacy` (`privacystatement_consent_id`, `identity_id`, `privacystatement_id`),
+  ADD UNIQUE KEY `identity_privacy` (`identity_id`, `privacystatement_id`),
   ADD CONSTRAINT `fk_pci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Problemset_Identities table

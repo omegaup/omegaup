@@ -398,9 +398,8 @@ CREATE TABLE `PrivacyStatement_Consent_Log` (
   `privacystatement_id` int(11) NOT NULL COMMENT 'Id del documento de privacidad',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario acepta las nuevas políticas',
   PRIMARY KEY (`privacystatement_consent_id`),
-  UNIQUE KEY `identity_privacy` (`privacystatement_consent_id`,`identity_id`,`privacystatement_id`),
+  UNIQUE KEY `identity_privacy` (`identity_id`,`privacystatement_id`),
   KEY `fk_pcp_privacystatement_id` (`privacystatement_id`),
-  KEY `fk_pci_identity_id` (`identity_id`),
   CONSTRAINT `fk_pci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pcp_privacystatement_id` FOREIGN KEY (`privacystatement_id`) REFERENCES `PrivacyStatements` (`privacystatement_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Log para auditar las identidades que han aceptado los documentos de privacidad de omegaUp.';
