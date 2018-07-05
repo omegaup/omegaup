@@ -14,3 +14,4 @@ define('RUNS_PATH', '/tmp/omegaup/submissions');
 define('GRADE_PATH', '/tmp/omegaup/grade');
 define('PROBLEMS_GIT_PATH', '/tmp/omegaup/problems.git');
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+define('OMEGAUP_GRADER_FAKE', true);

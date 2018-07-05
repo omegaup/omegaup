@@ -406,7 +406,8 @@ CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
   `type` enum('privacy_policy') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
-  PRIMARY KEY (`privacystatement_id`)
+  PRIMARY KEY (`privacystatement_id`),
+  UNIQUE KEY `type_git_object_id` (`type`,`git_object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -731,8 +732,8 @@ CREATE TABLE `Runs` (
   `contest_score` double DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
-  `test` tinyint(1) NOT NULL DEFAULT '0',
   `judged_by` char(32) DEFAULT NULL,
+  `type` enum('normal','test','disqualified') DEFAULT 'normal',
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_alias` (`guid`),
   KEY `problem_id` (`problem_id`),
@@ -773,15 +774,16 @@ CREATE TABLE `States` (
 CREATE TABLE `Submission_Log` (
   `problemset_id` int(11) DEFAULT NULL,
   `run_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `ip` int(10) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`run_id`),
-  KEY `fk_slu_user_id` (`user_id`),
   KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_sli_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_slp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_slu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

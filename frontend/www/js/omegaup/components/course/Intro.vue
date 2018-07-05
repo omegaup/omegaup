@@ -12,11 +12,14 @@
          v-if="requestsUserInformation == 'optional'"></p>
       <template v-if="requestsUserInformation == 'required'">
         <p v-html="T.courseUserInformationRequired"></p>
-      </template><label><input type="radio"
-             v-bind:value="1"
-             v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
-             v-bind:value="0"
-             v-model="shareUserInformation"> {{ T.wordsNo }}</label>
+      </template>
+      <template v-if="requestsUserInformation != 'no'">
+        <label><input type="radio"
+               v-bind:value="1"
+               v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
+               v-bind:value="0"
+               v-model="shareUserInformation"> {{ T.wordsNo }}</label>
+      </template>
       <div class="text-center">
         <form v-on:submit.prevent="">
           <button class="btn btn-primary btn-lg"

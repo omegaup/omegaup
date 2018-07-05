@@ -72,7 +72,7 @@ class ProblemsetController extends Controller {
      */
     public static function apiDetails(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
-        ProblemsetController::validateDetails($r);
+        $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiDetails(
@@ -103,27 +103,24 @@ class ProblemsetController extends Controller {
      */
     public static function apiScoreboard(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
-        ProblemsetController::validateDetails($r);
+        $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
-            $scoreboard = ContestController::apiScoreboard(
+            return ContestController::apiScoreboard(
                 new Request([
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
-            $scoreboard = CourseController::apiAssignmentScoreboard(
+            return CourseController::apiAssignmentScoreboard(
                 new Request([
                     'course_alias' => $r['problemset']['course'],
                     'assignment_alias' => $r['problemset']['assignment'],
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Interview') {
-            // There in no scoreboard for interviews yet
-            return [];
         }
-
-        return $scoreboard;
+        // There in no scoreboard for interviews yet
+        return [];
     }
 
     /**
@@ -136,19 +133,17 @@ class ProblemsetController extends Controller {
      */
     public static function apiScoreboardEvents(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
-        ProblemsetController::validateDetails($r);
+        $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] != 'Contest') {
             // Not implemented in courses nor interviews yet
             return ['events' => []];
-        } else {
-            $scoreboardEvents = ContestController::apiScoreboardEvents(
-                new Request([
-                    'contest_alias' => $r['problemset']['contest_alias']
-                ])
-            );
         }
-        return $scoreboardEvents;
+        return ContestController::apiScoreboardEvents(
+            new Request([
+                'contest_alias' => $r['problemset']['contest_alias']
+            ])
+        );
     }
 
     /**
@@ -156,7 +151,7 @@ class ProblemsetController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    public static function validateDetails(Request $r) {
+    public static function wrapRequest(Request $r) {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
 
         try {
