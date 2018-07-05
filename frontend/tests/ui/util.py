@@ -173,7 +173,7 @@ def is_message_whitelisted(message, message_whitelist):
 
     quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
     for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if whitelisted_message in quoted_string:
+        if quoted_string == whitelisted_message:
             return True
 
     return False
