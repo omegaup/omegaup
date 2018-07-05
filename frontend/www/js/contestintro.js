@@ -14,16 +14,26 @@ omegaup.OmegaUp.on('ready', function() {
         ev.preventDefault();
         $('#request-access-form').hide();
         $('#start-contest-submit').prop('disabled', true);
+        var request = {
+          contest_alias: contestAlias,
+          share_user_information:
+              $('input[name=share-user-information]:checked').val()
+        };
+        var userInformationRequest = {};
+        if ($('.requests-user-information').length) {
+          var gitObjectId = JSON.parse(
+              document.getElementById('payload').innerText)['gitObjectId'];
+          var statementType = JSON.parse(
+              document.getElementById('payload').innerText)['statementType'];
+          userInformationRequest = {
+            git_object_id: gitObjectId,
+            statement_type: statementType
+          };
+        }
+        $.extend(request, userInformationRequest);
 
         // Explicitly join the contest.
-        omegaup.API.Contest.open({
-                             contest_alias: contestAlias,
-                             share_user_information:
-                                 $('input[name=share-user-information]:checked')
-                                     .val(),
-                             git_object_id: payload['gitObjectId'],
-                             statement_type: payload['statementType']
-                           })
+        omegaup.API.Contest.open(request)
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);
       });
