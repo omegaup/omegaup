@@ -19,6 +19,11 @@ function _call(url, transform, defaultParams) {
           dfd.resolve(data);
         })
         .fail(function(jqXHR) {
+          if (jqXHR.status == 499 || jqXHR.readyState != 4) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
+            return;
+          }
           var errorData;
           try {
             if (jqXHR.responseText) {
@@ -500,6 +505,8 @@ export default {
   },
 
   User: {
+    acceptPrivacyPolicy: _call('/api/user/acceptPrivacyPolicy'),
+
     addExperiment: _call('/api/user/addexperiment/'),
 
     addGroup: _call('/api/user/addgroup/'),

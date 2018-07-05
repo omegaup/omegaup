@@ -53,16 +53,30 @@ class UsersDAO extends UsersDAOBase {
 
     public static function FindByUsernameOrName($usernameOrName) {
         global  $conn;
-        $sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
-        $args = [$usernameOrName, $usernameOrName];
+        $sql = "
+            SELECT
+                u.*
+            FROM
+                Users u
+            WHERE
+                u.username = ? OR u.name = ?
+            UNION DISTINCT
+            SELECT DISTINCT
+                u.*
+            FROM
+                Users u
+            WHERE
+                u.username LIKE CONCAT('%', ?, '%') OR
+                u.username LIKE CONCAT('%', ?, '%')
+            LIMIT 10";
+        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
         $rs = $conn->Execute($sql, $args);
-        $ar = [];
-        foreach ($rs as $foo) {
-            $bar =  new Users($foo);
-            array_push($ar, $bar);
+        $result = [];
+        foreach ($rs as $user_data) {
+            array_push($result, new Users($user_data));
         }
-        return $ar;
+        return $result;
     }
 
     public static function FindResetInfoByEmail($email) {

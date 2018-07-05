@@ -168,24 +168,23 @@ omegaup.OmegaUp.on('ready', function() {
         return contest;
       })
       .always(function(contest) {
-        // Feel free to re-write this if you have the time.
-        if (contest.admission_mode == 'registration') {
-          if (contest.user_registration_requested) {
-            if (contest.user_registration_answered) {
-              if (contest.user_registration_accepted) {
-                readyToStart(contest);
-              } else {
-                $('#registration_denied').removeClass('hidden');
-              }
-            } else {
-              $('#registration_pending').removeClass('hidden');
-            }
-          } else {
-            $('#must_register').removeClass('hidden');
-          }
-        } else {
-          readyToStart(contest);
-        }
         $('#intro-page').removeClass('hidden');
+        if (contest.admission_mode != 'registration') {
+          readyToStart(contest);
+          return;
+        }
+        if (!contest.user_registration_requested) {
+          $('#must_register').removeClass('hidden');
+          return;
+        }
+        if (!contest.user_registration_answered) {
+          $('#registration_pending').removeClass('hidden');
+          return;
+        }
+        if (!contest.user_registration_accepted) {
+          $('#registration_denied').removeClass('hidden');
+          return;
+        }
+        readyToStart(contest);
       });
 });
