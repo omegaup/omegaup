@@ -77,11 +77,6 @@ export default {
             T: T
         }
     },
-    mounted: function() {
-        console.log(this.problems)
-        console.log(this.contest)
-        console.log(this.users);
-    },
     components: {
         'contest-new-form': ContestNewForm,
         'contest-add-problem': ContestAddProblem,
