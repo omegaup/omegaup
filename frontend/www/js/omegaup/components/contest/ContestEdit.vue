@@ -4,7 +4,7 @@
         <h1><span>{{T.frontPageLoading}}</span> <small></small></h1>
     </div>
 
-    <ul class="nav nav-tabs nav-justified" id="sections">
+    <ul class="nav nav-tabs nav-justified">
         <li v-on:click="showTab = 'new_form'" class="active"><a data-toggle="tab">{{T.contestEdit}}</a></li>
         <li v-on:click="showTab = 'problems'"><a data-toggle="tab">{{T.wordsAddProblem}}</a></li>
         <li v-on:click="showTab = 'publish'"><a data-toggle="tab">{{T.makePublic}}</a></li>

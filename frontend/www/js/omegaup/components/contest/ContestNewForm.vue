@@ -121,7 +121,7 @@
 					<div class="form-group col-md-6">
                         <label>{{T.wordsLanguage}}s</label>
 						<br>
-						<select id="languages" name="languages" class="form-control" multiple="multiple">
+						<select class="form-control" multiple="multiple">
 							{foreach item=language from=$LANGUAGES}
 							<option value="{$language}">{$language}</option>
 							{/foreach}
