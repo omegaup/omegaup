@@ -1471,11 +1471,14 @@ class UserController extends Controller {
                 $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             }
             foreach ($coders as $c) {
+                $userInfo = UsersDAO::FindByUsername($c['username']);
+                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
                 $response['coders'][] = [
                     'username' => $c['username'],
                     'country_id' => $c['country_id'],
                     'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time']
+                    'date' => $c['time'],
+                    'classname' => $classname,
                 ];
             }
         } catch (Exception $e) {
