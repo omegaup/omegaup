@@ -1,20 +1,25 @@
 <template>
   <div>
     <div class="page-header">
-      <h1><span>{{T.frontPageLoading}}</span> <small></small></h1>
+      <h1>{{T.contestEdit + ' ' + contest.title}} <small><a v-bind:href=
+      "`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li class="active"
+          v-if="!isVirtual"
           v-on:click="showTab = 'new_form'">
         <a data-toggle="tab">{{T.contestEdit}}</a>
       </li>
-      <li v-on:click="showTab = 'problems'">
+      <li v-if="!isVirtual"
+          v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{T.wordsAddProblem}}</a>
       </li>
-      <li v-on:click="showTab = 'publish'">
+      <li v-if="!isVirtual"
+          v-on:click="showTab = 'publish'">
         <a data-toggle="tab">{{T.makePublic}}</a>
       </li>
-      <li v-on:click="showTab = 'contestants'">
+      <li v-bind:class="{active: isVirtual}"
+          v-on:click="showTab = 'contestants'">
         <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
       </li>
       <li v-on:click="showTab = 'admins'">
@@ -23,10 +28,12 @@
       <li v-on:click="showTab = 'group_admins'">
         <a data-toggle="tab">{{T.omegaupTitleContestAddGroupAdmin}}</a>
       </li>
-      <li v-on:click="showTab = 'links'">
+      <li v-if="!isVirtual"
+          v-on:click="showTab = 'links'">
         <a data-toggle="tab">{{T.showLinks}}</a>
       </li>
-      <li v-on:click="showTab = 'clone'">
+      <li v-if="!isVirtual"
+          v-on:click="showTab = 'clone'">
         <a data-toggle="tab">{{T.courseEditClone}}</a>
       </li>
     </ul>
@@ -88,8 +95,9 @@ export default {
     groupAdmins: Array
   },
   data: function() {
-    return { showTab: "new_form", T: T }
+    return { showTab: this.isVirtual ? "contestants" : "new_form", T: T }
   },
+  methods: {isVirtual: function() { return this.contest.rerun_id != 0;}},
   components: {
     'contest-new-form': ContestNewForm,
     'contest-add-problem': ContestAddProblem,
