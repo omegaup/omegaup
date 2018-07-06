@@ -42,28 +42,28 @@ UPDATE
 SET
     `from_admission_mode` = 'public'
 WHERE
-    `from_admission_mode` = 1;
+    `from_admission_mode` = '1';
 
 UPDATE
     `Contest_Log`
 SET
     `to_admission_mode` = 'public'
 WHERE
-    `to_admission_mode` = 1;
+    `to_admission_mode` = '1';
 
 UPDATE
     `Contest_Log`
 SET
     `from_admission_mode` = 'private'
 WHERE
-    `from_admission_mode` = 0;
+    `from_admission_mode` = '0';
 
 UPDATE
     `Contest_Log`
 SET
     `to_admission_mode` = 'private'
 WHERE
-    `to_admission_mode` = 0;
+    `to_admission_mode` = '0';
 
 ALTER TABLE `Contest_Log`
     MODIFY COLUMN `from_admission_mode` enum('private','registration','public') NOT NULL,
