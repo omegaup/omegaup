@@ -37,7 +37,6 @@
 import {T} from '../../omegaup.js';
 import AutocompleteGroupAdmins from '../AutocompleteGroupAdmins.vue';
 
-
 export default {
   props: {groupAdmins: Array},
   data: function() {
