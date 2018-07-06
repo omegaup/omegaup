@@ -72,8 +72,7 @@ OmegaUp.on('ready', function() {
                                                  points: ev.point,
                                                })
                                         .then(function(response) {
-                                          UI.success(
-                                              'Problem successfully added!');
+                                          UI.success(T.problemSuccessfullyAdded);
                                         })
                                         .fail(UI.apiError);
                                   },
@@ -83,8 +82,7 @@ OmegaUp.on('ready', function() {
                                                  problem_alias: problem
                                                })
                                         .then(function(response) {
-                                          UI.success(
-                                              'Problem successfully removed!');
+                                          UI.success(T.problemSuccessfullyRemoved);
                                         })
                                         .fail(UI.apiError);
                                   },

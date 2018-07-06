@@ -545,6 +545,8 @@ omegaup.OmegaUp.loadTranslations({
 	problemNotInContest: "Problema n\u00e3o existe neste concurso",
 	problemNotPartOfAssignment: "Problema n\u00e3o faz parte da designa\u00e7\u00e3o.",
 	problemProvidedDoesNotExist: "Problema n\u00e3o existe",
+	problemSuccessfullyAdded: "Problema adicionado com sucesso",
+	problemSuccessfullyRemoved: "Problema removido com sucesso",
 	problemTitleExists: "J\u00e1 existe este t\u00edtulo de problema. Por favor, tente um diferente.",
 	problemTopic2Sat: "2-Sat",
 	problemTopicArrays: "Arrays",

@@ -545,6 +545,8 @@ omegaup.OmegaUp.loadTranslations({
 	problemNotInContest: "(Pr0b13m d035 n07 3xi57 in c0n7357.)",
 	problemNotPartOfAssignment: "(Th3 pr0b13m i5 n07 par7 0f 7h3 a55ignm3n7.)",
 	problemProvidedDoesNotExist: "(Pr0b13m d035 n07 3xi57.)",
+	problemSuccessfullyAdded: "(Pr0b13m 5ucc355fu11y add3d)",
+	problemSuccessfullyRemoved: "(Pr0b13m 5ucc355fu11y r3m0v3d)",
 	problemTitleExists: "(Pr0b13m 7i713 a1r3ady 3xi575. P13a53 7ry a diff3r3n7 0n3.)",
 	problemTopic2Sat: "(2-Sa7)",
 	problemTopicArrays: "(Array5)",

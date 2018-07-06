@@ -542,6 +542,8 @@
 	"problemNotInContest": "Problem does not exist in contest.",
 	"problemNotPartOfAssignment": "The problem is not part of the assignment.",
 	"problemProvidedDoesNotExist": "Problem does not exist.",
+	"problemSuccessfullyAdded": "Problem successfully added",
+	"problemSuccessfullyRemoved": "Problem successfully removed",
 	"problemTitleExists": "Problem title already exists. Please try a different one.",
 	"problemTopic2Sat": "2-Sat",
 	"problemTopicArrays": "Arrays",
