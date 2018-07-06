@@ -134,7 +134,7 @@ class ContestsDAO extends ContestsDAOBase {
                                 finish_time as original_finish_time,
                                 UNIX_TIMESTAMP (start_time) as start_time,
                                 UNIX_TIMESTAMP (finish_time) as finish_time,
-                                public,
+                                admission_mode,
                                 alias,
                                 recommended,
                                 window_length,
@@ -181,7 +181,7 @@ class ContestsDAO extends ContestsDAOBase {
         ON
             a.acl_id = c.acl_id
         WHERE
-            public = 0 and a.owner_id = ?;';
+            admission_mode = \'private\' and a.owner_id = ?;';
         $params = [$user->user_id];
 
         global $conn;
@@ -401,7 +401,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Contests
             WHERE
                 $recommended_check  AND $end_check AND $query_check
-                AND `public` = 1
+                AND `admission_mode` != 'private'
             ORDER BY
                 `last_updated` DESC,
                 `recommended` DESC,
@@ -489,7 +489,7 @@ class ContestsDAO extends ContestsDAOBase {
                     ON
                         ACLs.owner_id = Identities.user_id
                     WHERE
-                        Contests.public = 0 AND Identities.identity_id = ? AND
+                        Contests.admission_mode = 'private' AND Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $identity_id;
@@ -512,7 +512,7 @@ class ContestsDAO extends ContestsDAOBase {
                     ON
                         Contests.problemset_id = Problemset_Identities.problemset_id
                     WHERE
-                        Contests.public = 0 AND Problemset_Identities.identity_id = ? AND
+                        Contests.admission_mode = 'private' AND Problemset_Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $identity_id;
@@ -539,7 +539,7 @@ class ContestsDAO extends ContestsDAOBase {
                      ON
                          Identities.user_id = User_Roles.user_id
                      WHERE
-                         Contests.public = 0 AND
+                         Contests.admission_mode = 'private' AND
                          Identities.identity_id = ? AND
                          User_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
@@ -567,7 +567,7 @@ class ContestsDAO extends ContestsDAOBase {
                      ON
                          Groups_Identities.group_id = Group_Roles.group_id
                      WHERE
-                         Contests.public = 0 AND
+                         Contests.admission_mode = 'private' AND
                          Groups_Identities.identity_id = ? AND
                          Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
@@ -588,7 +588,7 @@ class ContestsDAO extends ContestsDAOBase {
                      FROM
                          Contests
                      WHERE
-                         public = 1 AND $recommended_check AND $end_check AND $query_check
+                         admission_mode <> 'private' AND $recommended_check AND $end_check AND $query_check
                  )
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
@@ -636,9 +636,9 @@ class ContestsDAO extends ContestsDAOBase {
                SELECT
                     $columns
                 FROM
-                    Contests
+                    `Contests`
                 WHERE
-                    Public = 1
+                    `admission_mode` <> 'private'
                 AND $recommended_check
                 AND $end_check
                 AND $query_check
