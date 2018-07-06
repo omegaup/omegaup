@@ -43,13 +43,12 @@ let UI = {
   },
 
   contestUpdated: function(data) {
-    if (data.status == "ok") {
-        UI.success(omegaup.T.contestEditContestEdited + 
-                 ' <a href="/arena/' + 
-                 $('.new_contest_form #alias').val() + '">' + 
+    if (data.status == 'ok') {
+      UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
+                 $('.new_contest_form #alias').val() + '">' +
                  T.contestEditGoToContest + '</a>');
     } else {
-        UI.error(data.error || 'error');
+      UI.error(data.error || 'error');
     }
   },
 

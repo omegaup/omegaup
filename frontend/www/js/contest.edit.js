@@ -11,7 +11,6 @@ omegaup.OmegaUp.on('ready', function() {
         $(this).tab('show');
       });
 
-
   omegaup.API.Contest.adminDetails({contest_alias: contestAlias})
       .then(function(contest) {
         $('.page-header h1 span')
