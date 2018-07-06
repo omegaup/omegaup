@@ -67,7 +67,7 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-@util.no_javascript_errors()
+@util.no_javascript_errors(path_whitelist=('/js/dist/omegaup.js',))
 @util.annotate
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''

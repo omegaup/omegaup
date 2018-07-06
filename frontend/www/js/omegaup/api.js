@@ -505,6 +505,8 @@ export default {
   },
 
   User: {
+    acceptPrivacyPolicy: _call('/api/user/acceptPrivacyPolicy'),
+
     addExperiment: _call('/api/user/addexperiment/'),
 
     addGroup: _call('/api/user/addgroup/'),
