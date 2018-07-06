@@ -10,7 +10,7 @@ export default {
         }
     },
     mounted: function() {
-        UI.problemTypeahead($(this.$el));
+        UI.userTypeahead($(this.$el));
     },
     methods: {
         updateInput() {

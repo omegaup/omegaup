@@ -1,54 +1,87 @@
 <template>
-<div class="panel panel-primary">
-    <div class="panel-body">
-        <form class="form" id="add-contestant-form">
-            <div class="form-group">
-                <label for="username-contestant">{#wordsUser#}</label>
-                <input id="username-contestant" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
-            </div>
+<div>
+    <div class="panel panel-primary">
+        <div class="panel-body">
+            <form class="form" v-on:submit.prevent="onSubmit">
+                <div class="form-group">
+                    <label>{{T.wordsUser}}</label>
+                    <autocomplete-user v-model="contestant"></autocomplete-user>
+                </div>
 
-            <button class="btn btn-primary user-add-single" type="submit">{#contestAdduserAddUser#}</button>
+                <button class="btn btn-primary user-add-single" type="submit">{{T.contestAdduserAddUser}}</button>
 
-            <hr>
+                <hr>
 
-            <div class="form-group">
-                <label for="username-contestants">{#wordsMultipleUser#}</label>
-                <textarea name="usernames" rows="4" class="form-control"></textarea>
-            </div>
+                <div class="form-group">
+                    <label>{{T.wordsMultipleUser}}</label>
+                    <textarea rows="4" class="form-control" v-model="contestants"></textarea>
+                </div>
 
-            <button class="btn btn-primary user-add-bulk" type="submit">{#contestAdduserAddUsers#}</button>
-        </form>
+                <button class="btn btn-primary user-add-bulk" type="submit">{{T.contestAdduserAddUsers}}</button>
+            </form>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <th>{{T.wordsUser}}</th>
+                <th>{{T.contestAdduserRegisteredUserTime}}</th>
+                <th>{{T.contestAdduserRegisteredUserDelete}}</th>
+            </thead>
+            <tbody>
+                <tr v-for="user in users">
+                    <td>
+                        <a v-bind:href="`/profile/${user.username}/`">{{user.username}}</a>
+                    </td>
+                    <td>{{user.access_time}}</td>
+                    <td><button type="button" class="close">x</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <table class="table table-striped">
-        <thead>
-            <th>{#wordsUser#}</th>
-            <th>{#contestAdduserRegisteredUserTime#}</th>
-            <th>{#contestAdduserRegisteredUserDelete#}</th>
-        </thead>
-        <tbody id="contest-users"></tbody>
-    </table>
-</div>
-
-<div class="panel panel-primary" id="requests">
-    <div class="panel-body">
-        {#pendingRegistrations#}
+    <div class="panel panel-primary">
+        <div class="panel-body">
+            {{T.pendingRegistrations}}
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>{{T.wordsUser}}</th>
+                <th>{{T.userEditCountry}}</th>
+                <th>{{T.requestDate}}</th>
+                <th>{{T.currentStatus}}</th>
+                <th>{{T.lastUpdate}}</th>
+                <th>{{T.contestAdduserAddContestant}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
-    <table id="user-requests-table"  >
-        <thead>
-        <tr>
-            <th>{#wordsUser#}</th>
-            <th>{#userEditCountry#}</th>
-            <th>{#requestDate#}</th>
-            <th>{#currentStatus#}</th>
-            <th>{#lastUpdate#}</th>
-            <th>{#contestAdduserAddContestant#}</th>
-        </tr>
-        </thead>
-    </table>
 </div>
 </template>
 <script>
+import {T} from '../../omegaup.js';
+import AutocompleteUser from '../AutocompleteUser.vue';
+
 export default {
+    props: {
+        users: Array
+    },
+    data: function() {
+        return {
+            T: T,
+            contestant: "",
+            contestants: ""
+        }
+    },
+    methods: {
+        onSubmit: function() {
+            this.$parent.$emit('addUser', this);
+        }
+    },
+    components: {
+        'autocomplete-user': AutocompleteUser
+    }
 }
 </script>

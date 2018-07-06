@@ -42,6 +42,17 @@ let UI = {
     return template;
   },
 
+  contestUpdated: function(data) {
+    if (data.status == "ok") {
+        UI.success(omegaup.T.contestEditContestEdited + 
+                 ' <a href="/arena/' + 
+                 $('.new_contest_form #alias').val() + '">' + 
+                 T.contestEditGoToContest + '</a>');
+    } else {
+        UI.error(data.error || 'error');
+    }
+  },
+
   displayStatus: function(message, type) {
     if ($('#status .message').length == 0) {
       console.error('Showing warning but there is no status div');
@@ -198,7 +209,8 @@ let UI = {
               },
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger("change");
   },
 
   problemTypeahead: function(elem, cb) {
@@ -221,7 +233,8 @@ let UI = {
               }
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger("change");
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {

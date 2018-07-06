@@ -1,17 +1,17 @@
 <template>
 <div class="panel panel-primary">
     <div class='panel-body'>
-        <form class='contest-publish-form'>
+        <form class='contest-publish-form' v-on:submit.prevent="onSubmit">
             <div class="form-group">
-                <label for="public">{#contestNewFormPublic#}</label>
-                <select name='public' id='public' class="form-control">
-                    <option value='0' selected="selected">{#wordsNo#}</option>
-                    <option value='1'>{#wordsYes#}</option>
+                <label>{{T.contestNewFormPublic}}</label>
+                <select v-model="public" class="form-control">
+                    <option value='0'>{{T.wordsNo}}</option>
+                    <option value='1'>{{T.wordsYes}}</option>
                 </select>
-                <p class="help-block">{#contestNewFormPublicDesc#}</p>
+                <p class="help-block">{{T.contestNewFormPublicDesc}}</p>
             </div>
 
-            <button class="btn btn-primary" type="submit">{#wordsSaveChanges#}</button>
+            <button class="btn btn-primary" type="submit">{{T.wordsSaveChanges}}</button>
         </form>
     </div>
 </div>
@@ -19,8 +19,19 @@
 <script>
 import {T} from '../../omegaup.js';
 export default {
+    props: {
+        contest: Object
+    },
     data: function() {
-        return {T: T}
+        return {
+            public: this.contest.public,
+            T: T
+        }
+    },
+    methods: {
+        onSubmit: function() {
+            this.$parent.$emit('updatePublic', this);
+        }
     }
 }
 </script>

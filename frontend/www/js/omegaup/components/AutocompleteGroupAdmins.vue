@@ -2,7 +2,7 @@
     <input class="typeahead form-control" ref="input" @change="updateInput()" :value="value">
 </template>
 <script>
-import {UI} from '../omegaup.js';
+import {UI, API} from '../omegaup.js';
 export default {
     data: function() {
         return {
@@ -10,7 +10,7 @@ export default {
         }
     },
     mounted: function() {
-        UI.problemTypeahead($(this.$el));
+        UI.typeahead($(this.$el), API.Group.list);
     },
     methods: {
         updateInput() {

@@ -182,7 +182,6 @@
 </template>
 <script>
 import {T} from '../../omegaup.js';
-import Vue from 'vue';
 import DateTimePicker from '../DateTimePicker.vue';
 export default {
     props: {

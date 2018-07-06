@@ -22,31 +22,32 @@
         </div>
 
         <div v-if="showTab === 'problems'" class="tab-pane active">
-            <contest-add-problem v-bind:problems="problems"></contest-add-problem>
+            <contest-add-problem
+                v-bind:problems="problems"></contest-add-problem>
         </div>
 
         <div v-if="showTab === 'publish'" class="tab-pane active">
-            <!--<contest-publish></contest-publish>-->
+            <contest-publish v-bind:contest="contest"></contest-publish>
         </div>
 
         <div v-if="showTab === 'contestants'" class="tab-pane active">
-            <!--<contest-contestants></contest-contestants>-->
+            <contest-contestant v-bind:users="users"></contest-contestant>
         </div>
 
         <div v-if="showTab === 'admins'" class="tab-pane active">
-            <!--<contest-admins></contest-admins>-->
+            <contest-admins v-bind:admins="admins"></contest-admins>
         </div>
 
         <div v-if="showTab === 'group_admins'" class="tab-pane active">
-            <!--<contest-group-admins></contest-group-admins>-->
+            <contest-group-admins v-bind:groupAdmins="groupAdmins"></contest-group-admins>
         </div>
 
         <div v-if="showTab === 'links'" class="tab-pane active">
-            <!--<contest-links></contest-links>-->
+            <contest-links v-bind:contest="contest"></contest-links>
         </div>
 
         <div v-if="showTab === 'clone'" class="tab-pane active">
-            <!--<contest-clone></contest-clone>-->
+            <contest-clone></contest-clone>
         </div>
     </div>
 </div>
@@ -55,10 +56,20 @@
 import {T} from '../../omegaup.js';
 import ContestNewForm from './ContestNewForm.vue';
 import ContestAddProblem from './ContestAddProblem.vue';
+import ContestPublish from './ContestPublish.vue';
+import ContestContestant from './ContestContestant.vue';
+import ContestAdmins from './ContestAdmins.vue';
+import ContestGroupAdmins from './ContestGroupAdmins.vue';
+import ContestLinks from './ContestLinks.vue';
+import ContestClone from './ContestClone.vue';
+
 export default {
     props: {
         contest: Object,
         problems: Array,
+        users: Array,
+        admins: Array,
+        groupAdmins: Array
     },
     data: function() {
         return {
@@ -66,9 +77,20 @@ export default {
             T: T
         }
     },
+    mounted: function() {
+        console.log(this.problems)
+        console.log(this.contest)
+        console.log(this.users);
+    },
     components: {
         'contest-new-form': ContestNewForm,
-        'contest-add-problem': ContestAddProblem
+        'contest-add-problem': ContestAddProblem,
+        'contest-publish': ContestPublish,
+        'contest-contestant': ContestContestant,
+        'contest-admins': ContestAdmins,
+        'contest-group-admins': ContestGroupAdmins,
+        'contest-links': ContestLinks,
+        'contest-clone': ContestClone
     }
 }
 </script>

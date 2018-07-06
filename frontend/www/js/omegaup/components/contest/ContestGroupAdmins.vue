@@ -1,26 +1,57 @@
 <template>
 <div class="panel panel-primary">
     <div class="panel-body">
-        <form class="form" id="add-group-admin-form">
+        <form class="form" v-on:submit.prevent="onSubmit">
             <div class="form-group">
-                <label for="groupalias-admin">{#wordsGroupAdmin#}</label>
-                <input id="groupalias-admin" name="alias" value="" type="text" size="20" class="form-control" autocomplete="off" />
+                <label>{{T.wordsGroupAdmin}}</label>
+                <autocomplete-group-admins v-model="groupName"></autocomplete-group-admins>
             </div>
 
-            <button class="btn btn-primary" type="submit">{#contestAddgroupAddGroup#}</button>
+            <button class="btn btn-primary" type="submit">{{T.contestAddgroupAddGroup}}</button>
         </form>
     </div>
 
     <table class="table table-striped">
         <thead>
-            <th>{#contestEditRegisteredGroupAdminName#}</th>
-            <th>{#contestEditRegisteredAdminRole#}</th>
-            <th>{#contestEditRegisteredAdminDelete#}</th>
+            <th>{{T.contestEditRegisteredGroupAdminName}}</th>
+            <th>{{T.contestEditRegisteredAdminRole}}</th>
+            <th>{{T.contestEditRegisteredAdminDelete}}</th>
         </thead>
-        <tbody id="contest-group-admins"></tbody>
+        <tbody>
+            <tr v-for="group in groupAdmins">
+                <td><a v-bind:href="`/group/${group.alias}/edit/`"></a>{{group.name}}</td>
+                <td>{{group.role}}</td>
+                <td>
+                    <button type="button" class="close"
+                        v-if="group.name != 'admin'">x</button>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </div>
 </template>
 <script>
 import {T} from '../../omegaup.js';
+import AutocompleteGroupAdmins from '../AutocompleteGroupAdmins.vue';
+
+
+export default {
+    props: {
+        groupAdmins: Array
+    },
+    data: function() {
+        return {
+            T: T,
+            groupName: ""
+        }
+    },
+    methods: {
+        onSubmit: function() {
+            this.$parent.$emit('addGroupAdmin', this);
+        }
+    },
+    components: {
+        'autocomplete-group-admins': AutocompleteGroupAdmins
+    }
+}
 </script>

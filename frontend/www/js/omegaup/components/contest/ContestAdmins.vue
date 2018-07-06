@@ -1,10 +1,10 @@
 <template>
 <div class="panel panel-primary">
     <div class="panel-body">
-        <form class="form" id="add-admin-form">
+        <form class="form" v-on:submit.prevent="onSubmit">
             <div class="form-group">
                 <label>{{T.wordsAdmin}}</label>
-                <input type="text" size="20" class="form-control" autocomplete="off" />
+                <autocomplete-user v-model="user"></autocomplete-user>
             </div>
 
             <div class="form-group">
@@ -12,8 +12,8 @@
                     <button class="btn btn-primary" type="submit">{{T.wordsAddAdmin}}</button>
                 </div>
                 <div class="col-xs-7 col-sm-9 col-md-9 toggle-container">
-                    <input type="checkbox" name="toggle-site-admins" id="toggle-site-admins">
-                    <label for="toggle-site-admins">{{T.wordsShowSiteAdmins}}</label>
+                    <input type="checkbox" v-model="showSiteAdmin">
+                    <label>{{T.wordsShowSiteAdmins}}</label>
                 </div>
             </div>
         </form>
@@ -25,18 +25,38 @@
             <th>{{T.contestEditRegisteredAdminRole}}</th>
             <th>{{T.contestEditRegisteredAdminDelete}}</th>
         </thead>
-        <tbody id="contest-admins"></tbody>
+        <tbody>
+            <tr v-for="admin in admins" v-if="(admin.role != 'site-admin') || showSiteAdmin">
+                <td><a v-bind:href="`/profile/${admin.username}/`">{{admin.username}}</a></td>
+                <td>{{admin.role}}</td>
+                <td><button type="button" class="close">x</button></td>
+            </tr>
+        </tbody>
     </table>
 </div>
 </template>
 <script>
 import {T} from '../../omegaup.js';
+import AutocompleteUser from '../AutocompleteUser.vue';
+
 export default {
     props: {
-        admins: Object,
+        admins: Array,
     },
     data: function() {
-        return {T: T}
+        return {
+            T: T,
+            user: "",
+            showSiteAdmin: false
+        }
+    },
+    methods: {
+        onSubmit: function() {
+            this.$parent.$emit('addAdmin', this);
+        }
+    },
+    components: {
+        'autocomplete-user': AutocompleteUser
     }
 }
 </script>
