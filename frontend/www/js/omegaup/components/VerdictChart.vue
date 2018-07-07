@@ -1,0 +1,28 @@
+<template>
+  <div></div>
+</template>
+
+<script>
+
+export default {
+  props: {
+    stats: Object,
+    contestAlias: String,
+  },
+  mounted: function() { this.draw_pie_chart();},
+  watch: {stats: function() { this.updateRunCountsData();}},
+  methods: {
+    draw_pie_chart: function() {
+      if (this.$el.run_counts_chart) return;
+
+      // Draw verdict counts pie chart
+      this.$el.run_counts_chart =
+          oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
+    },
+    updateRunCountsData: function() {
+      this.$el.run_counts_chart.series[0].setData(
+          oGraph.normalizeRunCounts(this.stats));
+    },
+  },
+};
+</script>
