@@ -25,6 +25,15 @@ export default {
     'verdict-chart': verdict_chart,
     'distribution-chart': distribution_chart,
   },
+  mounted: function() { this.updateTotalRuns();},
+  methods: {
+    updateTotalRuns: function() {
+      this.$el.querySelector('.total-runs').textContent =
+          omegaup.UI.formatString(omegaup.T.totalRuns,
+                                  {numRuns: this.stats.total_runs});
+    }
+  },
+  watch: {stats: function() { this.updateTotalRuns();}}
 };
 
 </script>

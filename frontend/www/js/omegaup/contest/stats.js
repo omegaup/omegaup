@@ -41,7 +41,6 @@ OmegaUp.on('ready', function() {
                 updatePendingRunsChartTimeout,
                 function() { return stats.pending_runs.length; });
           }
-          drawCharts();
         })
         .fail(omegaup.UI.apiError);
     updateStats();
@@ -50,12 +49,5 @@ OmegaUp.on('ready', function() {
   function updateStats() {
     setTimeout(function() { getStats(); }, callStatsApiTimeout);
   }
-
-  function drawCharts() {
-    $($('.total-runs')[0])
-        .text(omegaup.UI.formatString(omegaup.T.totalRuns,
-                                      {numRuns: stats.total_runs}));
-  }
-
   getStats();
 });
