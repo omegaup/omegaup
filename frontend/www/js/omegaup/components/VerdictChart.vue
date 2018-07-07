@@ -10,6 +10,7 @@ export default {
     contestAlias: String,
   },
   mounted: function() { this.draw_pie_chart();},
+
   watch: {stats: function() { this.updateRunCountsData();}},
   methods: {
     draw_pie_chart: function() {
