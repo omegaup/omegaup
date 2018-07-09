@@ -542,7 +542,7 @@ class Scoreboard {
             $problem_id = $run->problem_id;
             $contest_score = $run->contest_score;
             $score = $run->score;
-            $is_test = $run->test != 0;
+            $is_test = ($run->type== 'test');
 
             $problem =
                 &$identities_info[$identity_id]['problems'][$problem_mapping[$problem_id]['order']];
@@ -699,7 +699,7 @@ class Scoreboard {
 
         // Calculate score for each contestant x problem x run
         foreach ($contest_runs as $run) {
-            if (!$params['admin'] && $run->test != 0) {
+            if (!$params['admin'] && $run->type != 'normal') {
                 continue;
             }
 

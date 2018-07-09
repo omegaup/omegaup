@@ -21,7 +21,7 @@
 		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
-{if isset($inArena) && $inArena}
+{if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
@@ -67,6 +67,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 {/if}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/common.css"}" />
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 

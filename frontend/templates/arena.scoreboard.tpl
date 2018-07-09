@@ -1,5 +1,7 @@
 {include file='head.tpl' inArena=true}
+{if $titleClassName == 'course-title'}
         <script type="text/javascript" src="{version_hash src="/js/dist/course_scoreboard.js"}"></script>
+{/if}
 		<div>
 			<div id="title">
 				<h1>
