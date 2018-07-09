@@ -64,7 +64,7 @@
 					"feedback": "yes",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",
-					"public": 0,
+					"admission_mode": "private",
 					"show_scoreboard_after": 1
 				}
 			},
@@ -88,7 +88,7 @@
 				"api": "/contest/update",
 				"params": {
 					"contest_alias": "prueba",
-					"public": 1
+					"admission_mode": "public"
 				}
 			},
 			{

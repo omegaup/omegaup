@@ -148,7 +148,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         $this->assertGreaterThanOrEqual($r['finish_time'], Utils::GetPhpUnixTimestamp($contest->finish_time) + 1);
 
         $this->assertEquals($r['window_length'], $contest->window_length);
-        $this->assertEquals($r['public'], $contest->public);
+        $this->assertEquals($r['admission_mode'], $contest->admission_mode);
         $this->assertEquals($r['alias'], $contest->alias);
         $this->assertEquals($r['points_decay_factor'], $contest->points_decay_factor);
         $this->assertEquals($r['partial_score'], $contest->partial_score);

@@ -60,7 +60,11 @@
 						<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
 					</div>
 {include file='arena.runs.tpl' show_submit=true show_details=true}
+{if isset($histograms)}
 					<script type="text/json" id="histograms">{$histograms|json_encode}</script>
+{else}
+					<script type="text/json" id="histograms">null</script>
+{/if}
 					<div id="problem-feedback"></div>
 					<script type="text/javascript" src="{version_hash src="/js/dist/problem_feedback.js"}"></script>
 					<table class="best-solvers">

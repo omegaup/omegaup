@@ -20,6 +20,7 @@ else
 fi
 
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/db-migrate.py validate
+/usr/bin/python3 $OMEGAUP_ROOT/stuff/policy-tool.py validate
 
 /usr/bin/phpunit \
 	--bootstrap $OMEGAUP_ROOT/frontend/tests/bootstrap.php \
