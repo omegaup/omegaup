@@ -35,11 +35,11 @@ class ContestLog extends VO {
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
-        if (isset($data['from_visibility'])) {
-            $this->from_visibility = $data['from_visibility'];
+        if (isset($data['from_admission_mode'])) {
+            $this->from_admission_mode = $data['from_admission_mode'];
         }
-        if (isset($data['to_visibility'])) {
-            $this->to_visibility = $data['to_visibility'];
+        if (isset($data['to_admission_mode'])) {
+            $this->to_admission_mode = $data['to_admission_mode'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -83,16 +83,16 @@ class ContestLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
+      * @var enum('private','registration','public')
       */
-    public $from_visibility;
+    public $from_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
+      * @var enum('private','registration','public')
       */
-    public $to_visibility;
+    public $to_admission_mode;
 
     /**
       *  [Campo no documentado]

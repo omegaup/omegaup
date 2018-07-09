@@ -170,7 +170,7 @@ class UserProfileTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $contests[0] = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
         $contests[1] = ContestsFactory::createContest();
 
         ContestsFactory::addUser($contests[0], $contestant);

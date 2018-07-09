@@ -1,5 +1,7 @@
 <template>
-  <span v-bind:class="classname">{{ username }}</span>
+  <span v-if="linkify"><a v-bind:class="classname"
+     v-bind:href="`/profile/${username}/`">{{ username }}</a></span> <span v-bind:class="classname"
+        v-else="">{{ username }}</span>
 </template>
 
 <script>
@@ -7,7 +9,8 @@ export default {
   props: {
     username: String,
     classname: String,
-  }
+    linkify: Boolean,
+  },
 }
 </script>
 

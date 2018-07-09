@@ -109,7 +109,6 @@ class Utils {
             'Identity_Login_Log',
             'Interviews',
             'PrivacyStatement_Consent_Log',
-            'PrivacyStatements',
             'Problems',
             'Problems_Languages',
             'Problems_Tags',
