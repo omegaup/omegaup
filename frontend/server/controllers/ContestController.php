@@ -614,18 +614,18 @@ class ContestController extends Controller {
 
             $letter = 0;
 
-            foreach ($problemsInContest as $temp_array) {
+            foreach ($problemsInContest as $problem) {
                 // Add the 'points' value that is stored in the ContestProblem relationship
-                $temp_array['letter'] = ContestController::columnName($letter++);
+                $problem['letter'] = ContestController::columnName($letter++);
                 if (!empty($result['languages'])) {
-                    $temp_array['languages'] = join(',', array_intersect(
+                    $problem['languages'] = join(',', array_intersect(
                         explode(',', $result['languages']),
-                        explode(',', $temp_array['languages'])
+                        explode(',', $problem['languages'])
                     ));
                 }
 
                 // Save our array into the response
-                array_push($problemsResponseArray, $temp_array);
+                array_push($problemsResponseArray, $problem);
             }
 
             // Add problems to response
@@ -2219,10 +2219,10 @@ class ContestController extends Controller {
 
             if (!is_null($r['problems'])) {
                 // Get current problems
-                $current_problems_id = ProblemsetProblemsDAO::getIdByProblemset($r['contest']->problemset_id);
+                $currentProblemIds = ProblemsetProblemsDAO::getIdByProblemset($r['contest']->problemset_id);
                 // Check who needs to be deleted and who needs to be added
-                $to_delete = array_diff($current_problems_id, self::$problems_id);
-                $to_add = array_diff(self::$problems_id, $current_problems_id);
+                $to_delete = array_diff($currentProblemIds, self::$problems_id);
+                $to_add = array_diff(self::$problems_id, $currentProblemIds);
 
                 foreach ($to_add as $problem) {
                     ProblemsetProblemsDAO::save(new ProblemsetProblems([

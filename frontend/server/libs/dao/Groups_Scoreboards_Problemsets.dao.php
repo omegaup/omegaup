@@ -15,10 +15,10 @@ class GroupsScoreboardsProblemsetsDAO extends GroupsScoreboardsProblemsetsDAOBas
         global $conn;
         $rs = $conn->Execute($sql, [$group_scoreboard_id]);
 
-        $groups_scoreboards_problemsets = [];
+        $groupsScoreboardsProblemsets = [];
         foreach ($rs as $row) {
-            array_push($groups_scoreboards_problemsets, new GroupsScoreboardsProblemsets($row));
+            array_push($groupsScoreboardsProblemsets, new GroupsScoreboardsProblemsets($row));
         }
-        return $groups_scoreboards_problemsets;
+        return $groupsScoreboardsProblemsets;
     }
 }

@@ -75,7 +75,7 @@ class InterviewsDAO extends InterviewsDAOBase {
 
         global $conn;
         $interviews = $conn->GetRow($sql, [$problemset_id]);
-        if (count($rs) == 0) {
+        if (count($interviews) == 0) {
             return null;
         }
 

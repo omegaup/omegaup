@@ -69,11 +69,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, [$problemset_id]);
 
-        $problemset_problems = [];
+        $problemsetProblems = [];
         foreach ($rs as $row) {
-            array_push($problemset_problems, new ProblemsetProblems($row));
+            array_push($problemsetProblems, new ProblemsetProblems($row));
         }
-        return $problemset_problems;
+        return $problemsetProblems;
     }
 
     /*
@@ -143,7 +143,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function getIdProblemsByProblemset($problemset_id) {
+    final public static function getProblemIdsByProblemset($problemset_id) {
         $sql = 'SELECT
                     pp.problem_id
                 FROM
@@ -154,11 +154,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, [$problemset_id]);
 
-        $problems_id = [];
+        $problemIds = [];
         foreach ($rs as $problem) {
-            array_push($problems_id, $problem['problem_id']);
+            array_push($problemIds, $problem['problem_id']);
         }
-        return $problems_id;
+        return $problemIds;
     }
 
     final public static function getProblemsByProblemset($problemset_id) {
