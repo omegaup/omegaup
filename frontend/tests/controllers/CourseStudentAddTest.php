@@ -77,17 +77,17 @@ class CourseStudentAddTest extends OmegaupTestCase {
         // Asserting shouldShowResults is on, because admin cannot update share_user_information
         $this->assertEquals(1, $intro_details['isFirstTimeAccess']);
 
-        try {
-            // User join course for first time.
-            $response = CourseController::apiAddStudent(new Request([
-                'auth_token' => $userLogin->auth_token,
-                'usernameOrEmail' => $student->username,
-                'course_alias' => $courseData['course_alias'],
-                'share_user_information' => 1,
-                'git_object_id' => $intro_details['git_object_id'],
-                'statement_type' => $intro_details['statement_type'],
-            ]));
+        // User join course for first time.
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+            'share_user_information' => 1,
+            'git_object_id' => $intro_details['git_object_id'],
+            'statement_type' => $intro_details['statement_type'],
+        ]));
 
+        try {
             // User can not join course twice.
             $response = CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin->auth_token,
