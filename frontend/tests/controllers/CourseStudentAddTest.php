@@ -78,7 +78,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals(1, $intro_details['isFirstTimeAccess']);
 
         try {
-            // User can not join course.
+            // User join course for first time.
             $response = CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin->auth_token,
                 'usernameOrEmail' => $student->username,
@@ -87,6 +87,17 @@ class CourseStudentAddTest extends OmegaupTestCase {
                 'git_object_id' => $intro_details['git_object_id'],
                 'statement_type' => $intro_details['statement_type'],
             ]));
+
+            // User can not join course twice.
+            $response = CourseController::apiAddStudent(new Request([
+                'auth_token' => $userLogin->auth_token,
+                'usernameOrEmail' => $student->username,
+                'course_alias' => $courseData['course_alias'],
+                'share_user_information' => 1,
+                'git_object_id' => $intro_details['git_object_id'],
+                'statement_type' => $intro_details['statement_type'],
+            ]));
+            $this->fail('Should have thrown an InvalidDatabaseOperationException');
         } catch (InvalidDatabaseOperationException $e) {
             // OK!
         }
@@ -98,7 +109,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting shouldShowResults is off
-        $this->assertEquals(0, $intro_details['isFirstTimeAccess']);
+        $this->assertEquals(0, $intro_details['shouldShowResults']);
     }
 
     /**
