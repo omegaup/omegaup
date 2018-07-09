@@ -78,7 +78,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals(1, $intro_details['isFirstTimeAccess']);
 
         // User join course for first time.
-        $response = CourseController::apiAddStudent(new Request([
+        CourseController::apiAddStudent(new Request([
             'auth_token' => $userLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
@@ -89,7 +89,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
         try {
             // User can not join course twice.
-            $response = CourseController::apiAddStudent(new Request([
+            CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin->auth_token,
                 'usernameOrEmail' => $student->username,
                 'course_alias' => $courseData['course_alias'],
