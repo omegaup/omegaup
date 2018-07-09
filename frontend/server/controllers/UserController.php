@@ -259,42 +259,19 @@ class UserController extends Controller {
      *
      * */
     public function TestPassword(Request $r) {
-        $user_id = $email = $username = $password = $identity_id = null;
-
-        if (null != $r['user_id']) {
-            $user_id = $r['user_id'];
-        }
-
-        if (null != $r['email']) {
-            $email = $r['email'];
-        }
-
-        if (null != $r['username']) {
-            $username = $r['username'];
-        }
-
-        if (null != $r['password']) {
-            $password = $r['password'];
-        }
-
-        if (null != $r['identity_id']) {
-            $identity_id = $r['identity_id'];
-        }
-        if (is_null($user_id) && is_null($email) && is_null($username) && is_null($identity_id)) {
-            throw new ApiException('mustProvideUSerIdEmailOrUsername');
-        }
-
         $vo_UserToTest = null;
 
         //find this user
-        if (!is_null($user_id)) {
-            $vo_UserToTest = UsersDAO::getByPK($user_id);
-        } elseif (!is_null($email)) {
+        if (!is_null($r['user_id'])) {
+            $vo_UserToTest = UsersDAO::getByPK($r['user_id']);
+        } elseif (!is_null($r['email'])) {
             $vo_UserToTest = $this->FindByEmail();
-        } elseif (!is_null($username)) {
+        } elseif (!is_null($r['username'])) {
             $vo_UserToTest = $this->FindByUserName();
+        } elseif (!is_null($r['identity_id'])) {
+            $vo_UserToTest = IdentitiesDAO::getByPK($r['identity_id']);
         } else {
-            $vo_UserToTest = IdentitiesDAO::getByPK($identity_id);
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         if (is_null($vo_UserToTest)) {
@@ -307,7 +284,7 @@ class UserController extends Controller {
         }
 
         $newPasswordCheck = SecurityTools::compareHashedStrings(
-            $password,
+            $r['password'],
             $vo_UserToTest->password
         );
 
