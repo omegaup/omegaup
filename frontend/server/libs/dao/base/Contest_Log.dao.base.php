@@ -20,7 +20,7 @@ abstract class ContestLogDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time`';
+    const FIELDS = '`Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class ContestLogDAOBase extends DAO {
         if (is_null($public_contest_id)) {
             return null;
         }
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
         $params = [$public_contest_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class ContestLogDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link ContestLog}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` from Contest_Log';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` from Contest_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -139,13 +139,13 @@ abstract class ContestLogDAOBase extends DAO {
             $clauses[] = '`user_id` = ?';
             $params[] = $Contest_Log->user_id;
         }
-        if (!is_null($Contest_Log->from_visibility)) {
-            $clauses[] = '`from_visibility` = ?';
-            $params[] = $Contest_Log->from_visibility;
+        if (!is_null($Contest_Log->from_admission_mode)) {
+            $clauses[] = '`from_admission_mode` = ?';
+            $params[] = $Contest_Log->from_admission_mode;
         }
-        if (!is_null($Contest_Log->to_visibility)) {
-            $clauses[] = '`to_visibility` = ?';
-            $params[] = $Contest_Log->to_visibility;
+        if (!is_null($Contest_Log->to_admission_mode)) {
+            $clauses[] = '`to_admission_mode` = ?';
+            $params[] = $Contest_Log->to_admission_mode;
         }
         if (!is_null($Contest_Log->time)) {
             $clauses[] = '`time` = ?';
@@ -161,7 +161,7 @@ abstract class ContestLogDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_visibility`, `Contest_Log`.`to_visibility`, `Contest_Log`.`time` FROM `Contest_Log`';
+        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM `Contest_Log`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -185,12 +185,12 @@ abstract class ContestLogDAOBase extends DAO {
       * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a actualizar.
       */
     final private static function update(ContestLog $Contest_Log) {
-        $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_visibility` = ?, `to_visibility` = ?, `time` = ? WHERE `public_contest_id` = ?;';
+        $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
             $Contest_Log->contest_id,
             $Contest_Log->user_id,
-            $Contest_Log->from_visibility,
-            $Contest_Log->to_visibility,
+            $Contest_Log->from_admission_mode,
+            $Contest_Log->to_admission_mode,
             $Contest_Log->time,
             $Contest_Log->public_contest_id,
         ];
@@ -212,22 +212,16 @@ abstract class ContestLogDAOBase extends DAO {
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a crear.
      */
     final private static function create(ContestLog $Contest_Log) {
-        if (is_null($Contest_Log->from_visibility)) {
-            $Contest_Log->from_visibility = '0';
-        }
-        if (is_null($Contest_Log->to_visibility)) {
-            $Contest_Log->to_visibility = '1';
-        }
         if (is_null($Contest_Log->time)) {
             $Contest_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Contest_Log (`public_contest_id`, `contest_id`, `user_id`, `from_visibility`, `to_visibility`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Contest_Log (`public_contest_id`, `contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Contest_Log->public_contest_id,
             $Contest_Log->contest_id,
             $Contest_Log->user_id,
-            $Contest_Log->from_visibility,
-            $Contest_Log->to_visibility,
+            $Contest_Log->from_admission_mode,
+            $Contest_Log->to_admission_mode,
             $Contest_Log->time,
         ];
         global $conn;
@@ -309,25 +303,25 @@ abstract class ContestLogDAOBase extends DAO {
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_LogA->from_visibility;
-        $b = $Contest_LogB->from_visibility;
+        $a = $Contest_LogA->from_admission_mode;
+        $b = $Contest_LogB->from_admission_mode;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`from_visibility` >= ? AND `from_visibility` <= ?';
+            $clauses[] = '`from_admission_mode` >= ? AND `from_admission_mode` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`from_visibility` = ?';
+            $clauses[] = '`from_admission_mode` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 
-        $a = $Contest_LogA->to_visibility;
-        $b = $Contest_LogB->to_visibility;
+        $a = $Contest_LogA->to_admission_mode;
+        $b = $Contest_LogB->to_admission_mode;
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`to_visibility` >= ? AND `to_visibility` <= ?';
+            $clauses[] = '`to_admission_mode` >= ? AND `to_admission_mode` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`to_visibility` = ?';
+            $clauses[] = '`to_admission_mode` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

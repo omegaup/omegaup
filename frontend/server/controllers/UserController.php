@@ -21,6 +21,12 @@ class UserController extends Controller {
 
     const SENDY_SUCCESS = '1';
 
+    // Languages
+    const LANGUAGE_ES = 1;
+    const LANGUAGE_EN = 2;
+    const LANGUAGE_PT = 3;
+    const LANGUAGE_PSEUDO = 4;
+
     /**
      * Entry point for Create a User API
      *
@@ -1463,11 +1469,14 @@ class UserController extends Controller {
                 $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             }
             foreach ($coders as $c) {
+                $userInfo = UsersDAO::FindByUsername($c['username']);
+                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
                 $response['coders'][] = [
                     'username' => $c['username'],
                     'country_id' => $c['country_id'],
                     'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time']
+                    'date' => $c['time'],
+                    'classname' => $classname,
                 ];
             }
         } catch (Exception $e) {
@@ -2394,6 +2403,38 @@ class UserController extends Controller {
         ];
     }
 
+    /**
+     * Gets the last privacy policy saved in the data base
+     * @throws ForbiddenAccessException
+     */
+    public static function getPrivacyPolicy(Request $r) {
+        self::authenticateRequest($r);
+
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+
+        $lang = 'es';
+        if ($user->language_id == UserController::LANGUAGE_EN ||
+            $user->language_id == UserController::LANGUAGE_PSEUDO) {
+            $lang = 'en';
+        } elseif ($user->language_id == UserController::LANGUAGE_PT) {
+            $lang = 'pt';
+        }
+        $latest_privacy_policy = PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy();
+        return [
+            'status' => 'ok',
+            'policy_markdown' => file_get_contents(
+                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
+            ),
+            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                $latest_privacy_policy['privacystatement_id']
+            ),
+            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'statement_type' => $latest_privacy_policy['type'],
+        ];
+    }
+
     private static function getSelectedFilter($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
@@ -2424,8 +2465,9 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
-            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedLatestPrivacyPolicy(
-                $identity->identity_id
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()['privacystatement_id']
             ),
         ];
     }
@@ -2438,11 +2480,17 @@ class UserController extends Controller {
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-
+        $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+        if (is_null($privacystatement_id)) {
+            throw new NotFoundException('privacyStatementNotFound');
+        }
         $identity = self::resolveTargetIdentity($r);
 
         try {
-            $response = PrivacyStatementConsentLogDAO::saveLog($identity->identity_id);
+            $response = PrivacyStatementConsentLogDAO::saveLog(
+                $identity->identity_id,
+                $privacystatement_id
+            );
             $sessionController = new SessionController();
             $sessionController->InvalidateCache();
         } catch (Exception $e) {

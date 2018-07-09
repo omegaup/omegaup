@@ -48,7 +48,7 @@ class GroupScoreboardController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'Contest');
         }
 
-        if ($r['contest']->public != '1' && !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
+        if (!ContestController::isPublic($r['contest']->admission_mode) && !Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
             throw new ForbiddenAccessException();
         }
     }

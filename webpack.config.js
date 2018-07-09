@@ -1,12 +1,17 @@
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const WrapperPlugin = require('wrapper-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
 
-module.exports = {
+module.exports = [{
+  name: 'frontend',
   entry: {
     omegaup: [
       'babel-polyfill',
@@ -38,8 +43,9 @@ module.exports = {
     qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
-    user_profile: './frontend/www/js/omegaup/user/profile.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
+    user_profile: './frontend/www/js/omegaup/user/profile.js',
+    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
     omegaup_styles: './frontend/www/sass/main.scss',
   },
   output: {
@@ -102,8 +108,8 @@ module.exports = {
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.common.js',
-			'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
-			jszip: 'jszip/dist/jszip.js',
+      'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
+      jszip: 'jszip/dist/jszip.js',
     }
   },
   devServer: {
@@ -113,23 +119,80 @@ module.exports = {
   performance: {
     hints: false
   },
-  devtool: '#cheap-source-map'
-}
+  devtool: '#cheap-source-map',
+}, {
+  name: 'grader',
+  entry: {
+    grader_ephemeral: [
+      'babel-polyfill',
+      './frontend/www/js/omegaup/grader/ephemeral.js',
+    ],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          loaders: {},
+          // other vue-loader options go here
+        },
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env'],
+          },
+        },
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader',
+      },
+    ],
+  },
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.common.js',
+      'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
+    },
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new MonacoWebpackPlugin({
+      output: './js/dist',
+    }),
+  ],
+  output: {
+    path: path.resolve(__dirname, './frontend/www/'),
+    publicPath: '/',
+    filename: 'js/dist/[name].js',
+    library: '[name]',
+    libraryTarget: 'umd',
+  },
+  devtool: '#cheap-source-map',
+}];
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
+  for (let config of module.exports) {
+    if (config.name == 'grader') continue;
+    config.devtool = '#source-map';
+    // http://vue-loader.vuejs.org/en/workflow/production.html
+    config.plugins = (config.plugins || []).concat([
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: '"production"'
+        }
+      }),
+      new webpack.optimize.UglifyJsPlugin({
+        sourceMap: true
+      }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
+    ]);
+  }
 }
