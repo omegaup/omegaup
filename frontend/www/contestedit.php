@@ -7,5 +7,10 @@ $r = new Request([
 ]);
 $smarty->assign('LANGUAGES', array_keys(RunController::$kSupportedLanguages));
 $smarty->assign('IS_UPDATE', 1);
-$smarty->assign('REQUEST_PAYLOAD', ContestController::apiRequests($r));
-$smarty->display('../templates/contest.edit.tpl');
+try {
+    $smarty->assign('REQUEST_PAYLOAD', ContestController::apiRequests($r));
+    $smarty->display('../templates/contest.edit.tpl');
+} catch (APIException $e) {
+    header('HTTP/1.1 404 Not Found');
+    die();
+}

@@ -4,8 +4,6 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
-  let contestAlias =
-      /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
   let contestRequests = new Vue({
     el: '#contest-requests',
     render: function(createElement) {
@@ -24,7 +22,7 @@ OmegaUp.on('ready', function() {
     methods: {
       arbitrateRequest: function(username, resolution) {
         omegaup.API.Contest.arbitrateRequest({
-                             contest_alias: contestAlias,
+                             contest_alias: payload.contest_alias,
                              username: username,
                              resolution: resolution,
                              note: '',
