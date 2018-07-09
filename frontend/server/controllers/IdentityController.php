@@ -16,7 +16,8 @@ class IdentityController extends Controller {
             'language_id' => $user->language_id,
             'country_id' => $user->country_id,
             'state_id' => $user->state_id,
-            'school_id' => $user->school_id
+            'school_id' => $user->school_id,
+            'gender' => $user->gender,
         ]));
     }
 
@@ -50,7 +51,7 @@ class IdentityController extends Controller {
     }
 
     /**
-     * Entry point for Create a User API
+     * Entry point for Create an Identity API
      *
      * @param Request $r
      * @return array
@@ -58,14 +59,10 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        self::validateIdentity($r);
-
-        // Check password
-        SecurityTools::testStrongPassword($r['password']);
-        $hashedPassword = SecurityTools::hashString($r['password']);
+        self::validateRequest($r);
 
         // Prepare DAOs
-        $identity = self::createIdentity($r, $hashedPassword);
+        $identity = self::createIdentity($r);
 
         // Save in DB
         self::saveIdentityGroup($r, $identity);
@@ -86,38 +83,27 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiBulkCreate(Request $r) {
-        self::authenticateRequest($r);
-        if (!Authorization::isOrganizer($r['current_identity_id'])) {
-            throw new ForbiddenAccessException();
-        }
-        GroupController::validateGroup(new Request(['group_alias' => $r['group_alias']]));
-        if (!is_array($r['identities'])) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
-        }
+        self::validateRequest($r);
+
         // Save objects into DB
         try {
             DAO::transBegin();
 
             foreach ($r['identities'] as $identity) {
                 $identity_group = new Request($identity);
-                self::validateIdentity($identity_group);
-                $group_alias = explode(':', $identity_group['username'])[0];
-                if ($group_alias != $r['group_alias']) {
-                    throw new InvalidParameterException('parameterInvalid', 'username');
-                }
-
-                // Check password
-                SecurityTools::testStrongPassword($identity_group['password']);
-                $hashedPassword = SecurityTools::hashString($identity_group['password']);
+                $identity_group['group_alias'] = $r['group_alias'];
+                $identity_group['auth_token'] = $r['auth_token'];
 
                 // Prepare DAOs
-                $identity = self::createIdentity($identity_group, $hashedPassword);
+                $identity = self::createIdentity($identity_group);
 
-                $identity_group['group_alias'] = $r['group_alias'];
                 self::saveIdentityGroup($identity_group, $identity);
             }
 
             DAO::transEnd();
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            DAO::transRollback();
+            throw new DuplicatedEntryInDatabaseException('usernameInUse');
         } catch (Exception $e) {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
@@ -128,7 +114,22 @@ class IdentityController extends Controller {
         ];
     }
 
-    private static function validateIdentity(Request $r) {
+    /**
+     * @param Request $r
+     * @throws InvalidParameterException
+     */
+    private static function validateRequest(Request $r) {
+        self::authenticateRequest($r);
+        if (!Authorization::isOrganizer($r['current_identity_id'])) {
+            throw new ForbiddenAccessException();
+        }
+        GroupController::validateGroup($r);
+        if (!is_array($r['identities'])) {
+            throw new InvalidParameterException('parameterInvalid', 'identities');
+        }
+    }
+
+    public static function validateIdentity(Request $r) {
         // Validate request
         Validators::isValidUsername($r['username'], 'username');
 
@@ -149,48 +150,32 @@ class IdentityController extends Controller {
             Validators::isStringOfMaxLength($r['name'], 'name', 50);
         }
 
-        $state = null;
-        if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
-            // Both state and country must be specified together.
-            $r['country_id'] = trim($r['country_id']);
-            $r['state_id'] = trim($r['state_id']);
-            Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
-            Validators::isStringNonEmpty($r['state_id'], 'state_id', false);
-
-            try {
-                $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            if (is_null($state)) {
-                throw new InvalidParameterException('parameterInvalid', 'state_id');
-            }
+        if (!is_null($r['gender'])) {
+            $r['gender'] = trim($r['gender']);
         }
-        $r['gender'] = trim($r['gender']);
         if (!empty($r['gender'])) {
             Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
         }
-        $r['school_name'] = trim($r['school_name']);
-        if (empty($r['school_name'])) {
-            $r['school_id'] = null;
-        } else {
-            try {
-                $response = SchoolController::apiCreate(new Request([
-                    'name' => $r['school_name'],
-                    'country_id' => $state != null ? $state->country_id : null,
-                    'state_id' => $state != null ? $state->state_id : null,
-                    'auth_token' => $r['auth_token'],
-                ]));
-                $r['school_id'] = $response['school_id'];
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
+
+        $state = SchoolController::isValidCountryAndState($r, true);
+
+        $r['school_id'] = SchoolController::createSchool($state, trim($r['school_name']));
     }
 
-    private static function createIdentity(Request $r, $hashedPassword) {
-        $user_data = [
+    private static function createIdentity(Request $r) {
+        self::validateIdentity($r);
+
+        // Check group is present
+        $group_alias = explode(':', $r['username'])[0];
+        if ($group_alias != $r['group_alias']) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        // Check password
+        SecurityTools::testStrongPassword($r['password']);
+        $hashedPassword = SecurityTools::hashString($r['password']);
+
+        return new Identities([
             'username' => $r['username'],
             'name' => $r['name'],
             'password' => $hashedPassword,
@@ -198,12 +183,17 @@ class IdentityController extends Controller {
             'state_id' => $r['state_id'],
             'gender' => $r['gender'],
             'school_id' => $r['school_id'],
-        ];
-
-        return new Identities($user_data);
+        ]);
     }
 
-    private static function saveIdentityGroup(Request $r, $identity) {
+    /**
+     * Save object Identities in DB, and add user into group.
+     * This function is called inside a transaction.
+     * @param Request $r
+     * @param Identties $identity
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function saveIdentityGroup(Request $r, Identities $identity) {
         // Save objects into DB
         try {
             DAO::transBegin();

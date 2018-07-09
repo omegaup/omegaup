@@ -54,6 +54,7 @@
 
 <script>
 import {T, UI} from '../../omegaup.js';
+import * as CSV from '../../../../third_party/js/csv.js/csv.js';
 
 export default {
   props: {groupAlias: String},
@@ -97,28 +98,24 @@ export default {
       self = this;
       self.$emit('bulk-identities', self.identities);
     },
-    generatePassword: function(len) {
-      let password = '';
-      let validChars =
+    generatePassword: function() {
+      const validChars =
           'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const len = 8;
       // Browser supports window.crypto
       if (typeof window.crypto == 'object') {
-        let arr = new Uint8Array(len || 8);
+        let arr = new Uint8Array(2 * len);
         window.crypto.getRandomValues(arr);
-        return Array.from(arr, function(dec) {
-                      let randomNumber =
-                          parseInt(('0' + dec.toString(10)).substr(-2));
-                      if (randomNumber > validChars.length) {
-                        randomNumber = parseInt(
-                            ('0' + randomNumber.toString(10)).substr(-1));
-                        ;
-                      }
-                      return validChars[randomNumber];
-                    }).join('');
+        return Array.from(arr.filter(value => value <=
+                                              (255 - 255 % validChars.length)),
+                          value => validChars[value % validChars.length])
+            .join('')
+            .substr(0, len);
       }
 
       // Browser does not support window.crypto
-      for (var i = 0; i < 8; i++) {
+      let password = '';
+      for (var i = 0; i < len; i++) {
         password +=
             validChars.charAt(Math.floor(Math.random() * validChars.length));
       }

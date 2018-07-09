@@ -119,7 +119,7 @@ class Validators {
     public static function isValidUsername($parameter, $parameterName, $required = true) {
         $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
-        if ($isPresent && preg_match('/[^a-zA-Z0-9_.-:]/', $parameter)) {
+        if ($isPresent && preg_match('/[^a-zA-Z0-9_\\.\\-:]/', $parameter)) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
 
