@@ -40,13 +40,19 @@ class CoursesDAO extends CoursesDAOBase {
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
         $sql = "
             SELECT
-                a.*
+                a.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Courses c
             INNER JOIN
                 Assignments a
             ON
                 a.course_id = c.course_id
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = a.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             ORDER BY
@@ -332,27 +338,27 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
+        if ($course->group_id != $group->group_id) {
+            return true;
+        }
         $sql = '
             SELECT
-                share_user_information,
+                gi.share_user_information,
                 accept_teacher
             FROM
                 Groups_Identities AS gi
             INNER JOIN
-                Courses AS c ON gi.group_id = c.group_id
+                PrivacyStatement_Consent_Log AS pcl
+            ON
+                gi.privacystatement_consent_id = pcl.privacystatement_consent_id
             WHERE
                 gi.identity_id = ?
-            AND
-                gi.group_id = ?
-            AND
-                c.course_id = ?
+                AND gi.group_id = ?
             ';
         $params = [
             $identity_id,
             $group->group_id,
-            $course->course_id
         ];
-
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {

@@ -32,7 +32,11 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
         'showAcceptTeacher' => $intro_details['showAcceptTeacher'],
+        'privacyStatementMarkdown' => $intro_details['privacy_statement_markdown'],
+        'gitObjectId' => $intro_details['git_object_id'],
+        'statementType' => $intro_details['statement_type'],
     ]);
+
     $smarty->display('../templates/arena.course.intro.tpl');
 } elseif ($show_assignment) {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
@@ -44,5 +48,8 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
+    $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
+    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['user']->user_id, $course);
+    $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/course.details.tpl');
 }

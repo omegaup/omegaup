@@ -42,7 +42,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
         $this->assertEquals($originalContest->title, $virtualContest->title);
         $this->assertEquals($originalContest->description, $virtualContest->description);
-        $this->assertEquals(0, $virtualContest->public); // Virtual contest must be private
+        $this->assertEquals('private', $virtualContest->admission_mode); // Virtual contest must be private
         $this->assertEquals($originalContest->scoreboard, $virtualContest->scoreboard);
         $this->assertEquals($originalContest->points_decay_factor, $virtualContest->points_decay_factor);
         $this->assertEquals($originalContest->partial_score, $virtualContest->partial_score);
@@ -78,9 +78,12 @@ class VirtualContestTest extends OmegaupTestCase {
 
         Time::setTimeForTesting(Time::get() - 100);
 
-        $this->expectException(ForbiddenAccessException::class);
-
-        $response = ContestController::apiCreateVirtual($r);
+        try {
+            $response = ContestController::apiCreateVirtual($r);
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
+        }
     }
 
     public function testVirtualContestRestrictedApiAddProblem() {
@@ -103,19 +106,19 @@ class VirtualContestTest extends OmegaupTestCase {
         ]);
 
         $response = ContestController::apiCreateVirtual($r);
-
         $virtualContestAlias = $response['alias'];
 
-        $this->expectException(ForbiddenAccessException::class);
-
-        $r = new Request([
-            'contest_alias' => $virtualContestAlias,
-            'problem_alias' => $problemData['problem']->alias,
-            'points' => 100,
-            'auth_token' => $login->auth_token
-        ]);
-
-        ContestController::apiAddProblem($r);
+        try {
+            ContestController::apiAddProblem(new Request([
+                'contest_alias' => $virtualContestAlias,
+                'problem_alias' => $problemData['problem']->alias,
+                'points' => 100,
+                'auth_token' => $login->auth_token
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+        }
     }
 
     public function testVirtualContestRestrictedApiRemoveProblem() {
@@ -141,18 +144,18 @@ class VirtualContestTest extends OmegaupTestCase {
         ]);
 
         $response = ContestController::apiCreateVirtual($r);
-
         $virtualContestAlias = $response['alias'];
 
-        $this->expectException(ForbiddenAccessException::class);
-
-        $r = new Request([
-            'contest_alias' => $virtualContestAlias,
-            'problem_alias' => $problemData['problem']->alias,
-            'auth_token' => $login->auth_token
-        ]);
-
-        ContestController::apiRemoveProblem($r);
+        try {
+            ContestController::apiRemoveProblem(new Request([
+                'contest_alias' => $virtualContestAlias,
+                'problem_alias' => $problemData['problem']->alias,
+                'auth_token' => $login->auth_token
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+        }
     }
 
     public function testVirtualContestRestrictedApiUpdate() {
@@ -172,17 +175,17 @@ class VirtualContestTest extends OmegaupTestCase {
         ]);
 
         $response = ContestController::apiCreateVirtual($r);
-
         $virtualContestAlias = $response['alias'];
 
-        $this->expectException(ForbiddenAccessException::class);
-
-        $r = new Request([
-            'contest_alias' => $virtualContestAlias,
-            'title' => 'testtest',
-            'auth_token' => $login->auth_token
-        ]);
-
-        $response = ContestController::apiUpdate($r);
+        try {
+            ContestController::apiUpdate(new Request([
+                'contest_alias' => $virtualContestAlias,
+                'title' => 'testtest',
+                'auth_token' => $login->auth_token
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+        }
     }
 }

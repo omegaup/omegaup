@@ -26,6 +26,13 @@ if ($show_intro['shouldShowIntro']) {
         'requestsUserInformation',
         $show_intro['requests_user_information']
     );
+    if (isset($show_intro['privacy_statement_markdown'])) {
+        $smarty->assign('privacyStatement', [
+            'markdown' => $show_intro['privacy_statement_markdown'],
+            'gitObjectId' => $show_intro['git_object_id'],
+            'statementType' => $show_intro['statement_type'],
+        ]);
+    }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');

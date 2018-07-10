@@ -15,7 +15,8 @@ OmegaUp.on('ready', function() {
           description: coursePayload.description,
           needsBasicInformation: coursePayload.needsBasicInformation,
           requestsUserInformation: coursePayload.requestsUserInformation,
-          showAcceptTeacher: coursePayload.showAcceptTeacher
+          showAcceptTeacher: coursePayload.showAcceptTeacher,
+          privacyStatementMarkdown: coursePayload.privacyStatementMarkdown,
         },
         on: {
           submit: function(ev) {
@@ -23,7 +24,8 @@ OmegaUp.on('ready', function() {
                         'course_alias': coursePayload.alias,
                         'usernameOrEmail': coursePayload.currentUsername,
                         'share_user_information': ev.shareUserInformation,
-                        'accept_teacher': ev.acceptTeacher
+                        'accept_teacher': ev.acceptTeacher,
+                        'statement_type': coursePayload.statementType,
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + coursePayload.alias);

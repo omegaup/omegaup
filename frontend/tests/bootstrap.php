@@ -19,6 +19,12 @@ require_once(OMEGAUP_ROOT . '/server/config.default.php');
 require_once(OMEGAUP_ROOT . '/www/api/ApiCaller.php');
 require_once(OMEGAUP_ROOT . '/tests/controllers/ApiCallerMock.php');
 
+// PHP Unit compatibility hack.
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+    class PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase {
+    }
+}
+
 // Load test utils
 require_once(OMEGAUP_ROOT . '/tests/controllers/OmegaupTestCase.php');
 require_once(OMEGAUP_ROOT . '/tests/common/Utils.php');
@@ -34,6 +40,7 @@ require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
 require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
 
+require_once(OMEGAUP_ROOT . '/server/libs/PrivacyStatement.php');
 require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
 
 // Clean previous log

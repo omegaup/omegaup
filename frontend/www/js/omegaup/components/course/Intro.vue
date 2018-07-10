@@ -8,6 +8,11 @@
       <p name="description">{{ description }}</p>
       <p v-html="T.courseBasicInformationNeeded"
          v-if="needsBasicInformation"></p>
+      <p v-html="consentHtml"
+         v-if="requestsUserInformation != 'no'"></p>
+      <template v-if="requestsUserInformation == 'required'">
+        <p v-html="T.courseUserInformationRequired"></p>
+      </template>
       <template v-if="requestsUserInformation != 'no'">
         <p v-html="T.courseUserInformationOptional"
            v-if="requestsUserInformation == 'optional'"></p>
@@ -40,7 +45,7 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {T, UI} from '../../omegaup.js';
 
 export default {
   props: {
@@ -48,10 +53,19 @@ export default {
     description: String,
     needsBasicInformation: Boolean,
     requestsUserInformation: String,
-    showAcceptTeacher: Boolean
+    privacyStatementMarkdown: String,
+  },
+  computed: {
+    consentHtml: function() {
+      return this.markdownConverter.makeHtml(this.privacyStatementMarkdown);
+    }
   },
   data: function() {
-    return { T: T, shareUserInformation: undefined, acceptTeacher: undefined }
+    return {
+      T: T, shareUserInformation: undefined,
+          markdownConverter: UI.markdownConverter(),
+          acceptTeacher: undefined,
+    }
   },
   methods: {onSubmit() { this.$emit('submit', this);}}
 }
