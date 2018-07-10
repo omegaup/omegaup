@@ -155,10 +155,11 @@ class UserFilterTest extends OmegaupTestCase {
 
     public function testAnonymousProblemsetWithToken() {
         $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $response = UserController::apiValidateFilter(new Request([
             'filter' => '/problemset/' . $contest->problemset_id . '/' .
-                        $contest->scoreboard_url,
+                        $problemset->scoreboard_url,
         ]));
         $this->assertEmpty($response['contest_admin']);
     }
@@ -170,17 +171,17 @@ class UserFilterTest extends OmegaupTestCase {
         $response = UserController::apiValidateFilter(new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
                         $problemset->scoreboard_url,
-        ]);
-        $response = UserController::apiValidateFilter($r);
+        ]));
         $this->assertEmpty($response['contest_admin']);
     }
 
     public function testAnonymousProblemsetWithAdminToken() {
         $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $response = UserController::apiValidateFilter(new Request([
             'filter' => '/problemset/' . $contest->problemset_id . '/' .
-                        $contest->scoreboard_url_admin,
+                        $problemset->scoreboard_url_admin,
         ]));
         $this->assertContains($contest->alias, $response['contest_admin']);
         $this->assertNull($response['user']);
@@ -193,8 +194,7 @@ class UserFilterTest extends OmegaupTestCase {
         $response = UserController::apiValidateFilter(new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
                         $problemset->scoreboard_url_admin,
-        ]);
-        $response = UserController::apiValidateFilter($r);
+        ]));
         $this->assertContains($contest->alias, $response['contest_admin']);
         $this->assertNull($response['user']);
     }

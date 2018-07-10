@@ -165,7 +165,6 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
 @util.annotate
 def update_scoreboard_for_contest(driver, contest_alias):
     '''Updates the scoreboard for a contest.
-
     This can be run without a session being active.
     '''
 

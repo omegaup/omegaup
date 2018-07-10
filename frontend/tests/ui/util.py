@@ -21,8 +21,7 @@ CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/',
-                     'https://connect.facebook.net/')
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -163,9 +162,9 @@ def is_path_whitelisted(message, path_whitelist):
 
 def is_message_whitelisted(message, message_whitelist):
     '''Checks whether string in message is whitelisted.
-
     It only compares strings between double or single quotes.
     '''
+
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
 
     if not match:

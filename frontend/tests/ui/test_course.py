@@ -12,39 +12,9 @@ import ui.util as util
 
 # Assignment scoreboard is still not completely working.
 @util.no_javascript_errors(
-    path_whitelist=('/api/course/assignmentScoreboard/',
-                    '/api/problemset/scoreboard/',
-                    '/js/dist/omegaup.js'),
+    path_whitelist=('/api/course/assignmentScoreboard/',),
     message_whitelist=('/api/course/assignmentScoreboard/',))
 @util.annotate
-def test_create_course(driver):
-    '''Tests creating an course and retrieving it.'''
-
-    run_id = driver.generate_id()
-    course_alias = 'unittest_course_%s' % run_id
-    school_name = 'unittest_school_%s' % run_id
-    assignment_alias = 'unittest_homework_%s' % run_id
-    user = 'user'
-    problem = 'sumas'
-
-    with driver.login_admin():
-        create_course(driver, course_alias, school_name)
-
-        assert (('/course/%s/edit/' % course_alias) in
-                driver.browser.current_url), driver.browser.current_url
-
-        add_students_course(driver, [user])
-
-        add_assignment(driver, assignment_alias)
-
-        add_problem_to_assignment(driver, assignment_alias, problem)
-
-    with driver.login_user():
-        enter_course(driver, course_alias, assignment_alias)
-
-
-@util.no_javascript_errors(path_whitelist=('/api/course/assignmentScoreboard/',
-                                           '/js/dist/omegaup.js'))
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
@@ -219,10 +189,6 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
 @util.annotate
 def add_students_course(driver, users):
     '''Add students to a recently course.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "#students"]'))).click()
 
     util.add_students(
         driver, users, container_id='students',
