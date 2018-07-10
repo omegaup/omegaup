@@ -149,8 +149,8 @@ export class Arena {
 
     self.options = options;
 
-    // The current contest.
-    self.currentContest = null;
+    // The current problemset.
+    self.currentProblemset = null;
 
     // The interval for clock updates.
     self.clockInterval = null;
@@ -485,7 +485,7 @@ export class Arena {
 
   initProblems(problemset) {
     let self = this;
-    self.currentContest = problemset;
+    self.currentProblemset = problemset;
     self.contestAdmin = problemset.admin;
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
@@ -594,7 +594,7 @@ export class Arena {
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias
                 })
-          .then(self.rankingChange.bind(self))
+          .then(self.rankingCourseChange.bind(self))
           .fail(UI.ignoreError);
     }
   }
@@ -674,6 +674,22 @@ export class Arena {
           .then(self.onRankingEvents.bind(self))
           .fail(UI.ignoreError);
     }
+  }
+
+  rankingCourseChange(data) {
+    let self = this;
+    self.onRankingChanged(data);
+
+    let params = {
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Course.assignmentScoreboardEvents(params)
+        .then(self.onRankingEvents.bind(self))
+        .fail(UI.ignoreError);
   }
 
   onRankingChanged(data) {
@@ -1425,7 +1441,7 @@ export class Arena {
                  problem.runs.length > 0) {
         nextSubmissionTimestamp =
             new Date(problem.runs[problem.runs.length - 1].time.getTime() +
-                     self.currentContest.submissions_gap * 1000);
+                     self.currentProblemset.submissions_gap * 1000);
       }
     }
     if (self.submissionGapInterval) {

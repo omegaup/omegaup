@@ -47,6 +47,12 @@ class Problemsets extends VO {
         if (isset($data['type'])) {
             $this->type = $data['type'];
         }
+        if (isset($data['scoreboard_url'])) {
+            $this->scoreboard_url = $data['scoreboard_url'];
+        }
+        if (isset($data['scoreboard_url_admin'])) {
+            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+        }
     }
 
     /**
@@ -110,4 +116,18 @@ class Problemsets extends VO {
       * @var enum('contest','assignment','interview')
       */
     public $type;
+
+    /**
+      * Token para la url del scoreboard en problemsets
+      * @access public
+      * @var varchar(30)
+      */
+    public $scoreboard_url;
+
+    /**
+      * Token para la url del scoreboard de admin en problemsets
+      * @access public
+      * @var varchar(30)
+      */
+    public $scoreboard_url_admin;
 }

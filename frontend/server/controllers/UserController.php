@@ -552,7 +552,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
@@ -1559,26 +1559,31 @@ class UserController extends Controller {
         }
 
         $contests = [];
+
         foreach ($contestsParticipated as $contest) {
             // Get identity ranking
-            $scoreboardR = new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $contest->alias,
-                'token' => $contest->scoreboard_url_admin
-            ]);
-            $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
+            $scoreboardResponse = ContestController::apiScoreboard(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $contest['alias'],
+                    'token' => $contest['scoreboard_url_admin'],
+                ])
+            );
 
             // Grab the place of the current identity in the given contest
-            $contests[$contest->alias]['place']  = null;
-            foreach ($scoreboardResponse['ranking'] as $userData) {
-                if ($userData['username'] == $identity->username) {
-                    $contests[$contest->alias]['place'] = $userData['place'];
+            $contests[$contest['alias']]['place'] = null;
+            foreach ($scoreboardResponse['ranking'] as $identityData) {
+                if ($identityData['username'] == $identity->username) {
+                    $contests[$contest['alias']]['place'] = $identityData['place'];
                     break;
                 }
             }
-
-            $contest->toUnixTime();
-            $contests[$contest->alias]['data'] = $contest->asArray();
+            $contests[$contest['alias']]['data'] = $contest;
+            foreach ($contest as $key => $item) {
+                if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
+                    $contests[$contest['alias']][$key] = strtotime($item);
+                }
+            }
         }
 
         $response['contests'] = $contests;
@@ -2442,7 +2447,7 @@ class UserController extends Controller {
         } elseif ($user->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
-        $latest_privacy_policy = PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy();
+        $latest_statement = PrivacyStatementsDAO::getLatestPublishedStatement();
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
@@ -2450,10 +2455,10 @@ class UserController extends Controller {
             ),
             'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                $latest_privacy_policy['privacystatement_id']
+                $latest_statement['privacystatement_id']
             ),
-            'git_object_id' => $latest_privacy_policy['git_object_id'],
-            'statement_type' => $latest_privacy_policy['type'],
+            'git_object_id' => $latest_statement['git_object_id'],
+            'statement_type' => 'privacy_policy',
         ];
     }
 
@@ -2489,7 +2494,7 @@ class UserController extends Controller {
             'status' => 'ok',
             'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                PrivacyStatementsDAO::getLatestPublishedPrivacyPolicy()['privacystatement_id']
+                PrivacyStatementsDAO::getLatestPublishedStatement()['privacystatement_id']
             ),
         ];
     }
