@@ -357,6 +357,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         $result = ContestsDAO::getNeedsInformation($r['contest']->problemset_id);
+
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -364,6 +365,18 @@ class ContestController extends Controller {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
                 $r['current_identity_id'] = $session['identity']->identity_id;
+
+                // Privacy Statement Information
+                $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
+                    $session['user']->language_id,
+                    'contest',
+                    $result['requests_user_information']
+                );
+                if (!is_null($result['privacy_statement_markdown'])) {
+                    $statement_type = "contest_{$result['requests_user_information']}_consent";
+                    $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
+                    $result['statement_type'] = $statement_type;
+                }
             } else {
                 // No session, show the intro (if public), so that they can login.
                 $result['shouldShowIntro'] =
@@ -381,8 +394,6 @@ class ContestController extends Controller {
             $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
             return $result;
         }
-
-        $cs = SessionController::apiCurrentSession()['session'];
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
@@ -543,12 +554,38 @@ class ContestController extends Controller {
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
-        ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-            $r['current_identity_id'],
-            $r['contest']->problemset_id,
-            true,
-            $r['share_user_information']
-        );
+
+        CoursesDAO::transBegin();
+        try {
+            ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                $r['current_identity_id'],
+                $r['contest']->problemset_id,
+                true,
+                $r['share_user_information']
+            );
+
+            // Insert into PrivacyStatement_Consent_Log whether request
+            // user info is optional or required
+            if ($needsInformation['requests_user_information'] != 'no') {
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                    $r['current_identity_id'],
+                    $privacystatement_id
+                );
+
+                ProblemsetIdentitiesDAO::updatePrivacyStatementConsent(new ProblemsetIdentities([
+                    'identity_id' => $r['current_identity_id'],
+                    'problemset_id' => $r['contest']->problemset_id,
+                    'privacystatement_consent_id' => $privacystatement_consent_id
+                ]));
+            }
+
+            CoursesDAO::transEnd();
+        } catch (Exception $e) {
+            CoursesDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
         return ['status' => 'ok'];
     }
