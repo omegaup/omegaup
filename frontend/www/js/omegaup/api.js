@@ -208,6 +208,9 @@ export default {
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
 
+    assignmentScoreboardEvents:
+        _call('/api/course/assignmentScoreboardEvents/'),
+
     clone: _call('/api/course/clone/'),
 
     create: _call('/api/course/create/'),

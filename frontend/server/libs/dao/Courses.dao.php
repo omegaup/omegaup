@@ -40,13 +40,19 @@ class CoursesDAO extends CoursesDAOBase {
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
         $sql = "
             SELECT
-                a.*
+                a.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Courses c
             INNER JOIN
                 Assignments a
             ON
                 a.course_id = c.course_id
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = a.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             ORDER BY

@@ -218,6 +218,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseAssignmentUpdated: "Designa\u00e7\u00e3o editada com sucesso!",
 	courseBasicInformationNeeded: "Para participar do curso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o <a href=\"/profile/edit/\">Meu perfil</a>",
 	courseDetails: "Detalhes do curso",
+	courseDetailsScoreboard: "Painel de avalia\u00e7\u00e3o",
 	courseEdit: "Editar curso",
 	courseEditAddAdminsTooltip: "Adicionar administratores usando seu nome de usu\u00e1rio omegaUp",
 	courseEditAddAssignment: "Adicionar designa\u00e7\u00e3o",

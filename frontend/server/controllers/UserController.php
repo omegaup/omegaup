@@ -1559,26 +1559,31 @@ class UserController extends Controller {
         }
 
         $contests = [];
+
         foreach ($contestsParticipated as $contest) {
             // Get identity ranking
-            $scoreboardR = new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $contest->alias,
-                'token' => $contest->scoreboard_url_admin
-            ]);
-            $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
+            $scoreboardResponse = ContestController::apiScoreboard(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $contest['alias'],
+                    'token' => $contest['scoreboard_url_admin'],
+                ])
+            );
 
             // Grab the place of the current identity in the given contest
-            $contests[$contest->alias]['place']  = null;
-            foreach ($scoreboardResponse['ranking'] as $userData) {
-                if ($userData['username'] == $identity->username) {
-                    $contests[$contest->alias]['place'] = $userData['place'];
+            $contests[$contest['alias']]['place'] = null;
+            foreach ($scoreboardResponse['ranking'] as $identityData) {
+                if ($identityData['username'] == $identity->username) {
+                    $contests[$contest['alias']]['place'] = $identityData['place'];
                     break;
                 }
             }
-
-            $contest->toUnixTime();
-            $contests[$contest->alias]['data'] = $contest->asArray();
+            $contests[$contest['alias']]['data'] = $contest;
+            foreach ($contest as $key => $item) {
+                if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
+                    $contests[$contest['alias']][$key] = strtotime($item);
+                }
+            }
         }
 
         $response['contests'] = $contests;

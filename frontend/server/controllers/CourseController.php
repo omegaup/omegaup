@@ -357,7 +357,9 @@ class CourseController extends Controller {
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
-                'acl_id' => $r['course']->acl_id
+                'acl_id' => $r['course']->acl_id,
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
 
@@ -1644,5 +1646,33 @@ class CourseController extends Controller {
             false /*withRunDetails*/,
             true /*sortByName*/
         );
+    }
+
+    /**
+     * Returns the Scoreboard events
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiAssignmentScoreboardEvents(Request $r) {
+        // Get the current user
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+        self::validateCourseAssignmentAlias($r);
+
+        $scoreboard = new Scoreboard(
+            ScoreboardParams::fromAssignment(
+                $r['assignment'],
+                $r['course']->group_id,
+                Authorization::isCourseAdmin($r['current_user_id'], $r['course'])/*show_all_runs*/
+            )
+        );
+
+        // Push scoreboard data in response
+        return [
+            'events' => $scoreboard->events()
+        ];
     }
 }
