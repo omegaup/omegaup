@@ -175,6 +175,7 @@ class ProblemsetController extends Controller {
                 $request['token'] = $r['tokens'][3];
             }
             ContestController::validateDetails($request);
+            $request['problemset'] = $r['problemset'];
             return $request;
         }
         return $r;
