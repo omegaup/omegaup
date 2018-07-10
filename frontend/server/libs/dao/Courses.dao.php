@@ -338,26 +338,26 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
+        if ($course->group_id != $group->group_id) {
+            return true;
+        }
         $sql = '
             SELECT
-                share_user_information
+                gi.share_user_information
             FROM
                 Groups_Identities AS gi
             INNER JOIN
-                Courses AS c ON gi.group_id = c.group_id
+                PrivacyStatement_Consent_Log AS pcl
+            ON
+                gi.privacystatement_consent_id = pcl.privacystatement_consent_id
             WHERE
                 gi.identity_id = ?
-            AND
-                gi.group_id = ?
-            AND
-                c.course_id = ?
+                AND gi.group_id = ?
             ';
         $params = [
             $identity_id,
             $group->group_id,
-            $course->course_id
         ];
-
         global $conn;
         return $conn->GetOne($sql, $params) == null;
     }

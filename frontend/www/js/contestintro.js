@@ -2,19 +2,38 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   var contestObject = null;
 
+  if ($('.requests-user-information').length) {
+    var markdownConverter = omegaup.UI.markdownConverter();
+    var payload = JSON.parse(document.getElementById('payload').innerText);
+    document.getElementsByClassName('requests-user-information')[0].innerHTML =
+        markdownConverter.makeHtml(payload['markdown']);
+  }
+
   $('#start-contest-form')
       .on('submit', function(ev) {
         ev.preventDefault();
         $('#request-access-form').hide();
         $('#start-contest-submit').prop('disabled', true);
+        var request = {
+          contest_alias: contestAlias,
+          share_user_information:
+              $('input[name=share-user-information]:checked').val()
+        };
+        var userInformationRequest = {};
+        if ($('.requests-user-information').length) {
+          var gitObjectId = JSON.parse(
+              document.getElementById('payload').innerText)['gitObjectId'];
+          var statementType = JSON.parse(
+              document.getElementById('payload').innerText)['statementType'];
+          userInformationRequest = {
+            git_object_id: gitObjectId,
+            statement_type: statementType
+          };
+        }
+        $.extend(request, userInformationRequest);
 
         // Explicitly join the contest.
-        omegaup.API.Contest.open({
-                             contest_alias: contestAlias,
-                             share_user_information:
-                                 $('input[name=share-user-information]:checked')
-                                     .val()
-                           })
+        omegaup.API.Contest.open(request)
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);
       });

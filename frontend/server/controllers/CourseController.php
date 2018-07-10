@@ -1031,15 +1031,33 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-            'share_user_information' => $r['share_user_information']
-        ]);
-
+        CoursesDAO::transBegin();
         try {
-            GroupsIdentitiesDAO::save($groupIdentity);
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id
+            ]));
+
+            // Only users adding themselves are saved in consent log
+            if ($r['identity']->identity_id === $r['current_identity_id']
+                 && $r['course']->requests_user_information != 'no') {
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                    $r['identity']->identity_id,
+                    $privacystatement_id
+                );
+
+                GroupsIdentitiesDAO::save(new GroupsIdentities([
+                    'group_id' => $r['course']->group_id,
+                    'identity_id' => $r['identity']->identity_id,
+                    'share_user_information' => $r['share_user_information'],
+                    'privacystatement_consent_id' => $privacystatement_consent_id
+                ]));
+            }
+
+            CoursesDAO::transEnd();
         } catch (Exception $e) {
+            CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1299,7 +1317,22 @@ class CourseController extends Controller {
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
+
+        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+
+        // Privacy Statement Information
+        $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
+            $user_session->language_id,
+            'course',
+            $result['requests_user_information']
+        );
+        if (!is_null($result['privacy_statement_markdown'])) {
+            $statement_type = "course_{$result['requests_user_information']}_consent";
+            $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
+            $result['statement_type'] = $statement_type;
+        }
+
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         $result['requests_user_information'] = $result['requests_user_information'];
