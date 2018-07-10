@@ -114,7 +114,6 @@ omegaup.OmegaUp.on('ready', function() {
   refreshContestProblems();
   refreshContestContestants();
   refreshContestAdmins();
-  refreshContestRequests();
 
   // Edit contest
   $('.new_contest_form')
@@ -261,91 +260,6 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.UI.userTypeahead($('#username-admin'));
   omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
   omegaup.UI.problemTypeahead($('#problems-dropdown'));
-
-  function refreshContestRequests() {
-    $('#user-requests-table')
-        .bootstrapTable({
-          method: 'get',
-          url: '/api/contest/requests/contest_alias/' + contestAlias + '/',
-          onPostBody: function() {
-            $('.close.request-accept')
-                .on('click', (function() {
-                      return function() {
-                        var username = $(this).val();
-                        omegaup.API.Contest.arbitrateRequest({
-                                             contest_alias: contestAlias,
-                                             username: username,
-                                             resolution: true /* accepted */,
-                                             note: '',
-                                           })
-                            .then(function(response) {
-                              omegaup.UI.success(omegaup.T.successfulOperation);
-                              $('#user-requests-table')
-                                  .bootstrapTable('refresh');
-                            })
-                            .fail(omegaup.UI.apiError);
-                      };
-                    })());
-
-            $('.close.request-deny')
-                .on('click', (function() {
-                      return function() {
-                        var username = $(this).val();
-                        omegaup.API.Contest.arbitrateRequest({
-                                             contest_alias: contestAlias,
-                                             username: username,
-                                             resolution: false /* rejected */,
-                                             note: '',
-                                           })
-                            .then(function(response) {
-                              omegaup.UI.success(omegaup.T.successfulOperation);
-                              $('#user-requests-table')
-                                  .bootstrapTable('refresh');
-                            })
-                            .fail(omegaup.UI.apiError);
-                      };
-                    })());
-          },
-          responseHandler: function(res) { return res.users; },
-          columns: [
-            {field: 'username'},
-            {field: 'country', sortable: true},
-            {field: 'request_time'},
-            {
-              field: 'accepted',
-              sortable: true,
-              formatter: function(value) {
-                if (value == null) {
-                  return omegaup.T.wordsDenied;
-                }
-
-                if (value == 'true' || value == '1') {
-                  return omegaup.T.wordAccepted;
-                }
-
-                return omegaup.T.wordsDenied;
-              }
-            },
-            {
-              field: 'last_update',
-              formatter: function(v, o) {
-                return v + ' (' + o.admin.username + ')';
-              }
-            },
-            {
-              field: 'accepted',
-              formatter: function(a, b, c) {
-                return '<button type="button" ' +
-                       'class="close request-deny" value="' + b.username +
-                       '" style="color:red">&times;</button>' +
-                       '<button type="button" ' +
-                       'class="close request-accept" value="' + b.username +
-                       '" style="color:green">&#x2713;</button>';
-              }
-            }
-          ]
-        });
-  }
 
   function refreshContestContestants() {
     omegaup.API.Contest.users({contest_alias: contestAlias})

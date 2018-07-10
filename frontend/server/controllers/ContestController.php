@@ -2041,6 +2041,7 @@ class ContestController extends Controller {
 
         $response = [];
         $response['users'] = $users;
+        $response['contest_alias'] = $r['contest_alias'];
         $response['status'] = 'ok';
 
         return $response;

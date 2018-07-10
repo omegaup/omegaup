@@ -27,6 +27,7 @@ module.exports = [{
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant: './frontend/www/js/omegaup/contest/list_participant.js',
+    contest_requests: './frontend/www/js/omegaup/contest/requests.js',
     contest_scoreboardmerge: './frontend/www/js/omegaup/contest/scoreboardmerge.js',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
