@@ -68,8 +68,7 @@ export default {
   data: function() {
     return {
       T: T, shareUserInformation: undefined,
-          markdownConverter: UI.markdownConverter(),
-          acceptTeacher: undefined,
+          markdownConverter: UI.markdownConverter(), acceptTeacher: undefined,
     }
   },
   methods: {onSubmit() { this.$emit('submit', this);}}

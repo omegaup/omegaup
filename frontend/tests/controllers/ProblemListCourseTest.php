@@ -49,11 +49,19 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<$num_users; $i++) {
             $userLogin[$i] = self::login($user[$i]);
+
+            $intro_details = CourseController::apiIntroDetails(new Request([
+                'auth_token' => $userLogin[$i]->auth_token,
+                'current_user_id' => $user[$i]->user_id,
+                'course_alias' => $courseData['course_alias']
+            ]));
+
             CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
-                'accept_teacher' => 'yes'
+                'accept_teacher' => 'yes',
+                'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
             ]));
         }
 
@@ -151,11 +159,19 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<($num_users - 1); $i++) {
             $userLogin[$i] = self::login($user[$i]);
+
+            $intro_details = CourseController::apiIntroDetails(new Request([
+                'auth_token' => $userLogin[$i]->auth_token,
+                'current_user_id' => $user[$i]->user_id,
+                'course_alias' => $courseData['course_alias']
+            ]));
+
             CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
-                'accept_teacher' => 'no'
+                'accept_teacher' => 'no',
+                'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
             ]));
         }
 
@@ -174,11 +190,19 @@ class ProblemListCourseTest extends OmegaupTestCase {
 
         // User[2] accept teacher's request
         $userLogin[2] = self::login($user[2]);
+
+        $intro_details = CourseController::apiIntroDetails(new Request([
+            'auth_token' => $userLogin[$i]->auth_token,
+            'current_user_id' => $user[$i]->user_id,
+            'course_alias' => $courseData['course_alias']
+        ]));
+
         CourseController::apiAddStudent(new Request([
             'auth_token' => $userLogin[2]->auth_token,
             'course_alias' => $courseData['course_alias'],
             'usernameOrEmail' => $user[2]->username,
-            'accept_teacher' => 'yes'
+            'accept_teacher' => 'yes',
+            'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
         ]));
 
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([

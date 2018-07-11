@@ -1058,7 +1058,7 @@ class CourseController extends Controller {
                  && !empty($r['accept_teacher'])) {
                 PrivacyStatementConsentLogDAO::saveLog(
                     $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['git_object_id'], 'accept_teacher')
+                    PrivacyStatementsDAO::getId($r['teacher_git_object_id'], 'accept_teacher')
                 );
             }
             GroupsIdentitiesDAO::save($groupIdentity);
@@ -1106,7 +1106,7 @@ class CourseController extends Controller {
             GroupsIdentitiesDAO::delete(new GroupsIdentities([
             'group_id' => $r['course']->group_id,
             'identity_id' => $r['identity']->identity_id,
-        ]));
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1683,7 +1683,6 @@ class CourseController extends Controller {
         }
         try {
             $db_results = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
-
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

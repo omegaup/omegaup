@@ -270,7 +270,6 @@ omegaup.OmegaUp.loadTranslations({
 	courseStudentsEmpty: "N\u00e3o h\u00e1 alunos",
 	courseStudentsProgress: "Progresso do aluno",
 	courseStudentsProgressExportToSpreadsheet: "Exportar o progresso dos alunos para planilha",
-	courseUserAcceptTeacher: "Voc\u00ea quer adicionar o organizador do curso como seu professor? Se voc\u00ea o aceitar, ele poder\u00e1 ver uma lista dos problemas que voc\u00ea resolveu e outro dos problemas que voc\u00ea tentou resolver",
 	courseUserInformationOptional: "O criador do curso solicitou acesso \u00e0s informa\u00e7\u00f5es do usu\u00e1rio para contat\u00e1-lo, mas voc\u00ea decide se deseja autorizar esta a\u00e7\u00e3o. Deseja compartilhar suas informa\u00e7\u00f5es?",
 	courseUserInformationRequired: "O criador do curso exige acesso \u00e0s informa\u00e7\u00f5es do usu\u00e1rio para contat\u00e1-lo.<br>Clique <a href=\"https://omegaup.com/privacy/contest-user-information/\" target=\"_blank\">aqui</a> para mais informa\u00e7\u00f5es.<br>  Voc\u00ea s\u00f3 pode participar do curso se concordar. Deseja compartilhar suas informa\u00e7\u00f5es?",
 	courseViewProgress: "Ver o progresso",
