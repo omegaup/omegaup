@@ -5,7 +5,6 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   let coursePayload =
       JSON.parse(document.getElementById('course-payload').innerText);
-
   let courseIntro = new Vue({
     el: '#course-intro',
     render: function(createElement) {
@@ -17,6 +16,7 @@ OmegaUp.on('ready', function() {
           requestsUserInformation: coursePayload.requestsUserInformation,
           showAcceptTeacher: coursePayload.showAcceptTeacher,
           privacyStatementMarkdown: coursePayload.privacyStatementMarkdown,
+          acceptTeacherMarkdown: coursePayload.acceptTeacherMarkdown,
         },
         on: {
           submit: function(ev) {
@@ -25,6 +25,8 @@ OmegaUp.on('ready', function() {
                         'usernameOrEmail': coursePayload.currentUsername,
                         'share_user_information': ev.shareUserInformation,
                         'accept_teacher': ev.acceptTeacher,
+                        'git_object_id': coursePayload.gitObjectId,
+                        'teacher_git_object_id': coursePayload.teacherGitObjectId,
                         'statement_type': coursePayload.statementType,
                       })
                 .then(function(data) {

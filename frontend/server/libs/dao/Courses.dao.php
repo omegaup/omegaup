@@ -347,7 +347,7 @@ class CoursesDAO extends CoursesDAOBase {
                 accept_teacher
             FROM
                 Groups_Identities AS gi
-            INNER JOIN
+            LEFT JOIN
                 PrivacyStatement_Consent_Log AS pcl
             ON
                 gi.privacystatement_consent_id = pcl.privacystatement_consent_id

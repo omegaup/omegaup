@@ -270,12 +270,9 @@ omegaup.OmegaUp.loadTranslations({
 	courseStudentsEmpty: "(N0 57ud3n75)",
 	courseStudentsProgress: "(S7ud3n75' pr0gr355)",
 	courseStudentsProgressExportToSpreadsheet: "(Exp0r7 57ud3n75' pr0gr355 70 5pr3ad5h337)",
-<<<<<<< HEAD
 	courseUserAcceptTeacher: "(D0 y0u wan7 70 add 7h3 c0ur53 0rganiz3r a5 y0ur 73ach3r? If y0u acc3p7 him, h3 wi11 b3 ab13 70 533 a 1i57 0f 7h3 pr0b13m5 7ha7 y0u hav3 501v3d and an07h3r 0n3 0f 7h3 pr0b13m5 7ha7 y0u hav3 7ri3d 70 501v3)",
 	courseUserInformationOptional: "(Th3 cr3a70r 0f 7h3 c0ur53 ha5 r3qu3573d acc355 70 y0ur u53r inf0rma7i0n in 0rd3r 70 c0n7ac7 y0u, bu7 y0u d3cid3 if y0u wi5h 70 au7h0riz3 7hi5 ac7i0n. D0 y0u wan7 70 5har3 y0ur inf0rma7i0n?)",
 	courseUserInformationRequired: "(Th3 cr3a70r 0f 7h3 c0ur53 r3quir35 acc355 70 y0ur u53r inf0rma7i0n in 0rd3r 70 c0n7ac7 y0u. Y0u can 0n1y par7icipa73 in 7h3 c0ur53 if y0u agr33.<br>C1ick <a hr3f=\"h77p5://0m3gaup.c0m/privacy/c0n7357-u53r-inf0rma7i0n/\" 7arg37=\"_b1ank\">h3r3</a> f0r m0r3 inf0rma7i0n.<br> D0 y0u wan7 70 5har3 y0ur inf0rma7i0n?)",
-=======
->>>>>>> upstream/master
 	courseViewProgress: "(Vi3w pr0gr355)",
 	createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",
 	csrfException: "(Cr055-5i73 R3qu357 F0rg3ry a773mp7)",

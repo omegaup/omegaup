@@ -24,7 +24,7 @@
                v-model="shareUserInformation"> {{ T.wordsNo }}</label>
       </template>
       <template v-if="showAcceptTeacher">
-        <p v-html="T.courseUserAcceptTeacher"></p><label><input type="radio"
+        <p v-html="acceptTeacherConsentHtml"></p><label><input type="radio"
                v-model="acceptTeacher"
                value="yes"> {{ T.wordsYes }}</label> <label><input type="radio"
                v-model="acceptTeacher"
@@ -53,11 +53,16 @@ export default {
     description: String,
     needsBasicInformation: Boolean,
     requestsUserInformation: String,
+    showAcceptTeacher: Boolean,
     privacyStatementMarkdown: String,
+    acceptTeacherMarkdown: String,
   },
   computed: {
     consentHtml: function() {
       return this.markdownConverter.makeHtml(this.privacyStatementMarkdown);
+    },
+    acceptTeacherConsentHtml: function() {
+      return this.markdownConverter.makeHtml(this.acceptTeacherMarkdown);
     }
   },
   data: function() {
