@@ -5,10 +5,8 @@
 <script>
 
 export default {
-  data:function(){
-    return{
-      runCountsChart: null,
-    }
+  data: function() {
+    return { runCountsChart: null, }
   },
   props: {
     stats: Object,

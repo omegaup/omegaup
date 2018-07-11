@@ -2,10 +2,11 @@
   <div class="post">
     <div class="copy">
       <h1>{{ T.liveStatistics }}</h1>
-      <div>{{ totalRuns }}</div>
-      <omegaup-verdict-chart v-bind:contestalias="contestAlias"
-           v-bind:stats="stats"></omegaup-verdict-chart> <omegaup-distribution-chart v-bind:contestalias=
-           "contestAlias"
+      <div>
+        {{ totalRuns }}
+      </div><omegaup-verdict-chart v-bind:contestalias="contestAlias"
+           v-bind:stats="stats"></omegaup-verdict-chart>
+           <omegaup-distribution-chart v-bind:contestalias="contestAlias"
            v-bind:stats="stats"></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
@@ -21,18 +22,18 @@ export default {
     stats: Object,
     contestAlias: String,
   },
-  computed : {
-    totalRuns: function(){
+  computed: {
+    totalRuns: function() {
       return omegaup.UI.formatString(omegaup.T.totalRuns,
-                                  {numRuns: this.stats.total_runs});
+                                     {numRuns: this.stats.total_runs});
     }
   },
   components: {
     'omegaup-verdict-chart': verdict_chart,
     'omegaup-distribution-chart': distribution_chart,
   },
-  data: function(){
-    return { T:T, }
+  data: function() {
+    return { T: T, }
   },
 };
 

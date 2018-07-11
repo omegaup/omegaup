@@ -5,11 +5,9 @@
 <script>
 
 export default {
-	data: function(){
-		return{
-			distributionChart: null,
-		}
-	},
+  data: function() {
+    return { distributionChart: null, }
+  },
   props: {
     stats: Object,
     contestAlias: String,

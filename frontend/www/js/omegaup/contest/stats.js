@@ -34,14 +34,12 @@ OmegaUp.on('ready', function() {
                 'contestStats': contest_Stats,
               },
             });
-          
           }
-          if(stats){
+          if (stats) {
             // Pending runs chart
-           pendingChart = oGraph.pendingRuns(
-                updatePendingRunsChartTimeout,
-                () => s.pending_runs.length);
-           stats.stats = s;
+            pendingChart = oGraph.pendingRuns(updatePendingRunsChartTimeout,
+                                              () => s.pending_runs.length);
+            stats.stats = s;
           }
         })
         .fail(omegaup.UI.apiError);
@@ -49,6 +47,4 @@ OmegaUp.on('ready', function() {
 
   setInterval(() => getStats(), callStatsApiTimeout);
   getStats();
-
-  
 });
