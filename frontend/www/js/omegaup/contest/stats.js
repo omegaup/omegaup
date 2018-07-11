@@ -3,22 +3,20 @@ import Vue from 'vue';
 import {OmegaUp} from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  var stats = null;
   var ChartsDrawn = false;
   var contestAlias =
       /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
 
   Highcharts.setOptions({global: {useUTC: false}});
   var callStatsApiTimeout = 10 * 1000;
-  var updateRunCountsChartTimeout = callStatsApiTimeout;
   var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
+  var pendingChart = null;
   function getStats() {
     omegaup.API.Contest.stats({contest_alias: contestAlias})
         .then(function(s) {
-          stats = s;
           if (ChartsDrawn != true) {
             ChartsDrawn = true;
-            var StatsVue = new Vue({
+            var stats = new Vue({
               el: '#contest-stats',
               render: function(createElement) {
                 return createElement('contestStats', {
@@ -29,25 +27,28 @@ OmegaUp.on('ready', function() {
                 });
               },
               data: {
-                stats: stats,
+                stats: s,
                 contestAlias: contestAlias,
               },
               components: {
                 'contestStats': contest_Stats,
               },
             });
+          
+          }
+          if(stats){
             // Pending runs chart
-            window.pending_chart = oGraph.pendingRuns(
+           pendingChart = oGraph.pendingRuns(
                 updatePendingRunsChartTimeout,
-                function() { return stats.pending_runs.length; });
+                () => s.pending_runs.length);
+           stats.stats = s;
           }
         })
         .fail(omegaup.UI.apiError);
-    updateStats();
   };
 
-  function updateStats() {
-    setTimeout(function() { getStats(); }, callStatsApiTimeout);
-  }
+  setInterval(() => getStats(), callStatsApiTimeout);
   getStats();
+
+  
 });

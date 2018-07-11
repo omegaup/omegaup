@@ -5,23 +5,28 @@
 <script>
 
 export default {
+  data:function(){
+    return{
+      runCountsChart: null,
+    }
+  },
   props: {
     stats: Object,
     contestAlias: String,
   },
-  mounted: function() { this.draw_pie_chart();},
+  mounted: function() { this.drawPieChart();},
 
   watch: {stats: function() { this.updateRunCountsData();}},
   methods: {
-    draw_pie_chart: function() {
-      if (this.$el.run_counts_chart) return;
+    drawPieChart: function() {
+      if (this.runCountsChart) return;
 
       // Draw verdict counts pie chart
-      this.$el.run_counts_chart =
+      this.runCountsChart =
           oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
     },
     updateRunCountsData: function() {
-      this.$el.run_counts_chart.series[0].setData(
+      this.runCountsChart.series[0].setData(
           oGraph.normalizeRunCounts(this.stats));
     },
   },

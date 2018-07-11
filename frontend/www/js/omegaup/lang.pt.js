@@ -357,6 +357,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveLanguage: "Idioma",
 	libinteractiveOs: "Sistema Operacional",
 	libinteractiveTitle: "Modelo para problemas interativos",
+	liveStatistics: "Estat\u00edsticas ao vivo",
 	locale: "pt",
 	lockdownDetailsDisabled: "A visualiza\u00e7\u00e3o do c\u00f3digo-fonte foi desativada temporariamente.",
 	lockdownMessageWarning: "Aviso: no modo lockdown, Suas env\u00edos n\u00e3o ser\u00e3o mais acess\u00edveis se voc\u00ea sair da p\u00e1gina.",

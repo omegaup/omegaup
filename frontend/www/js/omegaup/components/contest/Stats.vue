@@ -1,19 +1,19 @@
 <template>
   <div class="post">
     <div class="copy">
-      <h1>Estadísticas en vivo</h1>
-      <div class="total-runs">
-        <h2></h2>
-      </div><verdict-chart v-bind:contestalias="contestAlias"
-           v-bind:stats="stats"></verdict-chart> <distribution-chart v-bind:contestalias=
+      <h1>{{ T.liveStatistics }}</h1>
+      <div>{{ totalRuns }}</div>
+      <omegaup-verdict-chart v-bind:contestalias="contestAlias"
+           v-bind:stats="stats"></omegaup-verdict-chart> <omegaup-distribution-chart v-bind:contestalias=
            "contestAlias"
-           v-bind:stats="stats"></distribution-chart>
+           v-bind:stats="stats"></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
   </div>
 </template>
 
 <script>
+import {T} from '../../omegaup.js';
 import verdict_chart from '../VerdictChart.vue';
 import distribution_chart from '../DistributionChart.vue';
 export default {
@@ -21,19 +21,19 @@ export default {
     stats: Object,
     contestAlias: String,
   },
-  components: {
-    'verdict-chart': verdict_chart,
-    'distribution-chart': distribution_chart,
-  },
-  mounted: function() { this.updateTotalRuns();},
-  methods: {
-    updateTotalRuns: function() {
-      this.$el.querySelector('.total-runs').textContent =
-          omegaup.UI.formatString(omegaup.T.totalRuns,
+  computed : {
+    totalRuns: function(){
+      return omegaup.UI.formatString(omegaup.T.totalRuns,
                                   {numRuns: this.stats.total_runs});
     }
   },
-  watch: {stats: function() { this.updateTotalRuns();}}
+  components: {
+    'omegaup-verdict-chart': verdict_chart,
+    'omegaup-distribution-chart': distribution_chart,
+  },
+  data: function(){
+    return { T:T, }
+  },
 };
 
 </script>

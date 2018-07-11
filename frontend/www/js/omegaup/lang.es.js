@@ -357,6 +357,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveLanguage: "Lenguaje",
 	libinteractiveOs: "Sistema Operativo",
 	libinteractiveTitle: "Plantillas para problema interactivo",
+	liveStatistics: "Estad\u00edsticas en vivo",
 	locale: "es",
 	lockdownDetailsDisabled: "Ver el c\u00f3digo ha sido temporalmente desactivado.",
 	lockdownMessageWarning: "Advertencia: en modo lockdown, tus env\u00edos ya no ser\u00e1n accesibles si te sales de la p\u00e1gina.",
