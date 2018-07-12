@@ -572,15 +572,17 @@ export class Arena {
   refreshRanking() {
     let self = this;
     if (self.options.originalContestAlias != null) {
-      API.Problemset.scoreboardEvents({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboardEvents(
+                        {problemset_id: self.options.problemsetId})
           .then(function(response) {
             let events = response.events;
             for (let event of events) {
               event.username += '-(virtual)';
               event.name += '-(virtual)';
             }
-            API.Problemset.scoreboardEvents(
-                           {problemset_id: self.options.originalProblemsetId})
+            API.Problemset.scoreboardEvents({
+                            problemset_id: self.options.originalProblemsetId
+                          })
                 .then(function(response) {
                   events.push.apply(response.events);
                   self.virtualRankingChange(events);
