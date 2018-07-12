@@ -12,17 +12,16 @@ export default {
     stats: Object,
     contestAlias: String,
   },
-  mounted: function() { this.drawPieChart();},
+  mounted: function() {
+    if (this.runCountsChart) return;
+
+    // Draw verdict counts pie chart
+    this.runCountsChart =
+        oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
+  },
 
   watch: {stats: function() { this.updateRunCountsData();}},
   methods: {
-    drawPieChart: function() {
-      if (this.runCountsChart) return;
-
-      // Draw verdict counts pie chart
-      this.runCountsChart =
-          oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
-    },
     updateRunCountsData: function() {
       this.runCountsChart.series[0].setData(
           oGraph.normalizeRunCounts(this.stats));
