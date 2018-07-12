@@ -591,7 +591,8 @@ export class Arena {
                 .fail(UI.ignoreError);
           })
           .fail(UI.ignoreError);
-    } else if (self.options.contestAdmin) {
+    } else if (self.options.contestAdmin || self.options.contestAlias != null ||
+               self.contestAdmin) {
       API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
