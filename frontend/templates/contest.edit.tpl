@@ -111,23 +111,10 @@
 			</table>
 		</div>
 
-		<div class="panel panel-primary" id="requests">
-			<div class="panel-body">
-				{#pendingRegistrations#}
-			</div>
-			<table id="user-requests-table"  >
-				<thead>
-				<tr>
-					<th>{#wordsUser#}</th>
-					<th>{#userEditCountry#}</th>
-					<th>{#requestDate#}</th>
-					<th>{#currentStatus#}</th>
-					<th>{#lastUpdate#}</th>
-					<th>{#contestAdduserAddContestant#}</th>
-				</tr>
-				</thead>
-			</table>
-		</div>
+		<script type="text/json" id="payload">{$REQUEST_PAYLOAD|json_encode}</script>
+		<div id="contest-requests"></div>
+		<script type="text/javascript" src="{version_hash src="/js/dist/contest_requests.js"}"></script>
+
 	</div>
 
 	<div class="tab-pane" id="admins">
