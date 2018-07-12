@@ -632,7 +632,13 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
-            $result['original_contest_alias'] = ($result['rerun_id'] != 0 ? ContestsDAO::getByPK($result['rerun_id'])->alias : null);
+            $result['original_contest_alias'] = null;
+            $result['original_problemset_id'] = null;
+            if ($result['rerun_id'] != 0) {
+                $original_contest = ContestsDAO::getByPK($result['rerun_id']);
+                $result['original_contest_alias'] = $original_contest->alias;
+                $result['original_problemset_id'] = $original_contest->problemset_id;
+            }
 
             try {
                 $acl = ACLsDAO::getByPK($r['contest']->acl_id);

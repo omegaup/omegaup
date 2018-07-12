@@ -77,12 +77,14 @@ class ProblemsetController extends Controller {
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiDetails(
                 new Request([
+                    'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
             return CourseController::apiAssignmentDetails(
                 new Request([
+                    'auth_token' => $r['auth_token'],
                     'course' => $r['problemset']['course'],
                     'assignment' => $r['problemset']['assignment'],
                 ])
@@ -90,6 +92,7 @@ class ProblemsetController extends Controller {
         } elseif ($r['problemset']['type'] == 'Interview') {
             return InterviewController::apiDetails(
                 new Request([
+                    'auth_token' => $r['auth_token'],
                     'interview_alias' => $r['problemset']['interview_alias'],
                 ])
             );
@@ -108,12 +111,15 @@ class ProblemsetController extends Controller {
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiScoreboard(
                 new Request([
+                    'auth_token' => $r['auth_token'],
+                    'token' => $r['token'],
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
             return CourseController::apiAssignmentScoreboard(
                 new Request([
+                    'auth_token' => $r['auth_token'],
                     'course_alias' => $r['problemset']['course'],
                     'assignment_alias' => $r['problemset']['assignment'],
                 ])
@@ -141,7 +147,8 @@ class ProblemsetController extends Controller {
         }
         return ContestController::apiScoreboardEvents(
             new Request([
-                'contest_alias' => $r['problemset']['contest_alias']
+                'auth_token' => $r['auth_token'],
+                'contest_alias' => $r['problemset']['contest_alias'],
             ])
         );
     }
@@ -166,6 +173,7 @@ class ProblemsetController extends Controller {
         }
         if ($r['problemset']['type'] == 'Contest') {
             $request = new Request([
+                'token' => $r['token'],
                 'contest_alias' => $r['problemset']['contest_alias'],
             ]);
             if (isset($r['auth_token'])) {

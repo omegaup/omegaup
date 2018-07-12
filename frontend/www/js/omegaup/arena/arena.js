@@ -441,6 +441,10 @@ export class Arena {
       self.options.originalContestAlias = problemset.original_contest_alias;
     }
 
+    if (problemset.hasOwnProperty('original_problemset_id')) {
+      self.options.originalProblemsetId = problemset.original_problemset_id;
+    }
+
     $('#title .contest-title')
         .html(UI.escape(problemset.title | problemset.name));
     self.updateSummary(problemset);
@@ -568,15 +572,15 @@ export class Arena {
   refreshRanking() {
     let self = this;
     if (self.options.originalContestAlias != null) {
-      API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
+      API.Problemset.scoreboardEvents({problemset_id: self.options.problemsetId})
           .then(function(response) {
             let events = response.events;
             for (let event of events) {
               event.username += '-(virtual)';
               event.name += '-(virtual)';
             }
-            API.Contest.scoreboardEvents(
-                           {contest_alias: self.options.originalContestAlias})
+            API.Problemset.scoreboardEvents(
+                           {problemset_id: self.options.originalProblemsetId})
                 .then(function(response) {
                   events.push.apply(response.events);
                   self.virtualRankingChange(events);
@@ -585,16 +589,9 @@ export class Arena {
                 .fail(UI.ignoreError);
           })
           .fail(UI.ignoreError);
-    } else if (self.options.contestAlias) {
-      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
+    } else {
+      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
-          .fail(UI.ignoreError);
-    } else if (self.options.assignmentAlias) {
-      API.Course.assignmentScoreboard({
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias
-                })
-          .then(self.rankingCourseChange.bind(self))
           .fail(UI.ignoreError);
     }
   }
