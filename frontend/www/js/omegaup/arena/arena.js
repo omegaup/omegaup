@@ -401,7 +401,7 @@ export class Arena {
     }
   }
 
-  contestLoaded(problemset) {
+  problemsetLoaded(problemset) {
     let self = this;
     if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
@@ -416,7 +416,7 @@ export class Arena {
               setTimeout(f, 1000);
             } else {
               API.Problemset.details({problemset_id: x})
-                  .then(contestLoaded.bind(self))
+                  .then(problemsetLoaded.bind(self))
                   .fail(UI.ignoreError);
             }
           }
@@ -591,7 +591,7 @@ export class Arena {
                 .fail(UI.ignoreError);
           })
           .fail(UI.ignoreError);
-    } else {
+    } else if (self.options.contestAdmin) {
       API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);

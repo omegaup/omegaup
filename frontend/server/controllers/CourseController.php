@@ -1533,6 +1533,7 @@ class CourseController extends Controller {
             'problems' => $problems,
             'director' => $director,
             'problemset_id' => $r['assignment']->problemset_id,
+            'admin' => Authorization::isCourseAdmin($r['current_identity_id'], $r['course']),
         ];
     }
 
