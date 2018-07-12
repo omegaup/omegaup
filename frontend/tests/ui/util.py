@@ -162,6 +162,7 @@ def is_path_whitelisted(message, path_whitelist):
 
 def is_message_whitelisted(message, message_whitelist):
     '''Checks whether string in message is whitelisted.
+
     It only compares strings between double or single quotes.
     '''
 
