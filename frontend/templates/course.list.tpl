@@ -33,6 +33,33 @@
 </div>
 </template>
 
+<template id="student-course-list">
+<div class="panel">
+    <div class="panel-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{#wordsName#}</th>
+                    <th>{#wordsStartTime#}</th>
+                    <th>{#wordsEndTime#}</th>
+                    <th>{#wordsNumHomeworks#}</th>
+                    <th>{#wordsNumTests#}</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: course">
+                <tr>
+                    <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
+                    <td data-bind="text: startDate"></td>
+                    <td data-bind="text: endDate"></td>
+                    <td data-bind="text: numHomeworks"></td>
+                    <td data-bind="text: numTests"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</template>
+
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">{#courseList#}</h3>
@@ -83,14 +110,14 @@
                 </div>
                 <div class="tab-pane" id="tab-student-courses-current">
                     <div id="student-courses-current"
-             data-bind="template: { name: 'course-list',
+             data-bind="template: { name: 'student-course-list',
                                     if: studentCoursesCurrent().length > 0,
                                     data: { listName: '{#courseListStudentCurrentCourses#}',
                                             course: studentCoursesCurrent() }  }"></div>
                 </div>
                 <div class="tab-pane" id="tab-student-courses-current">
                     <div id="student-courses-past"
-             data-bind="template: { name: 'course-list',
+             data-bind="template: { name: 'student-course-list',
                                     if: studentCoursesPast().length > 0,
                                     data: { listName: '{#courseListStudentPastCourses#}',
                                             course: studentCoursesPast() }  }"></div>

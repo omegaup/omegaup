@@ -1104,8 +1104,8 @@ class CourseController extends Controller {
 
         try {
             GroupsIdentitiesDAO::delete(new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
