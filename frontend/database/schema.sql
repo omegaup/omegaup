@@ -620,6 +620,7 @@ CREATE TABLE `Problemsets` (
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
   `scoreboard_url_admin` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard de admin en problemsets',
+  `type` enum('Contest','Assignment','Interview') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
   PRIMARY KEY (`problemset_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION

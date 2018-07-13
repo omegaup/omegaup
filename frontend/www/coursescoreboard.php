@@ -1,3 +1,4 @@
 <?php
 require_once('../server/bootstrap.php');
-$smarty->display('../templates/course.scoreboard.tpl');
+$smarty->assign('titleClassName', 'course-title');
+$smarty->display('../templates/arena.scoreboard.tpl');

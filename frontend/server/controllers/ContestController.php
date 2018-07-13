@@ -100,6 +100,7 @@ class ContestController extends Controller {
         // Filter returned values by these columns
         $relevantColumns = [
             'contest_id',
+            'problemset_id',
             'title',
             'description',
             'start_time',
@@ -202,6 +203,7 @@ class ContestController extends Controller {
             'alias',
             'start_time',
             'finish_time',
+            'problemset_id',
             'admission_mode',
             'scoreboard_url',
             'scoreboard_url_admin',
@@ -617,7 +619,6 @@ class ContestController extends Controller {
                 'submissions_gap',
                 'feedback',
                 'penalty',
-                'time_start',
                 'penalty_type',
                 'penalty_calc_policy',
                 'show_scoreboard_after',
@@ -631,7 +632,13 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
-            $result['original_contest_alias'] = ($result['rerun_id'] != 0 ? ContestsDAO::getByPK($result['rerun_id'])->alias : null);
+            $result['original_contest_alias'] = null;
+            $result['original_problemset_id'] = null;
+            if ($result['rerun_id'] != 0) {
+                $original_contest = ContestsDAO::getByPK($result['rerun_id']);
+                $result['original_contest_alias'] = $original_contest->alias;
+                $result['original_problemset_id'] = $original_contest->problemset_id;
+            }
 
             try {
                 $acl = ACLsDAO::getByPK($r['contest']->acl_id);
@@ -1053,6 +1060,7 @@ class ContestController extends Controller {
         $problemset = new Problemsets([
             'needs_basic_information' => $r['needs_basic_information'] == 'true',
             'requests_user_information' => $r['requests_user_information'],
+            'type' => 'Contest',
             'scoreboard_url' => SecurityTools::randomString(30),
             'scoreboard_url_admin' => SecurityTools::randomString(30),
         ]);
