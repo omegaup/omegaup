@@ -20,7 +20,7 @@
       </li>
       <li v-bind:class="{active: virtual}"
           v-on:click="showTab = 'contestants'">
-          <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
+        <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
       </li>
       <li v-on:click="showTab = 'admins'">
         <a data-toggle="tab">{{T.omegaupTitleContestAddAdmin}}</a>
@@ -61,7 +61,7 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'group_admins'">
-        <contest-group-admins v-bind:groupAdmins="groupAdmins"></contest-group-admins>
+        <contest-group-admins v-bind:groupadmins="groupAdmins"></contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
@@ -95,7 +95,10 @@ export default {
     groupAdmins: Array
   },
   data: function() {
-    return { showTab: this.isVirtual ? "contestants" : "new_form", T: T , virtual: this.isVirtual()}
+    return {
+      showTab: this.isVirtual ? "contestants" : "new_form", T: T,
+          virtual: this.isVirtual()
+    }
   },
   methods: {isVirtual: function() { return this.contest.rerun_id != 0;}},
   components: {

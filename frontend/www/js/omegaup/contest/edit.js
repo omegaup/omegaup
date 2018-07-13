@@ -144,7 +144,7 @@ OmegaUp.on('ready', function() {
                                         .fail(UI.apiError);
                                   },
                                   'add-group-admin': function(ev) {
-                                      console.log(ev.groupName);
+                                    console.log(ev.groupName);
                                     API.Contest.addGroupAdmin({
                                                  contest_alias: contestAlias,
                                                  group: ev.groupName

@@ -40,7 +40,7 @@
             <a v-bind:href="`/arena/problem/${problem.alias}/`">{{problem.alias}}</a>
           </td>
           <td>{{problem.points}}</td>
-          <td><button class="close">&times;</button></td>
+          <td><button class="close">×</button></td>
         </tr>
       </tbody>
     </table>

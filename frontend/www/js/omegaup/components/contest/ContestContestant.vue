@@ -5,8 +5,9 @@
         <form class="form"
               v-on:submit.prevent="onSubmit">
           <div class="form-group">
-            <label>{{T.wordsUser}}</label>
-            <omegaup-autocomplete v-model="contestant" v-bind:init="el => UI.userTypeahead(el)"></omegaup-autocomplete>
+            <label>{{T.wordsUser}}</label> <omegaup-autocomplete v-bind:init=
+            "el =&gt; UI.userTypeahead(el)"
+                 v-model="contestant"></omegaup-autocomplete>
           </div><button class="btn btn-primary user-add-single"
                 type="submit">{{T.contestAdduserAddUser}}</button>
           <hr>
@@ -34,7 +35,7 @@
             </td>
             <td>{{user.access_time}}</td>
             <td><button class="close"
-                    type="button">&times;</button></td>
+                    type="button">×</button></td>
           </tr>
         </tbody>
       </table>

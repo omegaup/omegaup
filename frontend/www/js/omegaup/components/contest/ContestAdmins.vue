@@ -4,8 +4,9 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsAdmin}}</label>
-          <omegaup-autocomplete v-model="user" v-bind:init="el => UI.userTypeahead(el)"></omegaup-autocomplete>
+          <label>{{T.wordsAdmin}}</label> <omegaup-autocomplete v-bind:init=
+          "el =&gt; UI.userTypeahead(el)"
+               v-model="user"></omegaup-autocomplete>
         </div>
         <div class="form-group">
           <div class="col-xs-5 col-sm-3 col-md-3 action-container">
@@ -35,7 +36,7 @@
           </td>
           <td>{{admin.role}}</td>
           <td><button class="close"
-                  type="button">&times;</button></td>
+                  type="button">×</button></td>
         </tr>
       </tbody>
     </table>
@@ -51,7 +52,7 @@ export default {
     admins: Array,
   },
   data: function() {
-    return { T: T, UI: UI,  user: "", showSiteAdmin: false }
+    return { T: T, UI: UI, user: "", showSiteAdmin: false }
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-admin', this);}},
   components: {'omegaup-autocomplete': Autocomplete}
