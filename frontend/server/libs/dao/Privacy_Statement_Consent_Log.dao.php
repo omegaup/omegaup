@@ -10,45 +10,30 @@ include_once('base/PrivacyStatement_Consent_Log.vo.base.php');
   *
   */
 class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
-    public static function hasAcceptedLatestPrivacyPolicy($identity_id) {
+    public static function hasAcceptedPrivacyStatement($identity_id, $privacystatement_id) {
         $sql = 'SELECT
                   COUNT(1)
                 FROM
                   `PrivacyStatement_Consent_Log` pscl
                 WHERE
                   pscl.identity_id = ?
-                  AND pscl.privacystatement_id = (
-                    SELECT
-                      MAX(privacystatement_id)
-                    FROM
-                      PrivacyStatements ps
-                    WHERE
-                      ps.type = \'privacy_policy\'
-                    )
+                  AND pscl.privacystatement_id = ?
                ';
         global $conn;
-        return $conn->GetOne($sql, [$identity_id]) > 0;
+        return $conn->GetOne($sql, [$identity_id, $privacystatement_id]) > 0;
     }
 
-    public static function saveLog($identity_id) {
+    public static function saveLog($identity_id, $privacystatement_id) {
         $sql = 'INSERT INTO
                   PrivacyStatement_Consent_Log (
                     `identity_id`,
                     `privacystatement_id`
                   )
-                SELECT
-                  ?,
-                  privacystatement_id
-                FROM
-                  `PrivacyStatements`
-                WHERE
-                  type = \'privacy_policy\'
-                ORDER BY
-                  privacystatement_id DESC
-                LIMIT 1;';
-        $params = [$identity_id];
+                VALUES
+                  (?, ?)';
+        $params = [$identity_id, $privacystatement_id];
         global $conn;
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        return $conn->Insert_ID();
     }
 }

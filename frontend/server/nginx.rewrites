@@ -41,6 +41,9 @@ location ^~ /events/ {
 
 # Backendv2 grader web interface.
 location /grader/ {
+  try_files $uri $uri/ @grader;
+}
+location @grader {
 	rewrite    ^/grader/(.*) /$1 break;
 	proxy_pass http://localhost:36663;
 }
@@ -70,6 +73,7 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /courseactivity.php?course=$1 las
 rewrite ^/course/new/?$ /coursenew.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /coursescoreboard.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /courseedit.php?course=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /coursestudent.php?course=$1&student=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /coursestudents.php?course=$1 last;
@@ -102,4 +106,5 @@ rewrite ^/profile/?$ /profile.php last;
 rewrite ^/profile/edit/?$ /profileedit.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/rank/?$ /rank.php last;
+rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolsrank/?$ /schoolsrank.php last;

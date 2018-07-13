@@ -44,8 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
             .val(contest.submissions_gap / 60);
         $('.new_contest_form #feedback').val(contest.feedback);
         $('.new_contest_form #penalty').val(contest.penalty);
-        $('.new_contest_form #public').val(contest.public);
-        $('.new_contest_form #register').val(contest.contestant_must_register);
+        $('.new_contest_form #admission_mode').val(contest.admission_mode);
         $('.new_contest_form #scoreboard').val(contest.scoreboard);
         $('.new_contest_form #penalty-type').val(contest.penalty_type);
         $('.new_contest_form #show-scoreboard-after')
@@ -61,7 +60,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #requests-user-information')
             .val(contest.requests_user_information);
 
-        $('.contest-publish-form #public').val(contest.public);
+        $('.contest-publish-form #admission_mode').val(contest.admission_mode);
         $('.contest-admin-links #submissions')
             .attr('href', '/arena/' + contestAlias + '/admin/');
         $('.contest-admin-links #conteststats')
@@ -81,8 +80,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.clone_contest_form #start-time')
             .val(omegaup.UI.formatDateTime(contest.start_time));
         $('.clone_contest_form #description').val(contest.description);
-        if (contest.contestant_must_register == null ||
-            contest.contestant_must_register == '0') {
+        if (contest.admission_mode != 'registration') {
           $('#requests').hide();
         }
 
@@ -113,7 +111,6 @@ omegaup.OmegaUp.on('ready', function() {
   refreshContestProblems();
   refreshContestContestants();
   refreshContestAdmins();
-  refreshContestRequests();
 
   // Edit contest
   $('.new_contest_form')
@@ -124,7 +121,7 @@ omegaup.OmegaUp.on('ready', function() {
   // Publish
   $('.contest-publish-form')
       .on('submit', function() {
-        return updateContest($('.contest-publish-form #public').val());
+        return updateContest($('.contest-publish-form #admission_mode').val());
       });
 
   // Update contest
@@ -145,12 +142,12 @@ omegaup.OmegaUp.on('ready', function() {
           points_decay_factor: $('#points-decay-factor').val(),
           submissions_gap: $('#submissions-gap').val() * 60,
           feedback: $('#feedback').val(),
-          penalty: $('#penalty').val(), public: public,
+          penalty: $('#penalty').val(),
           scoreboard: $('#scoreboard').val(),
           penalty_type: $('#penalty-type').val(),
           show_scoreboard_after: $('#show-scoreboard-after').val(),
           languages: $('#languages').val(),
-          contestant_must_register: $('#register').val(),
+          admission_mode: $('#admission_mode').val(),
           basic_information:
               $('#basic-information-required').is(':checked') ? '1' : '0',
           requests_user_information: $('#requests-user-information').val(),
@@ -260,91 +257,6 @@ omegaup.OmegaUp.on('ready', function() {
   omegaup.UI.userTypeahead($('#username-admin'));
   omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
   omegaup.UI.problemTypeahead($('#problems-dropdown'));
-
-  function refreshContestRequests() {
-    $('#user-requests-table')
-        .bootstrapTable({
-          method: 'get',
-          url: '/api/contest/requests/contest_alias/' + contestAlias + '/',
-          onPostBody: function() {
-            $('.close.request-accept')
-                .on('click', (function() {
-                      return function() {
-                        var username = $(this).val();
-                        omegaup.API.Contest.arbitrateRequest({
-                                             contest_alias: contestAlias,
-                                             username: username,
-                                             resolution: true /* accepted */,
-                                             note: '',
-                                           })
-                            .then(function(response) {
-                              omegaup.UI.success(omegaup.T.successfulOperation);
-                              $('#user-requests-table')
-                                  .bootstrapTable('refresh');
-                            })
-                            .fail(omegaup.UI.apiError);
-                      };
-                    })());
-
-            $('.close.request-deny')
-                .on('click', (function() {
-                      return function() {
-                        var username = $(this).val();
-                        omegaup.API.Contest.arbitrateRequest({
-                                             contest_alias: contestAlias,
-                                             username: username,
-                                             resolution: false /* rejected */,
-                                             note: '',
-                                           })
-                            .then(function(response) {
-                              omegaup.UI.success(omegaup.T.successfulOperation);
-                              $('#user-requests-table')
-                                  .bootstrapTable('refresh');
-                            })
-                            .fail(omegaup.UI.apiError);
-                      };
-                    })());
-          },
-          responseHandler: function(res) { return res.users; },
-          columns: [
-            {field: 'username'},
-            {field: 'country', sortable: true},
-            {field: 'request_time'},
-            {
-              field: 'accepted',
-              sortable: true,
-              formatter: function(value) {
-                if (value == null) {
-                  return omegaup.T.wordsDenied;
-                }
-
-                if (value == 'true' || value == '1') {
-                  return omegaup.T.wordAccepted;
-                }
-
-                return omegaup.T.wordsDenied;
-              }
-            },
-            {
-              field: 'last_update',
-              formatter: function(v, o) {
-                return v + ' (' + o.admin.username + ')';
-              }
-            },
-            {
-              field: 'accepted',
-              formatter: function(a, b, c) {
-                return '<button type="button" ' +
-                       'class="close request-deny" value="' + b.username +
-                       '" style="color:red">&times;</button>' +
-                       '<button type="button" ' +
-                       'class="close request-accept" value="' + b.username +
-                       '" style="color:green">&#x2713;</button>';
-              }
-            }
-          ]
-        });
-  }
 
   function refreshContestContestants() {
     omegaup.API.Contest.users({contest_alias: contestAlias})
