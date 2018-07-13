@@ -2,7 +2,11 @@
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
+{if isset($coderOfTheMonthData)}
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
+{else}
+<script type="text/json" id="coder-of-the-month-payload">null</script>
+{/if}
 {if $LOGGED_IN eq '1'}
 <script type="text/json" id="current-user-payload">{$currentUserInfo|json_encode}</script>
 {else}
@@ -36,6 +40,7 @@
 				{include file='rank.table.tpl' length=5 is_index=true}
 			</div>
 
+			{if isset($schoolRankPayload)}
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
@@ -48,6 +53,7 @@
 					</div>
 				</div>
 			</div>
+			{/if}
 
 		</div>
 	</div>

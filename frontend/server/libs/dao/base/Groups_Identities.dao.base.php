@@ -20,7 +20,7 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`';
+    const FIELDS = '`Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
         if (is_null($group_id) || is_null($identity_id)) {
             return null;
         }
-        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` from Groups_Identities';
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id` from Groups_Identities';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -139,6 +139,10 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
             $clauses[] = '`share_user_information` = ?';
             $params[] = $Groups_Identities->share_user_information;
         }
+        if (!is_null($Groups_Identities->privacystatement_consent_id)) {
+            $clauses[] = '`privacystatement_consent_id` = ?';
+            $params[] = $Groups_Identities->privacystatement_consent_id;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -149,7 +153,7 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information` FROM `Groups_Identities`';
+        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id` FROM `Groups_Identities`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -173,9 +177,10 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
       * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a actualizar.
       */
     final private static function update(GroupsIdentities $Groups_Identities) {
-        $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
+        $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
             $Groups_Identities->share_user_information,
+            $Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->group_id,$Groups_Identities->identity_id,
         ];
         global $conn;
@@ -196,11 +201,12 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a crear.
      */
     final private static function create(GroupsIdentities $Groups_Identities) {
-        $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`) VALUES (?, ?, ?, ?);';
         $params = [
             $Groups_Identities->group_id,
             $Groups_Identities->identity_id,
             $Groups_Identities->share_user_information,
+            $Groups_Identities->privacystatement_consent_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -277,6 +283,17 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`share_user_information` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $Groups_IdentitiesA->privacystatement_consent_id;
+        $b = $Groups_IdentitiesB->privacystatement_consent_id;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`privacystatement_consent_id` >= ? AND `privacystatement_consent_id` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`privacystatement_consent_id` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

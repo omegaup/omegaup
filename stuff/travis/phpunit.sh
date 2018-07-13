@@ -26,6 +26,7 @@ stage_script() {
 		--coverage-clover=coverage.xml \
 		frontend/tests/controllers
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
+	python3 stuff/policy-tool.py --database=omegaup-test validate
 }
 
 stage_after_success() {

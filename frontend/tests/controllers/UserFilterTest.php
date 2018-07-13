@@ -122,7 +122,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException UnauthorizedException
      */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias,
@@ -131,22 +131,24 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
-                        $contest->scoreboard_url,
+                        $problemset->scoreboard_url,
         ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertEmpty($response['contest_admin']);
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['public' => 0]))['contest'];
+        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $r = new Request([
             'filter' => '/contest/' . $contest->alias . '/' .
-                        $contest->scoreboard_url_admin,
+                        $problemset->scoreboard_url_admin,
         ]);
         $response = UserController::apiValidateFilter($r);
         $this->assertContains($contest->alias, $response['contest_admin']);

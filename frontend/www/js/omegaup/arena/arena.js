@@ -149,8 +149,8 @@ export class Arena {
 
     self.options = options;
 
-    // The current contest.
-    self.currentContest = null;
+    // The current problemset.
+    self.currentProblemset = null;
 
     // The interval for clock updates.
     self.clockInterval = null;
@@ -482,11 +482,11 @@ export class Arena {
     $('#root').fadeIn('slow');
   }
 
-  initProblems(contest) {
+  initProblems(problemset) {
     let self = this;
-    self.currentContest = contest;
-    self.contestAdmin = contest.admin;
-    let problems = contest.problems;
+    self.currentProblemset = problemset;
+    self.contestAdmin = problemset.admin;
+    let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
@@ -497,7 +497,7 @@ export class Arena {
     }
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
-      self.elements.rankingTable.showPenalty = contest.show_penalty;
+      self.elements.rankingTable.showPenalty = problemset.show_penalty;
     }
   }
 
@@ -593,7 +593,7 @@ export class Arena {
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias
                 })
-          .then(self.rankingChange.bind(self))
+          .then(self.rankingCourseChange.bind(self))
           .fail(UI.ignoreError);
     }
   }
@@ -674,6 +674,22 @@ export class Arena {
           .then(self.onRankingEvents.bind(self))
           .fail(UI.ignoreError);
     }
+  }
+
+  rankingCourseChange(data) {
+    let self = this;
+    self.onRankingChanged(data);
+
+    let params = {
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Course.assignmentScoreboardEvents(params)
+        .then(self.onRankingEvents.bind(self))
+        .fail(UI.ignoreError);
   }
 
   onRankingChanged(data) {
@@ -892,7 +908,7 @@ export class Arena {
         contest: clarification.contest_alias,
         problem: clarification.problem_alias,
         message: clarification.message,
-        answer: clarification.answer,
+        answer: clarification.answer, public: clarification.public,
         anchor: '#' + anchor,
         modificationTime: clarification.time.getTime()
       });
@@ -917,6 +933,8 @@ export class Arena {
           if (clarification.public == 1) {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
+            $('#create-response-is-public', responseFormNode)
+                .prop('checked', true);
           }
           responseFormNode.on('submit', function() {
             let responseText = null;
@@ -972,7 +990,7 @@ export class Arena {
         contest: clarification.contest_alias,
         problem: clarification.problem_alias,
         message: clarification.message,
-        answer: clarification.answer,
+        answer: clarification.answer, public: clarification.public,
         anchor: '#' + anchor,
         modificationTime: clarification.time.getTime()
       });
@@ -990,6 +1008,9 @@ export class Arena {
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
+    }
+    if (clarification.public == 1) {
+      $('#create-response-is-public', r).prop('checked', true);
     }
   }
 
@@ -1421,7 +1442,7 @@ export class Arena {
                  problem.runs.length > 0) {
         nextSubmissionTimestamp =
             new Date(problem.runs[problem.runs.length - 1].time.getTime() +
-                     self.currentContest.submissions_gap * 1000);
+                     self.currentProblemset.submissions_gap * 1000);
       }
     }
     if (self.submissionGapInterval) {
@@ -1860,6 +1881,7 @@ class ObservableRun {
     self.runtime = ko.observable(run.runtime);
     self.score = ko.observable(run.score);
     self.status = ko.observable(run.status);
+    self.type = ko.observable(run.type);
     self.submit_delay = ko.observable(run.submit_delay);
     self.time = ko.observable(run.time);
     self.username = ko.observable(run.username);
@@ -1962,6 +1984,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
+    if (self.type() == 'disqualified') return T['wordsDisqualify'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -1989,6 +2012,8 @@ class ObservableRun {
     let self = this;
 
     if (self.status() != 'ready') return '';
+
+    if (self.type() == "disqualified") return '#F00';
 
     if (self.verdict() == 'AC') {
       return '#CF6';
@@ -2031,6 +2056,16 @@ class ObservableRun {
     API.Run.rejudge({run_alias: self.guid, debug: false})
         .then(function(data) {
           self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
+  }
+
+  disqualify() {
+    let self = this;
+    API.Run.disqualify({run_alias: self.guid})
+        .then(function(data) {
+          self.type('disqualifed');
           self.arena.updateRunFallback(self.guid);
         })
         .fail(UI.ignoreError);

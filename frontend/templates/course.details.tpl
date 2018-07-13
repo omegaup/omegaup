@@ -10,6 +10,9 @@
 		<th>{#wordsProgress#}</th>
 		<th class="time">{#wordsStartTime#}</th>
 		<th class="time">{#wordsEndTime#}</th>
+		{if $showRanking}
+		<th class="time">{#courseDetailsScoreboard#}</th>
+		{/if}
 	</tr></thead>
 	<tbody data-bind="foreach: assignment">
 		<tr>
@@ -18,6 +21,12 @@
 			<td data-bind="text: progress" />
 			<td data-bind="text: startTime" />
 			<td data-bind="text: finishTime" />
+			{if $showRanking}
+			<td>
+				<a data-bind="attr: { href: scoreboardUrl }" class="glyphicon glyphicon-link">{#wordsPublic#}</a>
+				<a data-bind="attr: { href: scoreboardUrlAdmin }" class="glyphicon glyphicon-link">{#wordsAdmin#}</a>
+			</td>
+			{/if}
 		</tr>
 	</tbody>
 </table>
