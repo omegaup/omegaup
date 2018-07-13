@@ -22,7 +22,7 @@
       <tbody>
         <tr v-for="group in groupAdmins">
           <td>
-            <a v-bind:href="`/group/${group.alias}/edit/`"></a>{{group.name}}
+            <a v-bind:href="`/group/${group.alias}/edit/`">{{group.name}}</a>
           </td>
           <td>{{group.role}}</td>
           <td><button class="close"
