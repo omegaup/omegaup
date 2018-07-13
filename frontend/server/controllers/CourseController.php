@@ -909,13 +909,9 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-        ]);
         if (is_null(GroupsIdentitiesDAO::getByPK(
-            $groupIdentity->group_id,
-            $groupIdentity->identity_id
+            $r['course']->group_id,
+            $r['identity']->identity_id
         ))) {
             throw new NotFoundException(
                 'courseStudentNotInCourse'
@@ -1028,11 +1024,21 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])
             && ($r['course']->public == false
             || $r['identity']->identity_id !== $r['current_identity_id'])
-            && $r['course']->requests_user_information == 'no') {
+            && $r['course']->requests_user_information == 'no'
+            && is_null($r['accept_teacher'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
+        $groupIdentity = new GroupsIdentities([
+            'group_id' => $r['course']->group_id,
+            'identity_id' => $r['identity']->identity_id,
+            'share_user_information' => $r['share_user_information'],
+            'accept_teacher' => $r['accept_teacher'],
+        ]);
+
         CoursesDAO::transBegin();
+
         try {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $r['course']->group_id,
@@ -1042,19 +1048,21 @@ class CourseController extends Controller {
             // Only users adding themselves are saved in consent log
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && $r['course']->requests_user_information != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['identity']->identity_id,
-                    $privacystatement_id
+                    PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type'])
                 );
 
-                GroupsIdentitiesDAO::save(new GroupsIdentities([
-                    'group_id' => $r['course']->group_id,
-                    'identity_id' => $r['identity']->identity_id,
-                    'share_user_information' => $r['share_user_information'],
-                    'privacystatement_consent_id' => $privacystatement_consent_id
-                ]));
+                $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
             }
+            if ($r['identity']->identity_id === $r['current_identity_id']
+                 && !empty($r['accept_teacher'])) {
+                PrivacyStatementConsentLogDAO::saveLog(
+                    $r['identity']->identity_id,
+                    PrivacyStatementsDAO::getId($r['teacher_git_object_id'], 'accept_teacher')
+                );
+            }
+            GroupsIdentitiesDAO::save($groupIdentity);
 
             CoursesDAO::transEnd();
         } catch (Exception $e) {
@@ -1088,19 +1096,18 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-        ]);
         if (is_null(GroupsIdentitiesDAO::getByPK(
-            $groupIdentity->group_id,
-            $groupIdentity->identity_id
+            $r['course']->group_id,
+            $r['identity']->identity_id
         ))) {
             throw new NotFoundException('courseStudentNotInCourse');
         }
 
         try {
-            GroupsIdentitiesDAO::delete($groupIdentity);
+            GroupsIdentitiesDAO::delete(new GroupsIdentities([
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id,
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1312,8 +1319,11 @@ class CourseController extends Controller {
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group']);
         $isFirstTimeAccess = false;
+        $showAcceptTeacher = false;
         if (!Authorization::isGroupAdmin($r['current_identity_id'], $r['group'])) {
-            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_identity_id'], $r['course'], $r['group']);
+            $sharingInformation = CoursesDAO::getSharingInformation($r['current_identity_id'], $r['course'], $r['group']);
+            $isFirstTimeAccess = $sharingInformation['share_user_information'] == null;
+            $showAcceptTeacher = $sharingInformation['accept_teacher'] == null;
         }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
@@ -1321,6 +1331,7 @@ class CourseController extends Controller {
 
         $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result['showAcceptTeacher'] = $showAcceptTeacher;
 
         // Privacy Statement Information
         $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
@@ -1328,15 +1339,23 @@ class CourseController extends Controller {
             'course',
             $result['requests_user_information']
         );
+        $result['git_object_id'] = null;
+        $result['statement_type'] = null;
         if (!is_null($result['privacy_statement_markdown'])) {
             $statement_type = "course_{$result['requests_user_information']}_consent";
             $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
             $result['statement_type'] = $statement_type;
         }
+        $result['teacher_git_object_id'] = null;
+        $result['accept_teacher_markdown'] = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
+        if (!is_null($result['accept_teacher_markdown'])) {
+            $result['teacher_git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement('accept_teacher')['git_object_id'];
+        }
 
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         $result['requests_user_information'] = $result['requests_user_information'];
+
         return $result;
     }
 
@@ -1648,6 +1667,61 @@ class CourseController extends Controller {
             false /*withRunDetails*/,
             true /*sortByName*/
         );
+    }
+
+    /**
+     * Get Problems solved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListSolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+        try {
+            $db_results = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
+    }
+
+    /**
+     * Get Problems unsolved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $db_results = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $user_problems = [];
+        foreach ($db_results as $problem) {
+            unset($problem['problem_id']);
+            $user_problems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $user_problems];
     }
 
     /**
