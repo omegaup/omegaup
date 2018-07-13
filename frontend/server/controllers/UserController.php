@@ -2118,6 +2118,7 @@ class UserController extends Controller {
             'admin' => false,
             'problem_admin' => [],
             'contest_admin' => [],
+            'problemset' => [],
         ];
 
         $session = SessionController::apiCurrentSession($r)['session'];
@@ -2164,6 +2165,19 @@ class UserController extends Controller {
                         $r2['token'] = $tokens[3];
                     }
                     ContestController::validateDetails($r2);
+                    if ($r2['contest_admin']) {
+                        $response['contest_admin'][] = $r2['contest_alias'];
+                    }
+                    break;
+                case 'problemset':
+                    if (count($tokens) < 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $r2 = ProblemsetController::wrapRequest(new Request([
+                        'problemset_id' => $tokens[2],
+                        'auth_token' => $r['auth_token'],
+                        'tokens' => $tokens
+                    ]));
                     if ($r2['contest_admin']) {
                         $response['contest_admin'][] = $r2['contest_alias'];
                     }

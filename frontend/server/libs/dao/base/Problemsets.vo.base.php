@@ -50,6 +50,9 @@ class Problemsets extends VO {
         if (isset($data['scoreboard_url_admin'])) {
             $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
         }
+        if (isset($data['type'])) {
+            $this->type = $data['type'];
+        }
     }
 
     /**
@@ -120,4 +123,11 @@ class Problemsets extends VO {
       * @var varchar(30)
       */
     public $scoreboard_url_admin;
+
+    /**
+      * Almacena el tipo de problemset que se ha creado
+      * @access public
+      * @var enum('contest','assignment','interview')
+      */
+    public $type;
 }

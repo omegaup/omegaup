@@ -358,6 +358,7 @@ class CourseController extends Controller {
             // Create the backing problemset
             $problemset = new Problemsets([
                 'acl_id' => $r['course']->acl_id,
+                'type' => 'Assignment',
                 'scoreboard_url' => SecurityTools::randomString(30),
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
@@ -1551,6 +1552,7 @@ class CourseController extends Controller {
             'problems' => $problems,
             'director' => $director,
             'problemset_id' => $r['assignment']->problemset_id,
+            'admin' => Authorization::isCourseAdmin($r['current_identity_id'], $r['course']),
         ];
     }
 

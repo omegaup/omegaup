@@ -11,9 +11,7 @@ import ui.util as util
 
 
 # Assignment scoreboard is still not completely working.
-@util.no_javascript_errors(
-    path_whitelist=('/api/course/assignmentScoreboard/',),
-    message_whitelist=('/api/course/assignmentScoreboard/',))
+@util.no_javascript_errors()
 @util.annotate
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
