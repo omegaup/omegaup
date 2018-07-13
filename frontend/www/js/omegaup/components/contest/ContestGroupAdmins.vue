@@ -4,8 +4,9 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsGroupAdmin}}</label>
-          <omegaup-autocomplete v-model="groupName" v-bind:init="el => UI.typeahead(el, API.Group.list)"></omegaup-autocomplete>
+          <label>{{T.wordsGroupAdmin}}</label> <omegaup-autocomplete v-bind:init=
+          "el =&gt; UI.typeahead(el, API.Group.list)"
+               v-model="groupName"></omegaup-autocomplete>
         </div><button class="btn btn-primary"
               type="submit">{{T.contestAddgroupAddGroup}}</button>
       </form>

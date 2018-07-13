@@ -4,8 +4,9 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsProblem}}</label>
-          <autocomplete v-model="alias" v-bind:init="el => UI.problemTypeahead(el)"></autocomplete>
+          <label>{{T.wordsProblem}}</label> <omegaup-autocomplete v-bind:init=
+          "el =&gt; UI.problemTypeahead(el)"
+               v-model="alias"></omegaup-autocomplete>
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemProblemPoints}}</label> <input class="form-control"
@@ -55,6 +56,6 @@ export default {
     return { T: T, UI: UI, alias: "", point: 100, order: 1, }
   },
   methods: {onSubmit: function() { this.$parent.$emit('addProblem', this);}},
-  components: {'autocomplete': Autocomplete}
+  components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>
