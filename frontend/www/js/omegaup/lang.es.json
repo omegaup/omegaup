@@ -104,6 +104,7 @@
 	"contestEditTagDelete": "Eliminar",
 	"contestEditTagName": "Nombre",
 	"contestEditTagPublic": "P\u00fablico",
+	"contestEditWithTitle": "Editar concurso %(title)",
 	"contestFullList": "Ver listado completo",
 	"contestIntroDifferentStarts": "Tiempo (en minutos) que tienes para enviar soluciones despu\u00e9s que el concurso inicia: %(window_length) minutos",
 	"contestIntroPenaltyDesc": "Entero indicando el n\u00famero de minutos con que se penaliza por enviar una respuesta incorrecta: %(window_length) minutos",

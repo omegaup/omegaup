@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header">
-      <h1>{{T.contestEdit + ' ' + contest.title}} <small><a v-bind:href=
+		<h1>{{UI.formatString(T.contestEditWithTitle, {title: contest.title})}} <small><a v-bind:href=
       "`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
     </div>
     <ul class="nav nav-tabs nav-justified">
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {T, UI} from '../../omegaup.js';
 import ContestNewForm from './ContestNewForm.vue';
 import ContestAddProblem from './ContestAddProblem.vue';
 import ContestPublish from './ContestPublish.vue';
@@ -97,7 +97,7 @@ export default {
   data: function() {
     return {
       showTab: this.isVirtual() ? "contestants" : "new_form", T: T,
-          virtual: this.isVirtual()
+          virtual: this.isVirtual(), UI: UI
     }
   },
   methods: {isVirtual: function() { return this.contest.rerun_id != 0;}},
