@@ -11,7 +11,7 @@
         <div class="form-group">
           <label>{{T.contestAddproblemProblemPoints}}</label> <input class="form-control"
                size="3"
-               v-model="point">
+               v-model="points">
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemContestOrder}}</label> <input class="form-control"
@@ -40,7 +40,7 @@
             <a v-bind:href="`/arena/problem/${problem.alias}/`">{{problem.alias}}</a>
           </td>
           <td>{{problem.points}}</td>
-          <td><button class="close">x</button></td>
+          <td><button class="close">&times;</button></td>
         </tr>
       </tbody>
     </table>
@@ -53,9 +53,9 @@ import Autocomplete from '../Autocomplete.vue';
 export default {
   props: {problems: Array},
   data: function() {
-    return { T: T, UI: UI, alias: "", point: 100, order: 1, }
+    return { T: T, UI: UI, alias: "", points: 100, order: 1, }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('addProblem', this);}},
+  methods: {onSubmit: function() { this.$parent.$emit('add-problem', this);}},
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

@@ -1,17 +1,16 @@
 <template>
   <input class="typeahead form-control"
-        ref="input">
+        ref="input" v-on:change="updateInput">
 </template>
 
 <script>
 import {UI} from '../omegaup.js';
 export default {
   props: {
+      value: String,
       init: Function
   },
-  data: function() {
-    return { value: "" }
-  },
+  data: function() { return {};},
   mounted: function() {
       this.init($(this.$el));
   },

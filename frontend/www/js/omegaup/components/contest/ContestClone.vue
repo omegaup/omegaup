@@ -56,7 +56,7 @@ export default {
       T: T, title: "", alias: "", description: "", startTime: new Date()
     }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('cloneContest', this);}},
+  methods: {onSubmit: function() { this.$parent.$emit('clone-contest', this);}},
   components: {'omegaup-datetime': DateTime}
 }
 </script>

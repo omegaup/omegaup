@@ -30,7 +30,7 @@ OmegaUp.on('ready', function() {
                                   groupAdmins: groupAdmins
                                 },
                                 on: {
-                                  updateContest: function(ev) {
+                                  'update-contest': function(ev) {
                                     API.Contest
                                         .update({
                                           contest_alias: contestAlias,
@@ -64,12 +64,12 @@ OmegaUp.on('ready', function() {
                                         .then(UI.contestUpdated)
                                         .fail(UI.apiError);
                                   },
-                                  addProblem: function(ev) {
+                                  'add-problem': function(ev) {
                                     API.Contest.addProblem({
                                                  contest_alias: contestAlias,
                                                  order_in_contest: ev.order,
                                                  problem_alias: ev.alias,
-                                                 points: ev.point,
+                                                 points: ev.points,
                                                })
                                         .then(function(response) {
                                           UI.success(
@@ -77,7 +77,7 @@ OmegaUp.on('ready', function() {
                                         })
                                         .fail(UI.apiError);
                                   },
-                                  removeProblem: function(problem) {
+                                  'remove-problem': function(problem) {
                                     API.Contest.removeProblem({
                                                  contest_alias: contestAlias,
                                                  problem_alias: problem
@@ -88,7 +88,7 @@ OmegaUp.on('ready', function() {
                                         })
                                         .fail(UI.apiError);
                                   },
-                                  updatePublic: function(ev) {
+                                  'update-public': function(ev) {
                                     API.Contest.update({
                                                  contest_alias: contestAlias,
                                                  public: ev.public
@@ -96,7 +96,7 @@ OmegaUp.on('ready', function() {
                                         .then(UI.contestUpdated)
                                         .fail(UI.apiError);
                                   },
-                                  addUser: function(ev) {
+                                  'add-user': function(ev) {
                                     var contestants = [];
                                     if (ev.contestants !== '')
                                       contestants = ev.contestants.split(',');
@@ -117,7 +117,7 @@ OmegaUp.on('ready', function() {
                                           UI.error(T.bulkUserAddError);
                                         });
                                   },
-                                  cloneContest: function(ev) {
+                                  'clone-contest': function(ev) {
                                     API.Contest.clone({
                                                  contest_alias: contestAlias,
                                                  title: ev.title,
@@ -133,7 +133,7 @@ OmegaUp.on('ready', function() {
                                         })
                                         .fail(UI.apiError);
                                   },
-                                  addAdmin: function(ev) {
+                                  'add-admin': function(ev) {
                                     API.Contest.addAdmin({
                                                  contest_alias: contestAlias,
                                                  usernameOrEmail: ev.user
@@ -143,7 +143,8 @@ OmegaUp.on('ready', function() {
                                         })
                                         .fail(UI.apiError);
                                   },
-                                  addGroupAdmin: function(ev) {
+                                  'add-group-admin': function(ev) {
+                                      console.log(ev.groupName);
                                     API.Contest.addGroupAdmin({
                                                  contest_alias: contestAlias,
                                                  group: ev.groupName

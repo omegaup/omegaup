@@ -28,6 +28,6 @@ export default {
   data: function() {
     return { public: this.contest.public, T: T }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('updatePublic', this);}}
+  methods: {onSubmit: function() { this.$parent.$emit('update-public', this);}}
 }
 </script>

@@ -34,7 +34,7 @@
             </td>
             <td>{{user.access_time}}</td>
             <td><button class="close"
-                    type="button">x</button></td>
+                    type="button">&times;</button></td>
           </tr>
         </tbody>
       </table>
@@ -69,7 +69,7 @@ export default {
   data: function() {
     return { T: T, UI: UI, contestant: "", contestants: "" }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('addUser', this);}},
+  methods: {onSubmit: function() { this.$parent.$emit('add-user', this);}},
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

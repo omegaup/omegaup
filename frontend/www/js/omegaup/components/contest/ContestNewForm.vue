@@ -284,7 +284,7 @@ export default {
       this.penaltyType = "none";
       this.showScoreboardAfter = true;
     },
-    onSubmit: function() { this.$parent.$emit('updateContest', this);}
+    onSubmit: function() { this.$parent.$emit('update-contest', this);}
   },
   components: {'omegaup-datetimepicker': DateTimePicker},
 }

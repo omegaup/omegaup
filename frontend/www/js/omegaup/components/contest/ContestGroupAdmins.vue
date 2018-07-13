@@ -27,7 +27,7 @@
           <td>{{group.role}}</td>
           <td><button class="close"
                   type="button"
-                  v-if="group.name != 'admin'">x</button></td>
+                  v-if="group.name != 'admin'">&times;</button></td>
         </tr>
       </tbody>
     </table>
@@ -43,7 +43,7 @@ export default {
   data: function() {
     return { T: T, UI: UI, API: API, groupName: "" }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('addGroupAdmin', this);}},
+  methods: {onSubmit: function() { this.$parent.$emit('add-group-admin', this);}},
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

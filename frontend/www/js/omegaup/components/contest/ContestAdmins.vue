@@ -35,7 +35,7 @@
           </td>
           <td>{{admin.role}}</td>
           <td><button class="close"
-                  type="button">x</button></td>
+                  type="button">&times;</button></td>
         </tr>
       </tbody>
     </table>
@@ -53,7 +53,7 @@ export default {
   data: function() {
     return { T: T, UI: UI,  user: "", showSiteAdmin: false }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('addAdmin', this);}},
+  methods: {onSubmit: function() { this.$parent.$emit('add-admin', this);}},
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>
