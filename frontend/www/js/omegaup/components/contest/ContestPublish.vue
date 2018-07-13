@@ -4,16 +4,15 @@
       <form class='contest-publish-form'
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.contestNewFormPublic}}</label> <select class="form-control"
-               v-model="public">
-            <option value='0'>
-              {{T.wordsNo}}
-            </option>
-            <option value='1'>
-              {{T.wordsYes}}
-            </option>
+          <label>{{T.contestNewFormAdmissionMode}}</label> <select class="form-control"
+               v-model="admissionMode">
+              <option value="private">{{T.wordsPrivate}}</option>
+              <option value="registration">{{T.wordsRegistration}}</option>
+              <option value="public">{{T.wordsPublic}}</option>
           </select>
-          <p class="help-block">{{T.contestNewFormPublicDesc}}</p>
+          <p class="help-block">
+            <span v-html="T.contestNewFormAdmissionModeDescription"></span>
+          </p>
         </div><button class="btn btn-primary"
               type="submit">{{T.wordsSaveChanges}}</button>
       </form>
@@ -26,8 +25,8 @@ import {T} from '../../omegaup.js';
 export default {
   props: {contest: Object},
   data: function() {
-    return { public: this.contest.public, T: T }
+    return { admissionMode: this.contest.admission_mode, T: T }
   },
-  methods: {onSubmit: function() { this.$parent.$emit('update-public', this);}}
+  methods: {onSubmit: function() { this.$parent.$emit('update-admission-mode', this);}}
 }
 </script>

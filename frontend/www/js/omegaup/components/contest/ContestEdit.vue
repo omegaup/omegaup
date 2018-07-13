@@ -16,7 +16,7 @@
       </li>
       <li v-if="!virtual"
           v-on:click="showTab = 'publish'">
-        <a data-toggle="tab">{{T.makePublic}}</a>
+        <a data-toggle="tab">{{T.contestNewFormAdmissionMode}}</a>
       </li>
       <li v-bind:class="{active: virtual}"
           v-on:click="showTab = 'contestants'">
@@ -45,7 +45,7 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'problems'">
-        <contest-add-problem v-bind:problems="problems"></contest-add-problem>
+        <contest-add-problem v-bind:data="problems"></contest-add-problem>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
@@ -88,19 +88,20 @@ import ContestClone from './ContestClone.vue';
 
 export default {
   props: {
-    contest: Object,
-    problems: Array,
-    users: Array,
-    admins: Array,
-    groupAdmins: Array
+	  data: Object
   },
   data: function() {
     return {
       showTab: this.isVirtual() ? "contestants" : "new_form", T: T,
-          virtual: this.isVirtual(), UI: UI
+          virtual: this.isVirtual(), UI: UI,
+    contest: this.data.contest,
+    problems: this.data.problems,
+    users: this.data.users,
+    admins: this.data.admins,
+    groupAdmins: this.data.groupAdmins 
     }
   },
-  methods: {isVirtual: function() { return this.contest.rerun_id != 0;}},
+  methods: {isVirtual: function() { return this.data.contest.rerun_id != 0;}},
   components: {
     'contest-new-form': ContestNewForm,
     'contest-add-problem': ContestAddProblem,

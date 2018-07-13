@@ -51,9 +51,9 @@
 import {T, UI} from '../../omegaup.js';
 import Autocomplete from '../Autocomplete.vue';
 export default {
-  props: {problems: Array},
+  props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, alias: "", points: 100, order: 1, }
+    return { T: T, UI: UI, alias: '', points: 100, order: 1, problems: this.data}
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-problem', this);}},
   components: {'omegaup-autocomplete': Autocomplete}

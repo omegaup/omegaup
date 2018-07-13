@@ -8,12 +8,11 @@
       <div class="btn-group bottom-margin"
            v-if="update">
         <button class="btn btn-default"
-             v-on:click="contestMode = 'OMI'">{{T.contestNewFormOmiStyle}}</button> <button class=
+             v-on:click="fillOmi()">{{T.contestNewFormOmiStyle}}</button> <button class=
              "btn btn-default"
-             v-on:click="contestMode = 'IOI'">{{T.contestNewForm}}</button> <button class=
+             v-on:click="fillPreIoi()">{{T.contestNewForm}}</button> <button class=
              "btn btn-default"
-             v-on:click="contestMode = 'CONACUP'">{{T.contestNewFormConacupStyle}}</button>
-      </div>
+             v-on:click="fillConacup()">{{T.contestNewFormConacupStyle}}</button> </div>
       <form class="new_contest_form"
             v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -58,7 +57,9 @@
                      v-model="windowLengthEnabled"> {{T.wordsEnable}}</label>
             </div><input class="form-control"
                  size="3"
-                 type="text">
+                 type="text"
+                 :disabled="!windowLengthEnabled"
+                 v-model="windowLength">
             <p class="help-block">{{T.contestNewFormDifferentStartsDesc}}</p>
           </div>
         </div>
@@ -179,34 +180,6 @@
             <p class="help-block">{{T.contestNewFormUserInformationRequiredDesc}}</p>
           </div>
         </div>
-        <div class="row"
-             v-if="update">
-          <div class="form-group col-md-6">
-            <label>{{T.contestNewFormPublic}}</label> <select class="form-control"
-                 v-model="public">
-              <option value="0">
-                {{T.wordsNo}}
-              </option>
-              <option value="1">
-                {{T.wordsYes}}
-              </option>
-            </select>
-            <p class="help-block">{{T.contestNewFormPublicDesc}}</p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{T.contestNewFormRegistration}}</label> <select class="form-control"
-                 v-model="contestantMustRegister">
-              <option selected="selected"
-                      value="0">
-                {{T.wordsNo}}
-              </option>
-              <option value="1">
-                {{T.wordsYes}}
-              </option>
-            </select>
-            <p class="help-block">{{T.contestNewFormRegistrationDesc}}</p>
-          </div>
-        </div>
         <div class="form-group">
           <button class="btn btn-primary"
                type="submit"
@@ -235,23 +208,22 @@ export default {
           needsBasicInformation: this.contest.needs_basic_information,
           penalty: this.contest.penalty, penaltyType: this.contest.penalty_type,
           penaltyCalcPolicy: this.contest.penalty_calc_policy,
-          pointsDecayFactor: this.contest.poinst_decay_factor,
-          public: this.contest.public,
+          pointsDecayFactor: this.contest.points_decay_factor,
           requestsUserInformation: this.contest.requests_user_information,
           startTime: this.contest.start_time,
           showPenalty: this.contest.show_penalty,
           showScoreboardAfter: this.contest.show_scoreboard_after,
           submissionsGap: this.contest.submissions_gap,
           title: this.contest.title, titlePlaceHolder: "",
-          windowLength: this.contest.window_length,
-          windowLengthEnabled: this.contest.window_length != null, T: T
+          windowLength: this.contest.window_length == 0 ? "" : this.contest.window_length,
+          windowLengthEnabled: this.contest.window_length != 0, T: T
     }
   },
   methods: {
     fillOmi: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
       this.windowLengthEnabled = false;
-      this.windowLength = "";
+      this.windowLength = 0;
       this.scoreboard = 0;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 1;
