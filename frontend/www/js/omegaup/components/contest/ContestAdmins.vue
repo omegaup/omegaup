@@ -32,7 +32,9 @@
         <tr v-for="admin in admins"
             v-if="(admin.role != 'site-admin') || showSiteAdmin">
           <td>
-            <a v-bind:href="`/profile/${admin.username}/`">{{admin.username}}</a>
+              <omegaup-user-username
+                  v-bind:linkify="true"
+                  v-bind:username="admin.username"></omegaup-user-username>
           </td>
           <td>{{admin.role}}</td>
           <td><button class="close"
@@ -46,6 +48,7 @@
 <script>
 import {T, UI} from '../../omegaup.js';
 import Autocomplete from '../Autocomplete.vue';
+import user_Username from '../user/Username.vue';
 
 export default {
   props: {
@@ -55,6 +58,6 @@ export default {
     return { T: T, UI: UI, user: "", showSiteAdmin: false }
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-admin', this);}},
-  components: {'omegaup-autocomplete': Autocomplete}
+  components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}
 }
 </script>

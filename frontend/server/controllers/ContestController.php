@@ -223,7 +223,8 @@ class ContestController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
+        
+        $addedContests = [];
         foreach ($contests as $contest) {
             $contest['start_time'] = strtotime($contest['start_time']);
             $contest['finish_time'] = strtotime($contest['finish_time']);

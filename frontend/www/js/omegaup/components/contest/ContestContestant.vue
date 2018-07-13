@@ -31,7 +31,9 @@
         <tbody>
           <tr v-for="user in users">
             <td>
-              <a v-bind:href="`/profile/${user.username}/`">{{user.username}}</a>
+                <omegaup-user-username
+                    v-bind:linkify="true"
+                    v-bind:username="user.username"></omegaup-user-username>
             </td>
             <td>{{user.access_time}}</td>
             <td><button class="close"
@@ -64,6 +66,7 @@
 <script>
 import {T, UI} from '../../omegaup.js';
 import Autocomplete from '../Autocomplete.vue';
+import user_Username from '../user/Username.vue';
 
 export default {
   props: {users: Array},
@@ -71,6 +74,6 @@ export default {
     return { T: T, UI: UI, contestant: "", contestants: "" }
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-user', this);}},
-  components: {'omegaup-autocomplete': Autocomplete}
+  components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}
 }
 </script>

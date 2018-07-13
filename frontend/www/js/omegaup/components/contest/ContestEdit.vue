@@ -96,7 +96,7 @@ export default {
   },
   data: function() {
     return {
-      showTab: this.isVirtual ? "contestants" : "new_form", T: T,
+      showTab: this.isVirtual() ? "contestants" : "new_form", T: T,
           virtual: this.isVirtual()
     }
   },
