@@ -4,8 +4,8 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsGroupAdmin}}</label> <autocomplete-group-admins v-model=
-          "groupName"></autocomplete-group-admins>
+          <label>{{T.wordsGroupAdmin}}</label>
+          <omegaup-autocomplete v-model="groupName" v-bind:init="el => UI.typeahead(el, API.Group.list)"></omegaup-autocomplete>
         </div><button class="btn btn-primary"
               type="submit">{{T.contestAddgroupAddGroup}}</button>
       </form>
@@ -34,15 +34,15 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
-import AutocompleteGroupAdmins from '../AutocompleteGroupAdmins.vue';
+import {T, UI, API} from '../../omegaup.js';
+import Autocomplete from '../Autocomplete.vue';
 
 export default {
   props: {groupAdmins: Array},
   data: function() {
-    return { T: T, groupName: "" }
+    return { T: T, UI: UI, API: API, groupName: "" }
   },
   methods: {onSubmit: function() { this.$parent.$emit('addGroupAdmin', this);}},
-  components: {'autocomplete-group-admins': AutocompleteGroupAdmins}
+  components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

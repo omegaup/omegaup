@@ -5,8 +5,8 @@
         <form class="form"
               v-on:submit.prevent="onSubmit">
           <div class="form-group">
-            <label>{{T.wordsUser}}</label> <autocomplete-user v-model=
-            "contestant"></autocomplete-user>
+            <label>{{T.wordsUser}}</label>
+            <omegaup-autocomplete v-model="contestant" v-bind:init="el => UI.userTypeahead(el)"></omegaup-autocomplete>
           </div><button class="btn btn-primary user-add-single"
                 type="submit">{{T.contestAdduserAddUser}}</button>
           <hr>
@@ -61,15 +61,15 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
-import AutocompleteUser from '../AutocompleteUser.vue';
+import {T, UI} from '../../omegaup.js';
+import Autocomplete from '../Autocomplete.vue';
 
 export default {
   props: {users: Array},
   data: function() {
-    return { T: T, contestant: "", contestants: "" }
+    return { T: T, UI: UI, contestant: "", contestants: "" }
   },
   methods: {onSubmit: function() { this.$parent.$emit('addUser', this);}},
-  components: {'autocomplete-user': AutocompleteUser}
+  components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

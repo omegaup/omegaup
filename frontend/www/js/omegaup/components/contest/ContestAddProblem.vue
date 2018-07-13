@@ -4,8 +4,8 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsProblem}}</label> <omegaup-autocomplete-problems v-model=
-          "alias"></omegaup-autocomplete-problems>
+          <label>{{T.wordsProblem}}</label>
+          <autocomplete v-model="alias" v-bind:init="el => UI.problemTypeahead(el)"></autocomplete>
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemProblemPoints}}</label> <input class="form-control"
@@ -47,14 +47,14 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
-import AutocompleteProblems from '../AutocompleteProblems.vue';
+import {T, UI} from '../../omegaup.js';
+import Autocomplete from '../Autocomplete.vue';
 export default {
   props: {problems: Array},
   data: function() {
-    return { T: T, alias: "", point: 100, order: 1, }
+    return { T: T, UI: UI, alias: "", point: 100, order: 1, }
   },
   methods: {onSubmit: function() { this.$parent.$emit('addProblem', this);}},
-  components: {'omegaup-autocomplete-problems': AutocompleteProblems}
+  components: {'autocomplete': Autocomplete}
 }
 </script>

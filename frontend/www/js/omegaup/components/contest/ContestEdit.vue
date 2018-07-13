@@ -6,21 +6,21 @@
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li class="active"
-          v-if="!isVirtual"
+          v-if="!virtual"
           v-on:click="showTab = 'new_form'">
         <a data-toggle="tab">{{T.contestEdit}}</a>
       </li>
-      <li v-if="!isVirtual"
+      <li v-if="!virtual"
           v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{T.wordsAddProblem}}</a>
       </li>
-      <li v-if="!isVirtual"
+      <li v-if="!virtual"
           v-on:click="showTab = 'publish'">
         <a data-toggle="tab">{{T.makePublic}}</a>
       </li>
-      <li v-bind:class="{active: isVirtual}"
+      <li v-bind:class="{active: virtual}"
           v-on:click="showTab = 'contestants'">
-        <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
+          <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
       </li>
       <li v-on:click="showTab = 'admins'">
         <a data-toggle="tab">{{T.omegaupTitleContestAddAdmin}}</a>
@@ -28,11 +28,11 @@
       <li v-on:click="showTab = 'group_admins'">
         <a data-toggle="tab">{{T.omegaupTitleContestAddGroupAdmin}}</a>
       </li>
-      <li v-if="!isVirtual"
+      <li v-if="!virtual"
           v-on:click="showTab = 'links'">
         <a data-toggle="tab">{{T.showLinks}}</a>
       </li>
-      <li v-if="!isVirtual"
+      <li v-if="!virtual"
           v-on:click="showTab = 'clone'">
         <a data-toggle="tab">{{T.courseEditClone}}</a>
       </li>
@@ -61,7 +61,7 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'group_admins'">
-        <contest-group-admins v-bind:groupadmins="groupAdmins"></contest-group-admins>
+        <contest-group-admins v-bind:groupAdmins="groupAdmins"></contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
@@ -95,7 +95,7 @@ export default {
     groupAdmins: Array
   },
   data: function() {
-    return { showTab: this.isVirtual ? "contestants" : "new_form", T: T }
+    return { showTab: this.isVirtual ? "contestants" : "new_form", T: T , virtual: this.isVirtual()}
   },
   methods: {isVirtual: function() { return this.contest.rerun_id != 0;}},
   components: {

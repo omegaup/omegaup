@@ -4,7 +4,8 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsAdmin}}</label> <autocomplete-user v-model="user"></autocomplete-user>
+          <label>{{T.wordsAdmin}}</label>
+          <omegaup-autocomplete v-model="user" v-bind:init="el => UI.userTypeahead(el)"></omegaup-autocomplete>
         </div>
         <div class="form-group">
           <div class="col-xs-5 col-sm-3 col-md-3 action-container">
@@ -42,17 +43,17 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
-import AutocompleteUser from '../AutocompleteUser.vue';
+import {T, UI} from '../../omegaup.js';
+import Autocomplete from '../Autocomplete.vue';
 
 export default {
   props: {
     admins: Array,
   },
   data: function() {
-    return { T: T, user: "", showSiteAdmin: false }
+    return { T: T, UI: UI,  user: "", showSiteAdmin: false }
   },
   methods: {onSubmit: function() { this.$parent.$emit('addAdmin', this);}},
-  components: {'autocomplete-user': AutocompleteUser}
+  components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>
