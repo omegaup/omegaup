@@ -37,7 +37,7 @@
             </td>
             <td>{{user.access_time}}</td>
             <td><button class="close"
-                    type="button">×</button></td>
+                    type="button" v-on:click="onRemove(user)">×</button></td>
           </tr>
         </tbody>
       </table>
@@ -72,9 +72,15 @@ import user_Username from '../user/Username.vue';
 export default {
   props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, contestant: "", contestants: "", users: this.data}
+      return { T: T, UI: UI, contestant: "", contestants: "", users: this.data, selected: {}}
   },
-  methods: {onSubmit: function() { this.$parent.$emit('add-user', this);}},
+  methods: {
+      onSubmit: function() { this.$parent.$emit('add-user', this);},
+      onRemove: function(user) {
+          this.selected = user;
+          this.$parent.$emit('remove-user', this);
+      }
+  },
   components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}
 }
 </script>

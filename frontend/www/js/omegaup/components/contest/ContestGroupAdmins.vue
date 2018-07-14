@@ -27,7 +27,8 @@
           <td>{{group.role}}</td>
           <td><button class="close"
                   type="button"
-                  v-if="group.name != 'admin'">×</button></td>
+                  v-if="group.name != 'admin'"
+                  v-on:click="onRemove(group)">×</button></td>
         </tr>
       </tbody>
     </table>
@@ -41,10 +42,15 @@ import Autocomplete from '../Autocomplete.vue';
 export default {
   props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, API: API, groupName: "", groupAdmins: this.data}
+      return { T: T, UI: UI, API: API, groupName: "", groupAdmins: this.data, selected: {}}
   },
-  methods:
-      {onSubmit: function() { this.$parent.$emit('add-group-admin', this);}},
+  methods: {
+      onSubmit: function() { this.$parent.$emit('add-group-admin', this);},
+      onRemove: function(group) {
+          this.selected = group;
+          this.$parent.$emit('remove-group-admin', this);
+      }
+  },
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

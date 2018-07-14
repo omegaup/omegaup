@@ -40,7 +40,7 @@
             <a v-bind:href="`/arena/problem/${problem.alias}/`">{{problem.alias}}</a>
           </td>
           <td>{{problem.points}}</td>
-          <td><button class="close">×</button></td>
+          <td><button class="close" v-on:click="onRemove(problem)">×</button></td>
         </tr>
       </tbody>
     </table>
@@ -53,9 +53,15 @@ import Autocomplete from '../Autocomplete.vue';
 export default {
   props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, alias: '', points: 100, order: 1, problems: this.data}
+	  return { T: T, UI: UI, alias: '', points: 100, order: 1, problems: this.data, selected: {}}
   },
-  methods: {onSubmit: function() { this.$parent.$emit('add-problem', this);}},
+  methods: {
+	  onSubmit: function() { this.$parent.$emit('add-problem', this);},
+	  onRemove: function(problem) {
+		  this.selected = problem;
+		  this.$parent.$emit('remove-problem', this);
+	  }
+  },
   components: {'omegaup-autocomplete': Autocomplete}
 }
 </script>

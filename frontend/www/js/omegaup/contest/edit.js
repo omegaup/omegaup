@@ -38,6 +38,7 @@ OmegaUp.on('ready', function() {
 	  },
 	  refresh: (ev, api, param, key) => {
 		  key = key || param;
+		  console.log(key);
 		  api({contest_alias: contestAlias})
 			  .then((response) => {
 				  ev[param] = response[key] || response;
@@ -64,7 +65,7 @@ OmegaUp.on('ready', function() {
 	  removeProblem: (ev) => {
 		API.Contest.removeProblem({
 			 contest_alias: contestAlias,
-			 problem_alias: problem
+			 problem_alias: ev.selected.alias
 		})
 		.then(function(response) {
 		  if (response.status != 'ok') {
@@ -105,6 +106,20 @@ OmegaUp.on('ready', function() {
 			  UI.error(T.bulkUserAddError);
 			});
 	  },
+	  removeUser: (ev) => {
+		  API.Contest.removeUser({
+			  contest_alias: contestAlias,
+			  usernameOrEmail: ev.selected.username
+		  })
+		  .then(function(response) {
+				  if (response.status != 'ok') {
+					  UI.error(response.error || 'error');
+				  }
+				  UI.success(T.userRemoveSuccess);
+				  trigger.refresh(ev, API.Contest.users, 'users');
+			  })
+		  .fail(UI.apiError);
+	  },
 	  cloneContest: (ev) => {
 		API.Contest.clone({
 					 contest_alias: contestAlias,
@@ -132,6 +147,20 @@ OmegaUp.on('ready', function() {
 			})
 			.fail(UI.apiError);
 	  },
+	  removeAdmin: (ev) => {
+		  API.Contest.removeAdmin({
+			  contest_alias: contestAlias,
+			  usernameOrEmail: ev.selected.username
+		  })
+		  .then(function(response) {
+			  if (response.status != 'ok') {
+				  UI.error(response.error || 'error');
+			  }
+			  UI.success(T.adminRemoved);
+			  trigger.refresh(ev, API.Contest.admins, 'admins')
+		  })
+		  .fail(UI.apiError);
+	  },
 	  addGroupAdmin: (ev) => {
 		API.Contest.addGroupAdmin({
 					 contest_alias: contestAlias,
@@ -139,9 +168,20 @@ OmegaUp.on('ready', function() {
 				   })
 			.then(function(response) {
 			  UI.success(T.groupAdminAdded);
-			  trigger.refresh(ev, API.Contest.admins, 'groupAdmins', 'group_admin');
+			  trigger.refresh(ev, API.Contest.admins, 'groupAdmins', 'group_admins');
 			})
 			.fail(UI.apiError);
+	  },
+	  removeGroupAdmin: (ev) => {
+		  API.Contest.removeGroupAdminFromContest({
+			  contest_alias: contestAlias,
+			  group: ev.selected.alias
+		  })
+		  .then(function(response) {
+			  UI.success(T.groupAdminRemoved);
+			  trigger.refresh(ev, API.Contest.admins, 'groupAdmins', 'group_admins');
+		  })
+		  .fail(UI.apiError);
 	  }
   }
 
@@ -174,9 +214,12 @@ OmegaUp.on('ready', function() {
 			  'remove-problem': trigger.removeProblem,
 			  'update-admission-mode': trigger.updateAdmissionMode,
 			  'add-user': trigger.addUser,
+			  'remove-user': trigger.removeUser,
 			  'clone-contest': trigger.cloneContest,
 			  'add-admin': trigger.addAdmin,
-			  'add-group-admin': trigger.addGroupAdmin
+			  'remove-admin': trigger.removeAdmin,
+			  'add-group-admin': trigger.addGroupAdmin,
+			  'remove-group-admin': trigger.removeGroupAdmin,
 			}
 		  });
 		},
