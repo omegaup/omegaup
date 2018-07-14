@@ -197,26 +197,27 @@
 import {T} from '../../omegaup.js';
 import DateTimePicker from '../DateTimePicker.vue';
 export default {
-  props: {update: Boolean, contest: Object},
+  props: {update: Boolean, data: Object},
   data: function() {
     return {
-      alias: this.contest.alias,
-          contestantMustRegister: this.contest.contestant_must_register,
-          description: this.contest.description,
-          feedback: this.contest.feedback, finishTime: this.contest.finish_time,
-          scoreboard: this.contest.scoreboard,
-          needsBasicInformation: this.contest.needs_basic_information,
-          penalty: this.contest.penalty, penaltyType: this.contest.penalty_type,
-          penaltyCalcPolicy: this.contest.penalty_calc_policy,
-          pointsDecayFactor: this.contest.points_decay_factor,
-          requestsUserInformation: this.contest.requests_user_information,
-          startTime: this.contest.start_time,
-          showPenalty: this.contest.show_penalty,
-          showScoreboardAfter: this.contest.show_scoreboard_after,
-          submissionsGap: this.contest.submissions_gap,
-          title: this.contest.title, titlePlaceHolder: "",
-          windowLength: this.contest.window_length == 0 ? "" : this.contest.window_length,
-          windowLengthEnabled: this.contest.window_length != 0, T: T
+          alias: this.data.alias,
+          contest: this.data,
+          contestantMustRegister: this.data.contestant_must_register,
+          description: this.data.description,
+          feedback: this.data.feedback, finishTime: this.data.finish_time,
+          scoreboard: this.data.scoreboard,
+          needsBasicInformation: this.data.needs_basic_information,
+          penalty: this.data.penalty, penaltyType: this.data.penalty_type,
+          penaltyCalcPolicy: this.data.penalty_calc_policy,
+          pointsDecayFactor: this.data.points_decay_factor,
+          requestsUserInformation: this.data.requests_user_information,
+          startTime: this.data.start_time,
+          showPenalty: this.data.show_penalty,
+          showScoreboardAfter: this.data.show_scoreboard_after,
+          submissionsGap: this.data.submissions_gap,
+          title: this.data.title, titlePlaceHolder: "",
+          windowLength: this.data.window_length == 0 ? "" : this.data.window_length,
+          windowLengthEnabled: this.data.window_length != 0, T: T
     }
   },
   methods: {

@@ -39,9 +39,9 @@ import {T, UI, API} from '../../omegaup.js';
 import Autocomplete from '../Autocomplete.vue';
 
 export default {
-  props: {groupAdmins: Array},
+  props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, API: API, groupName: "" }
+    return { T: T, UI: UI, API: API, groupName: "", groupAdmins: this.data}
   },
   methods:
       {onSubmit: function() { this.$parent.$emit('add-group-admin', this);}},

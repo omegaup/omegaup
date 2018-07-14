@@ -57,7 +57,8 @@
             <th>{{T.contestAdduserAddContestant}}</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+        </tbody>
       </table>
     </div>
   </div>
@@ -69,9 +70,9 @@ import Autocomplete from '../Autocomplete.vue';
 import user_Username from '../user/Username.vue';
 
 export default {
-  props: {users: Array},
+  props: {data: Array},
   data: function() {
-    return { T: T, UI: UI, contestant: "", contestants: "" }
+    return { T: T, UI: UI, contestant: "", contestants: "", users: this.data}
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-user', this);}},
   components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}

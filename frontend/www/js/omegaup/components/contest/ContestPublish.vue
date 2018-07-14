@@ -23,9 +23,12 @@
 <script>
 import {T} from '../../omegaup.js';
 export default {
-  props: {contest: Object},
+  props: {data: Object},
   data: function() {
-    return { admissionMode: this.contest.admission_mode, T: T }
+    return { contest: this.data, T: T, admissionMode: this.data.admission_mode}
+  },
+  watch: {
+      contest: function() { this.admissionMode = this.contest.admission_mode}
   },
   methods: {onSubmit: function() { this.$parent.$emit('update-admission-mode', this);}}
 }

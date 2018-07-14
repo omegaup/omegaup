@@ -40,7 +40,7 @@
     <div class="tab-content">
       <div class="tab-pane active"
            v-if="showTab === 'new_form'">
-        <contest-new-form v-bind:contest="contest"
+        <contest-new-form v-bind:data="contest"
              v-bind:update="true"></contest-new-form>
       </div>
       <div class="tab-pane active"
@@ -49,23 +49,23 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
-        <contest-publish v-bind:contest="contest"></contest-publish>
+        <contest-publish v-bind:data="contest"></contest-publish>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'contestants'">
-        <contest-contestant v-bind:users="users"></contest-contestant>
+        <contest-contestant v-bind:data="users"></contest-contestant>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
-        <contest-admins v-bind:admins="admins"></contest-admins>
+        <contest-admins v-bind:data="admins"></contest-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'group_admins'">
-        <contest-group-admins v-bind:groupadmins="groupAdmins"></contest-group-admins>
+        <contest-group-admins v-bind:data="groupAdmins"></contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
-        <contest-links v-bind:contest="contest"></contest-links>
+        <contest-links v-bind:data="contest"></contest-links>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'clone'">

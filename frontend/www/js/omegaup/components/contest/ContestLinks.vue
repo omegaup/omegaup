@@ -37,9 +37,9 @@
 import {T} from '../../omegaup.js';
 
 export default {
-  props: {contest: Object},
+  props: {data: Object},
   data: function() {
-    return { T: T }
+    return { T: T, contest: this.data}
   }
 }
 </script>

@@ -7,34 +7,144 @@ OmegaUp.on('ready', function() {
   var contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  function updateContest(ev) {
-     API.Contest.update({
-     	  contest_alias: contestAlias,
-     	  title: ev.title,
-     	  description: ev.description,
-     	  start_time:
-     		  (ev.startTime.getTime()) /
-     			  1000,
-     	  finish_time:
-     		  (ev.finishTime.getTime()) /
-     			  1000,
-     	  window_length: ev.windowLength == "" || !ev.windowLengthEnabled? 0 : ev.windowLength,
-     	  points_decay_factor: ev.pointsDecayFactor,
-     	  submissions_gap: ev.submissionsGap,
-     	  feedback: ev.feedback,
-     	  penalty: ev.penalty,
-     	  scoreboard: ev.scoreboard,
-     	  penalty_type: ev.penaltyType,
-     	  show_scoreboard_after:
-     		  ev.showScoreboardAfter,
-     	  basic_information:
-     		  ev.needsBasicInformation ? 1 : 0,
-     	  requests_user_information:
-     		  ev.requestsUserInformation
-	})
-	.then(UI.contestUpdated)
-	.fail(UI.apiError);
+  var trigger = {
+	  updateContest: (ev) => {
+		 API.Contest.update({
+			  contest_alias: contestAlias,
+			  title: ev.title,
+			  description: ev.description,
+			  start_time:
+				  (ev.startTime.getTime()) /
+					  1000,
+			  finish_time:
+				  (ev.finishTime.getTime()) /
+					  1000,
+			  window_length: ev.windowLength == "" || !ev.windowLengthEnabled? 0 : ev.windowLength,
+			  points_decay_factor: ev.pointsDecayFactor,
+			  submissions_gap: ev.submissionsGap,
+			  feedback: ev.feedback,
+			  penalty: ev.penalty,
+			  scoreboard: ev.scoreboard,
+			  penalty_type: ev.penaltyType,
+			  show_scoreboard_after:
+				  ev.showScoreboardAfter,
+			  basic_information:
+				  ev.needsBasicInformation ? 1 : 0,
+			  requests_user_information:
+				  ev.requestsUserInformation
+		})
+		.then(UI.contestUpdated)
+		.fail(UI.apiError);
+	  },
+	  refresh: (ev, api, param, key) => {
+		  key = key || param;
+		  api({contest_alias: contestAlias})
+			  .then((response) => {
+				  ev[param] = response[key] || response;
+				  ev.$parent[param] = response[key] || response;
+			  })
+			  .fail(UI.apiError);
+	  },
+	  addProblem: (ev) => {
+		API.Contest.addProblem({
+			 contest_alias: contestAlias,
+			 order_in_contest: ev.order,
+			 problem_alias: ev.alias,
+			 points: ev.points,
+		})
+		.then(function(response) {
+		  if (response.status != 'ok') {
+			  UI.error(response.error || 'error');
+		  }
+		  UI.success(T.problemSuccessfullyAdded);
+		  trigger.refresh(ev, API.Contest.problems, 'problems');
+		})
+		.fail(UI.apiError);
+	  },
+	  removeProblem: (ev) => {
+		API.Contest.removeProblem({
+			 contest_alias: contestAlias,
+			 problem_alias: problem
+		})
+		.then(function(response) {
+		  if (response.status != 'ok') {
+			  UI.error(response.error || 'error');
+		  }
+		  UI.success(T.problemSuccessfullyRemoved);
+		  trigger.refresh(ev, API.Contest.problems, 'problems');
+		})
+		.fail(UI.apiError);
+	  },
+	  updateAdmissionMode: (ev) => {
+		API.Contest.update({
+					 contest_alias: contestAlias,
+					 admission_mode: ev.admissionMode
+				   })
+			.then(function(response) {
+				UI.contestUpdated(response);
+				trigger.refresh(ev, API.Contest.adminDetails, 'contest');
+			})
+			.fail(UI.apiError);
+	  },
+	  addUser: (ev) => {
+		var contestants = [];
+		if (ev.contestants !== '') contestants = ev.contestants.split(',');
+		if (ev.contestant !== '') contestants.push(ev.contestant);
+		var promises = contestants.map(function(contestant) {
+			  return API.Contest.addUser({
+				contest_alias: contestAlias,
+				usernameOrEmail: contestant.trim()
+			  });
+			});
+		$.when.apply($, promises)
+			.then(function() {
+			  UI.success(T.bulkUserAddSuccess);
+			  trigger.refresh(ev, API.Contest.users, 'users');
+			})
+			.fail(function() {
+			  UI.error(T.bulkUserAddError);
+			});
+	  },
+	  cloneContest: (ev) => {
+		API.Contest.clone({
+					 contest_alias: contestAlias,
+					 title: ev.title,
+					 alias: ev.alias,
+					 description: ev.description,
+					 start_time:
+						 ev.startTime.getTime() /
+							 1000
+				   })
+			.then(function(response) {
+			  UI.success(
+				  T.contestEditContestClonedSuccessfully);
+			})
+			.fail(UI.apiError);
+	  },
+	  addAdmin: (ev) => {
+		API.Contest.addAdmin({
+					 contest_alias: contestAlias,
+					 usernameOrEmail: ev.user
+				   })
+			.then(function(response) {
+			  UI.success(T.adminAdded);
+			  trigger.refresh(ev, API.Contest.admins, 'admins');
+			})
+			.fail(UI.apiError);
+	  },
+	  addGroupAdmin: (ev) => {
+		API.Contest.addGroupAdmin({
+					 contest_alias: contestAlias,
+					 group: ev.groupName
+				   })
+			.then(function(response) {
+			  UI.success(T.groupAdminAdded);
+			  trigger.refresh(ev, API.Contest.admins, 'groupAdmins', 'group_admin');
+			})
+			.fail(UI.apiError);
+	  }
   }
+
   $.when(
 	  API.Contest.adminDetails({contest_alias: contestAlias}),
       API.Contest.problems({contest_alias: contestAlias}),
@@ -59,104 +169,14 @@ OmegaUp.on('ready', function() {
 				}
 			},
 			on: {
-			  'update-contest': updateContest,
-			  'add-problem': function(ev) {
-				API.Contest.addProblem({
-							 contest_alias: contestAlias,
-							 order_in_contest: ev.order,
-							 problem_alias: ev.alias,
-							 points: ev.points,
-						   })
-					.then(function(response) {
-					  if (response.status != 'ok') {
-						  UI.error(response.error || 'error');
-					  }
-					  UI.success(T.problemSuccessfullyAdded);
-					  API.Contest.problems({contest_alias: contestAlias})
-						  .then((response) => {
-							  ev.problems = response.problems;
-							  ev.$parent.problems = response.problems;
-						  })
-						  .fail(UI.apiError);
-					})
-					.fail(UI.apiError);
-			  },
-			  'remove-problem': function(problem) {
-				API.Contest.removeProblem({
-							 contest_alias: contestAlias,
-							 problem_alias: problem
-						   })
-					.then(function(response) {
-					  UI.success(
-						  T.problemSuccessfullyRemoved);
-					})
-					.fail(UI.apiError);
-			  },
-			  'update-admission-mode': function(ev) {
-				API.Contest.update({
-							 contest_alias: contestAlias,
-							 admission_mode: ev.admissionMode
-						   })
-					.then(UI.contestUpdated)
-					.fail(UI.apiError);
-			  },
-			  'add-user': function(ev) {
-				var contestants = [];
-				if (ev.contestants !== '')
-				  contestants = ev.contestants.split(',');
-				if (ev.contestant !== '')
-				  contestants.push(ev.contestant);
-				var promises =
-					contestants.map(function(contestant) {
-					  return API.Contest.addUser({
-						contest_alias: contestAlias,
-						usernameOrEmail: contestant.trim()
-					  });
-					});
-				$.when.apply($, promises)
-					.then(function() {
-					  UI.success(T.bulkUserAddSuccess);
-					})
-					.fail(function() {
-					  UI.error(T.bulkUserAddError);
-					});
-			  },
-			  'clone-contest': function(ev) {
-				API.Contest.clone({
-							 contest_alias: contestAlias,
-							 title: ev.title,
-							 alias: ev.alias,
-							 description: ev.description,
-							 start_time:
-								 ev.startTime.getTime() /
-									 1000
-						   })
-					.then(function(response) {
-					  UI.success(
-						  T.contestEditContestClonedSuccessfully);
-					})
-					.fail(UI.apiError);
-			  },
-			  'add-admin': function(ev) {
-				API.Contest.addAdmin({
-							 contest_alias: contestAlias,
-							 usernameOrEmail: ev.user
-						   })
-					.then(function(response) {
-					  UI.success(T.adminAdded);
-					})
-					.fail(UI.apiError);
-			  },
-			  'add-group-admin': function(ev) {
-				API.Contest.addGroupAdmin({
-							 contest_alias: contestAlias,
-							 group: ev.groupName
-						   })
-					.then(function(response) {
-					  UI.success(T.groupAdminAdded);
-					})
-					.fail(UI.apiError);
-			  }
+			  'update-contest': trigger.updateContest,
+			  'add-problem': trigger.addProblem,
+			  'remove-problem': trigger.removeProblem,
+			  'update-admission-mode': trigger.updateAdmissionMode,
+			  'add-user': trigger.addUser,
+			  'clone-contest': trigger.cloneContest,
+			  'add-admin': trigger.addAdmin,
+			  'add-group-admin': trigger.addGroupAdmin
 			}
 		  });
 		},

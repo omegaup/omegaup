@@ -52,10 +52,10 @@ import user_Username from '../user/Username.vue';
 
 export default {
   props: {
-    admins: Array,
+    data: Array,
   },
   data: function() {
-    return { T: T, UI: UI, user: "", showSiteAdmin: false }
+    return { T: T, UI: UI, user: "", showSiteAdmin: false, admins: this.data}
   },
   methods: {onSubmit: function() { this.$parent.$emit('add-admin', this);}},
   components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}
