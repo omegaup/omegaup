@@ -3,10 +3,10 @@ import Vue from 'vue';
 import ContestEdit from '../components/contest/ContestEdit.vue';
 
 OmegaUp.on('ready', function() {
-  var contestAlias =
+  const contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  var trigger =
+  const trigger =
       {
         updateContest: (ev) => {
           API.Contest.update({
@@ -84,10 +84,10 @@ OmegaUp.on('ready', function() {
               .fail(UI.apiError);
         },
         addUser: (ev) => {
-          var contestants = [];
+          let contestants = [];
           if (ev.contestants !== '') contestants = ev.contestants.split(',');
           if (ev.contestant !== '') contestants.push(ev.contestant);
-          var promises = contestants.map(function(contestant) {
+          let promises = contestants.map(function(contestant) {
             return API.Contest.addUser({
               contest_alias: contestAlias,
               usernameOrEmail: contestant.trim()
@@ -181,19 +181,19 @@ OmegaUp.on('ready', function() {
           .done((contest, problems, users, admins) => {
             problems = problems.problems;
             users = users.users;
-            var groupAdmins = admins.group_admins;
+            let groupAdmins = admins.group_admins;
             admins = admins.admins;
             let contest_edit = new Vue({
               el: '#contest-edit',
               render: function(createElement) {
-                return createElement('contest-edit', {
+                return createElement('omegaup-contest-edit', {
                   props: {
                     data: {
                       contest: contest,
                       problems: problems,
                       users: users,
                       admins: admins,
-                      groupAdmins: groupAdmins
+                      groupAdmins: groupAdmins,
                     }
                   },
                   on: {
@@ -208,10 +208,12 @@ OmegaUp.on('ready', function() {
                     'remove-admin': trigger.removeAdmin,
                     'add-group-admin': trigger.addGroupAdmin,
                     'remove-group-admin': trigger.removeGroupAdmin,
-                  }
+                  },
                 });
               },
-              components: {'contest-edit': ContestEdit},
+              components: {
+                'omegaup-contest-edit': ContestEdit,
+              },
             });
           })
           .fail(UI.apiError);

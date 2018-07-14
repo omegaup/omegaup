@@ -53,10 +53,18 @@ import DateTime from '../DateTimePicker.vue';
 export default {
   data: function() {
     return {
-      T: T, title: "", alias: "", description: "", startTime: new Date()
-    }
+      T: T,
+      title: '',
+      alias: '',
+      description: '',
+      startTime: new Date(),
+    };
   },
-  methods: {onSubmit: function() { this.$parent.$emit('clone-contest', this);}},
-  components: {'omegaup-datetime': DateTime}
-}
+  methods: {
+    onSubmit: function() { this.$parent.$emit('clone-contest', this);},
+  },
+  components: {
+    'omegaup-datetime': DateTime,
+  },
+};
 </script>

@@ -196,27 +196,37 @@
 <script>
 import {T} from '../../omegaup.js';
 import DateTimePicker from '../DateTimePicker.vue';
+
 export default {
-  props: {update: Boolean, data: Object},
+  props: {
+    update: Boolean,
+    data: Object,
+  },
   data: function() {
     return {
-      alias: this.data.alias, contest: this.data,
-          contestantMustRegister: this.data.contestant_must_register,
-          description: this.data.description, feedback: this.data.feedback,
-          finishTime: this.data.finish_time, scoreboard: this.data.scoreboard,
-          needsBasicInformation: this.data.needs_basic_information,
-          penalty: this.data.penalty, penaltyType: this.data.penalty_type,
-          penaltyCalcPolicy: this.data.penalty_calc_policy,
-          pointsDecayFactor: this.data.points_decay_factor,
-          requestsUserInformation: this.data.requests_user_information,
-          startTime: this.data.start_time, showPenalty: this.data.show_penalty,
-          showScoreboardAfter: this.data.show_scoreboard_after,
-          submissionsGap: this.data.submissions_gap, title: this.data.title,
-          titlePlaceHolder: "",
-          windowLength: this.data.window_length == 0 ? "" :
-                                                       this.data.window_length,
-          windowLengthEnabled: this.data.window_length != 0, T: T
-    }
+      alias: this.data.alias,
+      contest: this.data,
+      contestantMustRegister: this.data.contestant_must_register,
+      description: this.data.description,
+      feedback: this.data.feedback,
+      finishTime: this.data.finish_time,
+      scoreboard: this.data.scoreboard,
+      needsBasicInformation: this.data.needs_basic_information,
+      penalty: this.data.penalty,
+      penaltyType: this.data.penalty_type,
+      penaltyCalcPolicy: this.data.penalty_calc_policy,
+      pointsDecayFactor: this.data.points_decay_factor,
+      requestsUserInformation: this.data.requests_user_information,
+      startTime: this.data.start_time,
+      showPenalty: this.data.show_penalty,
+      showScoreboardAfter: this.data.show_scoreboard_after,
+      submissionsGap: this.data.submissions_gap,
+      title: this.data.title,
+      titlePlaceHolder: '',
+      windowLength: this.data.window_length == 0 ? '' : this.data.window_length,
+      windowLengthEnabled: this.data.window_length != 0,
+      T: T,
+    };
   },
   methods: {
     fillOmi: function() {
@@ -226,9 +236,9 @@ export default {
       this.scoreboard = 0;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 1;
-      this.feedback = "yes";
+      this.feedback = 'yes';
       this.penalty = 0;
-      this.penaltyType = "none";
+      this.penaltyType = 'none';
       this.showScoreboardAfter = true;
     },
     fillPreIoi: function() {
@@ -238,25 +248,27 @@ export default {
       this.scoreboard = 0;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 0;
-      this.feedback = "yes";
+      this.feedback = 'yes';
       this.penalty = 0;
-      this.penaltyType = "none";
+      this.penaltyType = 'none';
       this.showScoreboardAfter = true;
     },
     fillConacup: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
       this.windowLengthEnabled = false;
-      this.windowLength = "";
+      this.windowLength = '';
       this.scoreboard = 75;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 1;
-      this.feedback = "yes";
+      this.feedback = 'yes';
       this.penalty = 20;
-      this.penaltyType = "none";
+      this.penaltyType = 'none';
       this.showScoreboardAfter = true;
     },
-    onSubmit: function() { this.$parent.$emit('update-contest', this);}
+    onSubmit: function() { this.$parent.$emit('update-contest', this);},
   },
-  components: {'omegaup-datetimepicker': DateTimePicker},
-}
+  components: {
+    'omegaup-datetimepicker': DateTimePicker,
+  },
+};
 </script>

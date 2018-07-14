@@ -54,20 +54,24 @@ export default {
   },
   data: function() {
     return {
-      T: T, UI: UI, user: "", showSiteAdmin: false, admins: this.data,
-          selected: {}
-    }
+      T: T,
+      UI: UI,
+      user: '',
+      showSiteAdmin: false,
+      admins: this.data,
+      selected: {},
+    };
   },
   methods: {
     onSubmit: function() { this.$parent.$emit('add-admin', this);},
     onRemove: function(admin) {
       this.selected = admin;
       this.$parent.$emit('remove-admin', this);
-    }
+    },
   },
   components: {
     'omegaup-autocomplete': Autocomplete,
-    'omegaup-user-username': user_Username
-  }
+    'omegaup-user-username': user_Username,
+  },
 }
 </script>

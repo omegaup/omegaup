@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-primary">
-    <div class='panel-body'>
-      <form class='contest-publish-form'
+    <div class="panel-body">
+      <form class="contest-publish-form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{T.contestNewFormAdmissionMode}}</label> <select class="form-control"
@@ -26,15 +26,23 @@
 
 <script>
 import {T} from '../../omegaup.js';
+
 export default {
-  props: {data: Object},
-  data: function() {
-    return { contest: this.data, T: T, admissionMode: this.data.admission_mode }
+  props: {
+    data: Object,
   },
-  watch:
-      {contest: function() { this.admissionMode = this.contest.admission_mode}},
+  data: function() {
+    return {
+      contest: this.data,
+      T: T,
+      admissionMode: this.data.admission_mode,
+    };
+  },
+  watch: {
+    contest: function() { this.admissionMode = this.contest.admission_mode;},
+  },
   methods: {
-    onSubmit: function() { this.$parent.$emit('update-admission-mode', this);}
-  }
-}
+    onSubmit: function() { this.$parent.$emit('update-admission-mode', this);},
+  },
+};
 </script>

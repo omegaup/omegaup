@@ -6,10 +6,15 @@
 
 <script>
 import {UI} from '../omegaup.js';
+
 export default {
-  props: {value: String, init: Function},
-  data: function() { return {};},
+  props: {
+    value: String,
+    init: Function,
+  },
   mounted: function() { this.init($(this.$el));},
-  methods: {updateInput() { this.$emit('input', this.$refs.input.value);}}
-}
+  methods: {
+    updateInput() { this.$emit('input', this.$refs.input.value);},
+  },
+};
 </script>

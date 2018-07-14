@@ -40,36 +40,36 @@
     <div class="tab-content">
       <div class="tab-pane active"
            v-if="showTab === 'new_form'">
-        <contest-new-form v-bind:data="contest"
-             v-bind:update="true"></contest-new-form>
+        <omegaup-contest-new-form v-bind:data="contest"
+             v-bind:update="true"></omegaup-contest-new-form>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'problems'">
-        <contest-add-problem v-bind:data="problems"></contest-add-problem>
+        <omegaup-contest-add-problem v-bind:data="problems"></omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
-        <contest-publish v-bind:data="contest"></contest-publish>
+        <omegaup-contest-publish v-bind:data="contest"></omegaup-contest-publish>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'contestants'">
-        <contest-contestant v-bind:data="users"></contest-contestant>
+        <omegaup-contest-contestant v-bind:data="users"></omegaup-contest-contestant>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
-        <contest-admins v-bind:data="admins"></contest-admins>
+        <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'group_admins'">
-        <contest-group-admins v-bind:data="groupAdmins"></contest-group-admins>
+        <omegaup-contest-group-admins v-bind:data="groupAdmins"></omegaup-contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
-        <contest-links v-bind:data="contest"></contest-links>
+        <omegaup-contest-links v-bind:data="contest"></omegaup-contest-links>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'clone'">
-        <contest-clone></contest-clone>
+        <omegaup-contest-clone></omegaup-contest-clone>
       </div>
     </div>
   </div>
@@ -87,25 +87,33 @@ import ContestLinks from './ContestLinks.vue';
 import ContestClone from './ContestClone.vue';
 
 export default {
-  props: {data: Object},
+  props: {
+    data: Object,
+  },
   data: function() {
     return {
-      showTab: this.isVirtual() ? "contestants" : "new_form", T: T,
-          virtual: this.isVirtual(), UI: UI, contest: this.data.contest,
-          problems: this.data.problems, users: this.data.users,
-          admins: this.data.admins, groupAdmins: this.data.groupAdmins
-    }
+      showTab: this.isVirtual() ? 'contestants' : 'new_form',
+      T: T, virtual: this.isVirtual(),
+      UI: UI,
+      contest: this.data.contest,
+      problems: this.data.problems,
+      users: this.data.users,
+      admins: this.data.admins,
+      groupAdmins: this.data.groupAdmins,
+    };
   },
-  methods: {isVirtual: function() { return this.data.contest.rerun_id != 0;}},
+  methods: {
+    isVirtual: function() { return this.data.contest.rerun_id != 0;},
+  },
   components: {
-    'contest-new-form': ContestNewForm,
-    'contest-add-problem': ContestAddProblem,
-    'contest-publish': ContestPublish,
-    'contest-contestant': ContestContestant,
-    'contest-admins': ContestAdmins,
-    'contest-group-admins': ContestGroupAdmins,
-    'contest-links': ContestLinks,
-    'contest-clone': ContestClone
-  }
-}
+    'omegaup-contest-new-form': ContestNewForm,
+    'omegaup-contest-add-problem': ContestAddProblem,
+    'omegaup-contest-publish': ContestPublish,
+    'omegaup-contest-contestant': ContestContestant,
+    'omegaup-contest-admins': ContestAdmins,
+    'omegaup-contest-group-admins': ContestGroupAdmins,
+    'omegaup-contest-links': ContestLinks,
+    'omegaup-contest-clone': ContestClone,
+  },
+};
 </script>

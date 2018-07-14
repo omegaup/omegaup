@@ -51,21 +51,31 @@
 <script>
 import {T, UI} from '../../omegaup.js';
 import Autocomplete from '../Autocomplete.vue';
+
 export default {
-  props: {data: Array},
+  props: {
+    data: Array,
+  },
   data: function() {
     return {
-      T: T, UI: UI, alias: '', points: 100, order: 1, problems: this.data,
-          selected: {}
-    }
+      T: T,
+      UI: UI,
+      alias: '',
+      points: 100,
+      order: 1,
+      problems: this.data,
+      selected: {},
+    };
   },
   methods: {
     onSubmit: function() { this.$parent.$emit('add-problem', this);},
     onRemove: function(problem) {
       this.selected = problem;
       this.$parent.$emit('remove-problem', this);
-    }
+    },
   },
-  components: {'omegaup-autocomplete': Autocomplete}
-}
+  components: {
+    'omegaup-autocomplete': Autocomplete,
+  },
+};
 </script>
