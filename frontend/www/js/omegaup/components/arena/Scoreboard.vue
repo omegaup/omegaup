@@ -91,7 +91,8 @@ export default {
     },
     renderUser: function(u) {
       return u.username +
-             (u.name && (u.name != u.username ? ' (' + u.name + ')' : ''));
+             (u.name && (u.name != u.username ? ' (' + u.name + ')' : '')) +
+             (u.virtual ? ' - virtual' : '');
     },
     renderPoints: function(p) { return (p.points > 0 ? '+' : '') + p.points;},
     totalRuns: function(u) {
