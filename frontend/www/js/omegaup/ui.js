@@ -43,13 +43,13 @@ let UI = {
   },
 
   contestUpdated: function(data) {
-    if (data.status == 'ok') {
-      UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
-                 $('.new_contest_form #alias').val() + '">' +
-                 T.contestEditGoToContest + '</a>');
-    } else {
+    if (data.status != 'ok') {
       UI.error(data.error || 'error');
+      return;
     }
+    UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
+               $('.new_contest_form #alias').val() + '">' +
+               T.contestEditGoToContest + '</a>');
   },
 
   displayStatus: function(message, type) {
@@ -209,7 +209,7 @@ let UI = {
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb)
-        .trigger("change");
+        .trigger('change');
   },
 
   problemTypeahead: function(elem, cb) {
