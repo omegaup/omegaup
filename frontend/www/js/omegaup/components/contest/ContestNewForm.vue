@@ -12,7 +12,8 @@
              "btn btn-default"
              v-on:click="fillPreIoi()">{{T.contestNewForm}}</button> <button class=
              "btn btn-default"
-             v-on:click="fillConacup()">{{T.contestNewFormConacupStyle}}</button> </div>
+             v-on:click="fillConacup()">{{T.contestNewFormConacupStyle}}</button>
+      </div>
       <form class="new_contest_form"
             v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -58,7 +59,6 @@
             </div><input class="form-control"
                  size="3"
                  type="text"
-                 :disabled="!windowLengthEnabled"
                  v-model="windowLength">
             <p class="help-block">{{T.contestNewFormDifferentStartsDesc}}</p>
           </div>
@@ -200,23 +200,21 @@ export default {
   props: {update: Boolean, data: Object},
   data: function() {
     return {
-          alias: this.data.alias,
-          contest: this.data,
+      alias: this.data.alias, contest: this.data,
           contestantMustRegister: this.data.contestant_must_register,
-          description: this.data.description,
-          feedback: this.data.feedback, finishTime: this.data.finish_time,
-          scoreboard: this.data.scoreboard,
+          description: this.data.description, feedback: this.data.feedback,
+          finishTime: this.data.finish_time, scoreboard: this.data.scoreboard,
           needsBasicInformation: this.data.needs_basic_information,
           penalty: this.data.penalty, penaltyType: this.data.penalty_type,
           penaltyCalcPolicy: this.data.penalty_calc_policy,
           pointsDecayFactor: this.data.points_decay_factor,
           requestsUserInformation: this.data.requests_user_information,
-          startTime: this.data.start_time,
-          showPenalty: this.data.show_penalty,
+          startTime: this.data.start_time, showPenalty: this.data.show_penalty,
           showScoreboardAfter: this.data.show_scoreboard_after,
-          submissionsGap: this.data.submissions_gap,
-          title: this.data.title, titlePlaceHolder: "",
-          windowLength: this.data.window_length == 0 ? "" : this.data.window_length,
+          submissionsGap: this.data.submissions_gap, title: this.data.title,
+          titlePlaceHolder: "",
+          windowLength: this.data.window_length == 0 ? "" :
+                                                       this.data.window_length,
           windowLengthEnabled: this.data.window_length != 0, T: T
     }
   },

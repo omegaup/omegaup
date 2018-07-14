@@ -30,14 +30,12 @@
         </thead>
         <tbody>
           <tr v-for="user in users">
-            <td>
-                <omegaup-user-username
-                    v-bind:linkify="true"
-                    v-bind:username="user.username"></omegaup-user-username>
-            </td>
+            <td><omegaup-user-username v-bind:linkify="true"
+                                   v-bind:username="user.username"></omegaup-user-username></td>
             <td>{{user.access_time}}</td>
             <td><button class="close"
-                    type="button" v-on:click="onRemove(user)">×</button></td>
+                    type="button"
+                    v-on:click="onRemove(user)">×</button></td>
           </tr>
         </tbody>
       </table>
@@ -57,8 +55,7 @@
             <th>{{T.contestAdduserAddContestant}}</th>
           </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </div>
@@ -72,15 +69,21 @@ import user_Username from '../user/Username.vue';
 export default {
   props: {data: Array},
   data: function() {
-      return { T: T, UI: UI, contestant: "", contestants: "", users: this.data, selected: {}}
+    return {
+      T: T, UI: UI, contestant: "", contestants: "", users: this.data,
+          selected: {}
+    }
   },
   methods: {
-      onSubmit: function() { this.$parent.$emit('add-user', this);},
-      onRemove: function(user) {
-          this.selected = user;
-          this.$parent.$emit('remove-user', this);
-      }
+    onSubmit: function() { this.$parent.$emit('add-user', this);},
+    onRemove: function(user) {
+      this.selected = user;
+      this.$parent.$emit('remove-user', this);
+    }
   },
-  components: {'omegaup-autocomplete': Autocomplete, 'omegaup-user-username': user_Username}
+  components: {
+    'omegaup-autocomplete': Autocomplete,
+    'omegaup-user-username': user_Username
+  }
 }
 </script>

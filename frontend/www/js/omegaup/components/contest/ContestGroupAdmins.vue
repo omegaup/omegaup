@@ -42,14 +42,17 @@ import Autocomplete from '../Autocomplete.vue';
 export default {
   props: {data: Array},
   data: function() {
-      return { T: T, UI: UI, API: API, groupName: "", groupAdmins: this.data, selected: {}}
+    return {
+      T: T, UI: UI, API: API, groupName: "", groupAdmins: this.data, selected: {
+      }
+    }
   },
   methods: {
-      onSubmit: function() { this.$parent.$emit('add-group-admin', this);},
-      onRemove: function(group) {
-          this.selected = group;
-          this.$parent.$emit('remove-group-admin', this);
-      }
+    onSubmit: function() { this.$parent.$emit('add-group-admin', this);},
+    onRemove: function(group) {
+      this.selected = group;
+      this.$parent.$emit('remove-group-admin', this);
+    }
   },
   components: {'omegaup-autocomplete': Autocomplete}
 }

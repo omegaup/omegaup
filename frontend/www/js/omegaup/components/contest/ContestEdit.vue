@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="page-header">
-		<h1>{{UI.formatString(T.contestEditWithTitle, {title: contest.title})}} <small><a v-bind:href=
-      "`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
+      <h1>{{UI.formatString(T.contestEditWithTitle, {title: contest.title})}}
+      <small><a v-bind:href="`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li class="active"
@@ -87,18 +87,13 @@ import ContestLinks from './ContestLinks.vue';
 import ContestClone from './ContestClone.vue';
 
 export default {
-  props: {
-	  data: Object
-  },
+  props: {data: Object},
   data: function() {
     return {
       showTab: this.isVirtual() ? "contestants" : "new_form", T: T,
-          virtual: this.isVirtual(), UI: UI,
-    contest: this.data.contest,
-    problems: this.data.problems,
-    users: this.data.users,
-    admins: this.data.admins,
-    groupAdmins: this.data.groupAdmins 
+          virtual: this.isVirtual(), UI: UI, contest: this.data.contest,
+          problems: this.data.problems, users: this.data.users,
+          admins: this.data.admins, groupAdmins: this.data.groupAdmins
     }
   },
   methods: {isVirtual: function() { return this.data.contest.rerun_id != 0;}},
