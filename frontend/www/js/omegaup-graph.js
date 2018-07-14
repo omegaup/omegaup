@@ -1,7 +1,4 @@
-
-function OmegaupGraph() {
-  var self = this;
-}
+function OmegaupGraph() {}
 
 OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
   return new Highcharts.Chart({
@@ -12,11 +9,8 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
       renderTo: renderTo
     },
     title: {text: 'veredictos de ' + title},
-    tooltip: {
-      formatter: function() {
-        return '<b>Envíos</b>: ' + stats.verdict_counts[this.point.name];
-      }
-    },
+    tooltip:
+        {formatter: function() { return '<b>Envíos</b>: ' + this.point.y; }},
     plotOptions: {
       pie: {
         allowPointSelect: true,
@@ -27,8 +21,7 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
           connectorColor: '#000000',
           formatter: function() {
             return '<b>' + this.point.name + '</b>: ' +
-                   this.percentage.toFixed(2) + ' % (' +
-                   stats.verdict_counts[this.point.name] + ')';
+                   this.percentage.toFixed(2) + '% (' + this.point.y + ')';
           }
         }
       }
@@ -44,22 +37,22 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
 };
 
 OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
-  return [
-    ['WA', (stats.verdict_counts['WA'] / stats.total_runs) * 100],
-    ['PA', (stats.verdict_counts['PA'] / stats.total_runs) * 100],
-    {
-      name: 'AC',
-      y: (stats.verdict_counts['AC'] / stats.total_runs) * 100,
-      sliced: true,
-      selected: true
-    },
-    ['TLE', (stats.verdict_counts['TLE'] / stats.total_runs) * 100],
-    ['MLE', (stats.verdict_counts['MLE'] / stats.total_runs) * 100],
-    ['OLE', (stats.verdict_counts['OLE'] / stats.total_runs) * 100],
-    ['RTE', (stats.verdict_counts['RTE'] / stats.total_runs) * 100],
-    ['CE', (stats.verdict_counts['CE'] / stats.total_runs) * 100],
-    ['JE', (stats.verdict_counts['JE'] / stats.total_runs) * 100],
-  ];
+  var result = [];
+  for (var verdict in stats.verdict_counts) {
+    if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
+    if (verdict == 'NO-AC') continue;
+    if (verdict == 'AC') {
+      result.push({
+        name: verdict,
+        y: stats.verdict_counts[verdict],
+        sliced: true,
+        selected: true,
+      });
+      continue;
+    }
+    result.push([verdict, stats.verdict_counts[verdict]]);
+  }
+  return result;
 };
 
 OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {

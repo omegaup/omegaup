@@ -4,9 +4,9 @@
       <h1>{{ T.liveStatistics }}</h1>
       <div>
         {{ totalRuns }}
-      </div><omegaup-verdict-chart v-bind:contestalias="contestAlias"
+      </div><omegaup-verdict-chart v-bind:contest-alias="contestAlias"
            v-bind:stats="stats"></omegaup-verdict-chart>
-           <omegaup-distribution-chart v-bind:contestalias="contestAlias"
+           <omegaup-distribution-chart v-bind:contest-alias="contestAlias"
            v-bind:stats="stats"></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
@@ -17,6 +17,7 @@
 import {T} from '../../omegaup.js';
 import verdict_chart from '../VerdictChart.vue';
 import distribution_chart from '../DistributionChart.vue';
+
 export default {
   props: {
     stats: Object,
@@ -33,8 +34,9 @@ export default {
     'omegaup-distribution-chart': distribution_chart,
   },
   data: function() {
-    return { T: T, }
+    return {
+      T: T,
+    };
   },
 };
-
 </script>

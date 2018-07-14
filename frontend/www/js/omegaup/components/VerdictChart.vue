@@ -3,7 +3,6 @@
 </template>
 
 <script>
-
 export default {
   data: function() {
     return { runCountsChart: null, }
@@ -13,16 +12,11 @@ export default {
     contestAlias: String,
   },
   mounted: function() {
-    if (this.runCountsChart) return;
-
-    // Draw verdict counts pie chart
     this.runCountsChart =
         oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
   },
-
-  watch: {stats: function() { this.updateRunCountsData();}},
-  methods: {
-    updateRunCountsData: function() {
+  watch: {
+    stats: function() {
       this.runCountsChart.series[0].setData(
           oGraph.normalizeRunCounts(this.stats));
     },
