@@ -89,11 +89,7 @@ export default {
       return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
                                                     '';
     },
-    renderUser: function(u) {
-      return u.username +
-             (u.name && (u.name != u.username ? ' (' + u.name + ')' : '')) +
-             (u.virtual ? ' - virtual' : '');
-    },
+    renderUser: function(u) { return UI.rankingUsername(u);},
     renderPoints: function(p) { return (p.points > 0 ? '+' : '') + p.points;},
     totalRuns: function(u) {
       return u.problems.reduce((acc, val) => acc + val.runs, 0);

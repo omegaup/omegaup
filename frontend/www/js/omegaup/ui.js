@@ -33,6 +33,13 @@ let UI = {
     return clock;
   },
 
+  rankingUsername: function(rank) {
+    return rank.username + ((rank.name == rank.username) ?
+                                '' :
+                                (' (' + UI.escape(rank.name) + ')')) +
+           (rank.virtual ? ' - virtual' : '');
+  },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;

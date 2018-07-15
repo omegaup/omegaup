@@ -612,24 +612,21 @@ export class Arena {
 
     data.forEach(function(env) {
       if (env.delta > delta) return;
-      var key = env.username + (env.virtual ? '-virtual' : '');
+      let key = env.username + (env.virtual ? '-virtual' : '');
       if (!rank.hasOwnProperty(key)) {
         rank[key] = {
           country: env.country,
           name: env.name,
           username: env.username,
           place: 0,
-          problems: [],
-          virtual: env.virtual || false
+          problems: [], virtual: env.virtual || false
         };
         for (let j = 0; j < problems.length; j++) {
-          rank[key].problems.push(
-              {penalty: 0, percent: 0, points: 0, runs: 0});
+          rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});
         }
         rank[key].total = {points: 0, penalty: 0};
       }
-      var problem =
-          rank[key].problems[problemOrder[env.problem.alias]];
+      let problem = rank[key].problems[problemOrder[env.problem.alias]];
       rank[key].problems[problemOrder[env.problem.alias]] = {
         penalty: env.problem.penalty,
         points: env.problem.points,
@@ -714,11 +711,7 @@ export class Arena {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = rank.username +
-                     ((rank.name == rank.username) ?
-                                          '' :
-                                          (' (' + UI.escape(rank.name) + ')')) +
-                     (rank.virtual ? ' - virtual' : '');
+      let username = UI.rankingUsername(rank);
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
       // Update problem scores.
