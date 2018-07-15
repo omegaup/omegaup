@@ -1010,6 +1010,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsValidator: "Validador",
 	wordsVerdict: "Verdito",
 	wordsVeryEasy: "Muito f\u00e1cil",
+	wordsVirtualSuffix: " [virtual]",
 	wordsYes: "Sim",
 	youMustOpenBeforeSubmit: "Voc\u00ea deve abrir o problema antes de tentar apresentar uma solu\u00e7\u00e3o.",
 });

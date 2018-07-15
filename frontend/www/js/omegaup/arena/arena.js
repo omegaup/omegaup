@@ -619,7 +619,7 @@ export class Arena {
           name: env.name,
           username: env.username,
           place: 0,
-          problems: [], virtual: env.virtual || false
+          problems: [], virtual: env.virtual || false,
         };
         for (let j = 0; j < problems.length; j++) {
           rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});

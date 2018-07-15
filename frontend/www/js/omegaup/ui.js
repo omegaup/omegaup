@@ -34,10 +34,10 @@ let UI = {
   },
 
   rankingUsername: function(rank) {
-    return rank.username + ((rank.name == rank.username) ?
-                                '' :
-                                (' (' + UI.escape(rank.name) + ')')) +
-           (rank.virtual ? ' - virtual' : '');
+    let username = rank.username;
+    if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
+    if (rank.virtual) username += T.virtualSuffix;
+    return username;
   },
 
   formatString: function(template, values) {
