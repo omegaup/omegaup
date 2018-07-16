@@ -446,7 +446,7 @@ export class Arena {
     }
 
     $('#title .contest-title')
-        .html(UI.escape(problemset.title | problemset.name));
+        .html(UI.escape(problemset.title || problemset.name));
     self.updateSummary(problemset);
     self.submissionGap = parseInt(problemset.submission_gap);
 
