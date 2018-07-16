@@ -911,6 +911,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsKeepProblem: "Conservar problema",
 	wordsKeyword: "Palabra clave",
 	wordsLanguage: "Lenguaje",
+	wordsLanguages: "Idioma",
 	wordsLatestSubmissions: "\u00daltimos env\u00edos",
 	wordsLevels: "Niveles de dificultad",
 	wordsLiveStatistics: "Estad\u00edsticas en vivo",
