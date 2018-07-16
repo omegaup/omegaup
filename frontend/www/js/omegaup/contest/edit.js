@@ -21,6 +21,7 @@ OmegaUp.on('ready', function() {
                                ev.windowLength,
                        points_decay_factor: ev.pointsDecayFactor,
                        submissions_gap: ev.submissionsGap,
+                       languages: ev.languages[0] == "" ? [] : ev.languages,
                        feedback: ev.feedback,
                        penalty: ev.penalty,
                        scoreboard: ev.scoreboard,

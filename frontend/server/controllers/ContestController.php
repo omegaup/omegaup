@@ -785,6 +785,7 @@ class ContestController extends Controller {
         $result = [];
         self::getCachedDetails($r, $result);
 
+        $result['available_languages'] = RunController::$kSupportedLanguages;
         $result['status'] = 'ok';
         $result['admin'] = true;
         return $result;

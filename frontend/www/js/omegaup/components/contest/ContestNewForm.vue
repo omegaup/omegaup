@@ -147,9 +147,9 @@
           <div class="form-group col-md-6">
             <label>{{T.wordsLanguage}}s</label><br>
             <select class="form-control"
-                 multiple="multiple">
-              <option value="{$language}">
-                {$language}
+                 multiple="multiple" v-model="languages">
+              <option v-for="(language, lang) in availableLanguages" v-bind:value="lang">
+              {{language}}
               </option>
             </select>
             <p class="help-block">{{T.contestNewFormLanguages}}</p>
@@ -205,12 +205,14 @@ export default {
   data: function() {
     return {
       alias: this.data.alias,
+      availableLanguages: this.data.available_languages,
       contest: this.data,
       contestantMustRegister: this.data.contestant_must_register,
       description: this.data.description,
       feedback: this.data.feedback,
       finishTime: this.data.finish_time,
       scoreboard: this.data.scoreboard,
+      languages: this.data.languages,
       needsBasicInformation: this.data.needs_basic_information,
       penalty: this.data.penalty,
       penaltyType: this.data.penalty_type,
