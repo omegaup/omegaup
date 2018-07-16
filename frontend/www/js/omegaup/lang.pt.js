@@ -809,6 +809,7 @@ omegaup.OmegaUp.loadTranslations({
 	verificationEmailSubject: "Bem-vindo ao omegaUp!",
 	verificationIdInvalid: "A informa\u00e7\u00e3o sobre a verifica\u00e7\u00e3o fornecida n\u00e3o \u00e9 v\u00e1lido.",
 	virtualContest: "Concurso virtual",
+	virtualSuffix: "%(username) [virtual]",
 	virtualTitle: "%(title) - Concurso virtual",
 	wordAccepted: "Aceitado",
 	wordsAccepted: "Resolvidos",
@@ -1010,7 +1011,6 @@ omegaup.OmegaUp.loadTranslations({
 	wordsValidator: "Validador",
 	wordsVerdict: "Verdito",
 	wordsVeryEasy: "Muito f\u00e1cil",
-	wordsVirtualSuffix: " [virtual]",
 	wordsYes: "Sim",
 	youMustOpenBeforeSubmit: "Voc\u00ea deve abrir o problema antes de tentar apresentar uma solu\u00e7\u00e3o.",
 });

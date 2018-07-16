@@ -36,7 +36,8 @@ let UI = {
   rankingUsername: function(rank) {
     let username = rank.username;
     if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
-    if (rank.virtual) username += T.virtualSuffix;
+    if (rank.virtual)
+      username = UI.formatString(T.virtualSuffix, {username: username});
     return username;
   },
 

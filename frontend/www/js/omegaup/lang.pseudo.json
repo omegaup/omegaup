@@ -806,6 +806,7 @@
 	"verificationEmailSubject": "(W31c0m3 70 0m3gaUp!)",
 	"verificationIdInvalid": "(Th3 pr0vid3d v3rifica7i0n inf0rma7i0n i5 n07 va1id.)",
 	"virtualContest": "(Vir7ua1 c0n7357)",
+	"virtualSuffix": "(%(username) [vir7ua1])",
 	"virtualTitle": "(%(title) - Vir7ua1 c0n7357)",
 	"wordAccepted": "(Acc3p73d)",
 	"wordsAccepted": "(Acc3p73d)",
@@ -1007,7 +1008,6 @@
 	"wordsValidator": "(Va1ida70r)",
 	"wordsVerdict": "(V3rdic7)",
 	"wordsVeryEasy": "(V3ryEa5y)",
-	"wordsVirtualSuffix": "( [vir7ua1])",
 	"wordsYes": "(Y35)",
 	"youMustOpenBeforeSubmit": "(Y0u mu57 0p3n 7h3 pr0b13m b3f0r3 7rying 70 5ubmi7 a 501u7i0n.)"
 }
