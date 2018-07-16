@@ -147,9 +147,11 @@
           <div class="form-group col-md-6">
             <label>{{T.wordsLanguage}}s</label><br>
             <select class="form-control"
-                 multiple="multiple" v-model="languages">
-              <option v-for="(language, lang) in availableLanguages" v-bind:value="lang">
-              {{language}}
+                 multiple="multiple"
+                 v-model="languages">
+              <option v-bind:value="lang"
+                      v-for="(language, lang) in availableLanguages">
+                {{language}}
               </option>
             </select>
             <p class="help-block">{{T.contestNewFormLanguages}}</p>
