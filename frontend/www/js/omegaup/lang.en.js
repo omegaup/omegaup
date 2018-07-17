@@ -810,6 +810,7 @@ omegaup.OmegaUp.loadTranslations({
 	verificationEmailSubject: "Welcome to omegaUp!",
 	verificationIdInvalid: "The provided verification information is not valid.",
 	virtualContest: "Virtual contest",
+	virtualSuffix: "%(username) [virtual]",
 	virtualTitle: "%(title) - Virtual contest",
 	wordAccepted: "Accepted",
 	wordsAccepted: "Accepted",

@@ -806,6 +806,7 @@ verificationEmailBody = "Welcome to omegaUp! Please click on the following link 
 verificationEmailSubject = "Welcome to omegaUp!"
 verificationIdInvalid = "The provided verification information is not valid."
 virtualContest = "Virtual contest"
+virtualSuffix = "%(username) [virtual]"
 virtualTitle = "%(title) - Virtual contest"
 wordAccepted = "Accepted"
 wordsAccepted = "Accepted"
