@@ -57,6 +57,7 @@
               <label><input type="checkbox"
                      v-model="windowLengthEnabled"> {{T.wordsEnable}}</label>
             </div><input class="form-control"
+                 v-bind:disabled="!windowLengthEnabled"
                  size="3"
                  type="text"
                  v-model="windowLength">
@@ -228,7 +229,7 @@ export default {
       title: this.data.title,
       titlePlaceHolder: '',
       windowLength: this.data.window_length == 0 ? '' : this.data.window_length,
-      windowLengthEnabled: this.data.window_length != 0,
+      windowLengthEnabled: this.data.window_length != 0 && this.data.window_length != '',
       T: T,
     };
   },
