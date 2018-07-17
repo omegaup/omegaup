@@ -8,7 +8,7 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-import ui.util as util
+from ui import util
 
 
 @util.no_javascript_errors()
