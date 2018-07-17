@@ -38,6 +38,7 @@ omegaup.OmegaUp.on('ready', function() {
             .fail(omegaup.UI.apiError);
       });
 
+  // Handler to enable start contest button
   $('input[name=share-user-information]')
       .on('click', function(ev) { enableStartContestButton(); });
 
@@ -62,8 +63,8 @@ omegaup.OmegaUp.on('ready', function() {
     if ($formElement.hasClass('basic-information-needed')) {
       return false;
     }
-    if ($formElement.hasClass('requests-user-information-required') &&
-        $('input[name=share-user-information]:checked').val() != '1') {
+    if (($formElement.hasClass('requests-user-information-required') &&
+         $('input[name=share-user-information]:checked').val() != '1')) {
       $('#start-contest-submit').prop('disabled', true);
       return false;
     }
