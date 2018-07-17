@@ -576,10 +576,7 @@ export class Arena {
                         {problemset_id: self.options.problemsetId})
           .then(function(response) {
             let events = response.events;
-            for (let event of events) {
-              event.username += '-(virtual)';
-              event.name += '-(virtual)';
-            }
+            for (let event of events) event.virtual = true;
             API.Problemset.scoreboardEvents({
                             problemset_id: self.options.originalProblemsetId
                           })
@@ -604,39 +601,38 @@ export class Arena {
     let delta = (new Date()).getTime() - self.startTime.getTime();
     let rank = [];
 
-    let problemOrder = [];
+    let problemOrder = {};
     let problems = [];
     let initialScores = [];
 
     for (let problem of Object.values(self.problems)) {
-      problemOrder[problem.alias] = problems.length + 1;
+      problemOrder[problem.alias] = problems.length;
       problems.push({order: problems.length + 1, alias: problem.alias});
     }
 
     data.forEach(function(env) {
       if (env.delta > delta) return;
-      if (!rank.hasOwnProperty(env.username)) {
-        rank[env.username] = {
+      let key = env.username + (env.virtual ? '-virtual' : '');
+      if (!rank.hasOwnProperty(key)) {
+        rank[key] = {
           country: env.country,
           name: env.name,
           username: env.username,
           place: 0,
-          problems: []
+          problems: [], virtual: env.virtual || false,
         };
         for (let j = 0; j < problems.length; j++) {
-          rank[env.username].problems.push(
-              {penalty: 0, percent: 0, points: 0, runs: 0});
+          rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});
         }
-        rank[env.username].total = {points: 0, penalty: 0};
+        rank[key].total = {points: 0, penalty: 0};
       }
-      let problem =
-          rank[env.username].problems[problemOrder[env.problem.alias]];
-      rank[env.username].problems[problemOrder[env.problem.alias]] = {
+      let problem = rank[key].problems[problemOrder[env.problem.alias]];
+      rank[key].problems[problemOrder[env.problem.alias]] = {
         penalty: env.problem.penalty,
         points: env.problem.points,
         runs: problem.runs + 1
       };
-      rank[env.username].total = env.total;
+      rank[key].total = env.total;
     });
 
     let ranking = Object.values(rank);
@@ -715,10 +711,7 @@ export class Arena {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = rank.username + ((rank.name == rank.username) ?
-                                          '' :
-                                          (' (' + UI.escape(rank.name) + ')'));
-
+      let username = UI.rankingUsername(rank);
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
       // Update problem scores.
