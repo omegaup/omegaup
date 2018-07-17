@@ -354,6 +354,7 @@ omegaup.OmegaUp.loadTranslations({
 	libinteractiveLanguage: "Language",
 	libinteractiveOs: "Operating System",
 	libinteractiveTitle: "Interactive templates",
+	liveStatistics: "Live Statistics",
 	locale: "en",
 	lockdownDetailsDisabled: "Viewing source code has been temporarily disabled.",
 	lockdownMessageWarning: "Warning: in lockdown mode, your submissions will no longer be accessible if you leave the page.",

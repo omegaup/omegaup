@@ -350,6 +350,7 @@ libinteractiveIdlFilenameHelp = "O nome do arquivo .idl (sem a extensão). Deve 
 libinteractiveLanguage = "Idioma"
 libinteractiveOs = "Sistema Operacional"
 libinteractiveTitle = "Modelo para problemas interativos"
+liveStatistics = "Estatísticas ao vivo"
 locale = "pt"
 lockdownDetailsDisabled = "A visualização do código-fonte foi desativada temporariamente."
 lockdownMessageWarning = "Aviso: no modo lockdown, Suas envíos não serão mais acessíveis se você sair da página."
