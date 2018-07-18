@@ -20,6 +20,9 @@ try {
     die();
 }
 
+// TODO Remove this when #2134 is omegaup-course-assignmentdetails
+$intro_details['showAcceptTeacher'] = false;
+
 if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [

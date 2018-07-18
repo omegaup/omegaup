@@ -429,7 +429,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.identity_id = i.identity_id
             WHERE
                 c.alias = ?
-                AND accept_teacher = 'yes'
+                # AND accept_teacher = 'yes' # TODO Uncomment this when #2134 is merged
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
@@ -482,7 +482,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.problem_id = p.problem_id
             WHERE
                 c.alias = ?
-                AND accept_teacher = 'yes'
+                # AND accept_teacher = 'yes' # TODO Uncomment this when #2134 is merged
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
