@@ -28,7 +28,7 @@
                 name="start-course-submit"
                 type="button"
                 v-bind:disabled=
-                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1 || || acceptTeacher == undefined)"
+                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1 || acceptTeacher == undefined)"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
