@@ -75,6 +75,7 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /coursescoreboard.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /courseedit.php?course=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/list/?$ /coursesubmissionslist.php?course=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /coursestudent.php?course=$1&student=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /coursestudents.php?course=$1 last;
 rewrite ^/group/?$ /grouplist.php last;

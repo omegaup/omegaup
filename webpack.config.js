@@ -35,6 +35,7 @@ module.exports = [{
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
     course_student: './frontend/www/js/omegaup/course/student.js',
     course_students: './frontend/www/js/omegaup/course/students.js',
+    course_submissions_list: './frontend/www/js/omegaup/course/submissions_list.js',
     group_list: './frontend/www/js/omegaup/group/list.js',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.js',
