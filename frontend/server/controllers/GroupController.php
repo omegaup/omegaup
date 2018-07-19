@@ -83,11 +83,10 @@ class GroupController extends Controller {
                 'alias' => $r['group_alias']
             ]));
 
-            if (is_null($groups) || count($groups) === 0) {
+            if (empty($groups)) {
                 throw new InvalidParameterException('parameterNotFound', 'Group');
-            } else {
-                $r['group'] = $groups[0];
             }
+            $r['group'] = $groups[0];
         } catch (ApiException $ex) {
             throw $ex;
         } catch (Exception $ex) {
