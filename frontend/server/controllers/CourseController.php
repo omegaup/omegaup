@@ -1346,11 +1346,16 @@ class CourseController extends Controller {
             $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
             $result['statement_type'] = $statement_type;
         }
-        $result['teacher_git_object_id'] = null;
-        $result['accept_teacher_markdown'] = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
-        if (!is_null($result['accept_teacher_markdown'])) {
-            $result['teacher_git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement('accept_teacher')['git_object_id'];
+
+        $markdown = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
+        if (is_null($markdown)) {
+            throw new ForbiddenAccessException();
         }
+        $result['accept_teacher_statement'] = [
+            'git_object_id' => PrivacyStatementsDAO::getLatestPublishedStatement('accept_teacher')['git_object_id'],
+            'markdown' => $markdown,
+            'statement_type' => 'accept_teacher',
+        ];
 
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
