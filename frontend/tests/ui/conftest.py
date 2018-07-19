@@ -20,7 +20,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-import ui.util as util
+from ui import util
 
 
 _DEFAULT_TIMEOUT = 10  # seconds
@@ -29,7 +29,7 @@ _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
 
 
-class JavaScriptLogCollector(object):
+class JavaScriptLogCollector:
     '''Collects JavaScript errors from the log.'''
 
     def __init__(self, dr):
@@ -62,7 +62,7 @@ class JavaScriptLogCollector(object):
             yield entry
 
 
-class Driver(object):  # pylint: disable=too-many-instance-attributes
+class Driver:  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments

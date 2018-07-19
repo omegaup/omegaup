@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 import database_utils
-import hook_tools.git_tools as git_tools
+from hook_tools import git_tools
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
