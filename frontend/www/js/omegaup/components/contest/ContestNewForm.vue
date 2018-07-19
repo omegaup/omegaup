@@ -146,7 +146,7 @@
             <p class="help-block">{{T.contestNewFormScoreboardAtEndDesc}}</p>
           </div>
           <div class="form-group col-md-6">
-            <label>{{T.wordsLanguage}}s</label><br>
+            <label>{{T.wordsLanguages}}</label><br>
             <select class="form-control"
                  multiple="multiple"
                  v-model="languages">

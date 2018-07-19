@@ -5,7 +5,7 @@
       <small><a v-bind:href="`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
     </div>
     <ul class="nav nav-tabs nav-justified">
-      <li class="active"
+      <li v-bind:class="{active : !virtual}"
           v-if="!virtual"
           v-on:click="showTab = 'new_form'">
         <a data-toggle="tab">{{T.contestEdit}}</a>

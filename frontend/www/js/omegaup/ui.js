@@ -42,14 +42,13 @@ let UI = {
     return template;
   },
 
-  contestUpdated: function(data) {
+  contestUpdated: function(data, contestAlias) {
     if (data.status != 'ok') {
       UI.error(data.error || 'error');
       return;
     }
     UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
-               $('.new_contest_form #alias').val() + '">' +
-               T.contestEditGoToContest + '</a>');
+               contestAlias + '">' + T.contestEditGoToContest + '</a>');
   },
 
   displayStatus: function(message, type) {

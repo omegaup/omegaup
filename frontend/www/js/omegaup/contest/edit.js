@@ -63,7 +63,7 @@ OmegaUp.on('ready', function() {
                         basic_information: ev.needsBasicInformation ? 1 : 0,
                         requests_user_information: ev.requestsUserInformation
                       })
-                      .then(UI.contestUpdated)
+                      .then((data) => UI.contestUpdated(data, contestAlias))
                       .fail(UI.apiError);
                 },
                 'add-problem': function(ev) {
