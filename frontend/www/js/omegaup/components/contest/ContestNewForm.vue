@@ -57,9 +57,9 @@
               <label><input type="checkbox"
                      v-model="windowLengthEnabled"> {{T.wordsEnable}}</label>
             </div><input class="form-control"
-                 v-bind:disabled="!windowLengthEnabled"
                  size="3"
                  type="text"
+                 v-bind:disabled="!windowLengthEnabled"
                  v-model="windowLength">
             <p class="help-block">{{T.contestNewFormDifferentStartsDesc}}</p>
           </div>
@@ -228,8 +228,13 @@ export default {
       submissionsGap: this.data.submissions_gap,
       title: this.data.title,
       titlePlaceHolder: '',
-      windowLength: this.data.window_length == 0 ? '' : this.data.window_length,
-      windowLengthEnabled: this.data.window_length != 0 && this.data.window_length != '',
+      windowLength:
+          (this.data.window_length == 0 || this.data.window_length == null) ?
+              '' :
+              this.data.window_length,
+      windowLengthEnabled: this.data.window_length != 0 &&
+                               this.data.window_length != '' &&
+                               this.data.window_length != null,
       T: T,
     };
   },
