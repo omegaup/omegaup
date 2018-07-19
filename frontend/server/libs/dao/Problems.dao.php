@@ -393,20 +393,19 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $sql = "
             SELECT
-                rp.problem_id,
                 rp.alias,
                 rp.title,
                 i.username
             FROM
-                Identities i
+                Courses c
             INNER JOIN
                 Groups_Identities gi
             ON
-                gi.identity_id = i.identity_id
-            INNER JOIN
-                Courses c
-            ON
                 c.group_id = gi.group_id
+            INNER JOIN
+                Identities i
+            ON
+                gi.identity_id = i.identity_id
             INNER JOIN
                 (
                 SELECT
@@ -420,7 +419,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                     Problems p
                 ON
                     p.problem_id = r.problem_id
-                    AND r.verdict = 'AC'
+                WHERE
+                    r.verdict = 'AC'
                     AND p.visibility = ?
                 GROUP BY
                     p.problem_id, r.identity_id
@@ -429,18 +429,17 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.identity_id = i.identity_id
             WHERE
                 c.alias = ?
-                # AND accept_teacher = 'yes' # TODO Uncomment when #2134 is merged
+                AND accept_teacher = 'yes'
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
-        $params = [ProblemController::VISIBILITY_PUBLIC, $course_alias];
-        return $conn->GetAll($sql, $params);
+
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
     final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
         $sql = "
             SELECT
-                rp.problem_id,
                 rp.alias,
                 rp.title,
                 i.username
@@ -468,7 +467,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                     Problems pp
                 ON
                     pp.problem_id = r.problem_id
-                    AND pp.visibility = ?
+                WHERE
+                    pp.visibility = ?
                 GROUP BY
                     pp.problem_id, r.identity_id
                 HAVING
@@ -482,15 +482,13 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.problem_id = p.problem_id
             WHERE
                 c.alias = ?
-                # AND accept_teacher = 'yes' # TODO Uncomment when #2134 is merged
+                AND accept_teacher = 'yes'
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
 
-        $params = [ProblemController::VISIBILITY_PUBLIC, $course_alias];
-
         global $conn;
-        return $conn->GetAll($sql, $params);
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
     final public static function isProblemSolved(Problems $problem, $identity_id) {

@@ -1722,7 +1722,6 @@ class CourseController extends Controller {
         }
         $user_problems = [];
         foreach ($db_results as $problem) {
-            unset($problem['problem_id']);
             $user_problems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $user_problems];
@@ -1750,7 +1749,6 @@ class CourseController extends Controller {
         }
         $user_problems = [];
         foreach ($db_results as $problem) {
-            unset($problem['problem_id']);
             $user_problems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $user_problems];

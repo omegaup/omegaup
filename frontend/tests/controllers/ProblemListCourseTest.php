@@ -51,7 +51,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'yes',
-                //'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
+                'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             ]));
         }
         $adminLogin = self::login($courseData['admin']);
@@ -128,9 +128,8 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         // No one has join course
-        // TODO This will work when #2134 is merged
-        // $this->assertEquals(0, count($solvedProblems['user_problems']));
-        // $this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertEquals(0, count($solvedProblems['user_problems']));
+        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // Users must join course
         for ($i=0; $i<($num_users - 1); $i++) {
             $userLogin[$i] = self::login($user[$i]);
@@ -144,7 +143,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'no',
-                //'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
+                'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             ]));
         }
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
@@ -156,9 +155,8 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         // No one has accept teacher's request
-        // TODO This will work when #2134 is merged
-        //$this->assertEquals(0, count($solvedProblems['user_problems']));
-        //$this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertEquals(0, count($solvedProblems['user_problems']));
+        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // User[2] accept teacher's request
         $userLogin[2] = self::login($user[2]);
         $intro_details = CourseController::apiIntroDetails(new Request([
@@ -171,7 +169,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'usernameOrEmail' => $user[2]->username,
             'accept_teacher' => 'yes',
-            //'teacher_git_object_id' => $intro_details['teacher_git_object_id'],
+            'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
         ]));
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
             'auth_token' => $adminLogin->auth_token,
@@ -183,6 +181,6 @@ class ProblemListCourseTest extends OmegaupTestCase {
         ]));
         $this->assertArrayHasKey($user[2]->username, $solvedProblems['user_problems']);
         $this->assertEquals(2, count($solvedProblems['user_problems'][$user[2]->username]));
-        //$this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
     }
 }
