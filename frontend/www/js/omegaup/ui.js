@@ -33,6 +33,14 @@ let UI = {
     return clock;
   },
 
+  rankingUsername: function(rank) {
+    let username = rank.username;
+    if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
+    if (rank.virtual)
+      username = UI.formatString(T.virtualSuffix, {username: username});
+    return username;
+  },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;

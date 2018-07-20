@@ -259,6 +259,7 @@ CREATE TABLE `Groups_Identities` (
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
+  `accept_teacher` enum('yes','no') DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
@@ -405,7 +406,7 @@ CREATE TABLE `PrivacyStatement_Consent_Log` (
 CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
-  `type` enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
+  `type` enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent','accept_teacher') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
   PRIMARY KEY (`privacystatement_id`),
   UNIQUE KEY `type_git_object_id` (`type`,`git_object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
@@ -620,6 +621,7 @@ CREATE TABLE `Problemsets` (
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
   `scoreboard_url_admin` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard de admin en problemsets',
+  `type` enum('Contest','Assignment','Interview') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
   PRIMARY KEY (`problemset_id`),
   KEY `acl_id` (`acl_id`),
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
