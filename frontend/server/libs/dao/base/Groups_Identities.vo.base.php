@@ -35,6 +35,12 @@ class GroupsIdentities extends VO {
         if (isset($data['share_user_information'])) {
             $this->share_user_information = $data['share_user_information'];
         }
+        if (isset($data['privacystatement_consent_id'])) {
+            $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
+        }
+        if (isset($data['accept_teacher'])) {
+            $this->accept_teacher = $data['accept_teacher'];
+        }
     }
 
     /**
@@ -70,4 +76,18 @@ class GroupsIdentities extends VO {
       * @var tinyint(1)
       */
     public $share_user_information;
+
+    /**
+      * Id del documento con el consentimiento de privacidad
+      * @access public
+      * @var int(11)
+      */
+    public $privacystatement_consent_id;
+
+    /**
+      * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
+      * @access public
+      * @var enum('yes','no')
+      */
+    public $accept_teacher;
 }

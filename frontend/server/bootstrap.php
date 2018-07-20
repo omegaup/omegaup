@@ -63,6 +63,7 @@ require_once('libs/Git.php');
 require_once('libs/Grader.php');
 require_once('libs/LinkedIn.php');
 require_once('libs/Pager.php');
+require_once('libs/PrivacyStatement.php');
 require_once('libs/ProblemDeployer.php');
 require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');

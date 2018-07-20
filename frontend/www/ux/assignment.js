@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
                       course: arena.options.courseAlias,
                       assignment: arena.options.assignmentAlias
                     })
-      .then(arena.contestLoaded.bind(arena))
+      .then(arena.problemsetLoaded.bind(arena))
       .fail(omegaup.UI.apiError);
 
   window.addEventListener('hashchange', arena.onHashChanged.bind(arena));

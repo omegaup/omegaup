@@ -22,7 +22,7 @@ def generate(alias):
                                    cwd=os.path.join(_PROBLEMS_GIT_DIR, alias))
     idlname = None
     with tempfile.TemporaryDirectory(
-        prefix='refresh_libinteractive_') as dirname:
+            prefix='refresh_libinteractive_') as dirname:
         for match in _LS_TREE_RE.finditer(tree):
             _, objtype, _, filename = match.groups()
             if objtype != b'blob':

@@ -73,7 +73,8 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 i.username,
                 pi.access_time,
                 e.email,
-                i.country_id
+                i.country_id,
+                pi.access_time
             FROM
                 Identities i
             INNER JOIN
@@ -89,5 +90,24 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
 
         global $conn;
         return $conn->GetAll($sql, [$problemset_id]);
+    }
+
+    public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
+        $sql = 'UPDATE
+                    `Problemset_Identities`
+                SET
+                    `privacystatement_consent_id` = ?
+                WHERE
+                    `identity_id` = ?
+                    AND `problemset_id` = ?;';
+        $params = [
+            $problemset_identity->privacystatement_consent_id,
+            $problemset_identity->identity_id,
+            $problemset_identity->problemset_id,
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 }

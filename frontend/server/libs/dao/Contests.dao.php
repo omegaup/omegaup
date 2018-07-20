@@ -129,6 +129,7 @@ class PublicStatus extends StatusBase {
 class ContestsDAO extends ContestsDAOBase {
     private static $getContestsColumns = '
                                 Contests.contest_id,
+                                Contests.problemset_id,
                                 title,
                                 description,
                                 finish_time as original_finish_time,
@@ -143,8 +144,8 @@ class ContestsDAO extends ContestsDAOBase {
                                 ';
 
     final public static function getByAlias($alias) {
-        $sql = 'SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;';
-        $params = [  $alias ];
+        $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
+        $params = [$alias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -155,6 +156,30 @@ class ContestsDAO extends ContestsDAOBase {
         $contest = new Contests($rs);
 
         return $contest;
+    }
+
+    final public static function getByAliasWithExtraInformation($alias) {
+        $sql = '
+                SELECT
+                    c.*,
+                    p.scoreboard_url,
+                    p.scoreboard_url_admin
+                FROM
+                    Contests c
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = c.problemset_id
+                WHERE c.alias = ? LIMIT 1;';
+        $params = [$alias];
+
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+
+        return $rs;
     }
 
     final public static function getByProblemset($problemset_id) {
@@ -202,9 +227,15 @@ class ContestsDAO extends ContestsDAOBase {
     public static function getContestsParticipated($identity_id) {
         $sql = '
             SELECT
-                c.*
+                c.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Contests c
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = c.problemset_id
             WHERE contest_id IN (
                 SELECT DISTINCT
                     c2.contest_id
@@ -222,13 +253,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params = [$identity_id];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $foo) {
-            $bar =  new Contests($foo);
-            array_push($ar, $bar);
-        }
-        return $ar;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -298,11 +323,15 @@ class ContestsDAO extends ContestsDAOBase {
         $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
-                c.*
+                c.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Contests c
             INNER JOIN
                 ACLs a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Problemsets p ON p.problemset_id = c.problemset_id
             WHERE
                 a.owner_id = ?
             ORDER BY
@@ -315,13 +344,7 @@ class ContestsDAO extends ContestsDAOBase {
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
-
-        $contests = [];
-        foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
-        }
-        return $contests;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -342,13 +365,19 @@ class ContestsDAO extends ContestsDAOBase {
 
         $sql = "
             SELECT
-                $columns
+                $columns,
+                Problemsets.scoreboard_url,
+                Problemsets.scoreboard_url_admin
             FROM
                 Contests
             INNER JOIN
                 Problemset_Identities
             ON
                 Contests.problemset_id = Problemset_Identities.problemset_id
+            INNER JOIN
+                Problemsets
+            ON
+                Problemsets.problemset_id = Contests.problemset_id
             WHERE
                 Problemset_Identities.identity_id = ? AND
                 $recommended_check  AND $end_check AND $query_check
@@ -366,13 +395,8 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $pageSize;
-        $rs = $conn->Execute($sql, $params);
 
-        $contests = [];
-        foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
-        }
-        return $contests;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -416,13 +440,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = $offset;
         $params[] = $pageSize;
 
-        $rs = $conn->Execute($sql, $params);
-
-        $contests = [];
-        foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
-        }
-        return $contests;
+        return $conn->GetAll($sql, $params);
     }
 
     /**
@@ -602,16 +620,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
         global $conn;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     final public static function getAllPublicContests(
@@ -655,16 +664,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     final public static function getAllContests(
@@ -704,16 +704,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = $offset;
         $params[] = $renglones_por_pagina;
-        $rs = $conn->Execute($sql, $params);
-
-        $allData = [];
-
-        foreach ($rs as $foo) {
-            $bar = new Contests($foo);
-            array_push($allData, $bar);
-        }
-
-        return $allData;
+        return $conn->GetAll($sql, $params);
     }
 
     public static function getContestForProblemset($problemset_id) {
