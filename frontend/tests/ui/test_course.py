@@ -35,7 +35,7 @@ def test_user_ranking_course(driver):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[contains(@href, "#problems/%s")]' %
-                  problem_alias)))).click()
+                  problem)))).click()
 
         util.create_run(driver, problem, 'Main.cpp11')
         driver.update_score_in_course(problem, assignment_alias)
