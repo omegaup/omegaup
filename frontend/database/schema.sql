@@ -259,6 +259,7 @@ CREATE TABLE `Groups_Identities` (
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
+  `accept_teacher` enum('yes','no') DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
@@ -405,7 +406,7 @@ CREATE TABLE `PrivacyStatement_Consent_Log` (
 CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
-  `type` enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
+  `type` enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent','accept_teacher') NOT NULL DEFAULT 'privacy_policy' COMMENT 'Tipo de documento de privacidad',
   PRIMARY KEY (`privacystatement_id`),
   UNIQUE KEY `type_git_object_id` (`type`,`git_object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
