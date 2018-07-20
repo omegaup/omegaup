@@ -51,15 +51,10 @@ def add_students(driver, users, container_id, parent_xpath, submit_locator):
                  '//*[@id="%s"]//a[text()="%s"]' % (container_id, user))))
 
 
-def create_run(driver, problem_alias, filename, select_tab=True):
+def create_run(driver, problem_alias, filename):
     '''Utility function to create a new run.'''
     logging.debug('Trying to submit new run for %s...', problem_alias)
-    if select_tab:
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem_alias)))).click()
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
@@ -174,7 +169,7 @@ def is_message_whitelisted(message, message_whitelist):
 
     quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
     for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if whitelisted_message in quoted_string:
+        if quoted_string == whitelisted_message:
             return True
 
     return False

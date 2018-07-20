@@ -73,12 +73,15 @@ def test_create_problem(driver):
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
-        util.create_run(driver, problem_alias, 'Main.java', False)
+        runs_before_submit = driver.browser.find_elements_by_xpath(
+            '//td[@class="status"]')
 
-        new_run = driver.browser.find_element_by_xpath(
-            '//td[@class="status"]/span')
+        util.create_run(driver, problem_alias, 'Main.java')
 
-        assert new_run.text == 'new', new_run
+        runs_after_submit = driver.browser.find_elements_by_xpath(
+            '//td[@class="status"]')
+
+        assert len(runs_before_submit) + 1 == len(runs_after_submit)
 
 
 # Creating a problem intentionally attempts to get the details of a problem to
