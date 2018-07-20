@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#enterCourse#}"}
+{include file='head.tpl' htmlTitle="{#enterCourse#}" loadMarkdown=true}
 
 <div class="container-fluid">
 	<script type="text/json" id="course-payload">{$course_payload|json_encode}</script>

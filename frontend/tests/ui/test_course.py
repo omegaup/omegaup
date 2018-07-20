@@ -7,13 +7,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-import ui.util as util
+from ui import util
 
 
 # Assignment scoreboard is still not completely working.
-@util.no_javascript_errors(
-    path_whitelist=('/api/course/assignmentScoreboard/',),
-    message_whitelist=('/api/course/assignmentScoreboard/',))
+@util.no_javascript_errors()
 @util.annotate
 def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''

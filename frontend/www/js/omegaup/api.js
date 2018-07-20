@@ -173,8 +173,6 @@ export default {
 
     scoreboard: _call('/api/contest/scoreboard/'),
 
-    scoreboardEvents: _call('/api/contest/scoreboardevents/'),
-
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
 
     stats: _call('/api/contest/stats/'),
@@ -207,6 +205,9 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
+
+    assignmentScoreboardEvents:
+        _call('/api/course/assignmentScoreboardEvents/'),
 
     clone: _call('/api/course/clone/'),
 
@@ -414,6 +415,12 @@ export default {
     update: _call('/api/problem/update/'),
 
     updateStatement: _call('/api/problem/updateStatement/'),
+  },
+
+  Problemset: {
+    scoreboard: _call('/api/problemset/scoreboard/'),
+
+    scoreboardEvents: _call('/api/problemset/scoreboardevents/'),
   },
 
   QualityNomination: {
