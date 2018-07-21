@@ -11,6 +11,8 @@ import sys
 import time
 import urllib
 
+from ui import util
+
 import pytest
 
 from selenium import webdriver
@@ -19,9 +21,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-
-from ui import util
-
 
 _DEFAULT_TIMEOUT = 10  # seconds
 _DIRNAME = os.path.dirname(__file__)
@@ -219,12 +218,12 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             # good measure and to enforce that there are two URL changes.
             self._wait_for_page_loaded()
             with self.page_transition():
-                self.browser.get('about:blank')
+                self.browser.get('http://www.example.com')
             with self.page_transition():
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (
                 'Invalid URL redirect. Expected %s, got %s' % (
-                    home_page_url, self.current.browser_url))
+                    home_page_url, self.browser.current_url))
 
     @util.no_javascript_errors()
     @util.annotate
@@ -234,7 +233,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         # Home page
         home_page_url = self.url('/')
         with self.page_transition():
-            self.browser.get('about:blank')
+            self.browser.get('http://www.example.com')
         with self.page_transition():
             self.browser.get(home_page_url)
         with self.page_transition():
@@ -254,12 +253,12 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         # Home screen
         with self.page_transition():
-            self.browser.get('about:blank')
+            self.browser.get('http://www.example.com')
         with self.page_transition():
             self.browser.get(self.url('/logout/?redirect=/'))
         assert self.browser.current_url == home_page_url, (
             'Invalid URL redirect. Expected %s, got %s' % (
-                home_page_url, self.current.browser_url))
+                home_page_url, self.browser.current_url))
 
     def annotate(self, message, level=logging.INFO):
         '''Add an annotation to the run's log.'''

@@ -3,11 +3,11 @@
 
 '''Run Selenium course tests.'''
 
+from ui import util
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-
-from ui import util
 
 
 # Assignment scoreboard is still not completely working.
@@ -189,7 +189,8 @@ def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
     util.add_students(
-        driver, users, container_id='students',
+        driver, users, container_selector='a[href="#students"]',
+        container='#students',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))

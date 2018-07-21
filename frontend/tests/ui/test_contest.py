@@ -5,10 +5,10 @@
 
 import urllib
 
+from ui import util
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-
-from ui import util
 
 
 @util.no_javascript_errors()
@@ -224,8 +224,10 @@ def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
     util.add_students(
-        driver, users, container_id='contestants',
-        parent_xpath='*[@id="contestants"]',
+        driver, users,
+        container_selector='.nav-tabs > li:nth-child(4) > a:nth-child(1)',
+        container='div.panel:nth-child(1) > div:nth-child(1)',
+        parent_xpath='*[contains(@class, "twitter-typeahead")]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
 
@@ -235,15 +237,16 @@ def add_students_bulk(driver, users):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "#contestants")]')))).click()
+            (By.CSS_SELECTOR,
+             ('.nav-tabs > li:nth-child(4) > a:nth-child(1)')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#contestants')))
+            (By.CSS_SELECTOR, '#content')))
 
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, (
-                '//textarea[contains(@name, "usernames")]')))).send_keys(
+                '//textarea[contains(@class, "form-control")]')))).send_keys(
                     ', '.join(users))
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -251,7 +254,8 @@ def add_students_bulk(driver, users):
     for user in users:
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH, '//*[@id="contest-users"]//a[text()="%s"]' % user)))
+                (By.XPATH,
+                 '//*[contains(@class, "table")]//a[text()="%s"]' % user)))
 
 
 @util.annotate
@@ -260,16 +264,19 @@ def add_problem_to_contest(driver, problem):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "#problems"]'))).click()
+            (By.CSS_SELECTOR,
+             '.nav-tabs > li:nth-child(2) > a:nth-child(1)'))).click()
 
-    driver.typeahead_helper('*[@id="problems"]', problem)
+    driver.typeahead_helper('*[contains(@class, "twitter-typeahead")]',
+                            problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '#add-problem-form button[type="submit"]'))).click()
+             '.btn'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.XPATH, '//*[@id="problems"]//a[text()="%s"]' % problem)))
+            (By.XPATH,
+             '//*[contains(@class, "table")]//a[text()="%s"]' % problem)))
 
 
 @util.annotate
