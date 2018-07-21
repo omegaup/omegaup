@@ -218,7 +218,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             # good measure and to enforce that there are two URL changes.
             self._wait_for_page_loaded()
             with self.page_transition():
-                self.browser.get('http://www.example.com')
+                self.browser.get('http://localhost/404/')
             with self.page_transition():
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (
@@ -233,7 +233,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         # Home page
         home_page_url = self.url('/')
         with self.page_transition():
-            self.browser.get('http://www.example.com')
+            self.browser.get('http://localhost/404/')
         with self.page_transition():
             self.browser.get(home_page_url)
         with self.page_transition():
@@ -253,7 +253,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         # Home screen
         with self.page_transition():
-            self.browser.get('http://www.example.com')
+            self.browser.get('http://localhost/404/')
         with self.page_transition():
             self.browser.get(self.url('/logout/?redirect=/'))
         assert self.browser.current_url == home_page_url, (
