@@ -270,6 +270,8 @@
 	"createSchoolFailed": "School creation failed.",
 	"csrfException": "Cross-site Request Forgery attempt",
 	"currentStatus": "Current state",
+	"datePickerFormat": "mm/dd/yyyy",
+	"dateTimePickerFormat": "mm/dd/yyyy hh:ii",
 	"demotionProblemEmailBody": "<p>Dear <strong>%(user_name)</strong>:</p><p>The access to your problem <strong>%(problem_name)</strong> in omegaUp has been restricted because it was reported as inappropriate. The omegaUp team has reviewed this report and confirmed that the problem is not appropriate because <em>%(reason)</em>.</p><p>To unblock the problem and have it appear again in the list of problems, please follow the steps below:</p><p><ol><li>Review and edit your problem: make sure you describe a problem, it is not offensive or spam.</li><li>Once you have resolved the reason on why your problem was blocked, send an email <a href=\"mailto:quality@omegaup.com\" target=\"_top\">quality@omegaup.com</a> to be reviewed and reactivated.</li></ol></p><p>If the steps mentioned above are not followed, the problem will not be shown again in the list of problems, nor can it be used in competitions. In case of a relapse in three occasions, omegaUp reserves the right to suspend your user account.</p><p>omegaUp is a platform to help users improve their software engineering skills by solving code problems and competing in programing contests. omegaUp welcomes all the problems that help meet that goal.</p><p>Thanks,</p><p>omegaUp team</p>",
 	"demotionProblemEmailSubject": "Problem [%(problem_name)] has been reported as inappropriate",
 	"duplicateTagsNotAllowed": "Duplicate tags are not allowed",
