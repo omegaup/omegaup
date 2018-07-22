@@ -31,7 +31,7 @@ import database_utils  # NOQA
 
 
 # pylint: disable=too-many-arguments
-def add_students(driver, users, container_selector,
+def add_students(driver, users, *, container_selector,
                  container, parent_xpath, submit_locator):
     '''Add students to a recently :instance.'''
 
