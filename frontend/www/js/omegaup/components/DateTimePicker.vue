@@ -21,7 +21,6 @@ export default {
                                .setDate(val);},
   },
   mounted: function() {
-  	T.datePickerFormat
     var self = this;
     $(self.$el)
         .datetimepicker({
