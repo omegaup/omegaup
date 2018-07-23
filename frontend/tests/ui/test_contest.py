@@ -225,8 +225,8 @@ def add_students_contest(driver, users):
 
     util.add_students(
         driver, users,
-        container_selector='.nav-tabs > li:nth-child(4) > a:nth-child(1)',
-        container='div.panel:nth-child(1) > div:nth-child(1)',
+        tab_xpath='//li[contains(@class, "contestants")]//a',
+        container_xpath='//div[contains(@class, "contestants-input-area")]',
         parent_xpath='*[contains(@class, "twitter-typeahead")]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
@@ -238,15 +238,15 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             ('.nav-tabs > li:nth-child(4) > a:nth-child(1)')))).click()
+             ('li.contestants > a')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#content')))
+            (By.CSS_SELECTOR, 'div.contestants')))
 
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, (
-                '//textarea[contains(@class, "form-control")]')))).send_keys(
+                '//textarea[contains(@class, "contestants")]')))).send_keys(
                     ', '.join(users))
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -265,7 +265,7 @@ def add_problem_to_contest(driver, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.nav-tabs > li:nth-child(2) > a:nth-child(1)'))).click()
+             'li.problems > a'))).click()
 
     driver.typeahead_helper('*[contains(@class, "twitter-typeahead")]',
                             problem)

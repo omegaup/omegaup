@@ -10,7 +10,8 @@
           v-on:click="showTab = 'new_form'">
         <a data-toggle="tab">{{T.contestEdit}}</a>
       </li>
-      <li v-if="!virtual"
+      <li class="problems"
+          v-if="!virtual"
           v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{T.wordsAddProblem}}</a>
       </li>
@@ -18,7 +19,8 @@
           v-on:click="showTab = 'publish'">
         <a data-toggle="tab">{{T.contestNewFormAdmissionMode}}</a>
       </li>
-      <li v-bind:class="{active: virtual}"
+      <li class="contestants"
+          v-bind:class="{active: virtual}"
           v-on:click="showTab = 'contestants'">
         <a data-toggle="tab">{{T.contestAdduserAddContestant}}</a>
       </li>
@@ -43,7 +45,7 @@
         <omegaup-contest-new-form v-bind:data="contest"
              v-bind:update="true"></omegaup-contest-new-form>
       </div>
-      <div class="tab-pane active"
+      <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
         <omegaup-contest-add-problem v-bind:data="problems"></omegaup-contest-add-problem>
       </div>
@@ -51,7 +53,7 @@
            v-if="showTab === 'publish'">
         <omegaup-contest-publish v-bind:data="contest"></omegaup-contest-publish>
       </div>
-      <div class="tab-pane active"
+      <div class="tab-pane active contestants"
            v-if="showTab === 'contestants'">
         <omegaup-contest-contestant v-bind:data="users"></omegaup-contest-contestant>
       </div>

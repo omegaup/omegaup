@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="panel panel-primary">
+    <div class="panel panel-primary contestants-input-area">
       <div class="panel-body">
         <form class="form"
               v-on:submit.prevent="onSubmit">
@@ -13,7 +13,7 @@
           <hr>
           <div class="form-group">
             <label>{{T.wordsMultipleUser}}</label>
-            <textarea class="form-control"
+            <textarea class="form-control contestants"
                  rows="4"
                  v-model="contestants"></textarea>
           </div><button class="btn btn-primary user-add-bulk"

@@ -31,16 +31,16 @@ import database_utils  # NOQA
 
 
 # pylint: disable=too-many-arguments
-def add_students(driver, users, container_selector,
-                 container, parent_xpath, submit_locator):
+def add_students(driver, users, tab_xpath,
+                 container_xpath, parent_xpath, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, container_selector))).click()
+            (By.XPATH, tab_xpath))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, container)))
+            (By.XPATH, container_xpath)))
 
     for user in users:
         driver.typeahead_helper(parent_xpath, user)
@@ -50,7 +50,7 @@ def add_students(driver, users, container_selector,
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//a[text()="%s"]' % (user))))
+                 '%s//a[text()="%s"]' % (container_xpath, user))))
 
 
 def create_run(driver, problem_alias, filename):
