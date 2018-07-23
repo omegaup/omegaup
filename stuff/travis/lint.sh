@@ -41,7 +41,8 @@ stage_script() {
 stage_after_success() {
 	if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 		mkdir -p build/webpack-artifacts
-		zip --quiet --recurse-paths "build/webpack-artifacts/${TRAVIS_COMMIT}.zip" frontend/www/js/dist/*
-		aws s3 cp "build/webpack-artifacts/${TRAVIS_COMMIT}.zip" "s3://omegaup-build-artifacts/webpack-artifacts/${TRAVIS_COMMIT}.zip"
+		local tarball="build/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
+		tar --xz --create --file "${tarball}" -C frontend/www/js/dist .
+		aws s3 cp "${tarball}" "s3://omegaup-build-artifacts/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
 	fi
 }
