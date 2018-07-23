@@ -3,11 +3,11 @@
 
 '''Run Selenium course tests.'''
 
-from ui import util
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
+
+from ui import util
 
 
 # Assignment scoreboard is still not completely working.

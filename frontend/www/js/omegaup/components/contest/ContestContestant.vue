@@ -20,7 +20,7 @@
                 type="submit">{{T.contestAdduserAddUsers}}</button>
         </form>
       </div>
-      <table class="table table-striped">
+      <table class="table table-striped participants">
         <thead>
           <tr>
             <th>{{T.wordsUser}}</th>

@@ -1,5 +1,5 @@
 <template>
-  <div class="panel panel-primary">
+  <div class="panel panel-primary problems-container">
     <div class="panel-body">
       <form class="form"
             v-on:submit.prevent="onSubmit">

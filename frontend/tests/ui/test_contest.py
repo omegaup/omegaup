@@ -5,10 +5,10 @@
 
 import urllib
 
-from ui import util
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+
+from ui import util
 
 
 @util.no_javascript_errors()
@@ -227,7 +227,7 @@ def add_students_contest(driver, users):
         driver, users,
         tab_xpath='//li[contains(@class, "contestants")]//a',
         container_xpath='//div[contains(@class, "contestants-input-area")]',
-        parent_xpath='*[contains(@class, "twitter-typeahead")]',
+        parent_xpath='div[contains(@class, "contestants")]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
 
 
@@ -255,7 +255,8 @@ def add_students_bulk(driver, users):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//*[contains(@class, "table")]//a[text()="%s"]' % user)))
+                 '//table[contains(@class, "participants")]//a[text()="%s"]'
+                 % user)))
 
 
 @util.annotate
@@ -267,7 +268,7 @@ def add_problem_to_contest(driver, problem):
             (By.CSS_SELECTOR,
              'li.problems > a'))).click()
 
-    driver.typeahead_helper('*[contains(@class, "twitter-typeahead")]',
+    driver.typeahead_helper('*[contains(@class, "problems-container")]',
                             problem)
     driver.wait.until(
         EC.element_to_be_clickable(
