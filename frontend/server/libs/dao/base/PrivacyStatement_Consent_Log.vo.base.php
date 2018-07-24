@@ -26,6 +26,9 @@ class PrivacyStatementConsentLog extends VO {
         if (is_null($data)) {
             return;
         }
+        if (isset($data['privacystatement_consent_id'])) {
+            $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
+        }
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
@@ -49,8 +52,16 @@ class PrivacyStatementConsentLog extends VO {
     }
 
     /**
-      * Identidad del usuario
+      * Id del consentimiento de privacidad almacenado en el log
       * Llave Primaria
+      * Auto Incremento
+      * @access public
+      * @var int(11)
+      */
+    public $privacystatement_consent_id;
+
+    /**
+      * Identidad del usuario
       * @access public
       * @var int(11)
       */
@@ -58,7 +69,6 @@ class PrivacyStatementConsentLog extends VO {
 
     /**
       * Id del documento de privacidad
-      * Llave Primaria
       * @access public
       * @var int(11)
       */

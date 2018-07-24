@@ -111,7 +111,7 @@ omegaup.OmegaUp.on('ready', function() {
         JSON.parse(document.getElementById('payload').firstChild.nodeValue));
   } else {
     omegaup.API.Contest.details({contest_alias: arena.options.contestAlias})
-        .then(arena.contestLoaded.bind(arena))
+        .then(arena.problemsetLoaded.bind(arena))
         .fail(omegaup.UI.ignoreError);
 
     $('.clarifpager .clarifpagerprev')

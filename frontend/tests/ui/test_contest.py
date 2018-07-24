@@ -8,7 +8,7 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-import ui.util as util
+from ui import util
 
 
 @util.no_javascript_errors()
@@ -181,6 +181,12 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     '''Makes the user join a course and then creates a run.'''
 
     enter_contest(driver, contest_alias)
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "#problems/%s")]' %
+              problem)))).click()
 
     util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)

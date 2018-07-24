@@ -42,7 +42,9 @@ class InterviewController extends Controller {
 
             $problemset = new Problemsets([
                 'acl_id' => $acl->acl_id,
-                'type' => 'Interview'
+                'type' => 'Interview',
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
             $interview->problemset_id = $problemset->problemset_id;

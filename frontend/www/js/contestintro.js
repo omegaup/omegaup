@@ -2,19 +2,38 @@ omegaup.OmegaUp.on('ready', function() {
   var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   var contestObject = null;
 
+  if ($('.requests-user-information').length) {
+    var markdownConverter = omegaup.UI.markdownConverter();
+    var payload = JSON.parse(document.getElementById('payload').innerText);
+    document.getElementsByClassName('requests-user-information')[0].innerHTML =
+        markdownConverter.makeHtml(payload['markdown']);
+  }
+
   $('#start-contest-form')
       .on('submit', function(ev) {
         ev.preventDefault();
         $('#request-access-form').hide();
         $('#start-contest-submit').prop('disabled', true);
+        var request = {
+          contest_alias: contestAlias,
+          share_user_information:
+              $('input[name=share-user-information]:checked').val()
+        };
+        var userInformationRequest = {};
+        if ($('.requests-user-information').length) {
+          var gitObjectId = JSON.parse(
+              document.getElementById('payload').innerText)['gitObjectId'];
+          var statementType = JSON.parse(
+              document.getElementById('payload').innerText)['statementType'];
+          userInformationRequest = {
+            git_object_id: gitObjectId,
+            statement_type: statementType
+          };
+        }
+        $.extend(request, userInformationRequest);
 
         // Explicitly join the contest.
-        omegaup.API.Contest.open({
-                             contest_alias: contestAlias,
-                             share_user_information:
-                                 $('input[name=share-user-information]:checked')
-                                     .val()
-                           })
+        omegaup.API.Contest.open(request)
             .then(function(result) { window.location.reload(); })
             .fail(omegaup.UI.apiError);
       });
@@ -168,24 +187,23 @@ omegaup.OmegaUp.on('ready', function() {
         return contest;
       })
       .always(function(contest) {
-        // Feel free to re-write this if you have the time.
-        if (contest.contestant_must_register) {
-          if (contest.user_registration_requested) {
-            if (contest.user_registration_answered) {
-              if (contest.user_registration_accepted) {
-                readyToStart(contest);
-              } else {
-                $('#registration_denied').removeClass('hidden');
-              }
-            } else {
-              $('#registration_pending').removeClass('hidden');
-            }
-          } else {
-            $('#must_register').removeClass('hidden');
-          }
-        } else {
-          readyToStart(contest);
-        }
         $('#intro-page').removeClass('hidden');
+        if (contest.admission_mode != 'registration') {
+          readyToStart(contest);
+          return;
+        }
+        if (!contest.user_registration_requested) {
+          $('#must_register').removeClass('hidden');
+          return;
+        }
+        if (!contest.user_registration_answered) {
+          $('#registration_pending').removeClass('hidden');
+          return;
+        }
+        if (!contest.user_registration_accepted) {
+          $('#registration_denied').removeClass('hidden');
+          return;
+        }
+        readyToStart(contest);
       });
 });

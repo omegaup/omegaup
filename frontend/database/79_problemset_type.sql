@@ -1,6 +1,5 @@
 -- Problemsets
 ALTER TABLE `Problemsets`
-    ADD COLUMN `type` enum('Contest','Assignment','Interview') DEFAULT NULL,
     ADD COLUMN `contest_id` int(11) DEFAULT NULL COMMENT 'Id del concurso',
     ADD COLUMN `assignment_id` int(11) DEFAULT NULL COMMENT 'Id del curso',
     ADD COLUMN `interview_id` int(11) DEFAULT NULL COMMENT 'Id de la entrevista',
@@ -18,7 +17,6 @@ INNER JOIN
 ON
     p.problemset_id = a.problemset_id
 SET
-    `type` = 'Assignment',
     p.assignment_id = a.assignment_id;
 
 UPDATE
@@ -28,7 +26,6 @@ INNER JOIN
 ON
     p.problemset_id = c.problemset_id
 SET
-    `type` = 'Contest',
     c.contest_id = c.contest_id;
 
 UPDATE
@@ -38,10 +35,4 @@ INNER JOIN
 ON
     p.problemset_id = i.problemset_id
 SET
-    `type` = 'Interview',
     i.interview_id = i.interview_id;
-
--- Problemsets
-ALTER TABLE `Problemsets`
-    MODIFY COLUMN `type` enum('Contest', 'Assignment', 'Interview') NOT NULL DEFAULT 'Contest'
-        COMMENT 'Almacena el tipo de problemset que se ha creado';

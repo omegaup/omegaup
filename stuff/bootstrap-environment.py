@@ -24,7 +24,7 @@ OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 OMEGAUP_RUNTIME_ROOT = '/var/lib/omegaup'
 
 
-class ScopedFiles(object):
+class ScopedFiles:
     '''
     A RAII wrapper over a map of POST names to filenames. Upon entering, it
     creates a mapping from POST names to Python file objects, which are closed
@@ -48,7 +48,7 @@ class ScopedFiles(object):
                 f.close()
 
 
-class Session(object):
+class Session:
     '''
     A context manager that represents an omegaUp user session.
 

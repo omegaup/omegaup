@@ -42,7 +42,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
         $this->assertEquals($originalContest->title, $virtualContest->title);
         $this->assertEquals($originalContest->description, $virtualContest->description);
-        $this->assertEquals(0, $virtualContest->public); // Virtual contest must be private
+        $this->assertEquals('private', $virtualContest->admission_mode); // Virtual contest must be private
         $this->assertEquals($originalContest->scoreboard, $virtualContest->scoreboard);
         $this->assertEquals($originalContest->points_decay_factor, $virtualContest->points_decay_factor);
         $this->assertEquals($originalContest->partial_score, $virtualContest->partial_score);

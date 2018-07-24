@@ -358,7 +358,9 @@ class CourseController extends Controller {
             // Create the backing problemset
             $problemset = new Problemsets([
                 'acl_id' => $r['course']->acl_id,
-                'type' => 'Assignment'
+                'type' => 'Assignment',
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
             $assignment = new Assignments([
@@ -912,13 +914,9 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-        ]);
         if (is_null(GroupsIdentitiesDAO::getByPK(
-            $groupIdentity->group_id,
-            $groupIdentity->identity_id
+            $r['course']->group_id,
+            $r['identity']->identity_id
         ))) {
             throw new NotFoundException(
                 'courseStudentNotInCourse'
@@ -1031,19 +1029,49 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])
             && ($r['course']->public == false
             || $r['identity']->identity_id !== $r['current_identity_id'])
-            && $r['course']->requests_user_information == 'no') {
+            && $r['course']->requests_user_information == 'no'
+            && is_null($r['accept_teacher'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
         $groupIdentity = new GroupsIdentities([
             'group_id' => $r['course']->group_id,
             'identity_id' => $r['identity']->identity_id,
-            'share_user_information' => $r['share_user_information']
+            'share_user_information' => $r['share_user_information'],
+            'accept_teacher' => $r['accept_teacher'],
         ]);
 
+        CoursesDAO::transBegin();
+
         try {
+            GroupsIdentitiesDAO::save(new GroupsIdentities([
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id
+            ]));
+
+            // Only users adding themselves are saved in consent log
+            if ($r['identity']->identity_id === $r['current_identity_id']
+                 && $r['course']->requests_user_information != 'no') {
+                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                    $r['identity']->identity_id,
+                    PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type'])
+                );
+
+                $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
+            }
+            if ($r['identity']->identity_id === $r['current_identity_id']
+                 && !empty($r['accept_teacher'])) {
+                PrivacyStatementConsentLogDAO::saveLog(
+                    $r['identity']->identity_id,
+                    PrivacyStatementsDAO::getId($r['teacher_git_object_id'], 'accept_teacher')
+                );
+            }
             GroupsIdentitiesDAO::save($groupIdentity);
+
+            CoursesDAO::transEnd();
         } catch (Exception $e) {
+            CoursesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1073,19 +1101,18 @@ class CourseController extends Controller {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $groupIdentity = new GroupsIdentities([
-            'group_id' => $r['course']->group_id,
-            'identity_id' => $r['identity']->identity_id,
-        ]);
         if (is_null(GroupsIdentitiesDAO::getByPK(
-            $groupIdentity->group_id,
-            $groupIdentity->identity_id
+            $r['course']->group_id,
+            $r['identity']->identity_id
         ))) {
             throw new NotFoundException('courseStudentNotInCourse');
         }
 
         try {
-            GroupsIdentitiesDAO::delete($groupIdentity);
+            GroupsIdentitiesDAO::delete(new GroupsIdentities([
+                'group_id' => $r['course']->group_id,
+                'identity_id' => $r['identity']->identity_id,
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1297,16 +1324,47 @@ class CourseController extends Controller {
 
         $shouldShowIntro = !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group']);
         $isFirstTimeAccess = false;
+        $showAcceptTeacher = false;
         if (!Authorization::isGroupAdmin($r['current_identity_id'], $r['group'])) {
-            $isFirstTimeAccess = CoursesDAO::isFirstTimeAccess($r['current_identity_id'], $r['course'], $r['group']);
+            $sharingInformation = CoursesDAO::getSharingInformation($r['current_identity_id'], $r['course'], $r['group']);
+            $isFirstTimeAccess = $sharingInformation['share_user_information'] == null;
+            $showAcceptTeacher = $sharingInformation['accept_teacher'] == null;
         }
         if ($shouldShowIntro && !$r['course']->public) {
             throw new ForbiddenAccessException();
         }
+
+        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($r, true /*onlyIntroDetails*/);
+        $result['showAcceptTeacher'] = $showAcceptTeacher;
+
+        // Privacy Statement Information
+        $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
+            $user_session->language_id,
+            'course',
+            $result['requests_user_information']
+        );
+        $result['git_object_id'] = null;
+        $result['statement_type'] = null;
+        if (!is_null($result['privacy_statement_markdown'])) {
+            $statement_type = "course_{$result['requests_user_information']}_consent";
+            $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
+            $result['statement_type'] = $statement_type;
+        }
+
+        $markdown = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
+        if (is_null($markdown)) {
+            throw new InvalidFilesystemOperationException();
+        }
+        $result['accept_teacher_statement'] = [
+            'git_object_id' => PrivacyStatementsDAO::getLatestPublishedStatement('accept_teacher')['git_object_id'],
+            'markdown' => $markdown,
+            'statement_type' => 'accept_teacher',
+        ];
         $result['shouldShowResults'] = $shouldShowIntro;
         $result['isFirstTimeAccess'] = $isFirstTimeAccess;
         $result['requests_user_information'] = $result['requests_user_information'];
+
         return $result;
     }
 
@@ -1503,6 +1561,7 @@ class CourseController extends Controller {
             'problems' => $problems,
             'director' => $director,
             'problemset_id' => $r['assignment']->problemset_id,
+            'admin' => Authorization::isCourseAdmin($r['current_identity_id'], $r['course']),
         ];
     }
 
@@ -1617,5 +1676,33 @@ class CourseController extends Controller {
             false /*withRunDetails*/,
             true /*sortByName*/
         );
+    }
+
+    /**
+     * Returns the Scoreboard events
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiAssignmentScoreboardEvents(Request $r) {
+        // Get the current user
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+        self::validateCourseAssignmentAlias($r);
+
+        $scoreboard = new Scoreboard(
+            ScoreboardParams::fromAssignment(
+                $r['assignment'],
+                $r['course']->group_id,
+                Authorization::isCourseAdmin($r['current_user_id'], $r['course'])/*show_all_runs*/
+            )
+        );
+
+        // Push scoreboard data in response
+        return [
+            'events' => $scoreboard->events()
+        ];
     }
 }

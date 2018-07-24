@@ -149,8 +149,8 @@ export class Arena {
 
     self.options = options;
 
-    // The current contest.
-    self.currentContest = null;
+    // The current problemset.
+    self.currentProblemset = null;
 
     // The interval for clock updates.
     self.clockInterval = null;
@@ -401,7 +401,7 @@ export class Arena {
     }
   }
 
-  contestLoaded(problemset) {
+  problemsetLoaded(problemset) {
     let self = this;
     if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
@@ -416,7 +416,7 @@ export class Arena {
               setTimeout(f, 1000);
             } else {
               API.Problemset.details({problemset_id: x})
-                  .then(contestLoaded.bind(self))
+                  .then(problemsetLoaded.bind(self))
                   .fail(UI.ignoreError);
             }
           }
@@ -441,10 +441,15 @@ export class Arena {
       self.options.originalContestAlias = problemset.original_contest_alias;
     }
 
+    if (problemset.hasOwnProperty('original_problemset_id')) {
+      self.options.originalProblemsetId = problemset.original_problemset_id;
+    }
+
     $('#title .contest-title')
         .html(UI.escape(problemset.title | problemset.name));
     self.updateSummary(problemset);
     self.submissionGap = parseInt(problemset.submission_gap);
+
     if (!(self.submissionGap > 0)) self.submissionGap = 0;
 
     self.initClock(problemset.start_time, problemset.finish_time,
@@ -484,7 +489,7 @@ export class Arena {
 
   initProblems(problemset) {
     let self = this;
-    self.currentContest = problemset;
+    self.currentProblemset = problemset;
     self.contestAdmin = problemset.admin;
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
@@ -567,15 +572,14 @@ export class Arena {
   refreshRanking() {
     let self = this;
     if (self.options.originalContestAlias != null) {
-      API.Contest.scoreboardEvents({contest_alias: self.options.contestAlias})
+      API.Problemset.scoreboardEvents(
+                        {problemset_id: self.options.problemsetId})
           .then(function(response) {
             let events = response.events;
-            for (let event of events) {
-              event.username += '-(virtual)';
-              event.name += '-(virtual)';
-            }
-            API.Contest.scoreboardEvents(
-                           {contest_alias: self.options.originalContestAlias})
+            for (let event of events) event.virtual = true;
+            API.Problemset.scoreboardEvents({
+                            problemset_id: self.options.originalProblemsetId
+                          })
                 .then(function(response) {
                   events.push.apply(response.events);
                   self.virtualRankingChange(events);
@@ -584,15 +588,9 @@ export class Arena {
                 .fail(UI.ignoreError);
           })
           .fail(UI.ignoreError);
-    } else if (self.options.contestAlias) {
-      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
-          .then(self.rankingChange.bind(self))
-          .fail(UI.ignoreError);
-    } else if (self.options.assignmentAlias) {
-      API.Course.assignmentScoreboard({
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias
-                })
+    } else if (self.options.contestAdmin || self.options.contestAlias != null ||
+               self.contestAdmin) {
+      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
     }
@@ -603,39 +601,38 @@ export class Arena {
     let delta = (new Date()).getTime() - self.startTime.getTime();
     let rank = [];
 
-    let problemOrder = [];
+    let problemOrder = {};
     let problems = [];
     let initialScores = [];
 
     for (let problem of Object.values(self.problems)) {
-      problemOrder[problem.alias] = problems.length + 1;
+      problemOrder[problem.alias] = problems.length;
       problems.push({order: problems.length + 1, alias: problem.alias});
     }
 
     data.forEach(function(env) {
       if (env.delta > delta) return;
-      if (!rank.hasOwnProperty(env.username)) {
-        rank[env.username] = {
+      let key = env.username + (env.virtual ? '-virtual' : '');
+      if (!rank.hasOwnProperty(key)) {
+        rank[key] = {
           country: env.country,
           name: env.name,
           username: env.username,
           place: 0,
-          problems: []
+          problems: [], virtual: env.virtual || false,
         };
         for (let j = 0; j < problems.length; j++) {
-          rank[env.username].problems.push(
-              {penalty: 0, percent: 0, points: 0, runs: 0});
+          rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});
         }
-        rank[env.username].total = {points: 0, penalty: 0};
+        rank[key].total = {points: 0, penalty: 0};
       }
-      let problem =
-          rank[env.username].problems[problemOrder[env.problem.alias]];
-      rank[env.username].problems[problemOrder[env.problem.alias]] = {
+      let problem = rank[key].problems[problemOrder[env.problem.alias]];
+      rank[key].problems[problemOrder[env.problem.alias]] = {
         penalty: env.problem.penalty,
         points: env.problem.points,
         runs: problem.runs + 1
       };
-      rank[env.username].total = env.total;
+      rank[key].total = env.total;
     });
 
     let ranking = Object.values(rank);
@@ -675,6 +672,22 @@ export class Arena {
     }
   }
 
+  rankingCourseChange(data) {
+    let self = this;
+    self.onRankingChanged(data);
+
+    let params = {
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Course.assignmentScoreboardEvents(params)
+        .then(self.onRankingEvents.bind(self))
+        .fail(UI.ignoreError);
+  }
+
   onRankingChanged(data) {
     let self = this;
     $('tbody.inserted', self.elements.miniRanking).remove();
@@ -698,10 +711,7 @@ export class Arena {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = rank.username + ((rank.name == rank.username) ?
-                                          '' :
-                                          (' (' + UI.escape(rank.name) + ')'));
-
+      let username = UI.rankingUsername(rank);
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
       // Update problem scores.
@@ -1424,7 +1434,7 @@ export class Arena {
                  problem.runs.length > 0) {
         nextSubmissionTimestamp =
             new Date(problem.runs[problem.runs.length - 1].time.getTime() +
-                     self.currentContest.submissions_gap * 1000);
+                     self.currentProblemset.submissions_gap * 1000);
       }
     }
     if (self.submissionGapInterval) {
