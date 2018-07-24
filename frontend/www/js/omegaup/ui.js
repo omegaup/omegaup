@@ -240,7 +240,7 @@ let UI = {
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb)
-        .trigger("change");
+        .trigger('change');
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {
