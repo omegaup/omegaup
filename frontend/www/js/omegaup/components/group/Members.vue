@@ -68,7 +68,157 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table><!-- Modal Edit-->
+    <div class="modal fade modal-edit"
+         role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal"
+                role="form">
+            <div class="modal-header">
+              <button class="close"
+                   data-dismiss="modal"
+                   type="button">×</button>
+              <h4 class="modal-title">{{ T.groupEditIdentity }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="username">{{ T.username }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         name="username"
+                         size="30"
+                         type="text"
+                         v-bind:value="username">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="name">{{ T.profile }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         name="name"
+                         size="30"
+                         type="text"
+                         v-bind:value="name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="country_id">{{ T.userEditCountry }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="form-control"
+                         name="country_id">
+                      <option v-bind:value="country_id">
+                        {{ country }}
+                      </option>
+                      <option v-bind:value="country.country_id"
+                              v-for="country in countries">
+                        {{ country.name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="state_id">{{ T.profileState }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="form-control"
+                         disabled="true"
+                         name="state_id">
+                      <option v-bind:value="state_id">
+                        {{ state }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="school">{{ T.profileSchool }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         name="school"
+                         size="20"
+                         type="text"
+                         v-bind:value="school">
+                  </div><input name="school_id"
+                       type="hidden"
+                       v-bind:value="school_id">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default"
+                   data-dismiss="modal"
+                   type="button">{{ T.wordsCancel }}</button> <button class="btn btn-primary"
+                   type="button">{{ T.wordsSaveChanges }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div><!-- Modal Change Password-->
+    <div class="modal fade modal-change-password"
+         role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal"
+                role="form">
+            <div class="modal-header">
+              <button class="close"
+                   data-dismiss="modal"
+                   type="button">×</button>
+              <h4 class="modal-title">{{ T.userEditChangePassword }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="username">{{ T.username }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         disabled="disabled"
+                         name="username"
+                         size="30"
+                         type="text"
+                         v-bind:value="username">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="new-password-1">{{ T.userEditChangePasswordNewPassword }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         name="new-password-1"
+                         size="30"
+                         type="password"
+                         value="">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 col-sm-4 control-label"
+                       for="new-password-2">{{ T.userEditChangePasswordRepeatNewPassword }}</label>
+                  <div class="col-md-7 col-sm-7">
+                    <input class="form-control"
+                         name="new-password-2"
+                         size="30"
+                         type="password"
+                         value="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default"
+                   data-dismiss="modal"
+                   type="button">{{ T.wordsCancel }}</button> <button class="btn btn-primary"
+                   type="button">{{ T.wordsSaveChanges }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
