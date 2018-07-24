@@ -61,10 +61,6 @@
                 href="#"
                 v-bind:title="T.groupEditMembersChangePassword"
                 v-on:click="onChangePass(identity.username)"></a> <a class=
-                "glyphicon glyphicon-user"
-                href="#"
-                v-bind:title="T.groupEditMembersAssignUser"
-                v-on:click="onAssignUser(identity.username, identity.user_username)"></a> <a class=
                 "glyphicon glyphicon-remove"
                 href="#"
                 v-bind:title="T.groupEditMembersRemove"
@@ -134,11 +130,6 @@ export default {
     onChangePass: function(username) {
       this.username = username;
       $('.modal-change-password').modal();
-    },
-    onAssignUser: function(username, user_username) {
-      this.username = username;
-      this.user_username = user_username;
-      $('.modal-assign-user').modal();
     },
     onRemove: function(username) { this.$emit('remove', username);},
     reset: function() {
