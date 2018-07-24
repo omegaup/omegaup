@@ -14,6 +14,6 @@
 		{include file='group.edit.members.tpl'}
 	</div>
 	<div class="tab-pane" id="scoreboards">
-		{include file='group.edit.scoreboards.tpl'}
+		{include file='group.edit.scoreboards.tpl' payload=$PAYLOAD}
 	</div>
 </div>

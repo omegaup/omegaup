@@ -30,7 +30,7 @@ $(function() {
                                        weight: $('#weight').val(),
                                      })
               .then(function(data) {
-                omegaup.UI.success('Contest successfully added!');
+                omegaup.UI.success(omegaup.T.groupEditScoreboardsContestsAdded);
                 refreshScoreboardContests();
               })
               .fail(omegaup.UI.apiError);
@@ -66,8 +66,8 @@ $(function() {
                                                   omegaup.T.wordsNo))
                           .append($('<td></td>').append(contest.weight))
                           .append(
-                              $('<td><button type="button" class="close">' +
-                                '&times;</button></td>')
+                              $('<td><a href="#" class="glyphicon glyphicon-remove">' +
+                                '</a></td>')
                                   .on('click', (function(contestAlias) {
                                         return function(e) {
                                           omegaup.API.GroupScoreboard
@@ -79,8 +79,8 @@ $(function() {
                                               })
                                               .then(function(response) {
                                                 omegaup.UI.success(
-                                                    'Contest successfully ' +
-                                                    'removed!');
+                                                    omegaup.T
+                                                        .groupEditScoreboardsContestsRemoved);
 
                                                 var tr = e.target.parentElement
                                                              .parentElement;
