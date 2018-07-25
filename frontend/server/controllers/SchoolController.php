@@ -50,7 +50,7 @@ class SchoolController extends Controller {
 
         Validators::isStringNonEmpty($r['name'], 'name');
 
-        $state = self::isValidCountryAndState($r['country_id'], $r['state_id']);
+        $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
 
         return [
             'status' => 'ok',
@@ -65,7 +65,7 @@ class SchoolController extends Controller {
      * @return $school_id
      * @throws InvalidParameterException
      */
-    public static function createSchool($name, $state = null) {
+    public static function createSchool($name, $state) {
         // Create school object
         $school = new Schools([
             'name' => $name,
@@ -168,7 +168,7 @@ class SchoolController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
-    public static function isValidCountryAndState($countryId, $stateId) {
+    public static function getStateIdFromCountryAndState($countryId, $stateId) {
         if (is_null($countryId) || is_null($stateId)) {
             // Both state and country must be specified together.
             return null;

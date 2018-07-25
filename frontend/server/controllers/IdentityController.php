@@ -61,21 +61,30 @@ class IdentityController extends Controller {
     public static function apiCreate(Request $r) {
         self::validateRequest($r);
 
-        // Prepare DAOs
-        self::validateIdentity($r);
-        $identity = self::createIdentity(
-            $r['username'],
-            $r['user'],
-            $r['password'],
-            $r['country_id'],
-            $r['state_id'],
-            $r['gender'],
-            $r['school_id'],
-            $r['group_alias']
-        );
+        // Save objects into DB
+        try {
+            DAO::transBegin();
 
-        // Save in DB
-        self::saveIdentityGroup($identity, $r['username'], $r['group_alias']);
+            // Prepare DAOs
+            $identity = self::createIdentity(
+                $r['username'],
+                $r['user'],
+                $r['password'],
+                $r['country_id'],
+                $r['state_id'],
+                $r['gender'],
+                $r['school'],
+                $r['group_alias']
+            );
+
+            // Save in DB
+            self::saveIdentityGroup($identity, $r['username'], $r['group_alias']);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return [
             'status' => 'ok',
@@ -100,12 +109,7 @@ class IdentityController extends Controller {
             DAO::transBegin();
 
             foreach ($r['identities'] as $identity) {
-                //$identity_group = new Request($identity);
-                $identity_group['group_alias'] = $r['group_alias'];
-                $identity_group['auth_token'] = $r['auth_token'];
-
                 // Prepare DAOs
-                self::validateIdentity($r);
                 $identity = self::createIdentity(
                     $identity['username'],
                     $identity['user'],
@@ -113,7 +117,7 @@ class IdentityController extends Controller {
                     $identity['country_id'],
                     $identity['state_id'],
                     $identity['gender'],
-                    $identity['school_id'],
+                    $identity['school'],
                     $r['group_alias']
                 );
 
@@ -149,13 +153,22 @@ class IdentityController extends Controller {
         }
     }
 
-    public static function validateIdentity(Request $r) {
+    public static function validateIdentity($username, $user, $gender, $aliasGroup) {
+        // Check group is present
+        $usernameIdentity = explode(':', $username);
+        if (count($usernameIdentity) != 2) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+        $groupAlias = $usernameIdentity[0];
+        if ($groupAlias != $aliasGroup) {
+            throw new InvalidParameterException('parameterInvalid', 'group_alias');
+        }
         // Validate request
-        Validators::isValidUsername($r['username'], 'username');
+        Validators::isValidUsernameIdentity($usernameIdentity[1], 'username');
 
         // Does identity already exists?
         try {
-            $identity = IdentitiesDAO::FindByUsername($r['username']);
+            $identity = IdentitiesDAO::FindByUsername($username);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -164,22 +177,18 @@ class IdentityController extends Controller {
             throw new DuplicatedEntryInDatabaseException('usernameInUse');
         }
 
-        if (!is_null($r['name'])) {
-            $r['name'] = trim($r['name']);
-            Validators::isStringNonEmpty($r['name'], 'name', true);
-            Validators::isStringOfMaxLength($r['name'], 'name', 50);
+        if (!is_null($user)) {
+            $user = trim($user);
+            Validators::isStringNonEmpty($user, 'name', true);
+            Validators::isStringOfMaxLength($user, 'name', 50);
         }
 
-        if (!is_null($r['gender'])) {
-            $r['gender'] = trim($r['gender']);
+        if (!is_null($gender)) {
+            $gender = trim($gender);
         }
-        if (!empty($r['gender'])) {
-            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+        if (!empty($gender)) {
+            Validators::isInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
         }
-
-        $state = SchoolController::isValidCountryAndState($r['country_id'], $r['state_id']);
-
-        $r['school_id'] = SchoolController::createSchool(trim($r['school_name']), $state);
     }
 
     private static function createIdentity(
@@ -189,14 +198,13 @@ class IdentityController extends Controller {
         $countryId,
         $stateId,
         $gender,
-        $schoolId,
+        $school,
         $aliasGroup
     ) {
-        // Check group is present
-        $groupAlias = explode(':', $username)[0];
-        if ($groupAlias != $aliasGroup) {
-            throw new InvalidParameterException('parameterInvalid', 'username');
-        }
+        self::validateIdentity($username, $user, $gender, $aliasGroup);
+
+        $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
+        $schoolId = SchoolController::createSchool(trim($school), $state);
 
         // Check password
         SecurityTools::testStrongPassword($password);
@@ -221,24 +229,12 @@ class IdentityController extends Controller {
      * @param $group_alias
      * @throws InvalidDatabaseOperationException
      */
-    private static function saveIdentityGroup(Identities $identity, $username, $group_alias = null) {
-        // Save objects into DB
-        try {
-            DAO::transBegin();
+    private static function saveIdentityGroup(Identities $identity, $username, $group_alias) {
+        IdentitiesDAO::save($identity);
 
-            IdentitiesDAO::save($identity);
-
-            if (!is_null($group_alias)) {
-                GroupController::apiAddUser(new Request([
-                    'usernameOrEmail' => $username,
-                    'group_alias' => $group_alias,
-                ]));
-            }
-
-            DAO::transEnd();
-        } catch (Exception $e) {
-            DAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
-        }
+        GroupController::apiAddUser(new Request([
+            'usernameOrEmail' => $username,
+            'group_alias' => $group_alias,
+        ]));
     }
 }
