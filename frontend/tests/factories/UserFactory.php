@@ -217,6 +217,23 @@ class UserFactory {
     }
 
     /**
+     * Creates a new user with contest organizer role
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     * @return User
+     */
+    public static function createGroupIdentityCreator($params = null) {
+        $user = self::createUser($params);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+
+        self::addGroupIdentityCreator($identity);
+
+        return $user;
+    }
+
+    /**
      * Adds a system role to the user.
      *
      * @param Users $user
@@ -259,6 +276,22 @@ class UserFactory {
         GroupsIdentitiesDao::save(new GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $support_group->group_id,
+        ]));
+    }
+
+    /**
+     * Adds group identity creator
+     *
+     * @param Identities $identity
+     */
+    public static function addGroupIdentityCreator(Identities $identity) {
+        $groupIdentityCreator = GroupsDAO::findByAlias(
+            Authorization::IDENTITY_CREATOR_GROUP_ALIAS
+        );
+
+        GroupsIdentitiesDao::save(new GroupsIdentities([
+            'identity_id' => $identity->identity_id,
+            'group_id' => $groupIdentityCreator->group_id,
         ]));
     }
 

@@ -68,17 +68,17 @@ class IdentityController extends Controller {
             // Prepare DAOs
             $identity = self::createIdentity(
                 $r['username'],
-                $r['user'],
+                $r['name'],
                 $r['password'],
                 $r['country_id'],
                 $r['state_id'],
                 $r['gender'],
-                $r['school'],
+                $r['school_name'],
                 $r['group_alias']
             );
 
             // Save in DB
-            self::saveIdentityGroup($identity, $r['username'], $r['group_alias']);
+            self::saveIdentityGroup($identity, $r['group']->group_id);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -112,16 +112,16 @@ class IdentityController extends Controller {
                 // Prepare DAOs
                 $identity = self::createIdentity(
                     $identity['username'],
-                    $identity['user'],
+                    $identity['name'],
                     $identity['password'],
                     $identity['country_id'],
                     $identity['state_id'],
                     $identity['gender'],
-                    $identity['school'],
+                    $identity['school_name'],
                     $r['group_alias']
                 );
 
-                self::saveIdentityGroup($identity, $identity['username'], $r['group_alias']);
+                self::saveIdentityGroup($identity, $r['group']->group_id);
             }
 
             DAO::transEnd();
@@ -144,16 +144,16 @@ class IdentityController extends Controller {
      */
     private static function validateRequest(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isOrganizer($r['current_identity_id'])) {
+        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
         GroupController::validateGroup($r);
-        if (!is_array($r['identities'])) {
+        if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
     }
 
-    public static function validateIdentity($username, $user, $gender, $aliasGroup) {
+    public static function validateIdentity($username, $name, $gender, $aliasGroup) {
         // Check group is present
         $usernameIdentity = explode(':', $username);
         if (count($usernameIdentity) != 2) {
@@ -177,10 +177,10 @@ class IdentityController extends Controller {
             throw new DuplicatedEntryInDatabaseException('usernameInUse');
         }
 
-        if (!is_null($user)) {
-            $user = trim($user);
-            Validators::isStringNonEmpty($user, 'name', true);
-            Validators::isStringOfMaxLength($user, 'name', 50);
+        if (!is_null($name)) {
+            $name = trim($name);
+            Validators::isStringNonEmpty($name, 'name', true);
+            Validators::isStringOfMaxLength($name, 'name', 50);
         }
 
         if (!is_null($gender)) {
@@ -193,7 +193,7 @@ class IdentityController extends Controller {
 
     private static function createIdentity(
         $username,
-        $user,
+        $name,
         $password,
         $countryId,
         $stateId,
@@ -201,7 +201,7 @@ class IdentityController extends Controller {
         $school,
         $aliasGroup
     ) {
-        self::validateIdentity($username, $user, $gender, $aliasGroup);
+        self::validateIdentity($username, $name, $gender, $aliasGroup);
 
         $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
         $schoolId = SchoolController::createSchool(trim($school), $state);
@@ -224,17 +224,16 @@ class IdentityController extends Controller {
     /**
      * Save object Identities in DB, and add user into group.
      * This function is called inside a transaction.
-     * @param Identties $identity
-     * @param $username
-     * @param $group_alias
+     * @param Identities $identity
+     * @param $groupId
      * @throws InvalidDatabaseOperationException
      */
-    private static function saveIdentityGroup(Identities $identity, $username, $group_alias) {
+    private static function saveIdentityGroup(Identities $identity, $groupId) {
         IdentitiesDAO::save($identity);
 
-        GroupController::apiAddUser(new Request([
-            'usernameOrEmail' => $username,
-            'group_alias' => $group_alias,
+        GroupsIdentitiesDAO::save(new GroupsIdentities([
+            'group_id' => $groupId,
+            'identity_id' => $identity->identity_id
         ]));
     }
 }
