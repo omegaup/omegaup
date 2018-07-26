@@ -2,7 +2,7 @@
 INSERT INTO
   `Roles` (`role_id`,`name`,`description`)
 VALUES
-  (6,'group_identity_creator','Miembro del grupo que tiene privilegios para crear identidades a partir de un grupo');
+  (6,'GroupIdentityCreator','Miembro del grupo que tiene privilegios para crear identidades a partir de un grupo');
 
 INSERT INTO `ACLs` (`owner_id`) VALUES (1);
 
