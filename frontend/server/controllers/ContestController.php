@@ -317,6 +317,8 @@ class ContestController extends Controller {
      *
      */
     private static function validateBasicDetails(Request $r) {
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        // If the contest is private, verify that our user is invited
         try {
             $contest_problemset = ContestsDAO::getByAliasWithExtraInformation($r['contest_alias']);
         } catch (Exception $e) {
