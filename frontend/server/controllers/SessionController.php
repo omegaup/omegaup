@@ -156,9 +156,8 @@ class SessionController extends Controller {
         return [
             'valid' => true,
             'email' => !empty($email) ? $email->email : '',
-            'user' => $currentUser,
             'username' => $currentIdentity->username,
-            'verified' => !empty($currentUser) ? $currentUser->verified : '1',
+            'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
             'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
@@ -220,8 +219,8 @@ class SessionController extends Controller {
 
         // Create the new token
         $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
-        $hashAuth = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
-        $s_AuthT = "{$entropy}-{$identity->identity_id}-{$hashAuth}";
+        $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
+        $s_AuthT = "{$entropy}-{$identity->identity_id}-{$hash}";
 
         $authToken = new AuthTokens();
         $authToken->user_id = $identity->user_id;

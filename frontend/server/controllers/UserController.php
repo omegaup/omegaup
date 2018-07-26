@@ -1184,6 +1184,61 @@ class UserController extends Controller {
     }
 
     /**
+     * Returns the profile of the user given
+     *
+     * @param Users $user
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function getProfileImpl(Users $user) {
+        $response = [];
+        $response['userinfo'] = [];
+
+        $response['userinfo'] = [
+            'username' => $user->username,
+            'name' => $user->name,
+            'birth_date' => is_null($user->birth_date) ? null : strtotime($user->birth_date),
+            'gender' => $user->gender,
+            'graduation_date' => is_null($user->graduation_date) ? null : strtotime($user->graduation_date),
+            'scholar_degree' => $user->scholar_degree,
+            'preferred_language' => $user->preferred_language,
+            'is_private' => $user->is_private,
+            'verified' => $user->verified == '1',
+            'hide_problem_tags' => is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags,
+        ];
+
+        if (!is_null($user->language_id)) {
+            $query = LanguagesDAO::getByPK($user->language_id);
+            if (!is_null($query)) {
+                $response['userinfo']['locale'] =
+                    UserController::convertToSupportedLanguage($query->name);
+            }
+        }
+
+        try {
+            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+
+            $response['userinfo']['email'] = $user_db['email'];
+            $response['userinfo']['country'] = $user_db['country'];
+            $response['userinfo']['country_id'] = $user->country_id;
+            $response['userinfo']['state'] = $user_db['state'];
+            $response['userinfo']['state_id'] = $user->state_id;
+            $response['userinfo']['school'] = $user_db['school'];
+            $response['userinfo']['school_id'] = $user->school_id;
+
+            if (!is_null($user->language_id)) {
+                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
+
+        return $response;
+    }
+
+    /**
      * Get general user info
      *
      * @param Request $r
@@ -1327,7 +1382,7 @@ class UserController extends Controller {
         $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
-        $response = IdentityController::getProfileImpl($user);
+        $response = UserController::getProfileImpl($user);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);

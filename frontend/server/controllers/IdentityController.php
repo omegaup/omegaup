@@ -70,7 +70,10 @@ class IdentityController extends Controller {
             $r['identity']->username,
             $r,
             function (Request $r) {
-                return IdentityController::getProfileImpl($r['user'], $r['identity']);
+                if (!is_null($r['user'])) {
+                    return UserController::getProfileImpl($r['user'], $r['identity']);
+                }
+                return IdentityController::getProfileImpl($r['identity']);
             },
             $response
         );
@@ -98,78 +101,34 @@ class IdentityController extends Controller {
     }
 
     /**
-     * Returns the profile of the user or identity given
+     * Returns the profile of the identity given
      *
-     * @param Users $user
      * @param Identities $identity
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getProfileImpl(Users $user = null, Identities $identity = null) {
+    public static function getProfileImpl(Identities $identity) {
         $response = [];
         $response['userinfo'] = [];
-        $response['problems'] = [];
-
-        if (is_null($user)) {
-            try {
-                $identity_db = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
-
-                $response['userinfo']['username'] = $identity->username;
-                $response['userinfo']['name'] = $identity->name;
-                $response['userinfo']['preferred_language'] = null;
-                $response['userinfo']['country'] = $identity_db['country'];
-                $response['userinfo']['country_id'] = $identity->country_id;
-                $response['userinfo']['state'] = $identity_db['state'];
-                $response['userinfo']['state_id'] = $identity->state_id;
-                $response['userinfo']['school'] = $identity_db['school'];
-                $response['userinfo']['school_id'] = $identity->school_id;
-                $response['userinfo']['is_private'] = 0; # TODO: Review what value is setted
-                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($identity_db['locale']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-            return $response;
-        }
-
-        $response['userinfo']['username'] = $user->username;
-        $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
-        $response['userinfo']['gender'] = $user->gender;
-        $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
-        $response['userinfo']['scholar_degree'] = $user->scholar_degree;
-        $response['userinfo']['preferred_language'] = $user->preferred_language;
-        $response['userinfo']['is_private'] = $user->is_private;
-        $response['userinfo']['verified'] = $user->verified == '1';
-        $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
-
-        if (!is_null($user->language_id)) {
-            $query = LanguagesDAO::getByPK($user->language_id);
-            if (!is_null($query)) {
-                $response['userinfo']['locale'] =
-                    UserController::convertToSupportedLanguage($query->name);
-            }
-        }
-
         try {
-            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+            $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
-            $response['userinfo']['email'] = $user_db['email'];
-            $response['userinfo']['country'] = $user_db['country'];
-            $response['userinfo']['country_id'] = $user->country_id;
-            $response['userinfo']['state'] = $user_db['state'];
-            $response['userinfo']['state_id'] = $user->state_id;
-            $response['userinfo']['school'] = $user_db['school'];
-            $response['userinfo']['school_id'] = $user->school_id;
-
-            if (!is_null($user->language_id)) {
-                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
-            }
+            $response['userinfo'] = [
+                'username' => $identity->username,
+                'name' => $identity->name,
+                'preferred_language' => null,
+                'country' => $extendedProfile['country'],
+                'country_id' => $identity->country_id,
+                'state' => $extendedProfile['state'],
+                'state_id' => $identity->state_id,
+                'school' => $extendedProfile['school'],
+                'school_id' => $identity->school_id,
+                'is_private' => 0, # TODO: Review what value is setted
+                'locale' => UserController::convertToSupportedLanguage($extendedProfile['locale']),
+            ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
-
         return $response;
     }
 }

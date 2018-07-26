@@ -27,7 +27,7 @@ class Controller {
      */
     protected static function authenticateRequest(Request $r) {
         $session = SessionController::apiCurrentSession($r)['session'];
-        if (is_null($session['user']) && is_null($session['identity'])) {
+        if (is_null($session['identity'])) {
             $r['current_user'] = null;
             $r['current_user_id'] = null;
             $r['current_identity'] = null;
