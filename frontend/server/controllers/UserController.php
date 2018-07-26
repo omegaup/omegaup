@@ -514,7 +514,7 @@ class UserController extends Controller {
             try {
                 $users = UsersDAO::getByVerification($r['id']);
 
-                $user = (!empty($users)) ? $users[0] : null;
+                $user = !empty($users) ? $users[0] : null;
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }

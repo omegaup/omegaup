@@ -194,8 +194,6 @@ class InterviewController extends Controller {
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
 
-        $thisResult = [];
-
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
             throw new NotFoundException('interviewNotFound');
@@ -206,35 +204,34 @@ class InterviewController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $thisResult['description'] = $interview->description;
-        $thisResult['contest_alias'] = $interview->alias;
-        $thisResult['problemset_id'] = $interview->problemset_id;
-
         try {
-            $problemset_identities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
+            $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $thisResult['users'] = [];
         $users = [];
 
         // Add all users to an array
-        foreach ($problemset_identities as $identity) {
+        foreach ($problemsetIdentities as $identity) {
             $users[] = [
                         'user_id' => $identity['user_id'],
                         'username' => $identity['username'],
                         'access_time' => $identity['access_time'],
                         'email' => $identity['email'],
-                        'opened_interview' => is_null($identity['access_time']) ? false : true,
+                        'opened_interview' => !is_null($identity['access_time']) ? false : true,
                         'country' => $identity['country_id'],
                     ];
         }
-        $thisResult['users'] = $users;
-        $thisResult['status'] = 'ok';
 
-        return $thisResult;
+        return [
+            'description' => $interview->description,
+            'contest_alias' => $interview->alias,
+            'problemset_id' => $interview->problemset_id,
+            'users' => $users,
+            'status' => 'ok',
+        ];
     }
 
     public static function apiList(Request $r) {

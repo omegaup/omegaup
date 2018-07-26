@@ -126,12 +126,12 @@ class GroupScoreboardController extends Controller {
         $response['contests'] = [];
         $response['ranking'] = [];
         try {
-            $r['gscs'] = GroupsScoreboardsProblemsetsDAO::getByGroupScoreboard(
+            $gscs = GroupsScoreboardsProblemsetsDAO::getByGroupScoreboard(
                 $r['scoreboard']->group_scoreboard_id
             );
             $i = 0;
             $contest_params = [];
-            foreach ($r['gscs'] as $gsc) {
+            foreach ($gscs as $gsc) {
                 $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
                 if (empty($contest)) {
                     throw new NotFoundException('contestNotFound');

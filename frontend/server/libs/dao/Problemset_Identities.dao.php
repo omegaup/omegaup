@@ -78,13 +78,13 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             FROM
                 Identities i
             INNER JOIN
-                Emails e
-            ON
-                e.user_id = i.user_id
-            INNER JOIN
                 Problemset_Identities pi
             ON
                 pi.identity_id = i.identity_id
+            LEFT JOIN
+                Emails e
+            ON
+                e.user_id = i.user_id
             WHERE
                 pi.problemset_id = ?;';
 

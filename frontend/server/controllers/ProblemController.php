@@ -1293,7 +1293,7 @@ class ProblemController extends Controller {
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::getByKeys(
+                $runsArray = RunsDAO::getByKeys(
                     $r['problem']->problem_id,
                     $problemset_id,
                     $r['current_identity_id']
@@ -1304,16 +1304,14 @@ class ProblemController extends Controller {
             }
 
             // Add each filtered run to an array
-            if (count($runs_array) >= 0) {
-                $runs_filtered_array = [];
-                foreach ($runs_array as $run) {
-                    $filtered = $run->asFilteredArray($relevant_columns);
-                    $filtered['alias'] = $r['problem']->alias;
-                    $filtered['username'] = $r['current_user']->username;
-                    $filtered['time'] = strtotime($filtered['time']);
-                    $filtered['contest_score'] = (float)$filtered['contest_score'];
-                    array_push($runs_filtered_array, $filtered);
-                }
+            $runs_filtered_array = [];
+            foreach ($runsArray as $run) {
+                $filtered = $run->asFilteredArray($relevant_columns);
+                $filtered['alias'] = $r['problem']->alias;
+                $filtered['username'] = $r['current_user']->username;
+                $filtered['time'] = strtotime($filtered['time']);
+                $filtered['contest_score'] = (float)$filtered['contest_score'];
+                array_push($runs_filtered_array, $filtered);
             }
 
             $response['runs'] = $runs_filtered_array;
