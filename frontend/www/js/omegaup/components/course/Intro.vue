@@ -27,8 +27,7 @@
           <button class="btn btn-primary btn-lg"
                 name="start-course-submit"
                 type="button"
-                v-bind:disabled=
-                "needsBasicInformation || (requestsUserInformation == 'optional' &amp;&amp; shareUserInformation == undefined) || (requestsUserInformation == 'required' &amp;&amp; shareUserInformation != 1 || acceptTeacher == undefined)"
+                v-bind:disabled="buttonDisabled"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
@@ -46,15 +45,23 @@ export default {
     needsBasicInformation: Boolean,
     requestsUserInformation: String,
     showAcceptTeacher: Boolean,
-    privacyStatementMarkdown: String,
-    acceptTeacherMarkdown: String,
+    statements: Object,
   },
   computed: {
     consentHtml: function() {
-      return this.markdownConverter.makeHtml(this.privacyStatementMarkdown);
+      return this.markdownConverter.makeHtml(this.statements.privacy.markdown);
     },
     acceptTeacherConsentHtml: function() {
-      return this.markdownConverter.makeHtml(this.acceptTeacherMarkdown);
+      return this.markdownConverter.makeHtml(
+          this.statements.acceptTeacher.markdown);
+    },
+    buttonDisabled: function() {
+      return this.needsBasicInformation ||
+             (this.requestsUserInformation == 'optional' &&
+              this.shareUserInformation == undefined) ||
+             (this.requestsUserInformation == 'required' &&
+              this.shareUserInformation != 1) ||
+             this.acceptTeacher == undefined;
     }
   },
   data: function() {

@@ -224,6 +224,13 @@ def enter_course(driver, course_alias, assignment_alias):
     assert (course_url in
             driver.browser.current_url), driver.browser.current_url
 
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//input[@value = "yes"]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//button[@name = "start-course-submit"]'))).click()
+
     assignment_url = '/course/%s/assignment/%s' % (course_alias,
                                                    assignment_alias)
     with driver.page_transition():

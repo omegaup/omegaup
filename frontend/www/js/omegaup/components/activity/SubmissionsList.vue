@@ -15,7 +15,7 @@
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
@@ -30,7 +30,7 @@
                v-for="(problems, user) in groupedUnsolvedProblems">
           <thead>
             <tr>
-              <th v-bind:colspa="columns">{{ user }}</th>
+              <th v-bind:colspan="columns">{{ user }}</th>
             </tr>
           </thead>
           <tbody>

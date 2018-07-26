@@ -1059,7 +1059,7 @@ class CourseController extends Controller {
                  && !empty($r['accept_teacher'])) {
                 PrivacyStatementConsentLogDAO::saveLog(
                     $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['teacher_git_object_id'], 'accept_teacher')
+                    PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher')
                 );
             }
             GroupsIdentitiesDAO::save($groupIdentity);

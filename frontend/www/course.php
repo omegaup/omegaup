@@ -20,9 +20,6 @@ try {
     die();
 }
 
-// TODO Remove this when #2134 is omegaup-course-assignmentdetails
-$intro_details['showAcceptTeacher'] = false;
-
 if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [
@@ -35,11 +32,18 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
         'showAcceptTeacher' => $intro_details['showAcceptTeacher'],
-        'privacyStatementMarkdown' => $intro_details['privacy_statement_markdown'],
-        'acceptTeacherMarkdown' => $intro_details['accept_teacher_markdown'],
-        'gitObjectId' => $intro_details['git_object_id'],
-        'teacherGitObjectId' => $intro_details['teacher_git_object_id'],
-        'statementType' => $intro_details['statement_type'],
+        'statements' => [
+            'privacy' => [
+                'markdown' => $intro_details['privacy_statement_markdown'],
+                'gitObjectId' => $intro_details['git_object_id'],
+                'statementType' => $intro_details['statement_type'],
+            ],
+            'acceptTeacher' => [
+                'markdown' => $intro_details['accept_teacher_statement']['markdown'],
+                'gitObjectId' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'statementType' => 'accept_teacher',
+            ],
+        ],
     ]);
 
     $smarty->display('../templates/arena.course.intro.tpl');

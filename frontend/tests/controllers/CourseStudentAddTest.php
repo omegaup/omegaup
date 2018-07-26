@@ -295,7 +295,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'auth_token' => $studentLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
-            'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+            'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             'accept_teacher' => 'yes',
         ]));
         $intro_details = CourseController::apiIntroDetails(new Request([
