@@ -81,6 +81,9 @@ class IdentityController extends Controller {
             self::saveIdentityGroup($identity, $r['username'], $r['group_alias']);
 
             DAO::transEnd();
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            DAO::transRollback();
+            throw new DuplicatedEntryInDatabaseException('usernameInUse', $e);
         } catch (Exception $e) {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
@@ -127,7 +130,7 @@ class IdentityController extends Controller {
             DAO::transEnd();
         } catch (DuplicatedEntryInDatabaseException $e) {
             DAO::transRollback();
-            throw new DuplicatedEntryInDatabaseException('usernameInUse');
+            throw new DuplicatedEntryInDatabaseException('usernameInUse', $e);
         } catch (Exception $e) {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
@@ -155,27 +158,16 @@ class IdentityController extends Controller {
 
     public static function validateIdentity($username, $user, $gender, $aliasGroup) {
         // Check group is present
-        $usernameIdentity = explode(':', $username);
-        if (count($usernameIdentity) != 2) {
+        $identityUsername = explode(':', $username);
+        if (count($identityUsername) != 2) {
             throw new InvalidParameterException('parameterInvalid', 'username');
         }
-        $groupAlias = $usernameIdentity[0];
+        $groupAlias = $identityUsername[0];
         if ($groupAlias != $aliasGroup) {
             throw new InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
-        Validators::isValidUsernameIdentity($usernameIdentity[1], 'username');
-
-        // Does identity already exists?
-        try {
-            $identity = IdentitiesDAO::FindByUsername($username);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!is_null($identity)) {
-            throw new DuplicatedEntryInDatabaseException('usernameInUse');
-        }
+        Validators::isValidIdentityUsername($identityUsername[1], 'username');
 
         if (!is_null($user)) {
             $user = trim($user);
