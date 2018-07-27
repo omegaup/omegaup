@@ -78,7 +78,7 @@ class IdentityController extends Controller {
             $response
         );
 
-        if (is_null($r['omit_rank']) || !$r['omit_rank']) {
+        if (!empty($r['omit_rank'])) {
             $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
         } else {
             $response['userinfo']['rankinfo'] = [];
@@ -108,27 +108,26 @@ class IdentityController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function getProfileImpl(Identities $identity) {
-        $response = [];
-        $response['userinfo'] = [];
         try {
             $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
-            $response['userinfo'] = [
-                'username' => $identity->username,
-                'name' => $identity->name,
-                'preferred_language' => null,
-                'country' => $extendedProfile['country'],
-                'country_id' => $identity->country_id,
-                'state' => $extendedProfile['state'],
-                'state_id' => $identity->state_id,
-                'school' => $extendedProfile['school'],
-                'school_id' => $identity->school_id,
-                'is_private' => 0, # TODO: Review what value is setted
-                'locale' => UserController::convertToSupportedLanguage($extendedProfile['locale']),
+            return [
+                'userinfo' => [
+                    'username' => $identity->username,
+                    'name' => $identity->name,
+                    'preferred_language' => null,
+                    'country' => $extendedProfile['country'],
+                    'country_id' => $identity->country_id,
+                    'state' => $extendedProfile['state'],
+                    'state_id' => $identity->state_id,
+                    'school' => $extendedProfile['school'],
+                    'school_id' => $identity->school_id,
+                    'is_private' => true,
+                    'locale' => UserController::convertToSupportedLanguage($extendedProfile['locale']),
+                ]
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-        return $response;
     }
 }
