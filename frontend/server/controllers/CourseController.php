@@ -1716,15 +1716,15 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         try {
-            $db_results = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+            $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-        $user_problems = [];
-        foreach ($db_results as $problem) {
-            $user_problems[$problem['username']][] = $problem;
+        $userProblems = [];
+        foreach ($solvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
         }
-        return ['status' => 'ok', 'user_problems' => $user_problems];
+        return ['status' => 'ok', 'user_problems' => $userProblems];
     }
 
     /**
@@ -1743,14 +1743,14 @@ class CourseController extends Controller {
         }
 
         try {
-            $db_results = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+            $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-        $user_problems = [];
-        foreach ($db_results as $problem) {
-            $user_problems[$problem['username']][] = $problem;
+        $userProblems = [];
+        foreach ($unsolvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
         }
-        return ['status' => 'ok', 'user_problems' => $user_problems];
+        return ['status' => 'ok', 'user_problems' => $userProblems];
     }
 }
