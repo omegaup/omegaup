@@ -272,7 +272,7 @@ def add_problem_to_contest(driver, problem):
                             problem)
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '.btn'))).click()
+            (By.CSS_SELECTOR, '.btn.add-problem'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,

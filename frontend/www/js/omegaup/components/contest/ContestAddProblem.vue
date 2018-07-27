@@ -19,7 +19,7 @@
                v-model="order">
         </div>
         <div class="form-group">
-          <button class="btn btn-primary"
+          <button class="btn btn-primary add-problem"
                type="submit">{{T.wordsAddProblem}}</button>
         </div>
       </form>
