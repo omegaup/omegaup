@@ -73,6 +73,16 @@ def test_create_problem(driver):
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
+        runs_before_submit = driver.browser.find_elements_by_xpath(
+            '//td[@class="status"]')
+
+        util.create_run(driver, problem_alias, 'Main.java')
+
+        runs_after_submit = driver.browser.find_elements_by_xpath(
+            '//td[@class="status"]')
+
+        assert len(runs_before_submit) + 1 == len(runs_after_submit)
+
 
 # Creating a problem intentionally attempts to get the details of a problem to
 # see if the alias is being used already.
@@ -100,6 +110,12 @@ def create_problem(driver, problem_alias):
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
+        input_limit = driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "input_limit"]')))
+        input_limit.clear()
+        input_limit.send_keys('1024')
         # Alias should be set automatically
         driver.browser.find_element_by_name('source').send_keys('test')
         # Make the problem public
