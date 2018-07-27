@@ -182,6 +182,12 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
     enter_contest(driver, contest_alias)
 
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             ('//a[contains(@href, "#problems/%s")]' %
+              problem)))).click()
+
     util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)
 
