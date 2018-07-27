@@ -226,7 +226,7 @@ def enter_course(driver, course_alias, assignment_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//input[@value = "yes"]'))).click()
+            (By.XPATH, '//input[@name = "accept-teacher"]'))).click()
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//button[@name = "start-course-submit"]'))).click()

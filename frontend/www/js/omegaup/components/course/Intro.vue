@@ -16,9 +16,11 @@
                v-model="shareUserInformation"> {{ T.wordsNo }}</label>
       </template>
       <template v-if="showAcceptTeacher">
-        <p v-html="acceptTeacherConsentHtml"></p><label><input type="radio"
+        <p v-html="acceptTeacherConsentHtml"></p><label><input name="accept-teacher"
+               type="radio"
                v-model="acceptTeacher"
-               value="yes"> {{ T.wordsYes }}</label> <label><input type="radio"
+               value="yes"> {{ T.wordsYes }}</label> <label><input name="reject-teacher"
+               type="radio"
                v-model="acceptTeacher"
                value="no"> {{ T.wordsNo }}</label>
       </template>
@@ -27,7 +29,7 @@
           <button class="btn btn-primary btn-lg"
                 name="start-course-submit"
                 type="button"
-                v-bind:disabled="buttonDisabled"
+                v-bind:disabled="isButtonDisabled"
                 v-on:click="onSubmit">{{ T.startCourse }}</button>
         </form>
       </div>
@@ -55,7 +57,7 @@ export default {
       return this.markdownConverter.makeHtml(
           this.statements.acceptTeacher.markdown);
     },
-    buttonDisabled: function() {
+    isButtonDisabled: function() {
       return this.needsBasicInformation ||
              (this.requestsUserInformation == 'optional' &&
               this.shareUserInformation == undefined) ||
