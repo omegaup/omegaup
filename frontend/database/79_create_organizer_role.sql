@@ -2,7 +2,7 @@
 INSERT INTO
   `Roles` (`role_id`,`name`,`description`)
 VALUES
-  (6,'GroupIdentityCreator','Miembro del grupo que tiene privilegios para crear identidades a partir de un grupo');
+  (7,'GroupIdentityCreator','Miembro del grupo que tiene privilegios para crear identidades a partir de un grupo');
 
 INSERT INTO `ACLs` (`acl_id`, `owner_id`) VALUES (7, 1);
 
@@ -15,7 +15,7 @@ INSERT INTO `Groups` (`acl_id`, `alias`, `name`, `description`) VALUES (
 
 SET @organizer_group_id = LAST_INSERT_ID();
 
-INSERT INTO `Group_Roles` VALUES(@organizer_group_id, 6, 7);
+INSERT INTO `Group_Roles` VALUES(@organizer_group_id, 7, 7);
 
 -- Alter Identities table, adding and updating gender column
 

@@ -39,7 +39,7 @@ class Authorization {
     const MENTOR_ROLE = 5;
 
     // Identity creator.
-    const IDENTITY_CREATOR_ROLE = 6;
+    const IDENTITY_CREATOR_ROLE = 7;
 
     // System-level ACL.
     const SYSTEM_ACL = 1;
