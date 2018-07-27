@@ -220,7 +220,7 @@ class InterviewController extends Controller {
                         'username' => $identity['username'],
                         'access_time' => $identity['access_time'],
                         'email' => $identity['email'],
-                        'opened_interview' => !is_null($identity['access_time']) ? false : true,
+                        'opened_interview' => !is_null($identity['access_time']),
                         'country' => $identity['country_id'],
                     ];
         }
