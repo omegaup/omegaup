@@ -34,7 +34,7 @@ class ProblemOfTheWeekController extends Controller {
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_OF_THE_WEEK,
             $offset . '-' . $rowcount,
-            array($offset, $rowcount),
+            [$offset, $rowcount],
             'ProblemOfTheWeekController::getListOfProblemsOfTheWeekImpl',
             $results,
             APC_USER_CACHE_ONE_DAY_TIMEOUT
