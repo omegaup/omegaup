@@ -139,6 +139,7 @@ class Cache {
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
+    const PROBLEM_OF_THE_WEEK = 'problem-of-the-week';
 
     private $enabled;
     private $log;
@@ -250,7 +251,11 @@ class Cache {
         // If there wasn't a value in the cache for the key ($prefix, $id)
         if (is_null($returnValue)) {
             // Get the value from the function provided
-            $returnValue = call_user_func($setFunc, $arg);
+            if (is_array($arg)) {
+                $returnValue = call_user_func_array($setFunc, $arg);
+            } else {
+                $returnValue = call_user_func($setFunc, $arg);
+            }
 
             // If the $setFunc() didn't disable the cache
             if (self::$cacheResults === true) {

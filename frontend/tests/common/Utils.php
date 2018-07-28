@@ -109,6 +109,7 @@ class Utils {
             'Identity_Login_Log',
             'Interviews',
             'PrivacyStatement_Consent_Log',
+            'Problem_Of_The_Week',
             'Problems',
             'Problems_Languages',
             'Problems_Tags',

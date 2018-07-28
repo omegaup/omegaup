@@ -6,11 +6,6 @@
  */
 class ProblemOfTheWeekTest extends OmegaupTestCase {
     public function testProblemOfTheWeekApis() {
-        // Clean up.
-        global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
-        $conn->Execute('COMMIT');
-
         // Setup synthetic data.
         $numberOfProblems = 8;
         for ($i = 0; $i < $numberOfProblems; $i++) {
