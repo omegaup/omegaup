@@ -47,6 +47,8 @@ class ProblemOfTheWeekController extends Controller {
         if ($rowcount > self::MAX_REQUEST_SIZE) {
             throw new InvalidDatabaseOperationException($e);
         }
+        Validators::isNumber($offset, "Offset", /* $required= */ true);
+        Validators::isNumber($rowcount, "Row count", /* $required= */ true);
         return ProblemOfTheWeekDAO::getListOfProblemsOfTheWeek($offset, $rowcount);
     }
     
