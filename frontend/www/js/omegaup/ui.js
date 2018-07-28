@@ -33,6 +33,14 @@ let UI = {
     return clock;
   },
 
+  rankingUsername: function(rank) {
+    let username = rank.username;
+    if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
+    if (rank.virtual)
+      username = UI.formatString(T.virtualSuffix, {username: username});
+    return username;
+  },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;
@@ -156,30 +164,25 @@ let UI = {
 
   typeaheadWrapper: function(f) {
     let lastRequest = null;
-    let pending = false;
+    let pendingRequest = false;
     function wrappedCall(query, syncResults, asyncResults) {
-      if (pending) {
+      if (pendingRequest) {
         lastRequest = arguments;
         return;
       }
-      pending = true;
+      pendingRequest = true;
       f({query: query})
-          .then(function(data) {
-            if (lastRequest != null) {
-              // Typeahead will ignore any stale callbacks. Given that we
-              // will start a new request ASAP, let's do a best-effort
-              // asyncResults to the current request with the old data.
-              lastRequest[2](data.results || data);
-              pending = false;
-              let request = lastRequest;
-              lastRequest = null;
-              wrappedCall.apply(null, request);
-              return;
-            }
-            asyncResults(data.results || data);
-          })
+          .then(data => asyncResults(data.results || data))
           .fail(UI.ignoreError)
-          .always(function() { pending = false; });
+          .always(() => {
+            pendingRequest = false;
+
+            // If there is a pending request, send it out now.
+            if (!lastRequest) return;
+            let currentRequest = lastRequest;
+            lastRequest = null;
+            wrappedCall(...currentRequest);
+          });
     }
     return wrappedCall;
   },
@@ -195,6 +198,12 @@ let UI = {
               source: UI.typeaheadWrapper(searchFn),
               async: true,
               display: 'label',
+              templates: {
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
+                },
+              },
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb);
@@ -213,8 +222,9 @@ let UI = {
               display: 'alias',
               templates: {
                 suggestion: function(val) {
-                  return UI.formatString('<strong>%(title)</strong> (%(alias))',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+                      val);
                 }
               }
             })
@@ -254,6 +264,12 @@ let UI = {
               source: substringMatcher,
               async: true,
               display: 'alias',
+              templates: {
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(alias)">%(alias)</div>', val);
+                },
+              },
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb);
@@ -272,6 +288,10 @@ let UI = {
               display: 'label',
               templates: {
                 empty: T.schoolToBeAdded,
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
+                },
               }
             })
         .on('typeahead:select', cb)
@@ -502,6 +522,11 @@ export {UI as default};
 
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {
+      if (xhr.status == 499 || xhr.readyState != 4) {
+        // If we cancel the connection, let's just swallow the error since
+        // the user is not going to see it.
+        return;
+      }
       try {
         var responseText = xhr.responseText;
         var response = {};

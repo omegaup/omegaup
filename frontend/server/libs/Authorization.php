@@ -20,6 +20,9 @@ class Authorization {
     // Cache for system group for support team members
     private static $support_group = null;
 
+    // Cache for system group identity creators
+    private static $group_identity_creator = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -35,6 +38,9 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
+    // Identity creator.
+    const IDENTITY_CREATOR_ROLE = 7;
+
     // System-level ACL.
     const SYSTEM_ACL = 1;
 
@@ -49,6 +55,9 @@ class Authorization {
 
     // Group for support team members.
     const SUPPORT_GROUP_ALIAS = 'omegaup:support';
+
+    // Group identities creators.
+    const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
     public static function canViewRun($identity_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
@@ -143,6 +152,10 @@ class Authorization {
         return self::isMentor($identity_id);
     }
 
+    public static function canCreateGroupIdentities($identity_id) {
+        return self::isGroupIdentityCreator($identity_id);
+    }
+
     public static function canViewCourse($identity_id, Courses $course, Groups $group) {
         if (!Authorization::isCourseAdmin($identity_id, $course) &&
             !Authorization::isGroupMember($identity_id, $group)) {
@@ -212,6 +225,18 @@ class Authorization {
         );
     }
 
+    public static function isGroupIdentityCreator($identity_id) {
+        if (self::$group_identity_creator == null) {
+            self::$group_identity_creator = GroupsDAO::findByAlias(
+                Authorization::IDENTITY_CREATOR_GROUP_ALIAS
+            );
+        }
+        return Authorization::isGroupMember(
+            $identity_id,
+            self::$group_identity_creator
+        );
+    }
+
     public static function isSupportTeamMember($identity_id) {
         if (self::$support_group == null) {
             self::$support_group = GroupsDAO::findByAlias(
@@ -274,6 +299,7 @@ class Authorization {
         self::$quality_reviewer_group = null;
         self::$mentor_group = null;
         self::$support_group = null;
+        self::$group_identity_creator = null;
     }
 
     public static function canSubmitToProblemset($identity_id, $problemset) {

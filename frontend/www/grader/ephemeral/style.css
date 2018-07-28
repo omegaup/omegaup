@@ -1,0 +1,22 @@
+textarea.editor {
+	width: 100%;
+	height: 100%;
+	background: #222222;
+	border: 0px;
+	font-family: "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	color: #d4d4d4;
+}
+
+button[type="submit"] {
+	width: 7ex;
+}
+
+button[type="submit"]:disabled img, button[type="submit"] span {
+	display: inline;
+}
+button[type="submit"] img, button[type="submit"]:disabled span {
+	display: none;
+}
+input[type="file"] {
+	display: none;
+}

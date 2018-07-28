@@ -26,7 +26,9 @@
           <td><img v-bind:src="coder.gravatar_32"></td>
           <td><img v-bind:src="`/media/flags/${coder.country_id.toLowerCase()}.png`"
                v-if="coder.country_id != null"></td>
-          <td>{{coder.username}}</td>
+          <td><omegaup-user-username v-bind:classname="coder.classname"
+                                 v-bind:linkify="true"
+                                 v-bind:username="coder.username"></omegaup-user-username></td>
           <td v-if="showCurrentMonth">{{coder.date}}</td>
         </tr>
       </tbody>
@@ -37,6 +39,7 @@
 <script>
 import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
+import user_Username from '../user/Username.vue';
 
 export default {
   props: {},
@@ -44,7 +47,7 @@ export default {
     visibleCoders: function() {
       return this.showCurrentMonth ? this.codersOfCurrentMonth :
                                      this.codersOfPreviousMonth;
-    }
+    },
   },
   data: function() {
     return {
@@ -71,6 +74,9 @@ export default {
           self.codersOfPreviousMonth = response.coders;
         })
         .fail(UI.apiError);
+  },
+  components: {
+    'omegaup-user-username': user_Username,
   }
 };
 </script>

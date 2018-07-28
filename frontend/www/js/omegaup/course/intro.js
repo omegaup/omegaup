@@ -14,13 +14,16 @@ OmegaUp.on('ready', function() {
           name: coursePayload.name,
           description: coursePayload.description,
           needsBasicInformation: coursePayload.needsBasicInformation,
-          requestsUserInformation: coursePayload.requestsUserInformation
+          requestsUserInformation: coursePayload.requestsUserInformation,
+          privacyStatementMarkdown: coursePayload.privacyStatementMarkdown,
         },
         on: {
           submit: function(ev) {
             API.Course.addStudent({
                         'course_alias': coursePayload.alias,
                         'usernameOrEmail': coursePayload.currentUsername,
+                        'statement_type': coursePayload.statementType,
+                        'git_object_id': coursePayload.gitObjectId,
                         'share_user_information': ev.shareUserInformation
                       })
                 .then(function(data) {

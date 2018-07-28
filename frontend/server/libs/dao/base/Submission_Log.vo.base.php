@@ -35,6 +35,9 @@ class SubmissionLog extends VO {
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
         }
+        if (isset($data['identity_id'])) {
+            $this->identity_id = $data['identity_id'];
+        }
         if (isset($data['ip'])) {
             $this->ip = $data['ip'];
         }
@@ -75,6 +78,13 @@ class SubmissionLog extends VO {
       * @var int(11)
       */
     public $user_id;
+
+    /**
+      * Identidad del usuario
+      * @access public
+      * @var int(11)
+      */
+    public $identity_id;
 
     /**
       *  [Campo no documentado]
