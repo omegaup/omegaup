@@ -19,7 +19,7 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
                     INNER JOIN ACLs as acl on acl.acl_id = p.acl_id
                     INNER JOIN Users as u on u.user_id = acl.owner_id
                 ORDER BY pw.time DESC LIMIT ?, ?;';
-        
+
         $result = $conn->Execute($sql, [$offset, $rowcount]);
         $problemsOfTheWeek = [];
         foreach ($result as $row) {

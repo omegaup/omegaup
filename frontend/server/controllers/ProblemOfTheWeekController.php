@@ -41,9 +41,8 @@ class ProblemOfTheWeekController extends Controller {
         );
         return $results;
     }
-    
+
     public static function asdf($qwerty) {
-        
     }
 
     // Made public to be cacheable.
@@ -53,7 +52,7 @@ class ProblemOfTheWeekController extends Controller {
         }
         return ProblemOfTheWeekDAO::getListOfProblemsOfTheWeek($offset, $rowcount);
     }
-    
+
     public static function invalidateAllKeys() {
         Cache::invalidateAllKeys(Cache::PROBLEM_OF_THE_WEEK);
     }
