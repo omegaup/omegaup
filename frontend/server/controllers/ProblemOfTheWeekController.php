@@ -34,15 +34,12 @@ class ProblemOfTheWeekController extends Controller {
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_OF_THE_WEEK,
             $offset . '-' . $rowcount,
-            [$offset, $rowcount],
+            array($offset, $rowcount),
             'ProblemOfTheWeekController::getListOfProblemsOfTheWeekImpl',
             $results,
             APC_USER_CACHE_ONE_DAY_TIMEOUT
         );
         return $results;
-    }
-
-    public static function asdf($qwerty) {
     }
 
     // Made public to be cacheable.
@@ -52,7 +49,7 @@ class ProblemOfTheWeekController extends Controller {
         }
         return ProblemOfTheWeekDAO::getListOfProblemsOfTheWeek($offset, $rowcount);
     }
-
+    
     public static function invalidateAllKeys() {
         Cache::invalidateAllKeys(Cache::PROBLEM_OF_THE_WEEK);
     }
