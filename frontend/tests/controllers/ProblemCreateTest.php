@@ -30,7 +30,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
         $problems = ProblemsDAO::getByTitle($r['title']);
@@ -46,23 +45,29 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
         $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['validator'], $problem->validator);
-        $this->assertEquals($r['time_limit'], $problem->time_limit);
-        $this->assertEquals($r['memory_limit'], $problem->memory_limit);
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
         $this->assertEqualSets($r['languages'], $problem->languages);
-        $this->assertEquals(0, $problem->slow);
 
         // Verify author username -> author id conversion
         $acl = ACLsDAO::getByPK($problem->acl_id);
         $user = UsersDAO::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
-        // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        // Verify problem settings.
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+        $this->assertEquals(false, $problemSettings->Slow);
+        $this->assertEquals($r['validator'], $problemSettings->Validator->Name);
+        $this->assertEquals(5000, $r['time_limit']);
+        $this->assertEquals('5s', $problemSettings->Limits->TimeLimit);
+        $this->assertEquals(
+            $r['memory_limit'],
+            $problemSettings->Limits->MemoryLimit
+        );
 
-        $this->assertTrue($problemArtifacts->exists('testplan'));
+        // Verify problem contents were copied
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
 
@@ -96,7 +101,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
         $problems = ProblemsDAO::getByTitle($r['title']);
@@ -108,8 +112,10 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify contest was found
         $this->assertNotNull($problem);
 
-        // Verify DB data
-        $this->assertEquals(1, $problem->slow);
+        // Verify problem settings.
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+        $this->assertEquals(true, $problemSettings->Slow);
     }
 
     /**
@@ -136,7 +142,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
         $problems = ProblemsDAO::getByTitle($r['title']);
@@ -148,8 +153,10 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify contest was found
         $this->assertNotNull($problem);
 
-        // Verify DB data
-        $this->assertEquals(0, $problem->slow);
+        // Verify problem settings.
+        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+        $this->assertEquals(false, $problemSettings->Slow);
     }
 
     /**
@@ -176,16 +183,14 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('cases/g1.train0.in', $response['uploaded_files'][0]);
-        $this->assertEquals('cases/g1.train0.out', $response['uploaded_files'][1]);
 
         // Verify problem contents were copied
         $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
-        $this->assertTrue($problemArtifacts->exists('testplan'));
-        $this->assertTrue($problemArtifacts->exists('cases/in/g1.train0.in'));
-        $this->assertTrue($problemArtifacts->exists('cases/out/g1.train0.out'));
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
         $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('cases/g1.train0.in'));
+        $this->assertTrue($problemArtifacts->exists('cases/g1.train0.out'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
     }
 
@@ -285,7 +290,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('cases/1.in', $response['uploaded_files'][0]);
 
         // Verify data in DB
         $problems = ProblemsDAO::getByTitle($r['title']);
@@ -446,7 +450,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Validate
         // Verify response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals('testplan', $response['uploaded_files'][10]);
 
         // Verify data in DB
         $problems = ProblemsDAO::getByTitle($r['title']);
@@ -465,15 +468,13 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify problem contents were copied
         $problemArtifacts = new ProblemArtifacts($problem->alias);
 
-        $this->assertTrue($problemArtifacts->exists('testplan'));
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
     }
 
     /**
-     * Basic test for uploadin problem without statement
-     *
-     * @expectedException InvalidParameterException
+     * Basic test for uploading problem without statement
      */
     public function testCreateProblemWithoutStatement() {
         // Get the problem data
@@ -491,13 +492,16 @@ class CreateProblemTest extends OmegaupTestCase {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        try {
+            ProblemController::apiCreate($r);
+            $this->fail('Exception was expected.');
+        } catch (ProblemDeploymentFailedException $e) {
+            $this->assertEquals('problemDeployerNoStatements', $e->getMessage());
+        }
     }
 
     /**
      * Basic test for uploadin problem missing outputs
-     *
-     * @expectedException InvalidParameterException
      */
     public function testCreateProblemMissingOutput() {
         // Get the problem data
@@ -515,6 +519,11 @@ class CreateProblemTest extends OmegaupTestCase {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        try {
+            ProblemController::apiCreate($r);
+            $this->fail('Exception was expected.');
+        } catch (ProblemDeploymentFailedException $e) {
+            $this->assertEquals('problemDeployerMissingOutput', $e->getMessage());
+        }
     }
 }

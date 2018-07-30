@@ -6,14 +6,15 @@
  * @author lhchavez
  */
 class ProblemArtifacts {
-    public function __construct($alias) {
+    public function __construct(string $alias, string $commit = 'HEAD') {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->git = new Git(PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $alias);
+        $this->commit = $commit;
     }
 
     public function get($path, $quiet = false) {
         return $this->git->get(
-            ['cat-file', 'blob', 'HEAD:' . $path],
+            ['cat-file', 'blob', "{$this->commit}:{$path}"],
             null /* $cwd_override */,
             $quiet
         );
@@ -22,7 +23,7 @@ class ProblemArtifacts {
     public function exists($path) {
         try {
             $this->git->get(
-                ['cat-file', '-e', 'HEAD:' . $path],
+                ['cat-file', '-e', "{$this->commit}:{$path}"],
                 null /* cwd_override */,
                 true /* quiet */
             );
@@ -35,7 +36,7 @@ class ProblemArtifacts {
 
     public function lsTree($path) {
         $entries = explode("\0", trim($this->git->get(
-            ['ls-tree', '-z', 'HEAD:' . $path],
+            ['ls-tree', '-z', "{$this->commit}:{$path}"],
             null /* cwd_override */,
             true /* quiet */
         )));

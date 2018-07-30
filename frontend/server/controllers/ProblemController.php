@@ -166,6 +166,19 @@ class ProblemController extends Controller {
         $problem->languages = $r['languages'];
         $problem->email_clarifications = $r['email_clarifications'];
 
+        $problemSettings = [
+            'Limits' => [
+                'ExtraWallTime' => (int)$r['extra_wall_time'] . 'ms',
+                'MemoryLimit' => (int)$r['memory_limit'],
+                'OutputLimit' => (int)$r['output_limit'],
+                'OverallWallTimeLimit' => (int)$r['overall_wall_time_limit'] . 'ms',
+                'TimeLimit' => (int)$r['time_limit'] . 'ms',
+            ],
+            'Validator' => [
+                'Name' => $r['validator'],
+            ],
+        ];
+
         $acceptsSubmissions = $r['languages'] !== '';
         $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
@@ -176,21 +189,8 @@ class ProblemController extends Controller {
         try {
             ProblemsDAO::transBegin();
 
-            // Create file after we know that alias is unique
-            $problemDeployer->deploy();
-            if ($problemDeployer->hasValidator) {
-                $problem->validator = 'custom';
-            } elseif ($problem->validator == 'custom') {
-                throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
-            }
-            $problem->slow = $problemDeployer->isSlow($problem);
-
-            // Calculate output limit.
-            $output_limit = $problemDeployer->getOutputLimit();
-
-            if ($output_limit != -1) {
-                $problem->output_limit = $output_limit;
-            }
+            // Commit at the very end
+            $problemDeployer->commit('Initial commit', $r['current_user'], $problemSettings);
 
             // Save the contest object with data sent by user to the database
             ACLsDAO::save($acl);
@@ -198,9 +198,6 @@ class ProblemController extends Controller {
             ProblemsDAO::save($problem);
 
             ProblemsDAO::transEnd();
-
-            // Commit at the very end
-            $problemDeployer->commit('Initial commit', $r['current_user']);
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
             ProblemsDAO::transRollback();
@@ -219,17 +216,13 @@ class ProblemController extends Controller {
             } else {
                 throw new InvalidDatabaseOperationException($e);
             }
-        } finally {
-            $problemDeployer->cleanup();
         }
-
-        // Adding unzipped files to response
-        $result['uploaded_files'] = $problemDeployer->filesToUnzip;
-        $result['status'] = 'ok';
 
         self::updateLanguages($problem);
 
-        return $result;
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**
@@ -736,31 +729,11 @@ class ProblemController extends Controller {
             //Begin transaction
             ProblemsDAO::transBegin();
 
-            if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
-                // DeployProblemZip requires alias => problem_alias
-                $r['alias'] = $r['problem_alias'];
-
-                $problemDeployer->deploy();
-                if ($problemDeployer->hasValidator) {
-                    $problem->validator = 'custom';
-                } elseif ($problem->validator == 'custom') {
-                    throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
-                }
-                // This must come before the commit in case isSlow throws an exception.
-                $problem->slow = $problemDeployer->isSlow($problem);
-
-                // Calculate output limit.
-                $output_limit = $problemDeployer->getOutputLimit();
-
-                if ($output_limit != -1) {
-                    $r['problem']->output_limit = $output_limit;
-                }
-
-                $response['uploaded_files'] = $problemDeployer->filesToUnzip;
+            if (isset($_FILES['problem_contents'])
+                && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
+            ) {
                 $problemDeployer->commit($r['message'], $r['current_user']);
                 $requiresRejudge |= $problemDeployer->requiresRejudge;
-            } else {
-                $problem->slow = $problemDeployer->isSlow($problem);
             }
 
             // Save the contest object with data sent by user to the database
@@ -780,8 +753,6 @@ class ProblemController extends Controller {
             self::$log->error($e);
 
             throw new InvalidDatabaseOperationException($e);
-        } finally {
-            $problemDeployer->cleanup();
         }
 
         if (($requiresRejudge == true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE == true)) {
@@ -805,8 +776,7 @@ class ProblemController extends Controller {
 
         // Invalidar problem statement cache @todo invalidar todos los lenguajes
         foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$lang}-markdown");
         }
         Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
         Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
@@ -854,20 +824,31 @@ class ProblemController extends Controller {
         }
 
         $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
+        $tmpfile = tmpfile();
         try {
-            $problemDeployer->updateStatement($r['lang'], $r['statement']);
-            $problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
+            fwrite($tmpfile, $r['statement']);
+            $path = stream_get_meta_data($tmpfile)['uri'];
+
+            $problemDeployer->commitStatements(
+                "{$r['lang']}.markdown: {$r['message']}",
+                $r['current_user'],
+                [
+                    [
+                        'path' => "statements/{$r['lang']}.markdown",
+                        'contents_path' => $path,
+                    ],
+                ]
+            );
 
             // Invalidar problem statement cache
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'markdown');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$r['lang']}-markdown");
             Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         } finally {
-            $problemDeployer->cleanup();
+            fclose($tmpfile);
         }
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1016,7 +997,7 @@ class ProblemController extends Controller {
         $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            $problemAlias . '-' . $language,
+            "{$problemAlias}-{$language}-markdown",
             [$problemAlias, $language],
             'ProblemController::getProblemStatementImpl',
             $problemStatement,

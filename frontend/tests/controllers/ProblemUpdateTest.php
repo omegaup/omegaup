@@ -90,7 +90,6 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Validate rsponse
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(true, $response['rejudged']);
-        $this->assertEquals('cases/1.in', $response['uploaded_files'][0]);
 
         // Verify problem contents were copied
         $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
@@ -117,23 +116,23 @@ class UpdateProblemTest extends OmegaupTestCase {
             'title' => 'valid-languages'
         ]));
 
+        $languages = 'hs,java,pl';
+
+        // Call API
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'languages' => 'hs,java,pl',
+            'languages' => $languages,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed alias and languages',
-        ]);
-
-        //Call API
-        $response = ProblemController::apiUpdate($r);
+        ]));
 
         // Verify data in DB
-        $problem = ProblemsDAO::getByAlias($r['alias']);
+        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
 
         // Check that we only retrieved 1 element
         $this->assertEquals(1, count($problem));
-        $this->assertEqualSets($r['languages'], $problem->languages);
+        $this->assertEqualSets($languages, $problem->languages);
 
         // Validate response
         $this->assertEquals('ok', $response['status']);
@@ -153,8 +152,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Changed invalid languages',
         ]);
-
-        // Log in as contest director
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -235,28 +232,26 @@ class UpdateProblemTest extends OmegaupTestCase {
         // to rejudge them
         $this->detourGraderCalls($this->exactly(0));
 
-        // Prepare request
-        $login = self::login($problemData['author']);
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'title' => 'new title',
-            'time_limit' => 12345,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'message' => 'This shoudl fail',
-        ]);
-
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';
 
         // Call API. Should fail
         try {
-            ProblemController::apiUpdate($r);
-        } catch (InvalidParameterException $e) {
-            // Expected
+            $login = self::login($problemData['author']);
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'title' => 'new title',
+                'time_limit' => 12345,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'This should fail',
+            ]));
+            $this->fail('Expected update to fail');
+        } catch (ProblemDeploymentFailedException $e) {
+            $this->assertEquals($e->getMessage(), 'problemDeployerNoStatements');
         }
 
         // Verify contents were not erased
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
