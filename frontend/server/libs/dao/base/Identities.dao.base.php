@@ -20,7 +20,7 @@ abstract class IdentitiesDAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`';
+    const FIELDS = '`Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender`';
 
     /**
      * Guardar registros.
@@ -56,7 +56,7 @@ abstract class IdentitiesDAOBase extends DAO {
         if (is_null($identity_id)) {
             return null;
         }
-        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
         $params = [$identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -82,7 +82,7 @@ abstract class IdentitiesDAOBase extends DAO {
      * @return Array Un arreglo que contiene objetos del tipo {@link Identities}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id` from Identities';
+        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` from Identities';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -163,6 +163,10 @@ abstract class IdentitiesDAOBase extends DAO {
             $clauses[] = '`school_id` = ?';
             $params[] = $Identities->school_id;
         }
+        if (!is_null($Identities->gender)) {
+            $clauses[] = '`gender` = ?';
+            $params[] = $Identities->gender;
+        }
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -173,7 +177,7 @@ abstract class IdentitiesDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id` FROM `Identities`';
+        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM `Identities`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -197,7 +201,7 @@ abstract class IdentitiesDAOBase extends DAO {
       * @param Identities [$Identities] El objeto de tipo Identities a actualizar.
       */
     final private static function update(Identities $Identities) {
-        $sql = 'UPDATE `Identities` SET `username` = ?, `password` = ?, `name` = ?, `user_id` = ?, `language_id` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ? WHERE `identity_id` = ?;';
+        $sql = 'UPDATE `Identities` SET `username` = ?, `password` = ?, `name` = ?, `user_id` = ?, `language_id` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `gender` = ? WHERE `identity_id` = ?;';
         $params = [
             $Identities->username,
             $Identities->password,
@@ -207,6 +211,7 @@ abstract class IdentitiesDAOBase extends DAO {
             $Identities->country_id,
             $Identities->state_id,
             $Identities->school_id,
+            $Identities->gender,
             $Identities->identity_id,
         ];
         global $conn;
@@ -227,7 +232,7 @@ abstract class IdentitiesDAOBase extends DAO {
      * @param Identities [$Identities] El objeto de tipo Identities a crear.
      */
     final private static function create(Identities $Identities) {
-        $sql = 'INSERT INTO Identities (`identity_id`, `username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Identities (`identity_id`, `username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Identities->identity_id,
             $Identities->username,
@@ -238,6 +243,7 @@ abstract class IdentitiesDAOBase extends DAO {
             $Identities->country_id,
             $Identities->state_id,
             $Identities->school_id,
+            $Identities->gender,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -381,6 +387,17 @@ abstract class IdentitiesDAOBase extends DAO {
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
             $clauses[] = '`school_id` = ?';
+            $params[] = is_null($a) ? $b : $a;
+        }
+
+        $a = $IdentitiesA->gender;
+        $b = $IdentitiesB->gender;
+        if (!is_null($a) && !is_null($b)) {
+            $clauses[] = '`gender` >= ? AND `gender` <= ?';
+            $params[] = min($a, $b);
+            $params[] = max($a, $b);
+        } elseif (!is_null($a) || !is_null($b)) {
+            $clauses[] = '`gender` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
 

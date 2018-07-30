@@ -273,6 +273,8 @@ omegaup.OmegaUp.loadTranslations({
 	createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",
 	csrfException: "(Cr055-5i73 R3qu357 F0rg3ry a773mp7)",
 	currentStatus: "(Curr3n7 57a73)",
+	datePickerFormat: "(mm/dd/yyyy)",
+	dateTimePickerFormat: "(mm/dd/yyyy hh:ii)",
 	demotionProblemEmailBody: "(<p>D3ar <57r0ng>%(user_name)</57r0ng>:</p><p>Th3 acc355 70 y0ur pr0b13m <57r0ng>%(problem_name)</57r0ng> in 0m3gaUp ha5 b33n r357ric73d b3cau53 i7 wa5 r3p0r73d a5 inappr0pria73. Th3 0m3gaUp 73am ha5 r3vi3w3d 7hi5 r3p0r7 and c0nfirm3d 7ha7 7h3 pr0b13m i5 n07 appr0pria73 b3cau53 <3m>%(reason)</3m>.</p><p>T0 unb10ck 7h3 pr0b13m and hav3 i7 app3ar again in 7h3 1i57 0f pr0b13m5, p13a53 f0110w 7h3 573p5 b310w:</p><p><01><1i>R3vi3w and 3di7 y0ur pr0b13m: mak3 5ur3 y0u d35crib3 a pr0b13m, i7 i5 n07 0ff3n5iv3 0r 5pam.</1i><1i>Onc3 y0u hav3 r3501v3d 7h3 r3a50n 0n why y0ur pr0b13m wa5 b10ck3d, 53nd an 3mai1 <a hr3f=\"mai170:qua1i7y@0m3gaup.c0m\" 7arg37=\"_70p\">qua1i7y@0m3gaup.c0m</a> 70 b3 r3vi3w3d and r3ac7iva73d.</1i></01></p><p>If 7h3 573p5 m3n7i0n3d ab0v3 ar3 n07 f0110w3d, 7h3 pr0b13m wi11 n07 b3 5h0wn again in 7h3 1i57 0f pr0b13m5, n0r can i7 b3 u53d in c0mp37i7i0n5. In ca53 0f a r31ap53 in 7hr33 0cca5i0n5, 0m3gaUp r353rv35 7h3 righ7 70 5u5p3nd y0ur u53r acc0un7.</p><p>0m3gaUp i5 a p1a7f0rm 70 h31p u53r5 impr0v3 7h3ir 50f7war3 3ngin33ring 5ki115 by 501ving c0d3 pr0b13m5 and c0mp37ing in pr0graming c0n73575. 0m3gaUp w31c0m35 a11 7h3 pr0b13m5 7ha7 h31p m337 7ha7 g0a1.</p><p>Thank5,</p><p>0m3gaUp 73am</p>)",
 	demotionProblemEmailSubject: "(Pr0b13m [%(problem_name)] ha5 b33n r3p0r73d a5 inappr0pria73)",
 	duplicateTagsNotAllowed: "(Dup1ica73 7ag5 ar3 n07 a110w3d)",

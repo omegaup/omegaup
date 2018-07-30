@@ -3,7 +3,6 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ZipHandler.php';
-require_once 'libs/third_party/Markdown/markdown.php';
 /**
  * ProblemsController
  */
@@ -909,7 +908,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (isset($r['statement_type']) && !in_array($r['statement_type'], ['html', 'markdown'])) {
+        if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
             throw new NotFoundException('invalidStatementType');
         }
 
@@ -958,12 +957,46 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatementImpl($params) {
-        list($problemArtifacts, $sourcePath) = $params;
+        list($problemAlias, $language) = $params;
+        $problemArtifacts = new ProblemArtifacts($problemAlias);
+        $sourcePath = "statements/{$language}.markdown";
+
+        // Read the file that contains the source
+        if (!$problemArtifacts->exists($sourcePath)) {
+            // If there is no language file for the problem, return the Spanish
+            // version.
+            $language = 'es';
+            $sourcePath = "statements/{$language}.markdown";
+        }
+
+        $result = [
+            'language' => $language,
+            'images' => [],
+        ];
         try {
-            return mb_convert_encoding($problemArtifacts->get($sourcePath), 'utf-8');
+            $result['markdown'] = mb_convert_encoding($problemArtifacts->get($sourcePath), 'utf-8');
         } catch (Exception $e) {
             throw new InvalidFilesystemOperationException('statementNotFound');
         }
+
+        // Get all the images' mappings.
+        $statementFiles = $problemArtifacts->lsTree('statements');
+        $imageExtensions = ['bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png',
+                            'svg', 'svgz', 'tif', 'tiff'];
+        foreach ($statementFiles as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if (!in_array($extension, $imageExtensions)) {
+                continue;
+            }
+            $result['images'][$file['name']] = IMAGES_URL_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
+            $imagePath = IMAGES_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
+            if (!@file_exists($imagePath)) {
+                @mkdir(IMAGES_PATH . $problemAlias, 0755, true);
+                file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -972,39 +1005,25 @@ class ProblemController extends Controller {
      * @param string $problemAlias    The alias of the problem.
      * @param string $language        The language of the problem. Will default
      *                                to Spanish if not found.
-     * @param string $statementFormat The format in which the statement will be
-     *                                displayed.
      *
      * @return The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
         $problemAlias,
-        &$language,
-        $statementFormat = 'markdown'
+        $language
     ) {
-        $problemArtifacts = new ProblemArtifacts($problemAlias);
-        $sourcePath = "statements/{$language}.{$statementFormat}";
-
-        // Read the file that contains the source
-        if (!$problemArtifacts->exists($sourcePath)) {
-            // If there is no language file for the problem, return the Spanish
-            // version.
-            $language = 'es';
-            $sourcePath = "statements/{$language}.{$statementFormat}";
-        }
-
-        $fileContents = null;
+        $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            $problemAlias . '-' . $language . '-' . $statementFormat,
-            [$problemArtifacts, $sourcePath],
+            $problemAlias . '-' . $language,
+            [$problemAlias, $language],
             'ProblemController::getProblemStatementImpl',
-            $fileContents,
+            $problemStatement,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
 
-        return $fileContents;
+        return $problemStatement;
     }
 
     /**
@@ -1035,32 +1054,19 @@ class ProblemController extends Controller {
     public static function getLibinteractiveInterfaceName(Request $r) {
         $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
 
-        $interactive_files = [];
+        $interactiveFiles = [];
         try {
-            $interactive_files = $problemArtifacts->lsTree('interactive');
+            $interactiveFiles = $problemArtifacts->lsTree('interactive');
         } catch (Exception $e) {
             // Most problems won't have interactive files
         }
 
-        foreach ($interactive_files as $filename) {
-            if (strrpos($filename, '.idl') == strlen($filename) - 4) {
-                return $filename;
+        foreach ($interactiveFiles as $file) {
+            if (strrpos($file['name'], '.idl') == strlen($file['name']) - 4) {
+                return $file['name'];
             }
         }
         return null;
-    }
-
-    /**
-     * Get the format of statement that was requested.
-     * Markdown is the default if statement_type unspecified in the request.
-     *
-     * @param Request $r
-     */
-    private static function getStatementFormat(Request $r) {
-        if (!isset($r['statement_type'])) {
-            return 'markdown';
-        }
-        return $r['statement_type'];
     }
 
     /**
@@ -1190,11 +1196,6 @@ class ProblemController extends Controller {
 
         // Validate request
         self::validateDetails($r);
-        if ($r['statement_type'] != 'markdown') {
-            // Remove this and just refuse to serve after a few weeks.
-            $e = new Exception('Deprecated call to view non-markdown statement.');
-            self::$log->error($e);
-        }
 
         $response = [];
 
@@ -1205,16 +1206,10 @@ class ProblemController extends Controller {
             'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
             'visibility','languages', 'slow', 'email_clarifications'];
 
-        $language = $r['lang'];
-        $file_content = ProblemController::getProblemStatement(
+        $response['statement'] = ProblemController::getProblemStatement(
             $r['problem']->alias,
-            $language,
-            ProblemController::getStatementFormat($r)
+            $r['lang']
         );
-
-        // Add problem statement to source
-        $response['problem_statement'] = $file_content;
-        $response['problem_statement_language'] = $language;
 
         // Add the example input.
         $sample_input = null;

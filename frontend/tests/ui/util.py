@@ -54,11 +54,7 @@ def add_students(driver, users, container_id, parent_xpath, submit_locator):
 def create_run(driver, problem_alias, filename):
     '''Utility function to create a new run.'''
     logging.debug('Trying to submit new run for %s...', problem_alias)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' %
-              problem_alias)))).click()
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
