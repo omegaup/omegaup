@@ -5,12 +5,13 @@
 </template>
 
 <script>
+import {T} from '../omegaup.js';
 export default {
   props: {
     value: Date,
     format: {
       type: String,
-      'default': 'mm/dd/yyyy',
+      'default': T.datePickerFormat,
     },
   },
   data: function() { return {};},

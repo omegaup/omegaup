@@ -30,12 +30,14 @@ class Controller {
         if (is_null($session['user'])) {
             $r['current_user'] = null;
             $r['current_user_id'] = null;
+            $r['current_identity'] = null;
             $r['current_identity_id'] = null;
             throw new UnauthorizedException();
         }
 
         $r['current_user'] = $session['user'];
         $r['current_user_id'] = $session['user']->user_id;
+        $r['current_identity'] = $session['identity'];
         $r['current_identity_id'] = $session['identity']->identity_id;
     }
 
@@ -91,6 +93,40 @@ class Controller {
         }
 
         return $user;
+    }
+
+    /**
+     * Resolves the target identity for the API. If a username is provided in
+     * the request, then we use that one. Otherwise, we use currently logged-in
+     * identity.
+     *
+     * Request must be authenticated before this function is called.
+     *
+     * @param Request $r
+     * @return Identity
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    protected static function resolveTargetIdentity(Request $r) {
+        // By default use current identity
+        $identity = $r['current_identity'];
+
+        if (is_null($r['username'])) {
+            return $identity;
+        }
+        Validators::isStringNonEmpty($r['username'], 'username');
+
+        try {
+            $identity = IdentitiesDAO::FindByUsername($r['username']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($identity)) {
+            throw new NotFoundException('userNotExist');
+        }
+
+        return $identity;
     }
 
     /**

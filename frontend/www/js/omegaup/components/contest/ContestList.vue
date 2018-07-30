@@ -18,10 +18,13 @@
         <ul class="dropdown-menu"
             role="menu">
           <li>
-            <a v-on:click="onBulkUpdate(true)">{{ T.makePublic }}</a>
+            <a v-on:click="onBulkUpdate('public')">{{ T.makePublic }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate(false)">{{ T.makePrivate }}</a>
+            <a v-on:click="onBulkUpdate('private')">{{ T.makePrivate }}</a>
+          </li>
+          <li>
+            <a v-on:click="onBulkUpdate('registration')">{{ T.makeRegistration }}</a>
           </li>
           <li class="divider"></li>
         </ul>
@@ -34,7 +37,7 @@
           <th>{{ T.wordsTitle }}</th>
           <th>{{ T.arenaPracticeStartTime }}</th>
           <th>{{ T.arenaPracticeEndtime }}</th>
-          <th v-if="isAdmin">{{ T.contestsTablePublic }}</th>
+          <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
           <th colspan="2"
               v-if="isAdmin">Scoreboard</th>
           <th v-if="isAdmin"></th>
@@ -59,18 +62,22 @@
             contest.finish_time.format('long') }}</a>
           </td>
           <td v-if="!isAdmin"></td>
-          <td v-else-if="contest.public == '1'">{{ T.wordsYes }}</td>
-          <td v-else="">{{ T.wordsNo }}</td>
-          <td v-if="contest.scoreboard_url &amp;&amp; isAdmin">
+          <td v-else-if="contest.admission_mode == 'public'">{{ T.wordsPublic }}</td>
+          <td v-else-if="contest.admission_mode == 'private'">{{ T.wordsPrivate }}</td>
+          <td v-else-if="contest.admission_mode == 'registration'">{{ T.wordsRegistration }}</td>
+          <td v-else=""></td>
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href="'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url"
-                v-bind:title="T.contestScoreboardLink">Public</a>
+                v-bind:title="T.contestScoreboardLink"
+                v-if="contest.scoreboard_url">Public</a>
           </td>
-          <td v-if="contest.scoreboard_url_admin &amp;&amp; isAdmin">
+          <td v-if="isAdmin">
             <a class="glyphicon glyphicon-link"
                 v-bind:href=
                 "'/arena/' + contest.alias + '/scoreboard/' + contest.scoreboard_url_admin"
-                v-bind:title="T.contestScoreboardAdminLink">Admin</a>
+                v-bind:title="T.contestScoreboardAdminLink"
+                v-if="contest.scoreboard_url_admin">Admin</a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-edit"
@@ -90,7 +97,7 @@
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-time"
                 v-bind:href="'/contest/' + contest.alias + '/activity/'"
-                v-bind:title="T.contestActivityReport"></a>
+                v-bind:title="T.wordsActivityReport"></a>
           </td>
           <td v-if="isAdmin">
             <a class="glyphicon glyphicon-print"
@@ -120,8 +127,8 @@ export default {
       return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
              date.toISOString();
     },
-    onBulkUpdate: function(publiclyVisible) {
-      this.$emit('bulk-update', publiclyVisible);
+    onBulkUpdate: function(admissionMode) {
+      this.$emit('bulk-update', admissionMode);
     },
     onShowAdmin: function() {
       this.$emit('toggle-show-admin',

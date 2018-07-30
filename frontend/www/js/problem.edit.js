@@ -175,7 +175,7 @@ omegaup.OmegaUp.on('ready', function() {
                 statements[lang].original = statements[lang].current;
               }
             })
-            .fail(omegaup.UI.apiError);
+            .catch(omegaup.UI.apiError);
         return false;
       });
 
@@ -356,6 +356,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('input[name=extra_wall_time]').val('');
       $('input[name=memory_limit]').val('');
       $('input[name=output_limit]').val('');
+      $('input[name=input_limit]').val('');
       $('input[name=source]').val('');
       return;
     }
@@ -382,6 +383,7 @@ omegaup.OmegaUp.on('ready', function() {
     $('input[name=extra_wall_time]').val(problem.extra_wall_time);
     $('input[name=memory_limit]').val(problem.memory_limit);
     $('input[name=output_limit]').val(problem.output_limit);
+    $('input[name=input_limit]').val(problem.input_limit);
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(omegaup.UI.escape(problem.source));
     $('#statement-preview .problemsetter')

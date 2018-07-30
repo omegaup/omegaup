@@ -19,6 +19,11 @@ function _call(url, transform, defaultParams) {
           dfd.resolve(data);
         })
         .fail(function(jqXHR) {
+          if (jqXHR.status == 499 || jqXHR.readyState != 4) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
+            return;
+          }
           var errorData;
           try {
             if (jqXHR.responseText) {
@@ -69,9 +74,7 @@ export default {
   Contest: {
     activityReport: _call('/api/contest/activityReport/',
                           function(result) {
-                            for (var idx in result.events) {
-                              if (!result.events.hasOwnProperty(idx)) continue;
-                              var ev = result.events[idx];
+                            for (let ev of result.events) {
                               ev.time =
                                   omegaup.OmegaUp.remoteTime(ev.time * 1000);
                             }
@@ -125,6 +128,8 @@ export default {
 
     create: _call('/api/contest/create/'),
 
+    createVirtual: _call('/api/contest/createvirtual'),
+
     clone: _call('/api/contest/clone/'),
 
     details: _call('/api/contest/details/', _normalizeContestFields),
@@ -168,8 +173,6 @@ export default {
 
     scoreboard: _call('/api/contest/scoreboard/'),
 
-    scoreboardEvents: _call('/api/contest/scoreboardevents/'),
-
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
 
     stats: _call('/api/contest/stats/'),
@@ -180,6 +183,15 @@ export default {
   },
 
   Course: {
+    activityReport: _call('/api/course/activityReport/',
+                          function(result) {
+                            for (let ev of result.events) {
+                              ev.time =
+                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
+                            }
+                            return result;
+                          }),
+
     addAdmin: _call('/api/course/addAdmin/'),
 
     addGroupAdmin: _call('/api/course/addGroupAdmin/'),
@@ -193,6 +205,9 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
+
+    assignmentScoreboardEvents:
+        _call('/api/course/assignmentScoreboardEvents/'),
 
     clone: _call('/api/course/clone/'),
 
@@ -402,6 +417,12 @@ export default {
     updateStatement: _call('/api/problem/updateStatement/'),
   },
 
+  Problemset: {
+    scoreboard: _call('/api/problemset/scoreboard/'),
+
+    scoreboardEvents: _call('/api/problemset/scoreboardevents/'),
+  },
+
   QualityNomination: {
     create: _call('/api/qualitynomination/create/'),
 
@@ -447,6 +468,8 @@ export default {
 
     rejudge: _call('/api/run/rejudge/'),
 
+    disqualify: _call('/api/run/disqualify'),
+
     status: _call('/api/run/status/',
                   function(data) {
                     data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
@@ -489,6 +512,8 @@ export default {
   },
 
   User: {
+    acceptPrivacyPolicy: _call('/api/user/acceptPrivacyPolicy'),
+
     addExperiment: _call('/api/user/addexperiment/'),
 
     addGroup: _call('/api/user/addgroup/'),
@@ -498,6 +523,8 @@ export default {
     changePassword: _call('/api/user/changepassword/'),
 
     contestStats: _call('/api/user/conteststats/'),
+
+    coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
     /**
      * Creates a new user.

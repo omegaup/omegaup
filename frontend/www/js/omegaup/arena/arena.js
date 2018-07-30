@@ -10,30 +10,6 @@ import Vue from 'vue';
 
 export {ArenaAdmin};
 
-export function FormatDelta(delta) {
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-  delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
-  delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
-  delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
-
-  let clock = '';
-
-  if (days > 0) {
-    clock += days + ':';
-  }
-  if (hours < 10) clock += '0';
-  clock += hours + ':';
-  if (minutes < 10) clock += '0';
-  clock += minutes + ':';
-  if (seconds < 10) clock += '0';
-  clock += seconds;
-
-  return clock;
-}
-
 let ScoreboardColors = [
   '#FB3F51',
   '#FF5D40',
@@ -173,8 +149,8 @@ export class Arena {
 
     self.options = options;
 
-    // The current contest.
-    self.currentContest = null;
+    // The current problemset.
+    self.currentProblemset = null;
 
     // The interval for clock updates.
     self.clockInterval = null;
@@ -279,21 +255,23 @@ export class Arena {
       language: $('select[name="language"]', self.elements.submitForm),
     });
 
-    // Setup run details view
-    self.runDetailsView = new Vue({
-      el: '#run-details',
-      render: function(createElement) {
-        return createElement('omegaup-arena-rundetails', {
-          props: {
-            data: this.data,
-          },
-        });
-      },
-      data: {data: null},
-      components: {
-        'omegaup-arena-rundetails': arena_RunDetails,
-      },
-    });
+    // Setup run details view, if available.
+    if (document.getElementById('run-details') != null) {
+      self.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: {data: null},
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+    }
 
     // Setup any global hooks.
     self.bindGlobalHandlers();
@@ -353,17 +331,10 @@ export class Arena {
     let protocol = (window.location.protocol === 'https:') ? 'wss://' : 'ws://';
     let uris = [];
     // Backendv2 uri
-    uris.push(protocol + window.location.host + '/events/?filter=/contest/' +
-              self.options.contestAlias +
+    uris.push(protocol + window.location.host + '/events/?filter=/problemset/' +
+              self.options.problemsetId +
               (self.options.scoreboardToken ?
                    ('/' + self.options.scoreboardToken) :
-                   ''));
-    // Legacy uri
-    // TODO(lhchavez): Remove once we migrate to backendv2
-    uris.push(protocol + window.location.host + '/api/contest/events/' +
-              self.options.contestAlias + '/' +
-              (self.options.scoreboardToken ?
-                   ('?token=' + self.options.scoreboardToken) :
                    ''));
 
     function connect(uris, index) {
@@ -405,6 +376,13 @@ export class Arena {
     }
   }
 
+  initProblemsetId(problemset) {
+    let self = this;
+    if (problemset.hasOwnProperty('problemset_id')) {
+      self.options.problemsetId = problemset.problemset_id;
+    }
+  }
+
   initClock(start, finish, deadline) {
     let self = this;
 
@@ -423,56 +401,65 @@ export class Arena {
     }
   }
 
-  contestLoaded(contest) {
+  problemsetLoaded(problemset) {
     let self = this;
-    if (contest.status == 'error') {
+    if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
         window.location = '/login/?redirect=' + escape(window.location);
-      } else if (contest.start_time) {
+      } else if (problemset.start_time) {
         let f = (function(x, y) {
           return function() {
             let t = new Date();
             self.elements.loadingOverlay.html(
-                x + ' ' + FormatDelta(y.getTime() - t.getTime()));
+                x + ' ' + UI.formatDelta(y.getTime() - t.getTime()));
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
-              // TODO(pablo): Implement this for more than just contests.
-              API.Contest.details({contest_alias: x})
-                  .then(contestLoaded.bind(self))
+              API.Problemset.details({problemset_id: x})
+                  .then(problemsetLoaded.bind(self))
                   .fail(UI.ignoreError);
             }
           }
-        })(self.options.contestAlias, contest.start_time);
+        })(self.options.problemsetId, problemset.start_time);
         setTimeout(f, 1000);
       } else {
         self.elements.loadingOverlay.html('404');
       }
       return;
     }
-    if (self.options.isPractice && contest.finish_time &&
-        Date.now() < contest.finish_time.getTime()) {
+    if (self.options.isPractice && problemset.finish_time &&
+        Date.now() < problemset.finish_time.getTime()) {
       window.location = window.location.pathname.replace(/\/practice.*/, '/');
       return;
     }
 
-    if (contest.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = contest.problemset_id;
+    if (problemset.hasOwnProperty('problemset_id')) {
+      self.options.problemsetId = problemset.problemset_id;
     }
 
-    $('#title .contest-title').html(UI.escape(contest.title));
-    self.updateSummary(contest);
-    self.submissionGap = parseInt(contest.submission_gap);
+    if (problemset.hasOwnProperty('original_contest_alias')) {
+      self.options.originalContestAlias = problemset.original_contest_alias;
+    }
+
+    if (problemset.hasOwnProperty('original_problemset_id')) {
+      self.options.originalProblemsetId = problemset.original_problemset_id;
+    }
+
+    $('#title .contest-title')
+        .html(UI.escape(problemset.title || problemset.name));
+    self.updateSummary(problemset);
+    self.submissionGap = parseInt(problemset.submission_gap);
+
     if (!(self.submissionGap > 0)) self.submissionGap = 0;
 
-    self.initClock(contest.start_time, contest.finish_time,
-                   contest.submission_deadline);
-    self.initProblems(contest);
+    self.initClock(problemset.start_time, problemset.finish_time,
+                   problemset.submission_deadline);
+    self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
     let problemTemplate = $('#problem-list .template');
-    for (let idx in contest.problems) {
-      let problem = contest.problems[idx];
+    for (let idx in problemset.problems) {
+      let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
       let prob = problemTemplate.clone()
@@ -500,11 +487,11 @@ export class Arena {
     $('#root').fadeIn('slow');
   }
 
-  initProblems(contest) {
+  initProblems(problemset) {
     let self = this;
-    self.currentContest = contest;
-    self.contestAdmin = contest.admin;
-    let problems = contest.problems;
+    self.currentProblemset = problemset;
+    self.contestAdmin = problemset.admin;
+    let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
       let alias = problem.alias;
@@ -515,7 +502,7 @@ export class Arena {
     }
     if (self.elements.rankingTable) {
       self.elements.rankingTable.problems = problems;
-      self.elements.rankingTable.showPenalty = contest.show_penalty;
+      self.elements.rankingTable.showPenalty = problemset.show_penalty;
     }
   }
 
@@ -530,7 +517,7 @@ export class Arena {
     let clock = '';
 
     if (now < self.startTime.getTime()) {
-      clock = '-' + FormatDelta(self.startTime.getTime() - now);
+      clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -550,7 +537,7 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      clock = FormatDelta(countdownTime.getTime() - now);
+      clock = UI.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }
@@ -584,31 +571,119 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
-    if (self.options.contestAlias) {
-      API.Contest.scoreboard({contest_alias: self.options.contestAlias})
-          .then(self.rankingChange.bind(self))
-          .fail(UI.ignoreError);
-    } else if (self.options.assignmentAlias) {
-      API.Course.assignmentScoreboard({
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias
+    if (self.options.originalContestAlias != null) {
+      API.Problemset.scoreboardEvents(
+                        {problemset_id: self.options.problemsetId})
+          .then(function(response) {
+            let events = response.events;
+            for (let event of events) event.virtual = true;
+            API.Problemset.scoreboardEvents({
+                            problemset_id: self.options.originalProblemsetId
+                          })
+                .then(function(response) {
+                  events.push.apply(response.events);
+                  self.virtualRankingChange(events);
+                  self.onRankingEvents({events: events});
                 })
+                .fail(UI.ignoreError);
+          })
+          .fail(UI.ignoreError);
+    } else if (self.options.contestAdmin || self.options.contestAlias != null ||
+               self.contestAdmin) {
+      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
     }
   }
 
-  rankingChange(data) {
+  virtualRankingChange(data) {
+    let self = this;
+    let delta = (new Date()).getTime() - self.startTime.getTime();
+    let rank = [];
+
+    let problemOrder = {};
+    let problems = [];
+    let initialScores = [];
+
+    for (let problem of Object.values(self.problems)) {
+      problemOrder[problem.alias] = problems.length;
+      problems.push({order: problems.length + 1, alias: problem.alias});
+    }
+
+    data.forEach(function(env) {
+      if (env.delta > delta) return;
+      let key = env.username + (env.virtual ? '-virtual' : '');
+      if (!rank.hasOwnProperty(key)) {
+        rank[key] = {
+          country: env.country,
+          name: env.name,
+          username: env.username,
+          place: 0,
+          problems: [], virtual: env.virtual || false,
+        };
+        for (let j = 0; j < problems.length; j++) {
+          rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});
+        }
+        rank[key].total = {points: 0, penalty: 0};
+      }
+      let problem = rank[key].problems[problemOrder[env.problem.alias]];
+      rank[key].problems[problemOrder[env.problem.alias]] = {
+        penalty: env.problem.penalty,
+        points: env.problem.points,
+        runs: problem.runs + 1
+      };
+      rank[key].total = env.total;
+    });
+
+    let ranking = Object.values(rank);
+
+    ranking.sort(function(rank1, rank2) {
+      return rank2.total.points - rank1.total.points;
+    });
+
+    for (var index = 0; index < ranking.length; index++)
+      ranking[index].place = index + 1;
+
+    let scoreboard = {
+      finish_time: self.finishTime.getTime(),
+      start_time: self.startTime.getTime(),
+      time: Date.now(),
+      problems: problems,
+      ranking: ranking
+    };
+
+    self.rankingChange(scoreboard, false);
+  }
+
+  rankingChange(data, rankingEvent = true) {
     let self = this;
     self.onRankingChanged(data);
-
     let params = {
-      contest_alias: self.options.contestAlias,
+      problemset_id: self.options.problemsetId,
     };
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;
     }
-    API.Contest.scoreboardEvents(params)
+
+    if (rankingEvent) {
+      API.Problemset.scoreboardEvents(params)
+          .then(self.onRankingEvents.bind(self))
+          .fail(UI.ignoreError);
+    }
+  }
+
+  rankingCourseChange(data) {
+    let self = this;
+    self.onRankingChanged(data);
+
+    let params = {
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+    API.Course.assignmentScoreboardEvents(params)
         .then(self.onRankingEvents.bind(self))
         .fail(UI.ignoreError);
   }
@@ -636,10 +711,7 @@ export class Arena {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = rank.username + ((rank.name == rank.username) ?
-                                          '' :
-                                          (' (' + UI.escape(rank.name) + ')'));
-
+      let username = UI.rankingUsername(rank);
       currentRankingState[username] = {place: rank.place, accepted: {}};
 
       // Update problem scores.
@@ -698,7 +770,6 @@ export class Arena {
     let series = [];
     let usernames = {};
     this.currentEvents = data;
-
     // group points by person
     for (let i = 0, l = data.events.length; i < l; i++) {
       let curr = data.events[i];
@@ -829,7 +900,7 @@ export class Arena {
         contest: clarification.contest_alias,
         problem: clarification.problem_alias,
         message: clarification.message,
-        answer: clarification.answer,
+        answer: clarification.answer, public: clarification.public,
         anchor: '#' + anchor,
         modificationTime: clarification.time.getTime()
       });
@@ -854,6 +925,8 @@ export class Arena {
           if (clarification.public == 1) {
             $('#create-response-is-public', responseFormNode)
                 .attr('checked', 'checked');
+            $('#create-response-is-public', responseFormNode)
+                .prop('checked', true);
           }
           responseFormNode.on('submit', function() {
             let responseText = null;
@@ -909,7 +982,7 @@ export class Arena {
         contest: clarification.contest_alias,
         problem: clarification.problem_alias,
         message: clarification.message,
-        answer: clarification.answer,
+        answer: clarification.answer, public: clarification.public,
         anchor: '#' + anchor,
         modificationTime: clarification.time.getTime()
       });
@@ -927,6 +1000,9 @@ export class Arena {
     } else {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
+    }
+    if (clarification.public == 1) {
+      $('#create-response-is-public', r).prop('checked', true);
     }
   }
 
@@ -958,6 +1034,22 @@ export class Arena {
   }
 
   updateAllowedLanguages(lang_array) {
+    const allowedLanguages = [
+      {language: 'cpp11', name: 'C++11'},
+      {language: 'cpp', name: 'C++'},
+      {language: 'c', name: 'C'},
+      {language: 'cs', name: 'C#'},
+      {language: 'hs', name: 'Haskell'},
+      {language: 'java', name: 'Java'},
+      {language: 'pas', name: 'Pascal'},
+      {language: 'py', name: 'Python'},
+      {language: 'rb', name: 'Ruby'},
+      {language: 'lua', name: 'Lua'},
+      {language: 'kp', name: 'Karel (Pascal)'},
+      {language: 'kj', name: 'Karel (Java)'},
+      {language: 'cat', name: T.wordJustOutput},
+    ];
+
     let self = this;
 
     let can_submit = lang_array.length != 0;
@@ -965,21 +1057,34 @@ export class Arena {
     $('.runs').toggle(can_submit);
     $('.data').toggle(can_submit);
     $('.best-solvers').toggle(can_submit);
-    $('option', self.elements.submitForm.language)
-        .each(function(index, item) {
-          item = $(item);
-          item.toggle(lang_array.indexOf(item.val()) >= 0);
+
+    // refresh options in select
+    const languageSelect = document.querySelector('select[name="language"]');
+    while (languageSelect.firstChild)
+      languageSelect.removeChild(languageSelect.firstChild);
+
+    const languageArray =
+        typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+
+    allowedLanguages.filter(item => {
+                      return languageArray.includes(item.language);
+                    })
+        .forEach(optionItem => {
+          let optionNode = document.createElement('option');
+          optionNode.value = optionItem.language;
+          optionNode.appendChild(document.createTextNode(optionItem.name));
+          languageSelect.appendChild(optionNode);
         });
   }
 
   selectDefaultLanguage() {
     let self = this;
     let langElement = self.elements.submitForm.language;
+
     if (self.preferredLanguage) {
       $('option', langElement)
           .each(function() {
             let option = $(this);
-            if (option.css('display') == 'none') return;
             if (option.val() != self.preferredLanguage) return;
             option.prop('selected', true);
             return false;
@@ -990,11 +1095,10 @@ export class Arena {
     $('option', langElement)
         .each(function() {
           let option = $(this);
-          if (option.css('display') != 'none') {
-            option.prop('selected', true);
-            langElement.trigger('change');
-            return false;
-          }
+
+          option.prop('selected', true);
+          langElement.trigger('change');
+          return false;
         });
   }
 
@@ -1109,6 +1213,7 @@ export class Arena {
         $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
         $('#problem .overall_wall_time_limit')
             .text(problem.overall_wall_time_limit / 1000 + 's');
+        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
@@ -1184,6 +1289,7 @@ export class Arena {
                 problem.libinteractive_interface_name =
                     problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
+                problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
                 self.preferredLanguage = problem_ext.preferred_language;
@@ -1243,6 +1349,9 @@ export class Arena {
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
         problem.statement.markdown, problem.statement.images);
+
+    UI.renderSampleToClipboardButton();
+
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
     if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
@@ -1324,7 +1433,7 @@ export class Arena {
                  problem.runs.length > 0) {
         nextSubmissionTimestamp =
             new Date(problem.runs[problem.runs.length - 1].time.getTime() +
-                     self.currentContest.submissions_gap * 1000);
+                     self.currentProblemset.submissions_gap * 1000);
       }
     }
     if (self.submissionGapInterval) {
@@ -1401,8 +1510,10 @@ export class Arena {
           extension == 'kp' || extension == 'kj' || extension == 'p' ||
           extension == 'pas' || extension == 'py' || extension == 'rb' ||
           extension == 'lua') {
-        if (file.size >= 10 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, {limit: '10kB'}));
+        if (file.size >= self.currentProblem.input_limit) {
+          alert(UI.formatString(
+              T.arenaRunSubmitFilesize,
+              {limit: (self.currentProblem.input_limit / 1024 + ' KiB')}));
           return false;
         }
         reader.readAsText(file, 'UTF-8');
@@ -1496,7 +1607,7 @@ export class Arena {
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(
-        FormatDelta((contest.window_length * 60000) || duration));
+        UI.formatDelta((contest.window_length * 60000) || duration));
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(Highcharts.dateFormat(
         '%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
@@ -1571,6 +1682,7 @@ export class Arena {
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
+      language: data.language,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }
@@ -1750,6 +1862,7 @@ class ObservableRun {
 
     self.alias = ko.observable(run.alias);
     self.contest_alias = ko.observable(run.contest_alias);
+    self.problemset_id = ko.observable(run.problemset_id);
     self.contest_score = ko.observable(run.contest_score);
     self.country_id = ko.observable(run.country_id);
     self.judged_by = ko.observable(run.judged_by);
@@ -1760,6 +1873,7 @@ class ObservableRun {
     self.runtime = ko.observable(run.runtime);
     self.score = ko.observable(run.score);
     self.status = ko.observable(run.status);
+    self.type = ko.observable(run.type);
     self.submit_delay = ko.observable(run.submit_delay);
     self.time = ko.observable(run.time);
     self.username = ko.observable(run.username);
@@ -1862,6 +1976,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
+    if (self.type() == 'disqualified') return T['wordsDisqualify'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -1889,6 +2004,8 @@ class ObservableRun {
     let self = this;
 
     if (self.status() != 'ready') return '';
+
+    if (self.type() == "disqualified") return '#F00';
 
     if (self.verdict() == 'AC') {
       return '#CF6';
@@ -1931,6 +2048,16 @@ class ObservableRun {
     API.Run.rejudge({run_alias: self.guid, debug: false})
         .then(function(data) {
           self.status('rejudging');
+          self.arena.updateRunFallback(self.guid);
+        })
+        .fail(UI.ignoreError);
+  }
+
+  disqualify() {
+    let self = this;
+    API.Run.disqualify({run_alias: self.guid})
+        .then(function(data) {
+          self.type('disqualifed');
           self.arena.updateRunFallback(self.guid);
         })
         .fail(UI.ignoreError);

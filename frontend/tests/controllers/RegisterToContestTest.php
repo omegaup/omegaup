@@ -75,7 +75,7 @@ class RegisterToContestTest extends OmegaupTestCase {
      */
     public function testShowIntro() {
         $contestant = UserFactory::createUser();
-        $contestData = ContestsFactory::createContest(new ContestParams(['public' => 0]));
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -97,13 +97,15 @@ class RegisterToContestTest extends OmegaupTestCase {
         // create a contest and its admin
         $contestAdmin = UserFactory::createUser();
         $contestData = ContestsFactory::createContest(new ContestParams(['contestDirector' => $contestAdmin]));
+        $problemData = ProblemsFactory::createProblem();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // make it "registrable"
         self::log('Update contest to make it registrable');
         $adminLogin = self::login($contestAdmin);
         $r1 = new Request([
             'contest_alias' => $contestData['request']['alias'],
-            'contestant_must_register' => true,
+            'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
         ]);
         ContestController::apiUpdate($r1);
@@ -175,12 +177,14 @@ class RegisterToContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
+        $problemData = ProblemsFactory::createProblem();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // make it "registrable"
         $adminLogin = self::login($contestAdmin);
         $r1 = new Request([
             'contest_alias' => $contestData['request']['alias'],
-            'contestant_must_register' => true,
+            'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
         ]);
         ContestController::apiUpdate($r1);

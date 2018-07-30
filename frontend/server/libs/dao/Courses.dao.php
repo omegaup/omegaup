@@ -40,13 +40,19 @@ class CoursesDAO extends CoursesDAOBase {
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
         $sql = "
             SELECT
-                a.*
+                a.*,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Courses c
             INNER JOIN
                 Assignments a
             ON
                 a.course_id = c.course_id
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = a.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             ORDER BY
@@ -102,9 +108,9 @@ class CoursesDAO extends CoursesDAOBase {
                 INNER JOIN Identities i
                     ON i.identity_id = gi.identity_id
                 LEFT JOIN (
-                    SELECT bpr.alias, bpr.user_id, sum(best_score_of_problem) as assignment_score
+                    SELECT bpr.alias, bpr.identity_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
@@ -114,11 +120,11 @@ class CoursesDAO extends CoursesDAOBase {
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
                         WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
                     ) bpr
-                    GROUP BY bpr.assignment_id, bpr.user_id
+                    GROUP BY bpr.assignment_id, bpr.identity_id
                 ) pr
-                ON pr.user_id = i.user_id';
+                ON pr.identity_id = i.identity_id';
 
         $rs = $conn->Execute($sql, [$group_id, $course_id]);
         $progress = [];
@@ -151,7 +157,7 @@ class CoursesDAO extends CoursesDAOBase {
      * @param  int $user_id
      * @return Array Students data
      */
-    public static function getAssignmentsProgress($course_id, $user_id) {
+    public static function getAssignmentsProgress($course_id, $identity_id) {
         global  $conn;
 
         $sql = 'SELECT a.alias as assignment, IFNULL(pr.total_score, 0) as score, a.max_points as max_score
@@ -160,23 +166,23 @@ class CoursesDAO extends CoursesDAOBase {
                     -- aggregate all runs per assignment
                     SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
                     FROM (
-                        -- get all runs belonging to an user and get the best score
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.user_id, max(r.contest_score) as best_score_of_problem
+                        -- get all runs belonging to an identity and get the best score
+                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemset_Problems psp
                             ON a.problemset_id = psp.problemset_id
                         INNER JOIN Runs r
                             ON r.problem_id = psp.problem_id
                             AND r.problemset_id = a.problemset_id
-                        WHERE a.course_id = ? AND r.user_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.user_id
+                        WHERE a.course_id = ? AND r.identity_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id
                 ) pr
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = $conn->Execute($sql, [$course_id, $user_id, $course_id]);
+        $rs = $conn->Execute($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -331,28 +337,34 @@ class CoursesDAO extends CoursesDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function isFirstTimeAccess($identity_id, Courses $course, Groups $group) {
+    final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
+        if ($course->group_id != $group->group_id) {
+            return true;
+        }
         $sql = '
             SELECT
-                share_user_information
+                gi.share_user_information,
+                accept_teacher
             FROM
                 Groups_Identities AS gi
-            INNER JOIN
-                Courses AS c ON gi.group_id = c.group_id
+            LEFT JOIN
+                PrivacyStatement_Consent_Log AS pcl
+            ON
+                gi.privacystatement_consent_id = pcl.privacystatement_consent_id
             WHERE
                 gi.identity_id = ?
-            AND
-                gi.group_id = ?
-            AND
-                c.course_id = ?
+                AND gi.group_id = ?
             ';
         $params = [
             $identity_id,
             $group->group_id,
-            $course->course_id
         ];
-
         global $conn;
-        return $conn->GetOne($sql, $params) == null;
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+
+        return $row;
     }
 }

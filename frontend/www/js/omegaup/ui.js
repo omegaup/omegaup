@@ -9,6 +9,38 @@ let UI = {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
 
+  formatDelta: function(delta) {
+    let days = Math.floor(delta / (24 * 60 * 60 * 1000));
+    delta -= days * (24 * 60 * 60 * 1000);
+    let hours = Math.floor(delta / (60 * 60 * 1000));
+    delta -= hours * (60 * 60 * 1000);
+    let minutes = Math.floor(delta / (60 * 1000));
+    delta -= minutes * (60 * 1000);
+    let seconds = Math.floor(delta / 1000);
+
+    let clock = '';
+
+    if (days > 0) {
+      clock += days + ':';
+    }
+    if (hours < 10) clock += '0';
+    clock += hours + ':';
+    if (minutes < 10) clock += '0';
+    clock += minutes + ':';
+    if (seconds < 10) clock += '0';
+    clock += seconds;
+
+    return clock;
+  },
+
+  rankingUsername: function(rank) {
+    let username = rank.username;
+    if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
+    if (rank.virtual)
+      username = UI.formatString(T.virtualSuffix, {username: username});
+    return username;
+  },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;
@@ -132,30 +164,25 @@ let UI = {
 
   typeaheadWrapper: function(f) {
     let lastRequest = null;
-    let pending = false;
+    let pendingRequest = false;
     function wrappedCall(query, syncResults, asyncResults) {
-      if (pending) {
+      if (pendingRequest) {
         lastRequest = arguments;
         return;
       }
-      pending = true;
+      pendingRequest = true;
       f({query: query})
-          .then(function(data) {
-            if (lastRequest != null) {
-              // Typeahead will ignore any stale callbacks. Given that we
-              // will start a new request ASAP, let's do a best-effort
-              // asyncResults to the current request with the old data.
-              lastRequest[2](data.results || data);
-              pending = false;
-              let request = lastRequest;
-              lastRequest = null;
-              wrappedCall.apply(null, request);
-              return;
-            }
-            asyncResults(data.results || data);
-          })
+          .then(data => asyncResults(data.results || data))
           .fail(UI.ignoreError)
-          .always(function() { pending = false; });
+          .always(() => {
+            pendingRequest = false;
+
+            // If there is a pending request, send it out now.
+            if (!lastRequest) return;
+            let currentRequest = lastRequest;
+            lastRequest = null;
+            wrappedCall(...currentRequest);
+          });
     }
     return wrappedCall;
   },
@@ -171,6 +198,12 @@ let UI = {
               source: UI.typeaheadWrapper(searchFn),
               async: true,
               display: 'label',
+              templates: {
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
+                },
+              },
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb);
@@ -189,8 +222,9 @@ let UI = {
               display: 'alias',
               templates: {
                 suggestion: function(val) {
-                  return UI.formatString('<strong>%(title)</strong> (%(alias))',
-                                         val);
+                  return UI.formatString(
+                      '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+                      val);
                 }
               }
             })
@@ -230,6 +264,12 @@ let UI = {
               source: substringMatcher,
               async: true,
               display: 'alias',
+              templates: {
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(alias)">%(alias)</div>', val);
+                },
+              },
             })
         .on('typeahead:select', cb)
         .on('typeahead:autocomplete', cb);
@@ -248,6 +288,10 @@ let UI = {
               display: 'label',
               templates: {
                 empty: T.schoolToBeAdded,
+                suggestion: function(val) {
+                  return UI.formatString(
+                      '<div data-value="%(value)">%(label)</div>', val);
+                },
               }
             })
         .on('typeahead:select', cb)
@@ -296,6 +340,41 @@ let UI = {
   },
 
   formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
+
+  copyToClipboard: function(value) {
+    let tempInput = document.createElement('textarea');
+
+    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
+    tempInput.value = value;
+
+    document.body.appendChild(tempInput);
+
+    try {
+      tempInput.select();  // refactor-lint-disable
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(tempInput);
+    }
+  },
+
+  renderSampleToClipboardButton: function() {
+    document.querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
+        .forEach(function(item, index) {
+          let inputValue = item.querySelector('pre').innerHTML;
+
+          let clipboardButton = document.createElement('button');
+          clipboardButton.title = T.copySampleCaseTooltip;
+          clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
+
+          clipboardButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            UI.copyToClipboard(inputValue);
+          });
+
+          item.appendChild(clipboardButton);
+        });
+  },
 
   markdownConverter: function(options) {
     options = options || {};
@@ -440,6 +519,7 @@ let UI = {
               columns++;
             }
             result += '</tr></tbody>';
+
             return hashBlock('<table class="sample_io">\n' + result +
                              '\n</table>');
           });
@@ -462,6 +542,11 @@ export {UI as default};
 
 $(document)
     .ajaxError(function(e, xhr, settings, exception) {
+      if (xhr.status == 499 || xhr.readyState != 4) {
+        // If we cancel the connection, let's just swallow the error since
+        // the user is not going to see it.
+        return;
+      }
       try {
         var responseText = xhr.responseText;
         var response = {};

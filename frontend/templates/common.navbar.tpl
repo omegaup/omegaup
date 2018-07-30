@@ -19,7 +19,7 @@
 						{if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
 							<li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
-								<li id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
+								<li class="dropdown" id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
@@ -28,7 +28,7 @@
 										<li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
 									</ul>
 								</li>
-								<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
+								<li class="dropdown" id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
@@ -71,6 +71,19 @@
 								</ul>
 							</li>
 						{/if} <!-- CURRENT_USER_IS_ADMIN -->
+						{else} <!-- OMEGAUP_LOCKDOWN -->
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+						{if $LOGGED_IN eq '1'}
+							<li class="dropdown">
+							<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
+								<ul class="dropdown-menu">
+								 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
+								</ul>
+							</li>
+						{else} <!-- LOGGED_IN -->
+							<li><a href="/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}">{#navLogIn#}</a></li>
+						{/if} <!-- LOGGED_IN -->
 						{/if} <!-- OMEGAUP_LOCKDOWN -->
 						</ul>
 					</div>

@@ -26,7 +26,7 @@ def update_user_rank(cur):
         SET
             p.accepted = (
                 SELECT
-                    COUNT(DISTINCT r.user_id)
+                    COUNT(DISTINCT r.identity_id)
                 FROM
                     Runs r
                 WHERE
@@ -36,32 +36,35 @@ def update_user_rank(cur):
     logging.info('Updating user rank...')
     cur.execute('''
         SELECT
-            username,
-            name,
-            country_id,
-            state_id,
-            school_id,
-            up.user_id,
+            i.username,
+            i.name,
+            i.country_id,
+            i.state_id,
+            i.school_id,
+            up.identity_id,
+            i.user_id,
             COUNT(ps.problem_id) problems_solved_count,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
         FROM
         (
             SELECT DISTINCT
-              r.user_id,
+              r.identity_id,
               r.problem_id
             FROM
               Runs r
             WHERE
-              r.verdict = 'AC' AND r.test = 0
+              r.verdict = 'AC' AND r.type = 'normal'
         ) AS up
         INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
         INNER JOIN
-            Users u ON u.user_id = up.user_id
+            Identities i ON i.identity_id = up.identity_id
+        INNER JOIN
+            Users u ON u.user_id = i.user_id
         WHERE
             u.is_private = 0
         GROUP BY
-            user_id
+            identity_id
         ORDER BY
             score DESC;
     ''')

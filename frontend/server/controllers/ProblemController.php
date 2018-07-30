@@ -114,6 +114,7 @@ class ProblemController extends Controller {
         Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
         Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
         Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
+        Validators::isNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -154,6 +155,7 @@ class ProblemController extends Controller {
         $problem->extra_wall_time = $r['extra_wall_time'];
         $problem->memory_limit = $r['memory_limit'];
         $problem->output_limit = $r['output_limit'];
+        $problem->input_limit = $r['input_limit'];
         $problem->visits = 0;
         $problem->submissions = 0;
         $problem->accepted = 0;
@@ -658,8 +660,8 @@ class ProblemController extends Controller {
         $runs = [];
         try {
             $runs = RunsDAO::search(new Runs([
-                                'problem_id' => $r['problem']->problem_id
-                            ]));
+                'problem_id' => $r['problem']->problem_id
+            ]));
 
             $guids = [];
             foreach ($runs as $run) {
@@ -714,6 +716,7 @@ class ProblemController extends Controller {
             'extra_wall_time' => ['important' => true], // requires rejudge
             'memory_limit'  => ['important' => true], // requires rejudge
             'output_limit'  => ['important' => true], // requires rejudge
+            'input_limit'  => ['important' => true], // requires rejudge
             'email_clarifications',
             'source',
             'order',
@@ -916,7 +919,7 @@ class ProblemController extends Controller {
             if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (isset($r['contest'])) {
-                    if ($r['contest']->public != '1') {
+                    if (!ContestController::isPublic($r['contest']->admission_mode)) {
                         if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }
@@ -1201,9 +1204,9 @@ class ProblemController extends Controller {
         // Create array of relevant columns
         $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
             'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'visits', 'submissions', 'accepted',
-            'difficulty', 'creation_date', 'source', 'order', 'points', 'visibility',
-            'languages', 'slow', 'email_clarifications'];
+            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
+            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
+            'visibility','languages', 'slow', 'email_clarifications'];
 
         $response['statement'] = ProblemController::getProblemStatement(
             $r['problem']->alias,
@@ -1284,15 +1287,14 @@ class ProblemController extends Controller {
                 'submit_delay'];
 
             // Search the relevant runs from the DB
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id,
-                'problemset_id' => $problemset_id
-            ]);
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id,
+                    'problemset_id' => $problemset_id
+                ]));
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
@@ -1336,7 +1338,7 @@ class ProblemController extends Controller {
             if (!ProblemsetProblemOpenedDAO::getByPK(
                 $problemset_id,
                 $r['problem']->problem_id,
-                $r['current_user_id']
+                $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
@@ -1344,7 +1346,7 @@ class ProblemController extends Controller {
                         'problemset_id' => $problemset_id,
                         'problem_id' => $r['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
-                        'user_id' => $r['current_user_id']
+                        'identity_id' => $r['current_identity_id']
                     ]));
                 } catch (Exception $e) {
                     // Operation failed in the data layer
@@ -1355,9 +1357,9 @@ class ProblemController extends Controller {
             $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
         }
 
-        if (!is_null($r['current_user_id'])) {
+        if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
-                $r['current_user_id'],
+                $r['current_identity_id'],
                 $r['problem']->problem_id
             );
         }
@@ -1420,7 +1422,7 @@ class ProblemController extends Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['user'] = UsersDAO::FindByUsername($r['username']);
+                    $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new NotFoundException('userNotFound');
                 }
@@ -1432,7 +1434,7 @@ class ProblemController extends Controller {
                     $r['verdict'],
                     $r['problem']->problem_id,
                     $r['language'],
-                    !is_null($r['user']) ? $r['user']->user_id : null,
+                    !is_null($r['identity']) ? $r['identity']->identity_id : null,
                     $r['offset'],
                     $r['rowcount']
                 );
@@ -1454,14 +1456,12 @@ class ProblemController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         } else {
-            $keyrun = new Runs([
-                'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->problem_id
-            ]);
-
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::search($keyrun);
+                $runs_array = RunsDAO::search(new Runs([
+                    'identity_id' => $r['current_identity_id'],
+                    'problem_id' => $r['problem']->problem_id
+                ]));
 
                 // Create array of relevant columns for list of runs
                 $relevant_columns = ['guid', 'language', 'status', 'verdict',
@@ -1855,11 +1855,11 @@ class ProblemController extends Controller {
         // Uses same params as apiDetails, except for lang, which is optional
         self::validateDetails($r);
 
-        // If username is set in the request, we use that user as target.
+        // If username is set in the request, we use that identity as target.
         // else, we query using current_user
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        $response['score'] = self::bestScore($r, $user);
+        $response['score'] = self::bestScore($r, $identity);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1876,10 +1876,10 @@ class ProblemController extends Controller {
      * @return float
      * @throws InvalidDatabaseOperationException
      */
-    private static function bestScore(Request $r, Users $user = null) {
-        $current_user_id = (is_null($user) ? $r['current_user_id'] : $user->user_id);
+    private static function bestScore(Request $r, Identities $identity = null) {
+        $current_identity_id = (is_null($identity) ? $r['current_identity_id'] : $identity->identity_id);
 
-        if (is_null($current_user_id)) {
+        if (is_null($current_identity_id)) {
             return 0;
         }
 
@@ -1887,12 +1887,12 @@ class ProblemController extends Controller {
         try {
             // Add best score info
             if (!self::validateProblemset($r)) {
-                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
+                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_identity_id);
             } else {
                 $bestRun = RunsDAO::GetBestRun(
                     $r['problemset']->problemset_id,
                     $r['problem']->problem_id,
-                    $current_user_id,
+                    $current_identity_id,
                     false /*showAllRuns*/
                 );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;

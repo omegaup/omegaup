@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
             if (!omegaup.OmegaUp.loggedIn) {
               window.location = '/login/?redirect=' + escape(window.location);
             } else {
-              $('#loading').html('404');
+              window.location = '/';
             }
             return;
           } else if (arena.options.isPractice && contest.finish_time &&
@@ -44,7 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
 
           arena.initClock(contest.start_time, contest.finish_time);
           arena.initProblems(contest);
-
+          arena.initProblemsetId(contest);
           for (var idx in contest.problems) {
             var problem = contest.problems[idx];
             var problemName =
@@ -103,7 +103,7 @@ omegaup.OmegaUp.on('ready', function() {
           if (!omegaup.OmegaUp.loggedIn) {
             window.location = '/login/?redirect=' + escape(window.location);
           } else {
-            $('#loading').html('404');
+            window.location = '/';
           }
         });
   }

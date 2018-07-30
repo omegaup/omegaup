@@ -21,6 +21,12 @@ class UserController extends Controller {
 
     const SENDY_SUCCESS = '1';
 
+    // Languages
+    const LANGUAGE_ES = 1;
+    const LANGUAGE_EN = 2;
+    const LANGUAGE_PT = 3;
+    const LANGUAGE_PSEUDO = 4;
+
     /**
      * Entry point for Create a User API
      *
@@ -186,7 +192,7 @@ class UserController extends Controller {
 
         return [
             'status' => 'ok',
-            'user_id' => $user->user_id
+            'username' => $identity->username,
         ];
     }
 
@@ -272,7 +278,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user_id) && is_null($email) && is_null($username)) {
-            throw new ApiException('mustProvideUSerIdEmailOrUsername');
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         $vo_UserToTest = null;
@@ -546,7 +552,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
@@ -1049,13 +1055,31 @@ class UserController extends Controller {
             $keys = [
                 'PYE-AGS18' => 40,
             ];
+        } elseif ($r['contest_type'] == 'CAPKnuth') {
+            if ($r['current_user']->username != 'galloska'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'ESCOM2018' => 50,
+            ];
+        } elseif ($r['contest_type'] == 'CAPVirtualKnuth') {
+            if ($r['current_user']->username != 'galloska'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = [
+                'Virtual-ESCOM2018' => 50,
+            ];
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth',
                 ]
             );
         }
@@ -1198,7 +1222,6 @@ class UserController extends Controller {
         $response['userinfo']['preferred_language'] = $user->preferred_language;
         $response['userinfo']['is_private'] = $user->is_private;
         $response['userinfo']['verified'] = $user->verified == '1';
-        $response['userinfo']['recruitment_optin'] = is_null($user->recruitment_optin) ? null : $user->recruitment_optin;
         $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
 
         if (!is_null($user->language_id)) {
@@ -1388,40 +1411,39 @@ class UserController extends Controller {
             // Get first day of the current month
             $firstDay = date('Y-m-01');
         }
+
         try {
-            $coderOfTheMonth = null;
+            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
 
-            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay]));
-            if (count($codersOfTheMonth) > 0) {
-                $coderOfTheMonth = $codersOfTheMonth[0];
-            }
-
-            if (is_null($coderOfTheMonth)) {
+            if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
                 // Generate the coder
-                $retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
-                if ($retArray == null) {
+                $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+                if (is_null($users)) {
                     return [
                         'status' => 'ok',
                         'userinfo' => null,
                         'problems' => null,
                     ];
                 }
-                $user = $retArray['user'];
 
-                // Save it
-                $c = new CoderOfTheMonth([
-                    'user_id' => $user->user_id,
-                    'time' => $firstDay,
-                ]);
-                CoderOfTheMonthDAO::save($c);
-            } else {
-                // Grab the user info
-                $user = UsersDAO::getByPK($coderOfTheMonth->user_id);
+                $codersOfTheMonth = [];
+                foreach ($users as $index => $user) {
+                    // Save it
+                    $c = new CoderOfTheMonth([
+                        'user_id' => $user['user_id'],
+                        'time' => $firstDay,
+                        'rank' => $index + 1,
+                    ]);
+                    CoderOfTheMonthDAO::save($c);
+                    array_push($codersOfTheMonth, $c);
+                }
             }
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
+
+        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = self::getProfileImpl($user);
@@ -1442,13 +1464,21 @@ class UserController extends Controller {
         $response = [];
         $response['coders'] = [];
         try {
-            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            $coders = [];
+            if (!empty($r['date'])) {
+                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            } else {
+                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            }
             foreach ($coders as $c) {
+                $userInfo = UsersDAO::FindByUsername($c['username']);
+                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
                 $response['coders'][] = [
                     'username' => $c['username'],
                     'country_id' => $c['country_id'],
                     'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time']
+                    'date' => $c['time'],
+                    'classname' => $classname,
                 ];
             }
         } catch (Exception $e) {
@@ -1519,36 +1549,41 @@ class UserController extends Controller {
         $response = [];
         $response['contests'] = [];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        // Get contests where user had at least 1 run
+        // Get contests where identity had at least 1 run
         try {
-            $contestsParticipated = ContestsDAO::getContestsParticipated($user->user_id);
+            $contestsParticipated = ContestsDAO::getContestsParticipated($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $contests = [];
-        foreach ($contestsParticipated as $contest) {
-            // Get user ranking
-            $scoreboardR = new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $contest->alias,
-                'token' => $contest->scoreboard_url_admin
-            ]);
-            $scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 
-            // Grab the place of the current user in the given contest
-            $contests[$contest->alias]['place']  = null;
-            foreach ($scoreboardResponse['ranking'] as $userData) {
-                if ($userData['username'] == $user->username) {
-                    $contests[$contest->alias]['place'] = $userData['place'];
+        foreach ($contestsParticipated as $contest) {
+            // Get identity ranking
+            $scoreboardResponse = ContestController::apiScoreboard(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $contest['alias'],
+                    'token' => $contest['scoreboard_url_admin'],
+                ])
+            );
+
+            // Grab the place of the current identity in the given contest
+            $contests[$contest['alias']]['place'] = null;
+            foreach ($scoreboardResponse['ranking'] as $identityData) {
+                if ($identityData['username'] == $identity->username) {
+                    $contests[$contest['alias']]['place'] = $identityData['place'];
                     break;
                 }
             }
-
-            $contest->toUnixTime();
-            $contests[$contest->alias]['data'] = $contest->asArray();
+            $contests[$contest['alias']]['data'] = $contest;
+            foreach ($contest as $key => $item) {
+                if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
+                    $contests[$contest['alias']][$key] = strtotime($item);
+                }
+            }
         }
 
         $response['contests'] = $contests;
@@ -1569,17 +1604,17 @@ class UserController extends Controller {
         $response = [];
         $response['problems'] = [];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
         try {
-            $db_results = ProblemsDAO::getProblemsSolved($user->user_id);
+            $problems = ProblemsDAO::getProblemsSolved($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!is_null($db_results)) {
+        if (!is_null($problems)) {
             $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
-            foreach ($db_results as $problem) {
+            foreach ($problems as $problem) {
                 if (ProblemsDAO::isVisible($problem)) {
                     array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
                 }
@@ -1604,16 +1639,16 @@ class UserController extends Controller {
             'status' => 'ok',
         ];
 
-        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
         try {
-            $db_results = ProblemsDAO::getProblemsUnsolvedByUser($user->user_id);
+            $problems = ProblemsDAO::getProblemsUnsolvedByIdentity($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
-        foreach ($db_results as $problem) {
+        foreach ($problems as $problem) {
             if (ProblemsDAO::isVisible($problem)) {
                 array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
             }
@@ -1665,14 +1700,15 @@ class UserController extends Controller {
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
-        if ((is_null($r['current_user']) || $r['current_user']->username != $user->username)
+        if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
             && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
         try {
-            $runsPerDatePerVerdict = RunsDAO::CountRunsOfUserPerDatePerVerdict($user->user_id);
+            $runsPerDatePerVerdict = RunsDAO::CountRunsOfIdentityPerDatePerVerdict($identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1832,10 +1868,6 @@ class UserController extends Controller {
             Validators::isNumber($r['is_private'], 'is_private', true);
         }
 
-        if (!is_null($r['recruitment_optin'])) {
-            Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
-        }
-
         if (!is_null($r['hide_problem_tags'])) {
             Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
         }
@@ -1860,7 +1892,6 @@ class UserController extends Controller {
             }],
             'gender',
             'is_private',
-            'recruitment_optin',
             'hide_problem_tags',
         ];
 
@@ -2002,6 +2033,8 @@ class UserController extends Controller {
      */
     public static function deleteProblemsSolvedRankCacheList() {
         Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
+        Cache::invalidateAllKeys(Cache::CONTESTANT_SCOREBOARD_PREFIX);
+        Cache::invalidateAllKeys(Cache::ADMIN_SCOREBOARD_PREFIX);
     }
 
     /**
@@ -2085,6 +2118,7 @@ class UserController extends Controller {
             'admin' => false,
             'problem_admin' => [],
             'contest_admin' => [],
+            'problemset' => [],
         ];
 
         $session = SessionController::apiCurrentSession($r)['session'];
@@ -2131,6 +2165,19 @@ class UserController extends Controller {
                         $r2['token'] = $tokens[3];
                     }
                     ContestController::validateDetails($r2);
+                    if ($r2['contest_admin']) {
+                        $response['contest_admin'][] = $r2['contest_alias'];
+                    }
+                    break;
+                case 'problemset':
+                    if (count($tokens) < 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $r2 = ProblemsetController::wrapRequest(new Request([
+                        'problemset_id' => $tokens[2],
+                        'auth_token' => $r['auth_token'],
+                        'tokens' => $tokens
+                    ]));
                     if ($r2['contest_admin']) {
                         $response['contest_admin'][] = $r2['contest_alias'];
                     }
@@ -2383,6 +2430,38 @@ class UserController extends Controller {
         ];
     }
 
+    /**
+     * Gets the last privacy policy saved in the data base
+     * @throws ForbiddenAccessException
+     */
+    public static function getPrivacyPolicy(Request $r) {
+        self::authenticateRequest($r);
+
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+
+        $lang = 'es';
+        if ($user->language_id == UserController::LANGUAGE_EN ||
+            $user->language_id == UserController::LANGUAGE_PSEUDO) {
+            $lang = 'en';
+        } elseif ($user->language_id == UserController::LANGUAGE_PT) {
+            $lang = 'pt';
+        }
+        $latest_statement = PrivacyStatementsDAO::getLatestPublishedStatement();
+        return [
+            'status' => 'ok',
+            'policy_markdown' => file_get_contents(
+                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
+            ),
+            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                $latest_statement['privacystatement_id']
+            ),
+            'git_object_id' => $latest_statement['git_object_id'],
+            'statement_type' => 'privacy_policy',
+        ];
+    }
+
     private static function getSelectedFilter($r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
@@ -2400,6 +2479,52 @@ class UserController extends Controller {
             return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
         }
         return ['filteredBy' => null, 'value' => null];
+    }
+
+    /**
+     * Gets the last privacy policy accepted by user
+     *
+     * @param Request $r
+     */
+    public static function apiLastPrivacyPolicyAccepted(Request $r) {
+        self::authenticateRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+        return [
+            'status' => 'ok',
+            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+                $identity->identity_id,
+                PrivacyStatementsDAO::getLatestPublishedStatement()['privacystatement_id']
+            ),
+        ];
+    }
+
+    /**
+     * Keeps a record of a user who accepts the privacy policy
+     *
+     * @param Request $r
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiAcceptPrivacyPolicy(Request $r) {
+        self::authenticateRequest($r);
+        $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+        if (is_null($privacystatement_id)) {
+            throw new NotFoundException('privacyStatementNotFound');
+        }
+        $identity = self::resolveTargetIdentity($r);
+
+        try {
+            $response = PrivacyStatementConsentLogDAO::saveLog(
+                $identity->identity_id,
+                $privacystatement_id
+            );
+            $sessionController = new SessionController();
+            $sessionController->InvalidateCache();
+        } catch (Exception $e) {
+            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+        }
+
+        return ['status' => 'ok'];
     }
 }
 

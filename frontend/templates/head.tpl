@@ -21,7 +21,7 @@
 		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
-{if isset($inArena) && $inArena}
+{if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
@@ -39,7 +39,9 @@
 		<link rel="stylesheet" href="/third_party/css/reset.css" />
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
-
+        <!-- Social media button -->
+        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.12" charset="utf-8"></script>
+        <script async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
@@ -65,6 +67,7 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 {/if}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/common.css"}" />
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 

@@ -80,6 +80,28 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     }
 
     /**
+     * Copy problemset problems from one problem set to the new problemset
+     * @param Number, Number
+     * @return void
+     */
+    public static function copyProblemset($new_problemset, $old_problemset) {
+        $sql = '
+            INSERT INTO
+                Problemset_Problems (problemset_id, problem_id, points, `order`)
+            SELECT
+                ?, problem_id, points, `order`
+            FROM
+                Problemset_Problems
+            WHERE
+                Problemset_Problems.problemset_id = ?;
+        ';
+        global $conn;
+        $params = [$new_problemset, $old_problemset];
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
+    }
+
+    /**
       * Update problemset order.
       *
       * @return Affected Rows

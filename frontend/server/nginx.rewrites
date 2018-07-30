@@ -41,6 +41,9 @@ location ^~ /events/ {
 
 # Backendv2 grader web interface.
 location /grader/ {
+  try_files $uri $uri/ @grader;
+}
+location @grader {
 	rewrite    ^/grader/(.*) /$1 break;
 	proxy_pass http://localhost:36663;
 }
@@ -52,6 +55,7 @@ rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/print/?$ /arena/problemprint.php?problem_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/practice/?$ /arena/practice.php?contest_alias=$1  last;
+rewrite ^/arena/([a-zA-Z0-9_+-]+)/virtual/?$ /arena/virtual.php?contest_alias=$1  last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/print/?$ /arena/contestprint.php?alias=$1 last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/[a-zA-Z0-9_+-]+/?$ /arena/scoreboard.php last;
@@ -65,9 +69,11 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contestactivity.php?contest=$1 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contestedit.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;
 rewrite ^/course/?$ /courselist.php last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /courseactivity.php?course=$1 last;
 rewrite ^/course/new/?$ /coursenew.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /coursescoreboard.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /courseedit.php?course=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /coursestudent.php?course=$1&student=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /coursestudents.php?course=$1 last;
@@ -100,4 +106,5 @@ rewrite ^/profile/?$ /profile.php last;
 rewrite ^/profile/edit/?$ /profileedit.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/rank/?$ /rank.php last;
+rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolsrank/?$ /schoolsrank.php last;

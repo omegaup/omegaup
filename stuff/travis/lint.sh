@@ -8,10 +8,16 @@ stage_before_install() {
 
 	init_frontend_submodules
 
+	pip install --user --upgrade pip
 	pip install --user six
 	pip install --user https://github.com/google/closure-linter/zipball/master
-	pip3 install --user pylint
-	pip3 install --user pep8
+	python3 -m pip install --user --upgrade pip
+	python3 -m pip install --user pylint
+	python3 -m pip install --user pep8
+	python3 -m pip install --user awscli
+	python3.5 -m pip install --user --upgrade pip
+	python3.5 -m pip install --user pylint
+	python3.5 -m pip install --user pep8
 
 	install_yarn
 }
@@ -23,11 +29,27 @@ stage_before_script() {
 }
 
 stage_script() {
+	rm -rf frontend/www/{js,css}/dist
 	yarn install
 	yarn build
 	yarn test
 
-	python3 stuff/i18n.py --validate < /dev/null
 	python3 stuff/db-migrate.py validate
 	python3.5 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
+}
+
+stage_after_success() {
+	if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+		mkdir -p build/webpack-artifacts
+
+		# Upload a tarball with the build artifacts.
+		local tarball="build/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
+		tar --xz --create --file "${tarball}" -C frontend/www js/dist css/dist
+		aws s3 cp "${tarball}" "s3://omegaup-build-artifacts/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
+
+		# Start a deployment now that the build artifacts are done.
+		curl -H "${GITHUB_OAUTH_TOKEN}" \
+			https://api.github.com/repos/omegaup/omegaup/deployments \
+			--data "{\"ref\":\"${TRAVIS_BRANCH}\",\"required_contexts\":[]}"
+	fi
 }

@@ -71,6 +71,9 @@ class Problems extends VO {
         if (isset($data['output_limit'])) {
             $this->output_limit = $data['output_limit'];
         }
+        if (isset($data['input_limit'])) {
+            $this->input_limit = $data['input_limit'];
+        }
         if (isset($data['visits'])) {
             $this->visits = $data['visits'];
         }
@@ -106,6 +109,12 @@ class Problems extends VO {
         }
         if (isset($data['quality'])) {
             $this->quality = $data['quality'];
+        }
+        if (isset($data['quality_histogram'])) {
+            $this->quality_histogram = $data['quality_histogram'];
+        }
+        if (isset($data['difficulty_histogram'])) {
+            $this->difficulty_histogram = $data['difficulty_histogram'];
         }
     }
 
@@ -232,6 +241,13 @@ class Problems extends VO {
       * @access public
       * @var int(11)
       */
+    public $input_limit;
+
+    /**
+      *  [Campo no documentado]
+      * @access public
+      * @var int(11)
+      */
     public $visits;
 
     /**
@@ -310,4 +326,18 @@ class Problems extends VO {
       * @var double
       */
     public $quality;
+
+    /**
+      * Valores del histograma de calidad del problema.
+      * @access public
+      * @var text
+      */
+    public $quality_histogram;
+
+    /**
+      * Valores del histograma de dificultad del problema.
+      * @access public
+      * @var text
+      */
+    public $difficulty_histogram;
 }

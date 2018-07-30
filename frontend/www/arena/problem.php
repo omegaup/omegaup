@@ -12,7 +12,7 @@ try {
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
-            $session['user']
+            $session['identity']
         );
     } else {
         $nominationStatus = ['solved' => false, 'nominated' => false, 'dismissed' => false];
@@ -32,6 +32,7 @@ $smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
 $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 . 's');
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
+$smarty->assign('input_limit', $result['input_limit'] / 1024 . ' KiB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
@@ -59,6 +60,11 @@ $result['user'] = [
 ];
 $smarty->assign('problem_admin', $result['user']['admin']);
 
+$result['histogram'] = [
+    'difficulty_histogram' => $problem->difficulty_histogram,
+    'quality_histogram' => $problem->quality_histogram,
+    'quality' => floatval($problem->quality),
+    'difficulty' => floatval($problem->difficulty)];
 $smarty->assign('payload', $result);
 
 $smarty->display('../../templates/arena.problem.tpl');
