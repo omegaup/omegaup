@@ -310,6 +310,7 @@ CREATE TABLE `Identities` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
+  `gender` enum('female','male','other','decline') DEFAULT NULL COMMENT 'Género de la identidad',
   PRIMARY KEY (`identity_id`),
   UNIQUE KEY `username` (`username`),
   KEY `country_id` (`country_id`),

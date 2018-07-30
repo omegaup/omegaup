@@ -28,7 +28,7 @@ foreach ($problems as &$problem) {
     $r->method = 'ProblemController::apiDetails';
     $response = ApiCaller::call($r);
 
-    $problem['statement'] = $response['problem_statement'];
+    $problem['statement'] = $response['statement']['markdown'];
 }
 
 $smarty->assign('contestName', $contest['title']);
