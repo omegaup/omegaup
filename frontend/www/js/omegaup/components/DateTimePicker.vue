@@ -11,7 +11,7 @@ export default {
     value: Date,
     format: {
       type: String,
-      'default': 'mm/dd/yyyy hh:ii',
+      'default': T.dateTimePickerFormat,
     },
   },
   data: function() { return {};},

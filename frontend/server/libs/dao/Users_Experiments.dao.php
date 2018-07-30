@@ -23,4 +23,22 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
         global $conn;
         $conn->Execute($sql, $params);
     }
+
+    final public static function getByUserId($user_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Users_Experiments
+                WHERE
+                    user_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$user_id]);
+
+        $users_experiments = [];
+        foreach ($rs as $row) {
+            array_push($users_experiments, new UsersExperiments($row));
+        }
+        return $users_experiments;
+    }
 }

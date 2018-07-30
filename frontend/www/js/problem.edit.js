@@ -340,7 +340,9 @@ omegaup.OmegaUp.on('ready', function() {
         .fail(omegaup.UI.apiError);
   }
 
-  var markdownConverter = omegaup.UI.markdownConverter({preview: true});
+  var imageMapping = {};
+  var markdownConverter =
+      omegaup.UI.markdownConverter({preview: true, imageMapping: imageMapping});
   var markdownEditor =
       new Markdown.Editor(markdownConverter, '-statement');  // Global.
   markdownEditor.run();
@@ -402,18 +404,26 @@ omegaup.OmegaUp.on('ready', function() {
     $('input[name=alias]').val(problemAlias);
 
     if (chosenLanguage == null ||
-        chosenLanguage == problem.problem_statement_language) {
-      chosenLanguage = problem.problem_statement_language;
+        chosenLanguage == problem.statement.language) {
+      chosenLanguage = problem.statement.language;
       if (typeof statements[chosenLanguage] == 'undefined') {
         statements[chosenLanguage] = {
-          original: problem.problem_statement,
-          current: problem.problem_statement
+          original: problem.statement.markdown,
+          current: problem.statement.markdown
         };
       }
       $('#wmd-input-statement').val(statements[chosenLanguage].current);
-      $('#statement-language').val(problem.problem_statement_language);
+      $('#statement-language').val(problem.statement.language);
     } else {
       $('#wmd-input-statement').val('');
+    }
+    // Extend the current mapping with any new images.
+    for (var filename in problem.statement.images) {
+      if (!problem.statement.images.hasOwnProperty(filename) ||
+          imageMapping.hasOwnProperty(filename)) {
+        continue;
+      }
+      imageMapping[filename] = problem.statement.images[filename];
     }
     markdownEditor.refreshPreview();
     if (problem.slow == 1) {

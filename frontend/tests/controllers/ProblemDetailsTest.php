@@ -57,7 +57,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
         $this->assertEquals($response['source'], $problemDAO->source);
-        $this->assertContains('# Entrada', $response['problem_statement']);
+        $this->assertContains('# Entrada', $response['statement']['markdown']);
         $this->assertEquals($response['order'], $problemDAO->order);
         $this->assertEquals($response['score'], 0);
 
@@ -107,14 +107,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         // Assert data
-        $this->assertContains($expected_text, $response['problem_statement']);
-    }
-
-    /**
-     * Problem statement is returned in HTML.
-     */
-    public function testViewProblemStatementHtml() {
-        $this->internalViewProblemStatement('html', '<h1>Entrada</h1>');
+        $this->assertContains($expected_text, $response['statement']['markdown']);
     }
 
     /**

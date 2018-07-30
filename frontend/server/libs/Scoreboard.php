@@ -412,6 +412,7 @@ class Scoreboard {
             $log->debug('Sending updated scoreboards');
             $grader->broadcast(
                 $params['alias'],
+                (int)$problemset->problemset_id,
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
@@ -425,6 +426,7 @@ class Scoreboard {
             );
             $grader->broadcast(
                 $params['alias'],
+                (int)$problemset->problemset_id,
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
