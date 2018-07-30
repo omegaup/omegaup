@@ -18,4 +18,20 @@ require_once('base/Languages.vo.base.php');
   *
   */
 class LanguagesDAO extends LanguagesDAOBase {
+    final public static function getByName($name) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Languages
+                WHERE
+                    name = ?';
+
+        global $conn;
+        $row = $conn->GetRow($sql, [$name]);
+        if (count($row) == 0) {
+            return null;
+        }
+
+        return new Languages($row);
+    }
 }

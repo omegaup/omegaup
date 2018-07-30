@@ -21,23 +21,33 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 ON
                   e.user_id = i.user_id
                 WHERE
-                  e.email = ?';
+                  e.email = ?
+                LIMIT
+                  0, 1';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
     }
 
     public static function FindByUsername($username) {
-        $result = IdentitiesDAO::search(new Identities([
-            'username' => $username
-        ]));
-        if (sizeof($result) != 1) {
+        global  $conn;
+        $sql = 'SELECT
+                   i.*
+                FROM
+                  `Identities` i
+                WHERE
+                  i.username = ?
+                LIMIT
+                  0, 1';
+        $params = [ $username ];
+        $rs = $conn->GetRow($sql, $params);
+        if (empty($rs)) {
             return null;
         }
-        return array_pop($result);
+        return new Identities($rs);
     }
 
     public static function FindByUserId($user_id) {
@@ -47,10 +57,12 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 FROM
                   `Identities` i
                 WHERE
-                  i.user_id = ?';
+                  i.user_id = ?
+                LIMIT
+                  0, 1';
         $params = [ $user_id ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
@@ -80,7 +92,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                   0, 1';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return [
@@ -109,7 +121,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                   0, 1';
         $params = [ $identity_id ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs['verified'];

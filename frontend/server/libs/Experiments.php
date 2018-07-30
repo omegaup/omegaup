@@ -122,8 +122,7 @@ class Experiments {
         Users $user,
         array $knownExperiments
     ) {
-        $search = new UsersExperiments(['user_id' => $user->user_id]);
-        foreach (UsersExperimentsDAO::search($search) as $ue) {
+        foreach (UsersExperimentsDAO::getByUserId($user->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&
                 !$this->isEnabled($ue->experiment)
             ) {

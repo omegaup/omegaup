@@ -659,9 +659,7 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            $runs = RunsDAO::search(new Runs([
-                'problem_id' => $r['problem']->problem_id
-            ]));
+            $runs = RunsDAO::getByKeys($r['problem']->problem_id);
 
             $guids = [];
             foreach ($runs as $run) {
@@ -1290,27 +1288,25 @@ class ProblemController extends Controller {
 
             // Get all the available runs done by the current_user
             try {
-                $runs_array = RunsDAO::search(new Runs([
-                    'identity_id' => $r['current_identity_id'],
-                    'problem_id' => $r['problem']->problem_id,
-                    'problemset_id' => $problemset_id
-                ]));
+                $runsArray = RunsDAO::getByKeys(
+                    $r['problem']->problem_id,
+                    $problemset_id,
+                    $r['current_identity_id']
+                );
             } catch (Exception $e) {
                 // Operation failed in the data layer
                 throw new InvalidDatabaseOperationException($e);
             }
 
             // Add each filtered run to an array
-            if (count($runs_array) >= 0) {
-                $runs_filtered_array = [];
-                foreach ($runs_array as $run) {
-                    $filtered = $run->asFilteredArray($relevant_columns);
-                    $filtered['alias'] = $r['problem']->alias;
-                    $filtered['username'] = $r['current_user']->username;
-                    $filtered['time'] = strtotime($filtered['time']);
-                    $filtered['contest_score'] = (float)$filtered['contest_score'];
-                    array_push($runs_filtered_array, $filtered);
-                }
+            $runs_filtered_array = [];
+            foreach ($runsArray as $run) {
+                $filtered = $run->asFilteredArray($relevant_columns);
+                $filtered['alias'] = $r['problem']->alias;
+                $filtered['username'] = $r['current_user']->username;
+                $filtered['time'] = strtotime($filtered['time']);
+                $filtered['contest_score'] = (float)$filtered['contest_score'];
+                array_push($runs_filtered_array, $filtered);
             }
 
             $response['runs'] = $runs_filtered_array;
@@ -1458,10 +1454,7 @@ class ProblemController extends Controller {
         } else {
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::search(new Runs([
-                    'identity_id' => $r['current_identity_id'],
-                    'problem_id' => $r['problem']->problem_id
-                ]));
+                $runs_array = RunsDAO::getByKeys($r['problem']->problem_id, null, $r['current_identity_id']);
 
                 // Create array of relevant columns for list of runs
                 $relevant_columns = ['guid', 'language', 'status', 'verdict',
