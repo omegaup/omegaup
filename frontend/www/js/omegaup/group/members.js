@@ -12,7 +12,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-group-members', {
         props: {
           identities: this.identities,
-          identitiesCsv: this.identitiesCsv,
+          groupIdentities: this.groupIdentities,
           countries: this.countries,
         },
         on: {
@@ -42,7 +42,7 @@ OmegaUp.on('ready', function() {
     },
     data: {
       identities: [],
-      identitiesCsv: [],
+      groupIdentities: [],
       countries: payload.countries,
     },
     components: {
@@ -54,12 +54,12 @@ OmegaUp.on('ready', function() {
     API.Group.members({group_alias: groupAlias})
         .then(function(data) {
           groupMembers.identities = [];
-          groupMembers.identitiesCsv = [];
+          groupMembers.groupIdentities = [];
           for (let identity of data.identities) {
             if (identity.username.split(':').length == 1) {
               groupMembers.identities.push(identity);
             } else {
-              groupMembers.identitiesCsv.push(identity);
+              groupMembers.groupIdentities.push(identity);
             }
           }
         })

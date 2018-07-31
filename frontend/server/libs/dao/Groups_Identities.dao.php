@@ -15,14 +15,29 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
         $sql = '
             SELECT
                 i.username,
-                IF(LOCATE(\':\', i.username) > 0, i.name, NULL) as name,
-                IF(LOCATE(\':\', i.username) > 0, c.name, NULL) as country,
-                IF(LOCATE(\':\', i.username) > 0, c.country_id, NULL) as country_id,
-                IF(LOCATE(\':\', i.username) > 0, s.name, NULL) as state,
-                IF(LOCATE(\':\', i.username) > 0, s.state_id, NULL) as state_id,
-                IF(LOCATE(\':\', i.username) > 0, sc.name, NULL) as school,
-                IF(LOCATE(\':\', i.username) > 0, sc.school_id, NULL) as school_id,
-                IF(LOCATE(\':\', i.username) > 0, u.username, NULL) as user_username
+                i.name,
+                c.name as country,
+                c.country_id,
+                s.name as state,
+                s.state_id,
+                sc.name as school,
+                sc.school_id as school_id,
+                u.username as user_username,
+                (SELECT `urc`.classname FROM
+                    `User_Rank_Cutoffs` urc
+                WHERE
+                    `urc`.score <= (
+                            SELECT
+                                `ur`.`score`
+                            FROM
+                                `User_Rank` `ur`
+                            WHERE
+                                `ur`.user_id = `i`.`user_id`
+                        )
+                ORDER BY
+                    `urc`.percentile ASC
+                LIMIT
+                    1) `classname`
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -37,8 +52,21 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
                 Users u ON u.user_id = i.user_id
             WHERE
                 gi.group_id = ?;';
-        $params = [$group->group_id];
-        return $conn->GetAll($sql, $params);
+
+        $rs = $conn->Execute($sql, [$group->group_id]);
+        $identities = [];
+        foreach ($rs as $row) {
+            if (strpos($row['username'], ':') === false) {
+                array_push($identities, [
+                    'username' => $row['username'],
+                    'classname' => $row['classname'] ?? 'user-rank-unranked',
+                ]);
+                continue;
+            }
+            $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
+            array_push($identities, $row);
+        }
+        return $identities;
     }
 
     public static function GetMemberCountById($group_id) {

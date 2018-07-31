@@ -66,8 +66,8 @@ $(function() {
                                                   omegaup.T.wordsNo))
                           .append($('<td></td>').append(contest.weight))
                           .append(
-                              $('<td><a href="#" class="glyphicon glyphicon-remove">' +
-                                '</a></td>')
+                              $('<td><button type="button" class="close"><span class="glyphicon' +
+                                ' glyphicon-remove"></span></button></td>')
                                   .on('click', (function(contestAlias) {
                                         return function(e) {
                                           omegaup.API.GroupScoreboard

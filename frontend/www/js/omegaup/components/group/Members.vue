@@ -23,7 +23,11 @@
       <tbody>
         <tr v-for="identity in identities">
           <td>
-            <a v-bind:href="memberProfileUrl(identity.username)">{{ identity.username }}</a>
+            <a v-bind:href=
+            "memberProfileUrl(identity.username)"><strong><omegaup-user-username v-bind:classname=
+            "identity.classname"
+                                   v-bind:username=
+                                   "identity.username"></omegaup-user-username></strong></a>
           </td>
           <td>
             <a class="glyphicon glyphicon-remove"
@@ -45,9 +49,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identitiesCsv">
+        <tr v-for="identity in groupIdentities">
           <td>
-            <a v-bind:href="memberProfileUrl(identity.username)">{{ identity.username }}</a>
+            <a v-bind:href=
+            "memberProfileUrl(identity.username)"><strong><omegaup-user-username v-bind:classname=
+            "identity.classname"
+                                   v-bind:username=
+                                   "identity.username"></omegaup-user-username></strong></a>
           </td>
           <td>{{ identity.name }}</td>
           <td>{{ identity.country }}</td>
@@ -74,11 +82,12 @@
 
 <script>
 import {T, UI} from '../../omegaup.js';
+import user_Username from '../user/Username.vue';
 
 export default {
   props: {
     identities: Array,
-    identitiesCsv: Array,
+    groupIdentities: Array,
     countries: Array,
   },
   data: function() {
@@ -88,43 +97,31 @@ export default {
       username: '',
       name: '',
       country: '',
-      country_id: '',
+      countryId: '',
       state: '',
-      state_id: '',
+      stateId: '',
       school: '',
-      school_id: '',
-      user_username: ''
+      schoolId: '',
+      userUsername: ''
     };
   },
   mounted: function() {
-    let self = this;
-    UI.userTypeahead($('input.typeahead', self.$el), function(event, item) {
-      self.memberUsername = item.value;
-    });
+    UI.userTypeahead($('input.typeahead', this.$el),
+                     (event, item) => { this.memberUsername = item.value; });
   },
   methods: {
     onAddMember: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        // There is a hint currently visible in the UI, the user likely
-        // expects that hint to be used when trying to add someone, instead
-        // of what they've actually typed so far.
-        this.memberUsername = hint;
-      } else {
-        this.memberUsername = $('input.typeahead.tt-input', this.$el).val();
-      }
-      this.$emit('add-member', this.memberUsername);
+      this.$emit('add-member', $('input.typeahead.tt-input', this.$el).val());
     },
     onEdit: function(identity) {
       this.username = identity.username;
       this.name = identity.name;
       this.country = identity.country;
-      this.country_id = identity.country_id;
+      this.countryId = identity.country_id;
       this.state = identity.state;
-      this.state_id = identity.state_id;
+      this.stateId = identity.state_id;
       this.school = identity.school;
-      this.school_id = identity.school_id;
+      this.schoolId = identity.school_id;
       $('.modal-edit').modal();
     },
     onChangePass: function(username) {
@@ -135,11 +132,12 @@ export default {
     reset: function() {
       this.memberUsername = '';
 
-      let inputElem = $('input.typeahead', this.$el);
-      inputElem.typeahead('close');
-      inputElem.val('');
+      $('input.typeahead', this.$el).typeahead('close').val('');
     },
     memberProfileUrl: function(member) { return '/profile/' + member + '/';},
+  },
+  components: {
+    'omegaup-user-username': user_Username,
   },
 };
 </script>
