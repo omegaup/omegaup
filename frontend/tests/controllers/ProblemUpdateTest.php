@@ -98,11 +98,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
         $this->assertFalse($problemArtifacts->exists('examples/sample.in'));
 
         // Check update in statements
-        $statement = $problemArtifacts->get('statements/es.html');
+        $statement = $problemArtifacts->get('statements/es.markdown');
         $this->assertContains('perímetro', $statement);
 
         // Call API again to add an example, should not trigger rejudge.
@@ -188,10 +188,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Check statment contents
         $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
-        $statementHtmlContents = $problemArtifacts->get('statements/es.html');
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
-        $this->assertContains('<p>This is the new statement \$x\$</p>', $statementHtmlContents);
         $this->assertContains($statement, $statementMarkdownContents);
     }
 
@@ -221,13 +219,9 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Check statment contents
         $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
-        $statementHtmlContents = $problemArtifacts->get('statements/es.html');
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
-        $this->assertFileExists(IMAGES_PATH . $imgFilename);
-        $this->assertTrue($problemArtifacts->exists("statements/$imgFilename"));
-        $this->assertContains('<img src="' . IMAGES_URL_PATH . $imgFilename . '" alt="Alt text" title="Optional title" />', $statementHtmlContents);
-        $this->assertContains('![Alt text](' . IMAGES_URL_PATH . "$imgFilename \"Optional title\")", $statementMarkdownContents);
+        $this->assertEquals($statement, $statementMarkdownContents);
     }
 
     /**
@@ -269,11 +263,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.html'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Check statements still is the original one
-        $statement = $problemArtifacts->get('statements/es.html');
-        $this->assertContains('<h1>Entrada</h1>', $statement);
+        $statement = $problemArtifacts->get('statements/es.markdown');
+        $this->assertContains('# Entrada', $statement);
     }
 
     /**

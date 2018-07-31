@@ -66,6 +66,32 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         return $conn->GetAll($sql, [$problemset_id]);
     }
 
+    final public static function getIdentitiesByProblemset($problemset_id) {
+        $sql = '
+            SELECT
+                i.user_id,
+                i.username,
+                pi.access_time,
+                e.email,
+                i.country_id,
+                pi.access_time
+            FROM
+                Identities i
+            INNER JOIN
+                Problemset_Identities pi
+            ON
+                pi.identity_id = i.identity_id
+            LEFT JOIN
+                Emails e
+            ON
+                e.user_id = i.user_id
+            WHERE
+                pi.problemset_id = ?;';
+
+        global $conn;
+        return $conn->GetAll($sql, [$problemset_id]);
+    }
+
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
         $sql = 'UPDATE
                     `Problemset_Identities`
