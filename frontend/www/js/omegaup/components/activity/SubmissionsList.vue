@@ -15,7 +15,7 @@
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="addUrlProblem(problem.alias)">{{ problem.title }}</a>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{ problem.title }}</a>
               </td>
             </tr>
           </tbody>
@@ -73,9 +73,6 @@ export default {
         }
       }
       return groups;
-    },
-    addUrlProblem: function(problemAlias) {
-      return '/arena/problem/' + problemAlias + '/';
     },
   },
   data: function() {
