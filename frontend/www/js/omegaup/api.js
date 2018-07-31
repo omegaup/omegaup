@@ -19,6 +19,11 @@ function _call(url, transform, defaultParams) {
           dfd.resolve(data);
         })
         .fail(function(jqXHR) {
+          if (jqXHR.status == 499 || jqXHR.readyState != 4) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
+            return;
+          }
           var errorData;
           try {
             if (jqXHR.responseText) {
@@ -168,8 +173,6 @@ export default {
 
     scoreboard: _call('/api/contest/scoreboard/'),
 
-    scoreboardEvents: _call('/api/contest/scoreboardevents/'),
-
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
 
     stats: _call('/api/contest/stats/'),
@@ -202,6 +205,9 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
+
+    assignmentScoreboardEvents:
+        _call('/api/course/assignmentScoreboardEvents/'),
 
     clone: _call('/api/course/clone/'),
 
@@ -411,6 +417,12 @@ export default {
     updateStatement: _call('/api/problem/updateStatement/'),
   },
 
+  Problemset: {
+    scoreboard: _call('/api/problemset/scoreboard/'),
+
+    scoreboardEvents: _call('/api/problemset/scoreboardevents/'),
+  },
+
   QualityNomination: {
     create: _call('/api/qualitynomination/create/'),
 
@@ -456,6 +468,8 @@ export default {
 
     rejudge: _call('/api/run/rejudge/'),
 
+    disqualify: _call('/api/run/disqualify'),
+
     status: _call('/api/run/status/',
                   function(data) {
                     data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
@@ -498,6 +512,8 @@ export default {
   },
 
   User: {
+    acceptPrivacyPolicy: _call('/api/user/acceptPrivacyPolicy'),
+
     addExperiment: _call('/api/user/addexperiment/'),
 
     addGroup: _call('/api/user/addgroup/'),

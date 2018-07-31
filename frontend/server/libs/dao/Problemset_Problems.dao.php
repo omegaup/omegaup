@@ -69,11 +69,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, [$problemset_id]);
 
-        $problemset_problems = [];
+        $problemsetProblems = [];
         foreach ($rs as $row) {
-            array_push($problemset_problems, new ProblemsetProblems($row));
+            array_push($problemsetProblems, new ProblemsetProblems($row));
         }
-        return $problemset_problems;
+        return $problemsetProblems;
     }
 
     /*
@@ -141,5 +141,74 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
+    }
+
+    final public static function getProblemIdsByProblemset($problemset_id) {
+        $sql = 'SELECT
+                    pp.problem_id
+                FROM
+                    Problemset_Problems pp
+                WHERE
+                    pp.problemset_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemset_id]);
+
+        $problemIds = [];
+        foreach ($rs as $problem) {
+            array_push($problemIds, $problem['problem_id']);
+        }
+        return $problemIds;
+    }
+
+    final public static function getProblemsByProblemset($problemset_id) {
+        $sql = 'SELECT
+                    p.title,
+                    p.alias,
+                    p.validator,
+                    p.time_limit,
+                    p.overall_wall_time_limit,
+                    p.extra_wall_time,
+                    p.memory_limit,
+                    p.visits,
+                    p.submissions,
+                    p.accepted,
+                    p.difficulty,
+                    p.order,
+                    p.languages,
+                    pp.points
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    p.problem_id = pp.problem_id
+                WHERE
+                  pp.problemset_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemset_id]);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            array_push($problems, $row);
+        }
+        return $problems;
+    }
+
+    /*
+     * Get max points posible for contest
+     */
+    final public static function getMaxPointsByProblemset($problemset_id) {
+        // Build SQL statement
+        $sql = 'SELECT
+                    SUM(points) as max_points
+                FROM
+                    Problemset_Problems
+                WHERE
+                    problemset_id = ?;';
+
+        global $conn;
+        return $conn->GetOne($sql, [$problemset_id]);
     }
 }

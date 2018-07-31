@@ -85,7 +85,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'scholar_degree' => 'master',
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
-            'locale' => $locale[0]->name,
+            'locale' => $locale->name,
         ]);
 
         UserController::apiUpdate($r);
@@ -98,7 +98,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($locale[0]->language_id, $user_db->language_id);
+        $this->assertEquals($locale->language_id, $user_db->language_id);
 
         // Edit all fields again with diff values
         $locale = LanguagesDAO::getByName('pseudo');
@@ -111,7 +111,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'scholar_degree' => 'primary',
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
-            'locale' => $locale[0]->name,
+            'locale' => $locale->name,
         ]);
 
         UserController::apiUpdate($r);
@@ -124,13 +124,13 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($locale[0]->language_id, $user_db->language_id);
+        $this->assertEquals($locale->language_id, $user_db->language_id);
 
         // Double check language update with the appropiate API
         $r = new Request([
             'username' => $user->username
         ]);
-        $this->assertEquals($locale[0]->name, UserController::getPreferredLanguage($r));
+        $this->assertEquals($locale->name, UserController::getPreferredLanguage($r));
 
         $identity = IdentitiesDAO::getByPK($user_db->main_identity_id);
         $this->assertEquals($identity->password, $user_db->password);

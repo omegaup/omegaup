@@ -24,11 +24,11 @@ class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, [$group_id]);
 
-        $groups_scoreboards = [];
+        $groupsScoreboards = [];
         foreach ($rs as $row) {
-            array_push($groups_scoreboards, new GroupsScoreboards($row));
+            array_push($groupsScoreboards, new GroupsScoreboards($row));
         }
-        return $groups_scoreboards;
+        return $groupsScoreboards;
     }
 
     public static function getByAlias($alias) {

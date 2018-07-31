@@ -7,7 +7,7 @@ omegaup.OmegaUp.on('ready', function() {
   var admin = null;
 
   omegaup.API.Interview.details({interview_alias: arena.options.contestAlias})
-      .then(arena.contestLoaded.bind(arena))
+      .then(arena.problemsetLoaded.bind(arena))
       .fail(omegaup.UI.apiError);
 
   window.addEventListener('hashchange', arena.onHashChanged.bind(arena));

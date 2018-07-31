@@ -33,12 +33,11 @@ def authentication(*, config_file=default_config_file(), username=None,
     '''Computes the authentication arguments for mysql binaries.'''
     if config_file and os.path.isfile(config_file):
         return ['--defaults-extra-file=%s' % quote(config_file)]
-    else:
-        assert username
-        args = ['--user=%s' % quote(username)]
-        if password:
-            args.append('--password=%s' % quote(password))
-        return args
+    assert username
+    args = ['--user=%s' % quote(username)]
+    if password:
+        args.append('--password=%s' % quote(password))
+    return args
 
 
 def mysql(query, *, dbname=None, auth=None):

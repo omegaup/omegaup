@@ -173,7 +173,7 @@ class CoursesFactory {
                 $assignment = AssignmentsDAO::getByAliasAndCourse(
                     $assignmentAlias,
                     $course->course_id
-                )[0];
+                );
 
                 $expectedScores[$studentUsername][$assignmentAlias] = 0;
 

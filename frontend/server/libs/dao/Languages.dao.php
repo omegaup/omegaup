@@ -24,15 +24,16 @@ class LanguagesDAO extends LanguagesDAOBase {
                 FROM
                     Languages
                 WHERE
-                    name = ?';
+                    name = ?
+                LIMIT
+                    0, 1;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$name]);
-
-        $languages = [];
-        foreach ($rs as $row) {
-            array_push($languages, new Languages($row));
+        $row = $conn->GetRow($sql, [$name]);
+        if (count($row) == 0) {
+            return null;
         }
-        return $languages;
+
+        return new Languages($row);
     }
 }

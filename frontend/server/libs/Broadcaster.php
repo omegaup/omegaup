@@ -27,6 +27,7 @@ class Broadcaster {
             $this->log->debug("Sending update $message");
             $grader->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
+                is_null($r['contest']) ? null : (int)$r['contest']->problemset_id,
                 is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
                 $r['clarification']->public != '0',

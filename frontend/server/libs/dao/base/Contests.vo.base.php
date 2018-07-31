@@ -56,8 +56,8 @@ class Contests extends VO {
         if (isset($data['rerun_id'])) {
             $this->rerun_id = $data['rerun_id'];
         }
-        if (isset($data['public'])) {
-            $this->public = $data['public'];
+        if (isset($data['admission_mode'])) {
+            $this->admission_mode = $data['admission_mode'];
         }
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
@@ -89,17 +89,8 @@ class Contests extends VO {
         if (isset($data['show_scoreboard_after'])) {
             $this->show_scoreboard_after = $data['show_scoreboard_after'];
         }
-        if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = $data['scoreboard_url'];
-        }
-        if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
-        }
         if (isset($data['urgent'])) {
             $this->urgent = $data['urgent'];
-        }
-        if (isset($data['contestant_must_register'])) {
-            $this->contestant_must_register = $data['contestant_must_register'];
         }
         if (isset($data['languages'])) {
             $this->languages = $data['languages'];
@@ -193,11 +184,11 @@ class Contests extends VO {
     public $rerun_id;
 
     /**
-      * False implica concurso cerrado, ver la tabla ConcursantesConcurso
+      * Modalidad en la que se registra un concurso.
       * @access public
-      * @var tinyint(1)
+      * @var enum('private','registration','public')
       */
-    public $public;
+    public $admission_mode;
 
     /**
       * Almacenará el token necesario para acceder al concurso
@@ -270,32 +261,11 @@ class Contests extends VO {
     public $show_scoreboard_after;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url_admin;
-
-    /**
       * Indica si el concurso es de alta prioridad y requiere mejor QoS.
       * @access public
       * @var tinyint(1)
       */
     public $urgent;
-
-    /**
-      * Indica que los participantes deben pre-registrarse antes de poder paticipar
-      * @access public
-      * @var tinyint(1)
-      */
-    public $contestant_must_register;
 
     /**
       * Un filtro (opcional) de qué lenguajes se pueden usar en un concurso

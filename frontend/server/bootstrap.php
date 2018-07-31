@@ -43,7 +43,7 @@ $csp_mode = 'Content-Security-Policy';
 if (defined('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS')) {
     $csp_mode = 'Content-Security-Policy-Report-Only';
 }
-header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com https://connect.facebook.net https://platform.twitter.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com https://docs.google.com https://staticxx.facebook.com https://syndication.twitter.com; report-uri /cspreport.php");
+header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com https://connect.facebook.net https://platform.twitter.com; frame-src https://www.facebook.com https://web.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com https://docs.google.com https://staticxx.facebook.com https://syndication.twitter.com; report-uri /cspreport.php");
 header('X-Frame-Options: DENY');
 
 /*
@@ -63,6 +63,7 @@ require_once('libs/Git.php');
 require_once('libs/Grader.php');
 require_once('libs/LinkedIn.php');
 require_once('libs/Pager.php');
+require_once('libs/PrivacyStatement.php');
 require_once('libs/ProblemDeployer.php');
 require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
@@ -232,9 +233,9 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('LOGGED_IN', '1');
         UITools::$IsLoggedIn = true;
 
-        $smarty->assign('CURRENT_USER_USERNAME', $session['user']->username);
+        $smarty->assign('CURRENT_USER_USERNAME', $session['identity']->username);
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
-        $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', $session['user']->verified);
+        $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', empty($session['user']) || $session['user']->verified);
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
         $smarty->assign('CURRENT_USER_IS_REVIEWER', Authorization::isQualityReviewer($session['identity']->identity_id));
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
@@ -246,12 +247,12 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign(
             'currentUserInfo',
             [
-                'username' => $session['user']->username,
+                'username' => $session['username'],
             ]
         );
 
         UITools::$IsAdmin = $session['is_admin'];
-        $userRequest['username'] = $session['user']->username;
+        $userRequest['username'] = $session['username'];
     } else {
         $userRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');

@@ -14,7 +14,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateContestPositive() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['public' => 0]
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -43,7 +43,6 @@ class CreateContestTest extends OmegaupTestCase {
             'description',
             'start_time',
             'finish_time',
-            'public',
             'alias',
             'points_decay_factor',
             'submissions_gap',
@@ -55,7 +54,7 @@ class CreateContestTest extends OmegaupTestCase {
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
             $contestData = ContestsFactory::getRequest(new ContestParams(
-                ['public' => 0]
+                ['admission_mode' => 'private']
             ));
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
@@ -89,7 +88,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['public' => 0]
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -114,7 +113,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['public' => 0]
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -138,11 +137,41 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreatePublicContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['public' => 0]
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
-        $r['public'] = 1;
+        $r['admission_mode'] = 'public';
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = ContestController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+    }
+
+    /**
+     * Public contest with problems NOW is NOT valid. You need
+     * to create the contest first and then you can add problems
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testCreatePublicContestWithProblems() {
+        $problem = ProblemsFactory::createProblem();
+
+        // Create a valid contest Request object
+        $contestData = ContestsFactory::getRequest(new ContestParams(
+            ['admission_mode' => 'private']
+        ));
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+        $r['admission_mode'] = 'public';
+        $r['problems'] = json_encode([[
+            'problem' => $problem['problem']->alias,
+            'points' => 100,
+        ]]);
 
         // Log in the user and set the auth token in the new request
         $login = self::login($contestDirector);
@@ -164,11 +193,11 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['public' => 0]
+            ['admission_mode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
-        $r['public'] = 1;
+        $r['admission_mode'] = 'public';
         $r['problems'] = json_encode([[
             'problem' => $problem['problem']->alias,
             'points' => 100,

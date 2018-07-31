@@ -46,10 +46,10 @@ class UITools {
         $response = ApiCaller::call($profileRequest);
 
         if ($response['status'] === 'ok') {
-            $response['userinfo']['graduation_date'] = is_null($response['userinfo']['graduation_date']) ?
+            $response['userinfo']['graduation_date'] = empty($response['userinfo']['graduation_date']) ?
                     null : gmdate('d/m/Y', $response['userinfo']['graduation_date']);
 
-            $response['userinfo']['birth_date'] = is_null($response['userinfo']['birth_date']) ?
+            $response['userinfo']['birth_date'] = empty($response['userinfo']['birth_date']) ?
                     null : gmdate('d/m/Y', $response['userinfo']['birth_date']);
 
             $smarty->assign('profile', $response);

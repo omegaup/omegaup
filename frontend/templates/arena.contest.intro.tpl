@@ -1,4 +1,4 @@
-{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}"}
+{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}" loadMarkdown=true}
 
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">
@@ -25,19 +25,17 @@
 					    <p class="basic-information-needed">{#courseBasicInformationNeeded#}</p>
 					{/if}
 					{if $requestsUserInformation != 'no'}
-				    	{if $requestsUserInformation == 'optional'}
-				    	    <p class="requests-user-information-optional">{#contestUserInformationOptional#}</p>
-				    	{elseif $requestsUserInformation == 'required'}
-				    	    <p class="requests-user-information-required">{#contestUserInformationRequired#}</p>
-				    	{/if}
-					    <p>
-					    	<label>
-					    		<input type="radio" name="share-user-information" value="1"> {#wordsYes#}
-					    	</label>
-					    	<label>
-					    		<input type="radio" name="share-user-information" value="0"> {#wordsNo#}
-					    	</label>
-					    </p>
+					 <script type="text/json" id="payload">{$privacyStatement|json_encode}</script>
+						<p class="requests-user-information requests-user-information-{$requestsUserInformation}">
+						</p>
+						<p>
+							<label>
+								<input type="radio" name="share-user-information" value="1"> {#wordsYes#}
+							</label>
+							<label>
+								<input type="radio" name="share-user-information" value="0"> {#wordsNo#}
+							</label>
+						</p>
 					{/if}
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
 					{if $needsBasicInformation || $requestsUserInformation != 'no'} disabled="true"{/if}>{#startContest#}</button>

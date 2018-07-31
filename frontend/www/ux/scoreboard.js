@@ -9,7 +9,6 @@ omegaup.OmegaUp.on('ready', function() {
   };
   var arena = new omegaup.arena.Arena(options);
   var getRankingByTokenRefresh = 5 * 60 * 1000;  // 5 minutes
-
   omegaup.API.Contest.details({
                        contest_alias: arena.options.contestAlias,
                        token: arena.options.scoreboardToken,
@@ -17,20 +16,20 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(contest) {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
+        arena.initProblemsetId(contest);
         $('#title .contest-title').text(contest.title);
-
-        omegaup.API.Contest.scoreboard({
-                             contest_alias: arena.options.contestAlias,
-                             token: arena.options.scoreboardToken
-                           })
+        omegaup.API.Problemset.scoreboard({
+                                problemset_id: arena.options.problemsetId,
+                                token: arena.options.scoreboardToken
+                              })
             .then(arena.rankingChange.bind(arena))
             .fail(omegaup.UI.ignoreError);
         if (new Date() < contest.finish_time && !arena.socket) {
           setInterval(function() {
-            omegaup.API.Contest.scoreboard({
-                                 contest_alias: arena.options.contestAlias,
-                                 token: arena.options.scoreboardToken
-                               })
+            omegaup.API.Problemset.scoreboard({
+                                    problemset_id: arena.options.problemsetId,
+                                    token: arena.options.scoreboardToken
+                                  })
                 .then(arena.rankingChange.bind(arena))
                 .fail(omegaup.UI.ignoreError);
           }, getRankingByTokenRefresh);

@@ -53,7 +53,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 					FROM
 						Runs r
 					WHERE
-						r.verdict = 'AC' AND r.test = 0 AND
+						r.verdict = 'AC' AND r.type= 'normal' AND
 						r.time >= ? AND
 						r.time <= ?
 				) AS up
@@ -138,12 +138,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 100
         ';
         global $conn;
-        $results = $conn->getAll($sql, [$date]);
-        if (count($results) == 0) {
-            return null;
-        }
-
-        return $results;
+        return $conn->getAll($sql, [$date]);
     }
 
     /**
@@ -173,5 +168,25 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             return false;
         }
         return $username == $rs['username'];
+    }
+
+    final public static function getByTimeAndRank($time, $rank) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?
+                AND
+                    `rank` = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$time, $rank]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
     }
 }
