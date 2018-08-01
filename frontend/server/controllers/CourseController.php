@@ -1689,4 +1689,57 @@ class CourseController extends Controller {
             'events' => $scoreboard->events()
         ];
     }
+
+    /**
+     * Get Problems solved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListSolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+        try {
+            $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $userProblems = [];
+        foreach ($solvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
+
+    /**
+     * Get Problems unsolved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $userProblems = [];
+        foreach ($unsolvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
 }

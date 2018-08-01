@@ -388,6 +388,109 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $problems;
     }
 
+    final public static function getSolvedProblemsByUsersOfCourse($course_alias) {
+        global $conn;
+
+        $sql = "
+            SELECT
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Courses c
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                Identities i
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                (
+                SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.title,
+                    r.identity_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                WHERE
+                    r.verdict = 'AC'
+                    AND p.visibility = ?
+                GROUP BY
+                    p.problem_id, r.identity_id
+                ) rp
+            ON
+                rp.identity_id = i.identity_id
+            WHERE
+                c.alias = ?
+                AND gi.accept_teacher = 'yes'
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+    }
+
+    final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
+        $sql = "
+            SELECT
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                (
+                SELECT
+                    pp.problem_id,
+                    pp.alias,
+                    pp.title,
+                    r.identity_id,
+                    MAX(r.score) AS max_score
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems pp
+                ON
+                    pp.problem_id = r.problem_id
+                WHERE
+                    pp.visibility = ?
+                GROUP BY
+                    pp.problem_id, r.identity_id
+                HAVING
+                    max_score < 1
+                ) rp
+            ON
+                rp.identity_id = i.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                rp.problem_id = p.problem_id
+            WHERE
+                c.alias = ?
+                AND gi.accept_teacher = 'yes'
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        global $conn;
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+    }
+
     final public static function isProblemSolved(Problems $problem, $identity_id) {
         $sql = 'SELECT
             COUNT(r.run_id) as solved
