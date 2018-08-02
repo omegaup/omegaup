@@ -18,4 +18,21 @@ require_once('base/Emails.vo.base.php');
   *
   */
 class EmailsDAO extends EmailsDAOBase {
+    final public static function getByUserId($user_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Emails
+                WHERE
+                    user_id = ?';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$user_id]);
+
+        $emails = [];
+        foreach ($rs as $row) {
+            array_push($emails, new Emails($row));
+        }
+        return $emails;
+    }
 }

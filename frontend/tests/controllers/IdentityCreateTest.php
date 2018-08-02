@@ -13,17 +13,17 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testIdentityHasContestOrganizerRole() {
         $creator = UserFactory::createGroupIdentityCreator();
-        $creator_identity = IdentitiesDAO::getByPK($creator->main_identity_id);
+        $creatorIdentity = IdentitiesDAO::getByPK($creator->main_identity_id);
         $mentor = UserFactory::createMentorIdentity();
-        $mentor_identity = IdentitiesDAO::getByPK($mentor->main_identity_id);
+        $mentorIdentity = IdentitiesDAO::getByPK($mentor->main_identity_id);
 
-        $is_creator_member = Authorization::isGroupIdentityCreator($creator_identity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($creatorIdentity->identity_id);
         // Asserting that user belongs to the  identity creator group
-        $this->assertEquals(1, $is_creator_member);
+        $this->assertTrue($isCreatorMember);
 
-        $is_creator_member = Authorization::isGroupIdentityCreator($mentor_identity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($mentorIdentity->identity_id);
         // Asserting that user doesn't belong to the identity creator group
-        $this->assertNotEquals(1, $is_creator_member);
+        $this->assertFalse($isCreatorMember);
     }
 
     /**
@@ -59,7 +59,6 @@ class IdentityCreateTest extends OmegaupTestCase {
 
     /**
      * Test for creating an identity with wrong group
-     * @throws InvalidDatabaseOperationException
      */
     public function testCreateIdentityWithWrongGroup() {
         // Identity creator group member will upload csv file
@@ -81,7 +80,8 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-        } catch (InvalidDatabaseOperationException $e) {
+            $this->fail('Identity should not be created because group alias is not correct');
+        } catch (InvalidParameterException $e) {
             // OK.
         }
     }
@@ -94,7 +94,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
-        $wrongIdentityName = 'wrong:username';
+        $wrongIdentityName = 'username:with:wrong:char';
         // Call api using identity creator group member
         try {
             $response = IdentityController::apiCreate(new Request([
@@ -109,7 +109,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Identity should not be created because of the wrong username (Use of [:] is not allowed)');
-        } catch (InvalidDatabaseOperationException $e) {
+        } catch (InvalidParameterException $e) {
             // OK.
         }
         $wrongIdentityName = 'wrongUsername';
@@ -125,8 +125,8 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Identity should not be created because of the wrong username (Username needs inlclude group_alias)');
-        } catch (InvalidDatabaseOperationException $e) {
+            $this->fail('Identity should not be created because of the wrong username (Username needs include group_alias)');
+        } catch (InvalidParameterException $e) {
             // OK.
         }
     }
@@ -206,26 +206,21 @@ class IdentityCreateTest extends OmegaupTestCase {
     private static function getCsvData($file, $group_alias) {
         $row = 0;
         $identities = [];
-        $headers = [];
         $path_file = OMEGAUP_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
-        while (($data = fgetcsv($handle, 1000, ',')) != false) {
-            if ($row === 0) {
-                $headers = $data;
-            } else {
-                $identity = [];
-                $identity['username'] = "{$group_alias}:{$data[0]}";
-                $identity['name'] = $data[1];
-                $identity['country_id'] = $data[2];
-                $identity['state_id'] = $data[3];
-                $identity['gender'] = $data[4];
-                $identity['school_name'] = $data[5];
-                $identity['password'] = Utils::CreateRandomString();
-                array_push($identities, $identity);
-            }
-            $row++;
+        $headers = fgetcsv($handle, 1000, ',');
+        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+            array_push($identities, [
+                'username' => "{$group_alias}:{$data[0]}",
+                'name' => $data[1],
+                'country_id' => $data[2],
+                'state_id' => $data[3],
+                'gender' => $data[4],
+                'school_name' => $data[5],
+                'password' => Utils::CreateRandomString(),
+            ]);
         }
         fclose($handle);
         return $identities;

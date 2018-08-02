@@ -9,6 +9,7 @@ sudo: false
 branches:
   only:
     - master
+    - release
 
 php:
   - 7.0.7
