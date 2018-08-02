@@ -79,14 +79,10 @@ class GroupController extends Controller {
 
         Validators::isStringNonEmpty($r['group_alias'], 'group_alias');
         try {
-            $groups = GroupsDAO::search(new Groups([
-                'alias' => $r['group_alias']
-            ]));
+            $r['group'] = GroupsDAO::FindByAlias($r['group_alias']);
 
-            if (is_null($groups) || count($groups) === 0) {
+            if (empty($r['group'])) {
                 throw new InvalidParameterException('parameterNotFound', 'Group');
-            } else {
-                $r['group'] = $groups[0];
             }
         } catch (ApiException $ex) {
             throw $ex;
@@ -140,18 +136,16 @@ class GroupController extends Controller {
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
-            $key = new GroupsIdentities([
-                'group_id' => $r['group']->group_id,
-                'identity_id' => $r['identity']->identity_id
-            ]);
-
             // Check user is actually in group
-            $groupIdentities = GroupsIdentitiesDAO::search($key);
+            $groupIdentities = GroupsIdentitiesDAO::getByPK(
+                $r['group']->group_id,
+                $r['identity']->identity_id
+            );
             if (count($groupIdentities) === 0) {
                 throw new InvalidParameterException('parameterNotFound', 'User');
             }
 
-            GroupsIdentitiesDAO::delete($key);
+            GroupsIdentitiesDAO::delete($groupIdentities);
             self::$log->info('Removed ' . $r['identity']->username . ' removed.');
         } catch (ApiException $ex) {
             throw $ex;
@@ -232,11 +226,7 @@ class GroupController extends Controller {
         try {
             $response['group'] = $r['group']->asArray();
 
-            $scoreboards = GroupsScoreboardsDAO::search(
-                new GroupsScoreboards(
-                    ['group_id' => $r['group']->group_id]
-                )
-            );
+            $scoreboards = GroupsScoreboardsDAO::getByGroup($r['group']->group_id);
 
             $response['scoreboards'] = [];
             foreach ($scoreboards as $scoreboard) {

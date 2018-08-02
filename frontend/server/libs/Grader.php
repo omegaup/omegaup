@@ -138,7 +138,7 @@ class Grader {
         return $this->executeCurl($curl);
     }
 
-    public function broadcast($contest_alias, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
+    public function broadcast($contest_alias, $problemset_id, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
@@ -146,6 +146,7 @@ class Grader {
             explode(',', OMEGAUP_GRADER_BROADCAST_URL),
             [
                 'contest' => $contest_alias,
+                'problemset' => $problemset_id,
                 'problem' => $problem_alias,
                 'message' => $message,
                 'public' => $public,

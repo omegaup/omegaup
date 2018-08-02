@@ -25,17 +25,13 @@ class UsersDAO extends UsersDAOBase {
     }
 
     public static function FindByUsername($username) {
-        $vo_Query = new Users([
-            'username' => $username
-        ]);
-
-        $a_Results = UsersDAO::search($vo_Query);
-
-        if (sizeof($a_Results) != 1) {
+        global  $conn;
+        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1';
+        $rs = $conn->GetRow($sql, [$username]);
+        if (count($rs)==0) {
             return null;
         }
-
-        return array_pop($a_Results);
+        return new Users($rs);
     }
 
     public static function IsUserInterviewer($user_id) {
@@ -188,5 +184,43 @@ class UsersDAO extends UsersDAOBase {
         $params = [$user_id];
         global $conn;
         return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';
+    }
+
+    final public static function getByVerification($verification_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Users
+                WHERE
+                    verification_id = ?';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$verification_id]);
+
+        $users = [];
+        foreach ($rs as $row) {
+            array_push($users, new Users($row));
+        }
+        return $users;
+    }
+
+    final public static function getVerified($verified, $in_mailing_list) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Users
+                WHERE
+                    verified = ?
+                AND
+                    in_mailing_list = ?';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$verified, $in_mailing_list]);
+
+        $users = [];
+        foreach ($rs as $row) {
+            array_push($users, new Users($row));
+        }
+        return $users;
     }
 }
