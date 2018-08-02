@@ -146,7 +146,7 @@ class IdentityController extends Controller {
         }
     }
 
-    public static function validateIdentity($username, $name, $gender, $groupAlias) {
+    public static function validateIdentity($username, &$name, &$gender, $groupAlias) {
         // Check group is present
         $identityUsername = explode(':', $username);
         if (count($identityUsername) != 2) {
