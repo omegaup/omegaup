@@ -451,8 +451,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     }
 
     final public static function getByUserAndProblem(
-        $user_id,
-        $problem_id,
+        $userId,
+        $problemId,
         $nomination,
         $contents,
         $status
@@ -473,12 +473,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     status = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$user_id, $problem_id, $nomination, $contents, $status]);
+        $rs = $conn->Execute($sql, [$userId, $problemId, $nomination, $contents, $status]);
 
-        $quality_nominations = [];
+        $qualityNominations = [];
         foreach ($rs as $row) {
-            array_push($quality_nominations, new QualityNominations($row));
+            array_push($qualityNominations, new QualityNominations($row));
         }
-        return $quality_nominations;
+        return $qualityNominations;
     }
 }

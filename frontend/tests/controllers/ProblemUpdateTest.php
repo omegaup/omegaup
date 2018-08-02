@@ -17,11 +17,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update statement
         $login = self::login($problemData['author']);
 
-        $problem_languages = ProblemsLanguagesDAO::getByProblemId(
+        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
             $problemData['problem']->problem_id
         );
         // This problem only has one language at this point
-        $this->assertEquals(1, count($problem_languages));
+        $this->assertEquals(1, count($problemLanguages));
 
         ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
@@ -32,10 +32,10 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // The problem has two languages at this point
-        $problem_languages = ProblemsLanguagesDAO::getByProblemId(
+        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
             $problemData['problem']->problem_id
         );
-        $this->assertEquals(2, count($problem_languages));
+        $this->assertEquals(2, count($problemLanguages));
     }
 
     public function testUpdateProblemTitleAndContents() {

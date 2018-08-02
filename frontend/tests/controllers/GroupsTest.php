@@ -279,7 +279,7 @@ class GroupsTest extends OmegaupTestCase {
             $contestData['contest']->problemset_id
         );
 
-        $this->assertEquals(0, count($gscs));
+        $this->assertNull($gscs);
     }
 
     /**

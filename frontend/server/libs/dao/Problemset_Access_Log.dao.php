@@ -68,7 +68,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
         return $conn->GetAll($sql, [$course_id]);
     }
 
-    final public static function getByProblemsetIdentityId($problemset_id, $identity_id) {
+    final public static function getByProblemsetIdentityId($problemsetId, $identityId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -79,12 +79,12 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                     identity_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problemset_id, $identity_id]);
+        $rs = $conn->Execute($sql, [$problemsetId, $identityId]);
 
-        $problemset_access_log = [];
+        $problemsetAccessLog = [];
         foreach ($rs as $row) {
-            array_push($problemset_access_log, new ProblemsetAccessLog($row));
+            array_push($problemsetAccessLog, new ProblemsetAccessLog($row));
         }
-        return $problemset_access_log;
+        return $problemsetAccessLog;
     }
 }

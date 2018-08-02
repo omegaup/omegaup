@@ -272,8 +272,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 return null;
         }
 
-        $contest = new Problems($rs);
-        return $contest;
+        return new Problems($rs);
     }
 
     final public static function searchByAlias($alias) {

@@ -18,7 +18,7 @@ require_once('base/States.vo.base.php');
   *
   */
 class StatesDAO extends StatesDAOBase {
-    final public static function getByCountry($country_id) {
+    final public static function getByCountry($countryId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -27,7 +27,7 @@ class StatesDAO extends StatesDAOBase {
                     country_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$country_id]);
+        $rs = $conn->Execute($sql, [$countryId]);
 
         $states = [];
         foreach ($rs as $row) {

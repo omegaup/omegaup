@@ -38,7 +38,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
         return $conn->GetOne($sql, $params);
     }
 
-    final public static function getByGroupId($group_id) {
+    final public static function getByGroupId($groupId) {
         $sql = '
             SELECT
                 *
@@ -48,11 +48,11 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
                 group_id = ?;';
 
         global $conn;
-        $groups_identities = [];
-        foreach ($conn->Execute($sql, [$group_id]) as $row) {
-            array_push($groups_identities, new GroupsIdentities($row));
+        $groupsIdentities = [];
+        foreach ($conn->Execute($sql, [$groupId]) as $row) {
+            array_push($groupsIdentities, new GroupsIdentities($row));
         }
-        return $groups_identities;
+        return $groupsIdentities;
     }
 
     final public static function getUsernamesByGroupId($group_id) {

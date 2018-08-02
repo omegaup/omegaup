@@ -21,10 +21,10 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
         global $conn;
         $rs = $conn->Execute($sql, [$difficulty]);
 
-        $problems_of_the_week = [];
+        $problemsOfTheWeek = [];
         foreach ($rs as $row) {
-            array_push($problems_of_the_week, new ProblemOfTheWeek($row));
+            array_push($problemsOfTheWeek, new ProblemOfTheWeek($row));
         }
-        return $problems_of_the_week;
+        return $problemsOfTheWeek;
     }
 }

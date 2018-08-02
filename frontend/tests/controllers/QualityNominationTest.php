@@ -807,14 +807,7 @@ class QualityNominationTest extends OmegaupTestCase {
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
-        $key = new QualityNominations([
-            'user_id' => $r['current_user_id'],
-            'problem_id' => $problem->problem_id,
-            'nomination' => $r['nomination'],
-            'contents' => json_encode([]), // re-encoding it for normalization.
-            'status' => 'open',
-        ]);
-        $problem_dismissed = QualityNominationsDAO::getByUserAndProblem(
+        $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
             $r['current_user_id'],
             $problem->problem_id,
             $r['nomination'],
@@ -823,7 +816,7 @@ class QualityNominationTest extends OmegaupTestCase {
         );
         RunsFactory::gradeRun($runData);
         try {
-            $this->assertEquals(0, count($problem_dismissed), 'Should not have been able to dismiss the problem');
+            $this->assertEquals(0, count($problemDismissed), 'Should not have been able to dismiss the problem');
         } catch (PreconditionFailedException $e) {
             // Expected.
         }

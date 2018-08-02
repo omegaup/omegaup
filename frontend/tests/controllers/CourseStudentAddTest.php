@@ -33,7 +33,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
         );
 
         $this->assertNotNull($studentsInGroup);
-        $this->assertEquals(1, count($studentsInGroup));
     }
 
     /**
@@ -205,7 +204,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
         );
 
         $this->assertNotNull($studentsInGroup);
-        $this->assertEquals(1, count($studentsInGroup));
     }
 
     /**

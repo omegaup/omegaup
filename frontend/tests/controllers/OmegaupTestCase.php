@@ -126,8 +126,6 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      */
     public function assertContest(Request $r) {
         // Validate that data was written to DB by getting the contest by title
-        $contest = new Contests();
-        $contest->title = $r['title'];
         $contests = ContestsDAO::getByTitle($r['title']);
         $contest = $contests[0];
 

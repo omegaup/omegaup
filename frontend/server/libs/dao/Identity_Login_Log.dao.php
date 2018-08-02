@@ -10,7 +10,7 @@ include('base/Identity_Login_Log.vo.base.php');
   *
   */
 class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
-    final public static function getByIdentity($identity_id) {
+    final public static function getByIdentity($identityId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -19,12 +19,12 @@ class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
                     identity_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$identity_id]);
+        $rs = $conn->Execute($sql, [$identityId]);
 
-        $identity_login_logs = [];
+        $identityLoginLogs = [];
         foreach ($rs as $row) {
-            array_push($identity_login_logs, new IdentityLoginLog($row));
+            array_push($identityLoginLogs, new IdentityLoginLog($row));
         }
-        return $identity_login_logs;
+        return $identityLoginLogs;
     }
 }

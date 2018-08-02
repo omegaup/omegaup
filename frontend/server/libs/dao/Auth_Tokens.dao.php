@@ -69,7 +69,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function getByIdentityId($identity_id) {
+    final public static function getByIdentityId($identityId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -78,12 +78,12 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     identity_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$identity_id]);
+        $rs = $conn->Execute($sql, [$identityId]);
 
-        $auth_tokens = [];
+        $authTokens = [];
         foreach ($rs as $row) {
-            array_push($auth_tokens, new AuthTokens($row));
+            array_push($authTokens, new AuthTokens($row));
         }
-        return $auth_tokens;
+        return $authTokens;
     }
 }

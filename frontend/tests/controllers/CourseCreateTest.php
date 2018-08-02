@@ -119,7 +119,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
         // There should exist 1 assignment with this alias
         $assignment = AssignmentsDAO::getByAlias($assignment_alias);
-        $this->assertEquals(1, count($assignment));
+        $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.
         $problemData = ProblemsFactory::createProblem(new ProblemParams([

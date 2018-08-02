@@ -27,7 +27,7 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
         return $conn->Affected_Rows();
     }
 
-    final public static function getByProblemId($problem_id) {
+    final public static function getByProblemId($problemId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -36,12 +36,12 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
                     problem_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problem_id]);
+        $rs = $conn->Execute($sql, [$problemId]);
 
-        $problems_languages = [];
+        $problemsLanguages = [];
         foreach ($rs as $row) {
-            array_push($problems_languages, new ProblemsLanguages($row));
+            array_push($problemsLanguages, new ProblemsLanguages($row));
         }
-        return $problems_languages;
+        return $problemsLanguages;
     }
 }
