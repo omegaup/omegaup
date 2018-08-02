@@ -7,6 +7,7 @@
           <label>{{ T.wordsMember }} <input autocomplete="off"
                  class="form-control typeahead"
                  name="username"
+                 ref="parent.member"
                  size="20"
                  type="text"></label>
         </div><button class="btn btn-primary"
@@ -22,13 +23,10 @@
       </thead>
       <tbody>
         <tr v-for="identity in identities">
-          <td>
-            <a v-bind:href=
-            "memberProfileUrl(identity.username)"><strong><omegaup-user-username v-bind:classname=
-            "identity.classname"
-                                   v-bind:username=
-                                   "identity.username"></omegaup-user-username></strong></a>
-          </td>
+          <td><strong><omegaup-user-username v-bind:classname="identity.classname"
+                                 v-bind:linkify="true"
+                                 v-bind:username=
+                                 "identity.username"></omegaup-user-username></strong></td>
           <td>
             <a class="glyphicon glyphicon-remove"
                 href="#"
@@ -50,13 +48,10 @@
       </thead>
       <tbody>
         <tr v-for="identity in groupIdentities">
-          <td>
-            <a v-bind:href=
-            "memberProfileUrl(identity.username)"><strong><omegaup-user-username v-bind:classname=
-            "identity.classname"
-                                   v-bind:username=
-                                   "identity.username"></omegaup-user-username></strong></a>
-          </td>
+          <td><strong><omegaup-user-username v-bind:classname="identity.classname"
+                                 v-bind:linkify="true"
+                                 v-bind:username=
+                                 "identity.username"></omegaup-user-username></strong></td>
           <td>{{ identity.name }}</td>
           <td>{{ identity.country }}</td>
           <td>{{ identity.state }}</td>
@@ -131,10 +126,8 @@ export default {
     onRemove: function(username) { this.$emit('remove', username);},
     reset: function() {
       this.memberUsername = '';
-
       $('input.typeahead', this.$el).typeahead('close').val('');
     },
-    memberProfileUrl: function(member) { return '/profile/' + member + '/';},
   },
   components: {
     'omegaup-user-username': user_Username,

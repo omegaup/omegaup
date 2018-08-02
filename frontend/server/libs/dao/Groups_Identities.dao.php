@@ -56,14 +56,14 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
         $rs = $conn->Execute($sql, [$group->group_id]);
         $identities = [];
         foreach ($rs as $row) {
+            $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
             if (strpos($row['username'], ':') === false) {
                 array_push($identities, [
                     'username' => $row['username'],
-                    'classname' => $row['classname'] ?? 'user-rank-unranked',
+                    'classname' => $row['classname'],
                 ]);
                 continue;
             }
-            $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
             array_push($identities, $row);
         }
         return $identities;

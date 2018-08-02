@@ -56,7 +56,7 @@ OmegaUp.on('ready', function() {
           groupMembers.identities = [];
           groupMembers.groupIdentities = [];
           for (let identity of data.identities) {
-            if (identity.username.split(':').length == 1) {
+            if (!identity.username.includes(':')) {
               groupMembers.identities.push(identity);
             } else {
               groupMembers.groupIdentities.push(identity);
