@@ -18,4 +18,20 @@ require_once('base/Roles.vo.base.php');
   *
   */
 class RolesDAO extends RolesDAOBase {
+    final public static function getByName($name) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Roles
+                WHERE
+                    name = ?';
+
+        global $conn;
+        $row = $conn->GetRow($sql, [$name]);
+        if (count($row) == 0) {
+            return null;
+        }
+
+        return new Roles($row);
+    }
 }

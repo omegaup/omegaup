@@ -169,4 +169,24 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         }
         return $username == $rs['username'];
     }
+
+    final public static function getByTimeAndRank($time, $rank) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?
+                AND
+                    `rank` = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$time, $rank]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
+    }
 }

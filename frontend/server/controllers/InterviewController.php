@@ -194,8 +194,6 @@ class InterviewController extends Controller {
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
 
-        $thisResult = [];
-
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
             throw new NotFoundException('interviewNotFound');
@@ -206,14 +204,8 @@ class InterviewController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $thisResult['description'] = $interview->description;
-        $thisResult['contest_alias'] = $interview->alias;
-        $thisResult['problemset_id'] = $interview->problemset_id;
-
         try {
-            $db_results = ProblemsetIdentitiesDAO::search(new ProblemsetIdentities([
-                'problemset_id' => $interview->problemset_id,
-            ]));
+            $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -222,31 +214,24 @@ class InterviewController extends Controller {
         $users = [];
 
         // Add all users to an array
-        foreach ($db_results as $result) {
-            // @TODO: Slow queries ahead
-            $user_id = $result->user_id;
-            $user = UsersDAO::getByPK($user_id);
-
-            try {
-                $email = EmailsDAO::getByPK($user->main_email_id);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            $problemsetOpened = UserController::userOpenedProblemset($interview->problemset_id, $user_id);
+        foreach ($problemsetIdentities as $identity) {
             $users[] = [
-                        'user_id' => $user_id,
-                        'username' => $user->username,
-                        'access_time' => $result->access_time,
-                        'email' => $email->email,
-                        'opened_interview' => $problemsetOpened,
-                        'country' => $user->country_id];
+                        'user_id' => $identity['user_id'],
+                        'username' => $identity['username'],
+                        'access_time' => $identity['access_time'],
+                        'email' => $identity['email'],
+                        'opened_interview' => !is_null($identity['access_time']),
+                        'country' => $identity['country_id'],
+                    ];
         }
 
-        $thisResult['users'] = $users;
-        $thisResult['status'] = 'ok';
-
-        return $thisResult;
+        return [
+            'description' => $interview->description,
+            'contest_alias' => $interview->alias,
+            'problemset_id' => $interview->problemset_id,
+            'users' => $users,
+            'status' => 'ok',
+        ];
     }
 
     public static function apiList(Request $r) {

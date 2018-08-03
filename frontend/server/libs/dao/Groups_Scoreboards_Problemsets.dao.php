@@ -10,4 +10,15 @@ include_once('base/Groups_Scoreboards_Problemsets.vo.base.php');
   *
   */
 class GroupsScoreboardsProblemsetsDAO extends GroupsScoreboardsProblemsetsDAOBase {
+    public static function getByGroupScoreboard($group_scoreboard_id) {
+        $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
+        global $conn;
+        $rs = $conn->Execute($sql, [$group_scoreboard_id]);
+
+        $groupsScoreboardsProblemsets = [];
+        foreach ($rs as $row) {
+            array_push($groupsScoreboardsProblemsets, new GroupsScoreboardsProblemsets($row));
+        }
+        return $groupsScoreboardsProblemsets;
+    }
 }
