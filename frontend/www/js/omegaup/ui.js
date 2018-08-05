@@ -33,6 +33,10 @@ let UI = {
     return clock;
   },
 
+  isVirtual: function(contest) {
+	  return contest.rerun_id != 0;
+  },
+
   rankingUsername: function(rank) {
     let username = rank.username;
     if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;

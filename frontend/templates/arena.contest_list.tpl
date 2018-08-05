@@ -35,7 +35,7 @@
 						</a>
 					</td>
 {if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
-					<td class="col-md-2" data-bind="visible: $parent.showVirtual">
+					<td class="col-md-2" data-bind="visible: (!isVirtual && $parent.showVirtual)">
 						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
 							<span>{#virtualContest#}</span>
 						</a>

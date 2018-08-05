@@ -94,8 +94,8 @@ export default {
   },
   data: function() {
     return {
-      showTab: this.isVirtual() ? 'contestants' : 'new_form',
-      T: T, virtual: this.isVirtual(),
+      showTab: UI.isVirtual(this.data.contest) ? 'contestants' : 'new_form',
+      T: T, virtual: UI.isVirtual(this.data.contest),
       UI: UI,
       contest: this.data.contest,
       problems: this.data.problems,
@@ -103,9 +103,6 @@ export default {
       admins: this.data.admins,
       groupAdmins: this.data.groupAdmins,
     };
-  },
-  methods: {
-    isVirtual: function() { return this.data.contest.rerun_id != 0;},
   },
   components: {
     'omegaup-contest-new-form': ContestNewForm,

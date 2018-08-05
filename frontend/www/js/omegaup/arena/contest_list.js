@@ -79,6 +79,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
             // Create contest view model from contest data model.
             data.results.each(function(contest) {
               contest.contestLink = '/arena/' + contest.alias;
+              contest.isVirtual = omegaup.UI.isVirtual(contest);
               contest.practiceLink = contest.contestLink + '/practice/';
               contest.duration = omegaup.UI.toDDHHMM(contest.duration);
               contest.startLink =
