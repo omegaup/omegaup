@@ -917,13 +917,13 @@ class ContestController extends Controller {
 
         // Initialize contest
         $contest = new Contests();
-        $contest->title = $originalContest->title . " [virtual]";
+        $contest->title = $originalContest->title . ' [virtual]';
         $contest->description = $originalContest->description;
         $contest->window_length = $originalContest->window_length;
         $contest->public = 0; // Virtual contest must be private
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contestLength);
-        $contest->scoreboard = $originalContest->scoreboard;
+        $contest->scoreboard = 100; // Always show scoreboard in virtual contest
         $contest->alias = $virtualContestAlias;
         $contest->points_decay_factor = $originalContest->points_decay_factor;
         $contest->submissions_gap = $originalContest->submissions_gap;
