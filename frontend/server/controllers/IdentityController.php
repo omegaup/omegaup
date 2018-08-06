@@ -50,6 +50,138 @@ class IdentityController extends Controller {
     }
 
     /**
+     * Entry point for Update an Identity API
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdate(Request $r) {
+        self::validateRequest($r);
+        self::resolveIdentity($r['username']);
+
+        // Save objects into DB
+        try {
+            // Prepare DAOs
+            $identity = self::createIdentity(
+                $r['username'],
+                $r['name'],
+                $r['country_id'],
+                $r['state_id'],
+                $r['gender'],
+                $r['school_name'],
+                $r['group_alias']
+            );
+
+            // Save in DB
+            IdentitiesDAO::save($identity);
+        } catch (ApiException $e) {
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Entry point for change passowrd of an identity
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws DuplicatedEntryInDatabaseException
+     */
+    public static function apiChangePassword(Request $r) {
+        self::validateRequest($r);
+        $identity = self::resolveIdentity($r['username']);
+
+        SecurityTools::testStrongPassword($r['password']);
+        $hashedPassword = SecurityTools::hashString($r['password']);
+
+        // Save object into DB
+        try {
+            // Update password
+            IdentitiesDAO::save(new Identities([
+                'identity_id' => $identity->identity_id,
+                'password' => $hashedPassword,
+            ]));
+        } catch (ApiException $e) {
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * @param Request $r
+     * @throws InvalidParameterException
+     */
+    private static function validateRequest(Request $r) {
+        self::authenticateRequest($r);
+        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
+            throw new ForbiddenAccessException();
+        }
+        GroupController::validateGroup($r);
+        if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
+            throw new InvalidParameterException('parameterInvalid', 'identities');
+        }
+    }
+
+    public static function validateIdentity($username, &$name, &$gender, $groupAlias) {
+        // Check group is present
+        $identityUsername = explode(':', $username);
+        if (count($identityUsername) != 2) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+        $identityGroupAlias = $identityUsername[0];
+        if ($identityGroupAlias != $groupAlias) {
+            throw new InvalidParameterException('parameterInvalid', 'group_alias');
+        }
+        // Validate request
+        Validators::isValidUsernameIdentity($identityUsername[1], 'username');
+
+        if (!is_null($name)) {
+            $name = trim($name);
+            Validators::isStringNonEmpty($name, 'name', true);
+            Validators::isStringOfMaxLength($name, 'name', 50);
+        }
+
+        if (!is_null($gender)) {
+            $gender = trim($gender);
+        }
+        if (!empty($gender)) {
+            Validators::isInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+        }
+    }
+
+    private static function createIdentity(
+        $username,
+        $name,
+        $countryId,
+        $stateId,
+        $gender,
+        $school,
+        $aliasGroup
+    ) {
+        self::validateIdentity($username, $name, $gender, $aliasGroup);
+
+        $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
+        $schoolId = SchoolController::createSchool(trim($school), $state);
+
+        return new Identities([
+            'username' => $username,
+            'name' => $name,
+            'country_id' => $countryId,
+            'state_id' => $stateId,
+            'gender' => $gender,
+            'school_id' => $schoolId,
+        ]);
+    }
+
+    /**
      * Get identity profile from cache
      * Requires $r["identity"] to be an actual Identity
      *
