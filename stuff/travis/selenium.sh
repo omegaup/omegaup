@@ -6,16 +6,17 @@ stage_before_install() {
 	init_submodules
 	init_frontend_submodules
 
+	# Install pre-dependencies
+	python3.5 -m pip install --user --upgrade pip
+	python3.5 -m pip install --user selenium
+	python3.5 -m pip install --user pytest
+	python3.5 -m pip install --user pytest-xdist
+	python3.5 -m pip install --user flaky
+
 	install_yarn
 }
 
 stage_install() {
-	# Install pre-dependencies
-	pip3 install --user selenium
-	pip3 install --user pytest
-	pip3 install --user pytest-xdist
-	pip3 install --user flaky
-
 	# Expand all templates
 	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do
 		/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" "${tpl}" > "${tpl%.tpl}"
