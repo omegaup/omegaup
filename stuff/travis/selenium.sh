@@ -55,7 +55,7 @@ stage_before_script() {
 
 stage_script() {
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
-	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
+	python3.5 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 		--verbose --capture=no --log-cli-level=INFO --browser=chrome \
 		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 }
