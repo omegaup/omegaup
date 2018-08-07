@@ -518,6 +518,8 @@ export default {
 
     addGroup: _call('/api/user/addgroup/'),
 
+    addIdentity: _call('/api/user/addIdentity/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -542,7 +544,11 @@ export default {
 
     list: _call('/api/user/list/'),
 
+    listIdentities: _call('/api/user/listIdentities/'),
+
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+
+    markAsDefault: _call('/api/user/markAsDefault/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 
@@ -560,6 +566,8 @@ export default {
     removeExperiment: _call('/api/user/removeexperiment/'),
 
     removeGroup: _call('/api/user/removegroup/'),
+
+    removeIdentity: _call('/api/user/removeIdentity/'),
 
     removeRole: _call('/api/user/removerole/'),
 

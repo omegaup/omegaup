@@ -47,6 +47,7 @@ module.exports = [{
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
+    user_manage_identities : './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
     omegaup_styles: './frontend/www/sass/main.scss',

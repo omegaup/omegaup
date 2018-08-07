@@ -300,6 +300,10 @@ let UI = {
 
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
 
+  identityTypeahead: function(elem, cb) {
+    UI.typeahead(elem, API.User.listIdentities, cb);
+  },
+
   groupTypeahead: function(elem, cb) {
     UI.typeahead(elem, API.Group.list, cb);
   },

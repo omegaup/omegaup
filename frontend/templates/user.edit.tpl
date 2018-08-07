@@ -155,8 +155,11 @@
 					</div>
 				</form>
 			</div>
-
 		</div>
+
+		<div id="manage-identities"></div>
+		<script type="text/javascript" src="{version_hash src="/js/dist/user_manage_identities.js"}"></script>
+
 		{block name="basic-content"}
 		<div class="panel panel-default">
 			<div class="panel-heading">
