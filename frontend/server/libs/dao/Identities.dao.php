@@ -163,4 +163,93 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return $rs;
     }
+
+    public static function getUnlinkedIdentities($usernameOrName) {
+        global  $conn;
+        $sql = "
+            SELECT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                (i.username = ? OR i.name = ?)
+                AND user_id IS NULL
+            UNION DISTINCT
+            SELECT DISTINCT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                (i.username LIKE CONCAT('%', ?, '%') OR
+                i.username LIKE CONCAT('%', ?, '%'))
+                AND user_id IS NULL
+            LIMIT 10";
+        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+
+        $rs = $conn->Execute($sql, $args);
+        $result = [];
+        foreach ($rs as $identity) {
+            array_push($result, new Identities($identity));
+        }
+        return $result;
+    }
+
+    public static function getLinkedIdentities($userId) {
+        global  $conn;
+        $sql = '
+            SELECT
+                i.username,
+                i.identity_id,
+                u.main_identity_id
+            FROM
+                Identities i
+            INNER JOIN
+                Users u
+            ON
+                i.user_id = u.user_id
+            WHERE
+                i.user_id = ?
+                ';
+
+        $rs = $conn->Execute($sql, [$userId]);
+        $result = [];
+        foreach ($rs as $identity) {
+            array_push($result, [
+                'username' => $identity['username'],
+                'default' => $identity['identity_id'] == $identity['main_identity_id'],
+            ]);
+        }
+        return $result;
+    }
+
+    public static function linkIdentityToUser($userId, $username) {
+        global $conn;
+        $sql = '
+            UPDATE
+                Identities
+            SET
+                user_id = ?
+            WHERE
+                username = ?
+        ';
+        $conn->Execute($sql, [$userId, $username]);
+
+        return $conn->Affected_Rows();
+    }
+
+    public static function unlinkIdentityToUser($userId, $username) {
+        global $conn;
+        $sql = '
+            UPDATE
+                Identities
+            SET
+                user_id = NULL
+            WHERE
+                user_id = ?
+                AND username = ?
+        ';
+        $conn->Execute($sql, [$userId, $username]);
+
+        return $conn->Affected_Rows();
+    }
 }
