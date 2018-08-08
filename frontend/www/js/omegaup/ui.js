@@ -301,7 +301,7 @@ let UI = {
   userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
 
   identityTypeahead: function(elem, cb) {
-    UI.typeahead(elem, API.User.listIdentities, cb);
+    UI.typeahead(elem, API.User.listFreeIdentities, cb);
   },
 
   groupTypeahead: function(elem, cb) {

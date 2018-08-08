@@ -23,15 +23,6 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
-          'mark-as-default': function(username) {
-            API.User.markAsDefault({
-                      usernameOrEmail: username,
-                    })
-                .then(function(data) {
-                  UI.success(T.profileIdentityMarkedAsDefault);
-                })
-                .fail(UI.apiError);
-          },
           remove: function(identity) {
             API.User.removeIdentity({usernameOrEmail: identity.username})
                 .then(function(data) {

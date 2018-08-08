@@ -544,11 +544,11 @@ export default {
 
     list: _call('/api/user/list/'),
 
+    listFreeIdentities: _call('/api/user/listFreeIdentities/'),
+
     listIdentities: _call('/api/user/listIdentities/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
-
-    markAsDefault: _call('/api/user/markAsDefault/'),
 
     problemsSolved: _call('/api/user/problemssolved/'),
 

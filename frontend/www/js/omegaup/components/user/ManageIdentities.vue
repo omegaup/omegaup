@@ -31,17 +31,12 @@
         <thead>
           <tr>
             <th>{{ T.wordsIdentity }}</th>
-            <th>{{ T.profileIdentitiesMarkAsDefault }}</th>
             <th class="align-right">{{ T.wordsDelete }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="identity in identities">
             <td>{{ identity.username }}</td>
-            <td><label><input name="default-identity"
-                   type="radio"
-                   v-bind:checked="identity.default"
-                   v-on:click="onMarkAsDefault(identity)"></label></td>
             <td><button class="close"
                     type="button"
                     v-on:click="onRemove(identity)">×</button></td>
@@ -74,9 +69,6 @@ export default {
     onAddIdentity: function() {
       this.username = $('input.typeahead.tt-input', this.$el).val();
       this.$emit('add-identity', this.username);
-    },
-    onMarkAsDefault: function(identity) {
-      this.$emit('mark-as-default', identity.username);
     },
     onRemove: function(identity) { this.$emit('remove', identity);},
     reset: function() {
