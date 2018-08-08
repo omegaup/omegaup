@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
                         'usernameOrEmail': coursePayload.currentUsername,
                         'share_user_information': ev.shareUserInformation,
                         'accept_teacher': ev.acceptTeacher,
-                        'git_object_id':
+                        'privacy_git_object_id':
                             coursePayload.statements.privacy.gitObjectId,
                         'accept_teacher_git_object_id':
                             coursePayload.statements.acceptTeacher.gitObjectId,

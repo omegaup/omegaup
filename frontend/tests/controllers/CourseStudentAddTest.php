@@ -83,7 +83,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
             'share_user_information' => 1,
-            'git_object_id' => $intro_details['git_object_id'],
+            'privacy_git_object_id' => $intro_details['git_object_id'],
             'statement_type' => $intro_details['statement_type'],
         ]));
 
@@ -94,7 +94,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
                 'usernameOrEmail' => $student->username,
                 'course_alias' => $courseData['course_alias'],
                 'share_user_information' => 1,
-                'git_object_id' => $intro_details['git_object_id'],
+                'privacy_git_object_id' => $intro_details['git_object_id'],
                 'statement_type' => $intro_details['statement_type'],
             ]));
             $this->fail('Should have thrown an InvalidDatabaseOperationException');
