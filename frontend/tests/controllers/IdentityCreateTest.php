@@ -87,6 +87,34 @@ class IdentityCreateTest extends OmegaupTestCase {
     }
 
     /**
+     * Test for creating an identity without group
+     */
+    public function testCreateIdentityWithoutGroup() {
+        // Identity creator group member will upload csv file
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $identityName = substr(Utils::CreateRandomString(), -10);
+        // Call api using identity creator group member
+        try {
+            $response = IdentityController::apiCreate(new Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => $identityName,
+                'name' => $identityName,
+                'password' => Utils::CreateRandomString(),
+                'country_id' => 'MX',
+                'state_id' => 'QUE',
+                'gender' => 'male',
+                'school_name' => Utils::CreateRandomString(),
+                'group_alias' => $group['group']->alias,
+            ]));
+            $this->fail('Identity should not be created because group alias must be included in username');
+        } catch (InvalidParameterException $e) {
+            // OK.
+        }
+    }
+
+    /**
      * Test for creating an identity with wrong username
      */
     public function testCreateIdentityWithWrongUsername() {
