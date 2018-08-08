@@ -10,4 +10,21 @@ include('base/Identity_Login_Log.vo.base.php');
   *
   */
 class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
+    final public static function getByIdentity($identityId) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Identity_Login_Log
+                WHERE
+                    identity_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$identityId]);
+
+        $identityLoginLogs = [];
+        foreach ($rs as $row) {
+            array_push($identityLoginLogs, new IdentityLoginLog($row));
+        }
+        return $identityLoginLogs;
+    }
 }
