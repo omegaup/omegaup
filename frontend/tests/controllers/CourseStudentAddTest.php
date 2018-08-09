@@ -82,7 +82,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
             'share_user_information' => 1,
-            'git_object_id' => $intro_details['git_object_id'],
+            'privacy_git_object_id' => $intro_details['git_object_id'],
             'statement_type' => $intro_details['statement_type'],
         ]));
 
@@ -93,7 +93,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
                 'usernameOrEmail' => $student->username,
                 'course_alias' => $courseData['course_alias'],
                 'share_user_information' => 1,
-                'git_object_id' => $intro_details['git_object_id'],
+                'privacy_git_object_id' => $intro_details['git_object_id'],
                 'statement_type' => $intro_details['statement_type'],
             ]));
             $this->fail('Should have thrown an InvalidDatabaseOperationException');
@@ -290,7 +290,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'auth_token' => $studentLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
-            'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+            'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             'accept_teacher' => 'yes',
         ]));
         $intro_details = CourseController::apiIntroDetails(new Request([

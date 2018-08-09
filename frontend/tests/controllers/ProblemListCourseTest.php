@@ -51,7 +51,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'yes',
-                'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             ]));
         }
         $adminLogin = self::login($courseData['admin']);
@@ -143,7 +143,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'no',
-                'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
             ]));
         }
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
@@ -169,7 +169,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'usernameOrEmail' => $user[2]->username,
             'accept_teacher' => 'yes',
-            'teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+            'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
         ]));
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
             'auth_token' => $adminLogin->auth_token,
