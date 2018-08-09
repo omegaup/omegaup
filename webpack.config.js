@@ -45,6 +45,7 @@ module.exports = [{
     qualitynomination_list: './frontend/www/js/omegaup/qualitynomination/list.js',
     qualitynomination_demotionpopup:'./frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details: './frontend/www/js/omegaup/qualitynomination/details.js',
+    user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
