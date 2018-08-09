@@ -36,15 +36,13 @@ class GroupsFactory {
         ]);
 
         $response = GroupController::apiCreate($r);
-        $groups = GroupsDAO::search(new Groups([
-            'alias' => $alias
-        ]));
+        $group = GroupsDAO::FindByAlias($alias);
 
         return [
             'request' => $r,
             'response' => $response,
             'owner' => $owner,
-            'group' => $groups[0]
+            'group' => $group
         ];
     }
 
@@ -96,14 +94,12 @@ class GroupsFactory {
         ]);
         $response = GroupController::apiCreateScoreboard($request);
 
-        $scoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards([
-            'alias' => $alias
-        ]));
+        $scoreboard = GroupsScoreboardsDAO::getByAlias($alias);
 
         return [
             'request' => $request,
             'response' => $response,
-            'scoreboard' => $scoreboards[0]
+            'scoreboard' => $scoreboard
         ];
     }
 

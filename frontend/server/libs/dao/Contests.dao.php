@@ -158,6 +158,19 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
+    final public static function getByTitle($title) {
+        $sql = 'SELECT * FROM Contests WHERE title = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$title]);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
     final public static function getByAliasWithExtraInformation($alias) {
         $sql = '
                 SELECT
@@ -178,12 +191,11 @@ class ContestsDAO extends ContestsDAOBase {
         if (count($rs) == 0) {
             return null;
         }
-
         return $rs;
     }
 
     final public static function getByProblemset($problemset_id) {
-        $sql = 'SELECT * FROM Contests WHERE problemset_id = ?;';
+        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
         global $conn;
         $row = $conn->GetRow($sql, [$problemset_id]);
         if (count($row) == 0) {
