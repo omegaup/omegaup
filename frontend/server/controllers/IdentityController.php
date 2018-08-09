@@ -57,27 +57,24 @@ class IdentityController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdate(Request $r) {
-        self::validateRequest($r);
-        self::resolveIdentity($r['username']);
+        self::validateUpdateRequest($r);
+        $original_identity = self::resolveIdentity($r['username']);
 
-        // Save objects into DB
-        try {
-            // Prepare DAOs
-            $identity = self::createIdentity(
-                $r['username'],
-                $r['name'],
-                $r['country_id'],
-                $r['state_id'],
-                $r['gender'],
-                $r['school_name'],
-                $r['group_alias']
-            );
+        // Prepare DAOs
+        $identity = self::createIdentity(
+            $r['username'],
+            $r['name'],
+            $r['country_id'],
+            $r['state_id'],
+            $r['gender'],
+            $r['school_name'],
+            $r['group_alias']
+        );
 
-            // Save in DB
-            IdentitiesDAO::save($identity);
-        } catch (ApiException $e) {
-            throw $e;
-        }
+        $identity->identity_id = $original_identity->identity_id;
+
+        // Save in DB
+        IdentitiesDAO::save($identity);
 
         return [
             'status' => 'ok',
@@ -93,7 +90,7 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(Request $r) {
-        self::validateRequest($r);
+        self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 
         SecurityTools::testStrongPassword($r['password']);
@@ -119,7 +116,7 @@ class IdentityController extends Controller {
      * @param Request $r
      * @throws InvalidParameterException
      */
-    private static function validateRequest(Request $r) {
+    private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
