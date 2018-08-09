@@ -341,7 +341,7 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $exclude_admin = false) {
+    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $excludeAdmin = true) {
         // Build SQL statement
         $log = Logger::getLogger('Scoreboard');
         if ($showAllRuns) {
@@ -362,8 +362,7 @@ class RunsDAO extends RunsDAOBase {
                     Authorization::SYSTEM_ACL,
                     Authorization::ADMIN_ROLE,
                 ];
-                if ($exclude_admin) {
-                    $log->info('EXCLUDE ADMIN');
+                if ($excludeAdmin) {
                     $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
                     $val[] =  $acl_id;
                 }

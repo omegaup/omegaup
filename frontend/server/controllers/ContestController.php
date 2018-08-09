@@ -917,7 +917,7 @@ class ContestController extends Controller {
 
         // Initialize contest
         $contest = new Contests();
-        $contest->title = $originalContest->title . ' [virtual]';
+        $contest->title = $originalContest->title;
         $contest->description = $originalContest->description;
         $contest->window_length = $originalContest->window_length;
         $contest->public = 0; // Virtual contest must be private
