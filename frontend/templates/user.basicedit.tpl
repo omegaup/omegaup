@@ -2,5 +2,4 @@
 {block name="basic-content"}
 	<div id="user-basic-edit"></div>
 	<script type="text/javascript" src="{version_hash src="/js/dist/user_basic_edit.js"}"></script>
-	<script type="text/javascript" src="{version_hash src="/js/user.basicedit.js"}"></script>
 {/block}
