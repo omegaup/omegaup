@@ -157,7 +157,7 @@ class IdentityController extends Controller {
             throw new InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
-        Validators::isValidUsernameIdentity($identityUsername[1], 'username');
+        Validators::isValidUsernameIdentity($username, 'username');
 
         if (!is_null($name)) {
             $name = trim($name);
