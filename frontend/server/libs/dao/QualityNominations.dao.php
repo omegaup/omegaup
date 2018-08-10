@@ -449,4 +449,36 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
         return $mostVoted;
     }
+
+    final public static function getByUserAndProblem(
+        $userId,
+        $problemId,
+        $nomination,
+        $contents,
+        $status
+    ) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    QualityNominations
+                WHERE
+                    user_id = ?
+                AND
+                    problem_id = ?
+                AND
+                    nomination = ?
+                AND
+                    contents = ?
+                AND
+                    status = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$userId, $problemId, $nomination, $contents, $status]);
+
+        $qualityNominations = [];
+        foreach ($rs as $row) {
+            array_push($qualityNominations, new QualityNominations($row));
+        }
+        return $qualityNominations;
+    }
 }

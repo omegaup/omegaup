@@ -118,11 +118,8 @@ class CourseCreateTest extends OmegaupTestCase {
         ]));
 
         // There should exist 1 assignment with this alias
-        $assignments = AssignmentsDAO::search([
-            'alias' => $assignment_alias,
-        ]);
-        $this->assertEquals(1, count($assignments));
-        $assignment = $assignments[0];
+        $assignment = AssignmentsDAO::getByAlias($assignment_alias);
+        $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -138,9 +135,7 @@ class CourseCreateTest extends OmegaupTestCase {
             'points' => $points,
         ]));
 
-        $problems = ProblemsetProblemsDAO::search([
-            'problemset_id' => $assignment->problemset_id,
-        ]);
+        $problems = ProblemsetProblemsDAO::getByProblemset($assignment->problemset_id);
         $this->assertEquals(1, count($problems));
         $this->assertEquals($points, $problems[0]->points);
     }
