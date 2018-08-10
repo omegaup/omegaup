@@ -14,45 +14,17 @@
                     <th>{#wordsEndTime#}</th>
                     <th>{#wordsNumHomeworks#}</th>
                     <th>{#wordsNumTests#}</th>
-                    <th colspan="2">{#wordsActions#}</th>
+                    <th>{#wordsActions#}</th>
                 </tr>
             </thead>
             <tbody data-bind="foreach: course">
                 <tr>
-                    <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
+                    <td><a data-bind="text: name, attr: { href: courseURL }"></a></td>
                     <td data-bind="text: startDate"></td>
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>
                     <td data-bind="text: numTests"></td>
-                    <td><a class="glyphicon glyphicon-list-alt" data-bind="attr: { href: submissionsListUrl, title: submissionsList }" /></td>
-                    <td><a class="glyphicon glyphicon-time" data-bind="attr: { href: activityURL, title: activity }" /></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-</template>
-
-<template id="student-course-list">
-<div class="panel">
-    <div class="panel-body">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>{#wordsName#}</th>
-                    <th>{#wordsStartTime#}</th>
-                    <th>{#wordsEndTime#}</th>
-                    <th>{#wordsNumHomeworks#}</th>
-                    <th>{#wordsNumTests#}</th>
-                </tr>
-            </thead>
-            <tbody data-bind="foreach: course">
-                <tr>
-                    <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
-                    <td data-bind="text: startDate"></td>
-                    <td data-bind="text: endDate"></td>
-                    <td data-bind="text: numHomeworks"></td>
-                    <td data-bind="text: numTests"></td>
+                    <td><a data-bind="text: activity, attr: { href: activityURL }"></a></td>
                 </tr>
             </tbody>
         </table>
@@ -110,14 +82,14 @@
                 </div>
                 <div class="tab-pane" id="tab-student-courses-current">
                     <div id="student-courses-current"
-             data-bind="template: { name: 'student-course-list',
+             data-bind="template: { name: 'course-list',
                                     if: studentCoursesCurrent().length > 0,
                                     data: { listName: '{#courseListStudentCurrentCourses#}',
                                             course: studentCoursesCurrent() }  }"></div>
                 </div>
                 <div class="tab-pane" id="tab-student-courses-current">
                     <div id="student-courses-past"
-             data-bind="template: { name: 'student-course-list',
+             data-bind="template: { name: 'course-list',
                                     if: studentCoursesPast().length > 0,
                                     data: { listName: '{#courseListStudentPastCourses#}',
                                             course: studentCoursesPast() }  }"></div>

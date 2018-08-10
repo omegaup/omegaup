@@ -49,10 +49,12 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestAddproblemContestOrder#}</th>
-					<th>{#contestAddproblemProblemName#}</th>
-					<th>{#contestAddproblemProblemPoints#}</th>
-					<th>{#contestAddproblemProblemRemove#}</th>
+					<tr>
+						<th>{#contestAddproblemContestOrder#}</th>
+						<th>{#contestAddproblemProblemName#}</th>
+						<th>{#contestAddproblemProblemPoints#}</th>
+						<th>{#contestAddproblemProblemRemove#}</th>
+					</tr>
 				</thead>
 				<tbody id="contest-problems"></tbody>
 			</table>
@@ -70,7 +72,7 @@
 							<option value="registration">{#wordsRegistration#}</option>
 							<option value="public">{#wordsPublic#}</option>
 						</select>
-						<p class="help-block">{#contestNewFormAdmissionModeDescription#}</p>
+						<div class="help-block">{#contestNewFormAdmissionModeDescription#}</div>
 					</div>
 
 					<button class="btn btn-primary" type="submit">{#wordsSaveChanges#}</button>
@@ -103,9 +105,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#wordsUser#}</th>
-					<th>{#contestAdduserRegisteredUserTime#}</th>
-					<th>{#contestAdduserRegisteredUserDelete#}</th>
+					<tr>
+						<th>{#wordsUser#}</th>
+						<th>{#contestAdduserRegisteredUserTime#}</th>
+						<th>{#contestAdduserRegisteredUserDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="contest-users"></tbody>
 			</table>
@@ -141,9 +145,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestEditRegisteredAdminUsername#}</th>
-					<th>{#contestEditRegisteredAdminRole#}</th>
-					<th>{#contestEditRegisteredAdminDelete#}</th>
+					<tr>
+						<th>{#contestEditRegisteredAdminUsername#}</th>
+						<th>{#contestEditRegisteredAdminRole#}</th>
+						<th>{#contestEditRegisteredAdminDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="contest-admins"></tbody>
 			</table>
@@ -165,9 +171,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestEditRegisteredGroupAdminName#}</th>
-					<th>{#contestEditRegisteredAdminRole#}</th>
-					<th>{#contestEditRegisteredAdminDelete#}</th>
+					<tr>
+						<th>{#contestEditRegisteredGroupAdminName#}</th>
+						<th>{#contestEditRegisteredAdminRole#}</th>
+						<th>{#contestEditRegisteredAdminDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="contest-group-admins"></tbody>
 			</table>
@@ -177,21 +185,21 @@
 	<div class="tab-pane" id="links">
 		<div class="panel panel-primary">
 			<div class="panel-body">
-			<table class="table table-striped">
-				<thead>
-					<h3>{#contestEditAdministrativeLinks#}</h3>
-				</thead>
-				<tbody class="contest-admin-links">
-					<tr>
-						<td><a id="submissions">{#wordsSubmissions#}</a></td>
-						<td><a id="conteststats">{#profileStatistics#}</a></td>
-						<td><a id="activityreport">{#wordsActivityReport#}</a></td>
-						<td><a id="printableversion">{#contestPrintableVersion#}</a></td>
-						<td><a id="publicscoreboard">{#contestScoreboardLink#}</a></td>
-						<td><a id="adminscoreboard">{#contestScoreboardAdminLink#}</a></td>
-					</tr>
-				</tbody>
-			</table>
+				<h3>{#contestEditAdministrativeLinks#}</h3>
+				<table class="table table-striped">
+					<thead>
+					</thead>
+					<tbody class="contest-admin-links">
+						<tr>
+							<td><a id="submissions">{#wordsSubmissions#}</a></td>
+							<td><a id="conteststats">{#profileStatistics#}</a></td>
+							<td><a id="activityreport">{#wordsActivityReport#}</a></td>
+							<td><a id="printableversion">{#contestPrintableVersion#}</a></td>
+							<td><a id="publicscoreboard">{#contestScoreboardLink#}</a></td>
+							<td><a id="adminscoreboard">{#contestScoreboardAdminLink#}</a></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
