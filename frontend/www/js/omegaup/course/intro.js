@@ -5,7 +5,6 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   let coursePayload =
       JSON.parse(document.getElementById('course-payload').innerText);
-
   let courseIntro = new Vue({
     el: '#course-intro',
     render: function(createElement) {
@@ -15,16 +14,22 @@ OmegaUp.on('ready', function() {
           description: coursePayload.description,
           needsBasicInformation: coursePayload.needsBasicInformation,
           requestsUserInformation: coursePayload.requestsUserInformation,
-          privacyStatementMarkdown: coursePayload.privacyStatementMarkdown,
+          showAcceptTeacher: coursePayload.showAcceptTeacher,
+          statements: coursePayload.statements,
         },
         on: {
           submit: function(ev) {
             API.Course.addStudent({
                         'course_alias': coursePayload.alias,
                         'usernameOrEmail': coursePayload.currentUsername,
-                        'statement_type': coursePayload.statementType,
-                        'git_object_id': coursePayload.gitObjectId,
-                        'share_user_information': ev.shareUserInformation
+                        'share_user_information': ev.shareUserInformation,
+                        'accept_teacher': ev.acceptTeacher,
+                        'privacy_git_object_id':
+                            coursePayload.statements.privacy.gitObjectId,
+                        'accept_teacher_git_object_id':
+                            coursePayload.statements.acceptTeacher.gitObjectId,
+                        'statement_type':
+                            coursePayload.statements.privacy.statementType,
                       })
                 .then(function(data) {
                   window.location.replace('/course/' + coursePayload.alias);

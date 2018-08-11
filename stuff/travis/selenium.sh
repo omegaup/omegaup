@@ -6,16 +6,18 @@ stage_before_install() {
 	init_submodules
 	init_frontend_submodules
 
+	# Install pre-dependencies
+	python3.5 -m pip install --user --upgrade pip
+	# TODO: Figure out why 3.14.0 is broken
+	python3.5 -m pip install --user selenium==3.13.0
+	python3.5 -m pip install --user pytest
+	python3.5 -m pip install --user pytest-xdist
+	python3.5 -m pip install --user flaky
+
 	install_yarn
 }
 
 stage_install() {
-	# Install pre-dependencies
-	pip3 install --user selenium
-	pip3 install --user pytest
-	pip3 install --user pytest-xdist
-	pip3 install --user flaky
-
 	# Expand all templates
 	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do
 		/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" "${tpl}" > "${tpl%.tpl}"
@@ -55,7 +57,7 @@ stage_before_script() {
 
 stage_script() {
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
-	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
+	python3.5 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 		--verbose --capture=no --log-cli-level=INFO --browser=chrome \
 		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 }

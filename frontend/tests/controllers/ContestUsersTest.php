@@ -22,7 +22,7 @@ class ContestUsersTest extends OmegaupTestCase {
             ContestsFactory::addUser($contestData, $users[$i]);
         }
 
-        // Create a n+1 user who will just join to the contest withot being
+        // Create a n+1 user who will just join to the contest without being
         // added via API. For public contests, by entering to the contest, the user should be in
         // the list of contest's users.
         $nonRegisteredUser = UserFactory::createUser();

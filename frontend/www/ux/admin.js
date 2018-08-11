@@ -42,9 +42,9 @@ omegaup.OmegaUp.on('ready', function() {
           arena.submissionGap = parseInt(contest.submission_gap);
           if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
+          arena.initProblemsetId(contest);
           arena.initClock(contest.start_time, contest.finish_time);
           arena.initProblems(contest);
-          arena.initProblemsetId(contest);
           for (var idx in contest.problems) {
             var problem = contest.problems[idx];
             var problemName =
