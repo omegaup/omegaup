@@ -257,6 +257,10 @@ export default {
 
     listStudents: _call('/api/course/listStudents/'),
 
+    listSolvedProblems: _call('/api/course/listSolvedProblems/'),
+
+    listUnsolvedProblems: _call('/api/course/listUnsolvedProblems/'),
+
     removeAdmin: _call('/api/course/removeAdmin/'),
 
     removeAssignment: _call('/api/course/removeAssignment/'),

@@ -176,7 +176,7 @@ class UserRankTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
         $login = self::login($contestant);
 
-        $states = StatesDAO::search(['country_id' => 'MX']);
+        $states = StatesDAO::getByCountry('MX');
         UserController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
             'country_id' => 'MX',

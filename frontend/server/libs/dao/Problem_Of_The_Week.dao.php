@@ -10,4 +10,21 @@ include_once('base/Problem_Of_The_Week.vo.base.php');
   *
   */
 class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
+    final public static function getByDificulty($difficulty) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problem_Of_The_Week
+                WHERE
+                    difficulty = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$difficulty]);
+
+        $problemsOfTheWeek = [];
+        foreach ($rs as $row) {
+            array_push($problemsOfTheWeek, new ProblemOfTheWeek($row));
+        }
+        return $problemsOfTheWeek;
+    }
 }
