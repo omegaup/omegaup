@@ -7,9 +7,9 @@
 		<div class="panel-body">
 			<form id="add-password-form" class="form-horizontal" role="form">
 				<div class="form-group">
-					<label for="username" class="col-md-3 control-label">{#profileUsername#}</label>
+					<label for="basic-username" class="col-md-3 control-label">{#profileUsername#}</label>
 					<div class="col-md-7">
-						<input id="username" name="username" value="" type="text" size="30" class="form-control">
+						<input id="basic-username" name="username" value="" type="text" size="30" class="form-control">
 					</div>
 				</div>
 

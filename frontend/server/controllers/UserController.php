@@ -1685,6 +1685,8 @@ class UserController extends Controller {
 
         UsersDAO::save($r['current_user']);
 
+        IdentityController::convertFromUser($r['current_user']);
+
         // Expire profile cache
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
         $sessionController = new SessionController();
