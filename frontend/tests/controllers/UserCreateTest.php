@@ -190,6 +190,28 @@ class CreateUserTest extends OmegaupTestCase {
     }
 
     /**
+     * Tests usernames with invalid chars. Exception is expected
+     *
+     */
+    public function testUsernameWithInvalidChar() {
+        UserController::$permissionKey = uniqid();
+
+        // Call API
+        try {
+            $response = UserController::apiCreate(new Request([
+                'username' => 'invalid:username',
+                'password' => Utils::CreateRandomString(),
+                'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+                'permission_key' => UserController::$permissionKey,
+            ]));
+
+            $this->fail('Expected because of the invalid group name');
+        } catch (InvalidParameterException $e) {
+            // OK
+        }
+    }
+
+    /**
      * Admin can verify users only with username
      */
     public function testUsernameVerificationByAdmin() {

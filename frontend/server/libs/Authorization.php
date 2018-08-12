@@ -21,7 +21,7 @@ class Authorization {
     private static $support_group = null;
 
     // Cache for system group identity creators
-    private static $group_identity_creator = null;
+    private static $groupIdentityCreator = null;
 
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
@@ -225,15 +225,15 @@ class Authorization {
         );
     }
 
-    public static function isGroupIdentityCreator($identity_id) {
-        if (self::$group_identity_creator == null) {
-            self::$group_identity_creator = GroupsDAO::findByAlias(
+    public static function isGroupIdentityCreator($identityId) {
+        if (self::$groupIdentityCreator == null) {
+            self::$groupIdentityCreator = GroupsDAO::findByAlias(
                 Authorization::IDENTITY_CREATOR_GROUP_ALIAS
             );
         }
         return Authorization::isGroupMember(
-            $identity_id,
-            self::$group_identity_creator
+            $identityId,
+            self::$groupIdentityCreator
         );
     }
 
@@ -296,7 +296,7 @@ class Authorization {
         self::$quality_reviewer_group = null;
         self::$mentor_group = null;
         self::$support_group = null;
-        self::$group_identity_creator = null;
+        self::$groupIdentityCreator = null;
     }
 
     public static function canSubmitToProblemset($identity_id, $problemset) {
