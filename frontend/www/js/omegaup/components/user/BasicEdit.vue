@@ -55,7 +55,7 @@
 import {OmegaUp, T, API} from '../../omegaup.js';
 export default {
   data: function() {
-    return { T: T, newPassword1: "", newPassword2: "", username: "", }
+    return { T: T, newPassword1: '', newPassword2: '', username: '', }
   },
   mounted: function() {
     var self = this;
@@ -67,7 +67,7 @@ export default {
     formSubmit: function() {
       var self = this;
       if (self.newPassword1 != self.newPassword2) {
-        omegaup.UI.error('Los passwords nuevos deben ser iguales.');
+        omegaup.UI.error(T.userPasswordMustBeSame);
         return false;
       }
 

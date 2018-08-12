@@ -767,6 +767,7 @@ omegaup.OmegaUp.loadTranslations({
 	userNotInListOfRequests: "(Th3 u53r i5 n07 p3nding r3qu357 70 j0in.)",
 	userOrEmail: "(U53rnam3 0r 3mai1)",
 	userOrMailNotFound: "(U53rnam3 0r 3mai1 n07 f0und.)",
+	userPasswordMustBeSame: "(Th3 n3w pa55w0rd5 mu57 b3 7h3 5am3.)",
 	userProfileIsPrivate: "(Thi5 u53r'5 pr0fi13 i5 mark3d priva73; 50m3 inf0rma7i0n wi11 n07 b3 di5p1ay3d)",
 	userRemoveError: "(Th3r3 wa5 an 3rr0r r3m0ving a u53r.)",
 	userRemoveSuccess: "(U53r 5ucc355fu11y r3m0v3d!)",
