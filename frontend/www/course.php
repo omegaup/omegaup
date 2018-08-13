@@ -19,7 +19,8 @@ try {
     header('HTTP/1.1 404 Not Found');
     die();
 }
-if ($intro_details['shouldShowResults'] ||
+
+if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] ||
     ($intro_details['isFirstTimeAccess'] && $intro_details['requests_user_information'] != 'no')) {
     $smarty->assign('course_payload', [
         'name' => $intro_details['name'],
@@ -30,9 +31,19 @@ if ($intro_details['shouldShowResults'] ||
             !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
-        'privacyStatementMarkdown' => $intro_details['privacy_statement_markdown'],
-        'gitObjectId' => $intro_details['git_object_id'],
-        'statementType' => $intro_details['statement_type'],
+        'showAcceptTeacher' => $intro_details['showAcceptTeacher'],
+        'statements' => [
+            'privacy' => [
+                'markdown' => $intro_details['privacy_statement_markdown'],
+                'gitObjectId' => $intro_details['git_object_id'],
+                'statementType' => $intro_details['statement_type'],
+            ],
+            'acceptTeacher' => [
+                'markdown' => $intro_details['accept_teacher_statement']['markdown'],
+                'gitObjectId' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'statementType' => 'accept_teacher',
+            ],
+        ],
     ]);
 
     $smarty->display('../templates/arena.course.intro.tpl');

@@ -242,6 +242,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseListAdminPastCourses: "Cursos pasados (que ense\u00f1\u00e9)",
 	courseListStudentCurrentCourses: "Cursos actuales",
 	courseListStudentPastCourses: "Cursos pasados",
+	courseListSubmissionsByGroup: "Env\u00edos realizados por usuarios de este curso",
 	courseNew: "Nuevo curso",
 	courseNewFormBasicInformationRequired: "La informaci\u00f3n b\u00e1sica es requerida",
 	courseNewFormBasicInformationRequiredDesc: "Si est\u00e1 activado, todos los concursantes deben haber registrado su informaci\u00f3n b\u00e1sica para unirse al curso (pa\u00eds, estado y escuela)",

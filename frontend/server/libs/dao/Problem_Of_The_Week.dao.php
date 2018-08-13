@@ -29,4 +29,22 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
 
         return $conn->GetAll($sql, [$offset, $rowcount]);
     }
+
+    final public static function getByDificulty($difficulty) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problem_Of_The_Week
+                WHERE
+                    difficulty = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$difficulty]);
+
+        $problemsOfTheWeek = [];
+        foreach ($rs as $row) {
+            array_push($problemsOfTheWeek, new ProblemOfTheWeek($row));
+        }
+        return $problemsOfTheWeek;
+    }
 }

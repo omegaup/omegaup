@@ -170,10 +170,10 @@ class CoursesFactory {
             // Loop through all problems inside assignments created
             $p = 0;
             foreach ($assignmentAliases as $assignmentAlias) {
-                $assignment = AssignmentsDAO::search(new Assignments([
-                    'course_id' => $course->course_id,
-                    'alias' => $assignmentAlias,
-                ]))[0];
+                $assignment = AssignmentsDAO::getByAliasAndCourse(
+                    $assignmentAlias,
+                    $course->course_id
+                );
 
                 $expectedScores[$studentUsername][$assignmentAlias] = 0;
 

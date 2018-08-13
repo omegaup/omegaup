@@ -67,7 +67,7 @@ class RunController extends Controller {
      */
     private static function validateCreateRequest(Request $r) {
         // https://github.com/omegaup/omegaup/issues/739
-        if ($r['current_user']->username == 'omi') {
+        if ($r['current_identity']->username == 'omi') {
             throw new ForbiddenAccessException();
         }
 
@@ -496,7 +496,7 @@ class RunController extends Controller {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
         if ($r['run']->identity_id == $r['current_identity_id']) {
-            $filtered['username'] = $r['current_user']->username;
+            $filtered['username'] = $r['current_identity']->username;
         }
 
         $response = $filtered;

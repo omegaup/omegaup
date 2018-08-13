@@ -59,11 +59,9 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         }
 
         try {
-            $assignments = self::search(new Assignments([
-                'problemset_id' => $problemset_id,
-            ]));
-            if (count($assignments) === 1) {
-                return $assignments[0];
+            $assignment = self::getByProblemset($problemset_id);
+            if (!is_null($assignment)) {
+                return $assignment;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -78,6 +76,39 @@ class AssignmentsDAO extends AssignmentsDAOBase {
 
         global $conn;
         $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+
+        return new Assignments($row);
+    }
+
+    final public static function getByProblemset($problemset_id) {
+        $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
+        $params = [$problemset_id];
+
+        global $conn;
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+
+        return new Assignments($row);
+    }
+
+    final public static function getByAliasAndCourse($assignment_alias, $course_id) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Assignments
+                WHERE
+                    course_id = ?
+                AND
+                    alias = ?
+                LIMIT 1;';
+
+        global $conn;
+        $row = $conn->GetRow($sql, [$course_id, $assignment_alias]);
         if (empty($row)) {
             return null;
         }
