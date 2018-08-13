@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import UserBasicEdit from '../components/user/BasicEdit.vue';
+import user_BasicEdit from '../components/user/BasicEdit.vue';
 import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
@@ -10,7 +10,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-user-basic-edit');
     },
     components: {
-      'omegaup-user-basic-edit': UserBasicEdit,
+      'omegaup-user-basic-edit': user_BasicEdit,
     },
   });
 });
