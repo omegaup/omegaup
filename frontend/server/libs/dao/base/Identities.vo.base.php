@@ -53,6 +53,9 @@ class Identities extends VO {
         if (isset($data['school_id'])) {
             $this->school_id = $data['school_id'];
         }
+        if (isset($data['gender'])) {
+            $this->gender = $data['gender'];
+        }
     }
 
     /**
@@ -130,4 +133,11 @@ class Identities extends VO {
       * @var int(11)
       */
     public $school_id;
+
+    /**
+      * Género de la identidad
+      * @access public
+      * @var enum('female','male','other','decline')
+      */
+    public $gender;
 }

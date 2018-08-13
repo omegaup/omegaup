@@ -39,7 +39,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'privacy_git_object_id' => $latest_privacy_policy['git_object_id'],
             'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
@@ -68,7 +68,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'privacy_git_object_id' => $latest_privacy_policy['git_object_id'],
             'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 
@@ -77,7 +77,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
         try {
             UserController::apiAcceptPrivacyPolicy(new Request([
                 'auth_token' => $login->auth_token,
-                'git_object_id' => $latest_privacy_policy['git_object_id'],
+                'privacy_git_object_id' => $latest_privacy_policy['git_object_id'],
                 'statement_type' => $latest_privacy_policy['statement_type'],
             ]));
             $this->fail('Should have thrown a DuplicatedEntryInDatabaseException');
@@ -109,7 +109,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
 
         $response = UserController::apiAcceptPrivacyPolicy(new Request([
             'auth_token' => $login->auth_token,
-            'git_object_id' => $latest_privacy_policy['git_object_id'],
+            'privacy_git_object_id' => $latest_privacy_policy['git_object_id'],
             'statement_type' => $latest_privacy_policy['statement_type'],
         ]));
 

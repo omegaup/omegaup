@@ -39,12 +39,9 @@
           <th>{{ T.arenaPracticeEndtime }}</th>
           <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
           <th colspan="2"
-              v-if="isAdmin">Scoreboard</th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
+              v-if="isAdmin">{{ T.wordsScoreboard }}</th>
+          <th colspan="6"
+              v-if="isAdmin"></th>
         </tr>
       </thead>
       <tbody>

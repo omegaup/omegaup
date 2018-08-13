@@ -59,16 +59,26 @@ class InterviewsDAO extends InterviewsDAOBase {
         }
 
         try {
-            $interviews = self::search(new Interviews([
-                'problemset_id' => $problemset_id,
-            ]));
-            if (count($interviews) === 1) {
-                return $interviews[0];
+            $interview = self::getByProblemset($problemset_id);
+            if (!is_null($interview)) {
+                return $interviews;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         return null;
+    }
+
+    public static function getByProblemset($problemset_id) {
+        $sql = 'SELECT i.* from Interviews i where i.problemset_id = ?;';
+
+        global $conn;
+        $interviews = $conn->GetRow($sql, [$problemset_id]);
+        if (count($interviews) == 0) {
+            return null;
+        }
+
+        return new Interviews($interviews);
     }
 }
