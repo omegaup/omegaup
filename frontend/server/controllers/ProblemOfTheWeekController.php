@@ -21,6 +21,12 @@ class ProblemOfTheWeekController extends Controller {
      * Returns the last 'rowcount' problems of the week from newest to oldest.
      */
     public static function apiGetListOfProblemsOfTheWeek(Request $r) {
+        if ($r['rowcount'] > self::MAX_REQUEST_SIZE) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        Validators::isNumber($r['offset'], "offset", /* $required= */ true);
+        Validators::isNumber($r['rowcount'], "rowcount", /* $required= */ true);
+
         $results = self::getListOfProblemsOfTheWeek(intval($r['offset']), intval($r['rowcount']));
         return [
             'status' => 'ok',
@@ -37,22 +43,13 @@ class ProblemOfTheWeekController extends Controller {
             array($offset, $rowcount),
             'ProblemOfTheWeekController::getListOfProblemsOfTheWeekImpl',
             $results,
-            APC_USER_CACHE_ONE_DAY_TIMEOUT
+            APC_USER_CACHE_PROBLEMS_OF_THE_WEEK_TIMEOUT
         );
         return $results;
     }
 
     // Made public to be cacheable.
     public static function getListOfProblemsOfTheWeekImpl($offset, $rowcount) {
-        if ($rowcount > self::MAX_REQUEST_SIZE) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        Validators::isNumber($offset, "Offset", /* $required= */ true);
-        Validators::isNumber($rowcount, "Row count", /* $required= */ true);
         return ProblemOfTheWeekDAO::getListOfProblemsOfTheWeek($offset, $rowcount);
-    }
-    
-    public static function invalidateAllKeys() {
-        Cache::invalidateAllKeys(Cache::PROBLEM_OF_THE_WEEK);
     }
 }

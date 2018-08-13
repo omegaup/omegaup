@@ -5,7 +5,7 @@
  *
  */
 class ProblemOfTheWeekTest extends OmegaupTestCase {
-    public function testProblemOfTheWeekApis() {
+    public function testProblemOfTheWeek() {
         // Setup synthetic data.
         $numberOfProblems = 8;
         for ($i = 0; $i < $numberOfProblems; $i++) {

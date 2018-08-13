@@ -13,18 +13,20 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
     final public static function getListOfProblemsOfTheWeek($offset, $rowcount) {
         global $conn;
 
-        $sql = 'SELECT p.difficulty, p.title, p.alias, u.username as author
-                FROM `Problem_Of_The_Week` as pw
-                    INNER JOIN Problems as p on pw.problem_id = p.problem_id
-                    INNER JOIN ACLs as acl on acl.acl_id = p.acl_id
-                    INNER JOIN Users as u on u.user_id = acl.owner_id
-                ORDER BY pw.time DESC LIMIT ?, ?;';
+        $sql = '
+            SELECT
+                p.difficulty, p.title, p.alias, u.username as author
+            FROM
+                `Problem_Of_The_Week` as pw
+            INNER JOIN
+                Problems as p on pw.problem_id = p.problem_id
+            INNER JOIN
+                ACLs as acl on acl.acl_id = p.acl_id
+            INNER JOIN
+                Users as u on u.user_id = acl.owner_id
+            ORDER BY
+                pw.time DESC LIMIT ?, ?;';
 
-        $result = $conn->Execute($sql, [$offset, $rowcount]);
-        $problemsOfTheWeek = [];
-        foreach ($result as $row) {
-            $problemsOfTheWeek[] = $row;
-        }
-         return $problemsOfTheWeek;
+        return $conn->GetAll($sql, [$offset, $rowcount]);
     }
 }
