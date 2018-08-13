@@ -12,9 +12,17 @@
                data-placement="top"
                data-toggle="tooltip"
                v-bind:title="T.profileAddIdentitiesTooltip"></span> <input autocomplete="off"
-               class="form-control typeahead"
+               class="form-control"
                size="20"
-               type="text">
+               type="text"
+               v-model="username">
+        </div>
+        <div class="form-group">
+          <label>{{ T.loginPassword }}</label> <input autocomplete="off"
+               class="form-control"
+               size="20"
+               type="password"
+               v-model="password">
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary"
@@ -58,22 +66,12 @@ export default {
   data: function() {
     return {
       username: '',
+      password: '',
     };
-  },
-  mounted: function() {
-    let self = this;
-    UI.identityTypeahead($('input.typeahead', self.$el),
-                         function(event, item) { self.username = item.value; });
   },
   methods: {
     onAddIdentity: function() {
-      this.username = $('input.typeahead.tt-input', this.$el).val();
-      this.$emit('add-identity', this.username);
-    },
-    onRemove: function(identity) { this.$emit('remove', identity);},
-    reset: function() {
-      this.username = '';
-      $('input.typeahead', this.$el).typeahead('close').val('');
+      this.$emit('add-identity', this.username, this.password);
     },
   },
 };

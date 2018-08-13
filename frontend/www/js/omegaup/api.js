@@ -518,7 +518,7 @@ export default {
 
     addGroup: _call('/api/user/addgroup/'),
 
-    addIdentity: _call('/api/user/addIdentity/'),
+    associateIdentity: _call('/api/user/associateIdentity/'),
 
     addRole: _call('/api/user/addrole/'),
 
@@ -544,9 +544,7 @@ export default {
 
     list: _call('/api/user/list/'),
 
-    listFreeIdentities: _call('/api/user/listFreeIdentities/'),
-
-    listIdentities: _call('/api/user/listIdentities/'),
+    listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 

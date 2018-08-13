@@ -12,22 +12,15 @@ OmegaUp.on('ready', function() {
           identities: this.identities,
         },
         on: {
-          'add-identity': function(username) {
-            API.User.addIdentity({
+          'add-identity': function(username, password) {
+            API.User.associateIdentity({
                       usernameOrEmail: username,
+                      password: password,
                     })
                 .then(function(data) {
                   refreshIdentityList();
                   UI.success(T.profileIdentityAdded);
                   manageIdentities.$children[0].reset();
-                })
-                .fail(UI.apiError);
-          },
-          remove: function(identity) {
-            API.User.removeIdentity({usernameOrEmail: identity.username})
-                .then(function(data) {
-                  refreshIdentityList();
-                  UI.success(T.profileIdentityRemoved);
                 })
                 .fail(UI.apiError);
           },
@@ -43,7 +36,7 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshIdentityList() {
-    API.User.listIdentities({})
+    API.User.listAssociatedIdentities({})
         .then(function(data) { manageIdentities.identities = data.identities; })
         .fail(UI.apiError);
   }
