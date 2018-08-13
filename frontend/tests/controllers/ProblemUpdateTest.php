@@ -17,11 +17,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update statement
         $login = self::login($problemData['author']);
 
-        $problem_languages = ProblemsLanguagesDAO::search([
-            'problem_id' => $problemData['problem']->problem_id,
-        ]);
+        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
+            $problemData['problem']->problem_id
+        );
         // This problem only has one language at this point
-        $this->assertEquals(1, count($problem_languages));
+        $this->assertEquals(1, count($problemLanguages));
 
         ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
@@ -32,10 +32,10 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // The problem has two languages at this point
-        $problem_languages = ProblemsLanguagesDAO::search([
-            'problem_id' => $problemData['problem']->problem_id,
-        ]);
-        $this->assertEquals(2, count($problem_languages));
+        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
+            $problemData['problem']->problem_id
+        );
+        $this->assertEquals(2, count($problemLanguages));
     }
 
     public function testUpdateProblemTitleAndContents() {
@@ -82,9 +82,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiUpdate($r);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $r['title'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -131,13 +129,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiUpdate($r);
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->alias = $r['alias'];
-        $problems = ProblemsDAO::search($problem_mask);
+        $problem = ProblemsDAO::getByAlias($r['alias']);
 
         // Check that we only retrieved 1 element
-        $this->assertEquals(1, count($problems));
-        $this->assertEqualSets($r['languages'], $problems[0]->languages);
+        $this->assertEquals(1, count($problem));
+        $this->assertEqualSets($r['languages'], $problem->languages);
 
         // Validate response
         $this->assertEquals('ok', $response['status']);
@@ -301,9 +297,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $newTitle;
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($newTitle);
 
         $this->assertTrue(!is_null($problems));
     }
@@ -349,9 +343,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problem_mask = new Problems();
-        $problem_mask->title = $newTitle;
-        $problems = ProblemsDAO::search($problem_mask);
+        $problems = ProblemsDAO::getByTitle($newTitle);
     }
 
     /**

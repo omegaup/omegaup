@@ -24,7 +24,9 @@ class LanguagesDAO extends LanguagesDAOBase {
                 FROM
                     Languages
                 WHERE
-                    name = ?';
+                    name = ?
+                LIMIT
+                    0, 1;';
 
         global $conn;
         $row = $conn->GetRow($sql, [$name]);

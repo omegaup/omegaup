@@ -26,7 +26,7 @@ omegaup.OmegaUp.on('ready', function() {
           var statementType = JSON.parse(
               document.getElementById('payload').innerText)['statementType'];
           userInformationRequest = {
-            git_object_id: gitObjectId,
+            privacy_git_object_id: gitObjectId,
             statement_type: statementType
           };
         }
