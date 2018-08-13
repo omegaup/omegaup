@@ -53,6 +53,15 @@ class Problemsets extends VO {
         if (isset($data['type'])) {
             $this->type = $data['type'];
         }
+        if (isset($data['contest_id'])) {
+            $this->contest_id = $data['contest_id'];
+        }
+        if (isset($data['assignment_id'])) {
+            $this->assignment_id = $data['assignment_id'];
+        }
+        if (isset($data['interview_id'])) {
+            $this->interview_id = $data['interview_id'];
+        }
     }
 
     /**
@@ -130,4 +139,25 @@ class Problemsets extends VO {
       * @var enum('contest','assignment','interview')
       */
     public $type;
+
+    /**
+      * Id del concurso
+      * @access public
+      * @var int(11)
+      */
+    public $contest_id;
+
+    /**
+      * Id del curso
+      * @access public
+      * @var int(11)
+      */
+    public $assignment_id;
+
+    /**
+      * Id de la entrevista
+      * @access public
+      * @var int(11)
+      */
+    public $interview_id;
 }
