@@ -2459,25 +2459,35 @@ class UserController extends Controller {
     }
 
     /**
-     * Adds an identity to the logged user given the username
+     * Associates an identity to the logged user given the username
      *
      * @param Request $r
      * @throws InvalidParameterException
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiAddIdentity(Request $r) {
+    public static function apiAssociateIdentity(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::isStringNonEmpty($r['password'], 'password');
 
-        $identity = IdentitiesDAO::getUnlinkedIdentities($r['usernameOrEmail']);
+        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
 
         if (empty($identity)) {
-            throw new InvalidParameterException('parameterInvalid', 'usernameOrEmail');
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        $passwordCheck = SecurityTools::compareHashedStrings(
+            $r['password'],
+            $identity->password
+        );
+
+        if ($passwordCheck === false) {
+            throw new InvalidParameterException('parameterInvalid', 'password');
         }
 
         try {
-            IdentitiesDAO::linkIdentityToUser($r['current_user_id'], $r['usernameOrEmail']);
+            IdentitiesDAO::associateIdentityWithUser($r['current_user_id'], $identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -2486,79 +2496,22 @@ class UserController extends Controller {
     }
 
     /**
-     * Gets the identities that have not been linked to a user
-     *
-     * @param Request $r
-     * @throws InvalidParameterException
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiListUnlinkedIdentities(Request $r) {
-        self::authenticateRequest($r);
-
-        $param = '';
-        if (!is_null($r['term'])) {
-            $param = 'term';
-        } elseif (!is_null($r['query'])) {
-            $param = 'query';
-        } else {
-            throw new InvalidParameterException('parameterEmpty', 'query');
-        }
-
-        try {
-            $unlinkedIdentities = IdentitiesDAO::getUnlinkedIdentities($r[$param]);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response = [];
-        foreach ($unlinkedIdentities as $identity) {
-            array_push($response, ['label' => $identity->username, 'value' => $identity->username]);
-        }
-
-        return ['status' => 'ok', 'identities' => $response];
-    }
-
-    /**
-     * Get the identities that have been linked to the logged user
+     * Get the identities that have been associated to the logged user
      *
      * @param Request $r
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiListIdentities(Request $r) {
+    public static function apiListAssociatedIdentities(Request $r) {
         self::authenticateRequest($r);
 
         try {
-            $linkedIdentities = IdentitiesDAO::getLinkedIdentities($r['current_user_id']);
+            return [
+                'status' => 'ok',
+                'identities' => IdentitiesDAO::getLinkedIdentities($r['current_user_id'])
+            ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        return ['status' => 'ok', 'identities' => $linkedIdentities];
-    }
-
-    /**
-     * Removes an identity to the logged user given the username
-     *
-     * @param Request $r
-     * @throws InvalidParameterException
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiRemoveIdentity(Request $r) {
-        self::authenticateRequest($r);
-
-        Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
-
-        try {
-            $rowsAffected = IdentitiesDAO::unlinkIdentityToUser($r['current_user_id'], $r['usernameOrEmail']);
-
-            if ($rowsAffected == 0) {
-                throw new InvalidParameterException('parameterInvalid', 'usernameOrEmail');
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return ['status' => 'ok'];
     }
 }
 

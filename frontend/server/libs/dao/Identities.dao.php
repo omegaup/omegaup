@@ -164,34 +164,24 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return $rs;
     }
 
-    public static function getUnlinkedIdentities($usernameOrName) {
+    public static function getUnassociatedIdentity($username) {
         global  $conn;
-        $sql = "
+        $sql = '
             SELECT
                 i.*
             FROM
                 Identities i
             WHERE
-                (i.username = ? OR i.name = ?)
+                i.username = ?
                 AND user_id IS NULL
-            UNION DISTINCT
-            SELECT DISTINCT
-                i.*
-            FROM
-                Identities i
-            WHERE
-                (i.username LIKE CONCAT('%', ?, '%') OR
-                i.username LIKE CONCAT('%', ?, '%'))
-                AND user_id IS NULL
-            LIMIT 10";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+            LIMIT 1';
+        $args = [$username];
 
-        $rs = $conn->Execute($sql, $args);
-        $result = [];
-        foreach ($rs as $identity) {
-            array_push($result, new Identities($identity));
+        $rs = $conn->GetRow($sql, $args);
+        if (count($rs) == 0) {
+            return null;
         }
-        return $result;
+        return new Identities($rs);
     }
 
     public static function getLinkedIdentities($userId) {
@@ -222,7 +212,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return $result;
     }
 
-    public static function linkIdentityToUser($userId, $username) {
+    public static function associateIdentityWithUser($userId, $identity_id) {
         global $conn;
         $sql = '
             UPDATE
@@ -230,25 +220,9 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             SET
                 user_id = ?
             WHERE
-                username = ?
+                identity_id = ?
         ';
-        $conn->Execute($sql, [$userId, $username]);
-
-        return $conn->Affected_Rows();
-    }
-
-    public static function unlinkIdentityToUser($userId, $username) {
-        global $conn;
-        $sql = '
-            UPDATE
-                Identities
-            SET
-                user_id = NULL
-            WHERE
-                user_id = ?
-                AND username = ?
-        ';
-        $conn->Execute($sql, [$userId, $username]);
+        $conn->Execute($sql, [$userId, $identity_id]);
 
         return $conn->Affected_Rows();
     }
