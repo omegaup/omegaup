@@ -40,7 +40,7 @@ class VirtualContestTest extends OmegaupTestCase {
 
         // Assert virtual contest
         $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
-        $this->assertEquals($originalContest->title . ' [virtual]', $virtualContest->title);
+        $this->assertEquals($originalContest->title, $virtualContest->title);
         $this->assertEquals($originalContest->description, $virtualContest->description);
         $this->assertEquals('private', $virtualContest->admission_mode); // Virtual contest must be private
         $this->assertEquals($originalContest->scoreboard, $virtualContest->scoreboard);
