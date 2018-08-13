@@ -1604,7 +1604,7 @@ export class Arena {
       ko.applyBindings(self.summaryView, summary[0]);
       self.summaryView.attached = true;
     }
-    self.summaryView.title(contest.title);
+    self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(

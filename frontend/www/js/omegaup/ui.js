@@ -33,8 +33,13 @@ let UI = {
     return clock;
   },
 
-  isVirtual: function(contest) {
-	  return contest.rerun_id != 0;
+  isVirtual: function(contest) { return contest.rerun_id != 0; },
+
+  contestTitle: function(contest) {
+    if (UI.isVirtual(contest)) {
+      return UI.formatString(T.virtualContestSuffix, {title: contest.title});
+    }
+    return contest.title;
   },
 
   rankingUsername: function(rank) {

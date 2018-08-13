@@ -811,6 +811,7 @@ verificationEmailBody = "Bem-vindo ao omegaUp! Por favor, clique no seguinte lin
 verificationEmailSubject = "Bem-vindo ao omegaUp!"
 verificationIdInvalid = "A informação sobre a verificação fornecida não é válido."
 virtualContest = "Concurso virtual"
+virtualContestSuffix = "%(title) [virtual]"
 virtualSuffix = "%(username) [virtual]"
 virtualTitle = "%(title) - Concurso virtual"
 wordAccepted = "Aceitado"

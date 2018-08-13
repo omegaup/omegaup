@@ -1,8 +1,9 @@
 <template>
   <div>
     <div class="page-header">
-      <h1>{{UI.formatString(T.contestEditWithTitle, {title: contest.title})}}
-      <small><a v-bind:href="`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
+      <h1>{{UI.formatString(T.contestEditWithTitle, {title: UI.contestTitle(contest)})}}
+      <small><a v-bind:href=
+      "`/arena/${contest.alias}/`">{{T.contestDetailsGoToContest}}</a></small></h1>
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li v-bind:class="{active : !virtual}"

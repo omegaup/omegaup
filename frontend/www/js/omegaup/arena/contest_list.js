@@ -86,6 +86,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
                   'http://timeanddate.com/worldclock/fixedtime.html?iso=' +
                   contest.start_time.iso();
               contest.startText = contest.start_time.long();
+              contest.titleText = omegaup.UI.contestTitle(contest);
               contest.finishLink =
                   'http://timeanddate.com/worldclock/fixedtime.html?iso=' +
                   contest.finish_time.iso();

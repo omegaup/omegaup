@@ -65,6 +65,7 @@ class ApiCaller {
         $allowed_hosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
+            '35.231.177.254'
         ];
         return !in_array($referrer_host, $allowed_hosts, true);
     }

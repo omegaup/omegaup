@@ -18,7 +18,7 @@
 			<tbody data-bind="foreach: page" class="contest-list row">
 				<tr>
 					<td class="col-md-6"><a data-bind="attr: { href: contestLink }">
-						<span data-bind="text: title"></span>
+						<span data-bind="text: titleText"></span>
 						<span class="glyphicon glyphicon-ok" aria-hidden="true"
 							  data-bind="visible: recommended !== '0'"></span>
 					</a></td>
