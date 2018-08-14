@@ -767,6 +767,7 @@ omegaup.OmegaUp.loadTranslations({
 	userNotInListOfRequests: "O usu\u00e1rio n\u00e3o esteja pendente pedido",
 	userOrEmail: "user or email",
 	userOrMailNotFound: "Nome de usu\u00e1rio ou e-mail n\u00e3o encontrado",
+	userPasswordMustBeSame: "As novas senhas devem ser as mesmas.",
 	userProfileIsPrivate: "O perfil desse usu\u00e1rio \u00e9 marcado como privado; algumas informa\u00e7\u00f5es n\u00e3o ser\u00e3o exibidas",
 	userRemoveError: "Ocorreu um erro ao excluir um usu\u00e1rio.",
 	userRemoveSuccess: "Usu\u00e1rio exclu\u00eddo com sucesso!",

@@ -105,7 +105,7 @@ class UserFilterTest extends OmegaupTestCase {
         $login = self::login($user);
         UserController::apiValidateFilter(new Request([
             'auth_token' => $login->auth_token,
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]));
     }
 
@@ -127,7 +127,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest()['contest'];
 
         UserController::apiValidateFilter(new Request([
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]));
     }
 
@@ -149,7 +149,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
 
         UserController::apiValidateFilter(new Request([
-            'filter' => '/contest/' . $contest->alias,
+            'filter' => '/problemset/' . $contest->problemset_id,
         ]));
     }
 
@@ -169,7 +169,7 @@ class UserFilterTest extends OmegaupTestCase {
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $response = UserController::apiValidateFilter(new Request([
-            'filter' => '/contest/' . $contest->alias . '/' .
+            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
                         $problemset->scoreboard_url,
         ]));
         $this->assertEmpty($response['contest_admin']);
@@ -180,7 +180,7 @@ class UserFilterTest extends OmegaupTestCase {
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $response = UserController::apiValidateFilter(new Request([
-            'filter' => '/problemset/' . $contest->problemset_id . '/' .
+            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
                         $problemset->scoreboard_url_admin,
         ]));
         $this->assertContains($contest->alias, $response['contest_admin']);
@@ -192,7 +192,7 @@ class UserFilterTest extends OmegaupTestCase {
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         $response = UserController::apiValidateFilter(new Request([
-            'filter' => '/contest/' . $contest->alias . '/' .
+            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
                         $problemset->scoreboard_url_admin,
         ]));
         $this->assertContains($contest->alias, $response['contest_admin']);

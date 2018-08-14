@@ -623,8 +623,18 @@ CREATE TABLE `Problemsets` (
   `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
   `scoreboard_url_admin` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard de admin en problemsets',
   `type` enum('Contest','Assignment','Interview') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
+  `contest_id` int(11) DEFAULT NULL COMMENT 'Id del concurso',
+  `assignment_id` int(11) DEFAULT NULL COMMENT 'Id del curso',
+  `interview_id` int(11) DEFAULT NULL COMMENT 'Id de la entrevista',
   PRIMARY KEY (`problemset_id`),
+  UNIQUE KEY `problemset_id` (`problemset_id`,`contest_id`,`assignment_id`,`interview_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `contest_id` (`contest_id`),
+  KEY `assignment_id` (`assignment_id`),
+  KEY `interview_id` (`interview_id`),
+  CONSTRAINT `Problemsets_ibfk_1` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `Problemsets_ibfk_2` FOREIGN KEY (`assignment_id`) REFERENCES `Assignments` (`assignment_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `Problemsets_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `Interviews` (`interview_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
