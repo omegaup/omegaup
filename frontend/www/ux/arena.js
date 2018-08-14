@@ -82,7 +82,6 @@ omegaup.OmegaUp.on('ready', function() {
   $.when.apply($, requests)
       .done(function() {
         for (var i = 0, len = contestLists.length; i < len; i++) {
-          console.log(contestLists[i].contests());
           if (contestLists[i].totalPages()) {
             $('.nav-link', $('.nav-item')[i]).tab('show');
             break;
