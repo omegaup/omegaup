@@ -88,35 +88,6 @@ class SchoolController extends Controller {
     }
 
     /**
-     * Create new school
-     * @param $name
-     * @param $state
-     * @return $school_id
-     * @throws InvalidParameterException
-     */
-    public static function createSchool($name, $state) {
-        // Create school object
-        $school = new Schools([
-            'name' => $name,
-            'country_id' => $state != null ? $state->country_id : null,
-            'state_id' => $state != null ? $state->state_id : null,
-        ]);
-
-        $school_id = 0;
-        try {
-            $existing = SchoolsDAO::findByName($name);
-            if (count($existing) > 0) {
-                return $existing[0]->school_id;
-            }
-            // Save in db
-            SchoolsDAO::save($school);
-            return $school->school_id;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-    }
-
-    /**
      * Returns rank of best schools in last month
      *
      * @param Request $r
