@@ -248,7 +248,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Problemsets p
             ON
                 p.problemset_id = c.problemset_id
-            WHERE contest_id IN (
+            WHERE c.contest_id IN (
                 SELECT DISTINCT
                     c2.contest_id
                 FROM

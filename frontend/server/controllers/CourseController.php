@@ -363,8 +363,7 @@ class CourseController extends Controller {
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
-
-            AssignmentsDAO::save(new Assignments([
+            $assignment = new Assignments([
                 'course_id' => $r['course']->course_id,
                 'problemset_id' => $problemset->problemset_id,
                 'acl_id' => $r['course']->acl_id,
@@ -375,7 +374,13 @@ class CourseController extends Controller {
                 'assignment_type' => $r['assignment_type'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-            ]));
+            ]);
+
+            AssignmentsDAO::save($assignment);
+
+            // Update assignment_id in problemset object
+            $problemset->assignment_id = $assignment->assignment_id;
+            ProblemsetsDAO::save($problemset);
 
             AssignmentsDAO::transEnd();
         } catch (Exception $e) {
