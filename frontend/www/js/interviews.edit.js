@@ -53,11 +53,11 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(contest) {
         $('.page-header h1 span')
             .html(omegaup.T.interviewEdit + ' ' +
-                  omegaup.UI.escape(contest.title));
+                  omegaup.UI.escape(omegaup.UI.contestTitle(contest)));
         $('.page-header h1 small')
             .html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' +
                   omegaup.T.interviewGoToInterview + '</a>');
-        $('.new_interview_form #title').val(contest.title);
+        $('.new_interview_form #title').val(omegaup.UI.contestTitle(contest));
         $('.new_interview_form #description').val(contest.description);
         $('#window_length').val(contest.window_length);
       })

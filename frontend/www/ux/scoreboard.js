@@ -17,7 +17,7 @@ omegaup.OmegaUp.on('ready', function() {
         arena.initProblems(contest);
         arena.initClock(contest.start_time, contest.finish_time);
         arena.initProblemsetId(contest);
-        $('#title .contest-title').text(contest.title);
+        $('#title .contest-title').text(omegaup.UI.contestTitle(contest));
         omegaup.API.Problemset.scoreboard({
                                 problemset_id: arena.options.problemsetId,
                                 token: arena.options.scoreboardToken
