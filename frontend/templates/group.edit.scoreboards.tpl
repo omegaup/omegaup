@@ -30,8 +30,10 @@
 
 	<table class="table table-striped">
 		<thead>
-			<th>{#groupEditScoreboards#}</th>
-			<th></th>
+			<tr>
+				<th>{#groupEditScoreboards#}</th>
+				<th></th>
+			</tr>
 		</thead>
 		<tbody id="group-scoreboards"></tbody>
 	</table>
