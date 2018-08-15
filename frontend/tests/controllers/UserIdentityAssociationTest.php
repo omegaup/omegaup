@@ -16,11 +16,12 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
         $password = Utils::CreateRandomString();
         // Call api using identity creator group member
         IdentityController::apiCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'username' => "{$group['group']->alias}:{$identityName}",
+            'username' => $username,
             'name' => $identityName,
             'password' => $password,
             'country_id' => 'MX',
@@ -34,13 +35,25 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
+        $associatedIdentities = UserController::apiListAssociatedIdentities(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // User has one default associated identity when joins omegaUp
+        $this->assertEquals(1, count($associatedIdentities['identities']));
+
         $response = UserController::apiAssociateIdentity(new Request([
             'auth_token' => $login->auth_token,
-            'username' => "{$group['group']->alias}:{$identityName}",
+            'username' => $username,
             'password' => $password,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $associatedIdentities = UserController::apiListAssociatedIdentities(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // User now has two associated identities
+        $this->assertEquals(2, count($associatedIdentities['identities']));
     }
 
     /**
@@ -53,11 +66,12 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
         $password = Utils::CreateRandomString();
         // Call api using identity creator group member
         IdentityController::apiCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'username' => "{$group['group']->alias}:{$identityName}",
+            'username' => $username,
             'name' => $identityName,
             'password' => $password,
             'country_id' => 'MX',
@@ -73,9 +87,10 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
 
         try {
             $identityName = 'wrong_username';
+            $username = "{$group['group']->alias}:{$identityName}";
             $response = UserController::apiAssociateIdentity(new Request([
                 'auth_token' => $login->auth_token,
-                'username' => "{$group['group']->alias}:{$identityName}",
+                'username' => $username,
                 'password' => $password,
             ]));
             $this->fail('Identity should not be associated because identity username does not match');
@@ -94,10 +109,11 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
         // Call api using identity creator group member
         IdentityController::apiCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'username' => "{$group['group']->alias}:{$identityName}",
+            'username' => $username,
             'name' => $identityName,
             'password' => Utils::CreateRandomString(),
             'country_id' => 'MX',
@@ -114,7 +130,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         try {
             $response = UserController::apiAssociateIdentity(new Request([
                 'auth_token' => $login->auth_token,
-                'username' => "{$group['group']->alias}:{$identityName}",
+                'username' => $username,
                 'password' => Utils::CreateRandomString(),
             ]));
             $this->fail('Identity should not be associated because identity password does not match');
