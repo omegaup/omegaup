@@ -118,7 +118,7 @@ omegaup.OmegaUp.on('ready', function() {
         var newPassword = $('#new-password-1').val();
         var newPassword2 = $('#new-password-2').val();
         if (newPassword != newPassword2) {
-          omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
+          omegaup.UI.error(omegaup.T.passwordMismatch);
           return;
         }
 
