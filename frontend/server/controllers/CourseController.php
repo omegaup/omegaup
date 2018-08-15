@@ -1046,19 +1046,27 @@ class CourseController extends Controller {
             // Only users adding themselves are saved in consent log
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && $r['course']->requests_user_information != 'no') {
-                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
-                    $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type'])
-                );
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                        $r['identity']->identity_id,
+                        $privacystatement_id
+                    );
+                } else {
+                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::getId($r['identity']->identity_id, $privacystatement_id);
+                }
 
                 $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
             }
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && !empty($r['accept_teacher'])) {
-                PrivacyStatementConsentLogDAO::saveLog(
-                    $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher')
-                );
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher');
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                    PrivacyStatementConsentLogDAO::saveLog(
+                        $r['identity']->identity_id,
+                        $privacystatement_id
+                    );
+                }
             }
             GroupsIdentitiesDAO::save($groupIdentity);
 
