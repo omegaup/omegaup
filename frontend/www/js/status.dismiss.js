@@ -16,5 +16,5 @@ function isBrowserSupported() {
 }
 
 if (!isBrowserSupported()) {
-  omegaup.UI.error(omegaup.T.browserNotSupportOmegaUp);
+  omegaup.UI.error(omegaup.T.unsupportedBrowser);
 }
