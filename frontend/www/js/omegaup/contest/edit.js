@@ -1,6 +1,6 @@
 import {OmegaUp, UI, API, T} from '../omegaup.js';
 import Vue from 'vue';
-import ContestEdit from '../components/contest/ContestEdit.vue';
+import contest_Edit from '../components/contest/Edit.vue';
 
 OmegaUp.on('ready', function() {
   const contestAlias =
@@ -205,7 +205,7 @@ OmegaUp.on('ready', function() {
             });
           },
           components: {
-            'omegaup-contest-edit': ContestEdit,
+            'omegaup-contest-edit': contest_Edit,
           },
         });
       })

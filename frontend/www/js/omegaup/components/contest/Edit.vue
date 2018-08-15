@@ -80,14 +80,14 @@
 
 <script>
 import {T, UI} from '../../omegaup.js';
-import ContestNewForm from './ContestNewForm.vue';
-import ContestAddProblem from './ContestAddProblem.vue';
-import ContestPublish from './ContestPublish.vue';
-import ContestContestant from './ContestContestant.vue';
-import ContestAdmins from './ContestAdmins.vue';
-import ContestGroupAdmins from './ContestGroupAdmins.vue';
-import ContestLinks from './ContestLinks.vue';
-import ContestClone from './ContestClone.vue';
+import contest_AddProblem from './AddProblem.vue';
+import contest_Admins from './Admins.vue';
+import contest_Clone from './Clone.vue';
+import contest_Contestant from './Contestant.vue';
+import contest_GroupAdmins from './GroupAdmins.vue';
+import contest_Links from './Links.vue';
+import contest_NewForm from './NewForm.vue';
+import contest_Publish from './Publish.vue';
 
 export default {
   props: {
@@ -106,14 +106,14 @@ export default {
     };
   },
   components: {
-    'omegaup-contest-new-form': ContestNewForm,
-    'omegaup-contest-add-problem': ContestAddProblem,
-    'omegaup-contest-publish': ContestPublish,
-    'omegaup-contest-contestant': ContestContestant,
-    'omegaup-contest-admins': ContestAdmins,
-    'omegaup-contest-group-admins': ContestGroupAdmins,
-    'omegaup-contest-links': ContestLinks,
-    'omegaup-contest-clone': ContestClone,
+    'omegaup-contest-add-problem': contest_AddProblem,
+    'omegaup-contest-admins': contest_Admins,
+    'omegaup-contest-clone': contest_Clone,
+    'omegaup-contest-contestant': contest_Contestant,
+    'omegaup-contest-group-admins': contest_GroupAdmins,
+    'omegaup-contest-links': contest_Links,
+    'omegaup-contest-new-form': contest_NewForm,
+    'omegaup-contest-publish': contest_Publish,
   },
 };
 </script>
