@@ -42,10 +42,10 @@
 					</td>
 {/if}
 					<td class="no-wrap col-md-2" data-bind="visible: $parent.showPublicUpdated, text: publicUpdateText"></td>
+				</tr>
 				<tr>
 					<td colspan="5" class="forcebreaks forcebreaks-arena"
 						data-bind="text: description"></td>
-					</tr>
 				</tr>
 			</tbody>
 			<tfoot>
