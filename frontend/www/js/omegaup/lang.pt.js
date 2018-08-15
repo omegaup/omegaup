@@ -49,6 +49,7 @@ omegaup.OmegaUp.loadTranslations({
 	banningDeclinedByReviewer: "Proibi\u00e7\u00e3o negada pelo revisor.",
 	banningProblemDueToReport: "Banido problema devido ao relat\u00f3rio do usu\u00e1rio.",
 	birthdayInTheFuture: "Voc\u00ea n\u00e3o tem idade suficiente para usar omegaUp",
+	browserNotSupportOmegaUp: "O navegador n\u00e3o suporta todos os recursos desta p\u00e1gina. Por favor tente atualizar. <br />Para mais informa\u00e7\u00f5es, clique <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">aqui</a>.",
 	bulkUserAddError: "Ocorreu um erro ao adicionar usu\u00e1rios, pelo menos um deles n\u00e3o foi adicionado com sucesso.",
 	bulkUserAddSuccess: "Usu\u00e1rio adicionado com sucesso!",
 	cannotAddProb: "N\u00e3o \u00e9 poss\u00edvel adicionar problema. Voc\u00ea n\u00e3o \u00e9 o diretor do concurso.",

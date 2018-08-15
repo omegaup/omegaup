@@ -49,6 +49,7 @@ omegaup.OmegaUp.loadTranslations({
 	banningDeclinedByReviewer: "Suspenci\u00f3n denegada por juez.",
 	banningProblemDueToReport: "Suspendiendo problema por reporte de usuario.",
 	birthdayInTheFuture: "No tienes edad suficiente para usar omegaUp",
+	browserNotSupportOmegaUp: "El navegador no admite todas las funciones de esta p\u00e1gina. Intenta actualizarlo. <br />Para mas informaci\u00f3n, haz clic <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">aqu\u00ed</a>.",
 	bulkUserAddError: "Se ha producido un error al agregar usuarios, al menos uno de ellos no se agreg\u00f3 correctamente.",
 	bulkUserAddSuccess: "\u00a1Usuarios exitosamente agregados!",
 	cannotAddProb: "No puedes agregar problemas porque no eres el director del concurso.",

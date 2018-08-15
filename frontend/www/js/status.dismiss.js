@@ -8,11 +8,13 @@ function isBrowserSupported() {
   if (typeof(window.history.replaceState) !== 'function') {
     return false;
   }
+  if (typeof(window.WebSocket) !== 'function') {
+    return false;
+  }
 
   return true;
 }
 
 if (!isBrowserSupported()) {
-  omegaup.UI.error(
-      "The browser doesn't support all the features of this page. Please try to update.");
+  omegaup.UI.error(omegaup.T.browserNotSupportOmegaUp);
 }
