@@ -55,7 +55,7 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        $group = self::validateRequest($r);
+        $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
         try {
@@ -98,7 +98,7 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiBulkCreate(Request $r) {
-        $group = self::validateRequest($r);
+        $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
         try {
@@ -135,10 +135,10 @@ class IdentityController extends Controller {
      * @param Request $r
      * @throws InvalidParameterException
      */
-    private static function validateRequest(Request $r) {
+    private static function validateGroupOwnership(Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
-            throw new ForbiddenAccessException();
+            throw new ForbiddenAccessException('userNotAllowed');
         }
         $group = GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
@@ -266,7 +266,7 @@ class IdentityController extends Controller {
     private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
-            throw new ForbiddenAccessException();
+            throw new ForbiddenAccessException('userNotAllowed');
         }
         GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {

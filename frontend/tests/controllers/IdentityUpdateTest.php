@@ -194,9 +194,57 @@ class IdentityUpdateTest extends OmegaupTestCase {
                 'password' => $newPassword,
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Creator is not authorized to change passwords from other groups he does not belong');
+            $this->fail('Creators are not authorized to change passwords from other groups they do not belong');
         } catch (ForbiddenAccessException $e) {
             // Ok
+        }
+    }
+
+    /**
+     * Test for trying change identity password with invalid user
+     */
+    public function testChangePasswordIdentityWithInvalidUser() {
+        // Identity creator group member will create an identity
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+
+        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
+        $originalPassword = Utils::CreateRandomString();
+        // Call api using identity creator group member
+        IdentityController::apiCreate(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $identityName,
+            'password' => $originalPassword,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => Utils::CreateRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $identity = IdentityController::resolveIdentity($username);
+        $identity->password = $originalPassword;
+        $identityLogin = self::login($identity);
+
+        // Normal user will try change the passowrd of an identity
+        $normalUser = UserFactory::createUser();
+        $userLogin = self::login($normalUser);
+
+        try {
+            // Changing password
+            $newPassword = Utils::CreateRandomString();
+            IdentityController::apiChangePassword(new Request([
+                'auth_token' => $userLogin->auth_token,
+                'username' => $username,
+                'password' => $newPassword,
+                'group_alias' => $group['group']->alias,
+            ]));
+            $this->fail('User is not allowed to change password');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }
 }
