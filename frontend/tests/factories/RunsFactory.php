@@ -57,6 +57,75 @@ class RunsFactory {
     }
 
     /**
+     * Builds and returns a request object to be used for RunController::apiCreate
+     *
+     * @param type $problemData
+     * @param type $courseAssignmentData
+     * @param type $participant
+     * @return Request
+     */
+    private static function createRequestCourseAssignmentCommon(
+        $problemData,
+        $courseAssignmentData,
+        $participant,
+        ScopedLoginToken $login = null
+    ) {
+        // Create an empty request
+        $r = new Request();
+
+        if ($login == null) {
+            // Login as participant
+            $login = OmegaupTestCase::login($participant);
+        }
+        $r['auth_token'] = $login->auth_token;
+
+        // Build request
+        if (!is_null($courseAssignmentData)) {
+            $r['assignment_alias'] = $courseAssignmentData['request']['alias'];
+        }
+
+        $r['problem_alias'] = $problemData['problem']->alias;
+        $r['language'] = 'c';
+        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+        return $r;
+    }
+
+    /**
+     * Creates a run
+     *
+     * @param type $problemData
+     * @param type $courseAssignmentData
+     * @param $participant
+     * @return array
+     */
+    public static function createCourseAssignmentRun($problemData, $courseAssignmentData, $participant) {
+        // Our participant has to open the course before sending a run
+        CoursesFactory::openCourse($courseAssignmentData, $participant);
+
+        // Our participant has to open the assignment in a course before sending a run
+        CoursesFactory::openAssignmentCourse($courseAssignmentData, $participant);
+
+        // Then we need to open the problem
+        CoursesFactory::openProblemInCourseAssignment($courseAssignmentData, $problemData, $participant);
+
+        $r = self::createRequestCourseAssignmentCommon($problemData, $courseAssignmentData, $participant);
+
+        // Call API
+        RunController::$grader = new GraderMock();
+        $response = RunController::apiCreate($r);
+
+        // Clean up
+        unset($_REQUEST);
+
+        return [
+            'request' => $r,
+            'participant' => $participant,
+            'response' => $response
+        ];
+    }
+
+    /**
      * Creates a run
      *
      * @param type $problemData

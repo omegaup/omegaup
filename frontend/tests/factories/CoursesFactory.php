@@ -46,14 +46,18 @@ class CoursesFactory {
         ];
     }
 
-    public static function createCourseWithOneAssignment(Users $admin = null, ScopedLoginToken $adminLogin = null) {
+    public static function createCourseWithOneAssignment(
+        Users $admin = null,
+        ScopedLoginToken $adminLogin = null,
+        $public = false
+    ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
         // Create the course
-        $courseFactoryResult = self::createCourse($admin, $adminLogin);
+        $courseFactoryResult = self::createCourse($admin, $adminLogin, $public);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
@@ -70,10 +74,11 @@ class CoursesFactory {
             'assignment_type' => 'homework'
         ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
-
+        $assignment = AssignmentsDAO::getByAlias($assignmentAlias);
         return [
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
+            'assignment' => $assignment,
             'request' => $r,
             'admin' => $admin
         ];
@@ -209,5 +214,57 @@ class CoursesFactory {
         }
 
         return $expectedScores;
+    }
+
+    public static function openCourse($courseAssignmentData, $user) {
+        // Create an empty request
+        $r = new Request();
+
+        // Log in as course adminy
+        $login = OmegaupTestCase::login($user);
+        $r['auth_token'] = $login->auth_token;
+
+        // Prepare our request
+        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
+
+        // Call api
+        CourseController::apiIntroDetails($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function openAssignmentCourse($courseAssignmentData, $user) {
+        // Create an empty request
+        $r = new Request();
+
+        // Log in as course adminy
+        $login = OmegaupTestCase::login($user);
+        $r['auth_token'] = $login->auth_token;
+
+        // Prepare our request
+        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
+        $r['assignment_alias'] = $courseAssignmentData['request']['assignment_alias'];
+
+        // Call api
+        CourseController::apiIntroDetails($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function openProblemInCourseAssignment($courseAssignmentData, $problemData, $user) {
+        // Prepare our request
+        $r = new Request();
+        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
+        $r['assignment_alias'] = $courseAssignmentData['request']['assignment_alias'];
+        $r['problem_alias'] = $problemData['request']['problem_alias'];
+
+        // Log in the user
+        $login = OmegaupTestCase::login($user);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ProblemController::apiDetails($r);
+
+        unset($_REQUEST);
     }
 }
