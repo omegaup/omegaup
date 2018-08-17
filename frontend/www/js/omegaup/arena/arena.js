@@ -113,6 +113,7 @@ class EventsSocket {
       if (self.arena.contestAdmin && data.scoreboard_type != 'admin') {
         if (self.arena.options.originalContestAlias == null) return;
         self.arena.virtualRankingChange(data.scoreboard);
+        return;
       }
       self.arena.rankingChange(data.scoreboard);
     }
@@ -293,6 +294,12 @@ export class Arena {
 
     // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
+
+    // Cache scoreboard data for virtual contest
+    self.originalContestScoreboardEvent = null;
+
+    // Virtual contest refresh interval
+    self.virtualContestRefreshInterval = 0;
   }
 
   installLibinteractiveHooks() {
@@ -587,101 +594,114 @@ export class Arena {
     }
   }
 
+  onVirtualRankingChange(data) {
+    let self = this;
+    let events = self.originalContestScoreboardEvent;
+    let currentDelta =
+        ((new Date()).getTime() - self.startTime.getTime()) / (1000 * 60);
+
+    for (let rank of data.ranking) rank.virtual = true;
+
+    let problemOrder = {};
+    let problems = [];
+    let initProblems = [];
+
+    for (let problem of Object.values(self.problems)) {
+      problemOrder[problem.alias] = problems.length;
+      initProblems[problems.length] = {
+        penalty: 0,
+        percent: 0,
+        points: 0,
+        runs: 0,
+      };
+      problems.push({order: problems.length + 1, alias: problem.alias});
+    }
+
+    // Calculate original contest scoreboard with current delta time
+    let originalContestRanking = {};
+    let originalContestEvents = [];
+
+    events.forEach(function(env) {
+      let key = env.username;
+      if (!originalContestRanking.hasOwnProperty(key)) {
+        originalContestRanking[key] = {
+          country: env.country,
+          name: env.name,
+          username: env.username,
+          problems: Array.from(initProblems),
+          total: {
+            penalty: 0,
+            points: 0,
+            runs: 0,
+          },
+          place: 0,
+        };
+      }
+      if (env.delta > currentDelta) return;
+      originalContestEvents.push(env);
+      let problem =
+          originalContestRanking[key].problems[problemOrder[env.problem.alias]];
+      originalContestRanking[key].problems[problemOrder[env.problem.alias]] = {
+        penalty: env.problem.penalty,
+        points: env.problem.points,
+        runs: problem ? problem.runs + 1 : 1
+      };
+      originalContestRanking[key].total = env.total;
+    });
+    // Merge original contest scoreboard ranking with virtual contest
+    for (let ranking of Object.values(originalContestRanking))
+      data.ranking.push(ranking);
+
+    // Resort rank
+    data.ranking.sort(
+        (rank1, rank2) => { return rank2.total.points - rank1.total.points; });
+
+    // Override ranking
+    data.ranking.forEach((rank, index) => rank.place = index + 1);
+    self.onRankingChanged(data);
+
+    let params = {
+      problemset_id: self.options.problemsetId,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+
+    API.Problemset.scoreboardEvents(params)
+        .then(function(response) {
+          // Change username to username-virtual
+          for (let env of response.events) {
+            env.username = env.username + '-virtual';
+            env.name = env.name + '-virtual';
+          }
+
+          // Merge original contest and virtual contest scoreboard events
+          response.events = response.events.concat(originalContestEvents);
+          self.onRankingEvents(response);
+        })
+        .fail(UI.ignoreError);
+  }
+
   virtualRankingChange(data) {
     // Merge original contest scoreboard and virtual contest
     let self = this;
 
-    API.Problemset.scoreboardEvents(
-                      {problemset_id: self.options.originalProblemsetId})
-        .then(function(response) {
-          // Simulate scoreboard
-          let events = response.events;
-          let currentDelta =
-              ((new Date()).getTime() - self.startTime.getTime()) / (1000 * 60);
-
-          for (let rank of data.ranking) rank.virtual = true;
-
-          let problemOrder = {};
-          let problems = [];
-          let initProblems = [];
-
-          for (let problem of Object.values(self.problems)) {
-            problemOrder[problem.alias] = problems.length;
-            initProblems[problems.length] = {
-              penalty: 0,
-              percent: 0,
-              points: 0,
-              runs: 0,
-            };
-            problems.push({order: problems.length + 1, alias: problem.alias});
-          }
-
-          // Calculate original contest scoreboard with current delta time
-          let originalContestRanking = {};
-          let originalContestEvents = [];
-
-          events.forEach(function(env) {
-            let key = env.username;
-            if (!originalContestRanking.hasOwnProperty(key)) {
-              originalContestRanking[key] = {
-                country: env.country,
-                name: env.name,
-                username: env.username,
-                problems: Array.from(initProblems),
-                total: {
-                  penalty: 0,
-                  points: 0,
-                  runs: 0,
-                },
-                place: 0,
-              };
-            }
-            if (env.delta > currentDelta) return;
-            originalContestEvents.push(env);
-            let problem = originalContestRanking[key]
-                              .problems[problemOrder[env.problem.alias]];
-            originalContestRanking[key]
-                .problems[problemOrder[env.problem.alias]] = {
-              penalty: env.problem.penalty,
-              points: env.problem.points,
-              runs: problem ? problem.runs + 1 : 1
-            };
-            originalContestRanking[key].total = env.total;
-          });
-          // Merge original contest scoreboard ranking with virtual contest
-          for (let ranking of Object.values(originalContestRanking))
-            data.ranking.push(ranking);
-
-          // Resort rank
-          data.ranking.sort((rank1, rank2) => {
-            return rank2.total.points - rank1.total.points;
-          });
-
-          // Override ranking
-          data.ranking.forEach((rank, index) => rank.place = index + 1);
-          self.onRankingChanged(data);
-
-          let params = {
-            problemset_id: self.options.problemsetId,
-          };
-          if (self.options.scoreboardToken) {
-            params.token = self.options.scoreboardToken;
-          }
-
-          API.Problemset.scoreboardEvents(params)
-              .then(function(response) {
-                // Change username to username-virtual
-                for (let env of response.events) {
-                  env.username = env.username + '-virtual';
-                  env.name = env.name + '-virtual';
-                }
-
-                // Merge original contest and virtual contest scoreboard events
-                response.events = response.events.concat(originalContestEvents);
-                self.onRankingEvents(response);
-              })
-              .fail(UI.ignoreError);
-        }).fail(UI.apiError);
+    var defaultData = JSON.parse(JSON.stringify(data));
+    if (self.originalContestScoreboardEvent == null) {
+      API.Problemset.scoreboardEvents(
+                        {problemset_id: self.options.originalProblemsetId})
+          .then(function(response) {
+            self.originalContestScoreboardEvent = response.events;
+            self.virtualContestRefreshInterval = setInterval(function() {
+              self.onVirtualRankingChange(data);
+              data = JSON.parse(JSON.stringify(defaultData));
+            }, 5000);
+          })
+          .fail(UI.apiError);
+    } else {
+      self.onVirtualRankingChange(data);
+      data = JSON.parse(JSON.stringify(defaultData));
+    }
   }
 
   rankingChange(data, rankingEvent = true) {
