@@ -604,16 +604,16 @@ export class Arena {
 
     let problemOrder = {};
     let problems = [];
-    let initProblems = [];
+    let initialProblems = [];
 
     for (let problem of Object.values(self.problems)) {
       problemOrder[problem.alias] = problems.length;
-      initProblems[problems.length] = {
+      initialProblems.push({
         penalty: 0,
         percent: 0,
         points: 0,
         runs: 0,
-      };
+      });
       problems.push({order: problems.length + 1, alias: problem.alias});
     }
 
@@ -621,14 +621,14 @@ export class Arena {
     let originalContestRanking = {};
     let originalContestEvents = [];
 
-    events.forEach(function(env) {
-      let key = env.username;
+    events.forEach(function(evt) {
+      let key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
         originalContestRanking[key] = {
-          country: env.country,
-          name: env.name,
-          username: env.username,
-          problems: Array.from(initProblems),
+          country: evt.country,
+          name: evt.name,
+          username: evt.username,
+          problems: Array.from(initialProblems),
           total: {
             penalty: 0,
             points: 0,
@@ -637,16 +637,16 @@ export class Arena {
           place: 0,
         };
       }
-      if (env.delta > currentDelta) return;
-      originalContestEvents.push(env);
+      if (evt.delta > currentDelta) return;
+      originalContestEvents.push(evt);
       let problem =
-          originalContestRanking[key].problems[problemOrder[env.problem.alias]];
-      originalContestRanking[key].problems[problemOrder[env.problem.alias]] = {
-        penalty: env.problem.penalty,
-        points: env.problem.points,
-        runs: problem ? problem.runs + 1 : 1
+          originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
+      originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
+        penalty: evt.problem.penalty,
+        points: evt.problem.points,
+        runs: problem ? problem.runs + 1 : 1 // If problem appeared in event for than one, it means a problem has been solved multiple times
       };
-      originalContestRanking[key].total = env.total;
+      originalContestRanking[key].total = evt.total;
     });
     // Merge original contest scoreboard ranking with virtual contest
     for (let ranking of Object.values(originalContestRanking))
@@ -670,9 +670,9 @@ export class Arena {
     API.Problemset.scoreboardEvents(params)
         .then(function(response) {
           // Change username to username-virtual
-          for (let env of response.events) {
-            env.username = env.username + '-virtual';
-            env.name = env.name + '-virtual';
+          for (let evt of response.events) {
+            evt.username = UI.formatString(T.virtualSuffix, {username: evt.username});
+            evt.name = UI.formatString(T.virtualSuffix, {username: evt.name});
           }
 
           // Merge original contest and virtual contest scoreboard events
