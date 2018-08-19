@@ -299,7 +299,7 @@ export class Arena {
     self.originalContestScoreboardEvent = null;
 
     // Virtual contest refresh interval
-    self.virtualContestRefreshInterval = 0;
+    self.virtualContestRefreshInterval = null;
   }
 
   installLibinteractiveHooks() {
@@ -594,8 +594,11 @@ export class Arena {
     }
   }
 
-  onVirtualRankingChange(data) {
+  onVirtualRankingChange(virtualContestData) {
     let self = this;
+    // This clones virtualContestData to data so that virtualContestData values
+    // won't be overriden by processes below
+    let data = JSON.parse(JSON.stringify(virtualContestData));
     let events = self.originalContestScoreboardEvent;
     let currentDelta =
         ((new Date()).getTime() - self.startTime.getTime()) / (1000 * 60);
@@ -621,6 +624,9 @@ export class Arena {
     let originalContestRanking = {};
     let originalContestEvents = [];
 
+    // Refresh after time T
+    let refreshTime = 30 * 1000;  // 30 seconds
+
     events.forEach(function(evt) {
       let key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
@@ -637,14 +643,20 @@ export class Arena {
           place: 0,
         };
       }
-      if (evt.delta > currentDelta) return;
+      if (evt.delta > currentDelta) {
+        refreshTime =
+            Math.min(refreshTime, (evt.delta - currentDelta) * 60 * 1000);
+        return;
+      }
       originalContestEvents.push(evt);
       let problem =
           originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
       originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
         penalty: evt.problem.penalty,
         points: evt.problem.points,
-        runs: problem ? problem.runs + 1 : 1 // If problem appeared in event for than one, it means a problem has been solved multiple times
+        runs: problem ? problem.runs + 1 :
+                        1  // If problem appeared in event for than one, it
+                           // means a problem has been solved multiple times
       };
       originalContestRanking[key].total = evt.total;
     });
@@ -652,7 +664,7 @@ export class Arena {
     for (let ranking of Object.values(originalContestRanking))
       data.ranking.push(ranking);
 
-    // Resort rank
+    // Re-sort rank
     data.ranking.sort(
         (rank1, rank2) => { return rank2.total.points - rank1.total.points; });
 
@@ -671,7 +683,8 @@ export class Arena {
         .then(function(response) {
           // Change username to username-virtual
           for (let evt of response.events) {
-            evt.username = UI.formatString(T.virtualSuffix, {username: evt.username});
+            evt.username =
+                UI.formatString(T.virtualSuffix, {username: evt.username});
             evt.name = UI.formatString(T.virtualSuffix, {username: evt.name});
           }
 
@@ -680,27 +693,33 @@ export class Arena {
           self.onRankingEvents(response);
         })
         .fail(UI.ignoreError);
+
+    self.virtualContestRefreshInterval = setTimeout(function() {
+      self.onVirtualRankingChange(virtualContestData);
+    }, refreshTime);
   }
 
   virtualRankingChange(data) {
     // Merge original contest scoreboard and virtual contest
     let self = this;
 
-    var defaultData = JSON.parse(JSON.stringify(data));
+    // Stop existing scoreboard simulation
+    if (self.virtualContestRefreshInterval != null)
+      clearTimeout(self.virtualContestRefreshInterval);
+
     if (self.originalContestScoreboardEvent == null) {
       API.Problemset.scoreboardEvents(
                         {problemset_id: self.options.originalProblemsetId})
           .then(function(response) {
             self.originalContestScoreboardEvent = response.events;
-            self.virtualContestRefreshInterval = setInterval(function() {
+            self.onVirtualRankingChange(data);
+            /*self.virtualContestRefreshInterval = setInterval(function() {
               self.onVirtualRankingChange(data);
-              data = JSON.parse(JSON.stringify(defaultData));
-            }, 5000);
+            }, 5000);*/
           })
           .fail(UI.apiError);
     } else {
       self.onVirtualRankingChange(data);
-      data = JSON.parse(JSON.stringify(defaultData));
     }
   }
 
