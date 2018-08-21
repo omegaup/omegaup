@@ -6,6 +6,15 @@
  * @author juan.pablo
  */
 class UserIdentityAssociationTest extends OmegaupTestCase {
+    private function assertUsernameInArray($username, array $identities) {
+        foreach ($identities as $identity) {
+            if ($identity['username'] == $username) {
+                $this->assertTrue(true);
+                return;
+            }
+        }
+        $this->assertTrue(false, 'Username is not associated with user');
+    }
     /**
      * Basic test for creating a single identity and associating it
      * with a registred user
@@ -41,6 +50,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
 
         // User has one default associated identity when joins omegaUp
         $this->assertEquals(1, count($associatedIdentities['identities']));
+        $this->assertEquals($user->username, $associatedIdentities['identities'][0]['username']);
 
         $response = UserController::apiAssociateIdentity(new Request([
             'auth_token' => $login->auth_token,
@@ -54,6 +64,8 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
 
         // User now has two associated identities
         $this->assertEquals(2, count($associatedIdentities['identities']));
+        $this->assertUsernameInArray($username, $associatedIdentities['identities']);
+        $this->assertUsernameInArray($user->username, $associatedIdentities['identities']);
     }
 
     /**
