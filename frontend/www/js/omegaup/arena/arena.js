@@ -713,9 +713,6 @@ export class Arena {
           .then(function(response) {
             self.originalContestScoreboardEvent = response.events;
             self.onVirtualRankingChange(data);
-            /*self.virtualContestRefreshInterval = setInterval(function() {
-              self.onVirtualRankingChange(data);
-            }, 5000);*/
           })
           .fail(UI.apiError);
     } else {
