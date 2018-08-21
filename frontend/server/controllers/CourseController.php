@@ -919,11 +919,11 @@ class CourseController extends Controller {
             );
         }
 
-        $assignments = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
-        if (count($assignments) != 1) {
+        $assignment = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        if (is_null($assignment)) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment'] = $assignments[0];
+        $r['assignment'] = $assignment;
         $r['assignment']->toUnixTime();
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
