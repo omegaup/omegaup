@@ -23,10 +23,18 @@ class ScoreboardController extends Controller {
 
         $contest = ContestsDAO::getByAlias($r['alias']);
         if ($contest === null) {
-            throw new NotFoundException();
+            $course = CoursesDAO::getByAlias($r['course_alias']);
+            if ($course === null) {
+                throw new NotFoundException();
+            }
+            $assignment = AssignmentsDAO::getByAliasAndCourse($r['alias'], $course->course_id);
+            if ($assignment === null) {
+                throw new NotFoundException();
+            }
+            Scoreboard::refreshScoreboardCache(ScoreboardParams::fromAssignment($assignment, $course->group_id, true));
+        } else {
+            Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($contest));
         }
-
-        Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($contest));
 
         return [
             'status' => 'ok'
