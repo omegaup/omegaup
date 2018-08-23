@@ -316,6 +316,7 @@ class CourseController extends Controller {
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
+                'show_scoreboard' => is_null($r['show_scoreboard']) ? '0' : $r['show_scoreboard'],
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
                 'requests_user_information' => $r['requests_user_information'],
             ]));
@@ -1402,6 +1403,7 @@ class CourseController extends Controller {
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'show_scoreboard' => $r['course']->show_scoreboard,
                 'requests_user_information' => $r['course']->requests_user_information
             ];
 
@@ -1651,8 +1653,9 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);
+        self::resolveGroup($r);
 
-        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+        if (!Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1754,5 +1757,16 @@ class CourseController extends Controller {
             $userProblems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
+
+    /**
+     * @param $identity_id
+     * @param Courses $course
+     * @param Groups $group
+     */
+    public static function mustShowScoreboard($identity_id, Courses $course, Groups $group) {
+        Validators::isNumber($identity_id, 'identity_id', true);
+        return Authorization::canViewCourse($identity_id, $course, $group) &&
+            $course->show_scoreboard;
     }
 }

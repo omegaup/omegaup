@@ -50,11 +50,11 @@
                   v-bind:title="T.courseNewFormShowScoreboardDesc"></span></span>
             <div class="form-control container-fluid">
               <label class="radio-inline"><input type="radio"
-                     v-model="showScoreboard"
-                     value="1">{{ T.wordsYes }}</label> <label class="radio-inline"><input type=
-                     "radio"
-                     v-model="showScoreboard"
-                     value="0">{{ T.wordsNo }}</label>
+                     v-bind:value="1"
+                     v-model="showScoreboard">{{ T.wordsYes }}</label> <label class=
+                     "radio-inline"><input type="radio"
+                     v-bind:value="0"
+                     v-model="showScoreboard">{{ T.wordsNo }}</label>
             </div>
           </div>
         </div>

@@ -5,7 +5,8 @@ class CoursesFactory {
         Users $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
-        $requests_user_information = 'no'
+        $requestsUserInformation = 'no',
+        $showScoreboard = '0'
     ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
@@ -34,7 +35,8 @@ class CoursesFactory {
             'start_time' => (Utils::GetPhpUnixTimestamp()),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'public' => $public,
-            'requests_user_information' => $requests_user_information
+            'requests_user_information' => $requestsUserInformation,
+            'show_scoreboard' => $showScoreboard,
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -46,14 +48,20 @@ class CoursesFactory {
         ];
     }
 
-    public static function createCourseWithOneAssignment(Users $admin = null, ScopedLoginToken $adminLogin = null) {
+    public static function createCourseWithOneAssignment(
+        Users $admin = null,
+        ScopedLoginToken $adminLogin = null,
+        $public = false,
+        $requestsUserInformation = 'no',
+        $showScoreboard = '0'
+    ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
         // Create the course
-        $courseFactoryResult = self::createCourse($admin, $adminLogin);
+        $courseFactoryResult = self::createCourse($admin, $adminLogin, $public, $requestsUserInformation, $showScoreboard);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
