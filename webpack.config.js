@@ -62,9 +62,6 @@ module.exports = [{
     libraryTarget: 'umd'
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'omegaup',
-    }),
     new VueLoaderPlugin(),
     new ExtractTextPlugin({
       filename: 'css/dist/[name].css',
@@ -72,6 +69,11 @@ module.exports = [{
     }),
     new RemoveSourceWebpackPlugin([omegaupStylesRegExp]),
   ],
+  optimization: {
+    splitChunks: {
+      name: 'omegaup'
+    }
+  },
   module: {
     rules: [
       {
