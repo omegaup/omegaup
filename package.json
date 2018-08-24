@@ -30,9 +30,9 @@
     "vue-template-compiler": "^2.5.16",
     "vuex": "^3.0.1",
     "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
-    "wrapper-webpack-plugin": "^2.0.0",
-    "webpack-command": "^0.4.1"
+    "wrapper-webpack-plugin": "^2.0.0"
   },
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
