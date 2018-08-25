@@ -195,7 +195,8 @@ def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
     util.add_students(
-        driver, users, container_id='students',
+        driver, users, tab_xpath='//a[contains(@href, "#students")]',
+        container_xpath='//*[@id="students"]',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))

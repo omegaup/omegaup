@@ -7,7 +7,7 @@
               v-model="selectedContests">
         <option v-bind:value="contest.alias"
                 v-for="contest in availableContests">
-          {{contest.title}}
+          {{UI.contestTitle(contest)}}
         </option>
       </select></legend> <button class="btn"
            type="button"
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {T, UI} from '../../omegaup.js';
 
 export default {
   props: {
@@ -71,7 +71,7 @@ export default {
     }
   },
   data: function() {
-    return { T: T, selectedContests:[], }
+    return { T: T, selectedContests:[], UI: UI, }
   }
 }
 </script>
