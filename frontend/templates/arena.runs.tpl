@@ -132,10 +132,15 @@
 							<td class="memory numeric" data-bind="text: memory_text"></td>
 							<td class="runtime numeric" data-bind="text: runtime_text"></td>
 {if isset($show_rejudge)}
-							<td class="rejudge"><button type="button" class="glyphicon glyphicon-repeat" title="rejudge" data-bind="click: rejudge" /><button type="button" class="glyphicon glyphicon-flag" title="debug" data-bind="click: debug_rejudge" /></td>
+							<td class="rejudge">
+								<button type="button" class="glyphicon glyphicon-repeat" title="rejudge" data-bind="click: rejudge"></button>
+								<button type="button" class="glyphicon glyphicon-flag" title="debug" data-bind="click: debug_rejudge"></button>
+							</td>
 {/if}
 {if isset($show_disqualify)}
-							<td class="disqualify"><button type="button" class="glyphicon glyphicon-ban-circle" title="disqualify" data-bind="click: disqualify"/></td>
+							<td class="disqualify">
+								<button type="button" class="glyphicon glyphicon-ban-circle" title="disqualify" data-bind="click: disqualify"></button>
+							</td>
 {/if}
 {if isset($show_details)}
 							<td><button type="button" class="details glyphicon glyphicon-zoom-in" data-bind="click: details"></button></td>

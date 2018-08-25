@@ -36,7 +36,8 @@ omegaup.OmegaUp.on('ready', function() {
                 window.location.pathname.replace(/\/practice\/.*/, '/');
             return;
           }
-          $('#title .contest-title').html(omegaup.UI.escape(contest.title));
+          $('#title .contest-title')
+              .html(omegaup.UI.escape(omegaup.UI.contestTitle(contest)));
           arena.updateSummary(contest);
 
           arena.submissionGap = parseInt(contest.submission_gap);

@@ -36,4 +36,19 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Insert_ID();
     }
+
+    public static function getId($identity_id, $privacystatement_id) {
+        $sql = 'SELECT
+                  `privacystatement_consent_id`
+                FROM
+                  `PrivacyStatement_Consent_Log`
+                WHERE
+                  identity_id = ?
+                  AND privacystatement_id = ?
+                ORDER BY
+                  privacystatement_id DESC
+                LIMIT 1';
+        global $conn;
+        return $conn->GetOne($sql, [$identity_id, $privacystatement_id]);
+    }
 }
