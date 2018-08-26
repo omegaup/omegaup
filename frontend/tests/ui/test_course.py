@@ -55,11 +55,6 @@ def test_user_ranking_course(driver):
                     (By.XPATH, '//a[@href = "/schools/"]'))).click()
 
         with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, ('//a[@href = "/course/"]')))).click()
-
-        with driver.page_transition():
             course_url = '/course/%s' % course_alias
             driver.wait.until(
                 EC.element_to_be_clickable(
@@ -85,11 +80,6 @@ def create_course(driver, course_alias, school_name):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
     with driver.page_transition():
         driver.wait.until(
@@ -210,11 +200,6 @@ def enter_course(driver, course_alias, assignment_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
     course_url = '/course/%s' % course_alias
     with driver.page_transition():
