@@ -1506,6 +1506,7 @@ class ContestController extends Controller {
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
+                'is_invited' => '1',
             ]));
         } catch (Exception $e) {
             // Operation failed in the data layer

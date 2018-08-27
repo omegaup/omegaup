@@ -42,8 +42,10 @@ OmegaUp.on('ready', function() {
                 }
               },
               on: {
-                'accept-request': (ev, username) => this.arbitrateRequest(ev, username, true),
-                'deny-request': (ev, username) => this.arbitrateRequest(ev, username, false),
+                'accept-request':
+                    (ev, username) => this.arbitrateRequest(ev, username, true),
+                'deny-request': (ev, username) =>
+                                    this.arbitrateRequest(ev, username, false),
                 'update-contest': function(ev) {
                   API.Contest
                       .update({

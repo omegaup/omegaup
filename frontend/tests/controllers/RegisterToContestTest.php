@@ -285,4 +285,63 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         $this->assertEquals($contest['status'], 'ok');
     }
+
+    /**
+     * Testing identities can access to contest, but there are invited
+     * and no invited
+     */
+    public function testIdentitiesInvitedAndNoInvitedToContest() {
+        // Creating 5 identities, and inviting them to the contest
+        $numberOfInvitedContestants = 5;
+        $contestants = [];
+        for ($i = 0; $i < $numberOfInvitedContestants; $i++) {
+            $contestants[] = UserFactory::createUser();
+        }
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'public']));
+        foreach ($contestants as $contestant) {
+            ContestsFactory::addUser($contestData, $contestant);
+        }
+        // Creating 5 identities without an invitation to join the contest
+        $numberOfNotInvitedContestants = 3;
+        for ($i = 0; $i < $numberOfNotInvitedContestants; $i++) {
+            $contestants[] = UserFactory::createUser();
+        }
+
+        // All the identities join the contest
+        foreach ($contestants as $contestant) {
+            $contestantLogin = self::login($contestant);
+
+            ContestController::apiOpen(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $contestantLogin->auth_token,
+            ]));
+        }
+
+        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($contestData['contest']->problemset_id);
+
+        $this->assertEquals(count($problemsetIdentities), ($numberOfInvitedContestants + $numberOfNotInvitedContestants));
+
+        $this->assertNumberOfInvitedUsers($numberOfInvitedContestants, $problemsetIdentities);
+        $this->assertNumberOfNotInvitedUsers($numberOfNotInvitedContestants, $problemsetIdentities);
+    }
+
+    private function assertNumberOfInvitedUsers($numberOfInvitedContestants, $problemsetIdentities) {
+        $sumInvitedContestants = 0;
+        foreach ($problemsetIdentities as $identity) {
+            if ($identity['is_invited'] == '1') {
+                $sumInvitedContestants++;
+            }
+        }
+        $this->assertEquals($sumInvitedContestants, $numberOfInvitedContestants);
+    }
+
+    private function assertNumberOfNotInvitedUsers($numberOfNotInvitedContestants, $problemsetIdentities) {
+        $sumNotInvitedContestants = 0;
+        foreach ($problemsetIdentities as $identity) {
+            if ($identity['is_invited'] == '0') {
+                $sumNotInvitedContestants++;
+            }
+        }
+        $this->assertEquals($sumNotInvitedContestants, $numberOfNotInvitedContestants);
+    }
 }
