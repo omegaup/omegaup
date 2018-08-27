@@ -301,13 +301,13 @@ class RegisterToContestTest extends OmegaupTestCase {
         foreach ($contestants as $contestant) {
             ContestsFactory::addUser($contestData, $contestant);
         }
-        // Creating 5 identities without an invitation to join the contest
+        // Creating 3 identities without an invitation to join the contest
         $numberOfNotInvitedContestants = 3;
         for ($i = 0; $i < $numberOfNotInvitedContestants; $i++) {
             $contestants[] = UserFactory::createUser();
         }
 
-        // All the identities join the contest
+        // All identities join the contest
         foreach ($contestants as $contestant) {
             $contestantLogin = self::login($contestant);
 
