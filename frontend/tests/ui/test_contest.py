@@ -132,7 +132,7 @@ def test_user_ranking_contest(driver):
 
         contestants_full_list = driver.browser.find_elements_by_xpath(
             '//*[@id="ranking"]/div/table/tbody/tr')
-        assert contestants_full_list == 4, contestants_full_list
+        assert len(contestants_full_list) == 4, contestants_full_list
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -140,7 +140,7 @@ def test_user_ranking_contest(driver):
 
         invited_contestant_list = driver.browser.find_elements_by_xpath(
             '//*[@id="ranking"]/div/table/tbody/tr')
-        assert invited_contestant_list == 3, invited_contestant_list
+        assert len(invited_contestant_list) == 3, invited_contestant_list
 
 
 @util.annotate
