@@ -16,7 +16,8 @@
           v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{T.wordsAddProblem}}</a>
       </li>
-      <li v-if="!virtual"
+      <li class="admission-mode"
+          v-if="!virtual"
           v-on:click="showTab = 'publish'">
         <a data-toggle="tab">{{T.contestNewFormAdmissionMode}}</a>
       </li>

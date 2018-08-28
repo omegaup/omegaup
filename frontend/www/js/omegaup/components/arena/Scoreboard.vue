@@ -2,7 +2,8 @@
   <div class="omegaup-scoreboard">
     <!-- id-lint off -->
     <div id="ranking-chart"></div><!-- id-lint on -->
-    <label><input type="checkbox"
+    <label><input class="toggle-contestants"
+           type="checkbox"
            v-model="invited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
     <table>
       <thead>
