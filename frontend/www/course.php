@@ -58,7 +58,7 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         header('HTTP/1.1 404 Not Found');
         die();
     }
-    $showScoreboard = $session['valid'] && CourseController::mustShowScoreboard($session['identity']->identity_id, $course, $group);
+    $showScoreboard = $session['valid'] && CourseController::shouldShowScoreboard($session['identity']->identity_id, $course, $group);
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {

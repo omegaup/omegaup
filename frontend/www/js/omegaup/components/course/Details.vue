@@ -50,10 +50,10 @@
                   v-bind:title="T.courseNewFormShowScoreboardDesc"></span></span>
             <div class="form-control container-fluid">
               <label class="radio-inline"><input type="radio"
-                     v-bind:value="1"
+                     v-bind:value="true"
                      v-model="showScoreboard">{{ T.wordsYes }}</label> <label class=
                      "radio-inline"><input type="radio"
-                     v-bind:value="0"
+                     v-bind:value="false"
                      v-model="showScoreboard">{{ T.wordsNo }}</label>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default {
       alias: this.course.alias,
       description: this.course.description,
       finishTime: this.course.finish_time || new Date(),
-      showScoreboard: this.course.show_scoreboard || 0,
+      showScoreboard: !!this.course.show_scoreboard,
       startTime: this.course.start_time || new Date(),
       name: this.course.name,
       school_id: this.course.school_id,
@@ -170,7 +170,7 @@ export default {
       this.alias = this.course.alias;
       this.description = this.course.description;
       this.finishTime = this.course.finish_time || new Date();
-      this.showScoreboard = this.course.show_scoreboard || 0;
+      this.showScoreboard = !!this.course.show_scoreboard;
       this.startTime = this.course.start_time || new Date();
       this.name = this.course.name;
       this.school_id = this.course.school_id;

@@ -6,7 +6,7 @@ class CoursesFactory {
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
-        $showScoreboard = '0'
+        $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
@@ -53,7 +53,7 @@ class CoursesFactory {
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
-        $showScoreboard = '0'
+        $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
