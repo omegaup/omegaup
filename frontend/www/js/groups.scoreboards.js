@@ -15,7 +15,7 @@ $(function() {
             $('#contests')
                 .append($('<option></option>')
                             .attr('value', contest.alias)
-                            .text(contest.title));
+                            .text(omegaup.UI.contestTitle(contest)));
           }
         })
         .fail(omegaup.UI.apiError);
@@ -59,7 +59,8 @@ $(function() {
                                                         '/arena/' +
                                                             contest.alias + '/')
                                                   .text(omegaup.UI.escape(
-                                                      contest.title))))
+                                                      omegaup.UI.contestTitle(
+                                                          contest)))))
                           .append($('<td></td>')
                                       .append(contest.only_ac ?
                                                   omegaup.T.wordsYes :

@@ -19,13 +19,13 @@
             </thead>
             <tbody data-bind="foreach: course">
                 <tr>
-                    <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
+                    <td><a data-bind="text: name, attr: { href: courseURL }"></a></td>
                     <td data-bind="text: startDate"></td>
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>
                     <td data-bind="text: numTests"></td>
-                    <td><a class="glyphicon glyphicon-list-alt" data-bind="attr: { href: submissionsListUrl, title: submissionsList }" /></td>
-                    <td><a class="glyphicon glyphicon-time" data-bind="attr: { href: activityURL, title: activity }" /></td>
+                    <td><a class="glyphicon glyphicon-list-alt" data-bind="attr: { href: submissionsListUrl, title: submissionsList }"></a></td>
+                    <td><a class="glyphicon glyphicon-time" data-bind="attr: { href: activityURL, title: activity }"></a></td>
                 </tr>
             </tbody>
         </table>
@@ -48,7 +48,7 @@
             </thead>
             <tbody data-bind="foreach: course">
                 <tr>
-                    <td><a data-bind="text: name, attr: { href: courseURL }" /></td>
+                    <td><a data-bind="text: name, attr: { href: courseURL }"></a></td>
                     <td data-bind="text: startDate"></td>
                     <td data-bind="text: endDate"></td>
                     <td data-bind="text: numHomeworks"></td>

@@ -155,6 +155,10 @@ class ProblemsetController extends Controller {
 
     /**
      * @param Request $r
+     * $r['tokens'][0] = invalid filter
+     * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
+     * $r['tokens'][2] = Id of entity ($tokens[2])
+     * $r['tokens'][3] = Token given by the filter
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
@@ -174,6 +178,7 @@ class ProblemsetController extends Controller {
         if ($r['problemset']['type'] == 'Contest') {
             $request = new Request([
                 'token' => $r['token'],
+                'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $r['problemset']['contest_alias'],
             ]);
             if (isset($r['auth_token'])) {

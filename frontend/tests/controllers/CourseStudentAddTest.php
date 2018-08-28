@@ -86,20 +86,15 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'statement_type' => $intro_details['statement_type'],
         ]));
 
-        try {
-            // User can not join course twice.
-            CourseController::apiAddStudent(new Request([
-                'auth_token' => $userLogin->auth_token,
-                'usernameOrEmail' => $student->username,
-                'course_alias' => $courseData['course_alias'],
-                'share_user_information' => 1,
-                'privacy_git_object_id' => $intro_details['git_object_id'],
-                'statement_type' => $intro_details['statement_type'],
-            ]));
-            $this->fail('Should have thrown an InvalidDatabaseOperationException');
-        } catch (InvalidDatabaseOperationException $e) {
-            // OK!
-        }
+        // User join course twice.
+        CourseController::apiAddStudent(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+            'share_user_information' => 1,
+            'privacy_git_object_id' => $intro_details['git_object_id'],
+            'statement_type' => $intro_details['statement_type'],
+        ]));
 
         // User agrees sharing his information
         $intro_details = CourseController::apiIntroDetails(new Request([

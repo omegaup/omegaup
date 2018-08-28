@@ -1683,7 +1683,17 @@ class UserController extends Controller {
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r['current_user']->password = $hashedPassword;
 
-        UsersDAO::save($r['current_user']);
+        try {
+            DAO::transBegin();
+
+            UsersDAO::save($r['current_user']);
+            IdentityController::convertFromUser($r['current_user']);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         // Expire profile cache
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
