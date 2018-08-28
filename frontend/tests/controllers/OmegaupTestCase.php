@@ -64,10 +64,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      */
     public function assertLogin(Users $user, $auth_token = null) {
         // Check auth token
-        $authTokenKey = new AuthTokens([
-                    'user_id' => $user->user_id
-                ]);
-        $auth_tokens_bd = AuthTokensDAO::search($authTokenKey);
+        $auth_tokens_bd = AuthTokensDAO::getByIdentityId($user->main_identity_id);
 
         // Validar que el token se guardó en la BDD
         if (!is_null($auth_token)) {
@@ -90,11 +87,11 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     /**
      * Logs in a user an returns the auth_token
      *
-     * @param Users $user the user to be logged in
+     * @param $user the user to be logged in
      *
      * @return string auth_token
      */
-    public static function login(Users $user) {
+    public static function login($user) {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
@@ -129,9 +126,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      */
     public function assertContest(Request $r) {
         // Validate that data was written to DB by getting the contest by title
-        $contest = new Contests();
-        $contest->title = $r['title'];
-        $contests = ContestsDAO::search($contest);
+        $contests = ContestsDAO::getByTitle($r['title']);
         $contest = $contests[0];
 
         // Assert that we found our contest

@@ -341,8 +341,9 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null) {
+    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $excludeAdmin = true) {
         // Build SQL statement
+        $log = Logger::getLogger('Scoreboard');
         if ($showAllRuns) {
             if (is_null($group_id)) {
                 $sql = '
@@ -354,15 +355,18 @@ class RunsDAO extends RunsDAOBase {
                         Problemset_Identities pi ON i.identity_id = pi.identity_id
                     WHERE
                         pi.problemset_id = ? AND
-                        i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)';
                 $val = [
                     $problemset_id,
-                    $acl_id,
                     $acl_id,
                     Authorization::SYSTEM_ACL,
                     Authorization::ADMIN_ROLE,
                 ];
+                if ($excludeAdmin) {
+                    $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
+                    $val[] =  $acl_id;
+                }
+                $sql = $sql . ';';
             } else {
                 $sql = '
                     SELECT

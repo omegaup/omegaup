@@ -22,11 +22,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from ui import util
 
-
 _DEFAULT_TIMEOUT = 10  # seconds
 _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
+_BLANK = '/404.html'  # An path that returns 200 in both Firefox and Chrome.
 
 
 class JavaScriptLogCollector:
@@ -215,16 +215,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             yield
         finally:
             # Wait until there are no more pending requests to avoid races
-            # where those requests return 401. Navigate to about:blank just for
-            # good measure and to enforce that there are two URL changes.
+            # where those requests return 401. Navigate to a blank page just
+            # for good measure and to enforce that there are two URL changes.
             self._wait_for_page_loaded()
             with self.page_transition():
-                self.browser.get('about:blank')
+                self.browser.get(self.url(_BLANK))
             with self.page_transition():
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (
                 'Invalid URL redirect. Expected %s, got %s' % (
-                    home_page_url, self.current.browser_url))
+                    home_page_url, self.browser.current_url))
 
     @util.no_javascript_errors()
     @util.annotate
@@ -234,7 +234,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         # Home page
         home_page_url = self.url('/')
         with self.page_transition():
-            self.browser.get('about:blank')
+            self.browser.get(self.url(_BLANK))
         with self.page_transition():
             self.browser.get(home_page_url)
         with self.page_transition():
@@ -254,12 +254,12 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         # Home screen
         with self.page_transition():
-            self.browser.get('about:blank')
+            self.browser.get(self.url(_BLANK))
         with self.page_transition():
             self.browser.get(self.url('/logout/?redirect=/'))
         assert self.browser.current_url == home_page_url, (
             'Invalid URL redirect. Expected %s, got %s' % (
-                home_page_url, self.current.browser_url))
+                home_page_url, self.browser.current_url))
 
     def annotate(self, message, level=logging.INFO):
         '''Add an annotation to the run's log.'''

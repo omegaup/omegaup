@@ -44,8 +44,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get problem and contest from DB to check it
         $problemDAO = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
         $contestDAO = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contestantsDAO = UsersDAO::search(new Users(['username' => $contestant->username]));
-        $contestantDAO = $contestantsDAO[0];
+        $contestantDAO = UsersDAO::FindByUsername($contestant->username);
 
         // Assert data
         $this->assertEquals($response['title'], $problemDAO->title);

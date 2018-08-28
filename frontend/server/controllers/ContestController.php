@@ -224,6 +224,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        $addedContests = [];
         foreach ($contests as $contest) {
             $contest['start_time'] = strtotime($contest['start_time']);
             $contest['finish_time'] = strtotime($contest['finish_time']);
@@ -448,6 +449,7 @@ class ContestController extends Controller {
         } else {
             if ($r['token'] === $r['problemset']->scoreboard_url_admin) {
                 $r['contest_admin'] = true;
+                $r['contest_alias'] = $r['contest']->alias;
             } elseif ($r['token'] !== $r['problemset']->scoreboard_url) {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
             }
@@ -575,7 +577,7 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($needsInformation['requests_user_information'] != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id '], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['current_identity_id'],
                     $privacystatement_id
@@ -766,6 +768,7 @@ class ContestController extends Controller {
         $result = [];
         self::getCachedDetails($r, $result);
 
+        $result['available_languages'] = RunController::$kSupportedLanguages;
         $result['status'] = 'ok';
         $result['admin'] = true;
         return $result;
@@ -921,7 +924,7 @@ class ContestController extends Controller {
         $contest->public = 0; // Virtual contest must be private
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contestLength);
-        $contest->scoreboard = $originalContest->scoreboard;
+        $contest->scoreboard = 100; // Always show scoreboard in virtual contest
         $contest->alias = $virtualContestAlias;
         $contest->points_decay_factor = $originalContest->points_decay_factor;
         $contest->submissions_gap = $originalContest->submissions_gap;
@@ -956,10 +959,12 @@ class ContestController extends Controller {
 
             ACLsDAO::save($acl);
             $problemset->acl_id = $acl->acl_id;
+            $problemset->type = 'Contest';
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database
             ProblemsetsDAO::save($problemset);
+
             $contest->problemset_id = $problemset->problemset_id;
             if (!is_null($originalProblemset)) {
                 ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $originalProblemset);
@@ -967,6 +972,10 @@ class ContestController extends Controller {
 
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
+
+            // Update contest_id in problemset object
+            $problemset->contest_id = $contest->contest_id;
+            ProblemsetsDAO::save($problemset);
 
             // End transaction transaction
             ContestsDAO::transEnd();

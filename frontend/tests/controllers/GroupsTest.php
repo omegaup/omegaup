@@ -27,10 +27,7 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $groups = GroupsDAO::search(new Groups([
-            'name' => $name
-        ]));
-        $group = $groups[0];
+        $group = GroupsDAO::getByName($name);
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
         $this->assertTrue(Authorization::isGroupAdmin($identity->identity_id, $group));
@@ -201,11 +198,8 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $groupScoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards([
-            'alias' => $alias
-        ]));
+        $groupScoreboard = GroupsScoreboardsDAO::getByAlias($alias);
 
-        $groupScoreboard = $groupScoreboards[0];
         $this->assertNotNull($groupScoreboard);
         $this->assertEquals($description, $groupScoreboard->description);
         $this->assertEquals($groupData['group']->group_id, $groupScoreboard->group_id);
@@ -232,11 +226,10 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
-            'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'problemset_id' => $contestData['contest']->problemset_id
-        ]));
-        $gsc = $gscs[0];
+        $gsc = GroupsScoreboardsProblemsetsDAO::getByPK(
+            $scoreboardData['scoreboard']->group_scoreboard_id,
+            $contestData['contest']->problemset_id
+        );
 
         $this->assertNotNull($gsc);
     }
@@ -281,12 +274,12 @@ class GroupsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $gscs = GroupsScoreboardsProblemsetsDAO::search(new GroupsScoreboardsProblemsets([
-            'group_scoreboard_id' => $scoreboardData['scoreboard']->group_scoreboard_id,
-            'problemset_id' => $contestData['contest']->problemset_id
-        ]));
+        $gscs = GroupsScoreboardsProblemsetsDAO::getByPK(
+            $scoreboardData['scoreboard']->group_scoreboard_id,
+            $contestData['contest']->problemset_id
+        );
 
-        $this->assertEquals(0, count($gscs));
+        $this->assertNull($gscs);
     }
 
     /**

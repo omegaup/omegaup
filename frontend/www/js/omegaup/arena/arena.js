@@ -741,8 +741,9 @@ export class Arena {
 
         $('.position', r).html(rank.place);
         $('.user', r)
-            .html('<span title="' + username + '">' + rank.username +
-                  UI.getFlag(rank['country']) + '</span>');
+            .html('<span title="' + UI.rankingUsername(rank) + '">' +
+                  UI.rankingUsername(rank) + UI.getFlag(rank['country']) +
+                  '</span>');
         $('.points', r).html(rank.total.points);
         $('.penalty', r).html(rank.total.penalty);
 
@@ -1603,7 +1604,7 @@ export class Arena {
       ko.applyBindings(self.summaryView, summary[0]);
       self.summaryView.attached = true;
     }
-    self.summaryView.title(contest.title);
+    self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(

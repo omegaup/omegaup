@@ -127,6 +127,24 @@ class Validators {
     }
 
     /**
+     * Enforces username identity requirements
+     *
+     * @param string $parameter
+     * @param string $parameterName
+     * @param boolean $required
+     * @throws InvalidParameterException
+     */
+    public static function isValidUsernameIdentity($parameter, $parameterName, $required = true) {
+        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+
+        if ($isPresent && !preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
+            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+        }
+
+        Validators::isStringOfMinLength($parameter, $parameterName, 2);
+    }
+
+    /**
      *
      * @param date $parameter
      * @param string $parameterName
