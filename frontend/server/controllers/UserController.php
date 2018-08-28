@@ -2507,7 +2507,7 @@ class UserController extends Controller {
         try {
             return [
                 'status' => 'ok',
-                'identities' => IdentitiesDAO::getLinkedIdentities($r['current_user_id'])
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r['current_user_id'])
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

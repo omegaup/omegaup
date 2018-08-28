@@ -184,7 +184,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function getLinkedIdentities($userId) {
+    public static function getAssociatedIdentities($userId) {
         global  $conn;
         $sql = '
             SELECT

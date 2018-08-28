@@ -15,6 +15,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         }
         $this->assertTrue(false, 'Username is not associated with user');
     }
+
     /**
      * Basic test for creating a single identity and associating it
      * with a registred user
@@ -108,6 +109,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $this->fail('Identity should not be associated because identity username does not match');
         } catch (InvalidParameterException $e) {
             // Exception expected
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -148,6 +150,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $this->fail('Identity should not be associated because identity password does not match');
         } catch (InvalidParameterException $e) {
             // Exception expected
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }
     }
 }
