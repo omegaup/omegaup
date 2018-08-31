@@ -70,10 +70,12 @@ class CoursesFactory {
             'assignment_type' => 'homework'
         ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
+        $assignment = AssignmentsDAO::getByAlias($assignmentAlias);
 
         return [
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
+            'problemset_id' => $assignment->problemset_id,
             'request' => $r,
             'admin' => $admin
         ];
