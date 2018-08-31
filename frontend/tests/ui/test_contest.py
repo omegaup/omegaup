@@ -96,6 +96,20 @@ def test_user_ranking_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-contests'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+
+        public = '//tr[@class="%s"]/td[6]/a' % contest_alias
+        admin = '//tr[@class="%s"]/td[7]/a' % contest_alias
+        util.check_scoreboard_events(driver, public, admin, 1)
+
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(

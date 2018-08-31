@@ -71,6 +71,11 @@ def test_user_ranking_course(driver):
         assert driver.browser.find_element_by_css_selector(
             'td.score').text == '100'
 
+        driver.browser.execute_script("window.history.go(-1)")
+        public = '//*[@id="course-contents"]/span[1]/table/tbody/tr/td[5]/a[1]'
+        admin = '//*[@id="course-contents"]/span[1]/table/tbody/tr/td[5]/a[2]'
+        util.check_scoreboard_events(driver, public, admin, 1)
+
 
 @util.annotate
 def create_course(driver, course_alias, school_name):

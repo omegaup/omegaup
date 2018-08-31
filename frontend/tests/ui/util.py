@@ -175,3 +175,29 @@ def is_message_whitelisted(message, message_whitelist):
             return True
 
     return False
+
+
+def check_scoreboard_events(driver, public_xpath, admin_xpath,
+                            number_ac_or_pa_runs):
+    '''Verifies chart is correctly generated'''
+
+    num_elements = 0
+    if number_ac_or_pa_runs != 0:
+        num_elements = 2 + (number_ac_or_pa_runs * 2)
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable((By.XPATH, (public_xpath)))).click()
+
+        scoreboard_events = driver.browser.find_elements_by_xpath(
+            '//*[name()="svg"]/*[name()="g"][10]/*[name()="g"]')
+        assert len(scoreboard_events) == num_elements, len(scoreboard_events)
+
+    driver.browser.execute_script("window.history.go(-1)")
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable((By.XPATH, (admin_xpath)))).click()
+
+        scoreboard_events = driver.browser.find_elements_by_xpath(
+            '//*[name()="svg"]/*[name()="g"][10]/*[name()="g"]')
+        assert len(scoreboard_events) == num_elements, len(scoreboard_events)
