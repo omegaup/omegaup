@@ -271,6 +271,8 @@ export default {
 
     removeStudent: _call('/api/course/removeStudent/'),
 
+    runs: _call('/api/course/runs/', _convertRuntimes),
+
     studentProgress: _call('/api/course/studentProgress/',
                            function(result) {
                              for (var problem of result.problems) {

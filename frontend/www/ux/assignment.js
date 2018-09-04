@@ -8,6 +8,21 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   var arena = new omegaup.arena.Arena(options);
+  var admin = new omegaup.arena.ArenaAdmin(arena);
+  if (admin.arena.contestAdmin) {
+    admin.refreshRuns();
+    setInterval(function() {
+      runsOffset = 0;  // Return pagination to start on refresh
+      admin.refreshRuns();
+    }, 5 * 60 * 1000);
+
+    // Trigger the event (useful on page load).
+    arena.onHashChanged();
+
+    $('#loading').fadeOut('slow');
+    $('#root').fadeIn('slow');
+  }
+
   Highcharts.setOptions({global: {useUTC: false}});
   omegaup.API.Course.getAssignment({
                       course: arena.options.courseAlias,

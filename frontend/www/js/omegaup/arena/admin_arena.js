@@ -6,7 +6,6 @@ export default class ArenaAdmin {
     var self = this;
 
     self.arena = arena;
-    self.arena.contestAdmin = true;
 
     self.setUpPagers();
     self.arena.runs.attach($('#runs table.runs'));
@@ -97,9 +96,15 @@ export default class ArenaAdmin {
       API.Run.list(options)
           .then(self.runsChanged.bind(self))
           .fail(UI.ignoreError);
-    } else {
+    } else if (self.arena.options.contestAlias != null) {
       options.contest_alias = self.arena.options.contestAlias;
       API.Contest.runs(options)
+          .then(self.runsChanged.bind(self))
+          .fail(UI.apiError);
+    } else {
+      options.course_alias = self.arena.options.courseAlias;
+      options.assignment_alias = self.arena.options.assignmentAlias;
+      API.Course.runs(options)
           .then(self.runsChanged.bind(self))
           .fail(UI.apiError);
     }
