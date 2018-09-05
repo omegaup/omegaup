@@ -2467,6 +2467,62 @@ class UserController extends Controller {
 
         return ['status' => 'ok'];
     }
+
+    /**
+     * Associates an identity to the logged user given the username
+     *
+     * @param Request $r
+     * @throws InvalidParameterException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAssociateIdentity(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::isStringNonEmpty($r['password'], 'password');
+
+        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
+
+        if (empty($identity)) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        $passwordCheck = SecurityTools::compareHashedStrings(
+            $r['password'],
+            $identity->password
+        );
+
+        if ($passwordCheck === false) {
+            throw new InvalidParameterException('parameterInvalid', 'password');
+        }
+
+        try {
+            IdentitiesDAO::associateIdentityWithUser($r['current_user_id'], $identity->identity_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Get the identities that have been associated to the logged user
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListAssociatedIdentities(Request $r) {
+        self::authenticateRequest($r);
+
+        try {
+            return [
+                'status' => 'ok',
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r['current_user_id'])
+            ];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();

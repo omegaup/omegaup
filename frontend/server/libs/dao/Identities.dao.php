@@ -163,4 +163,67 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return $rs;
     }
+
+    public static function getUnassociatedIdentity($username) {
+        global  $conn;
+        $sql = '
+            SELECT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username = ?
+                AND user_id IS NULL
+            LIMIT 1';
+        $args = [$username];
+
+        $rs = $conn->GetRow($sql, $args);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Identities($rs);
+    }
+
+    public static function getAssociatedIdentities($userId) {
+        global  $conn;
+        $sql = '
+            SELECT
+                i.username,
+                i.identity_id,
+                u.main_identity_id
+            FROM
+                Identities i
+            INNER JOIN
+                Users u
+            ON
+                i.user_id = u.user_id
+            WHERE
+                i.user_id = ?
+                ';
+
+        $rs = $conn->Execute($sql, [$userId]);
+        $result = [];
+        foreach ($rs as $identity) {
+            array_push($result, [
+                'username' => $identity['username'],
+                'default' => $identity['identity_id'] == $identity['main_identity_id'],
+            ]);
+        }
+        return $result;
+    }
+
+    public static function associateIdentityWithUser($userId, $identity_id) {
+        global $conn;
+        $sql = '
+            UPDATE
+                Identities
+            SET
+                user_id = ?
+            WHERE
+                identity_id = ?
+        ';
+        $conn->Execute($sql, [$userId, $identity_id]);
+
+        return $conn->Affected_Rows();
+    }
 }
