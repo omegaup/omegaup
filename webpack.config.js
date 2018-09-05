@@ -25,6 +25,7 @@ module.exports = [{
     arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
     coder_of_the_month_notice: './frontend/www/js/omegaup/coderofthemonth/notice.js',
+    contest_edit: './frontend/www/js/omegaup/contest/edit.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant: './frontend/www/js/omegaup/contest/list_participant.js',
     contest_requests: './frontend/www/js/omegaup/contest/requests.js',

@@ -35,7 +35,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
-        $identityName = substr(Utils::CreateRandomString(), -10);
+        $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
         IdentityController::apiCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -66,7 +66,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
         $wrongGroupAlias = 'wrongGroupAlias';
-        $identityName = substr(Utils::CreateRandomString(), -10);
+        $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
         try {
             $response = IdentityController::apiCreate(new Request([
@@ -94,7 +94,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
-        $identityName = substr(Utils::CreateRandomString(), -10);
+        $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
         try {
             $response = IdentityController::apiCreate(new Request([

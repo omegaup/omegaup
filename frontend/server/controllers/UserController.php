@@ -1683,7 +1683,17 @@ class UserController extends Controller {
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r['current_user']->password = $hashedPassword;
 
-        UsersDAO::save($r['current_user']);
+        try {
+            DAO::transBegin();
+
+            UsersDAO::save($r['current_user']);
+            IdentityController::convertFromUser($r['current_user']);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         // Expire profile cache
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
@@ -2456,6 +2466,62 @@ class UserController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Associates an identity to the logged user given the username
+     *
+     * @param Request $r
+     * @throws InvalidParameterException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAssociateIdentity(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::isStringNonEmpty($r['password'], 'password');
+
+        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
+
+        if (empty($identity)) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        $passwordCheck = SecurityTools::compareHashedStrings(
+            $r['password'],
+            $identity->password
+        );
+
+        if ($passwordCheck === false) {
+            throw new InvalidParameterException('parameterInvalid', 'password');
+        }
+
+        try {
+            IdentitiesDAO::associateIdentityWithUser($r['current_user_id'], $identity->identity_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Get the identities that have been associated to the logged user
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListAssociatedIdentities(Request $r) {
+        self::authenticateRequest($r);
+
+        try {
+            return [
+                'status' => 'ok',
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r['current_user_id'])
+            ];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
     }
 }
 
