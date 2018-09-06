@@ -225,6 +225,30 @@ class Authorization {
         );
     }
 
+    /**
+     * Only the first and last day of the month mentor is
+     * available to choose the coder of the month
+     * @return Array
+     */
+    public static function canChooseCoder() {
+        $today = date('Y-m-d', Time::get());
+        $firstDayOfMonth = date('Y-m-01', Time::get());
+        $lastDayOfMonth = date('Y-m-t', Time::get());
+        $month  = date('m', Time::get());
+        if ($today == $lastDayOfMonth) {
+            return [
+                'canChoose' => true,
+                'monthToChoose' => $month,
+            ];
+        } elseif ($today == $firstDayOfMonth) {
+            return [
+                'canChoose' => true,
+                'monthToChoose' => $month - 1,
+            ];
+        }
+        return ['canChoose' => false];
+    }
+
     public static function isGroupIdentityCreator($identityId) {
         if (self::$groupIdentityCreator == null) {
             self::$groupIdentityCreator = GroupsDAO::findByAlias(
