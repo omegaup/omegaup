@@ -45,7 +45,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $sql = "
 			SELECT DISTINCT
-				i.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+				i.user_id, i.username, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
 			FROM
 				(
 					SELECT DISTINCT
@@ -62,9 +62,12 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			INNER JOIN
 				Identities i ON i.identity_id = up.identity_id
       LEFT JOIN
-          (SELECT user_id, MAX(time) latest_time, rank FROM Coder_Of_The_Month WHERE rank = 1 GROUP BY user_id, rank) AS cm on i.user_id = cm.user_id
+        (SELECT user_id, MAX(time) latest_time, selected FROM Coder_Of_The_Month WHERE selected = 1 GROUP BY user_id) AS cm on i.user_id = cm.user_id
+      LEFT JOIN
+        (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id = com.user_id
 			WHERE
-				cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?
+				(cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
+        AND com.user_id IS NULL
 			GROUP BY
 				up.identity_id
 			ORDER BY
@@ -72,7 +75,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			LIMIT 100
 		";
 
-        $val = [$startTime, $endTime, $endTime];
+        $val = [$startTime, $endTime, $endTime, $endTime];
 
         global $conn;
         $results = $conn->getAll($sql, $val);
@@ -170,7 +173,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndRank($time, $rank) {
+    final public static function getByTimeAndSelected($time) {
         $sql = 'SELECT
                     *
                 FROM
@@ -178,15 +181,71 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `rank` = ?;';
+                    `selected` = 1;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$time, $rank]);
+        $rs = $conn->Execute($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
             array_push($coders, new CoderOfTheMonth($row));
         }
         return $coders;
+    }
+
+    final public static function getByTime($time) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$time]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
+    }
+
+    /**
+     * One coder is selected, when parameters are not received
+     * means that coder was selected by default
+     *
+     * @param $username
+     * @param identity_id
+     * @return Affected_Rows
+     */
+    public static function selectCoder($username = null, $identity_id = null) {
+        $curdate = date('Y-m-d', Time::get());
+        if (is_null($username) && is_null($identity_id)) {
+            $sql = '
+              UPDATE
+                `Coder_Of_The_Month`
+              SET
+                `selected` = 1
+              WHERE
+                `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
+                AND `rank` = 1;';
+            $params = [$curdate];
+        } else {
+            $sql = '
+              UPDATE
+                `Coder_Of_The_Month`
+              SET
+                `selected` = 1,
+                `selected_by` = ?
+              WHERE
+                `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
+                AND `user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1);';
+            $params = [$identity_id, $curdate, $username];
+        }
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 }
