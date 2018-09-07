@@ -33,6 +33,15 @@ let UI = {
     return clock;
   },
 
+  isVirtual: function(contest) { return contest.rerun_id != 0; },
+
+  contestTitle: function(contest) {
+    if (UI.isVirtual(contest)) {
+      return UI.formatString(T.virtualContestSuffix, {title: contest.title});
+    }
+    return contest.title;
+  },
+
   rankingUsername: function(rank) {
     let username = rank.username;
     if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
@@ -48,6 +57,15 @@ let UI = {
           template.replace(new RegExp('%\\(' + key + '\\)', 'g'), values[key]);
     }
     return template;
+  },
+
+  contestUpdated: function(data, contestAlias) {
+    if (data.status != 'ok') {
+      UI.error(data.error || 'error');
+      return;
+    }
+    UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
+               contestAlias + '">' + T.contestEditGoToContest + '</a>');
   },
 
   displayStatus: function(message, type) {
@@ -206,7 +224,8 @@ let UI = {
               },
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger('change');
   },
 
   problemTypeahead: function(elem, cb) {
@@ -229,7 +248,8 @@ let UI = {
               }
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger('change');
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {
