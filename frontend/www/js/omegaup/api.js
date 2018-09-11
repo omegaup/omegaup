@@ -569,8 +569,6 @@ export default {
 
     removeGroup: _call('/api/user/removegroup/'),
 
-    removeIdentity: _call('/api/user/removeIdentity/'),
-
     removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),

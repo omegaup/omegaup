@@ -39,15 +39,11 @@
         <thead>
           <tr>
             <th>{{ T.wordsIdentity }}</th>
-            <th class="align-right">{{ T.wordsDelete }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="identity in identities">
             <td>{{ identity.username }}</td>
-            <td><button class="close"
-                    type="button"
-                    v-on:click="onRemove(identity)">×</button></td>
           </tr>
         </tbody>
       </table>
@@ -57,14 +53,15 @@
 
 <script>
 import UI from '../../ui.js';
+import {T} from '../../omegaup.js';
 
 export default {
   props: {
-    T: Object,
     identities: Array,
   },
   data: function() {
     return {
+      T: T,
       username: '',
       password: '',
     };

@@ -607,7 +607,6 @@ omegaup.OmegaUp.loadTranslations({
 	profileGraduationDate: "Fecha de graduaci\u00f3n",
 	profileIdentitiesEmpty: "No hay identidades",
 	profileIdentityAdded: "Identidad agregada exitosamente",
-	profileIdentityRemoved: "Identidad eliminada exitosamente",
 	profileInfo: "Informacion",
 	profileManageIdentities: "Administrar identidades",
 	profileRank: "Rango",

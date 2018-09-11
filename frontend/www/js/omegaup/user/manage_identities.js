@@ -8,19 +8,17 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-user-manage-identities', {
         props: {
-          T: T,
           identities: this.identities,
         },
         on: {
           'add-identity': function(username, password) {
             API.User.associateIdentity({
-                      usernameOrEmail: username,
+                      username: username,
                       password: password,
                     })
                 .then(function(data) {
                   refreshIdentityList();
                   UI.success(T.profileIdentityAdded);
-                  manageIdentities.$children[0].reset();
                 })
                 .fail(UI.apiError);
           },
