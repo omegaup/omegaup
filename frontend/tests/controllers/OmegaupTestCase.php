@@ -87,11 +87,11 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     /**
      * Logs in a user an returns the auth_token
      *
-     * @param Users $user the user to be logged in
+     * @param $user the user to be logged in
      *
      * @return string auth_token
      */
-    public static function login(Users $user) {
+    public static function login($user) {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
