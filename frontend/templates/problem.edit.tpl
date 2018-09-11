@@ -103,9 +103,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestEditRegisteredAdminUsername#}</th>
-					<th>{#contestEditRegisteredAdminRole#}</th>
-					<th>{#contestEditRegisteredAdminDelete#}</th>
+					<tr>
+						<th>{#contestEditRegisteredAdminUsername#}</th>
+						<th>{#contestEditRegisteredAdminRole#}</th>
+						<th>{#contestEditRegisteredAdminDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="problem-admins"></tbody>
 			</table>
@@ -127,9 +129,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestEditRegisteredGroupAdminName#}</th>
-					<th>{#contestEditRegisteredAdminRole#}</th>
-					<th>{#contestEditRegisteredAdminDelete#}</th>
+					<tr>
+						<th>{#contestEditRegisteredGroupAdminName#}</th>
+						<th>{#contestEditRegisteredAdminRole#}</th>
+						<th>{#contestEditRegisteredAdminDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="problem-group-admins"></tbody>
 			</table>
@@ -161,9 +165,11 @@
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestEditTagName#}</th>
-					<th>{#contestEditTagPublic#}</th>
-					<th>{#contestEditTagDelete#}</th>
+					<tr>
+						<th>{#contestEditTagName#}</th>
+						<th>{#contestEditTagPublic#}</th>
+						<th>{#contestEditTagDelete#}</th>
+					</tr>
 				</thead>
 				<tbody id="problem-tags"></tbody>
 			</table>
@@ -190,7 +196,7 @@
 						<div class="alert alert-danger">
 							<h4 class="alert-heading">{#wordsDangerZone#}</h4>
 							<hr>
-							<p>{#wordsDangerZoneDesc#}</p>
+							{#wordsDangerZoneDesc#}
 							<br><br>
 							<button class="btn btn-danger" type='submit'>{#wordsDelete#}</button>
 						</div>

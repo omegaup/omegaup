@@ -158,6 +158,19 @@ class ContestsDAO extends ContestsDAOBase {
         return $contest;
     }
 
+    final public static function getByTitle($title) {
+        $sql = 'SELECT * FROM Contests WHERE title = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$title]);
+
+        $contests = [];
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
     final public static function getByAliasWithExtraInformation($alias) {
         $sql = '
                 SELECT
@@ -178,22 +191,18 @@ class ContestsDAO extends ContestsDAOBase {
         if (count($rs) == 0) {
             return null;
         }
-
         return $rs;
     }
 
     final public static function getByProblemset($problemset_id) {
-        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 1;';
-
+        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
         global $conn;
-        $rs = $conn->GetRow($sql, [$problemset_id]);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, [$problemset_id]);
+        if (count($row) == 0) {
             return null;
         }
 
-        $contest = new Contests($rs);
-
-        return $contest;
+        return new Contests($row);
     }
 
     public static function getPrivateContestsCount(Users $user) {
@@ -239,7 +248,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Problemsets p
             ON
                 p.problemset_id = c.problemset_id
-            WHERE contest_id IN (
+            WHERE c.contest_id IN (
                 SELECT DISTINCT
                     c2.contest_id
                 FROM
@@ -716,11 +725,9 @@ class ContestsDAO extends ContestsDAOBase {
         }
 
         try {
-            $contests = ContestsDAO::search(new Contests([
-                'problemset_id' => $problemset_id,
-            ]));
-            if (count($contests) === 1) {
-                return $contests[0];
+            $contest = ContestsDAO::getByProblemset($problemset_id);
+            if (!empty($contest)) {
+                return $contest;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

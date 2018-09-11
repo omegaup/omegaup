@@ -341,8 +341,9 @@ class RunsDAO extends RunsDAOBase {
 	 *
 	 */
 
-    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null) {
+    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $excludeAdmin = true) {
         // Build SQL statement
+        $log = Logger::getLogger('Scoreboard');
         if ($showAllRuns) {
             if (is_null($group_id)) {
                 $sql = '
@@ -354,15 +355,18 @@ class RunsDAO extends RunsDAOBase {
                         Problemset_Identities pi ON i.identity_id = pi.identity_id
                     WHERE
                         pi.problemset_id = ? AND
-                        i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)';
                 $val = [
                     $problemset_id,
-                    $acl_id,
                     $acl_id,
                     Authorization::SYSTEM_ACL,
                     Authorization::ADMIN_ROLE,
                 ];
+                if ($excludeAdmin) {
+                    $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
+                    $val[] =  $acl_id;
+                }
+                $sql = $sql . ';';
             } else {
                 $sql = '
                     SELECT
@@ -545,6 +549,78 @@ class RunsDAO extends RunsDAOBase {
             array_push($ar, $run);
         }
         return $ar;
+    }
+
+    final public static function getByContest($contest_id) {
+        $sql = 'SELECT
+                    `run_id`,
+                    `guid`,
+                    `language`,
+                    `status`,
+                    `verdict`,
+                    `runtime`,
+                    `penalty`,
+                    `memory`,
+                    `score`,
+                    `contest_score`,
+                    `time`,
+                    `submit_delay`,
+                    `Identities.username`,
+                    `Problems.alias`
+                FROM
+                    Runs r
+                INNER JOIN
+                    Contests c
+                ON
+                    c.problemset_id = r.problemset_id
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = r.identity_id
+                WHERE
+                    c.contest_id = ?
+                ORDER BY
+                    `time` DESC;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$contest_id]);
+
+        $runs = [];
+        foreach ($rs as $row) {
+            array_push($runs, new Runs($row));
+        }
+        return $runs;
+    }
+
+    final public static function getByKeys($problem_id, $problemset_id = null, $identity_id = null) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Runs r
+                WHERE
+                    problem_id = ?';
+        $params = [$problem_id];
+        if (!is_null($problemset_id)) {
+            $sql .= ' AND problemset_id = ?';
+            $params[] = $problemset_id;
+        }
+        if (!is_null($identity_id)) {
+            $sql .= ' AND identity_id = ?';
+            $params[] = $identity_id;
+        }
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $runs = [];
+        foreach ($rs as $row) {
+            array_push($runs, new Runs($row));
+        }
+
+        return $runs;
     }
 
     final public static function IsRunInsideSubmissionGap(

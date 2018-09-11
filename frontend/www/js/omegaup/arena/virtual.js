@@ -24,7 +24,8 @@ OmegaUp.on('ready', function() {
                 submit: function(ev) {
                   API.Contest.createVirtual({
                                alias: contestAlias,
-                               start_time: ev.startTime.getTime() / 1000
+                               start_time:
+                                   ev.virtualContestStartTime.getTime() / 1000
                              })
                       .then(function(response) {
                         let virtualContestAlias = response.alias;

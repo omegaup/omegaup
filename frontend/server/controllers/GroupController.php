@@ -69,24 +69,19 @@ class GroupController extends Controller {
     /**
      * Validate group param
      *
-     * @param Request $r
+     * @param $groupAlias
+     * @param $identityId
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
-    public static function validateGroup(Request $r) {
-        self::authenticateRequest($r);
-
-        Validators::isStringNonEmpty($r['group_alias'], 'group_alias');
+    public static function validateGroup($groupAlias, $identityId) {
+        Validators::isStringNonEmpty($groupAlias, 'group_alias');
         try {
-            $groups = GroupsDAO::search(new Groups([
-                'alias' => $r['group_alias']
-            ]));
+            $group = GroupsDAO::FindByAlias($groupAlias);
 
-            if (is_null($groups) || count($groups) === 0) {
+            if (is_null($group)) {
                 throw new InvalidParameterException('parameterNotFound', 'Group');
-            } else {
-                $r['group'] = $groups[0];
             }
         } catch (ApiException $ex) {
             throw $ex;
@@ -94,18 +89,20 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        if (!Authorization::isGroupAdmin($r['current_identity_id'], $r['group'])) {
+        if (!Authorization::isGroupAdmin($identityId, $group)) {
             throw new ForbiddenAccessException();
         }
+        return $group;
     }
 
     /**
      * Validate common params for these APIs
      *
-     * @param Request $r
+     * @param $groupAlias
+     * @param $identityId
      */
-    private static function validateGroupAndOwner(Request $r) {
-        self::validateGroup($r);
+    private static function validateGroupAndOwner($groupAlias, $identityId) {
+        return self::validateGroup($groupAlias, $identityId);
     }
 
     /**
@@ -114,12 +111,13 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiAddUser(Request $r) {
-        self::validateGroupAndOwner($r);
+        self::authenticateRequest($r);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
             $groups_identity = new GroupsIdentities([
-                'group_id' => $r['group']->group_id,
+                'group_id' => $group->group_id,
                 'identity_id' => $r['identity']->identity_id
             ]);
             GroupsIdentitiesDAO::save($groups_identity);
@@ -136,22 +134,21 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiRemoveUser(Request $r) {
-        self::validateGroupAndOwner($r);
+        self::authenticateRequest($r);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
-            $key = new GroupsIdentities([
-                'group_id' => $r['group']->group_id,
-                'identity_id' => $r['identity']->identity_id
-            ]);
-
             // Check user is actually in group
-            $groupIdentities = GroupsIdentitiesDAO::search($key);
+            $groupIdentities = GroupsIdentitiesDAO::getByPK(
+                $group->group_id,
+                $r['identity']->identity_id
+            );
             if (count($groupIdentities) === 0) {
                 throw new InvalidParameterException('parameterNotFound', 'User');
             }
 
-            GroupsIdentitiesDAO::delete($key);
+            GroupsIdentitiesDAO::delete($groupIdentities);
             self::$log->info('Removed ' . $r['identity']->username . ' removed.');
         } catch (ApiException $ex) {
             throw $ex;
@@ -225,18 +222,15 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiDetails(Request $r) {
-        self::validateGroupAndOwner($r);
+        self::authenticateRequest($r);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
 
         $response = [];
 
         try {
-            $response['group'] = $r['group']->asArray();
+            $response['group'] = $group->asArray();
 
-            $scoreboards = GroupsScoreboardsDAO::search(
-                new GroupsScoreboards(
-                    ['group_id' => $r['group']->group_id]
-                )
-            );
+            $scoreboards = GroupsScoreboardsDAO::getByGroup($group->group_id);
 
             $response['scoreboards'] = [];
             foreach ($scoreboards as $scoreboard) {
@@ -256,12 +250,13 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiMembers(Request $r) {
-        self::validateGroupAndOwner($r);
+        self::authenticateRequest($r);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
 
         $response = [];
 
         try {
-            $response['identities'] = GroupsIdentitiesDAO::GetMemberIdentities($r['group']);
+            $response['identities'] = GroupsIdentitiesDAO::GetMemberIdentities($group);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
@@ -276,7 +271,8 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiCreateScoreboard(Request $r) {
-        self::validateGroup($r);
+        self::authenticateRequest($r);
+        $group = self::validateGroup($r['group_alias'], $r['current_identity_id']);
 
         Validators::isValidAlias($r['alias'], 'alias', true);
         Validators::isStringNonEmpty($r['name'], 'name', true);
@@ -284,7 +280,7 @@ class GroupController extends Controller {
 
         try {
             $groupScoreboard = new GroupsScoreboards([
-                'group_id' => $r['group']->group_id,
+                'group_id' => $group->group_id,
                 'name' => $r['name'],
                 'description' =>$r['description'],
                 'alias' => $r['alias'],

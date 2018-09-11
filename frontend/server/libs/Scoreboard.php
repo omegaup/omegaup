@@ -17,6 +17,7 @@ class ScoreboardParams implements ArrayAccess {
         ScoreboardParams::validateParameter('acl_id', $params, true /*is_required*/);
         ScoreboardParams::validateParameter('group_id', $params, false /*is_required*/, null);
         ScoreboardParams::validateParameter('penalty', $params, false /*is_required*/, 0);
+        ScoreboardParams::validateParameter('virtual', $params, false /*is_required */, false);
         ScoreboardParams::validateParameter('penalty_calc_policy', $params, false /*is_required*/, 'sum');
         ScoreboardParams::validateParameter('show_scoreboard_after', $params, false /*is_required*/, 1);
         ScoreboardParams::validateParameter('scoreboard_pct', $params, false /*is_required*/, 100);
@@ -64,6 +65,7 @@ class ScoreboardParams implements ArrayAccess {
                 'finish_time' => $contest->finish_time,
                 'acl_id' => $contest->acl_id,
                 'penalty' => $contest->penalty,
+                'virtual' => ContestsDAO::isVirtual($contest),
                 'penalty_calc_policy' => $contest->penalty_calc_policy,
                 'show_scoreboard_after' => $contest->show_scoreboard_after,
                 'scoreboard_pct' => $contest->scoreboard]);
@@ -169,7 +171,8 @@ class Scoreboard {
                 $this->params['acl_id'],
                 true /* show all runs */,
                 $filterUsersBy,
-                $this->params['group_id']
+                $this->params['group_id'],
+                !$this->params['virtual'] /* Treat admin as contestant in virtual contest*/
             );
 
             // Get all problems given problemset
@@ -254,7 +257,10 @@ class Scoreboard {
             $raw_contest_identities = RunsDAO::getAllRelevantIdentities(
                 $this->params['problemset_id'],
                 $this->params['acl_id'],
-                $this->params['admin']
+                $this->params['admin'],
+                null,
+                null,
+                !$this->params['virtual'] /* Treat admin as contestant */
             );
 
             // Get all problems given problemset
@@ -328,7 +334,9 @@ class Scoreboard {
                 $params['problemset_id'],
                 $params['acl_id'],
                 true /* show all runs */,
-                null
+                null,
+                null,
+                !$params['virtual'] /* Treat admin as contestant in virtual contest */
             );
 
             // Get all problems given problemset
@@ -412,6 +420,7 @@ class Scoreboard {
             $log->debug('Sending updated scoreboards');
             $grader->broadcast(
                 $params['alias'],
+                (int)$problemset->problemset_id,
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
@@ -425,6 +434,7 @@ class Scoreboard {
             );
             $grader->broadcast(
                 $params['alias'],
+                (int)$problemset->problemset_id,
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',

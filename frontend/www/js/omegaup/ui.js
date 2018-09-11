@@ -33,6 +33,15 @@ let UI = {
     return clock;
   },
 
+  isVirtual: function(contest) { return contest.rerun_id != 0; },
+
+  contestTitle: function(contest) {
+    if (UI.isVirtual(contest)) {
+      return UI.formatString(T.virtualContestSuffix, {title: contest.title});
+    }
+    return contest.title;
+  },
+
   rankingUsername: function(rank) {
     let username = rank.username;
     if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
@@ -48,6 +57,15 @@ let UI = {
           template.replace(new RegExp('%\\(' + key + '\\)', 'g'), values[key]);
     }
     return template;
+  },
+
+  contestUpdated: function(data, contestAlias) {
+    if (data.status != 'ok') {
+      UI.error(data.error || 'error');
+      return;
+    }
+    UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
+               contestAlias + '">' + T.contestEditGoToContest + '</a>');
   },
 
   displayStatus: function(message, type) {
@@ -206,7 +224,8 @@ let UI = {
               },
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger('change');
   },
 
   problemTypeahead: function(elem, cb) {
@@ -229,7 +248,8 @@ let UI = {
               }
             })
         .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+        .on('typeahead:autocomplete', cb)
+        .trigger('change');
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {
@@ -447,7 +467,7 @@ let UI = {
 
     converter.hooks.chain('postSpanGamut', function(text) {
       // Templates.
-      return text.replace(
+      text = text.replace(
           /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
             if (templates.hasOwnProperty(m1)) {
               return templates[m1];
@@ -455,6 +475,17 @@ let UI = {
             return '<strong style="color: red">Unrecognized template name: ' +
                    m1 + '</strong>';
           });
+      // Images.
+      let imageMapping = converter._imageMapping || options.imageMapping || {};
+      text = text.replace(
+          /<img src="([^"]+)" ([^>]+)>/g,
+          function(wholeMatch, url, attributes) {
+            if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+              return wholeMatch;
+            }
+            return '<img src="' + imageMapping[url] + '" ' + attributes + '>';
+          });
+      return text;
     });
     converter.hooks.chain('preBlockGamut', function(text, hashBlock) {
       // Sample I/O table.
@@ -513,6 +544,15 @@ let UI = {
                              '\n</table>');
           });
     });
+
+    converter.makeHtmlWithImages = function(markdown, imageMapping) {
+      try {
+        converter._imageMapping = imageMapping;
+        return converter.makeHtml(markdown);
+      } finally {
+        delete converter._imageMapping;
+      }
+    };
 
     return converter;
   },

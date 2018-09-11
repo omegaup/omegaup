@@ -259,37 +259,19 @@ class UserController extends Controller {
      *
      * */
     public function TestPassword(Request $r) {
-        $user_id = $email = $username = $password = null;
-
-        if (null != $r['user_id']) {
-            $user_id = $r['user_id'];
-        }
-
-        if (null != $r['email']) {
-            $email = $r['email'];
-        }
-
-        if (null != $r['username']) {
-            $username = $r['username'];
-        }
-
-        if (null != $r['password']) {
-            $password = $r['password'];
-        }
-
-        if (is_null($user_id) && is_null($email) && is_null($username)) {
-            throw new ApiException('mustProvideUserIdEmailOrUsername');
-        }
-
         $vo_UserToTest = null;
 
         //find this user
-        if (!is_null($user_id)) {
-            $vo_UserToTest = UsersDAO::getByPK($user_id);
-        } elseif (!is_null($email)) {
+        if (!is_null($r['user_id'])) {
+            $vo_UserToTest = UsersDAO::getByPK($r['user_id']);
+        } elseif (!is_null($r['email'])) {
             $vo_UserToTest = $this->FindByEmail();
-        } else {
+        } elseif (!is_null($r['username'])) {
             $vo_UserToTest = $this->FindByUserName();
+        } elseif (!is_null($r['identity_id'])) {
+            $vo_UserToTest = IdentitiesDAO::getByPK($r['identity_id']);
+        } else {
+            throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
         if (is_null($vo_UserToTest)) {
@@ -302,7 +284,7 @@ class UserController extends Controller {
         }
 
         $newPasswordCheck = SecurityTools::compareHashedStrings(
-            $password,
+            $r['password'],
             $vo_UserToTest->password
         );
 
@@ -512,11 +494,9 @@ class UserController extends Controller {
             Validators::isStringNonEmpty($r['id'], 'id');
 
             try {
-                $users = UsersDAO::search(new Users([
-                                    'verification_id' => $r['id']
-                                ]));
+                $users = UsersDAO::getByVerification($r['id']);
 
-                $user = (is_array($users) && count($users) > 0) ? $users[0] : null;
+                $user = !empty($users) ? $users[0] : null;
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -566,10 +546,10 @@ class UserController extends Controller {
         $usersAdded = [];
 
         try {
-            $usersMissing = UsersDAO::search(new Users([
-                'verified' => true,
-                'in_mailing_list' => false
-            ]));
+            $usersMissing = UsersDAO::getVerified(
+                true, // verified
+                false // in_mailing_list
+            );
 
             foreach ($usersMissing as $user) {
                 $registered = self::registerToSendy($user);
@@ -1208,21 +1188,22 @@ class UserController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    private static function getProfileImpl(Users $user) {
+    public static function getProfileImpl(Users $user) {
         $response = [];
         $response['userinfo'] = [];
-        $response['problems'] = [];
 
-        $response['userinfo']['username'] = $user->username;
-        $response['userinfo']['name'] = $user->name;
-        $response['userinfo']['birth_date'] = is_null($user->birth_date) ? null : strtotime($user->birth_date);
-        $response['userinfo']['gender'] = $user->gender;
-        $response['userinfo']['graduation_date'] = is_null($user->graduation_date) ? null : strtotime($user->graduation_date);
-        $response['userinfo']['scholar_degree'] = $user->scholar_degree;
-        $response['userinfo']['preferred_language'] = $user->preferred_language;
-        $response['userinfo']['is_private'] = $user->is_private;
-        $response['userinfo']['verified'] = $user->verified == '1';
-        $response['userinfo']['hide_problem_tags'] = is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags;
+        $response['userinfo'] = [
+            'username' => $user->username,
+            'name' => $user->name,
+            'birth_date' => is_null($user->birth_date) ? null : strtotime($user->birth_date),
+            'gender' => $user->gender,
+            'graduation_date' => is_null($user->graduation_date) ? null : strtotime($user->graduation_date),
+            'scholar_degree' => $user->scholar_degree,
+            'preferred_language' => $user->preferred_language,
+            'is_private' => $user->is_private,
+            'verified' => $user->verified == '1',
+            'hide_problem_tags' => is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags,
+        ];
 
         if (!is_null($user->language_id)) {
             $query = LanguagesDAO::getByPK($user->language_id);
@@ -1256,54 +1237,6 @@ class UserController extends Controller {
     }
 
     /**
-     * Get user profile from cache
-     * Requires $r["user"] to be an actual User
-     *
-     * @param Request $r
-     * @param array $response
-     * @param Request $r
-     * @return type
-     */
-    public static function getProfile(Request $r) {
-        if (is_null($r['user'])) {
-            throw new InvalidParameterException('parameterNotFound', 'User');
-        }
-
-        $response = [];
-
-        Cache::getFromCacheOrSet(
-            Cache::USER_PROFILE,
-            $r['user']->username,
-            $r,
-            function (Request $r) {
-                    return UserController::getProfileImpl($r['user']);
-            },
-            $response
-        );
-
-        if (is_null($r['omit_rank']) || !$r['omit_rank']) {
-            $response['userinfo']['rankinfo'] = self::getRankByProblemsSolved($r);
-        } else {
-            $response['userinfo']['rankinfo'] = [];
-        }
-
-        // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_identity_id'])
-              || $r['user']->user_id == $r['current_user_id']) {
-            return $response;
-        }
-
-        // Mentors can see current coder of the month email.
-        if (Authorization::canViewEmail($r['current_identity_id']) &&
-              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['user']->username)) {
-            return $response;
-        }
-        unset($response['userinfo']['email']);
-        return $response;
-    }
-
-    /**
      * Get general user info
      *
      * @param Request $r
@@ -1313,16 +1246,17 @@ class UserController extends Controller {
     public static function apiProfile(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
+        $r['identity'] = self::resolveTargetIdentity($r);
         $r['user'] = self::resolveTargetUser($r);
 
-        $response = self::getProfile($r);
-        if ((is_null($r['current_user']) || $r['current_user']->username != $r['user']->username)
-            && $r['user']->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+        $response = IdentityController::getProfile($r);
+        if ((is_null($r['current_identity']) || $r['current_identity']->username != $r['identity']->username)
+            && (isset($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
             }
-            $response['userinfo']['username'] = $r['user']->username;
+            $response['userinfo']['username'] = $r['identity']->username;
             $response['userinfo']['rankinfo'] = [
                 'name' => null,
                 'problems_solved' => null,
@@ -1331,7 +1265,7 @@ class UserController extends Controller {
             ];
             $response['userinfo']['is_private'] = true;
         }
-        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['user']->user_id);
+        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['identity']->user_id);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1413,9 +1347,9 @@ class UserController extends Controller {
         }
 
         try {
-            $codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(['time' => $firstDay, 'rank' => 1]));
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndRank($firstDay, 1);
 
-            if (is_null($codersOfTheMonth) or count($codersOfTheMonth) == 0) {
+            if (empty($codersOfTheMonth)) {
                 // Generate the coder
                 $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
                 if (is_null($users)) {
@@ -1446,7 +1380,7 @@ class UserController extends Controller {
         $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
-        $response = self::getProfileImpl($user);
+        $response = UserController::getProfileImpl($user);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
@@ -1699,11 +1633,14 @@ class UserController extends Controller {
      */
     public static function apiStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
-        $user = self::resolveTargetUser($r);
         $identity = self::resolveTargetIdentity($r);
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = self::resolveTargetUser($r);
+        }
 
         if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
-            && $user->is_private == 1 && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -1746,7 +1683,17 @@ class UserController extends Controller {
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r['current_user']->password = $hashedPassword;
 
-        UsersDAO::save($r['current_user']);
+        try {
+            DAO::transBegin();
+
+            UsersDAO::save($r['current_user']);
+            IdentityController::convertFromUser($r['current_user']);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         // Expire profile cache
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
@@ -1856,12 +1803,12 @@ class UserController extends Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            $query = LanguagesDAO::search(new Languages(['name' => $r['locale']]));
-            if (sizeof($query) != 1) {
+            $language = LanguagesDAO::getByName($r['locale']);
+            if (is_null($language)) {
                 throw new InvalidParameterException('invalidLanguage', 'locale');
             }
 
-            $r['current_user']->language_id = $query[0]->language_id;
+            $r['current_user']->language_id = $language->language_id;
         }
 
         if (!is_null($r['is_private'])) {
@@ -1966,10 +1913,10 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidDatabaseOperationException
      */
-    private static function getRankByProblemsSolved(Request $r) {
+    public static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
             $selectedFilter = self::getSelectedFilter($r);
-            $rankCacheName =  $r['offset'] . '-' . $r['rowcount'] . '-' . $r['filter'] . '-' . $selectedFilter['value'];
+            $rankCacheName =  "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
@@ -2224,13 +2171,10 @@ class UserController extends Controller {
         self::validateUser($r);
 
         Validators::isStringNonEmpty($r['role'], 'role');
-        $role = RolesDAO::search(new Roles([
-            'name' => $r['role'],
-        ]));
-        if (sizeof($role) != 1) {
+        $r['role'] = RolesDAO::getByName($r['role']);
+        if (is_null($r['role'])) {
             throw new InvalidParameterException('parameterNotFound', 'role');
         }
-        $r['role'] = $role[0];
 
         if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
@@ -2246,13 +2190,10 @@ class UserController extends Controller {
         self::validateUser($r);
 
         Validators::isStringNonEmpty($r['group'], 'group');
-        $group = GroupsDAO::search(new Groups([
-            'name' => $r['group'],
-        ]));
-        if (sizeof($group) != 1) {
+        $r['group'] = GroupsDAO::getByName($r['group']);
+        if (is_null($r['group'])) {
             throw new InvalidParameterException('parameterNotFound', 'group');
         }
-        $r['group'] = $group[0];
     }
 
     /**
@@ -2507,7 +2448,7 @@ class UserController extends Controller {
      */
     public static function apiAcceptPrivacyPolicy(Request $r) {
         self::authenticateRequest($r);
-        $privacystatement_id = PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type']);
+        $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
         if (is_null($privacystatement_id)) {
             throw new NotFoundException('privacyStatementNotFound');
         }
@@ -2525,6 +2466,62 @@ class UserController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Associates an identity to the logged user given the username
+     *
+     * @param Request $r
+     * @throws InvalidParameterException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAssociateIdentity(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::isStringNonEmpty($r['password'], 'password');
+
+        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
+
+        if (empty($identity)) {
+            throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        $passwordCheck = SecurityTools::compareHashedStrings(
+            $r['password'],
+            $identity->password
+        );
+
+        if ($passwordCheck === false) {
+            throw new InvalidParameterException('parameterInvalid', 'password');
+        }
+
+        try {
+            IdentitiesDAO::associateIdentityWithUser($r['current_user_id'], $identity->identity_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Get the identities that have been associated to the logged user
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListAssociatedIdentities(Request $r) {
+        self::authenticateRequest($r);
+
+        try {
+            return [
+                'status' => 'ok',
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r['current_user_id'])
+            ];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
     }
 }
 

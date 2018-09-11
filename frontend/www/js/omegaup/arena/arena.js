@@ -741,8 +741,9 @@ export class Arena {
 
         $('.position', r).html(rank.place);
         $('.user', r)
-            .html('<span title="' + username + '">' + rank.username +
-                  UI.getFlag(rank['country']) + '</span>');
+            .html('<span title="' + UI.rankingUsername(rank) + '">' +
+                  UI.rankingUsername(rank) + UI.getFlag(rank['country']) +
+                  '</span>');
         $('.points', r).html(rank.total.points);
         $('.penalty', r).html(rank.total.penalty);
 
@@ -1276,7 +1277,7 @@ export class Arena {
       }
 
       if (problemChanged) {
-        if (problem.problem_statement) {
+        if (problem.statement) {
           update(problem);
         } else {
           let problemset = self.computeProblemsetArg();
@@ -1285,7 +1286,7 @@ export class Arena {
               .then(function(problem_ext) {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
-                problem.problem_statement = problem_ext.problem_statement;
+                problem.statement = problem_ext.statement;
                 problem.libinteractive_interface_name =
                     problem_ext.libinteractive_interface_name;
                 problem.sample_input = problem_ext.sample_input;
@@ -1347,9 +1348,8 @@ export class Arena {
     let self = this;
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
-
-    statement.innerHTML =
-        self.markdownConverter.makeHtml(problem.problem_statement);
+    statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
+        problem.statement.markdown, problem.statement.images);
 
     UI.renderSampleToClipboardButton();
 
@@ -1604,7 +1604,7 @@ export class Arena {
       ko.applyBindings(self.summaryView, summary[0]);
       self.summaryView.attached = true;
     }
-    self.summaryView.title(contest.title);
+    self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
     let duration = contest.finish_time.getTime() - contest.start_time.getTime();
     self.summaryView.windowLength(

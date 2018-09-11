@@ -17,3 +17,5 @@
 		{include file='group.edit.scoreboards.tpl' payload=$PAYLOAD}
 	</div>
 </div>
+
+{include file='footer.tpl'}

@@ -116,7 +116,8 @@ export let OmegaUp = {
                 .then(function(data) {
                   if (data.session.valid) {
                     OmegaUp.loggedIn = true;
-                    OmegaUp.username = data.session.user.username;
+                    OmegaUp.username = data.session.identity.username;
+                    OmegaUp.identity = data.session.identity;
                     OmegaUp.email = data.session.email;
                   }
                   OmegaUp._remoteDeltaTime = t0 - data.time * 1000;

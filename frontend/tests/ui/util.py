@@ -30,15 +30,17 @@ sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 import database_utils  # NOQA
 
 
-def add_students(driver, users, container_id, parent_xpath, submit_locator):
+# pylint: disable=too-many-arguments
+def add_students(driver, users, *, tab_xpath,
+                 container_xpath, parent_xpath, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "%s")]' % container_id)))).click()
+            (By.XPATH, tab_xpath))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#%s' % container_id)))
+            (By.XPATH, container_xpath)))
 
     for user in users:
         driver.typeahead_helper(parent_xpath, user)
@@ -48,17 +50,13 @@ def add_students(driver, users, container_id, parent_xpath, submit_locator):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//*[@id="%s"]//a[text()="%s"]' % (container_id, user))))
+                 '%s//a[text()="%s"]' % (container_xpath, user))))
 
 
 def create_run(driver, problem_alias, filename):
     '''Utility function to create a new run.'''
     logging.debug('Trying to submit new run for %s...', problem_alias)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' %
-              problem_alias)))).click()
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,

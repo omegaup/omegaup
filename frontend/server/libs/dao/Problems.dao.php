@@ -272,9 +272,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 return null;
         }
 
-                $contest = new Problems($rs);
-
-                return $contest;
+        return new Problems($rs);
     }
 
     final public static function searchByAlias($alias) {
@@ -386,6 +384,109 @@ class ProblemsDAO extends ProblemsDAOBase {
             array_push($problems, new Problems($r));
         }
         return $problems;
+    }
+
+    final public static function getSolvedProblemsByUsersOfCourse($course_alias) {
+        global $conn;
+
+        $sql = "
+            SELECT
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Courses c
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                Identities i
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                (
+                SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.title,
+                    r.identity_id
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = r.problem_id
+                WHERE
+                    r.verdict = 'AC'
+                    AND p.visibility = ?
+                GROUP BY
+                    p.problem_id, r.identity_id
+                ) rp
+            ON
+                rp.identity_id = i.identity_id
+            WHERE
+                c.alias = ?
+                AND gi.accept_teacher = 'yes'
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+    }
+
+    final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
+        $sql = "
+            SELECT
+                rp.alias,
+                rp.title,
+                i.username
+            FROM
+                Identities i
+            INNER JOIN
+                Groups_Identities gi
+            ON
+                gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
+            INNER JOIN
+                (
+                SELECT
+                    pp.problem_id,
+                    pp.alias,
+                    pp.title,
+                    r.identity_id,
+                    MAX(r.score) AS max_score
+                FROM
+                    Runs r
+                INNER JOIN
+                    Problems pp
+                ON
+                    pp.problem_id = r.problem_id
+                WHERE
+                    pp.visibility = ?
+                GROUP BY
+                    pp.problem_id, r.identity_id
+                HAVING
+                    max_score < 1
+                ) rp
+            ON
+                rp.identity_id = i.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                rp.problem_id = p.problem_id
+            WHERE
+                c.alias = ?
+                AND gi.accept_teacher = 'yes'
+            ORDER BY
+                i.username ASC,
+                rp.problem_id DESC;";
+
+        global $conn;
+        return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
     final public static function isProblemSolved(Problems $problem, $identity_id) {
@@ -678,5 +779,49 @@ class ProblemsDAO extends ProblemsDAOBase {
                     AND `problem_id` = ?';
 
         return $conn->GetOne($sql, $problem->problem_id);
+    }
+
+    final public static function getByContest($contest_id) {
+        $sql = 'SELECT
+                    p.*
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    p.problem_id = pp.problem_id
+                INNER JOIN
+                    Contests c
+                ON
+                    c.problemset_id = pp.problemset_id
+                WHERE
+                    c.contest_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$contest_id]);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            array_push($problems, new Problems($row));
+        }
+        return $problems;
+    }
+
+    final public static function getByTitle($title) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problems
+                WHERE
+                    title = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$title]);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            array_push($problems, new Problems($row));
+        }
+        return $problems;
     }
 }

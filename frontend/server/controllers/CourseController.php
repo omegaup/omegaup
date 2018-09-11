@@ -363,8 +363,7 @@ class CourseController extends Controller {
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::save($problemset);
-
-            AssignmentsDAO::save(new Assignments([
+            $assignment = new Assignments([
                 'course_id' => $r['course']->course_id,
                 'problemset_id' => $problemset->problemset_id,
                 'acl_id' => $r['course']->acl_id,
@@ -375,7 +374,13 @@ class CourseController extends Controller {
                 'assignment_type' => $r['assignment_type'],
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-            ]));
+            ]);
+
+            AssignmentsDAO::save($assignment);
+
+            // Update assignment_id in problemset object
+            $problemset->assignment_id = $assignment->assignment_id;
+            ProblemsetsDAO::save($problemset);
 
             AssignmentsDAO::transEnd();
         } catch (Exception $e) {
@@ -572,19 +577,15 @@ class CourseController extends Controller {
         }
 
         // Update assignments order
-        $assignments = $r['assignments'];
-        foreach ($assignments as $assignment) {
-            $currentAssignment = AssignmentsDAO::search(new Assignments([
-                'alias' => $assignment['alias'],
-                'course_id' => $r['course']->course_id
-            ]));
+        foreach ($r['assignments'] as $assignment) {
+            $currentAssignment = AssignmentsDAO::getByAliasAndCourse($assignment['alias'], $r['course']->course_id);
 
-            if (empty($currentAssignment) || is_null($currentAssignment[0])) {
+            if (empty($currentAssignment)) {
                 throw new NotFoundException('assignmentNotFound');
             }
 
             AssignmentsDAO::updateAssignmentsOrder(
-                $currentAssignment[0]->assignment_id,
+                $currentAssignment->assignment_id,
                 (int)$assignment['order']
             );
         }
@@ -918,14 +919,10 @@ class CourseController extends Controller {
             );
         }
 
-        $assignments = AssignmentsDAO::search(new Assignments([
-            'course_id' => $r['course']->course_id,
-            'alias' => $r['assignment'],
-        ]));
-        if (count($assignments) != 1) {
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
@@ -934,11 +931,11 @@ class CourseController extends Controller {
             'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
             'submit_delay'];
         foreach ($problems as &$problem) {
-            $runs_array = RunsDAO::search(new Runs([
-                'identity_id' => $r['identity']->identity_id,
-                'problem_id' => $problem['problem_id'],
-                'problemset_id' => $r['assignment']->problemset_id,
-            ]));
+            $runs_array = RunsDAO::getByKeys(
+                $problem['problem_id'],
+                $r['assignment']->problemset_id,
+                $r['identity']->identity_id
+            );
             $runs_filtered_array = [];
             foreach ($runs_array as $run) {
                 $run->toUnixTime();
@@ -1048,19 +1045,27 @@ class CourseController extends Controller {
             // Only users adding themselves are saved in consent log
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && $r['course']->requests_user_information != 'no') {
-                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
-                    $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['git_object_id'], $r['statement_type'])
-                );
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                        $r['identity']->identity_id,
+                        $privacystatement_id
+                    );
+                } else {
+                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::getId($r['identity']->identity_id, $privacystatement_id);
+                }
 
                 $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
             }
             if ($r['identity']->identity_id === $r['current_identity_id']
                  && !empty($r['accept_teacher'])) {
-                PrivacyStatementConsentLogDAO::saveLog(
-                    $r['identity']->identity_id,
-                    PrivacyStatementsDAO::getId($r['teacher_git_object_id'], 'accept_teacher')
-                );
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher');
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                    PrivacyStatementConsentLogDAO::saveLog(
+                        $r['identity']->identity_id,
+                        $privacystatement_id
+                    );
+                }
             }
             GroupsIdentitiesDAO::save($groupIdentity);
 
@@ -1474,14 +1479,10 @@ class CourseController extends Controller {
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
-        $assignments = AssignmentsDAO::search(new Assignments([
-            'course_id' => $r['course']->course_id,
-            'alias' => $r['assignment'],
-        ]));
-        if (count($assignments) != 1) {
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment'] = $assignments[0];
         $r['assignment']->toUnixTime();
 
         Validators::isNumberInRange(
@@ -1699,5 +1700,58 @@ class CourseController extends Controller {
         return [
             'events' => $scoreboard->events()
         ];
+    }
+
+    /**
+     * Get Problems solved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListSolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+        try {
+            $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $userProblems = [];
+        foreach ($solvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
+
+    /**
+     * Get Problems unsolved by users of a course
+     *
+     * @param Request $r
+     * @return Problems array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListUnsolvedProblems(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        try {
+            $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        $userProblems = [];
+        foreach ($unsolvedProblems as $problem) {
+            $userProblems[$problem['username']][] = $problem;
+        }
+        return ['status' => 'ok', 'user_problems' => $userProblems];
     }
 }

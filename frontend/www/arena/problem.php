@@ -39,7 +39,7 @@ $smarty->assign('quality_payload', [
     'nominated' => (bool) $nominationStatus['nominated'],
     'dismissed' => (bool) $nominationStatus['dismissed'],
     'problem_alias' => $result['alias'],
-    'language' => $result['problem_statement_language'],
+    'language' => $result['statement']['language'],
 ]);
 $smarty->assign('qualitynomination_reportproblem_payload', [
     'problem_alias' => $result['alias'],

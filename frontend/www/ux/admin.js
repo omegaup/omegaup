@@ -36,15 +36,16 @@ omegaup.OmegaUp.on('ready', function() {
                 window.location.pathname.replace(/\/practice\/.*/, '/');
             return;
           }
-          $('#title .contest-title').html(omegaup.UI.escape(contest.title));
+          $('#title .contest-title')
+              .html(omegaup.UI.escape(omegaup.UI.contestTitle(contest)));
           arena.updateSummary(contest);
 
           arena.submissionGap = parseInt(contest.submission_gap);
           if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
+          arena.initProblemsetId(contest);
           arena.initClock(contest.start_time, contest.finish_time);
           arena.initProblems(contest);
-          arena.initProblemsetId(contest);
           for (var idx in contest.problems) {
             var problem = contest.problems[idx];
             var problemName =

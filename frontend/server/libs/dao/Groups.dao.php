@@ -21,7 +21,7 @@ require_once('base/Groups.vo.base.php');
 class GroupsDAO extends GroupsDAOBase {
     public static function FindByAlias($alias) {
         global  $conn;
-        $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ?;';
+        $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -41,6 +41,17 @@ class GroupsDAO extends GroupsDAOBase {
             array_push($ar, new Groups($row));
         }
         return $ar;
+    }
+
+    public static function getByName($name) {
+        global  $conn;
+        $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
+
+        $rs = $conn->GetRow($sql, [$name]);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Groups($rs);
     }
 
     /**
