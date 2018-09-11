@@ -17,3 +17,5 @@
 		{include file='group.edit.scoreboards.tpl'}
 	</div>
 </div>
+
+{include file='footer.tpl'}
