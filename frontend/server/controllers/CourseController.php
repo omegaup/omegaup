@@ -726,13 +726,11 @@ class CourseController extends Controller {
         ];
         $time = Time::get();
         foreach ($assignments as $assignment) {
-            if (!$isAdmin && $v['start_time'] > $time) {
+            if (!$isAdmin && $assignment['start_time'] > $time) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
                 continue;
             }
-            $assignment['start_time'] = strtotime($assignment['start_time']);
-            $assignment['finish_time'] = strtotime($assignment['finish_time']);
             $response['assignments'][] = $assignment;
         }
 

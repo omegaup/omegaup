@@ -144,8 +144,8 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                    `a`.`description`,
                    `a`.`alias`,
                    `a`.`assignment_type`,
-                   `a`.`start_time`,
-                   `a`.`finish_time`,
+                   UNIX_TIMESTAMP(`a`.`start_time`) AS `start_time`,
+                   UNIX_TIMESTAMP(`a`.`finish_time`) AS `finish_time`,
                    `a`.`order`,
                    `ps`.`scoreboard_url`,
                    `ps`.`scoreboard_url_admin`

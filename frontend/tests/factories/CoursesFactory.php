@@ -217,54 +217,38 @@ class CoursesFactory {
     }
 
     public static function openCourse($courseAssignmentData, $user) {
-        // Create an empty request
-        $r = new Request();
-
         // Log in as course adminy
         $login = OmegaupTestCase::login($user);
-        $r['auth_token'] = $login->auth_token;
-
-        // Prepare our request
-        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
 
         // Call api
-        CourseController::apiIntroDetails($r);
-
-        unset($_REQUEST);
+        CourseController::apiIntroDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAssignmentData['request']['course_alias'],
+        ]));
     }
 
     public static function openAssignmentCourse($courseAssignmentData, $user) {
-        // Create an empty request
-        $r = new Request();
-
         // Log in as course adminy
         $login = OmegaupTestCase::login($user);
-        $r['auth_token'] = $login->auth_token;
-
-        // Prepare our request
-        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
-        $r['assignment_alias'] = $courseAssignmentData['request']['assignment_alias'];
 
         // Call api
-        CourseController::apiIntroDetails($r);
-
-        unset($_REQUEST);
+        CourseController::apiIntroDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAssignmentData['request']['course_alias'],
+            'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
+        ]));
     }
 
     public static function openProblemInCourseAssignment($courseAssignmentData, $problemData, $user) {
-        // Prepare our request
-        $r = new Request();
-        $r['course_alias'] = $courseAssignmentData['request']['course_alias'];
-        $r['assignment_alias'] = $courseAssignmentData['request']['assignment_alias'];
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
-
         // Log in the user
         $login = OmegaupTestCase::login($user);
-        $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ProblemController::apiDetails($r);
-
-        unset($_REQUEST);
+        ProblemController::apiDetails(new Request([
+            'course_alias' => $courseAssignmentData['request']['course_alias'],
+            'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'auth_token' => $login->auth_token,
+        ]));
     }
 }

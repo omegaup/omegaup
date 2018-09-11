@@ -35,25 +35,28 @@ class RunsFactory {
      * @return Request
      */
     private static function createRequestCommon($problemData, $contestData, $contestant, ScopedLoginToken $login = null) {
-        // Create an empty request
-        $r = new Request();
-
         if ($login == null) {
             // Login as contestant
             $login = OmegaupTestCase::login($contestant);
         }
-        $r['auth_token'] = $login->auth_token;
 
         // Build request
         if (!is_null($contestData)) {
-            $r['contest_alias'] = $contestData['request']['alias'];
+            return new Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'language' => 'c',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]);
         }
 
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
-
-        return $r;
+        return new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]);
     }
 
     /**
@@ -70,25 +73,27 @@ class RunsFactory {
         $participant,
         ScopedLoginToken $login = null
     ) {
-        // Create an empty request
-        $r = new Request();
-
         if ($login == null) {
             // Login as participant
             $login = OmegaupTestCase::login($participant);
         }
-        $r['auth_token'] = $login->auth_token;
-
         // Build request
         if (!is_null($courseAssignmentData)) {
-            $r['assignment_alias'] = $courseAssignmentData['request']['alias'];
+            return new Request([
+                'auth_token' => $login->auth_token,
+                'assignment_alias' => $courseAssignmentData['request']['alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'language' => 'c',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]);
         }
 
-        $r['problem_alias'] = $problemData['problem']->alias;
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
-
-        return $r;
+        return new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]);
     }
 
     /**
