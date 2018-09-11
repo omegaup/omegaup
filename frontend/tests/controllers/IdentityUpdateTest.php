@@ -32,8 +32,6 @@ class IdentityUpdateTest extends OmegaupTestCase {
         ]));
 
         $identity = IdentityController::resolveIdentity($username);
-        $identityLogin = self::login($identity);
-        $this->assertLogin($identity, $identityLogin->auth_token);
 
         $this->assertEquals($username, $identity->username);
         $this->assertEquals($identityName, $identity->name);
@@ -90,7 +88,6 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $identity = IdentityController::resolveIdentity($username);
         $identity->password = $originalPassword;
         $identityLogin = self::login($identity);
-        $this->assertLogin($identity, $identityLogin->auth_token);
 
         // Changing password
         $newPassword = Utils::CreateRandomString();
