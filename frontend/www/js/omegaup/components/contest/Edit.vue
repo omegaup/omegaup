@@ -110,7 +110,6 @@ export default {
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-contestant': contest_Contestant,
-    'omegaup-contest-requests': contest_Requests,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
