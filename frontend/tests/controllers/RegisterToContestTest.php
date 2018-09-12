@@ -293,22 +293,23 @@ class RegisterToContestTest extends OmegaupTestCase {
     public function testIdentitiesInvitedAndNoInvitedToContest() {
         // Creating 5 identities, and inviting them to the contest
         $numberOfInvitedContestants = 5;
-        $contestants = [];
+        $invitedContestants = [];
         for ($i = 0; $i < $numberOfInvitedContestants; $i++) {
-            $contestants[] = UserFactory::createUser();
+            $invitedContestants[] = UserFactory::createUser();
         }
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'public']));
-        foreach ($contestants as $contestant) {
+        foreach ($invitedContestants as $contestant) {
             ContestsFactory::addUser($contestData, $contestant);
         }
         // Creating 3 identities without an invitation to join the contest
         $numberOfNotInvitedContestants = 3;
+        $uninvitedContestants = [];
         for ($i = 0; $i < $numberOfNotInvitedContestants; $i++) {
-            $contestants[] = UserFactory::createUser();
+            $uninvitedContestants[] = UserFactory::createUser();
         }
 
         // All identities join the contest
-        foreach ($contestants as $contestant) {
+        foreach ($uninvitedContestants as $contestant) {
             $contestantLogin = self::login($contestant);
 
             ContestController::apiOpen(new Request([
@@ -321,27 +322,20 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         $this->assertEquals(count($problemsetIdentities), ($numberOfInvitedContestants + $numberOfNotInvitedContestants));
 
-        $this->assertNumberOfInvitedUsers($numberOfInvitedContestants, $problemsetIdentities);
-        $this->assertNumberOfNotInvitedUsers($numberOfNotInvitedContestants, $problemsetIdentities);
+        $this->assertIdentitiesAreInCorrectList($invitedContestants, '1' /*is_invited*/, $problemsetIdentities);
+
+        $this->assertIdentitiesAreInCorrectList($uninvitedContestants, '0' /*is_not_invited*/, $problemsetIdentities);
     }
 
-    private function assertNumberOfInvitedUsers($numberOfInvitedContestants, $problemsetIdentities) {
-        $sumInvitedContestants = 0;
-        foreach ($problemsetIdentities as $identity) {
-            if ($identity['is_invited'] == '1') {
-                $sumInvitedContestants++;
-            }
+    private function assertIdentitiesAreInCorrectList($contestants, $is_invited, $identities) {
+        foreach ($contestants as $contestant) {
+            $this->assertArrayContainsWithPredicate(
+                $identities,
+                function ($identity) use ($contestant, $is_invited) {
+                    return $identity['user_id'] == $contestant->user_id &&
+                    $identity['is_invited'] == $is_invited;
+                }
+            );
         }
-        $this->assertEquals($sumInvitedContestants, $numberOfInvitedContestants);
-    }
-
-    private function assertNumberOfNotInvitedUsers($numberOfNotInvitedContestants, $problemsetIdentities) {
-        $sumNotInvitedContestants = 0;
-        foreach ($problemsetIdentities as $identity) {
-            if ($identity['is_invited'] == '0') {
-                $sumNotInvitedContestants++;
-            }
-        }
-        $this->assertEquals($sumNotInvitedContestants, $numberOfNotInvitedContestants);
     }
 }

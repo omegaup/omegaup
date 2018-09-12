@@ -694,7 +694,7 @@ omegaup.OmegaUp.loadTranslations({
 	schoolsLearnProgBySolvProblems: "Learn programming by solving problems",
 	schoolsManageProgressOfStudents: "Manage the progress of your students",
 	schoolsStartUsingSchools: "Start using Schools",
-	scoreboardShowOnlyInvitedIdentities: "Show invited contestants only",
+	scoreboardmerge: "Merge scorboard",
 	selectAction: "Select action",
 	sendInvitesToCandidates: "Send emails",
 	showLinks: "Links",

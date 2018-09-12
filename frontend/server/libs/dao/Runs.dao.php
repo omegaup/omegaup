@@ -370,7 +370,7 @@ class RunsDAO extends RunsDAOBase {
             } else {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id
+                        i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -390,7 +390,7 @@ class RunsDAO extends RunsDAOBase {
         } else {
             $sql = '
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id
+                    i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
                 FROM
                     Identities i
                 INNER JOIN

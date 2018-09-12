@@ -7,7 +7,6 @@ import urllib
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 
 from ui import util
 
@@ -78,12 +77,10 @@ def test_user_ranking_contest(driver):
     problem = 'sumas'
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
-    user3 = 'ut_rank_user_3_%s' % run_id
     password = 'P@55w0rd'
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
-    driver.register_user(user3, password)
 
     create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
@@ -95,10 +92,6 @@ def test_user_ranking_contest(driver):
     with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
                         verdict='WA', score=0)
-
-    with driver.login(user3, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
 
     update_scoreboard_for_contest(driver, contest_alias)
 
@@ -130,18 +123,6 @@ def test_user_ranking_contest(driver):
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        contestants_full_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr')
-        assert len(contestants_full_list) == 4, contestants_full_list
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
-
-        invited_contestant_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr')
-        assert len(invited_contestant_list) == 3, invited_contestant_list
-
 
 @util.annotate
 def create_contest_admin(driver, contest_alias, problem, users, user):
@@ -157,8 +138,6 @@ def create_contest_admin(driver, contest_alias, problem, users, user):
 
         add_students_bulk(driver, users)
         add_students_contest(driver, [user])
-
-        change_contest_admission_mode(driver, 'Public')
 
         contest_url = '/arena/%s' % contest_alias
         with driver.page_transition():
@@ -343,21 +322,3 @@ def enter_contest(driver, contest_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.ID, 'start-contest-submit'))).click()
-
-
-@util.annotate
-def change_contest_admission_mode(driver, contest_admission_mode):
-    '''Change admission mode for a contetst.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             'li.admission-mode > a'))).click()
-    Select(driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "admission-mode"]')))).select_by_visible_text(
-                 contest_admission_mode)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()

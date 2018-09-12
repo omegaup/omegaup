@@ -43,20 +43,17 @@
 <script>
 import {T} from '../../omegaup.js';
 export default {
-  props: {data: Array},
+  props: {requests: Array},
   data: function() {
     return {
       T: T,
-      requests: this.data,
     };
   },
   methods: {
     onAcceptRequest: function(username) {
-      this.$parent.$emit('accept-request', this, username);
+      this.$emit('accept-request', username);
     },
-    onDenyRequest: function(username) {
-      this.$parent.$emit('deny-request', this, username);
-    },
+    onDenyRequest: function(username) { this.$emit('deny-request', username);},
   },
 };
 </script>
