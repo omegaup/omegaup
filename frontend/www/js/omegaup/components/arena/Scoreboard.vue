@@ -2,6 +2,9 @@
   <div class="omegaup-scoreboard">
     <!-- id-lint off -->
     <div id="ranking-chart"></div><!-- id-lint on -->
+    <label><input class="toggle-contestants"
+           type="checkbox"
+           v-model="invited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
     <table>
       <thead>
         <tr>
@@ -16,7 +19,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(user, index) in ranking">
+        <tr v-bind:class="invitedClass(user.is_invited)"
+            v-for="(user, index) in ranking"
+            v-if="showUser(user.is_invited)">
           <td class="legend"
               v-bind:style="{ backgroundColor: legendColor(index) }"></td>
           <td class="position">{{ user.place }}</td>
@@ -69,11 +74,12 @@ export default {
     showPenalty: {
       type: Boolean,
       'default': true,
-    },
+    }
   },
   data: function() {
     return {
       UI: UI,
+      invited: false,
     };
   },
   computed: {
@@ -104,6 +110,20 @@ export default {
       } else {
         return '';
       }
+    },
+    invitedClass: function(userIsInvited) {
+      if (userIsInvited == 1) {
+        return 'invited';
+      } else {
+        return '';
+      }
+    },
+    showUser: function(userIsInvited) {
+      if (userIsInvited == 1 || (userIsInvited == 0 && this.invited == false) ||
+          userIsInvited == null) {
+        return true;
+      }
+      return false;
     },
   },
 };
