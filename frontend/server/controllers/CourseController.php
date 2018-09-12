@@ -1596,8 +1596,8 @@ class CourseController extends Controller {
 
         foreach ($runs as $run) {
             $run['time'] = (int)$run['time'];
-            $run['score'] = round((float)$run['score'], 4);
-            $run['contest_score'] = round((float)$run['contest_score'], 2);
+            $run['score'] = (float)$run['score'];
+            $run['contest_score'] = (float)$run['contest_score'];
             array_push($result, $run);
         }
 
