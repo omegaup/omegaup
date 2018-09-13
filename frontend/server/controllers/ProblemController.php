@@ -840,7 +840,7 @@ class ProblemController extends Controller {
                 ]
             );
 
-            // Invalidar problem statement cache
+            // Invalidate problem statement cache
             Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$r['lang']}-markdown");
             Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
         } catch (ApiException $e) {
