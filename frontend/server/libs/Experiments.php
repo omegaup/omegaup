@@ -41,10 +41,16 @@ class Experiments {
     const VIRTUAL = 'virtual';
 
     /**
+     * Constant for manage identities experiment.
+     */
+    const IDENTITIES = 'identities';
+
+    /**
      * An array with all the known experiments.
      */
     private static $kKnownExperiments = [
-        self::VIRTUAL
+        self::VIRTUAL,
+        self::IDENTITIES,
     ];
 
     /**
