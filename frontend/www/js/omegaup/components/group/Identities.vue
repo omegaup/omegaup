@@ -3,12 +3,12 @@
     <div class="panel-body">
       <div>
         <div class="panel-heading">
-          {{ T.groupsUploadCsv }} <input name="identities"
+          {{ T.groupsUploadCsvFile }} <input name="identities"
                type="file">
         </div>
         <div class="panel-heading">
           <a class="btn btn-primary"
-               v-on:click.prevent="readCsv">{{ T.groupsUploadFile }}</a>
+               v-on:click.prevent="readCsv">{{ T.groupsUploadCsvFile }}</a>
         </div>
       </div><br>
       <div class="panel panel-default no-bottom-margin"
@@ -42,7 +42,7 @@
         </table>
         <div class="panel-heading">
           <a class="btn btn-primary"
-               v-on:click.prevent="bulkIdentities">{{ T.groupEditIdentities }}</a>
+               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</a>
         </div>
         <div>
           {{ T.groupsIdentityWarning }}
@@ -66,10 +66,6 @@ export default {
       let regex = /.*\.(?:csv|txt)$/;
       if (!regex.test(fileUpload.value.toLowerCase())) {
         UI.error(T.groupsInvalidCsv);
-        return;
-      }
-      if (typeof(FileReader) == 'undefined') {
-        UI.error(T.wordsBrowserDoesNotSupportHtml5);
         return;
       }
       self.identities = [];
@@ -99,8 +95,7 @@ export default {
       self.$emit('bulk-identities', self.identities);
     },
     generatePassword: function() {
-      const validChars =
-          'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
       const len = 8;
       // Browser supports window.crypto
       if (typeof window.crypto == 'object') {

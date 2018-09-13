@@ -14,7 +14,6 @@ OmegaUp.on('ready', function() {
             API.Identity.bulkCreate(
                             {identities: identities, group_alias: groupAlias})
                 .then(function(data) {
-                  // window.location = window.location.pathname;
                   UI.success(T.groupsIdentitiesSuccessfullyCreated);
                 })
                 .fail(UI.apiError);

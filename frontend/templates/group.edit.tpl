@@ -8,7 +8,7 @@
 	<li class="active"><a href="#members" data-toggle="tab">{#groupEditMembers#}</a></li>
 	<li><a href="#scoreboards" data-toggle="tab">{#groupEditScoreboards#}</a></li>
 	{if $IS_ORGANIZER}
-		<li><a href="#identities" data-toggle="tab">{#groupEditIdentities#}</a></li>
+		<li><a href="#identities" data-toggle="tab">{#groupCreateIdentities#}</a></li>
 	{/if}
 </ul>
 
