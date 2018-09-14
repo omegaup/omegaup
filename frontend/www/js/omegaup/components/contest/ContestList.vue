@@ -39,19 +39,16 @@
           <th>{{ T.arenaPracticeEndtime }}</th>
           <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
           <th colspan="2"
-              v-if="isAdmin">Scoreboard</th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
-          <th v-if="isAdmin"></th>
+              v-if="isAdmin">{{ T.wordsScoreboard }}</th>
+          <th colspan="6"
+              v-if="isAdmin"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="contest in contests">
           <td v-if="isAdmin"><input type='checkbox'
                  v-bind:id="contest.alias"></td>
-          <td><strong><a v-bind:href="'/arena/' + contest.alias + '/'">{{ contest.title
+          <td><strong><a v-bind:href="'/arena/' + contest.alias + '/'">{{ UI.contestTitle(contest)
           }}</a></strong></td>
           <td>
             <a v-bind:href="makeWorldClockLink(contest.start_time)">{{
@@ -111,12 +108,13 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import {T, UI} from '../../omegaup.js';
 export default {
   props: {contests: Array, isAdmin: Boolean, title: String},
   data: function() {
     return {
       T: T,
+      UI: UI,
     };
   },
   methods: {

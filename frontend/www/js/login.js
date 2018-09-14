@@ -5,7 +5,7 @@ omegaup.OmegaUp.on('ready', function() {
     ev.preventDefault();
 
     if ($('#reg_pass').val() != $('#reg_pass2').val()) {
-      omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
+      omegaup.UI.error(omegaup.T.passwordMismatch);
       return false;
     }
 

@@ -26,4 +26,22 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+
+    final public static function getByProblemId($problemId) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Problems_Languages
+                WHERE
+                    problem_id = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$problemId]);
+
+        $problemsLanguages = [];
+        foreach ($rs as $row) {
+            array_push($problemsLanguages, new ProblemsLanguages($row));
+        }
+        return $problemsLanguages;
+    }
 }

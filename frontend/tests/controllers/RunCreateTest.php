@@ -72,10 +72,10 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Get the actual DB entries for later
         $this->course = CoursesDAO::getByAlias($this->courseData['course_alias']);
-        $this->assignment = AssignmentsDAO::search(new Assignments([
-            'course_id' => $this->course->course_id,
-            'alias' => $this->courseData['assignment_alias'],
-        ]))[0];
+        $this->assignment = AssignmentsDAO::getByAliasAndCourse(
+            $this->courseData['assignment_alias'],
+            $this->course->course_id
+        );
 
         $adminLogin = self::login($this->courseData['admin']);
 
@@ -137,12 +137,10 @@ class RunCreateTest extends OmegaupTestCase {
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
         $this->assertEquals(Utils::GetPhpUnixTimestamp() + $submission_gap, $response['nextSubmissionTimestamp']);
 
-        $logs = SubmissionLogDAO::search([
-            'run_id' => $run->run_id
-        ]);
+        $log = SubmissionLogDAO::getByPK($run->run_id);
 
-        $this->assertEquals(1, count($logs));
-        $this->assertEquals(ip2long('127.0.0.1'), $logs[0]->ip);
+        $this->assertEquals(1, count($log));
+        $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
             $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);

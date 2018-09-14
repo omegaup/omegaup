@@ -85,7 +85,8 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.Contest.publicDetails({contest_alias: contestAlias})
       .then(function(contest) {
-        $('.contest #title').html(omegaup.UI.escape(contest.title));
+        $('.contest #title')
+            .html(omegaup.UI.escape(omegaup.UI.contestTitle(contest)));
         $('.contest #description').html(omegaup.UI.escape(contest.description));
         $('.contest #window_length').val(contest.window_length);
         readyToStart(contest);

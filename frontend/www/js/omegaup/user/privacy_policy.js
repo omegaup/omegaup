@@ -17,7 +17,7 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             API.User.acceptPrivacyPolicy({
-                      git_object_id: payload.git_object_id,
+                      privacy_git_object_id: payload.git_object_id,
                       statement_type: payload.statement_type
                     })
                 .then(function(data) {

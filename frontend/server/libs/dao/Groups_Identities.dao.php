@@ -38,6 +38,23 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
         return $conn->GetOne($sql, $params);
     }
 
+    final public static function getByGroupId($groupId) {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Groups_Identities i
+            WHERE
+                group_id = ?;';
+
+        global $conn;
+        $groupsIdentities = [];
+        foreach ($conn->Execute($sql, [$groupId]) as $row) {
+            array_push($groupsIdentities, new GroupsIdentities($row));
+        }
+        return $groupsIdentities;
+    }
+
     final public static function getUsernamesByGroupId($group_id) {
         $sql = '
             SELECT

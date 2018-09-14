@@ -18,7 +18,7 @@
 			<tbody data-bind="foreach: page" class="contest-list row">
 				<tr>
 					<td class="col-md-6"><a data-bind="attr: { href: contestLink }">
-						<span data-bind="text: title"></span>
+						<span data-bind="text: titleText"></span>
 						<span class="glyphicon glyphicon-ok" aria-hidden="true"
 							  data-bind="visible: recommended !== '0'"></span>
 					</a></td>
@@ -35,17 +35,17 @@
 						</a>
 					</td>
 {if !empty($ENABLED_EXPERIMENTS) && in_array('virtual', $ENABLED_EXPERIMENTS)}
-					<td class="col-md-2" data-bind="visible: $parent.showVirtual">
+					<td class="col-md-2" data-bind="visible: (!isVirtual && $parent.showVirtual)">
 						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
 							<span>{#virtualContest#}</span>
 						</a>
 					</td>
 {/if}
 					<td class="no-wrap col-md-2" data-bind="visible: $parent.showPublicUpdated, text: publicUpdateText"></td>
+				</tr>
 				<tr>
 					<td colspan="5" class="forcebreaks forcebreaks-arena"
 						data-bind="text: description"></td>
-					</tr>
 				</tr>
 			</tbody>
 			<tfoot>
