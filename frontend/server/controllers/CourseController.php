@@ -707,7 +707,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $assignments = [];
         try {
             $assignments = AssignmentsDAO::getSortedCourseAssignments(
                 $r['course']->course_id
@@ -726,21 +725,13 @@ class CourseController extends Controller {
             'assignments' => [],
         ];
         $time = Time::get();
-        foreach ($assignments as $a) {
-            $a->toUnixTime();
-            if (!$isAdmin && $v['start_time'] > $time) {
+        foreach ($assignments as $assignment) {
+            if (!$isAdmin && $assignment['start_time'] > $time) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
                 continue;
             }
-            $response['assignments'][] = [
-                'name' => $a->name,
-                'alias' => $a->alias,
-                'description' => $a->description,
-                'start_time' => $a->start_time,
-                'finish_time' => $a->finish_time,
-                'assignment_type' => $a->assignment_type
-            ];
+            $response['assignments'][] = $assignment;
         }
 
         return $response;
@@ -1766,8 +1757,11 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);
+        self::resolveGroup($r);
 
-        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course']) &&
+            !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
