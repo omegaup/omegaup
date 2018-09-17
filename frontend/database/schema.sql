@@ -106,7 +106,6 @@ CREATE TABLE `Coder_Of_The_Month` (
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
-  `selected` tinyint(1) DEFAULT NULL COMMENT 'Bandera para indicar si es el coder del mes seleccionado, ya sea vía mentor o automática.',
   `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),

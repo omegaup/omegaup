@@ -62,7 +62,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			INNER JOIN
 				Identities i ON i.identity_id = up.identity_id
       LEFT JOIN
-        (SELECT user_id, MAX(time) latest_time, selected FROM Coder_Of_The_Month WHERE selected = 1 GROUP BY user_id) AS cm on i.user_id = cm.user_id
+        (SELECT user_id, MAX(time) latest_time, selected_by FROM Coder_Of_The_Month WHERE selected_by IS NOT NULL GROUP BY user_id, selected_by) AS cm on i.user_id = cm.user_id
       LEFT JOIN
         (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id = com.user_id
 			WHERE
@@ -181,7 +181,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `selected` = 1;';
+                    `selected_by` IS NOT NULL;';
 
         global $conn;
         $rs = $conn->Execute($sql, [$time]);
@@ -226,7 +226,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
               UPDATE
                 `Coder_Of_The_Month`
               SET
-                `selected` = 1
+                `selected_by` = (SELECT identity_id FROM Identities WHERE username = \'admin\' OR username = \'admintest\' )
               WHERE
                 `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
                 AND `rank` = 1;';
@@ -236,7 +236,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
               UPDATE
                 `Coder_Of_The_Month`
               SET
-                `selected` = 1,
                 `selected_by` = ?
               WHERE
                 `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY

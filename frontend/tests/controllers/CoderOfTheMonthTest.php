@@ -169,9 +169,6 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $firstDayOfMonth->modify('first day of next month');
         Time::setTimeForTesting(strtotime($firstDayOfMonth->format('Y-m-d')));
 
-        $response = UserController::apiCoderOfTheMonth(new Request([]));
-        $this->assertNull($response['userinfo'], 'No user should be selected, because is the first day of the month');
-
         // Selecting one user as coder of the month
         $login = self::login($mentor);
         $response = UserController::apiSelectCoderOfTheMonth(new Request([

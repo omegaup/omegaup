@@ -1338,12 +1338,13 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCoderOfTheMonth(Request $r) {
+        $currentTimestamp = Time::get();
         if (!empty($r['date'])) {
             Validators::isDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
-            $firstDay = date('Y-m-01', Time::get());
+            $firstDay = date('Y-m-01', $currentTimestamp);
         }
 
         try {
@@ -1363,17 +1364,18 @@ class UserController extends Controller {
                 $listOfCoders = [];
                 foreach ($users as $index => $user) {
                     // Save it
-                    $coders = new CoderOfTheMonth([
+                    $coder = new CoderOfTheMonth([
                         'user_id' => $user['user_id'],
                         'time' => $firstDay,
                         'rank' => $index + 1,
                     ]);
-                    CoderOfTheMonthDAO::save($coders);
-                    array_push($codersOfTheMonth, $coders);
+                    CoderOfTheMonthDAO::save($coder);
+                    array_push($codersOfTheMonth, $coder);
                 }
-                if ($firstDay != date('Y-m-d', Time::get())) {
-                    CoderOfTheMonthDAO::selectCoder();
-                }
+                $currentDay = date('Y-m-d', $currentTimestamp);
+
+                // It occurs when coder of the month is not explicitly selected by a mentor
+                CoderOfTheMonthDAO::selectCoder();
 
                 $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay);
                 if (empty($codersOfTheMonth)) {
@@ -1452,14 +1454,11 @@ class UserController extends Controller {
         }
         Validators::isStringNonEmpty($r['username'], 'username');
 
-        $month = date('m', Time::get());
-        if (date('d', Time::get()) == 1) {
-            // Get first day of the current month
-            $dateToSelect = date('Y-m-01', Time::get());
-        } else {
-            // When is the last day of the month, we need to get the first day of the next month
-            $dateToSelect = date('Y-' . ($month + 1) . '-01', Time::get());
-        }
+        $currentTimestamp = Time::get();
+        $runCreationDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfMonth = new DateTime($runCreationDate);
+        $firstDayOfMonth->modify('first day of this month');
+        $dateToSelect = $firstDayOfMonth->format('Y-m-d');
 
         try {
             $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
@@ -1473,16 +1472,15 @@ class UserController extends Controller {
                     // Save it
                     $coder = new CoderOfTheMonth([
                         'user_id' => $user['user_id'],
-                        'time' => $firstDay,
+                        'time' => $dateToSelect,
                         'rank' => $index + 1,
-                        'selected' => $isUserSelected ? 1 : null,
                         'selected_by' => $isUserSelected ? $r['current_identity_id'] : null,
                     ]);
                     CoderOfTheMonthDAO::save($coder);
                 }
             } else {
                 foreach ($codersOfTheMonth as $coder) {
-                    if ($coder->selected == 1) {
+                    if (!is_null($coder->selected_by)) {
                         throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
                     }
                 }
