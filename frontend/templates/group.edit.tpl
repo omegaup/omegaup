@@ -21,7 +21,8 @@
 	</div>
 	{if $IS_ORGANIZER}
 		<div class="tab-pane" id="identities">
-			{include file='group.edit.identities.tpl'}
+			<div id="create_identities"></div>
+			<script src="{version_hash src="/js/dist/group_identities.js"}" type="text/javascript"></script>
 		</div>
 	{/if}
 </div>

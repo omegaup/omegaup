@@ -2,6 +2,11 @@
 
 require_once('../server/bootstrap.php');
 
+if (!$experiments->isEnabled(Experiments::IDENTITIES)) {
+    header('HTTP/1.1 404 Not Found');
+    die();
+}
+
 $r = new Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 if (is_null($session['identity'])) {
