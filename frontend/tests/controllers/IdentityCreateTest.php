@@ -30,7 +30,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      * Basic test for creating a single identity
      */
     public function testCreateSingleIdentity() {
-        // Identity creator group member will upload csv file
+        // Identity creator group member will create the identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
@@ -225,6 +225,59 @@ class IdentityCreateTest extends OmegaupTestCase {
         } catch (InvalidDatabaseOperationException $e) {
             // OK.
         }
+    }
+
+    /**
+     * Basic test for login an identity
+     */
+    public function testLoginIdentity() {
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+
+        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $identityPassword = Utils::CreateRandomString();
+        // Call api using identity creator group member
+        IdentityController::apiCreate(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => "{$group['group']->alias}:{$identityName}",
+            'name' => $identityName,
+            'password' => $identityPassword,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => Utils::CreateRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $response = GroupController::apiMembers(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $user = UsersDAO::FindByUsername("{$group['group']->alias}:{$identityName}");
+        $this->assertNull($user);
+        $user = UsersDAO::FindByUsername($identityName);
+        $this->assertNull($user);
+
+        $identity = IdentitiesDAO::FindByUsername("{$group['group']->alias}:{$identityName}");
+
+        $this->assertEquals($identityName, $identity->name);
+
+        // Assert the log is empty.
+        $this->assertEquals(0, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+
+        // Call the API
+        $response = UserController::apiLogin(new Request([
+            'usernameOrEmail' => $identity->username,
+            'password' => $identityPassword
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertLogin($identity, $response['auth_token']);
+
+        // Assert the log is not empty.
+        $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
     }
 
     /**
