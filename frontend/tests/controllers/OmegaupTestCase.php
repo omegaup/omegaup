@@ -57,14 +57,14 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Given an User, checks that login let state as supposed
+     * Given an Identity, checks that login let state as supposed
      *
-     * @param Users $user
+     * @param Identities $identity
      * @param type $auth_token
      */
-    public function assertLogin(Users $user, $auth_token = null) {
+    public function assertLogin(Identities $identity, $auth_token = null) {
         // Check auth token
-        $auth_tokens_bd = AuthTokensDAO::getByIdentityId($user->main_identity_id);
+        $auth_tokens_bd = AuthTokensDAO::getByIdentityId($identity->identity_id);
 
         // Validar que el token se guardó en la BDD
         if (!is_null($auth_token)) {
@@ -85,23 +85,23 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Logs in a user an returns the auth_token
+     * Logs in a identity an returns the auth_token
      *
-     * @param $user the user to be logged in
+     * @param $identity the identity to be logged in
      *
      * @return string auth_token
      */
-    public static function login($user) {
+    public static function login($identity) {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
         $oldCookieSetting = SessionController::$setCookieOnRegisterSession;
         SessionController::$setCookieOnRegisterSession = false;
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password,
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password,
         ]);
 
         // Call the API
