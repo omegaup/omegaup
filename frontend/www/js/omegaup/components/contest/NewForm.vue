@@ -228,10 +228,7 @@ export default {
       submissionsGap: this.data.submissions_gap,
       title: this.data.title,
       titlePlaceHolder: '',
-      windowLength:
-          (this.data.window_length == 0 || this.data.window_length == null) ?
-              '' :
-              this.data.window_length,
+      windowLength: this.data.window_length,
       windowLengthEnabled: this.data.window_length != 0 &&
                                this.data.window_length != '' &&
                                this.data.window_length != null,
@@ -242,14 +239,14 @@ export default {
     fillOmi: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
       this.windowLengthEnabled = false;
-      this.windowLength = '';
+      this.windowLength = 0;
       this.scoreboard = 0;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 1;
       this.feedback = 'yes';
       this.penalty = 0;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
+      this.showScoreboardAfter = 1;
     },
     fillPreIoi: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
@@ -261,7 +258,7 @@ export default {
       this.feedback = 'yes';
       this.penalty = 0;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
+      this.showScoreboardAfter = 1;
     },
     fillConacup: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
@@ -273,7 +270,7 @@ export default {
       this.feedback = 'yes';
       this.penalty = 20;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
+      this.showScoreboardAfter = 1;
     },
     onSubmit: function() { this.$parent.$emit('update-contest', this);},
   },

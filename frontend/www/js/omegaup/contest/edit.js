@@ -47,11 +47,7 @@ OmegaUp.on('ready', function() {
                         description: ev.description,
                         start_time: (ev.startTime.getTime()) / 1000,
                         finish_time: (ev.finishTime.getTime()) / 1000,
-                        window_length: ev.windowLength == '' ||
-                                               ev.windowLength == null ||
-                                               !ev.windowLengthEnabled ?
-                                           '' :
-                                           ev.windowLength,
+                        window_length: ev.windowLength,
                         points_decay_factor: ev.pointsDecayFactor,
                         submissions_gap: ev.submissionsGap,
                         languages: ev.languages[0] == "" ? [] : ev.languages,

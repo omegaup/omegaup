@@ -20,7 +20,8 @@ from selenium.webdriver.support.select import Select
 CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
-PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
+PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js',
+                  '/o/oauth2/iframerpc')
 MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of

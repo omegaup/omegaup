@@ -368,4 +368,54 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $this->assertEquals($penalty_contestant_start, $response['runs'][0]['penalty']);
     }
+
+    /**
+     * Update window_length
+     *
+     */
+    public function testUpdateWindowLength() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        $directorLogin = self::login($contestData['director']);
+
+        $r = new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]);
+
+        // Explicitly join contest
+        ContestController::apiOpen($r);
+
+        $contest = ContestController::apiDetails($r);
+
+        $this->assertNull($contest['window_length'], 'Window length is not setted');
+
+        $r['window_length'] = 0;
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        $contest = ContestController::apiDetails($r);
+
+        $this->assertNull($contest['window_length'], 'Window length is not setted, because 0 is not a valid value');
+
+        $r['window_length'] = 60;
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        $contest = ContestController::apiDetails($r);
+
+        $this->assertEquals(60, $contest['window_length']);
+
+        $r['window_length'] = 'Not valid';
+
+        try {
+            // Call API
+            $response = ContestController::apiUpdate($r);
+            $this->assertTrue(false, 'Only numbers are allowed in window_length field');
+        } catch (InvalidParameterException $e) {
+            // Pass
+            $this->assertEquals('parameterNotANumber', $e->getMessage());
+        }
+    }
 }
