@@ -620,7 +620,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Call api again. This should (still) fail.
         try {
             ContestController::apiDetails($r);
-            $this->assertTrue(false, 'User with no access could see the contest');
+            $this->fail('User with no access could see the contest');
         } catch (ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());

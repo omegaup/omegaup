@@ -228,7 +228,7 @@ export default {
       submissionsGap: this.data.submissions_gap,
       title: this.data.title,
       titlePlaceHolder: '',
-      windowLength: this.data.window_length,
+      windowLength: this.data.window_length || 0,
       windowLengthEnabled: this.data.window_length != 0 &&
                                this.data.window_length != '' &&
                                this.data.window_length != null,
