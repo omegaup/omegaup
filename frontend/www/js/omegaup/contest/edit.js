@@ -50,7 +50,7 @@ OmegaUp.on('ready', function() {
                         window_length: ev.windowLength == '' ||
                                                ev.windowLength == null ||
                                                !ev.windowLengthEnabled ?
-                                           0 :
+                                           'NULL' :
                                            ev.windowLength,
                         points_decay_factor: ev.pointsDecayFactor,
                         submissions_gap: ev.submissionsGap,

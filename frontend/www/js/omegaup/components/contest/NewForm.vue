@@ -242,7 +242,7 @@ export default {
     fillOmi: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
       this.windowLengthEnabled = false;
-      this.windowLength = 0;
+      this.windowLength = '';
       this.scoreboard = 0;
       this.pointsDecayFactor = 0;
       this.submissionsGap = 1;
