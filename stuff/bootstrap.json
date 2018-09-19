@@ -56,7 +56,7 @@
 					"description": "Concurso de prueba",
 					"start_time": "$NOW$",
 					"finish_time": "$NOW$+18000",
-					"window_length": "NULL",
+					"window_length": "0",
 					"scoreboard": 100,
 					"points_decay_factor": 0,
 					"partial_score": 1,
