@@ -24,17 +24,11 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * when mentor is reviewing
      *
      * @global type $conn
-     * @param string (date) $date
-     * @param boolean $currentMonth
+     * @param string (date) $startTime
+     * @param string (date) $endTime
      * @return null|Users
      */
-    public static function calculateCoderOfTheMonth($date = 'now', $currentMonth = false) {
-        $monthToReview = $currentMonth ? 'this' : 'last';
-        $date = new DateTime($date);
-        $firstDayOfMonth = $date->modify('first day of ' . $monthToReview . ' month');
-        $startTime = $firstDayOfMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfMonth->format('Y-m-d');
+    public static function calculateCoderOfTheMonth($startTime, $endTime) {
         $sql = "
           SELECT DISTINCT
             i.user_id,

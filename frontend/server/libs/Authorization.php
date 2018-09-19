@@ -226,27 +226,17 @@ class Authorization {
     }
 
     /**
-     * Only the first and last day of the month mentor is
-     * available to choose the coder of the month
+     * Only last two days of the month mentor is available to choose
+     * the coder of the month
      * @return Array
      */
-    public static function canChooseCoder() {
-        $today = date('Y-m-d', Time::get());
-        $firstDayOfMonth = date('Y-m-01', Time::get());
-        $lastDayOfMonth = date('Y-m-t', Time::get());
-        $month  = date('m', Time::get());
-        if ($today == $lastDayOfMonth) {
-            return [
-                'canChoose' => true,
-                'monthToChoose' => $month,
-            ];
-        } elseif ($today == $firstDayOfMonth) {
-            return [
-                'canChoose' => true,
-                'monthToChoose' => $month - 1,
-            ];
-        }
-        return ['canChoose' => false];
+    public static function canChooseCoder($currentDate) {
+        $today = date('Y-m-d', $currentDate);
+        $lastDayOfMonth = date('t', $currentDate);
+        $availableDateToChooseCoder = [];
+        $availableDateToChooseCoder[] = date('Y-m-', $currentDate) . $lastDayOfMonth;
+        $availableDateToChooseCoder[] = date('Y-m-', $currentDate) . ($lastDayOfMonth - 1);
+        return in_array($today, $availableDateToChooseCoder);
     }
 
     public static function isGroupIdentityCreator($identityId) {

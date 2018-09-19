@@ -158,56 +158,47 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->assertTrue(Authorization::isMentor($mentor->main_identity_id));
 
         // Testing with the current date
-        $currentDate = date('Y-m-d', Time::get());
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
         $lastDayOfMonth = new DateTime($currentDate);
         $lastDayOfMonth->modify('last day of this month');
-        $currentMonth = date('m', Time::get());
         $date = new DateTime('now');
         $date->modify('last day of this month');
         $lastDayOfMonth = $date->format('Y-m-d');
-        $result = Authorization::canChooseCoder();
-        $dateToCalculate = $result['canChoose'] ? date('Y-' . $result['monthToChoose'] . '-d') : $currentDate;
-        $coders = CoderOfTheMonthDAO::calculateCoderOfTheMonth($dateToCalculate, true);
+        $result = Authorization::canChooseCoder($currentDateTimestamp);
+        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
         if ($currentDate == $lastDayOfMonth) {
-            $this->assertTrue($result['canChoose']);
-            $this->assertEquals($result['monthToChoose'], $currentMonth);
+            $this->assertTrue($result);
         } else {
-            $this->assertFalse($result['canChoose']);
+            $this->assertFalse($result);
         }
         $this->assertEquals(3, count($coders));
 
         // Setting the date to the last day of the currrent month and testing mentor can choose the coder
         Time::setTimeForTesting($date->getTimestamp());
-        $currentDate = date('Y-m-d', Time::get());
-        $currentMonth = date('m', Time::get());
-        $result = Authorization::canChooseCoder();
-        $dateToCalculate = $result['canChoose'] ? date('Y-' . $result['monthToChoose'] . '-d') : $currentDate;
-        $coders = CoderOfTheMonthDAO::calculateCoderOfTheMonth($dateToCalculate, true);
-        $this->assertTrue($result['canChoose']);
-        $this->assertEquals($result['monthToChoose'], $currentMonth);
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $result = Authorization::canChooseCoder($currentDateTimestamp);
+        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertTrue($result);
         $this->assertEquals(3, count($coders));
 
-        // Setting the date to the first day of the next month and testing mentor still can choose the coder
-        // In this case, mentor is still watching coders of the previous month
+        // Setting the date to the first day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
-        $currentDate = date('Y-m-d', Time::get());
-        $currentMonth = date('m', Time::get());
-        $result = Authorization::canChooseCoder();
-        $dateToCalculate = $result['canChoose'] ? date('Y-' . $result['monthToChoose'] . '-d') : $currentDate;
-        $coders = CoderOfTheMonthDAO::calculateCoderOfTheMonth($dateToCalculate, true);
-        $this->assertTrue($result['canChoose']);
-        $this->assertEquals($result['monthToChoose'], $currentMonth - 1);
-        $this->assertEquals(3, count($coders));
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $result = Authorization::canChooseCoder($currentDateTimestamp);
+        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertFalse($result);
+        $this->assertNull($coders);
 
         // Setting the date to the second day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
-        $currentDate = date('Y-m-d', Time::get());
-        $currentMonth = date('m', Time::get());
-        $result = Authorization::canChooseCoder();
-        $dateToCalculate = $result['canChoose'] ? date('Y-' . $result['monthToChoose'] . '-d') : $currentDate;
-        $coders = CoderOfTheMonthDAO::calculateCoderOfTheMonth($dateToCalculate, true);
-        $this->assertFalse($result['canChoose']);
-        $this->assertArrayNotHasKey('monthToChoose', $result, 'Function canChooseCoder does not return this key when canChoose attribute is false');
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $result = Authorization::canChooseCoder($currentDateTimestamp);
+        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertFalse($result);
         // No runs to calculate the coder for this month
         $this->assertNull($coders);
     }
