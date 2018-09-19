@@ -412,7 +412,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             // Call API
             $response = ContestController::apiUpdate($r);
-            $this->assertTrue(false, 'Only numbers are allowed in window_length field');
+            $this->fail('Only numbers are allowed in window_length field');
         } catch (InvalidParameterException $e) {
             // Pass
             $this->assertEquals('parameterNotANumber', $e->getMessage());
