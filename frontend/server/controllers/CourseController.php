@@ -105,7 +105,7 @@ class CourseController extends Controller {
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
+        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['false', 'true'], false /*is_required*/);
 
         Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
 
@@ -316,6 +316,7 @@ class CourseController extends Controller {
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
+                'show_scoreboard' =>$r['show_scoreboard'] == 'true',
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
                 'requests_user_information' => $r['requests_user_information'],
             ]));
@@ -1392,6 +1393,7 @@ class CourseController extends Controller {
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'show_scoreboard' => $r['course']->show_scoreboard == '1',
                 'requests_user_information' => $r['course']->requests_user_information
             ];
 
@@ -1607,7 +1609,9 @@ class CourseController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'school_id',
-            'show_scoreboard',
+            'show_scoreboard' => ['transform' => function ($value) {
+                return $value == 'true' ? 1 : 0;
+            }],
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
@@ -1643,9 +1647,7 @@ class CourseController extends Controller {
         self::validateCourseAssignmentAlias($r);
         self::resolveGroup($r);
 
-        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course']) &&
-            !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])
-        ) {
+        if (!Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1747,5 +1749,16 @@ class CourseController extends Controller {
             $userProblems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
+
+    /**
+     * @param $identity_id
+     * @param Courses $course
+     * @param Groups $group
+     */
+    public static function shouldShowScoreboard($identity_id, Courses $course, Groups $group) {
+        Validators::isNumber($identity_id, 'identity_id', true);
+        return Authorization::canViewCourse($identity_id, $course, $group) &&
+            $course->show_scoreboard;
     }
 }

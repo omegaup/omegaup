@@ -254,7 +254,7 @@
 	"courseNewFormShortTitle_alias_": "T\u00edtulo corto (alias)",
 	"courseNewFormShortTitle_alias_Desc": "El t\u00edtulo corto se usa para construir la URL del curso (ejemplos: IPNVERANO2016, ITVERINTRO2016)",
 	"courseNewFormShowScoreboard": "Mostrar scoreboard",
-	"courseNewFormShowScoreboardDesc": "Mostrar o ocultar los resultados generales a los alumnos del curso.",
+	"courseNewFormShowScoreboardDesc": "Mostrar u ocultar los resultados generales a los alumnos del curso.",
 	"courseNewFormStartDate": "Fecha de inicio",
 	"courseNewFormStartDateDesc": "La hora (en hora local) en la que inicia el curso.",
 	"courseNewFormUpdateCourse": "Actualizar curso",
