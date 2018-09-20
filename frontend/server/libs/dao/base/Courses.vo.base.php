@@ -62,6 +62,9 @@ class Courses extends VO {
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
         }
+        if (isset($data['show_scoreboard'])) {
+            $this->show_scoreboard = $data['show_scoreboard'];
+        }
     }
 
     /**
@@ -160,4 +163,11 @@ class Courses extends VO {
       * @var enum('no','optional','required')
       */
     public $requests_user_information;
+
+    /**
+      * Los estudiantes pueden visualizar el scoreboard de un curso.
+      * @access public
+      * @var tinyint(1)
+      */
+    public $show_scoreboard;
 }
