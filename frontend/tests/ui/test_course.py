@@ -3,6 +3,8 @@
 
 '''Run Selenium course tests.'''
 
+import urllib
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
@@ -48,16 +50,13 @@ def test_user_ranking_course(driver):
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
 
+    update_scoreboard_for_assignment(driver, assignment_alias, course_alias)
+
     with driver.login_admin():
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
         with driver.page_transition():
             course_url = '/course/%s' % course_alias
@@ -67,14 +66,14 @@ def test_user_ranking_course(driver):
                      '//a[@href = "%s"]' % course_url))).click()
 
         with driver.page_transition():
-            progress_url = '/course/%s/students/' % course_alias
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//a[@href = "%s"]' % progress_url)))).click()
+            driver.wait.until(EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
+                 assignment_alias))).click()
 
-        assert driver.browser.find_element_by_css_selector(
-            'td.score').text == '100'
+        run_user = driver.browser.find_element_by_xpath(
+            '//td[@class="accepted"]/preceding-sibling::td[1]')
+        assert run_user.text == driver.user_username, run_user
 
 
 @util.annotate
@@ -85,11 +84,6 @@ def create_course(driver, course_alias, school_name):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
     with driver.page_transition():
         driver.wait.until(
@@ -191,6 +185,21 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
 
 
 @util.annotate
+def update_scoreboard_for_assignment(driver, assignment_alias, course_alias):
+    '''Updates the scoreboard for an assignment.
+
+    This can be run without a session being active.
+    '''
+
+    scoreboard_refresh_url = driver.url(
+        '/api/scoreboard/refresh/alias/%s/course_alias/%s/token/secret' %
+        (urllib.parse.quote(assignment_alias, safe=''),
+         urllib.parse.quote(course_alias, safe='')))
+    driver.browser.get(scoreboard_refresh_url)
+    assert '{"status":"ok"}' in driver.browser.page_source
+
+
+@util.annotate
 def add_students_course(driver, users):
     '''Add students to a recently course.'''
 
@@ -210,11 +219,6 @@ def enter_course(driver, course_alias, assignment_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/"]')))).click()
 
     course_url = '/course/%s' % course_alias
     with driver.page_transition():
