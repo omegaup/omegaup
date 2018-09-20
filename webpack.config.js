@@ -195,12 +195,10 @@ if (process.env.NODE_ENV === 'production') {
           NODE_ENV: '"production"'
         }
       }),
-      new webpack.optimize.UglifyJsPlugin({
-        sourceMap: true
-      }),
       new webpack.LoaderOptionsPlugin({
         minimize: true
       })
     ]);
+    config.optimization.minimize = true;
   }
 }
