@@ -638,6 +638,7 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
+            $result['show_scoreboard_after'] = $result['show_scoreboard_after'] == '1' ? 'true' : 'false';
             $result['original_contest_alias'] = null;
             $result['original_problemset_id'] = null;
             if ($result['rerun_id'] != 0) {
@@ -1039,7 +1040,7 @@ class ContestController extends Controller {
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
 
         if (!is_null($r['show_scoreboard_after'])) {
-            $contest->show_scoreboard_after = $r['show_scoreboard_after'];
+            $contest->show_scoreboard_after = $r['show_scoreboard_after'] == 'true' ? '1' : '0';
         } else {
             $contest->show_scoreboard_after = '1';
         }
@@ -1168,7 +1169,7 @@ class ContestController extends Controller {
         }
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
+        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
 
         // languages is always optional
         if (!empty($r['languages'])) {
@@ -2242,7 +2243,9 @@ class ContestController extends Controller {
             }],
             'penalty_type',
             'penalty_calc_policy',
-            'show_scoreboard_after',
+            'show_scoreboard_after' => ['transform' => function ($value) {
+                return $value == 'true' ? '1' : '0';
+            }],
             'languages' => ['transform' => function ($value) {
                 if (!is_array($value)) {
                     return $value;

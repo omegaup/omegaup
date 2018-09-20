@@ -136,10 +136,10 @@
           <div class="form-group col-md-6">
             <label>{{T.contestNewFormScoreboardAtEnd}}</label> <select class="form-control"
                  v-model="showScoreboardAfter">
-              <option value="1">
+              <option v-bind:value="true">
                 {{T.wordsYes}}
               </option>
-              <option value="0">
+              <option v-bind:value="false">
                 {{T.wordsNo}}
               </option>
             </select>
@@ -246,7 +246,7 @@ export default {
       this.feedback = 'yes';
       this.penalty = 0;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = 1;
+      this.showScoreboardAfter = true;
     },
     fillPreIoi: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
@@ -258,7 +258,7 @@ export default {
       this.feedback = 'yes';
       this.penalty = 0;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = 1;
+      this.showScoreboardAfter = true;
     },
     fillConacup: function() {
       this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
@@ -270,7 +270,7 @@ export default {
       this.feedback = 'yes';
       this.penalty = 20;
       this.penaltyType = 'none';
-      this.showScoreboardAfter = 1;
+      this.showScoreboardAfter = true;
     },
     onSubmit: function() { this.$parent.$emit('update-contest', this);},
   },
