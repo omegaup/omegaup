@@ -835,6 +835,10 @@ export class Arena {
     let navigatorData = [[this.startTime.getTime(), 0]];
     let series = [];
     let usernames = {};
+
+    // Don't trust input data (data might not be sorted)
+    data.events.sort((a, b) => a.delta - b.delta);
+
     this.currentEvents = data;
     // group points by person
     for (let i = 0, l = data.events.length; i < l; i++) {
