@@ -105,10 +105,20 @@ def test_user_ranking_contest(driver):
                     (By.XPATH,
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
+        public = '//tr[@class="%s"]/td/a[text()="Public"]' % contest_alias
+        util.check_scoreboard_events(driver, public, number_ac_or_pa_runs=1)
 
-        public = '//tr[@class="%s"]/td[6]/a' % contest_alias
-        admin = '//tr[@class="%s"]/td[7]/a' % contest_alias
-        util.check_scoreboard_events(driver, public, admin, 1)
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-contests'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+        admin = '//tr[@class="%s"]/td/a[text()="Admin"]' % contest_alias
+        util.check_scoreboard_events(driver, admin, number_ac_or_pa_runs=1)
 
         with driver.page_transition():
             driver.wait.until(

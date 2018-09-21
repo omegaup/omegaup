@@ -177,27 +177,19 @@ def is_message_whitelisted(message, message_whitelist):
     return False
 
 
-def check_scoreboard_events(driver, public_xpath, admin_xpath,
-                            number_ac_or_pa_runs):
+def check_scoreboard_events(driver, xpath, *, number_ac_or_pa_runs):
     '''Verifies chart is correctly generated'''
 
     num_elements = 0
+    series = 'highcharts-series-group'
+    markers = 'highcharts-markers'
     if number_ac_or_pa_runs != 0:
-        num_elements = 2 + (number_ac_or_pa_runs * 2)
+        num_elements = 1 + number_ac_or_pa_runs
 
     with driver.page_transition():
         driver.wait.until(
-            EC.element_to_be_clickable((By.XPATH, (public_xpath)))).click()
+            EC.element_to_be_clickable((By.XPATH, (xpath)))).click()
 
         scoreboard_events = driver.browser.find_elements_by_xpath(
-            '//*[name()="svg"]/*[name()="g"][10]/*[name()="g"]')
-        assert len(scoreboard_events) == num_elements, len(scoreboard_events)
-
-    driver.browser.execute_script("window.history.go(-1)")
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable((By.XPATH, (admin_xpath)))).click()
-
-        scoreboard_events = driver.browser.find_elements_by_xpath(
-            '//*[name()="svg"]/*[name()="g"][10]/*[name()="g"]')
+            '//g[@class()="%s"]/g[@class()="%s"]' % (series, markers))
         assert len(scoreboard_events) == num_elements, len(scoreboard_events)
