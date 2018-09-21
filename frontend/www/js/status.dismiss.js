@@ -11,7 +11,9 @@ function isBrowserSupported() {
   if (typeof(window.WebSocket) !== 'function') {
     return false;
   }
-
+  if (typeof(FileReader) == 'undefined') {
+    return false;
+  }
   return true;
 }
 

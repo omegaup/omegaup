@@ -40,7 +40,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #feedback').val('yes');
         $('.new_contest_form #penalty').val('0');
         $('.new_contest_form #penalty-type').val('none');
-        $('.new_contest_form #show-scoreboard-after').val('1');
+        $('.new_contest_form #show-scoreboard-after').val('true');
       });
 
   // Defaults for preselectivos IOI
@@ -59,7 +59,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #feedback').val('yes');
         $('.new_contest_form #penalty').val('0');
         $('.new_contest_form #penalty-type').val('none');
-        $('.new_contest_form #show-scoreboard-after').val('1');
+        $('.new_contest_form #show-scoreboard-after').val('true');
       });
 
   // Defaults for CONACUP
@@ -78,7 +78,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.new_contest_form #feedback').val('yes');
         $('.new_contest_form #penalty').val('20');
         $('.new_contest_form #penalty-type').val('contest_start');
-        $('.new_contest_form #show-scoreboard-after').val('1');
+        $('.new_contest_form #show-scoreboard-after').val('true');
       });
 
   $('#languages').multiselect();
