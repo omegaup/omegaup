@@ -119,8 +119,8 @@
 					<div class="form-group col-md-6">
 						<label for="show-scoreboard-after">{#contestNewFormScoreboardAtEnd#}</label>
 						<select id="show-scoreboard-after" name="show_scoreboard_after" class="form-control">
-							<option value="1">{#wordsYes#}</option>
-							<option value="0">{#wordsNo#}</option>
+							<option value="true">{#wordsYes#}</option>
+							<option value="false">{#wordsNo#}</option>
 						</select>
 						<p class="help-block">{#contestNewFormScoreboardAtEndDesc#}</p>
 					</div>
