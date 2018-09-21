@@ -1026,7 +1026,7 @@ class ContestController extends Controller {
         $contest->description = $r['description'];
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
-        $contest->window_length = $r['window_length'] === '' || $r['window_length'] == 0 ? null : $r['window_length'];
+        $contest->window_length = empty($r['window_length']) ? null : $r['window_length'];
         $contest->rerun_id = 0;
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
@@ -2231,7 +2231,7 @@ class ContestController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'window_length' => ['transform' => function ($value) {
-                return $value === '' || $value == 0 ? null : $value;
+                return empty($value) ? null : $value;
             }],
             'scoreboard',
             'points_decay_factor',
