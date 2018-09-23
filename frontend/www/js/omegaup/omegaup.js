@@ -14,6 +14,9 @@ export class Experiments {
       self.enabledExperiments[experiment] = true;
   }
 
+  // Current frontend-available experiments:
+  static get IDENTITIES() { return 'identities'; }
+
   // The list of all enabled experiments for a particular request should have
   // been injected into the DOM by Smarty.
   static loadGlobal() {
