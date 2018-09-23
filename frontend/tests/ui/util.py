@@ -177,19 +177,16 @@ def is_message_whitelisted(message, message_whitelist):
     return False
 
 
-def check_scoreboard_events(driver, xpath, *, number_ac_or_pa_runs):
+def check_scoreboard_events(driver, xpath, url, *, num_elements):
     '''Verifies chart is correctly generated'''
 
-    num_elements = 0
     series = 'highcharts-series-group'
-    markers = 'highcharts-markers'
-    if number_ac_or_pa_runs != 0:
-        num_elements = 1 + number_ac_or_pa_runs
-
+    tracker = 'highcharts-tracker'
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable((By.XPATH, (xpath)))).click()
+    assert (url in driver.browser.current_url), driver.browser.current_url
 
-        scoreboard_events = driver.browser.find_elements_by_xpath(
-            '//g[@class()="%s"]/g[@class()="%s"]' % (series, markers))
-        assert len(scoreboard_events) == num_elements, len(scoreboard_events)
+    scoreboard_events = driver.browser.find_elements_by_xpath(
+        '//svg/g[@class="%s"]/g[contains(@class, "%s")]' % (series, tracker))
+    assert len(scoreboard_events) == num_elements, len(scoreboard_events)

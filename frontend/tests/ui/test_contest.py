@@ -105,8 +105,10 @@ def test_user_ranking_contest(driver):
                     (By.XPATH,
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
+
+        url = '/contest/%s/scoreboard' % (contest_alias)
         public = '//tr[@class="%s"]/td/a[text()="Public"]' % contest_alias
-        util.check_scoreboard_events(driver, public, number_ac_or_pa_runs=1)
+        util.check_scoreboard_events(driver, public, url, num_elements=1)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -118,7 +120,7 @@ def test_user_ranking_contest(driver):
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
         admin = '//tr[@class="%s"]/td/a[text()="Admin"]' % contest_alias
-        util.check_scoreboard_events(driver, admin, number_ac_or_pa_runs=1)
+        util.check_scoreboard_events(driver, admin, url, num_elements=1)
 
         with driver.page_transition():
             driver.wait.until(

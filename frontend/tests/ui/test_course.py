@@ -53,21 +53,30 @@ def test_user_ranking_course(driver):
     update_scoreboard_for_assignment(driver, assignment_alias, course_alias)
 
     with driver.login_admin():
-        enter_course_scoreboard_page(driver, course_alias, assignment_alias)
+        enter_course_assignments_page(driver, course_alias)
+        with driver.page_transition():
+            driver.wait.until(EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
+                 assignment_alias))).click()
+
         run_user = driver.browser.find_element_by_xpath(
             '//td[@class="accepted"]/preceding-sibling::td[1]')
         assert run_user.text == driver.user_username, run_user
 
-        enter_course_scoreboard_page(driver, course_alias, assignment_alias)
+        enter_course_assignments_page(driver, course_alias)
+        url = '/course/%s/assignment/%s/scoreboard' % (course_alias,
+                                                       assignment_alias)
         public = '//tr[@class="%s"]/td/a[text()="Public"]' % assignment_alias
-        util.check_scoreboard_events(driver, public, number_ac_or_pa_runs=1)
+        util.check_scoreboard_events(driver, public, url, num_elements=1)
 
-        enter_course_scoreboard_page(driver, course_alias, assignment_alias)
+        enter_course_assignments_page(driver, course_alias)
         admin = '//tr[@class="%s"]/td/a[text()="Admin"]' % assignment_alias
-        util.check_scoreboard_events(driver, admin, number_ac_or_pa_runs=1)
+
+        util.check_scoreboard_events(driver, admin, url, num_elements=1)
 
 
-def enter_course_scoreboard_page(driver, course_alias, assignment_alias):
+def enter_course_assignments_page(driver, course_alias):
     '''Steps to enter into scoreboard page'''
 
     with driver.page_transition():
@@ -81,12 +90,6 @@ def enter_course_scoreboard_page(driver, course_alias, assignment_alias):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  '//a[@href = "%s"]' % course_url))).click()
-
-    with driver.page_transition():
-        driver.wait.until(EC.element_to_be_clickable(
-            (By.XPATH,
-             '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
-             assignment_alias))).click()
 
 
 @util.annotate
