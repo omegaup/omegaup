@@ -62,9 +62,10 @@ class JavaScriptLogCollector:
             yield entry
 
 
-class Driver:
+class Driver:  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
+    # pylint: disable=too-many-arguments
     def __init__(self, browser, wait, url, options):
         self.browser = browser
         self.wait = wait

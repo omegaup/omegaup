@@ -131,19 +131,6 @@ def test_create_contest(driver):
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
 
-    #create_contest_admin(driver, contest_alias, problem, [user1, user2],
-    #                     driver.user_username)
-
-    #with driver.login(user1, password):
-    #    create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-    #                    verdict='AC', score=1)
-
-    #with driver.login(user2, password):
-    #    create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-    #                    verdict='WA', score=0)
-
-    #update_scoreboard_for_contest(driver, contest_alias)
-
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -172,32 +159,32 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
-@pytest.mark.dependency(depends=["test_create_users[firefox]",
-                                 "test_create_users[chrome]"])
+@pytest.mark.dependency(depends=["test_update_scoreboard[firefox]",
+                                 "test_update_scoreboard[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
     run_id = driver.get_session_id()
-    contest_alias = 'utrank_contest_%s' % run_id
+    contest_alias = 'ut_contest_%s' % run_id
     problem = 'sumas'
     user1 = 'ut_user_1_%s' % run_id
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
 
-    create_contest_admin(driver, contest_alias, problem, [user1, user2],
-                         driver.user_username)
+    #create_contest_admin(driver, contest_alias, problem, [user1, user2],
+    #                     driver.user_username)
 
-    with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
+    #with driver.login(user1, password):
+    #    create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+    #                    verdict='AC', score=1)
 
-    with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0)
+    #with driver.login(user2, password):
+    #    create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+    #                    verdict='WA', score=0)
 
-    update_scoreboard_for_contest(driver, contest_alias)
+    #update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
         with driver.page_transition():
