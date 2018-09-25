@@ -173,19 +173,6 @@ def test_user_ranking_contest(driver):
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
 
-    #create_contest_admin(driver, contest_alias, problem, [user1, user2],
-    #                     driver.user_username)
-
-    #with driver.login(user1, password):
-    #    create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-    #                    verdict='AC', score=1)
-
-    #with driver.login(user2, password):
-    #    create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-    #                    verdict='WA', score=0)
-
-    #update_scoreboard_for_contest(driver, contest_alias)
-
     with driver.login_admin():
         with driver.page_transition():
             driver.wait.until(
@@ -213,58 +200,6 @@ def test_user_ranking_contest(driver):
         run_wrong_user = driver.browser.find_element_by_xpath(
             '//td[@class="wrong"]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
-
-
-@util.annotate
-def create_contest_admin(driver, contest_alias, problem, users, user):
-    '''Creates a contest as an admin.'''
-
-    with driver.login_admin():
-        create_contest(driver, contest_alias)
-
-        assert (('/contest/%s/edit/' % contest_alias) in
-                driver.browser.current_url), driver.browser.current_url
-
-        add_problem_to_contest(driver, problem)
-
-        add_students_bulk(driver, users)
-        add_students_contest(driver, [user])
-
-        contest_url = '/arena/%s' % contest_alias
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//a[starts-with(@href, "%s")]' % contest_url))).click()
-        assert (contest_alias in
-                driver.browser.current_url), driver.browser.current_url
-
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.ID, 'start-contest-submit'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "#ranking"]'))).click()
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#ranking')))
-        assert ((contest_url) in
-                driver.browser.current_url), driver.browser.current_url
-
-
-@util.annotate
-def update_scoreboard_for_contest(driver, contest_alias):
-    '''Updates the scoreboard for a contest.
-
-    This can be run without a session being active.
-    '''
-
-    scoreboard_refresh_url = driver.url(
-        '/api/scoreboard/refresh/alias/%s/token/secret' %
-        urllib.parse.quote(contest_alias, safe=''))
-    driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
 
 
 @util.annotate
