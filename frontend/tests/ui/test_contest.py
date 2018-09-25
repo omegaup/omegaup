@@ -126,10 +126,8 @@ def test_create_contest(driver):
 
     run_id = driver.get_session_id()
     contest_alias = 'ut_contest_%s' % run_id
-    problem = 'sumas'
     user1 = 'ut_user_1_%s' % run_id
     user2 = 'ut_user_2_%s' % run_id
-    password = 'P@55w0rd'
 
     with driver.login_admin():
         driver.wait.until(
@@ -168,10 +166,8 @@ def test_user_ranking_contest(driver):
 
     run_id = driver.get_session_id()
     contest_alias = 'ut_contest_%s' % run_id
-    problem = 'sumas'
     user1 = 'ut_user_1_%s' % run_id
     user2 = 'ut_user_2_%s' % run_id
-    password = 'P@55w0rd'
 
     with driver.login_admin():
         with driver.page_transition():

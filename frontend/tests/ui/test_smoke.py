@@ -13,17 +13,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from ui import util
 
 
+@pytest.mark.dependency(scope="session",
+                        depends=["test_contest.py::test_create_users[firfox]",
+                                 "test_contest.py::test_create_users[firfox]"])
 @util.no_javascript_errors()
 @util.annotate
 def test_create_user(driver):
-    '''Tests basic functionality.'''
+    '''Stub to demonstrate inter-file dependency.'''
 
-    username = 'unittest_user_%s' % driver.generate_id()
-    password = 'p@ssw0rd'
-    driver.register_user(username, password)
-
-    with driver.login(username, password):
-        pass
+    assert driver is not None
 
 
 @util.no_javascript_errors()
