@@ -78,6 +78,30 @@ def test_create_contest_admin(driver):
                                  "test_create_contest_admin[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
+def test_create_run_user(driver):
+    '''Makes the user join a course and then creates a run.'''
+
+    run_id = driver.get_session_id()
+    contest_alias = 'ut_contest_%s' % run_id
+    problem = 'sumas'
+    user1 = 'ut_user_1_%s' % run_id
+    user2 = 'ut_user_2_%s' % run_id
+    password = 'P@55w0rd'
+
+    with driver.login(user1, password):
+        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                        verdict='AC', score=1)
+
+    with driver.login(user2, password):
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+                        verdict='WA', score=0)
+
+
+
+@pytest.mark.dependency(depends=["test_create_create_run_user[firefox]",
+                                 "test_create_create_run_user[chrome]"])
+@util.no_javascript_errors()
+@util.annotate
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
@@ -91,13 +115,13 @@ def test_create_contest(driver):
     #create_contest_admin(driver, contest_alias, problem, [user1, user2],
     #                     driver.user_username)
 
-    with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
-                        verdict='AC', score=1)
+    #with driver.login(user1, password):
+    #    create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+    #                    verdict='AC', score=1)
 
-    with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
-                        verdict='WA', score=0)
+    #with driver.login(user2, password):
+    #    create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+    #                    verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
 
