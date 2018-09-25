@@ -106,7 +106,7 @@ def test_user_ranking_contest(driver):
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
 
-        url = '/contest/%s/scoreboard' % (contest_alias)
+        url = '/arena/%s/scoreboard' % (contest_alias)
         public = '//tr[@class="%s"]/td/a[text()="Public"]' % contest_alias
         util.check_scoreboard_events(driver, public, url, num_elements=1)
 

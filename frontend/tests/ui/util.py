@@ -187,6 +187,12 @@ def check_scoreboard_events(driver, xpath, url, *, num_elements):
             EC.element_to_be_clickable((By.XPATH, (xpath)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//*[name()="svg"]/*[contains(@class, "%s")]' % (series))))
+
     scoreboard_events = driver.browser.find_elements_by_xpath(
-        '//svg/g[@class="%s"]/g[contains(@class, "%s")]' % (series, tracker))
+        '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
+        ', "%s")]' % (series, tracker))
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
