@@ -1361,7 +1361,6 @@ class UserController extends Controller {
                     ];
                 }
 
-                $listOfCoders = [];
                 foreach ($users as $index => $user) {
                     // Save it
                     $coder = new CoderOfTheMonth([
@@ -1370,7 +1369,6 @@ class UserController extends Controller {
                         'rank' => $index + 1,
                     ]);
                     CoderOfTheMonthDAO::save($coder);
-                    array_push($codersOfTheMonth, $coder);
                 }
                 $currentDay = date('Y-m-d', $currentTimestamp);
 
@@ -1469,6 +1467,11 @@ class UserController extends Controller {
 
                 foreach ($users as $index => $user) {
                     $isUserSelected = $user['username'] == $r['username'];
+
+                    if (!$isUserSelected) {
+                        continue;
+                    }
+
                     // Save it
                     $coder = new CoderOfTheMonth([
                         'user_id' => $user['user_id'],

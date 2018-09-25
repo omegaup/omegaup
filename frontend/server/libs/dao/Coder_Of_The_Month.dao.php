@@ -222,26 +222,22 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     public static function selectCoder($username = null, $identity_id = null) {
         $curdate = date('Y-m-d', Time::get());
         if (is_null($username) && is_null($identity_id)) {
-            $sql = '
-              UPDATE
-                `Coder_Of_The_Month`
-              SET
-                `selected_by` = (SELECT identity_id FROM Identities WHERE username = \'admin\' OR username = \'admintest\' )
-              WHERE
-                `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
-                AND `rank` = 1;';
+            $identity_clause = '(SELECT identity_id FROM Identities WHERE username = \'admin\' OR username = \'admintest\')';
+            $clause = '`rank` = 1';
             $params = [$curdate];
         } else {
-            $sql = '
-              UPDATE
-                `Coder_Of_The_Month`
-              SET
-                `selected_by` = ?
-              WHERE
-                `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
-                AND `user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1);';
+            $identity_clause = '?';
+            $clause = '`user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1)';
             $params = [$identity_id, $curdate, $username];
         }
+        $sql = '
+          UPDATE
+            `Coder_Of_The_Month`
+          SET
+            `selected_by` = ' . $identity_clause . '
+          WHERE
+            `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
+            AND ' . $clause . ';';
 
         global $conn;
         $conn->Execute($sql, $params);
