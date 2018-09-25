@@ -1351,7 +1351,7 @@ class UserController extends Controller {
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
-                $users = self::calculateCoderOfLastMonth($firstDay);
+                $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($firstDay);
                 if (is_null($users)) {
                     return [
                         'status' => 'ok',
@@ -1421,24 +1421,6 @@ class UserController extends Controller {
 
         $response['status'] = 'ok';
         return $response;
-    }
-
-    public static function calculateCoderOfLastMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfLastMonth = $date->modify('first day of last month');
-        $startTime = $firstDayOfLastMonth->format('Y-m-d');
-        $firstDayOfCurrentMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return CoderOfTheMonthDAO::calculateCoderOfTheMonth($startTime, $endTime);
-    }
-
-    public static function calculateCoderOfCurrentMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
-        return CoderOfTheMonthDAO::calculateCoderOfTheMonth($startTime, $endTime);
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {

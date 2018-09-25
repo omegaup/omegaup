@@ -206,4 +206,22 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         }
         return $coders;
     }
+
+    public static function calculateCoderOfLastMonth($currentDate) {
+        $date = new DateTime($currentDate);
+        $firstDayOfLastMonth = $date->modify('first day of last month');
+        $startTime = $firstDayOfLastMonth->format('Y-m-d');
+        $firstDayOfCurrentMonth = $date->modify('first day of next month');
+        $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
+        return self::calculateCoderOfTheMonth($startTime, $endTime);
+    }
+
+    public static function calculateCoderOfCurrentMonth($currentDate) {
+        $date = new DateTime($currentDate);
+        $firstDayOfCurrentMonth = $date->modify('first day of this month');
+        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
+        $firstDayOfNextMonth = $date->modify('first day of next month');
+        $endTime = $firstDayOfNextMonth->format('Y-m-d');
+        return self::calculateCoderOfTheMonth($startTime, $endTime);
+    }
 }

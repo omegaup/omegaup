@@ -165,40 +165,28 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $date = new DateTime('now');
         $date->modify('last day of this month');
         $lastDayOfMonth = $date->format('Y-m-d');
-        $result = Authorization::canChooseCoder($currentDateTimestamp);
-        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
-        if ($currentDate == $lastDayOfMonth) {
-            $this->assertTrue($result);
-        } else {
-            $this->assertFalse($result);
-        }
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
         $this->assertEquals(3, count($coders));
 
         // Setting the date to the last day of the currrent month and testing mentor can choose the coder
         Time::setTimeForTesting($date->getTimestamp());
         $currentDateTimestamp = Time::get();
         $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $result = Authorization::canChooseCoder($currentDateTimestamp);
-        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertTrue($result);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
         $this->assertEquals(3, count($coders));
 
         // Setting the date to the first day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
         $currentDateTimestamp = Time::get();
         $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $result = Authorization::canChooseCoder($currentDateTimestamp);
-        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertFalse($result);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
         $this->assertNull($coders);
 
         // Setting the date to the second day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
         $currentDateTimestamp = Time::get();
         $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $result = Authorization::canChooseCoder($currentDateTimestamp);
-        $coders = UserController::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertFalse($result);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
         // No runs to calculate the coder for this month
         $this->assertNull($coders);
     }
