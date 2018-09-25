@@ -32,7 +32,7 @@ def test_create_users(driver):
                                  "test_create_users[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
-def test_create_contest_admin(driver, user):
+def test_create_contest_admin(driver):
     '''Creates a contest as an admin.'''
 
     run_id = driver.get_session_id()
@@ -136,7 +136,7 @@ def test_create_contest(driver):
 def test_user_ranking_contest(driver):
     '''Tests creating a contest and reviewing ranking.'''
 
-    run_id = driver.generate_id()
+    run_id = driver.get_session_id()
     contest_alias = 'utrank_contest_%s' % run_id
     problem = 'sumas'
     user1 = 'ut_user_1_%s' % run_id
