@@ -62,15 +62,14 @@ class JavaScriptLogCollector:
             yield entry
 
 
-class Driver:  # pylint: disable=too-many-instance-attributes
+class Driver:
     '''Wraps the state needed to run a test.'''
 
-    # pylint: disable=too-many-arguments
-    def __init__(self, browser, wait, url, worker_id, options):
+    def __init__(self, browser, wait, url, options):
         self.browser = browser
         self.wait = wait
-        self._worker_id = worker_id
         self._next_id = 0
+        self._session_id = None
         self._url = url
         self.options = options
         self.user_username = self.create_user()
@@ -81,7 +80,18 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         '''Generates a relatively unique id.'''
 
         self._next_id += 1
-        return '%s_%d_%d' % (self._worker_id, int(time.time()), self._next_id)
+        return '%d_%d' % (int(time.time()), self._next_id)
+
+    def set_session_id(self):
+        '''Sets an id for particular test session.'''
+        self._session_id = self.generate_id()
+        return self._session_id
+
+    def get_session_id(self):
+        '''Returns current id, assuming set_session_id() is called earlier.'''
+
+        assert self._session_id is not None, "Please use set_session_id()."
+        return self._session_id
 
     def url(self, path):
         '''Gets the full url for :path.'''
@@ -535,7 +545,6 @@ def driver(request, browser_name):
 
         try:
             yield Driver(browser, wait, request.config.option.url,
-                         os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
             if util.CI:

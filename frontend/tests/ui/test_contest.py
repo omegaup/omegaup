@@ -5,26 +5,42 @@
 
 import urllib
 
+import pytest
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 from ui import util
 
 
+@pytest.mark.dependency()
 @util.no_javascript_errors()
 @util.annotate
-def test_create_contest(driver):
-    '''Tests creating a contest and retrieving it.'''
+def test_create_users(driver):
+    '''Tests creation of users.'''
 
-    run_id = driver.generate_id()
-    contest_alias = 'ut_contest_%s' % run_id
-    problem = 'sumas'
+    run_id = driver.set_session_id()
     user1 = 'ut_user_1_%s' % run_id
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
+
+
+@pytest.mark.dependency(depends=["test_create_users[firefox]",
+                                 "test_create_users[chrome]"])
+@util.no_javascript_errors()
+@util.annotate
+def test_create_contest(driver):
+    '''Tests creating a contest and retrieving it.'''
+
+    run_id = driver.get_session_id()
+    contest_alias = 'ut_contest_%s' % run_id
+    problem = 'sumas'
+    user1 = 'ut_user_1_%s' % run_id
+    user2 = 'ut_user_2_%s' % run_id
+    password = 'P@55w0rd'
 
     create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
