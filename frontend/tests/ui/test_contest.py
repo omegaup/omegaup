@@ -32,6 +32,52 @@ def test_create_users(driver):
                                  "test_create_users[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
+def test_create_contest_admin(driver, user):
+    '''Creates a contest as an admin.'''
+
+    run_id = driver.get_session_id()
+    contest_alias = 'ut_contest_%s' % run_id
+    problem = 'sumas'
+    users = ['ut_user_1_%s' % run_id, 'ut_user_2_%s' % run_id]
+
+    with driver.login_admin():
+        create_contest(driver, contest_alias)
+
+        assert (('/contest/%s/edit/' % contest_alias) in
+                driver.browser.current_url), driver.browser.current_url
+
+        add_problem_to_contest(driver, problem)
+
+        add_students_bulk(driver, users)
+        add_students_contest(driver, [driver.user_username])
+
+        contest_url = '/arena/%s' % contest_alias
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[starts-with(@href, "%s")]' % contest_url))).click()
+        assert (contest_alias in
+                driver.browser.current_url), driver.browser.current_url
+
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.ID, 'start-contest-submit'))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "#ranking"]'))).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#ranking')))
+        assert ((contest_url) in
+                driver.browser.current_url), driver.browser.current_url
+
+
+@pytest.mark.dependency(depends=["test_create_contest_admin[firefox]",
+                                 "test_create_contest_admin[chrome]"])
+@util.no_javascript_errors()
+@util.annotate
 def test_create_contest(driver):
     '''Tests creating a contest and retrieving it.'''
 
@@ -42,8 +88,8 @@ def test_create_contest(driver):
     user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
 
-    create_contest_admin(driver, contest_alias, problem, [user1, user2],
-                         driver.user_username)
+    #create_contest_admin(driver, contest_alias, problem, [user1, user2],
+    #                     driver.user_username)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
@@ -83,6 +129,8 @@ def test_create_contest(driver):
         assert run_wrong_user.text == user2, run_wrong_user
 
 
+@pytest.mark.dependency(depends=["test_create_users[firefox]",
+                                 "test_create_users[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
 def test_user_ranking_contest(driver):
@@ -91,12 +139,9 @@ def test_user_ranking_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'utrank_contest_%s' % run_id
     problem = 'sumas'
-    user1 = 'ut_rank_user_1_%s' % run_id
-    user2 = 'ut_rank_user_2_%s' % run_id
+    user1 = 'ut_user_1_%s' % run_id
+    user2 = 'ut_user_2_%s' % run_id
     password = 'P@55w0rd'
-
-    driver.register_user(user1, password)
-    driver.register_user(user2, password)
 
     create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
