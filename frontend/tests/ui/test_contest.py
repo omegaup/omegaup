@@ -97,9 +97,28 @@ def test_create_run_user(driver):
                         verdict='WA', score=0)
 
 
-
 @pytest.mark.dependency(depends=["test_create_create_run_user[firefox]",
                                  "test_create_create_run_user[chrome]"])
+@util.no_javascript_errors()
+@util.annotate
+def test_update_scoreboard(driver):
+    '''Updates the scoreboard for a contest.
+
+    This can be run without a session being active.
+    '''
+
+    run_id = driver.get_session_id()
+    contest_alias = 'ut_contest_%s' % run_id
+
+    scoreboard_refresh_url = driver.url(
+        '/api/scoreboard/refresh/alias/%s/token/secret' %
+        urllib.parse.quote(contest_alias, safe=''))
+    driver.browser.get(scoreboard_refresh_url)
+    assert '{"status":"ok"}' in driver.browser.page_source
+
+
+@pytest.mark.dependency(depends=["test_update_scoreboard[firefox]",
+                                 "test_update_scoreboard[chrome]"])
 @util.no_javascript_errors()
 @util.annotate
 def test_create_contest(driver):
@@ -123,7 +142,7 @@ def test_create_contest(driver):
     #    create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
     #                    verdict='WA', score=0)
 
-    update_scoreboard_for_contest(driver, contest_alias)
+    #update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
         driver.wait.until(
