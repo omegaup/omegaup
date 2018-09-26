@@ -7,11 +7,62 @@ omegaup.OmegaUp.on('ready', function() {
   }
   requiredFields.each(addRemoveErrorClass);
 
+  omegaup.API.Tag.list({query: ''})
+      .then(function(response) {
+        var tags = {};
+        $('#problem-tags a')
+            .each(function(index) { tags[$(this).html()] = true; });
+        response.forEach(function(e) {
+          $('.tag-list')
+              .append($('<a></a>')
+                          .attr('href', '#tags')
+                          .addClass('tag')
+                          .addClass('pull-left')
+                          .text(e.name));
+        });
+        $(document)
+            .on('click', '.tag', function(event) {
+              var tagname = $(this).html();
+              var public = $('#tag-public').val();
+              $(this).remove();
+              $('div.post.footer').show();
+              refreshProblemTags(tagname, public);
+              return false;  // Prevent refresh
+            });
+      })
+      .fail(omegaup.UI.apiError);
+
+  function refreshProblemTags(tagname, public) {
+    $('#problem-tags')
+        .append(
+            $('<tr></tr>')
+                .append(
+                    $('<td class="tag-name"></td>')
+                        .append($('<a></a>')
+                                    .attr('href', '/problem/?tag[]=' + tagname)
+                                    .text(tagname)))
+                .append($('<td class="is-public"></td>').text(public))
+                .append($('<td><button type="button" class="close">' +
+                          '&times;</button></td>')
+                            .on('click', (function(tagname) {
+                                  return function(e) {
+                                    $('div.post.footer').show();
+                                    var tr =
+                                        e.target.parentElement.parentElement;
+                                    $('.tag-list')
+                                        .append('<a href="#tags" ' +
+                                                'class="tag pull-left">' +
+                                                $(tr).find('a').html() +
+                                                '</a>');
+                                    $(tr).remove();
+                                  };
+                                })(tagname))));
+  }
+
   $('#problem-form')
       .on('submit', function() {
         $('.has-error').removeClass('has-error');
         var errors = false;
-
         requiredFields.each(function(inputId) {
           var input = $(inputId);
           if (input.val() == '') {
@@ -30,6 +81,15 @@ omegaup.OmegaUp.on('ready', function() {
           // the rest of the form.
           visibilityFields.attr('name', '');
         }
+        var selectedTags = {};
+        $('#problem-tags tr')
+            .each(function(index) {
+              selectedTags[index] = {};
+              selectedTags[index].tagname =
+                  $(this).find('td.tag-name').find('a').html();
+              selectedTags[index].public = $(this).find('td.is-public').html();
+            });
+        $('#selected-tags').val(JSON.stringify(selectedTags));
       });
 
   function addRemoveErrorClass(inputId) {
