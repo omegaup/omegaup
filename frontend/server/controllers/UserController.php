@@ -2550,6 +2550,8 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAssociateIdentity(Request $r) {
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['username'], 'username');
@@ -2586,6 +2588,8 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssociatedIdentities(Request $r) {
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         try {
