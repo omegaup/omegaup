@@ -171,6 +171,23 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         // Selecting one user as coder of the month
         $login = self::login($mentor);
+
+        // Call api. This should fail.
+        try {
+            $response = UserController::apiSelectCoderOfTheMonth(new Request([
+                'auth_token' => $login->auth_token,
+                'username' => $user3->username,
+            ]));
+            $this->fail('Exception was expected, because date is not in the range to select coder');
+        } catch (ForbiddenAccessException $e) {
+            // Pass
+        }
+
+        // Changing date with valid range
+        $runCreationDate = date('Y-' . ($currentMonth + 2) . '-t');
+        Time::setTimeForTesting(strtotime($runCreationDate));
+
+        // Call api again.
         $response = UserController::apiSelectCoderOfTheMonth(new Request([
             'auth_token' => $login->auth_token,
             'username' => $user3->username,

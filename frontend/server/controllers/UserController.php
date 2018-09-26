@@ -1446,13 +1446,13 @@ class UserController extends Controller {
      */
     public static function apiSelectCoderOfTheMonth(Request $r) {
         self::authenticateRequest($r);
+        $currentTimestamp = Time::get();
 
-        if (!Authorization::isMentor($r['current_identity_id'])) {
+        if (!Authorization::isMentor($r['current_identity_id']) || !Authorization::canChooseCoder($currentTimestamp)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         Validators::isStringNonEmpty($r['username'], 'username');
 
-        $currentTimestamp = Time::get();
         $runCreationDate = date('Y-m-d', $currentTimestamp);
         $firstDayOfMonth = new DateTime($runCreationDate);
         $firstDayOfMonth->modify('first day of this month');
