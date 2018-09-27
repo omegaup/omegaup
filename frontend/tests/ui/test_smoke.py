@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 from ui import util
+OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 
 @util.no_javascript_errors()
@@ -76,12 +77,36 @@ def test_create_problem(driver):
         runs_before_submit = driver.browser.find_elements_by_xpath(
             '//td[@class="status"]')
 
-        util.create_run(driver, problem_alias, 'Main.java')
+        filename = 'Main.java'
+        util.create_run(driver, problem_alias, filename)
 
         runs_after_submit = driver.browser.find_elements_by_xpath(
             '//td[@class="status"]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//button[contains(@class, "details")]'))).click()
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, '//form[@class="run-details-view"]')))
+
+        textareas = driver.browser.find_elements_by_xpath(
+            '//div[@class="CodeMirror-code"]')
+
+        assert textareas[1].text is not None
+
+        resource_path = os.path.join(OMEGAUP_ROOT,
+                                     'frontend/tests/resources/%s' % filename)
+        with open(resource_path, 'r') as f:
+            for row in f.read().splitlines():
+                if row is not None:
+                    assert (row in textareas[1].text), row
+
+        driver.browser.find_element_by_id('overlay').click()
 
 
 # Creating a problem intentionally attempts to get the details of a problem to
