@@ -471,7 +471,66 @@ class CreateProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Basic test for uploadin problem without statement
+     * Basic test for creating a problem
+     */
+    public function testCreateProblemWithTags() {
+        // Get the problem data
+        $problemData = ProblemsFactory::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = '{"0":{"tagname":"math","public":"1"},"1":{"tagname":"geometry","public":"0"}}';
+        $selectedTags = (array)json_decode($r['selected_tags']);
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+        // Call the API
+        ProblemController::apiCreate($r);
+
+        $tags = ProblemController::apiTags(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]))['tags'];
+
+        foreach ($selectedTags as $selectedTag) {
+            $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
+                return $tag['name'] == $selectedTag->tagname;
+            });
+        }
+    }
+
+    /**
+     * Basic test for creating a problem with wrong attribute
+     */
+    public function testCreateProblemTagsWithWrongAttribute() {
+        // Get the problem data
+        $problemData = ProblemsFactory::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = '{"0":{"name":"math","public":"1"},"1":{"tagname":"geometry","public":"0"}}';
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+        try {
+            // Call the API
+            $response = ProblemController::apiCreate($r);
+            $this->fail('Exception was expected. Wrong attribute');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'invalidParameters');
+        }
+    }
+
+    /**
+     * Basic test for uploading problem without statement
      *
      * @expectedException InvalidParameterException
      */
