@@ -1401,7 +1401,8 @@ export class Arena {
 
   onCloseSubmit(e) {
     let self = this;
-    if (e.target.id === 'overlay' || e.target.className === 'close') {
+    if (e.target.id === 'overlay' || e.target.className === 'close' ||
+        e.target.parentElement.parentElement.className == 'close') {
       $('#clarification', self.elements.submitForm).hide();
       self.hideOverlay();
       self.clearInputFile();
