@@ -20,8 +20,8 @@ require_once('base/Coder_Of_The_Month.vo.base.php');
  */
 class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     /**
-     * Gets the user that solved more problems during last month or this month
-     * when mentor is reviewing
+     * Gets the users that solved the most problems during the provided
+     * time period.
      *
      * @global type $conn
      * @param string (date) $startTime
