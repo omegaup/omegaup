@@ -81,7 +81,7 @@ class RunsFactory {
         if (!is_null($courseAssignmentData)) {
             return new Request([
                 'auth_token' => $login->auth_token,
-                'assignment_alias' => $courseAssignmentData['request']['alias'],
+                'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
                 'problem_alias' => $problemData['problem']->alias,
                 'language' => 'c',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
