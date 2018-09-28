@@ -100,6 +100,8 @@ def test_create_problem(driver):
 
         resource_path = os.path.join(util.OMEGAUP_ROOT,
                                      'frontend/tests/resources', filename)
+        # The text of the CodeMirror editor contains the line number.
+        # Non-exact match is needed.
         with open(resource_path, 'r') as f:
             for row in f.read().splitlines():
                 if row is not None:
