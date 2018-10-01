@@ -271,4 +271,50 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals(1, count(CoursesDAO::findByName($r['name'])));
         $this->assertEquals($school->name, CourseController::apiDetails($r)['school_name']);
     }
+
+    /**
+     * Test updating show_scoreboard attribute in the Course object
+     */
+    public function testUpdateCourseShowScoreboard() {
+        $admin = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($admin);
+
+        // Creating a course with one assignment and turning on show_scoreboard flag
+        $courseData = CoursesFactory::createCourseWithOneAssignment($admin, $adminLogin, null, null, 'true');
+        $group = GroupsDAO::getByPK($courseData['request']['course']->group_id);
+        // User not linked to course
+        $user = UserFactory::createUser();
+        $identityUser = IdentitiesDAO::getByPK($user->main_identity_id);
+        // User linked to course
+        $student = UserFactory::createUser();
+        $identityStudent = IdentitiesDAO::getByPK($student->main_identity_id);
+        $response = CourseController::apiAddStudent(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
+        $studentLogin = OmegaupTestCase::login($student);
+        // Scoreboard have to be visible to associated user
+        $this->assertTrue(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
+        // But, Scoreboard shouldn't  be visible to unassociated user
+        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+
+        // Turning off show_scoreboard flag
+        CourseController::apiUpdate(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => 'false',
+        ]));
+
+        $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
+
+        // Scoreboard shouldn't be visible to associated or unassociated user
+        $this->assertFalse(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
+        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+    }
 }

@@ -271,6 +271,8 @@ export default {
 
     removeStudent: _call('/api/course/removeStudent/'),
 
+    runs: _call('/api/course/runs/', _convertRuntimes),
+
     studentProgress: _call('/api/course/studentProgress/',
                            function(result) {
                              for (var problem of result.problems) {
@@ -360,6 +362,12 @@ export default {
     details: _call('/api/groupScoreboard/details/'),
 
     removeContest: _call('/api/groupScoreboard/removeContest/'),
+  },
+
+  Identity: {
+    create: _call('/api/identity/create/'),
+
+    bulkCreate: _call('/api/identity/bulkCreate/'),
   },
 
   Interview: {

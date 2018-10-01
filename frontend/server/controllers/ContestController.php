@@ -638,6 +638,7 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
+            $result['show_scoreboard_after'] = $result['show_scoreboard_after'] == '1';
             $result['original_contest_alias'] = null;
             $result['original_problemset_id'] = null;
             if ($result['rerun_id'] != 0) {
@@ -1025,7 +1026,7 @@ class ContestController extends Controller {
         $contest->description = $r['description'];
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
-        $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
+        $contest->window_length = empty($r['window_length']) ? null : $r['window_length'];
         $contest->rerun_id = 0;
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
@@ -1039,7 +1040,7 @@ class ContestController extends Controller {
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
 
         if (!is_null($r['show_scoreboard_after'])) {
-            $contest->show_scoreboard_after = $r['show_scoreboard_after'];
+            $contest->show_scoreboard_after = $r['show_scoreboard_after'] == 'true';
         } else {
             $contest->show_scoreboard_after = '1';
         }
@@ -1117,7 +1118,7 @@ class ContestController extends Controller {
         }
 
         // Window_length is optional
-        if (!is_null($r['window_length']) && $r['window_length'] !== 'NULL') {
+        if (!empty($r['window_length'])) {
             Validators::isNumberInRange(
                 $r['window_length'],
                 'window_length',
@@ -1168,7 +1169,7 @@ class ContestController extends Controller {
         }
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
+        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
 
         // languages is always optional
         if (!empty($r['languages'])) {
@@ -2231,19 +2232,21 @@ class ContestController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'window_length' => ['transform' => function ($value) {
-                return $value == 'NULL' ? null : $value;
+                return empty($value) ? null : $value;
             }],
             'scoreboard',
             'points_decay_factor',
             'partial_score',
             'submissions_gap',
             'feedback',
-            'penalty'               => ['transform' => function ($value) {
+            'penalty' => ['transform' => function ($value) {
                 return max(0, intval($value));
             }],
             'penalty_type',
             'penalty_calc_policy',
-            'show_scoreboard_after',
+            'show_scoreboard_after' => ['transform' => function ($value) {
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            }],
             'languages' => ['transform' => function ($value) {
                 if (!is_array($value)) {
                     return $value;
