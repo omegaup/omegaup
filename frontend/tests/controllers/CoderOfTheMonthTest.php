@@ -65,7 +65,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->assertEquals($userLastYear->username, $responseCoder['userinfo']['username']);
     }
 
-    private function createRuns($user, $runCreationDate, $n) {
+    private function createRuns($user = null, $runCreationDate = null, $n = 5) {
+        if (!$user) {
+            $user = UserFactory::createUser();
+        }
+        if (!$runCreationDate) {
+            $runCreationDate = date('Y-m-d', Time::get());
+        }
         $contest = ContestsFactory::createContest();
         $problem = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problem, $contest);
@@ -134,5 +140,54 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
             $this->assertArrayNotHasKey('email', $profile['userinfo']);
         }
+    }
+
+    /**
+     * Mentor can choose the coder of the month only the last day
+     * of the current month or the first day of the next month
+     */
+    public function testMentorCanChooseCoderOfTheMonth() {
+        // Creating runs for 3 users
+        $this->createRuns();
+        $this->createRuns(null, null, 3);
+        $this->createRuns(null, null, 2);
+
+        $mentor = UserFactory::createMentorIdentity();
+
+        $login = self::login($mentor);
+        $this->assertTrue(Authorization::isMentor($mentor->main_identity_id));
+
+        // Testing with the current date
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $lastDayOfMonth = new DateTime($currentDate);
+        $lastDayOfMonth->modify('last day of this month');
+        $date = new DateTime('now');
+        $date->modify('last day of this month');
+        $lastDayOfMonth = $date->format('Y-m-d');
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertEquals(3, count($coders));
+
+        // Setting the date to the last day of the currrent month and testing mentor can choose the coder
+        Time::setTimeForTesting($date->getTimestamp());
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertEquals(3, count($coders));
+
+        // Setting the date to the first day of the next month and testing mentor can not choose the coder
+        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
+        $this->assertNull($coders);
+
+        // Setting the date to the second day of the next month and testing mentor can not choose the coder
+        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
+        $currentDateTimestamp = Time::get();
+        $currentDate = date('Y-m-d', $currentDateTimestamp);
+        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
+        // No runs to calculate the coder for this month
+        $this->assertNull($coders);
     }
 }
