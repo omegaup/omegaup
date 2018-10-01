@@ -169,6 +169,8 @@ export default {
 
     removeUser: _call('/api/contest/removeUser/'),
 
+    requests: _call('/api/contest/requests/'),
+
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
     scoreboard: _call('/api/contest/scoreboard/'),

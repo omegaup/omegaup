@@ -16,7 +16,8 @@
           v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{T.wordsAddProblem}}</a>
       </li>
-      <li v-if="!virtual"
+      <li class="admission-mode"
+          v-if="!virtual"
           v-on:click="showTab = 'publish'">
         <a data-toggle="tab">{{T.contestNewFormAdmissionMode}}</a>
       </li>
@@ -57,6 +58,7 @@
       <div class="tab-pane active contestants"
            v-if="showTab === 'contestants'">
         <omegaup-contest-contestant v-bind:data="users"></omegaup-contest-contestant>
+        <omegaup-contest-requests v-bind:data="requests"></omegaup-contest-requests>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
@@ -84,6 +86,7 @@ import contest_AddProblem from './AddProblem.vue';
 import contest_Admins from './Admins.vue';
 import contest_Clone from './Clone.vue';
 import contest_Contestant from './Contestant.vue';
+import contest_Requests from './Requests.vue';
 import contest_GroupAdmins from './GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
@@ -101,6 +104,7 @@ export default {
       contest: this.data.contest,
       problems: this.data.problems,
       users: this.data.users,
+      requests: this.data.requests,
       admins: this.data.admins,
       groupAdmins: this.data.groupAdmins,
     };
@@ -110,6 +114,7 @@ export default {
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-contestant': contest_Contestant,
+    'omegaup-contest-requests': contest_Requests,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
