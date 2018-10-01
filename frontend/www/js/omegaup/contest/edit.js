@@ -19,13 +19,11 @@ OmegaUp.on('ready', function() {
   $.when(API.Contest.adminDetails({contest_alias: contestAlias}),
          API.Contest.problems({contest_alias: contestAlias}),
          API.Contest.users({contest_alias: contestAlias}),
-         API.Contest.requests({contest_alias: contestAlias}),
          API.Contest.admins({contest_alias: contestAlias}), )
-      .done((contest, problems, users, requests, admins) => {
+      .done((contest, problems, users, admins) => {
         problems = problems.problems;
         users = users.users;
         let groupAdmins = admins.group_admins;
-        requests = requests.users;
         admins = admins.admins;
         let contest_edit = new Vue({
           el: '#contest-edit',
@@ -36,16 +34,11 @@ OmegaUp.on('ready', function() {
                   contest: contest,
                   problems: problems,
                   users: users,
-                  requests: requests,
                   admins: admins,
                   groupAdmins: groupAdmins,
                 }
               },
               on: {
-                'accept-request':
-                    (ev, username) => this.arbitrateRequest(ev, username, true),
-                'deny-request': (ev, username) =>
-                                    this.arbitrateRequest(ev, username, false),
                 'update-contest': function(ev) {
                   API.Contest
                       .update({
@@ -210,21 +203,6 @@ OmegaUp.on('ready', function() {
                 },
               },
             });
-          },
-          methods: {
-            arbitrateRequest: function(ev, username, resolution) {
-              omegaup.API.Contest.arbitrateRequest({
-                                   contest_alias: contestAlias,
-                                   username: username,
-                                   resolution: resolution,
-                                   note: '',
-                                 })
-                  .then(function(response) {
-                    UI.success(T.successfulOperation);
-                    refresh(ev, API.Contest.requests, 'requests', 'users');
-                  })
-                  .fail(UI.apiError);
-            },
           },
           components: {
             'omegaup-contest-edit': contest_Edit,
