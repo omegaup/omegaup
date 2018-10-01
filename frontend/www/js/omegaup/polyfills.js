@@ -20,6 +20,7 @@ if (window.Node && !window.Node.prototype.innerText && Object.defineProperty) {
   });
 }
 
+// From https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
 if (window.Element && !Element.prototype.closest) {
   Element.prototype.closest = function(s) {
     var matches = (this.document || this.ownerDocument).querySelectorAll(s), i,

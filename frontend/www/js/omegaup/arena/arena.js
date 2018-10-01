@@ -1401,12 +1401,14 @@ export class Arena {
 
   onCloseSubmit(e) {
     let self = this;
-    if (e.target.id === 'overlay' || e.target.closest('.close') !== null) {
-      $('#clarification', self.elements.submitForm).hide();
-      self.hideOverlay();
-      self.clearInputFile();
-      return false;
+    if (e.target.id !== 'overlay' &&
+        e.target.closest('button.close') === null) {
+      return;
     }
+    $('#clarification', self.elements.submitForm).hide();
+    self.hideOverlay();
+    self.clearInputFile();
+    return false;
   }
 
   clearInputFile() {
