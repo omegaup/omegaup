@@ -482,8 +482,10 @@ class CreateProblemTest extends OmegaupTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-        $r['selected_tags'] = '{"0":{"tagname":"math","public":"1"},"1":{"tagname":"geometry","public":"0"}}';
-        $selectedTags = (array)json_decode($r['selected_tags']);
+        $r['selected_tags'] = json_encode([
+            ['tagname' => 'math', 'public' => true],
+            ['tagname' => 'geometry', 'public' => false],
+        ]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -496,7 +498,7 @@ class CreateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]))['tags'];
 
-        foreach ($selectedTags as $selectedTag) {
+        foreach ($r['selected_tags'] as $selectedTag) {
             $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
                 return $tag['name'] == $selectedTag->tagname;
             });
@@ -515,7 +517,10 @@ class CreateProblemTest extends OmegaupTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-        $r['selected_tags'] = '{"0":{"name":"math","public":"1"},"1":{"tagname":"geometry","public":"0"}}';
+        $r['selected_tags'] = json_encode([
+            ['name' => 'math', 'public' => true],
+            ['tagname' => 'geometry', 'public' => false],
+        ]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -525,7 +530,7 @@ class CreateProblemTest extends OmegaupTestCase {
             $response = ProblemController::apiCreate($r);
             $this->fail('Exception was expected. Wrong attribute');
         } catch (InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'invalidParameters');
+            $this->assertEquals($e->getMessage(), 'parameterEmpty');
         }
     }
 

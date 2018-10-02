@@ -11,7 +11,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(response) {
         var tags = {};
         $('#problem-tags a')
-            .each(function(index) { tags[$(this).html()] = true; });
+            .each(function(index) { tags[$(this).text()] = true; });
         response.forEach(function(e) {
           $('.tag-list')
               .append($('<a></a>')
@@ -22,8 +22,8 @@ omegaup.OmegaUp.on('ready', function() {
         });
         $(document)
             .on('click', '.tag', function(event) {
-              var tagname = $(this).html();
-              var public = $('#tag-public').val();
+              var tagname = $(this).text();
+              var public = $('#tag-public').val() == 'true';
               $(this).remove();
               $('div.post.footer').show();
               refreshProblemTags(tagname, public);
@@ -52,7 +52,7 @@ omegaup.OmegaUp.on('ready', function() {
                                     $('.tag-list')
                                         .append('<a href="#tags" ' +
                                                 'class="tag pull-left">' +
-                                                $(tr).find('a').html() +
+                                                $(tr).find('a').text() +
                                                 '</a>');
                                     $(tr).remove();
                                   };
@@ -81,13 +81,13 @@ omegaup.OmegaUp.on('ready', function() {
           // the rest of the form.
           visibilityFields.attr('name', '');
         }
-        var selectedTags = {};
+        var selectedTags = [];
         $('#problem-tags tr')
             .each(function(index) {
-              selectedTags[index] = {};
-              selectedTags[index].tagname =
-                  $(this).find('td.tag-name').find('a').html();
-              selectedTags[index].public = $(this).find('td.is-public').html();
+              selectedTags.push({
+                tagname: $(this).find('td.tag-name').find('a').text(),
+                public: $(this).find('td.is-public').text(),
+              });
             });
         $('#selected-tags').val(JSON.stringify(selectedTags));
       });
