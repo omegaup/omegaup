@@ -910,6 +910,33 @@ class UserController extends Controller {
             $keys =  [
                 'Pr8oUAIE' => 20
             ];
+        } elseif ($r['contest_type'] == 'OMIZAC') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIZAC-Prim' => 60,
+                'OMIZAC-Sec' => 60,
+                'OMIZAC-Prepa' => 60
+            ];
+        } elseif ($r['contest_type'] == 'ProgUAIE') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'MS-UAIE' => 60,
+                'Prim-UAIE' => 40,
+                'Sec-UAUE' => 40,
+                'ICPC-UAIE' => 45,
+                'Prim-UAIE-Jalpa' => 30,
+                'Sec-UAIE-Jalpa' => 30
+            ];
         } elseif ($r['contest_type'] == 'OMIAGS-2018') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
@@ -1059,7 +1086,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE',
                 ]
             );
         }
