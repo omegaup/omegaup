@@ -20,60 +20,61 @@ require_once('base/Coder_Of_The_Month.vo.base.php');
  */
 class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     /**
-     * Gets the user that solved more problems during last month
+     * Gets the users that solved the most problems during the provided
+     * time period.
      *
      * @global type $conn
-     * @param string (date) $firstDay
+     * @param string (date) $startTime
+     * @param string (date) $endTime
      * @return null|Users
      */
-    public static function calculateCoderOfTheMonth($firstDay) {
-        $endTime = $firstDay;
-        $startTime = null;
-        $date = explode('-', $firstDay);
-        $year = $date[0];
-        $month = $date[1];
-
-        $lastMonth = $month - 1;
-
-        if ($lastMonth === 0) {
-            // First month of the year, we need to check into last month of last year.
-            $lastYear = $year - 1;
-            $startTime = date($lastYear . '-12-01');
-        } else {
-            $startTime = date($year . '-' . $lastMonth . '-01');
-        }
-
+    public static function calculateCoderOfTheMonth($startTime, $endTime) {
         $sql = "
-			SELECT DISTINCT
-				i.user_id, i.username, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
-			FROM
-				(
-					SELECT DISTINCT
-						r.identity_id, r.problem_id
-					FROM
-						Runs r
-					WHERE
-						r.verdict = 'AC' AND r.type= 'normal' AND
-						r.time >= ? AND
-						r.time <= ?
-				) AS up
-			INNER JOIN
-				Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
-			INNER JOIN
-				Identities i ON i.identity_id = up.identity_id
-      LEFT JOIN
-        (SELECT user_id, MAX(time) latest_time, selected_by FROM Coder_Of_The_Month WHERE selected_by IS NOT NULL GROUP BY user_id, selected_by) AS cm on i.user_id = cm.user_id
-      LEFT JOIN
-        (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id = com.user_id
-			WHERE
-				(cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
-        AND com.user_id IS NULL
-			GROUP BY
-				up.identity_id
-			ORDER BY
-				score DESC
-			LIMIT 100
-		";
+    			SELECT DISTINCT
+    				i.user_id, i.username, i.country_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
+            (SELECT urc.classname FROM
+                    User_Rank_Cutoffs urc
+                WHERE
+                    urc.score <= (
+                            SELECT
+                                ur.score
+                            FROM
+                                User_Rank ur
+                            WHERE
+                                ur.user_id = i.user_id
+                        )
+                ORDER BY
+                    urc.percentile ASC
+                LIMIT
+                    1) classname
+    			FROM
+    				(
+    					SELECT DISTINCT
+    						r.identity_id, r.problem_id
+    					FROM
+    						Runs r
+    					WHERE
+    						r.verdict = 'AC' AND r.type= 'normal' AND
+    						r.time >= ? AND
+    						r.time <= ?
+    				) AS up
+    			INNER JOIN
+    				Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
+    			INNER JOIN
+    				Identities i ON i.identity_id = up.identity_id
+          LEFT JOIN
+            (SELECT user_id, MAX(time) latest_time, selected_by FROM Coder_Of_The_Month GROUP BY user_id, selected_by) AS cm on i.user_id = cm.user_id
+          LEFT JOIN
+            (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id = com.user_id
+    			WHERE
+    				(cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
+            AND com.user_id IS NULL
+    			GROUP BY
+    				up.identity_id
+    			ORDER BY
+    				score DESC
+    			LIMIT 100
+    		";
 
         $val = [$startTime, $endTime, $endTime, $endTime];
 
@@ -82,7 +83,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         if (count($results) == 0) {
             return null;
         }
-
         return $results;
     }
 
@@ -173,7 +173,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndSelected($time) {
+    final public static function getByTimeAndSelected($time, $autoselected = false) {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
                 FROM
@@ -181,8 +182,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `selected_by` IS NOT NULL;';
-
+                    `selected_by` ' . $clause . ';';
         global $conn;
         $rs = $conn->Execute($sql, [$time]);
 
@@ -211,36 +211,12 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $coders;
     }
 
-    /**
-     * One coder is selected, when parameters are not received
-     * means that coder was selected by default
-     *
-     * @param $username
-     * @param identity_id
-     * @return Affected_Rows
-     */
-    public static function selectCoder($username = null, $identity_id = null) {
-        $curdate = date('Y-m-d', Time::get());
-        if (is_null($username) && is_null($identity_id)) {
-            $identity_clause = '(SELECT identity_id FROM Identities WHERE username = \'admin\' OR username = \'admintest\')';
-            $clause = '`rank` = 1';
-            $params = [$curdate];
-        } else {
-            $identity_clause = '?';
-            $clause = '`user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1)';
-            $params = [$identity_id, $curdate, $username];
-        }
-        $sql = '
-          UPDATE
-            `Coder_Of_The_Month`
-          SET
-            `selected_by` = ' . $identity_clause . '
-          WHERE
-            `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
-            AND ' . $clause . ';';
-
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+    public static function calculateCoderOfLastMonth($currentDate) {
+        $date = new DateTime($currentDate);
+        $firstDayOfLastMonth = $date->modify('first day of last month');
+        $startTime = $firstDayOfLastMonth->format('Y-m-d');
+        $firstDayOfCurrentMonth = $date->modify('first day of next month');
+        $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
+        return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
 }

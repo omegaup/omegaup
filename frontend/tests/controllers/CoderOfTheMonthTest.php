@@ -70,7 +70,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->assertEquals($userLastYear->username, $responseCoder['userinfo']['username']);
     }
 
-    private function createRuns($user, $runCreationDate, $n) {
+    private function createRuns($user = null, $runCreationDate = null, $n = 5) {
+        if (!$user) {
+            $user = UserFactory::createUser();
+        }
+        if (!$runCreationDate) {
+            $runCreationDate = date('Y-m-d', Time::get());
+        }
         $contest = ContestsFactory::createContest();
         $problem = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problem, $contest);
@@ -196,5 +202,51 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $response = UserController::apiCoderOfTheMonth(new Request([]));
         $this->assertNotNull($response['userinfo'], 'A user has been selected by a mentor');
         $this->assertEquals($response['userinfo']['username'], $user3->username);
+    }
+
+    /**
+     * Mentor can choose the coder of the month only the last day
+     * of the current month or the first day of the next month
+     */
+    public function testMentorCanChooseCoderOfTheMonth() {
+        // Creating runs for 3 users
+        $this->createRuns();
+        $this->createRuns(null, null, 3);
+        $this->createRuns(null, null, 2);
+
+        $mentor = UserFactory::createMentorIdentity();
+
+        $login = self::login($mentor);
+        $this->assertTrue(Authorization::isMentor($mentor->main_identity_id));
+
+        // Testing with an intermediate day of the month
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-15', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
+
+        // Setting the date to the last day of the current month and testing mentor can choose the coder
+        $date = new DateTime('now');
+        $date->modify('last day of this month');
+        $date->format('Y-m-d');
+        Time::setTimeForTesting($date->getTimestamp());
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertTrue($canChooseCoder);
+
+        // Setting the date to the first day of the next month and testing mentor can not choose the coder
+        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
+
+        // Setting the date to the second day of the next month and testing mentor can not choose the coder
+        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
     }
 }
