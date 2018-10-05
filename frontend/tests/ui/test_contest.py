@@ -59,11 +59,11 @@ def test_create_contest(driver):
                       contest_alias)))).click()
 
         run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
+            '//td[contains(@class, "accepted")]/preceding-sibling::td[1]')
         assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
+            '//td[contains(@class, "wrong")]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
 
 
@@ -116,12 +116,93 @@ def test_user_ranking_contest(driver):
                 (By.CSS_SELECTOR, '#ranking')))
 
         run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
+            '//td[contains(@class, "accepted")]/preceding-sibling::td[1]')
         assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
+            '//td[contains(@class, "wrong")]/preceding-sibling::td[1]')
         assert run_wrong_user.text == user2, run_wrong_user
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '.navbar-brand'))).click()
+
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.ID, 'nav-contests'))).click()
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[@href = "/contest/%s/edit/"]' % contest_alias))).click()
+        scoreboard_element = driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '.scoreboard-time-percent')))
+        scoreboard_element.clear()
+        scoreboard_element.send_keys('0')
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, '//button[@type = "submit"]')))
+        driver.browser.find_element_by_tag_name('form').submit()
+
+    with driver.login(driver.user_username, 'user'):
+        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                        verdict='AC', score=1)
+
+        driver.browser.find_element_by_id('overlay').click()
+
+        check_ranking(driver, problem, driver.user_username, score='0')
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '.navbar-brand'))).click()
+
+        contest_url = '/arena/%s' % contest_alias
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[starts-with(@href, "%s")]' % contest_url))).click()
+
+        check_ranking(driver, problem, driver.user_username, score='0')
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "#problems"]'))).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#problems')))
+
+        driver.browser.find_element_by_xpath(
+            '//a[contains(@href, "problems/%s")]' % problem).click()
+
+        check_ranking(driver, problem, driver.user_username, score='100')
+
+
+@util.annotate
+def check_ranking(driver, problem, user, *, score):
+    ''' Check ranking for a contest'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#ranking"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#ranking')))
+
+    ranking_problem = driver.browser.find_element_by_xpath(
+        '//tr[@class = "%s"]/td[contains(@class, "%s")]/div[@class = "points"]'
+        % (user, problem))
+
+    assert ranking_problem.text == score, ranking_problem
 
 
 @util.annotate

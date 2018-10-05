@@ -1777,8 +1777,11 @@ export class Arena {
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
     $('.problem_' + alias + ' .solved')
-        .html('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
+        .text('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
               maxScore + ')');
+    $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
+      ' .points')
+        .text(self.myRuns.getMaxScore(alias, previousScore))
   }
 }
 ;
