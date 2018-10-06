@@ -1480,13 +1480,15 @@ class CourseController extends Controller {
         }
         $r['assignment']->toUnixTime();
 
-        Validators::isNumberInRange(
-            $r['start_time'],
-            'start_time',
-            $course_start_time,
-            $course_finish_time,
-            $is_required
-        );
+        if (!$is_update) {
+            Validators::isNumberInRange(
+                $r['start_time'],
+                'start_time',
+                $course_start_time,
+                $course_finish_time,
+                $is_required
+            );
+        }
         Validators::isNumberInRange(
             $r['finish_time'],
             'finish_time',
