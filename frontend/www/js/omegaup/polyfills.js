@@ -21,12 +21,13 @@ if (window.Node && !window.Node.prototype.innerText && Object.defineProperty) {
 }
 
 // From https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
-if (window.Element && !Element.prototype.matches)
-  Element.prototype.matches = Element.prototype.msMatchesSelector ||
-                              Element.prototype.webkitMatchesSelector;
+if (window.Element && !window.Element.prototype.matches)
+  window.Element.prototype.matches =
+      window.Element.prototype.msMatchesSelector ||
+      window.Element.prototype.webkitMatchesSelector;
 
-if (window.Element && !Element.prototype.closest) {
-  Element.prototype.closest = function(s) {
+if (window.Element && !window.Element.prototype.closest) {
+  window.Element.prototype.closest = function(s) {
     var el = this;
     if (!document.documentElement.contains(el)) return null;
     do {
