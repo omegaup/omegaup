@@ -530,6 +530,8 @@ export default {
 
     addGroup: _call('/api/user/addgroup/'),
 
+    associateIdentity: _call('/api/user/associateIdentity/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -553,6 +555,8 @@ export default {
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
+
+    listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 
