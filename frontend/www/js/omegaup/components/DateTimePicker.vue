@@ -1,7 +1,8 @@
 <template>
   <input class="form-control"
         size="16"
-        type="text">
+        type="text"
+        v-bind:disabled="update">
 </template>
 
 <script>
@@ -9,6 +10,7 @@ import {T} from '../omegaup.js';
 export default {
   props: {
     value: Date,
+    update: Boolean,
     format: {
       type: String,
       'default': T.dateTimePickerFormat,

@@ -99,7 +99,10 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::isNumber($r['start_time'], 'start_time', !$is_update);
+        // Validate only when create
+        if (!$is_update) {
+            Validators::isNumber($r['start_time'], 'start_time', !$is_update);
+        }
         Validators::isNumber($r['finish_time'], 'finish_time', !$is_update);
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
@@ -409,7 +412,7 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAssignmentDetails($r, true /*is_required*/);
+        self::validateAssignmentDetails($r, true /*is_required*/, true /*is_update*/);
 
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             throw new ForbiddenAccessException();
@@ -418,9 +421,8 @@ class CourseController extends Controller {
         Validators::isNumber($r['start_time'], 'start_time', false /*is_required*/);
         Validators::isNumber($r['finish_time'], 'finish_time', false /*is_required*/);
 
-        if (is_null($r['start_time'])) {
-            $r['start_time'] = $r['assignment']->start_time;
-        }
+        // Force start time with original value
+        $r['start_time'] = $r['assignment']->start_time;
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $r['assignment']->finish_time;
         }
@@ -1463,7 +1465,7 @@ class CourseController extends Controller {
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
-    private static function validateAssignmentDetails(Request $r, $is_required = false) {
+    private static function validateAssignmentDetails(Request $r, $is_required = false, $is_update = false) {
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
