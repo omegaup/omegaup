@@ -530,27 +530,6 @@ class RunsDAO extends RunsDAOBase {
         }
     }
 
-    /*
-	 * Get runs of an identity with verdict eq AC
-	 */
-    final public static function GetRunsByUser($identity_id) {
-        // SQL sentence
-        $sql = "SELECT DISTINCT * FROM Runs WHERE identity_id = ? AND verdict = 'AC'";
-        $val = [$identity_id];
-
-        global $conn;
-        //Get the rows
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        //Wrap every row in a Runs object
-        foreach ($rs as $iter) {
-            $run = new Runs($iter);
-            array_push($ar, $run);
-        }
-        return $ar;
-    }
-
     final public static function getByContest($contest_id) {
         $sql = 'SELECT
                     `run_id`,

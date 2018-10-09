@@ -904,8 +904,21 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
+        // Get user if we have something in username
+        if (!is_null($r['username'])) {
+            try {
+                $r['identity'] = IdentityController::resolveIdentity($r['username']);
+            } catch (NotFoundException $e) {
+                // If not found, simply ignore it
+                $r['username'] = null;
+                $r['identity'] = null;
+            }
+        }
+
         if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            if (is_null($r['identity']) || $r['current_identity_id'] !== $r['identity']->identity_id) {
+                throw new ForbiddenAccessException('userNotAllowed');
+            }
         }
 
         Validators::isNumber($r['offset'], 'offset', false);
@@ -935,17 +948,6 @@ class RunController extends Controller {
             array_keys(RunController::$kSupportedLanguages),
             false
         );
-
-        // Get user if we have something in username
-        if (!is_null($r['username'])) {
-            try {
-                $r['identity'] = IdentityController::resolveIdentity($r['username']);
-            } catch (NotFoundException $e) {
-                // If not found, simply ignore it
-                $r['username'] = null;
-                $r['identity'] = null;
-            }
-        }
     }
 
     /**
