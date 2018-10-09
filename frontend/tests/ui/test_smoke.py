@@ -110,10 +110,6 @@ def test_create_problem(driver):
         driver.browser.find_element_by_id('overlay').click()
 
 
-# Creating a problem intentionally attempts to get the details of a problem to
-# see if the alias is being used already.
-@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
-                           message_whitelist=('/api/problem/details/',))
 @util.annotate
 def create_problem(driver, problem_alias):
     '''Create a problem.'''

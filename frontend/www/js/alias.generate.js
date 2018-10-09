@@ -19,10 +19,13 @@ omegaup.OmegaUp.on('ready', function() {
   var existsFn = null;
   var aliasLength = 0;
 
-  function onAliasExists() {
-    omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) +
-                     '" ya existe. Elige otro nombre');
-    $('#alias').trigger('focus');
+  function onAliasExists(data) {
+    if (data.exists) {
+      omegaup.UI.error(omegaup.UI.formatString(
+          omegaup.T.aliasAlreadyInUse,
+          {alias: omegaup.UI.escape($('#alias').val())}));
+      $('#alias').trigger('focus');
+    }
   }
 
   function onAliasNew() { omegaup.UI.dismissNotifications(); }

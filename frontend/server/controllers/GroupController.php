@@ -81,7 +81,7 @@ class GroupController extends Controller {
             $group = GroupsDAO::FindByAlias($groupAlias);
 
             if (is_null($group)) {
-                throw new InvalidParameterException('parameterNotFound', 'Group');
+                return null;
             }
         } catch (ApiException $ex) {
             throw $ex;
@@ -225,6 +225,12 @@ class GroupController extends Controller {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
 
+        if (is_null($group)) {
+            return [
+                'exists' => false,
+                'status' => 'ok',
+            ];
+        }
         $response = [];
 
         try {
@@ -241,6 +247,7 @@ class GroupController extends Controller {
         }
 
         $response['status'] = 'ok';
+        $response['exists'] = true;
         return $response;
     }
 
