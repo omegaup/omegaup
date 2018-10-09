@@ -327,13 +327,13 @@ let UI = {
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
-  
+
   getContestURL: function(contestAlias) {
-      return '/arena/' + contestAlias + '/';
+    return '/arena/' + contestAlias + '/';
   },
-  
+
   getProblemURL: function(problemAlias) {
-      return '/arena/problem/' + problemAlias + '/';
+    return '/arena/problem/' + problemAlias + '/';
   },
 
   toDDHHMM: function(duration) {
