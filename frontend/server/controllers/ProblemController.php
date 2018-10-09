@@ -904,10 +904,6 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        /*if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
-        }*/
-
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
             throw new NotFoundException('invalidStatementType');
         }
