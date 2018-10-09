@@ -327,6 +327,14 @@ let UI = {
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
+  
+  getContestURL: function(contestAlias) {
+      return '/arena/' + contestAlias + '/';
+  },
+  
+  getProblemURL: function(problemAlias) {
+      return '/arena/problem/' + problemAlias + '/';
+  },
 
   toDDHHMM: function(duration) {
     var sec_num = parseInt(duration, 10);

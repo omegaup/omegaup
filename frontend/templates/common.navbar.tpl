@@ -57,6 +57,7 @@
 							<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
 								 <li><a href='/profile/'><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
+								 <li><a href='/submissions/'><span class="glyphicon glyphicon-list"></span> {#navMySubmissions#}</a></li>
 								 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
 								</ul>
 							</li>
