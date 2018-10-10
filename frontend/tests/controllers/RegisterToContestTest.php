@@ -285,4 +285,57 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         $this->assertEquals($contest['status'], 'ok');
     }
+
+    /**
+     * Testing identities can access to contest, but there are invited
+     * and no invited
+     */
+    public function testIdentitiesInvitedAndNoInvitedToContest() {
+        // Creating 5 identities, and inviting them to the contest
+        $numberOfInvitedContestants = 5;
+        $invitedContestants = [];
+        for ($i = 0; $i < $numberOfInvitedContestants; $i++) {
+            $invitedContestants[] = UserFactory::createUser();
+        }
+        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'public']));
+        foreach ($invitedContestants as $contestant) {
+            ContestsFactory::addUser($contestData, $contestant);
+        }
+        // Creating 3 identities without an invitation to join the contest
+        $numberOfNotInvitedContestants = 3;
+        $uninvitedContestants = [];
+        for ($i = 0; $i < $numberOfNotInvitedContestants; $i++) {
+            $uninvitedContestants[] = UserFactory::createUser();
+        }
+
+        // All identities join the contest
+        foreach ($uninvitedContestants as $contestant) {
+            $contestantLogin = self::login($contestant);
+
+            ContestController::apiOpen(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $contestantLogin->auth_token,
+            ]));
+        }
+
+        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($contestData['contest']->problemset_id);
+
+        $this->assertEquals(count($problemsetIdentities), ($numberOfInvitedContestants + $numberOfNotInvitedContestants));
+
+        $this->assertIdentitiesAreInCorrectList($invitedContestants, '1' /*is_invited*/, $problemsetIdentities);
+
+        $this->assertIdentitiesAreInCorrectList($uninvitedContestants, '0' /*is_not_invited*/, $problemsetIdentities);
+    }
+
+    private function assertIdentitiesAreInCorrectList($contestants, $is_invited, $identities) {
+        foreach ($contestants as $contestant) {
+            $this->assertArrayContainsWithPredicate(
+                $identities,
+                function ($identity) use ($contestant, $is_invited) {
+                    return $identity['user_id'] == $contestant->user_id &&
+                    $identity['is_invited'] == $is_invited;
+                }
+            );
+        }
+    }
 }
