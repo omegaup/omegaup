@@ -105,7 +105,7 @@ class CourseController extends Controller {
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['0', '1'], false /*is_required*/);
+        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['false', 'true'], false /*is_required*/);
 
         Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
 
@@ -120,7 +120,7 @@ class CourseController extends Controller {
             $r['school_id'] = $r['school']->school_id;
         }
 
-        // Get the actual start and finish time of the contest, considering that
+        // Get the actual start and finish time of the course, considering that
         // in case of update, parameters can be optional.
         $start_time = null;
         $finish_time = null;
@@ -316,6 +316,7 @@ class CourseController extends Controller {
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
                 'public' => is_null($r['public']) ? false : $r['public'],
+                'show_scoreboard' =>$r['show_scoreboard'] == 'true',
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
                 'requests_user_information' => $r['requests_user_information'],
             ]));
@@ -707,7 +708,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $assignments = [];
         try {
             $assignments = AssignmentsDAO::getSortedCourseAssignments(
                 $r['course']->course_id
@@ -726,21 +726,13 @@ class CourseController extends Controller {
             'assignments' => [],
         ];
         $time = Time::get();
-        foreach ($assignments as $a) {
-            $a->toUnixTime();
-            if (!$isAdmin && $v['start_time'] > $time) {
+        foreach ($assignments as $assignment) {
+            if (!$isAdmin && $assignment['start_time'] > $time) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
                 continue;
             }
-            $response['assignments'][] = [
-                'name' => $a->name,
-                'alias' => $a->alias,
-                'description' => $a->description,
-                'start_time' => $a->start_time,
-                'finish_time' => $a->finish_time,
-                'assignment_type' => $a->assignment_type
-            ];
+            $response['assignments'][] = $assignment;
         }
 
         return $response;
@@ -1401,6 +1393,7 @@ class CourseController extends Controller {
                 'is_admin' => $isAdmin,
                 'public' => $r['course']->public,
                 'basic_information_required' => $r['course']->needs_basic_information == '1',
+                'show_scoreboard' => $r['course']->show_scoreboard == '1',
                 'requests_user_information' => $r['course']->requests_user_information
             ];
 
@@ -1562,6 +1555,122 @@ class CourseController extends Controller {
     }
 
     /**
+     * Returns all runs for a course
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiRuns(Request $r) {
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        // Validate request
+        self::validateRuns($r);
+
+        // Get our runs
+        try {
+            $runs = RunsDAO::GetAllRuns(
+                $r['assignment']->problemset_id,
+                $r['status'],
+                $r['verdict'],
+                !is_null($r['problem']) ? $r['problem']->problem_id : null,
+                $r['language'],
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
+                $r['offset'],
+                $r['rowcount']
+            );
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $result = [];
+
+        foreach ($runs as $run) {
+            $run['time'] = (int)$run['time'];
+            $run['score'] = (float)$run['score'];
+            $run['contest_score'] = (float)$run['contest_score'];
+            array_push($result, $run);
+        }
+
+        $response = [];
+        $response['runs'] = $result;
+        $response['status'] = 'ok';
+
+        return $response;
+    }
+
+    /**
+     * Validates runs API
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     * @throws ForbiddenAccessException
+     */
+    private static function validateRuns(Request $r) {
+        // Defaults for offset and rowcount
+        if (!isset($r['offset'])) {
+            $r['offset'] = 0;
+        }
+        if (!isset($r['rowcount'])) {
+            $r['rowcount'] = 100;
+        }
+
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::isStringNonEmpty($r['assignment_alias'], 'assignment_alias');
+
+        try {
+            $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
+            $r['assignment'] = AssignmentsDAO::getByAlias($r['assignment_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['course'])) {
+            throw new NotFoundException('courseNotFound');
+        }
+
+        if (is_null($r['assignment'])) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        Validators::isNumber($r['offset'], 'offset', false);
+        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        Validators::isInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        Validators::isInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+
+        // Check filter by problem, is optional
+        if (!is_null($r['problem_alias'])) {
+            Validators::isStringNonEmpty($r['problem_alias'], 'problem');
+
+            try {
+                $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            } catch (Exception $e) {
+                // Operation failed in the data layer
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if (is_null($r['problem'])) {
+                throw new NotFoundException('problemNotFound');
+            }
+        }
+
+        Validators::isInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+
+        // Get user if we have something in username
+        if (!is_null($r['username'])) {
+            $r['identity'] = IdentityController::resolveIdentity($r['username']);
+        }
+    }
+
+    /**
      * Returns details of a given course
      * @param  Request $r
      * @return array
@@ -1616,7 +1725,9 @@ class CourseController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'school_id',
-            'show_scoreboard',
+            'show_scoreboard' => ['transform' => function ($value) {
+                return $value == 'true' ? 1 : 0;
+            }],
             'needs_basic_information' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
             }],
@@ -1636,7 +1747,7 @@ class CourseController extends Controller {
 
         // TODO: Expire cache
 
-        self::$log->info('Course updated (alias): ' . $r['contest_alias']);
+        self::$log->info('Course updated (alias): ' . $r['course_alias']);
         return ['status' => 'ok'];
     }
 
@@ -1650,8 +1761,9 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseAlias($r);
         self::validateCourseAssignmentAlias($r);
+        self::resolveGroup($r);
 
-        if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+        if (!Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1753,5 +1865,16 @@ class CourseController extends Controller {
             $userProblems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $userProblems];
+    }
+
+    /**
+     * @param $identity_id
+     * @param Courses $course
+     * @param Groups $group
+     */
+    public static function shouldShowScoreboard($identity_id, Courses $course, Groups $group) {
+        Validators::isNumber($identity_id, 'identity_id', true);
+        return Authorization::canViewCourse($identity_id, $course, $group) &&
+            $course->show_scoreboard;
     }
 }

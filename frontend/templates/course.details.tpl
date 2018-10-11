@@ -25,6 +25,7 @@
 			<td>
 				<a data-bind="attr: { href: scoreboardUrl }" class="glyphicon glyphicon-link">{#wordsPublic#}</a>
 				<a data-bind="attr: { href: scoreboardUrlAdmin }" class="glyphicon glyphicon-link">{#wordsAdmin#}</a>
+				<a data-bind="attr: { href: adminURL }" class="glyphicon glyphicon-dashboard">{#wordsRuns#}</a>
 			</td>
 			{/if}
 		</tr>

@@ -7,6 +7,9 @@
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#members" data-toggle="tab">{#groupEditMembers#}</a></li>
 	<li><a href="#scoreboards" data-toggle="tab">{#groupEditScoreboards#}</a></li>
+	{if $IS_ORGANIZER}
+		<li><a href="#identities" data-toggle="tab">{#groupCreateIdentities#}</a></li>
+	{/if}
 </ul>
 
 <div class="tab-content">
@@ -16,6 +19,12 @@
 	<div class="tab-pane" id="scoreboards">
 		{include file='group.edit.scoreboards.tpl' payload=$PAYLOAD}
 	</div>
+	{if $IS_ORGANIZER}
+		<div class="tab-pane" id="identities">
+			<div id="create_identities"></div>
+			<script src="{version_hash src="/js/dist/group_identities.js"}" type="text/javascript"></script>
+		</div>
+	{/if}
 </div>
 
 {include file='footer.tpl'}

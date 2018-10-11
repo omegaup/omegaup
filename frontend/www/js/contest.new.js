@@ -4,7 +4,7 @@ omegaup.OmegaUp.on('ready', function() {
         ev.preventDefault();
         var window_length_value = $('#window-length-enabled').is(':checked') ?
                                       $('#window-length').val() :
-                                      'NULL';
+                                      '0';
 
         omegaup.API.Contest
             .create({

@@ -28,6 +28,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->access_time = date('Y-m-d H:i:s');
             $problemset_identity->score = 0;
             $problemset_identity->time = 0;
+            $problemset_identity->is_invited = 0;
             $problemset_identity->share_user_information = $share_user_information;
             ProblemsetIdentitiesDAO::save($problemset_identity);
         } elseif (is_null($problemset_identity->access_time)) {
@@ -72,6 +73,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 i.user_id,
                 i.username,
                 pi.access_time,
+                pi.is_invited,
                 e.email,
                 i.country_id,
                 pi.access_time

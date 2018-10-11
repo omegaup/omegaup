@@ -25,6 +25,9 @@ omegaup.OmegaUp.on('ready', function() {
               '/course/' + courseAlias + '/assignment/' +
               course.assignments[i].alias + '/scoreboard/' +
               course.assignments[i].scoreboard_url_admin;
+          course.assignments[i].adminURL =
+              '/course/' + courseAlias + '/assignment/' +
+              course.assignments[i].alias + '/admin/#runs';
           course.assignments[i].startTime = omegaup.UI.formatDateTime(
               new Date(1000 * course.assignments[i].start_time));
           course.assignments[i].finishTime = omegaup.UI.formatDateTime(
