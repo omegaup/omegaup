@@ -9,54 +9,52 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.Tag.list({query: ''})
       .then(function(response) {
-        var tags = {};
-        $('#problem-tags a')
-            .each(function(index) { tags[$(this).text()] = true; });
         response.forEach(function(e) {
-          $('.tag-list')
+          $('#problem-form .tag-list')
               .append($('<a></a>')
                           .attr('href', '#tags')
                           .addClass('tag')
                           .addClass('pull-left')
-                          .text(e.name));
+                          .text(e.name)
+                          .on('click', onTabClicked));
         });
-        $(document)
-            .on('click', '.tag', function(event) {
-              var tagname = $(this).text();
-              var public = $('#tag-public').val() == 'true';
-              $(this).remove();
-              $('div.post.footer').show();
-              refreshProblemTags(tagname, public);
-              return false;  // Prevent refresh
-            });
       })
       .fail(omegaup.UI.apiError);
+
+  function onTabClicked() {
+    var tagname = $(this).text();
+    var public = $('#tag-public').val() == 'true';
+    $(this).remove();
+    refreshProblemTags(tagname, public);
+    return false;  // Prevent refresh
+  }
 
   function refreshProblemTags(tagname, public) {
     $('#problem-tags')
         .append(
             $('<tr></tr>')
+                .append($('<td class="tag-name"></td>')
+                            .append($('<a></a>')
+                                        .attr('href',
+                                              encodeURIComponent(
+                                                  '/problem/?tag[]=' + tagname))
+                                        .text(tagname)))
+                .append($('<td></td>').addClass('is-public').text(public))
                 .append(
-                    $('<td class="tag-name"></td>')
-                        .append($('<a></a>')
-                                    .attr('href', '/problem/?tag[]=' + tagname)
-                                    .text(tagname)))
-                .append($('<td class="is-public"></td>').text(public))
-                .append($('<td><button type="button" class="close">' +
-                          '&times;</button></td>')
-                            .on('click', (function(tagname) {
-                                  return function(e) {
-                                    $('div.post.footer').show();
-                                    var tr =
-                                        e.target.parentElement.parentElement;
-                                    $('.tag-list')
-                                        .append('<a href="#tags" ' +
-                                                'class="tag pull-left">' +
-                                                $(tr).find('a').text() +
-                                                '</a>');
-                                    $(tr).remove();
-                                  };
-                                })(tagname))));
+                    $('<td></td>')
+                        .append(
+                            '<button type="button" class="close">&times;</button>')
+                        .on('click', function(e) {
+                          var tr = e.target.parentElement.parentElement;
+                          $('#problem-form .tag-list')
+                              .append($('<a></a>')
+                                          .attr('href', '#tags')
+                                          .addClass('tag')
+                                          .addClass('pull-left')
+                                          .text(tagname)
+                                          .on('click', onTabClicked));
+                          $(tr).remove();
+                        })));
   }
 
   $('#problem-form')
@@ -85,11 +83,11 @@ omegaup.OmegaUp.on('ready', function() {
         $('#problem-tags tr')
             .each(function(index) {
               selectedTags.push({
-                tagname: $(this).find('td.tag-name').find('a').text(),
+                tagname: $(this).find('td.tag-name a').text(),
                 public: $(this).find('td.is-public').text(),
               });
             });
-        $('#selected-tags').val(JSON.stringify(selectedTags));
+        $('input[name=selected_tags]').val(JSON.stringify(selectedTags));
       });
 
   function addRemoveErrorClass(inputId) {

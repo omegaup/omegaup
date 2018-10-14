@@ -111,6 +111,9 @@ class ProblemController extends Controller {
                     }
                 }
             }
+            if ($tagsHaveErrors) {
+                throw new InvalidParameterException('parameterEmpty', 'tagname');
+            }
         }
 
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
@@ -377,6 +380,7 @@ class ProblemController extends Controller {
     public static function apiAddTag(Request $r) {
         // Check problem_alias
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::isStringNonEmpty($r['name'], 'name');
 
         // Authenticate logged user
         self::authenticateRequest($r);

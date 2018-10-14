@@ -143,9 +143,9 @@
 					</div>
 					<div class="form-group">
 						<label for="tag-public">{#wordsPublic#}</label>
-						<select id="tag-public" name="tag_public" class="form-control">
-							<option value="0" selected="selected">{#wordsNo#}</option>
-							<option value="1">{#wordsYes#}</option>
+						<select id="tag-public" class="form-control">
+							<option value="false" selected="selected">{#wordsNo#}</option>
+							<option value="true">{#wordsYes#}</option>
 						</select>
 					</div>
 				</div>
@@ -160,7 +160,7 @@
 					</thead>
 					<tbody id="problem-tags"></tbody>
 				</table>
-				<input type="hidden" id="selected-tags" name="selected_tags" />
+				<input type="hidden" name="selected_tags" />
 			</div>
 			{/if}
 
