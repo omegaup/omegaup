@@ -1577,10 +1577,10 @@ class ProblemController extends Controller {
             // For each run we got
             foreach ($runs as $run) {
                 // Build grade dir
-                $grade_dir = RunController::getGradePath($run);
+                $grade_dir = RunController::getGradePath($run->guid);
 
                 // Skip it if it failed to compile.
-                if (file_exists("$grade_dir/compile_error.log")) {
+                if ($run->verdict == 'CE') {
                     continue;
                 }
 

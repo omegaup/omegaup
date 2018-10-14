@@ -26,10 +26,10 @@ class RunController extends Controller {
     public static $grader = null;
     private static $practice = false;
 
-    public static function getGradePath($run) {
+    public static function getGradePath($guid) {
         return GRADE_PATH . '/' .
-            substr($run->guid, 0, 2) . '/' .
-            substr($run->guid, 2);
+            substr($guid, 0, 2) . '/' .
+            substr($guid, 2);
     }
 
     /**
@@ -527,8 +527,8 @@ class RunController extends Controller {
 
         // Try to delete existing directory, if exists.
         try {
-            $grade_dir = RunController::getGradePath($r['run']);
-            FileHandler::DeleteDirRecursive($grade_dir);
+            $gradeDir = RunController::getGradePath($r['run']->guid);
+            FileHandler::DeleteDirRecursive($gradeDir);
         } catch (Exception $e) {
             // Soft error :P
             self::$log->warn($e);
@@ -637,54 +637,26 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = [];
-
-        if (OMEGAUP_LOCKDOWN) {
-            $response['source'] = 'lockdownDetailsDisabled';
-            $response['status'] = 'ok';
-            return $response;
-        }
-
         // Get the source
-        $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
+        $response = [
+            'status' => 'ok',
+            'admin' => Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']),
+            'guid' => $r['run']->guid,
+            'language' => $r['run']->language,
+        ];
         $showDetails = $response['admin'] ||
             ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
-        // Get the details and/or compile error.
-        $grade_dir = RunController::getGradePath($r['run']);
-        $details = null;
-        if (($showDetails || $r['run']->verdict == 'CE') &&
-            file_exists("$grade_dir/details.json")) {
-            $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
-        }
-        if (!is_null($details) && isset($details['compile_error'])) {
-            $response['compile_error'] = $details['compile_error'];
-        } elseif (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
-        if ($showDetails && !is_null($details)) {
-            if (count(array_filter(array_keys($details), 'is_string')) > 0) {
-                $response['details'] = $details;
-            } else {
-                // TODO(lhchavez): Remove this backwards-compatibility shim
-                // with backendv1.
-                $response['groups'] = $details;
-            }
-        }
-
-        if ($response['admin']) {
-            if (file_exists("$grade_dir/logs.txt.gz")) {
-                $response['logs'] = file_get_contents("compress.zlib://$grade_dir/logs.txt.gz");
-            } elseif (file_exists("$grade_dir/run.log")) {
-                $response['logs'] = file_get_contents("$grade_dir/run.log");
+        // Get the details, compile error, logs, etc.
+        RunController::getSource($r['run'], $showDetails, $response);
+        if (!OMEGAUP_LOCKDOWN && $response['admin']) {
+            $gradeDir = RunController::getGradePath($r['run']->guid);
+            if (file_exists("$gradeDir/logs.txt.gz")) {
+                $response['logs'] = file_get_contents("compress.zlib://$gradeDir/logs.txt.gz");
             }
 
             $response['judged_by'] = $r['run']->judged_by;
         }
-        $response['guid'] = $r['run']->guid;
-        $response['status'] = 'ok';
-        $response['language'] = $r['run']->language;
 
         return $response;
     }
@@ -746,25 +718,33 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = [];
-
-        if (OMEGAUP_LOCKDOWN) {
-            // OMI hotfix
-            // @TODO @joemmanuel, hay que localizar este msg :P
-            $response['source'] = 'Ver el código ha sido temporalmente desactivado.';
-        } else {
-            // Get the source
-            $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        }
-
-        // Get the error
-        $grade_dir = RunController::getGradePath($r['run']);
-        if (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
-
-        $response['status'] = 'ok';
+        $response = [
+            'status' => 'ok',
+        ];
+        RunController::getSource($r['run'], false, $response);
         return $response;
+    }
+
+    private static function getSource(Runs $run, $showDetails, &$response) {
+        if (OMEGAUP_LOCKDOWN) {
+            $response['source'] = 'lockdownDetailsDisabled';
+        } else {
+            $response['source'] = file_get_contents(RunController::getSubmissionPath($run));
+        }
+        $gradeDir = RunController::getGradePath($run->guid);
+        if (!$showDetails && $run->verdict != 'CE') {
+            return;
+        }
+        if (!file_exists("$gradeDir/details.json")) {
+            return;
+        }
+        $details = json_decode(file_get_contents("$gradeDir/details.json"), true);
+        if (isset($details['compile_error'])) {
+            $response['compile_error'] = $details['compile_error'];
+        }
+        if (!OMEGAUP_LOCKDOWN && $showDetails) {
+            $response['details'] = $details;
+        }
     }
 
     /**
