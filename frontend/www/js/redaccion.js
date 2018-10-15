@@ -1,7 +1,7 @@
 omegaup.OmegaUp.on('ready', function() {
   var markdownConverter = omegaup.UI.markdownConverter({preview: true});
   var markdownEditor = new Markdown.Editor(markdownConverter);
-  var originalRedaction = `# Descripción
+  var defaultStatement = `# Descripción
 
 Esta es la descripción del problema. Inventa una historia creativa.
 Puedes utilizar matemáticas inline para hacer $x_i, y_i$, o $z_i$ o incluso:
@@ -44,15 +44,16 @@ Case #2: 15
   markdownEditor.run();
 
   // Ask the user if they want to restore the last draft
-  if (localStorage.getItem('wmdinput')) {
-    $('#wmd-input').val(localStorage.getItem('wmdinput'));
+  var wmdinput = localStorage.getItem('wmdinput');
+  if (wmdinput) {
+    $('#wmd-input').val(wmdinput);
   } else {
-    $('#wmd-input').val(originalRedaction);
+    $('#wmd-input').val(defaultStatement);
   }
 
-  $('#restart-problem')
+  $('#reset-statement')
       .on('click', function(evt) {
-        $('#wmd-input').val(originalRedaction);
+        $('#wmd-input').val(defaultStatement);
         markdownEditor.refreshPreview();
         localStorage.setItem('wmdinput', $('#wmd-input').val());
       });

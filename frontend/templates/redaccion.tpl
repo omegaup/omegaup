@@ -15,7 +15,7 @@
 <div><em>Subido por: tu_usuario</em></div>
 </div>
 <div id="wmd-panel">
-	<div id="wmd-button-bar"></div><button id="restart-problem">Restaurar</button>
+	<div id="wmd-button-bar"></div><button id="reset-statement">Restaurar</button>
 	<textarea class="wmd-input" id="wmd-input"></textarea>
 </div>
 <script type="text/javascript" src="{version_hash src="/js/redaccion.js"}"></script>
