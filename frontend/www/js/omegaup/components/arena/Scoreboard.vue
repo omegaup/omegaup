@@ -17,9 +17,9 @@
       </thead>
       <tbody>
         <tr v-bind:class="user.username"
-            v-for="(user, user_index) in ranking">
+            v-for="(user, userIndex) in ranking">
           <td class="legend"
-              v-bind:style="{ backgroundColor: legendColor(user_index) }"></td>
+              v-bind:style="{ backgroundColor: legendColor(userIndex) }"></td>
           <td class="position">{{ user.place }}</td>
           <td>{{ renderUser(user) }} <img alt=""
                height="11"
@@ -27,7 +27,7 @@
                v-bind:title="user.country"
                v-if="user.country"
                width="16"></td>
-          <td v-bind:class="problemClass(problem, problems[problem_index])"
+          <td v-bind:class="problemClass(problem, problems[problem_index].alias)"
               v-for="(problem, problem_index) in user.problems">
             <template v-if="problem.runs &gt; 0">
               <div class="points">
@@ -95,15 +95,15 @@ export default {
     totalRuns: function(u) {
       return u.problems.reduce((acc, val) => acc + val.runs, 0);
     },
-    problemClass: function(p, ps) {
+    problemClass: function(p, alias) {
       if (p.percent == 100) {
-        return ps.alias + ' accepted';
+        return alias + ' accepted';
       } else if (p.pending) {
-        return ps.alias + ' pending';
+        return alias + ' pending';
       } else if (p.percent == 0 && p.runs > 0) {
-        return ps.alias + ' wrong';
+        return alias + ' wrong';
       } else {
-        return ps.alias;
+        return alias;
       }
     },
   },
