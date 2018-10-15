@@ -650,9 +650,9 @@ class RunController extends Controller {
         // Get the details, compile error, logs, etc.
         RunController::getSource($r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
-            $gradeDir = RunController::getGradePath($r['run']->guid);
-            if (file_exists("$gradeDir/logs.txt.gz")) {
-                $response['logs'] = file_get_contents("compress.zlib://$gradeDir/logs.txt.gz");
+            $gzippedLogs = RunController::getGraderResource($r['run']->guid, 'logs.txt.gz');
+            if (is_string($gzippedLogs)) {
+                $response['logs'] = gzdecode($gzippedLogs);
             }
 
             $response['judged_by'] = $r['run']->judged_by;
@@ -731,14 +731,14 @@ class RunController extends Controller {
         } else {
             $response['source'] = file_get_contents(RunController::getSubmissionPath($run));
         }
-        $gradeDir = RunController::getGradePath($run->guid);
         if (!$showDetails && $run->verdict != 'CE') {
             return;
         }
-        if (!file_exists("$gradeDir/details.json")) {
+        $detailsJson = RunController::getGraderResource($run->guid, 'details.json');
+        if (!is_string($detailsJson)) {
             return;
         }
-        $details = json_decode(file_get_contents("$gradeDir/details.json"), true);
+        $details = json_decode($detailsJson, true);
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];
         }
@@ -762,30 +762,36 @@ class RunController extends Controller {
 
         self::validateAdminDetailsRequest($r);
 
-        $grade_dir = RunController::getGradePath($r['run']);
-        $results_zip = "$grade_dir/files.zip";
-        if (!file_exists($results_zip)) {
-            $results_zip = "$grade_dir/results.zip";
-        }
-
-        if (file_exists($results_zip)) {
-            $output_callback = function () use ($results_zip) {
-                header('Content-Length: ' . filesize($results_zip));
-                readfile($results_zip);
-                return true;
-            };
-        } else {
-            $output_callback = function () use ($r) {
-                return self::downloadRunFromS3($r['run']->guid);
-            };
-        }
-
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!$output_callback()) {
+        if (!RunController::serveGraderResource($r['run']->guid, 'files.zip')) {
             http_response_code(404);
         }
         exit;
+    }
+
+    private static function getGraderResource($guid, $filename) {
+        $gradeDir = RunController::getGradePath($guid);
+        $resourcePath = "${gradeDir}/${filename}";
+
+        if (!file_exists($resourcePath)) {
+            return self::downloadRunFromS3($guid, $filename, false);
+        }
+
+        return file_get_contents($resourcePath);
+    }
+
+    private static function serveGraderResource($guid, $filename) {
+        $gradeDir = RunController::getGradePath($guid);
+        $resourcePath = "${gradeDir}/${filename}";
+
+        if (!file_exists($resourcePath)) {
+            return self::downloadRunFromS3($guid, $filename, true);
+        }
+
+        header('Content-Length: ' . filesize($resourcePath));
+        readfile($resourcePath);
+        return true;
     }
 
     /**
@@ -794,7 +800,7 @@ class RunController extends Controller {
      * @param string $guid The run's GUID.
      * @return bool True if successful.
      */
-    private static function downloadRunFromS3($guid) {
+    private static function downloadRunFromS3($guid, $filename, $passthru) {
         if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
             return false;
         }
@@ -805,7 +811,7 @@ class RunController extends Controller {
             2 => ['pipe', 'w']
         ];
         $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}.zip -",
+            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}/${filename} -",
             $descriptorspec,
             $pipes,
             '/tmp',
@@ -824,7 +830,12 @@ class RunController extends Controller {
         fclose($pipes[0]);
         $err = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
-        fpassthru($pipes[1]);
+        if ($passthru) {
+            fpassthru($pipes[1]);
+            $result = true;
+        } else {
+            $result = stream_get_contents($pipes[1]);
+        }
         fclose($pipes[1]);
 
         $retval = proc_close($proc);
@@ -833,7 +844,7 @@ class RunController extends Controller {
             self::$log->error("Getting run $guid failed: $retval $err");
             return false;
         }
-        return true;
+        return $result;
     }
 
     /**
