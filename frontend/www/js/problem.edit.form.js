@@ -36,8 +36,8 @@ omegaup.OmegaUp.on('ready', function() {
                 .append($('<td class="tag-name"></td>')
                             .append($('<a></a>')
                                         .attr('href',
-                                              encodeURIComponent(
-                                                  '/problem/?tag[]=' + tagname))
+                                              '/problem/?tag[]=' +
+                                                  encodeURIComponent(tagname))
                                         .text(tagname)))
                 .append($('<td></td>').addClass('is-public').text(public))
                 .append(
@@ -84,7 +84,7 @@ omegaup.OmegaUp.on('ready', function() {
             .each(function(index) {
               selectedTags.push({
                 tagname: $(this).find('td.tag-name a').text(),
-                public: $(this).find('td.is-public').text(),
+                public: $(this).find('td.is-public').text() == 'true',
               });
             });
         $('input[name=selected_tags]').val(JSON.stringify(selectedTags));
