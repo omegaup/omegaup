@@ -421,6 +421,23 @@ class CourseController extends Controller {
         Validators::isNumber($r['start_time'], 'start_time', false /*is_required*/);
         Validators::isNumber($r['finish_time'], 'finish_time', false /*is_required*/);
 
+        // Prevent date changes if a course already has runs
+        if ((!is_null($r['finish_time']) && $r['finish_time'] != strtotime($r['assignment']->finish_time)) ||
+            (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['assignment']->start_time))
+        ) {
+            $runCount = 0;
+
+            try {
+                $runCount = RunsDAO::CountTotalRunsOfProblemset($r['assignment']->problemset_id);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+
+            if ($runCount > 0) {
+                throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
+            }
+        }
+
         // Force start time with original value
         $r['start_time'] = $r['assignment']->start_time;
         if (is_null($r['finish_time'])) {

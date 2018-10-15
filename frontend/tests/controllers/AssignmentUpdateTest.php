@@ -33,7 +33,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         ]));
 
         // Start time is not modified
-        $this->assertNotEquals($updatedStartTime, $response['start_time']);
+        $this->assertEquals($courseData['request']['start_time'], $response['start_time']);
         $this->assertEquals($updatedFinishTime, $response['finish_time']);
 
         $this->assertEquals('some new name', $response['name']);

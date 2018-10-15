@@ -32,7 +32,7 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseNewFormEndDateDesc"></span>
-                  <omegaup-datepicker v-bind:update="update"
+                  <omegaup-datepicker v-bind:enabled="update"
                                 v-model="startTime"></omegaup-datepicker></label>
           </div>
           <div class="form-group col-md-4">
