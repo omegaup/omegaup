@@ -904,6 +904,13 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (is_null($r['problem'])) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
             throw new NotFoundException('invalidStatementType');
         }
@@ -1191,12 +1198,9 @@ class ProblemController extends Controller {
         }
 
         // Validate request
-        self::validateDetails($r);
-        if (is_null($r['problem'])) {
-            return [
-                'status' => 'ok',
-                'exists' => false,
-            ];
+        $isValid = self::validateDetails($r);
+        if (!is_null($isValid)) {
+            return $isValid;
         }
         $response = [];
 
@@ -1848,7 +1852,10 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Uses same params as apiDetails, except for lang, which is optional
-        self::validateDetails($r);
+        $isValid = self::validateDetails($r);
+        if (!$isValid['exists']) {
+            return $isValid;
+        }
 
         // If username is set in the request, we use that identity as target.
         // else, we query using current_user

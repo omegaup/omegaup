@@ -231,7 +231,10 @@ class GroupController extends Controller {
                 'status' => 'ok',
             ];
         }
-        $response = [];
+        $response = [
+            'status' => 'ok',
+            'exists' => true,
+        ];
 
         try {
             $response['group'] = $group->asArray();
@@ -246,8 +249,6 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        $response['status'] = 'ok';
-        $response['exists'] = true;
         return $response;
     }
 

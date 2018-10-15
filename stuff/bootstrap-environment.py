@@ -99,6 +99,13 @@ class Session:
 
 def _does_resource_exist(s, request):
     '''Returns whether a resource already exist.'''
+    if request['api'] == '/problem/create':
+        if s.request('/problem/details/',
+                     {'problem_alias':
+                      request['params']['problem_alias']})['exists']:
+            logging.warning('Problem %s exists, skipping',
+                            request['params']['problem_alias'])
+            return True
     if request['api'] == '/contest/create':
         if s.request('/contest/adminDetails/',
                      {'contest_alias':
