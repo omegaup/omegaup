@@ -1852,10 +1852,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Uses same params as apiDetails, except for lang, which is optional
-        $isValid = self::validateDetails($r);
-        if (!$isValid['exists']) {
-            return $isValid;
-        }
+        self::validateDetails($r);
 
         // If username is set in the request, we use that identity as target.
         // else, we query using current_user
