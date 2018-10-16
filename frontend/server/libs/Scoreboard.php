@@ -524,8 +524,8 @@ class Scoreboard {
         foreach ($raw_contest_identities as $contestant) {
             $identity_problems = [];
 
-            $test_only[$contestant->identity_id] = true;
-            $no_runs[$contestant->identity_id] = true;
+            $test_only[$contestant['identity_id']] = true;
+            $no_runs[$contestant['identity_id']] = true;
             foreach ($problem_mapping as $id => $problem) {
                 array_push($identity_problems, [
                     'points' => 0,
@@ -536,14 +536,15 @@ class Scoreboard {
             }
 
             // Add the problems' information
-            $identities_info[$contestant->identity_id] = [
+            $identities_info[$contestant['identity_id']] = [
                 'problems' => $identity_problems,
-                'username' => $contestant->username,
-                'name' => $contestant->name ?
-                    $contestant->name :
-                    $contestant->username,
+                'username' => $contestant['username'],
+                'name' => $contestant['name'] ?
+                    $contestant['name'] :
+                    $contestant['username'],
                 'total' => null,
-                'country' => $contestant->country_id
+                'country' => $contestant['country_id'],
+                'is_invited' => $contestant['is_invited'],
             ];
         }
 
@@ -604,7 +605,7 @@ class Scoreboard {
 
         $result = [];
         foreach ($raw_contest_identities as $contestant) {
-            $identity_id = $contestant->identity_id;
+            $identity_id = $contestant['identity_id'];
 
             // Add contestant results to scoreboard data
             if (!$showAllRuns && $test_only[$identity_id] && !$no_runs[$identity_id]) {
@@ -699,7 +700,7 @@ class Scoreboard {
         $contest_identities = [];
 
         foreach ($raw_contest_identities as $identity) {
-            $contest_identities[$identity->identity_id] = $identity;
+            $contest_identities[$identity['identity_id']] = $identity;
         }
 
         $result = [];
@@ -752,8 +753,8 @@ class Scoreboard {
             }
 
             $data = [
-                'name' => $identity->name ? $identity->name : $identity->username,
-                'username' => $identity->username,
+                'name' => $identity['name'] ? $identity['name'] : $identity['username'],
+                'username' => $identity['username'],
                 'delta' => max(0, ($run_delay - $contestStart) / 60),
                 'problem' => [
                     'alias' => $problem_mapping[$problem_id]['alias'],
@@ -764,7 +765,8 @@ class Scoreboard {
                     'points' => 0,
                     'penalty' => 0
                 ],
-                'country' => $identity->country_id
+                'country' => $identity['country_id'],
+                'is_invited' => $identity['is_invited'],
             ];
 
             foreach ($identity_problems_score[$identity_id] as $problem) {
