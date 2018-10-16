@@ -132,6 +132,38 @@
 				</div>
 			</div>
 
+			{if $IS_UPDATE != 1}
+			<div class="panel panel-primary">
+				<div class="panel-body">
+					<div class="form-group">
+						<label for="tag-name">{#wordsTags#}</label>
+					</div>
+					<div class="form-group">
+						<div class="tag-list pull-left"></div>
+					</div>
+					<div class="form-group">
+						<label for="tag-public">{#wordsPublic#}</label>
+						<select id="tag-public" class="form-control">
+							<option value="false" selected="selected">{#wordsNo#}</option>
+							<option value="true">{#wordsYes#}</option>
+						</select>
+					</div>
+				</div>
+
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>{#contestEditTagName#}</th>
+							<th>{#contestEditTagPublic#}</th>
+							<th>{#contestEditTagDelete#}</th>
+						</tr>
+					</thead>
+					<tbody id="problem-tags"></tbody>
+				</table>
+				<input type="hidden" name="selected_tags" />
+			</div>
+			{/if}
+
       {if $IS_UPDATE eq 1}
 			<div class="row">
 				<div class="form-group  col-md-12" id="update-message-group">
