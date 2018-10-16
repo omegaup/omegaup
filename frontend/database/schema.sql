@@ -540,6 +540,7 @@ CREATE TABLE `Problemset_Identities` (
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
+  `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),

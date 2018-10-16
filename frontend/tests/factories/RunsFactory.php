@@ -81,7 +81,7 @@ class RunsFactory {
         if (!is_null($courseAssignmentData)) {
             return new Request([
                 'auth_token' => $login->auth_token,
-                'assignment_alias' => $courseAssignmentData['request']['alias'],
+                'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
                 'problem_alias' => $problemData['problem']->alias,
                 'language' => 'c',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
@@ -207,7 +207,7 @@ class RunsFactory {
 
         RunsDAO::save($run);
 
-        $gradeDir = RunController::getGradePath($run);
+        $gradeDir = RunController::getGradePath($run->guid);
         mkdir($gradeDir, 0755, true);
         file_put_contents("$gradeDir/details.json", json_encode([
             'verdict' => $verdict,
