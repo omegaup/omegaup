@@ -905,10 +905,7 @@ class ProblemController extends Controller {
         }
 
         if (is_null($r['problem'])) {
-            return [
-                'status' => 'ok',
-                'exists' => false,
-            ];
+            return null;
         }
 
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
@@ -949,6 +946,7 @@ class ProblemController extends Controller {
                 }
             }
         }
+        return $r['problem'];
     }
 
     /**
@@ -1198,9 +1196,11 @@ class ProblemController extends Controller {
         }
 
         // Validate request
-        $isValid = self::validateDetails($r);
-        if (!is_null($isValid)) {
-            return $isValid;
+        if (is_null(self::validateDetails($r))) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
         }
         $response = [];
 

@@ -19,9 +19,9 @@ omegaup.OmegaUp.on('ready', function() {
   var existsFn = null;
   var aliasLength = 0;
 
-  function onAliasExists(data) {
+  function onAliasReady(data) {
     if (!data.exists) {
-      onAliasReady();
+      onAliasNew();
       return;
     }
     omegaup.UI.error(
@@ -30,13 +30,13 @@ omegaup.OmegaUp.on('ready', function() {
     $('#alias').trigger('focus');
   }
 
-  function onAliasReady() { omegaup.UI.dismissNotifications(); }
+  function onAliasNew() { omegaup.UI.dismissNotifications(); }
 
   switch (formName) {
     case 'problems':
       existsFn = function(alias) {
         omegaup.API.Problem.details({problem_alias: alias})
-            .then(onAliasExists)
+            .then(onAliasReady)
             .fail(omegaup.UI.apiError);
       };
       aliasLength = 32;
@@ -45,7 +45,7 @@ omegaup.OmegaUp.on('ready', function() {
     case 'groups':
       existsFn = function(alias) {
         omegaup.API.Group.details({group_alias: alias})
-            .then(onAliasExists)
+            .then(onAliasReady)
             .fail(omegaup.UI.apiError);
       };
       aliasLength = 50;
@@ -54,7 +54,7 @@ omegaup.OmegaUp.on('ready', function() {
     case 'interviews':
       existsFn = function(alias) {
         omegaup.API.Interview.details({interview_alias: alias})
-            .then(onAliasExists)
+            .then(onAliasReady)
             .fail(omegaup.UI.apiError);
       };
       aliasLength = 32;
