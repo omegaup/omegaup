@@ -1352,7 +1352,7 @@ class UserController extends Controller {
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
-                $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+                $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($firstDay);
                 if (is_null($users)) {
                     return [
                         'status' => 'ok',
