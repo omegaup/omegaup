@@ -90,7 +90,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 100
         ";
 
-        $val = [$startTime, $endTime, $endTime, $endTime];
+        $val = [$startTime, $endTime, $endTime];
 
         global $conn;
         $results = $conn->getAll($sql, $val);

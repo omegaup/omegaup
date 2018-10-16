@@ -932,7 +932,7 @@ class UserController extends Controller {
             $keys =  [
                 'MS-UAIE' => 60,
                 'Prim-UAIE' => 40,
-                'Sec-UAIE' => 40,
+                'Sec-UAUE' => 40,
                 'ICPC-UAIE' => 45,
                 'Prim-UAIE-Jalpa' => 30,
                 'Sec-UAIE-Jalpa' => 30
@@ -1388,35 +1388,31 @@ class UserController extends Controller {
                     ];
                 }
 
-                foreach ($users as $index => $user) {
-                    // Save it
-                    $coder = new CoderOfTheMonth([
-                        'user_id' => $user['user_id'],
-                        'time' => $firstDay,
-                        'rank' => $index + 1,
-                    ]);
-                    CoderOfTheMonthDAO::save($coder);
-                }
-                $currentDay = date('Y-m-d', $currentTimestamp);
-
-                // It occurs when coder of the month is not explicitly selected by a mentor
-                CoderOfTheMonthDAO::selectCoder();
-
-                $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay);
-                if (empty($codersOfTheMonth)) {
-                    return [
-                        'status' => 'ok',
-                        'userinfo' => null,
-                        'problems' => null,
-                    ];
-                }
+                // Only first place coder is saved
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $users[0]['user_id'],
+                    'time' => $firstDay,
+                    'rank' => 1,
+                ]));
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+            } else {
+                $coderOfTheMonthUserId = $codersOfTheMonth[0];
             }
+
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay, true);
+            if (empty($codersOfTheMonth)) {
+                return [
+                    'status' => 'ok',
+                    'userinfo' => null,
+                    'problems' => null,
+                ];
+            }
+
+            $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = UserController::getProfileImpl($user);
@@ -1499,29 +1495,21 @@ class UserController extends Controller {
                         continue;
                     }
 
-                    // Save it
-                    $coder = new CoderOfTheMonth([
-                        'user_id' => $user['user_id'],
-                        'time' => $dateToSelect,
-                        'rank' => $index + 1,
-                        'selected_by' => $isUserSelected ? $r['current_identity_id'] : null,
-                    ]);
-                    CoderOfTheMonthDAO::save($coder);
-                }
-            } else {
-                foreach ($codersOfTheMonth as $coder) {
-                    if (!is_null($coder->selected_by)) {
-                        throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
-                    }
-                }
-                CoderOfTheMonthDAO::selectCoder($r['username'], $r['current_identity_id']);
+                // Save it
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                    'selected_by' => $r['current_identity_id'],
+                ]));
+                return ['status' => 'ok'];
             }
         } catch (Exception $e) {
             self::$log->error('Unable to select coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok'];
+        throw new InvalidDatabaseOperationException();
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
