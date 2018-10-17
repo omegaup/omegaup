@@ -1389,30 +1389,20 @@ class UserController extends Controller {
                 }
 
                 // Only first place coder is saved
-                $coder = new CoderOfTheMonth([
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
                     'user_id' => $users[0]['user_id'],
                     'time' => $firstDay,
                     'rank' => 1,
-                ]);
-                CoderOfTheMonthDAO::save($coder);
-
-                $currentDay = date('Y-m-d', $currentTimestamp);
-
-                $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay, true);
-                if (empty($codersOfTheMonth)) {
-                    return [
-                        'status' => 'ok',
-                        'userinfo' => null,
-                        'problems' => null,
-                    ];
-                }
+                ]));
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+            } else {
+                $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             }
+            $user = UsersDAO::getByPK($coderOfTheMonthUserId);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = UserController::getProfileImpl($user);
@@ -1491,28 +1481,26 @@ class UserController extends Controller {
             $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($dateToSelect);
 
             foreach ($users as $index => $user) {
-                $isUserSelected = $user['username'] == $r['username'];
-
-                if (!$isUserSelected) {
+                if ($user['username'] != $r['username']) {
                     continue;
                 }
 
                 // Save it
-                $coder = new CoderOfTheMonth([
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
                     'user_id' => $user['user_id'],
                     'time' => $dateToSelect,
                     'rank' => $index + 1,
                     'selected_by' => $r['current_identity_id'],
-                ]);
-                CoderOfTheMonthDAO::save($coder);
-                break;
+                ]));
+
+                return ['status' => 'ok'];
             }
         } catch (Exception $e) {
             self::$log->error('Unable to select coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return ['status' => 'ok'];
+        throw new InvalidDatabaseOperationException();
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {

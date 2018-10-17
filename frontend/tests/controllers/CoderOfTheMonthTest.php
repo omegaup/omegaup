@@ -186,6 +186,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             ]));
             $this->fail('Exception was expected, because date is not in the range to select coder');
         } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
             // Pass
         }
 
