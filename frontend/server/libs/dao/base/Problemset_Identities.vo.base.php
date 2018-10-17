@@ -47,6 +47,9 @@ class ProblemsetIdentities extends VO {
         if (isset($data['privacystatement_consent_id'])) {
             $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
         }
+        if (isset($data['is_invited'])) {
+            $this->is_invited = $data['is_invited'];
+        }
     }
 
     /**
@@ -110,4 +113,11 @@ class ProblemsetIdentities extends VO {
       * @var int(11)
       */
     public $privacystatement_consent_id;
+
+    /**
+      * Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos
+      * @access public
+      * @var tinyint(1)
+      */
+    public $is_invited;
 }

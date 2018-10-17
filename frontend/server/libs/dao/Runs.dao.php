@@ -348,7 +348,7 @@ class RunsDAO extends RunsDAOBase {
             if (is_null($group_id)) {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id
+                        i.identity_id, i.username, i.name, i.country_id, pi.is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -370,7 +370,7 @@ class RunsDAO extends RunsDAOBase {
             } else {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id
+                        i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -390,7 +390,7 @@ class RunsDAO extends RunsDAOBase {
         } else {
             $sql = '
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id
+                    i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
                 FROM
                     Identities i
                 INNER JOIN
@@ -416,7 +416,7 @@ class RunsDAO extends RunsDAOBase {
 
         $ar = [];
         foreach ($rs as $row) {
-            array_push($ar, new Identities($row));
+            array_push($ar, $row);
         }
 
         return $ar;
