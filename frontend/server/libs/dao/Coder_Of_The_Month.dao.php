@@ -187,7 +187,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndRank($time, $rank) {
+    final public static function getByTimeAndSelected($time, $autoselected = false) {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
                 FROM
@@ -195,10 +196,9 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `rank` = ?;';
-
+                    `selected_by` ' . $clause . ';';
         global $conn;
-        $rs = $conn->Execute($sql, [$time, $rank]);
+        $rs = $conn->Execute($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -207,21 +207,63 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $coders;
     }
 
+    final public static function getByTime($time) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$time]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
+    }
+
+    /**
+     * One coder is selected, when parameters are not received
+     * means that coder was selected by default
+     *
+     * @param $username
+     * @param identity_id
+     * @return Affected_Rows
+     */
+    public static function selectCoder($username = null, $identity_id = null) {
+        $curdate = date('Y-m-d', Time::get());
+        if (is_null($username) && is_null($identity_id)) {
+            $identity_clause = '(SELECT identity_id FROM Identities WHERE username = \'admin\' OR username = \'admintest\')';
+            $clause = '`rank` = 1';
+            $params = [$curdate];
+        } else {
+            $identity_clause = '?';
+            $clause = '`user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1)';
+            $params = [$identity_id, $curdate, $username];
+        }
+            $sql = '
+          UPDATE
+            `Coder_Of_The_Month`
+          SET
+            `selected_by` = ' . $identity_clause . '
+          WHERE
+            `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
+            AND ' . $clause . ';';
+
+            global $conn;
+            $conn->Execute($sql, $params);
+            return $conn->Affected_Rows();
+    }
+
     public static function calculateCoderOfLastMonth($currentDate) {
         $date = new DateTime($currentDate);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth($startTime, $endTime);
-    }
-
-    public static function calculateCoderOfCurrentMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
 }
