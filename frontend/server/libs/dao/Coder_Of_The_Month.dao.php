@@ -187,7 +187,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndSelected($time) {
+    final public static function getByTimeAndSelected($time, $autoselected = false) {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
                 FROM
@@ -195,8 +196,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `selected_by` IS NOT NULL;';
-
+                    `selected_by` ' . $clause . ';';
         global $conn;
         $rs = $conn->Execute($sql, [$time]);
 
@@ -244,7 +244,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             $clause = '`user_id` = (SELECT `user_id` FROM `Identities` WHERE `username` = ? LIMIT 1)';
             $params = [$identity_id, $curdate, $username];
         }
-        $sql = '
+            $sql = '
           UPDATE
             `Coder_Of_The_Month`
           SET
@@ -253,9 +253,10 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             `time` = LAST_DAY(? - INTERVAL 1 MONTH) + INTERVAL 1 DAY
             AND ' . $clause . ';';
 
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+            global $conn;
+            $conn->Execute($sql, $params);
+            return $conn->Affected_Rows();
+    }
 
     public static function calculateCoderOfLastMonth($currentDate) {
         $date = new DateTime($currentDate);
@@ -263,15 +264,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth($startTime, $endTime);
-    }
-
-    public static function calculateCoderOfCurrentMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
 }

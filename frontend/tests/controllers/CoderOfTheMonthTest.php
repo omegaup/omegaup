@@ -186,6 +186,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             ]));
             $this->fail('Exception was expected, because date is not in the range to select coder');
         } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
             // Pass
         }
 
@@ -219,37 +220,34 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $login = self::login($mentor);
         $this->assertTrue(Authorization::isMentor($mentor->main_identity_id));
 
-        // Testing with the current date
-        $currentDateTimestamp = Time::get();
-        $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $lastDayOfMonth = new DateTime($currentDate);
-        $lastDayOfMonth->modify('last day of this month');
+        // Testing with an intermediate day of the month
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-15', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
+
+        // Setting the date to the last day of the current month and testing mentor can choose the coder
         $date = new DateTime('now');
         $date->modify('last day of this month');
-        $lastDayOfMonth = $date->format('Y-m-d');
-        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertEquals(3, count($coders));
-
-        // Setting the date to the last day of the currrent month and testing mentor can choose the coder
+        $date->format('Y-m-d');
         Time::setTimeForTesting($date->getTimestamp());
-        $currentDateTimestamp = Time::get();
-        $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertEquals(3, count($coders));
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertTrue($canChooseCoder);
 
         // Setting the date to the first day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
-        $currentDateTimestamp = Time::get();
-        $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
-        $this->assertNull($coders);
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
 
         // Setting the date to the second day of the next month and testing mentor can not choose the coder
         Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
-        $currentDateTimestamp = Time::get();
-        $currentDate = date('Y-m-d', $currentDateTimestamp);
-        $coders = CoderOfTheMonthDAO::calculateCoderOfCurrentMonth($currentDate);
-        // No runs to calculate the coder for this month
-        $this->assertNull($coders);
+        $timestampTest = Time::get();
+        $dateTest = date('Y-m-d', $timestampTest);
+        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $this->assertFalse($canChooseCoder);
     }
 }

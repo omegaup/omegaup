@@ -1375,7 +1375,7 @@ class UserController extends Controller {
         }
 
         try {
-            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay);
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($firstDay);
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
@@ -1396,19 +1396,9 @@ class UserController extends Controller {
                 ]));
                 $coderOfTheMonthUserId = $users[0]['user_id'];
             } else {
-                $coderOfTheMonthUserId = $codersOfTheMonth[0];
+                $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             }
-
-            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndSelected($firstDay, true);
-            if (empty($codersOfTheMonth)) {
-                return [
-                    'status' => 'ok',
-                    'userinfo' => null,
-                    'problems' => null,
-                ];
-            }
-
-            $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
+            $user = UsersDAO::getByPK($coderOfTheMonthUserId);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
@@ -1484,16 +1474,16 @@ class UserController extends Controller {
         try {
             $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
 
-            if (empty($codersOfTheMonth)) {
-                // Generate the coder
-                $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($dateToSelect);
+            if (!empty($codersOfTheMonth)) {
+                throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
+            }
+            // Generate the coder
+            $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($dateToSelect);
 
-                foreach ($users as $index => $user) {
-                    $isUserSelected = $user['username'] == $r['username'];
-
-                    if (!$isUserSelected) {
-                        continue;
-                    }
+            foreach ($users as $index => $user) {
+                if ($user['username'] != $r['username']) {
+                    continue;
+                }
 
                 // Save it
                 CoderOfTheMonthDAO::save(new CoderOfTheMonth([
@@ -1502,6 +1492,7 @@ class UserController extends Controller {
                     'rank' => $index + 1,
                     'selected_by' => $r['current_identity_id'],
                 ]));
+
                 return ['status' => 'ok'];
             }
         } catch (Exception $e) {
