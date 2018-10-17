@@ -76,7 +76,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 Coder_Of_The_Month
               GROUP BY
                 user_id,
-                rank
+                selected_by
             ) AS cm on i.user_id = cm.user_id
           LEFT JOIN
             (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id
@@ -91,7 +91,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 100
         ";
 
-        $val = [$startTime, $endTime, $endTime];
+        $val = [$startTime, $endTime, $endTime, $endTime];
 
         global $conn;
         $results = $conn->getAll($sql, $val);
