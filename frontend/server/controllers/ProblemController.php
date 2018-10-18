@@ -918,7 +918,7 @@ class ProblemController extends Controller {
         if (!is_null($problemset['problemset'])) {
             if (!Authorization::isAdmin($r['current_identity_id'], $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
-                if (!is_null($problemset['contest'])) {
+                if (!empty($problemset['contest'])) {
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
                         if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
@@ -1166,7 +1166,7 @@ class ProblemController extends Controller {
         } elseif (!is_null($problemsetId)) {
             try {
                 // Is it a valid problemset_id?
-                $response['problemset'] = ProblemsetsDAO::getByPK($r['problemset_id']);
+                $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
                 if (is_null($response['problemset'])) {
                     throw new NotFoundException('problemsetNotFound');
                 }
