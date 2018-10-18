@@ -207,7 +207,7 @@ class RunsFactory {
 
         RunsDAO::save($run);
 
-        $gradeDir = RunController::getGradePath($run);
+        $gradeDir = RunController::getGradePath($run->guid);
         mkdir($gradeDir, 0755, true);
         file_put_contents("$gradeDir/details.json", json_encode([
             'verdict' => $verdict,

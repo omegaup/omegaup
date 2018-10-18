@@ -36,7 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
           if (tags.hasOwnProperty(e.name)) {
             return;
           }
-          $('.tag-list')
+          $('#tags .tag-list')
               .append($('<a></a>')
                           .attr('href', '#tags')
                           .addClass('tag')
@@ -324,7 +324,7 @@ omegaup.OmegaUp.on('ready', function() {
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
                                                            .parentElement;
-                                              $('.tag-list')
+                                              $('#tags .tag-list')
                                                   .append(
                                                       '<a href="#tags" ' +
                                                       'class="tag pull-left">' +
