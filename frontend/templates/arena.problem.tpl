@@ -41,7 +41,7 @@
 						<a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
 					</div>
 {/if}
-					<div class="statement"></div>
+					<div class="statement" data-step="1" data-intro="{#helpIntroInstructions#}"></div>
 					<hr />
 {if $source}
 					<div class="source">{#wordsSource#}: <span class="source-data">{$source|escape}</span></div>
@@ -49,6 +49,9 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
+					<div class="help">{#wordsNeedHelpToSendSubmission#}
+						<a href="#" id="submissions-help">{#wordsClickHere#}</a>
+					</div>
 					<div>
 						<script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
 						<div id="qualitynomination-demotionpopup"></div>
@@ -97,7 +100,7 @@
 {include file='arena.clarification_list.tpl' contest=false}
 			{/if}
 		</div>
-		<div id="overlay">
+		<div id="runs-overlay">
 {include file='arena.runsubmit.tpl'}
 			<div id="run-details"></div>
 		</div>

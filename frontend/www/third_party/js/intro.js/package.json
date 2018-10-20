@@ -1,0 +1,39 @@
+{
+  "name": "intro.js",
+  "description": "Better introductions for websites and features with a step-by-step guide for your projects",
+  "version": "2.9.3",
+  "author": "Afshin Mehrabani <afshin.meh@gmail.com>",
+  "homepage": "http://introjs.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usablica/intro.js"
+  },
+  "scripts": {
+    "test": "npm run test:jshint",
+    "test:jshint": "jshint ./intro.js",
+    "minify": "for file in ./intro*; do NAME=$(basename $file) && minify $file > ./minified/${NAME%.*}.min.${NAME#*.}; done",
+    "release": "./release.sh || true"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.5",
+    "minify": "^3.0.5"
+  },
+  "engine": [
+    "node >=0.1.90"
+  ],
+  "main": "intro.js",
+  "files": [
+    "*.js",
+    "*.css",
+    "license.md",
+    "themes/*",
+    "minified/*"
+  ],
+  "license": "AGPL-3.0",
+  "spm": {
+    "main": "intro.js",
+    "output": [
+      "introjs.css"
+    ]
+  }
+}

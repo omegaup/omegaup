@@ -111,10 +111,13 @@
 					<div class="karel-js-link hide">
 						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
 					</div>
-					<div class="statement"></div>
+					<div class="statement" data-step="1" data-intro="{#helpIntroInstructions#}"></div>
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
+					<div class="help">{#wordsNeedHelpToSendSubmission#}
+						<a href="#" id="submissions-help">{#wordsClickHere#}</a>
+					</div>
 {if $showPoints}
 {include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 {else}
@@ -134,7 +137,7 @@
 {/if}
 {include file='arena.clarification_list.tpl' contest=true}
 		</div>
-		<div id="overlay">
+		<div id="runs-overlay">
 {include file='arena.runsubmit.tpl'}
 {include file='arena.clarification.tpl' admin=$admin}
 			<div id="run-details"></div>

@@ -84,12 +84,37 @@ omegaup.OmegaUp.on('ready', function() {
           window.location = '/login/?redirect=' + escape(window.location);
           return;
         }
-        $('#overlay form').hide();
+        $('#runs-overlay form').hide();
         $('#submit input').show();
         $('#submit').show();
-        $('#overlay').show();
+        $('#runs-overlay').show();
         arena.codeEditor.code = arena.currentProblem.template;
         arena.codeEditor.refresh();
+
+        if (RegExp('multipage', 'gi').test(window.location.hash)) {
+          window.scrollTo(0, 0);
+          introJs()
+              .addSteps([
+                {
+                  element:
+                      document.querySelector('#submit select[name=language]'),
+                  intro: omegaup.T.helpIntroLanguage,
+                },
+                {
+                  element: document.querySelector('.vue-codemirror-wrap'),
+                  intro: omegaup.T.arenaRunSubmitPaste,
+                },
+                {
+                  element: document.querySelector('#submit input[type=file]'),
+                  intro: omegaup.T.arenaRunSubmitUpload,
+                },
+                {
+                  element: document.querySelector('#submit input[type=submit]'),
+                  intro: omegaup.T.helpIntroSubmit,
+                },
+              ])
+              .start();
+        }
       }
     }
     arena.detectShowRun();
@@ -138,6 +163,18 @@ omegaup.OmegaUp.on('ready', function() {
           arena.refreshClarifications();
         });
   }
+
+  $('#submissions-help')
+      .on('click', function(e) {
+        introJs()
+            .setOption('doneLabel', 'Next page')
+            .start()
+            .oncomplete(function() {
+              window.location.href =
+                  window.location + '/new-run?multipage=true';
+            });
+        return false;
+      });
 
   $('#clarification')
       .on('submit', function(e) {

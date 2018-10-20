@@ -107,7 +107,7 @@ def test_create_problem(driver):
                 if row is not None:
                     assert (row in textarea.text), row
 
-        driver.browser.find_element_by_id('overlay').click()
+        driver.browser.find_element_by_id('runs-overlay').click()
 
 
 # Creating a problem intentionally attempts to get the details of a problem to

@@ -6,7 +6,7 @@
 {include file='arena.runs.tpl' show_pager=true show_user=true show_problem=true show_rejudge=true show_details=true show_contest=true}
 			</div>
 		</div>
-		<div id="overlay">
+		<div id="runs-overlay">
 			<div id="run-details"></div>
 		</div>
 {include file='common.analytics.tpl'}

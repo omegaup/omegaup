@@ -42,3 +42,6 @@
 [submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/
+[submodule "usablica/intro.js"]
+	path = frontend/www/third_party/js/intro.js
+	url = https://github.com/usablica/intro.js/

@@ -545,6 +545,7 @@ export class Arena {
                     '/arena/' + self.options.contestAlias + '/practice/');
         }
         $('#new-run').hide();
+        $('#problem .help').hide();
       }
     } else {
       clock = UI.formatDelta(countdownTime.getTime() - now);
@@ -1376,10 +1377,10 @@ export class Arena {
       }
 
       if (newRun) {
-        $('#overlay form').hide();
+        $('#runs-overlay form').hide();
         $('input', self.elements.submitForm).show();
         self.elements.submitForm.show();
-        $('#overlay').show();
+        $('#runs-overlay').show();
         if (self.codeEditor) {
           // It might not be mounted yet if we refresh directly onto
           // a /new-run view. This code executes directly, whereas
@@ -1388,6 +1389,31 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
+          if (RegExp('multipage', 'gi').test(window.location.hash)) {
+            window.scrollTo(0, 0);
+            introJs()
+                .addSteps([
+                  {
+                    element:
+                        document.querySelector('#submit select[name=language]'),
+                    intro: T.helpIntroLanguage,
+                  },
+                  {
+                    element: document.querySelector('.vue-codemirror-wrap'),
+                    intro: T.arenaRunSubmitPaste,
+                  },
+                  {
+                    element: document.querySelector('#submit input[type=file]'),
+                    intro: T.arenaRunSubmitUpload,
+                  },
+                  {
+                    element:
+                        document.querySelector('#submit input[type=submit]'),
+                    intro: T.helpIntroSubmit,
+                  },
+                ])
+                .start();
+          }
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1397,8 +1423,8 @@ export class Arena {
       $('.summary', self.elements.problemList).addClass('active');
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
-        $('#overlay form').hide();
-        $('#overlay, #clarification').show();
+        $('#runs-overlay form').hide();
+        $('#runs-overlay, #clarification').show();
       }
     }
     self.detectShowRun();
@@ -1449,8 +1475,8 @@ export class Arena {
     let showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     let showRunMatch = window.location.hash.match(showRunRegex);
     if (showRunMatch) {
-      $('#overlay form').hide();
-      $('#overlay').show();
+      $('#runs-overlay form').hide();
+      $('#runs-overlay').show();
       API.Run.details({run_alias: showRunMatch[1]})
           .then(function(data) {
             self.displayRunDetails(showRunMatch[1], data);
@@ -1460,14 +1486,14 @@ export class Arena {
   }
 
   hideOverlay() {
-    $('#overlay').hide();
+    $('#runs-overlay').hide();
     window.location.hash = window.location.hash.substring(
         0, window.location.hash.lastIndexOf('/'));
   }
 
   bindGlobalHandlers() {
     let self = this;
-    $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
+    $('#runs-overlay, .close').on('click', self.onCloseSubmit.bind(self));
     self.elements.submitForm.language.on('change',
                                          self.onLanguageSelect.bind(self));
     self.elements.submitForm.on('submit', self.onSubmit.bind(self));
@@ -1475,7 +1501,7 @@ export class Arena {
 
   onCloseSubmit(e) {
     let self = this;
-    if (e.target.id === 'overlay' || e.target.className === 'close') {
+    if (e.target.id === 'runs-overlay' || e.target.className === 'close') {
       $('#clarification', self.elements.submitForm).hide();
       self.hideOverlay();
       self.clearInputFile();

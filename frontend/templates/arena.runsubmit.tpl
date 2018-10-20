@@ -1,6 +1,6 @@
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
-				<div>
+				<div class="language">
 					{#wordsLanguage#}
 					<select name="language">
 						<option value="" default="default"></option>
@@ -22,6 +22,6 @@
 				<div>{#arenaRunSubmitFilename#} <tt>Main<span class="submit-filename-extension"></span></tt></div>
 				<label for="editor">{#arenaRunSubmitPaste#}</label>
 				<textarea id="editor" name="code"></textarea><br/>
-				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
+				<div class="file"><label>{#arenaRunSubmitUpload#} <input type="file" /></label></div><br/>
 				<input type="submit" />
 			</form>

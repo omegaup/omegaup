@@ -93,7 +93,7 @@
 {if isset($show_submit)}
 					<tfoot>
 						<tr>
-							<td id="new-run" colspan="9"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
+							<td id="new-run" colspan="9" data-step="2" data-intro="{#helpIntroNewRun#}"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
 							<td id="new-run-practice-msg" colspan="9" style="display:none"><a>{#arenaContestEndedUsePractice#}</a></td>
 						</tr>
 					</tfoot>
