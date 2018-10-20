@@ -932,7 +932,7 @@ class UserController extends Controller {
             $keys =  [
                 'MS-UAIE' => 60,
                 'Prim-UAIE' => 40,
-                'Sec-UAUE' => 40,
+                'Sec-UAIE' => 40,
                 'ICPC-UAIE' => 45,
                 'Prim-UAIE-Jalpa' => 30,
                 'Sec-UAIE-Jalpa' => 30
