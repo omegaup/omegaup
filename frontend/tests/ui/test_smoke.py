@@ -111,6 +111,7 @@ def test_create_problem(driver):
 
 
 @util.annotate
+@util.no_javascript_errors()
 def create_problem(driver, problem_alias):
     '''Create a problem.'''
     with driver.login_admin():

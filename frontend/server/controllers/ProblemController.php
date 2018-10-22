@@ -942,7 +942,7 @@ class ProblemController extends Controller {
 
         // If we request a problem inside a contest
         $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
-        if (!is_null($problemset['problemset'])) {
+        if (!is_null($problemset) && isset($problemset['problemset'])) {
             if (!Authorization::isAdmin($r['current_identity_id'], $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
@@ -967,7 +967,7 @@ class ProblemController extends Controller {
                 }
             }
         } else {
-            if (!is_null($problem) && !Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
                 if (!ProblemsDAO::isVisible($problem)) {
@@ -1173,7 +1173,7 @@ class ProblemController extends Controller {
     private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
         $response = [];
-        if (!is_null($contestAlias)) {
+        if (!empty($contestAlias)) {
             try {
                 // Is it a valid contest_alias?
                 $response['contest'] = ContestsDAO::getByAlias($contestAlias);
@@ -1916,9 +1916,8 @@ class ProblemController extends Controller {
 
     /**
      * Returns the best score of a problem.
-     * Problem must be loaded in $r["problem"]
-     * Contest could be loaded in $r["contest"]. If set, will only look for
-     * runs inside that contest.
+     * If problemset is set, will only look for
+     * runs inside the contest.
      *
      * Authentication is expected to be performed earlier.
      *
