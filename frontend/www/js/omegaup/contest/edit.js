@@ -12,6 +12,9 @@ OmegaUp.on('ready', function() {
         .then((response) => {
           ev[param] = response[key] || response;
           ev.$parent[param] = response[key] || response;
+          if (param == 'problems') {
+            ev.order = response.problems.length + 1;
+          }
         })
         .fail(UI.apiError);
   }

@@ -15,7 +15,9 @@
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemContestOrder}}</label> <input class="form-control"
+               max="100"
                size="2"
+               type="number"
                v-model="order">
         </div>
         <div class="form-group">
@@ -62,7 +64,7 @@ export default {
       UI: UI,
       alias: '',
       points: 100,
-      order: 1,
+      order: this.data.length + 1,
       problems: this.data,
       selected: {},
     };
