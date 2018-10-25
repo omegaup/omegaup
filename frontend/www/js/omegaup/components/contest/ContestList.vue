@@ -45,8 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:class="contest.alias"
-            v-for="contest in contests">
+        <tr v-for="contest in contests">
           <td v-if="isAdmin"><input type='checkbox'
                  v-bind:id="contest.alias"></td>
           <td><strong><a v-bind:href="'/arena/' + contest.alias + '/'">{{ UI.contestTitle(contest)

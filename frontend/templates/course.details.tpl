@@ -15,7 +15,7 @@
 		{/if}
 	</tr></thead>
 	<tbody data-bind="foreach: assignment">
-		<tr data-bind="attr: { class: alias}">
+		<tr>
 			<td><a data-bind="text: name,
                               attr: { href: assignmentUrl }" /></td>
 			<td data-bind="text: progress" />

@@ -64,16 +64,16 @@ def test_user_ranking_course(driver):
             '//td[@class="accepted"]/preceding-sibling::td[1]')
         assert run_user.text == driver.user_username, run_user
 
-        enter_course_assignments_page(driver, course_alias)
         url = '/course/%s/assignment/%s/scoreboard' % (course_alias,
                                                        assignment_alias)
-        public = '//tr[@class="%s"]/td/a[text()="Public"]' % assignment_alias
-        util.check_scoreboard_events(driver, public, url, num_elements=1)
 
         enter_course_assignments_page(driver, course_alias)
-        admin = '//tr[@class="%s"]/td/a[text()="Admin"]' % assignment_alias
+        util.check_scoreboard_events(driver, assignment_alias, url,
+                                     num_elements=1, scoreboard='Public')
 
-        util.check_scoreboard_events(driver, admin, url, num_elements=1)
+        enter_course_assignments_page(driver, course_alias)
+        util.check_scoreboard_events(driver, assignment_alias, url,
+                                     num_elements=1, scoreboard='Admin')
 
 
 def enter_course_assignments_page(driver, course_alias):
