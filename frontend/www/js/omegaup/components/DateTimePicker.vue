@@ -10,7 +10,10 @@ import {T} from '../omegaup.js';
 export default {
   props: {
     value: Date,
-    enabled: true,
+    enabled: {
+      type: Boolean,
+      'default': true,
+    },
     format: {
       type: String,
       'default': T.dateTimePickerFormat,
