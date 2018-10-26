@@ -142,7 +142,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
     driver.register_user(user2, password)
 
     create_contest_admin(driver, alias, problem, [user1, user2],
-                         driver.user_username)
+                         driver.user_username, scoreboard_time_percent=0)
 
     with driver.login(user1, password):
         create_run_user(driver, alias, problem, 'Main.cpp11',
@@ -153,35 +153,6 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                         verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, alias)
-
-    with driver.login_admin():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/mine/"]')))).click()
-
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//a[@href = "/contest/%s/edit/"]' % alias))).click()
-
-        with driver.page_transition():
-            scoreboard_element = driver.wait.until(
-                EC.visibility_of_element_located(
-                    (By.CSS_SELECTOR,
-                     '.scoreboard-time-percent')))
-            scoreboard_element.clear()
-            scoreboard_element.send_keys('0')
-
-            driver.wait.until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, '//button[@type = "submit"]')))
-            driver.browser.find_element_by_tag_name('form').submit()
 
     with driver.login(driver.user_username, 'user'):
         create_run_user(driver, alias, problem, 'Main.cpp11',
@@ -198,8 +169,9 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                     (By.XPATH,
                      '//a[starts-with(@href, "%s")]' % contest_url))).click()
 
-        # User checks the score, it should be 0 because scoreboard show time
-        # has finished.
+        # User checks the score, it should be 0 because broadcaster is turned
+        # off in Travis, and the only way to get updated results while we are
+        # on the same page is going back to the page.
         check_ranking(driver, problem, driver.user_username, score='0')
 
         # User enters to problem in contest, the ranking for this problem
@@ -237,11 +209,12 @@ def check_ranking(driver, problem, user, *, score):
 
 
 @util.annotate
-def create_contest_admin(driver, contest_alias, problem, users, user):
+def create_contest_admin(driver, contest_alias, problem, users, user,
+                         **kwargs):
     '''Creates a contest as an admin.'''
 
     with driver.login_admin():
-        create_contest(driver, contest_alias)
+        create_contest(driver, contest_alias, **kwargs)
 
         assert (('/contest/%s/edit/' % contest_alias) in
                 driver.browser.current_url), driver.browser.current_url
@@ -314,7 +287,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
 
 @util.annotate
-def create_contest(driver, contest_alias):
+def create_contest(driver, contest_alias, scoreboard_time_percent=100):
     '''Creates a new contest.'''
 
     driver.wait.until(
@@ -334,6 +307,9 @@ def create_contest(driver, contest_alias):
         contest_alias)
     driver.browser.find_element_by_id('description').send_keys(
         'contest description')
+    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
+    scoreboard_element.clear()
+    scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
