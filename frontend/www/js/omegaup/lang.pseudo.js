@@ -852,6 +852,7 @@ omegaup.OmegaUp.loadTranslations({
 	wordsAddPrivileges: "(Agr3gar privi13g35)",
 	wordsAddProblem: "(Add pr0b13m)",
 	wordsAddStudent: "(Add 57ud3n7)",
+	wordsAddStudents: "(Add 57ud3n75)",
 	wordsAddTag: "(Add Tag)",
 	wordsAdmin: "(Admin)",
 	wordsAgree: "(I agr33)",
