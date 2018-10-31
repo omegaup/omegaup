@@ -30,6 +30,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           update: function(student, assignment) {
+            if (assignment == null) return;
             API.Course.studentProgress({
                         course_alias: payload.course.alias,
                         assignment: assignment.alias,

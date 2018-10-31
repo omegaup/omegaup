@@ -273,6 +273,8 @@ export default {
 
     removeStudent: _call('/api/course/removeStudent/'),
 
+    runs: _call('/api/course/runs/', _convertRuntimes),
+
     studentProgress: _call('/api/course/studentProgress/',
                            function(result) {
                              for (var problem of result.problems) {
@@ -362,6 +364,12 @@ export default {
     details: _call('/api/groupScoreboard/details/'),
 
     removeContest: _call('/api/groupScoreboard/removeContest/'),
+  },
+
+  Identity: {
+    create: _call('/api/identity/create/'),
+
+    bulkCreate: _call('/api/identity/bulkCreate/'),
   },
 
   Interview: {
@@ -524,6 +532,8 @@ export default {
 
     addGroup: _call('/api/user/addgroup/'),
 
+    associateIdentity: _call('/api/user/associateIdentity/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -547,6 +557,8 @@ export default {
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
+
+    listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 
