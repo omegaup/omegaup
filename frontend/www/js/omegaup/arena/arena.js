@@ -581,8 +581,16 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
+    let params = {
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
+    };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
+
     if (self.options.contestAlias != null) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(params)
           .then(function(response) {
             // Differentiate ranking change between virtual and normal contest
             if (self.options.originalContestAlias != null)
@@ -594,7 +602,7 @@ export class Arena {
     } else if (self.options.contestAdmin || self.options.contestAlias != null ||
                self.contestAdmin ||
                (self.options.courseAlias && self.options.assignmentAlias)) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(params)
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
     }
@@ -730,7 +738,8 @@ export class Arena {
     let self = this;
     self.onRankingChanged(data);
     let params = {
-      problemset_id: self.options.problemsetId,
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
     };
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;
@@ -748,8 +757,8 @@ export class Arena {
     self.onRankingChanged(data);
 
     let params = {
-      course_alias: self.options.courseAlias,
-      assignment_alias: self.options.assignmentAlias,
+      course: self.options.courseAlias,
+      assignment: self.options.assignmentAlias,
     };
     if (self.options.scoreboardToken) {
       params.token = self.options.scoreboardToken;

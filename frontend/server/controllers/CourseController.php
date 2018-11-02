@@ -1464,17 +1464,47 @@ class CourseController extends Controller {
     }
 
     private static function validateAssignmentDetails(Request $r, $is_required = false) {
+        if (is_null($r['token'])) {
+            self::authenticateRequest($r);
+        }
+
+        $r['course_admin'] = false;
+
         Validators::isStringNonEmpty($r['course'], 'course', $is_required);
         Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+
         $r['course'] = CoursesDAO::getByAlias($r['course']);
-        $course_start_time = strtotime($r['course']->start_time);
-        $course_finish_time = strtotime($r['course']->finish_time);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+        self::resolveGroup($r);
+
+        $course_start_time = strtotime($r['course']->start_time);
+        $course_finish_time = strtotime($r['course']->finish_time);
         $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
+        }
+
+        try {
+            $assignment_problemset = AssignmentsDAO::getByAliasWithExtraInformation($r['assignment']->assignment_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($assignment_problemset)) {
+            throw new NotFoundException('assignmentNotFound');
+        }
+
+        if (is_null($r['token'])) {
+            if (!Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
+                throw new ForbiddenAccessException('userNotAllowed');
+            }
+        } else {
+            if ($r['token'] === $assignment_problemset['scoreboard_url_admin']) {
+                $r['course_admin'] = true;
+            } elseif ($r['token'] !== $assignment_problemset['scoreboard_url']) {
+                throw new ForbiddenAccessException('invalidScoreboardUrl');
+            }
         }
         $r['assignment']->toUnixTime();
 
@@ -1493,7 +1523,8 @@ class CourseController extends Controller {
             $is_required
         );
         // Admins are almighty, no need to check anything else.
-        if (Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+        if (!is_null($r['token']) || Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
+            $r['course_admin'] = true;
             return;
         }
 
@@ -1514,7 +1545,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
         self::validateAssignmentDetails($r);
 
         $problems = ProblemsetProblemsDAO::getProblems(
@@ -1535,11 +1565,13 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
         // Log the operation.
-        ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
-            'identity_id' => $r['current_identity_id'],
-            'problemset_id' => $r['assignment']->problemset_id,
-            'ip' => ip2long($_SERVER['REMOTE_ADDR']),
-        ]));
+        if (is_null($r['token'])) {
+            ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+                'identity_id' => $r['current_identity_id'],
+                'problemset_id' => $r['assignment']->problemset_id,
+                'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+            ]));
+        }
         return [
             'status' => 'ok',
             'name' => $r['assignment']->name,
@@ -1550,7 +1582,7 @@ class CourseController extends Controller {
             'problems' => $problems,
             'director' => $director,
             'problemset_id' => $r['assignment']->problemset_id,
-            'admin' => Authorization::isCourseAdmin($r['current_identity_id'], $r['course']),
+            'admin' => $r['course_admin'],
         ];
     }
 
@@ -1758,14 +1790,7 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAssignmentScoreboard(Request $r) {
-        self::authenticateRequest($r);
-        self::validateCourseAlias($r);
-        self::validateCourseAssignmentAlias($r);
-        self::resolveGroup($r);
-
-        if (!Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
-            throw new ForbiddenAccessException();
-        }
+        self::validateAssignmentDetails($r);
 
         $scoreboard = new Scoreboard(
             new ScoreboardParams([
@@ -1795,10 +1820,7 @@ class CourseController extends Controller {
      * @throws NotFoundException
      */
     public static function apiAssignmentScoreboardEvents(Request $r) {
-        // Get the current user
-        self::authenticateRequest($r);
-        self::validateCourseAlias($r);
-        self::validateCourseAssignmentAlias($r);
+        self::validateAssignmentDetails($r);
 
         $scoreboard = new Scoreboard(
             ScoreboardParams::fromAssignment(

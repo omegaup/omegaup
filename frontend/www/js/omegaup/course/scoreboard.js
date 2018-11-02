@@ -27,8 +27,8 @@ OmegaUp.on('ready', function() {
         $('#title .course-title').text(course.name);
 
         API.Course.assignmentScoreboard({
-                    course_alias: arena.options.courseAlias,
-                    assignment_alias: arena.options.assignmentAlias,
+                    course: arena.options.courseAlias,
+                    assignment: arena.options.assignmentAlias,
                     token: arena.options.scoreboardToken
                   })
             .then(arena.rankingCourseChange.bind(arena))
@@ -36,8 +36,8 @@ OmegaUp.on('ready', function() {
         if (new Date() < course.finish_time && !arena.socket) {
           setInterval(function() {
             API.Course.assignmentScoreboard({
-                        course_alias: arena.options.courseAlias,
-                        assignment_alias: arena.options.assignmentAlias,
+                        course: arena.options.courseAlias,
+                        assignment: arena.options.assignmentAlias,
                         token: arena.options.scoreboardToken
                       })
                 .then(arena.rankingCourseChange.bind(arena))

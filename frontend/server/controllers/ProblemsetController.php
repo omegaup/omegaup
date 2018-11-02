@@ -120,8 +120,9 @@ class ProblemsetController extends Controller {
             return CourseController::apiAssignmentScoreboard(
                 new Request([
                     'auth_token' => $r['auth_token'],
-                    'course_alias' => $r['problemset']['course'],
-                    'assignment_alias' => $r['problemset']['assignment'],
+                    'token' => $r['token'],
+                    'course' => $r['problemset']['course'],
+                    'assignment' => $r['problemset']['assignment'],
                 ])
             );
         }
@@ -149,6 +150,7 @@ class ProblemsetController extends Controller {
             new Request([
                 'auth_token' => $r['auth_token'],
                 'contest_alias' => $r['problemset']['contest_alias'],
+                'token' => $r['token'],
             ])
         );
     }
