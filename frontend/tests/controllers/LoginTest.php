@@ -28,7 +28,7 @@ class LoginTest extends OmegaupTestCase {
         $response = UserController::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertLogin($user, $response['auth_token']);
+        $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
         $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
@@ -41,6 +41,7 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByEmailPositive() {
         $email = Utils::CreateRandomString() . '@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Inflate request with user data
         $r = new Request([
@@ -51,7 +52,7 @@ class LoginTest extends OmegaupTestCase {
         $response = UserController::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertLogin($user, $response['auth_token']);
+        $this->assertLogin($identity, $response['auth_token']);
     }
 
     /**
@@ -117,6 +118,7 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
         $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Set required context
         $_REQUEST['usernameOrEmail'] = $user->username;
@@ -134,7 +136,7 @@ class LoginTest extends OmegaupTestCase {
 
         // Validate output
         $this->assertEquals('ok', $response['status']);
-        $this->assertLogin($user, $response['auth_token']);
+        $this->assertLogin($identity, $response['auth_token']);
     }
 
     /**
@@ -144,6 +146,7 @@ class LoginTest extends OmegaupTestCase {
     public function test2ConsecutiveLogins() {
         // Create an user in omegaup
         $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Inflate request with user data
         $r = new Request([
@@ -154,12 +157,12 @@ class LoginTest extends OmegaupTestCase {
         // Call the API
         $response1 = UserController::apiLogin($r);
         $this->assertEquals('ok', $response1['status']);
-        $this->assertLogin($user, $response1['auth_token']);
+        $this->assertLogin($identity, $response1['auth_token']);
 
         // Call the API for 2nd time
         $response2 = UserController::apiLogin($r);
         $this->assertEquals('ok', $response2['status']);
-        $this->assertLogin($user, $response2['auth_token']);
+        $this->assertLogin($identity, $response2['auth_token']);
 
         $this->assertNotEquals($response1['auth_token'], $response2['auth_token']);
     }
