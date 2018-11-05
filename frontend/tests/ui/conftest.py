@@ -476,11 +476,9 @@ def _get_browser(request, browser_name):
         # Add browser configuration
         capabilities.update({
             'browserName': browser_name,
-            'version': '69.0',
-            'chromedriverVersion': '2.41',
-            'seleniumVersion': '3.13',
-            'platform': 'Windows 10',
-            'screenResolution': '%dx%d' % _WINDOW_SIZE,
+            'version': 'latest',
+            'platform': 'macOS 10.13',
+            'screenResolution': '1920x1440',  # '%dx%d' % _WINDOW_SIZE,
         })
         hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
@@ -494,7 +492,7 @@ def _get_browser(request, browser_name):
                 response = http.request('GET', '%s/status' % hub_url)
                 response = json.loads(response.data.decode('utf-8'))
                 logging.info('response: %r', response)
-                if response['ready']:
+                if response['status'] == 0:
                     break
             except:  # pylint: disable=bare-except
                 logging.exception('something went wrong, sleeping a bit...')
