@@ -8,10 +8,9 @@ stage_before_install() {
 
 	# Install pre-dependencies
 	python3.5 -m pip install --user --upgrade pip
-	# TODO: Figure out why 3.14.0 is broken
-	python3.5 -m pip install --user selenium==3.13.0
+	python3.5 -m pip install --user --upgrade urllib3
+	python3.5 -m pip install --user selenium
 	python3.5 -m pip install --user pytest
-	python3.5 -m pip install --user pytest-xdist
 	python3.5 -m pip install --user flaky
 
 	install_yarn
@@ -34,9 +33,7 @@ stage_install() {
 	/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" \
 		"${OMEGAUP_ROOT}/stuff/travis/nginx/config.php.tpl" > \
 		"${OMEGAUP_ROOT}/frontend/server/config.php"
-}
 
-stage_before_script() {
 	wait_for_mysql
 
 	setup_phpenv
@@ -55,9 +52,15 @@ stage_before_script() {
 	python3 stuff/bootstrap-environment.py --root-url=http://localhost:8000
 }
 
+stage_before_script() {
+	# Intentionally left blank.
+	# Nothing should be here to prevent Sauce Labs timeouts.
+	:
+}
+
 stage_script() {
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
 	python3.5 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 		--verbose --capture=no --log-cli-level=INFO --browser=chrome \
-		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
+		--force-flaky --max-runs=2 --min-passes=1
 }
