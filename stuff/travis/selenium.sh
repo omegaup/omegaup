@@ -33,9 +33,7 @@ stage_install() {
 	/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" \
 		"${OMEGAUP_ROOT}/stuff/travis/nginx/config.php.tpl" > \
 		"${OMEGAUP_ROOT}/frontend/server/config.php"
-}
 
-stage_before_script() {
 	wait_for_mysql
 
 	setup_phpenv
@@ -46,7 +44,9 @@ stage_before_script() {
 
 	yarn install
 	yarn build-development
+}
 
+stage_before_script() {
 	# Install the database schema
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup --development-environment
