@@ -8,8 +8,7 @@ stage_before_install() {
 
 	# Install pre-dependencies
 	python3.5 -m pip install --user --upgrade pip
-	# TODO: Figure out why 3.14.0 is broken
-	python3.5 -m pip install --user selenium==3.13.0
+	python3.5 -m pip install --user selenium
 	python3.5 -m pip install --user pytest
 	python3.5 -m pip install --user flaky
 
