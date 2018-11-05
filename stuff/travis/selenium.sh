@@ -8,6 +8,7 @@ stage_before_install() {
 
 	# Install pre-dependencies
 	python3.5 -m pip install --user --upgrade pip
+	python3.5 -m pip install --user --upgrade urllib3
 	python3.5 -m pip install --user selenium
 	python3.5 -m pip install --user pytest
 	python3.5 -m pip install --user flaky
@@ -43,14 +44,18 @@ stage_install() {
 
 	yarn install
 	yarn build-development
-}
 
-stage_before_script() {
 	# Install the database schema
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup --development-environment
 	# As well as installing some users and problems
 	python3 stuff/bootstrap-environment.py --root-url=http://localhost:8000
+}
+
+stage_before_script() {
+	# Intentionally left blank.
+	# Nothing should be here to prevent Sauce Labs timeouts.
+	:
 }
 
 stage_script() {
