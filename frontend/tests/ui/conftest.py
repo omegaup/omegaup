@@ -461,7 +461,6 @@ def _get_browser(request, browser_name):
 
     if util.CI:
         capabilities = {
-            'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
             'tunnelIdentifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
                 os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
@@ -475,6 +474,7 @@ def _get_browser(request, browser_name):
             'browserName': browser_name,
             'version': '69.0',
             'chromedriverVersion': '2.41',
+            'seleniumVersion': '3.13',
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
