@@ -15,7 +15,6 @@ import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
-from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
@@ -461,6 +460,10 @@ def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
     if util.CI:
+        # Selenium 3.14+ doesn't enable certificate checking
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         capabilities = {
             'tunnelIdentifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -485,17 +488,20 @@ def _get_browser(request, browser_name):
         )
         # Try to see if this removes the connection flakiness.
         t0 = time.time()
-        last_exception = Exception('timeout')
+        http = urllib3.PoolManager()
         while time.time() - t0 < 90:
             try:
-                return webdriver.Remote(desired_capabilities=capabilities,
-                                        command_executor=hub_url)
-            except SessionNotCreatedException as snce:
-                logging.error('Session not started yet. Sleeping 1s...')
-                last_exception = snce
+                response = http.request('GET', '%s/status' % hub_url)
+                response = json.loads(response.data.decode('utf-8'))
+                logging.info('response: %r', response)
+                if response['ready']:
+                    break
+            except:  # pylint: disable=bare-except
+                logging.exception('something went wrong, sleeping a bit...')
                 time.sleep(1)
-        # We failed to contact Sauce Labs in a reasonable amount of time :(
-        raise last_exception
+        # We failed to establish readiness in a reasonable amount of time :(
+        return webdriver.Remote(desired_capabilities=capabilities,
+                                command_executor=hub_url)
     if browser_name == 'chrome':
         chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = '/usr/bin/google-chrome'
