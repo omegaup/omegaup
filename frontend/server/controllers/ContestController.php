@@ -570,6 +570,7 @@ class ContestController extends Controller {
             ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
                 $r['current_identity_id'],
                 $r['contest']->problemset_id,
+                $r['contest']->window_length,
                 true,
                 $r['share_user_information']
             );
@@ -699,6 +700,8 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return array
+     * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
      * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) {
@@ -710,38 +713,47 @@ class ContestController extends Controller {
         unset($result['scoreboard_url_admin']);
         unset($result['rerun_id']);
         if (is_null($r['token'])) {
+            // Transaction begins
+            ContestsDAO::transBegin();
+
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody
             // Save the time of the first access
             try {
-                $problemset_user = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                $problemsetIdentity = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_identity_id'],
-                    $r['contest']->problemset_id
+                    $r['contest']->problemset_id,
+                    $r['contest']->window_length
                 );
-            } catch (ApiException $e) {
+
+                // Add time left to response
+                if ($r['contest']->window_length === null) {
+                    $result['submission_deadline'] = strtotime($r['contest']->finish_time);
+                } else {
+                    $result['submission_deadline'] = min(
+                        strtotime($r['contest']->finish_time),
+                        strtotime($problemsetIdentity->end_time)
+                    );
+                }
+                $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
+
+                // Log the operation.
+                ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+                    'identity_id' => $r['current_identity_id'],
+                    'problemset_id' => $r['contest']->problemset_id,
+                    'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+                ]));
+                ContestsDAO::transEnd();
+            } catch (InvalidParameterException $e) {
+                ContestsDAO::transRollback();
+                throw $e;
+            } catch (ForbiddenAccessException $e) {
+                ContestsDAO::transRollback();
                 throw $e;
             } catch (Exception $e) {
-                // Operation failed in the data layer
+                ContestsDAO::transRollback();
                 throw new InvalidDatabaseOperationException($e);
             }
-
-            // Add time left to response
-            if ($r['contest']->window_length === null) {
-                $result['submission_deadline'] = strtotime($r['contest']->finish_time);
-            } else {
-                $result['submission_deadline'] = min(
-                    strtotime($r['contest']->finish_time),
-                    strtotime($problemset_user->access_time) + $r['contest']->window_length * 60
-                );
-            }
-            $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
-
-            // Log the operation.
-            ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
-                'identity_id' => $r['current_identity_id'],
-                'problemset_id' => $r['contest']->problemset_id,
-                'ip' => ip2long($_SERVER['REMOTE_ADDR']),
-            ]));
         } else {
             $result['admin'] = $r['contest_admin'];
         }
@@ -1505,6 +1517,7 @@ class ContestController extends Controller {
                 'problemset_id' => $r['contest']->problemset_id,
                 'identity_id' => $r['user']->main_identity_id,
                 'access_time' => null,
+                'end_time' => null,
                 'score' => '0',
                 'time' => '0',
                 'is_invited' => '1',
@@ -2325,7 +2338,48 @@ class ContestController extends Controller {
     }
 
     /**
-     * This function reviews changes in penalty type and admission mode
+     * Update Contest end time for an identity when window_length
+     * option is turned on
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiUpdateEndTimeForIdentity(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate request
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::isNumber($r['end_time'], 'end_time');
+
+        try {
+            $problemsetIdentity = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
+                $r['contest_alias'],
+                $r['username'],
+                gmdate('Y-m-d H:i:s', $r['end_time'])
+            );
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!$problemsetIdentity) {
+            throw new NotFoundException('ProblemsetIdentityNotFound');
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * This function reviews changes in penalty type, admission mode and window length
      */
     private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
         if ($original_contest->admission_mode !== $contest->admission_mode) {
@@ -2338,6 +2392,12 @@ class ContestController extends Controller {
                 'time' => $timestamp
             ]));
             $contest->last_updated = $timestamp;
+        }
+        if ($original_contest->window_length !== $contest->window_length) {
+            ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
+                $contest->problemset_id,
+                $contest->window_length
+            );
         }
         ContestsDAO::save($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {

@@ -1345,6 +1345,7 @@ class ProblemController extends Controller {
                 ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
                     $r['current_identity_id'],
                     $problemset_id,
+                    null,
                     Authorization::canSubmitToProblemset(
                         $r['current_identity_id'],
                         $r['problemset']

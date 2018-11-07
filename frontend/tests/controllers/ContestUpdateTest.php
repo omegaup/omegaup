@@ -374,8 +374,20 @@ class UpdateContestTest extends OmegaupTestCase {
      *
      */
     public function testUpdateWindowLength() {
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
         // Get a contest
         $contestData = ContestsFactory::createContest();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create our contestant
+        $contestant = UserFactory::createUser();
+
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $directorLogin = self::login($contestData['director']);
 
@@ -389,6 +401,9 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $contest = ContestController::apiDetails($r);
 
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+
         $this->assertNull($contest['window_length'], 'Window length is not setted');
 
         $r['window_length'] = 0;
@@ -399,13 +414,36 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $this->assertNull($contest['window_length'], 'Window length is not setted, because 0 is not a valid value');
 
-        $r['window_length'] = 60;
+        $r['window_length'] = 10;
         // Call API
         $response = ContestController::apiUpdate($r);
 
         $contest = ContestController::apiDetails($r);
 
-        $this->assertEquals(60, $contest['window_length']);
+        $this->assertEquals(10, $contest['window_length']);
+
+        // Update time for testing
+        Time::setTimeForTesting(Time::get() + 700);
+
+        try {
+            // Trying to create a run out of contest time
+            $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $this->fail('User could not create a run when is out of contest time');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
+
+        $r['window_length'] = 40;
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        $contest = ContestController::apiDetails($r);
+
+        $this->assertEquals(40, $contest['window_length']);
+
+        // Trying to create a run inside contest time
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $r['window_length'] = 'Not valid';
 

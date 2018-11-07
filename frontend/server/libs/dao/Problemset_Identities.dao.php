@@ -11,38 +11,42 @@ include_once('base/Problemset_Identities.vo.base.php');
   */
 class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     public static function CheckAndSaveFirstTimeAccess(
-        $identity_id,
-        $problemset_id,
-        $grant_access = false,
-        $share_user_information = false
+        $identityId,
+        $problemsetId,
+        $windowLength,
+        $grantAccess = false,
+        $shareUserInformation = false
     ) {
-        $problemset_identity = self::getByPK($identity_id, $problemset_id);
-        if (is_null($problemset_identity)) {
-            if (!$grant_access) {
+        $problemsetIdentity = self::getByPK($identityId, $problemsetId);
+        if (is_null($problemsetIdentity)) {
+            if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
             }
-            $problemset_identity = new ProblemsetIdentities();
-            $problemset_identity->identity_id = $identity_id;
-            $problemset_identity->problemset_id = $problemset_id;
-            $problemset_identity->access_time = date('Y-m-d H:i:s');
-            $problemset_identity->score = 0;
-            $problemset_identity->time = 0;
-            $problemset_identity->is_invited = 0;
-            $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
-        } elseif (is_null($problemset_identity->access_time)) {
+            $problemsetIdentity = new ProblemsetIdentities();
+            $problemsetIdentity->identity_id = $identityId;
+            $problemsetIdentity->problemset_id = $problemsetId;
+            $problemsetIdentity->access_time = date('Y-m-d H:i:s');
+            $problemsetIdentity->end_time = date('Y-m-d H:i:s', Time::get() + $windowLength * 60);
+            $problemsetIdentity->score = 0;
+            $problemsetIdentity->time = 0;
+            $problemsetIdentity->is_invited = 0;
+            $problemsetIdentity->share_user_information = $shareUserInformation;
+            self::save($problemsetIdentity);
+        } elseif (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemset_identity->access_time = date('Y-m-d H:i:s');
-            $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
+            $problemsetIdentity->access_time = date('Y-m-d H:i:s');
+            $problemsetIdentity->end_time = date('Y-m-d H:i:s', Time::get() + $windowLength * 60);
+            $problemsetIdentity->share_user_information = $shareUserInformation;
+            self::save($problemsetIdentity);
         }
-        return $problemset_identity;
+        return $problemsetIdentity;
     }
 
     public static function getWithExtraInformation($problemset_id) {
         $sql = 'SELECT
                     pi.access_time,
+                    UNIX_TIMESTAMP(pi.end_time) as end_time,
                     i.username,
                     i.country_id,
                     IF(a.owner_id=i.identity_id, 1, NULL) as is_owner
@@ -72,11 +76,12 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             SELECT
                 i.user_id,
                 i.username,
+                pi.identity_id,
                 pi.access_time,
+                pi.end_time,
                 pi.is_invited,
                 e.email,
-                i.country_id,
-                pi.access_time
+                i.country_id
             FROM
                 Identities i
             INNER JOIN
@@ -92,6 +97,53 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
 
         global $conn;
         return $conn->GetAll($sql, [$problemset_id]);
+    }
+
+    public static function recalculateEndTimeForProblemsetIdentities($problemsetId, $windowLength) {
+        $problemsetIdentities = self::getIdentitiesByProblemset($problemsetId);
+        global $conn;
+        foreach ($problemsetIdentities as $problemsetIdentity) {
+            if (is_null($problemsetIdentity['end_time'])) {
+                continue;
+            }
+            $endTime = date('Y-m-d H:i:s', strtotime($problemsetIdentity['access_time']) + $windowLength * 60);
+            $sql = 'UPDATE
+                        `Problemset_Identities`
+                    SET
+                        `end_time` = ?
+                    WHERE
+                        `identity_id` = ?
+                        AND `problemset_id` = ?;';
+            $params = [
+                $endTime,
+                $problemsetIdentity['identity_id'],
+                $problemsetId,
+            ];
+            $conn->Execute($sql, $params);
+        }
+    }
+
+    public static function updateEndTimeForIdentity($contestAlias, $username, $endTime) {
+        $sql = 'UPDATE
+                    `Problemset_Identities`
+                INNER JOIN
+                    `Identities` ON `Problemset_Identities`.`identity_id` = `Identities`.`identity_id`
+                INNER JOIN
+                    `Contests` ON `Problemset_Identities`.`problemset_id` = `Contests`.`problemset_id`
+                SET
+                    `end_time` = ?
+                WHERE
+                    `Identities`.`username` = ?
+                    AND `Contests`.`alias` = ?;';
+        $params = [
+            $endTime,
+            $username,
+            $contestAlias,
+        ];
+
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {

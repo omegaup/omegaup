@@ -35,6 +35,9 @@ class ProblemsetIdentities extends VO {
         if (isset($data['access_time'])) {
             $this->access_time = $data['access_time'];
         }
+        if (isset($data['end_time'])) {
+            $this->end_time = $data['end_time'];
+        }
         if (isset($data['score'])) {
             $this->score = $data['score'];
         }
@@ -85,6 +88,13 @@ class ProblemsetIdentities extends VO {
       * @var datetime
       */
     public $access_time;
+
+    /**
+      * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
+      * @access public
+      * @var datetime
+      */
+    public $end_time;
 
     /**
       * Indica el puntaje que obtuvo el usuario en el concurso
