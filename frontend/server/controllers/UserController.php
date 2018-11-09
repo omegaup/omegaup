@@ -1245,7 +1245,7 @@ class UserController extends Controller {
 
             $response['userinfo']['email'] = $user_db['email'];
             $response['userinfo']['country'] = $user_db['country'];
-            $response['userinfo']['country_id'] = $user->country_id;
+            $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
             $response['userinfo']['state'] = $user_db['state'];
             $response['userinfo']['state_id'] = $user->state_id;
             $response['userinfo']['school'] = $user_db['school'];
