@@ -9,6 +9,7 @@ omegaup.OmegaUp.loadTranslations({
 	addUsersToReviewerGroup: "(C1iqu3 para adici0nar um u5u\u00e1ri0 na 1i57a d3 r3vi50r35.)",
 	adminAdded: "(Admin 5ucc355fu11y add3d.)",
 	adminRemoved: "(Admin 5ucc355fu11y r3m0v3d.)",
+	aliasAlreadyInUse: "(A1ia5 \"%(alias)\" a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 nam3.)",
 	aliasInUse: "(a1ia5 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 a1ia5.)",
 	apiNotFound: "(R3qu3573d API 3ndp0in7 n07 f0und.)",
 	arenaAdminManageProblem: "(Manag3 pr0b13m)",

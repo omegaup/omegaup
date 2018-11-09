@@ -9,6 +9,7 @@ omegaup.OmegaUp.loadTranslations({
 	addUsersToReviewerGroup: "Clic para agregar un usuario a la lista de revisores.",
 	adminAdded: "Administrador agregado correctamente",
 	adminRemoved: "Administrador eliminado correctamente",
+	aliasAlreadyInUse: "El alias \"%(alias)\" ya est\u00e1 siendo usado. Por favor elige un nombre distinto.",
 	aliasInUse: "El alias (t\u00edtulo corto) ya est\u00e1 siendo usado. Por favor elige un alias distinto.",
 	apiNotFound: "El API solicitada no fue encontrada.",
 	arenaAdminManageProblem: "Administrar problema",
