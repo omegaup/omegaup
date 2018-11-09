@@ -577,7 +577,7 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($needsInformation['requests_user_information'] != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id '], $r['statement_type']);
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['current_identity_id'],
                     $privacystatement_id
@@ -2802,6 +2802,39 @@ class ContestController extends Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Return users who participate in a contest, as long as contest admin
+     * contest admin have chosen asking for users information and contestant
+     * have previously agreed to share their information.
+     *
+     * @param Request $r
+     * @return array
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiContestants(Request $r) {
+        self::authenticateRequest($r);
+
+        self::validateStats($r);
+
+        if (!ContestsDAO::isRequiredUsersInformation($r['contest']->contest_id)) {
+            throw new ForbiddenAccessException('contestInformationNoRequired');
+        }
+
+        // Get our runs
+        try {
+            $contestants = ContestsDAO::getContestantsInfo($r['contest']->contest_id);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'contestants' => $contestants,
+        ];
     }
 
     public static function isPublic($admission_mode) {
