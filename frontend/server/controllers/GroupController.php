@@ -264,7 +264,7 @@ class GroupController extends Controller {
         $response = [];
 
         try {
-            $response['identities'] = GroupsIdentitiesDAO::GetMemberUsernames($group);
+            $response['identities'] = GroupsIdentitiesDAO::GetMemberIdentities($group);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
