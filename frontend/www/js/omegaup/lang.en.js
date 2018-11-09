@@ -272,6 +272,7 @@ omegaup.OmegaUp.loadTranslations({
 	courseStudentsEmpty: "No students",
 	courseStudentsProgress: "Students' progress",
 	courseStudentsProgressExportToSpreadsheet: "Export students' progress to spreadsheet",
+	courseUpdateAlreadyHasRuns: "Length of an assignment can't be changed once a solution has been judged.",
 	courseViewProgress: "View progress",
 	createSchoolFailed: "School creation failed.",
 	csrfException: "Cross-site Request Forgery attempt",
