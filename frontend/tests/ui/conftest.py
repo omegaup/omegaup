@@ -460,10 +460,6 @@ def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
     if util.CI:
-        # Selenium 3.14+ doesn't enable certificate checking
-        import urllib3
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
         capabilities = {
             'tunnelIdentifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
@@ -476,28 +472,16 @@ def _get_browser(request, browser_name):
         # Add browser configuration
         capabilities.update({
             'browserName': browser_name,
-            'version': 'latest',
-            'platform': 'macOS 10.13',
-            'screenResolution': '1920x1440',  # '%dx%d' % _WINDOW_SIZE,
+            'version': '69.0',
+            'chromedriverVersion': '2.41',
+            'seleniumVersion': '3.13',
+            'platform': 'Windows 10',
+            'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
         hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
             os.environ.get('SAUCE_USERNAME', 'lhchavez'),
             os.environ['SAUCE_ACCESS_KEY']
         )
-        # Try to see if this removes the connection flakiness.
-        t0 = time.time()
-        http = urllib3.PoolManager()
-        while time.time() - t0 < 90:
-            try:
-                response = http.request('GET', '%s/status' % hub_url)
-                response = json.loads(response.data.decode('utf-8'))
-                logging.info('response: %r', response)
-                if response['status'] == 0:
-                    break
-            except:  # pylint: disable=bare-except
-                logging.exception('something went wrong, sleeping a bit...')
-                time.sleep(1)
-        # We failed to establish readiness in a reasonable amount of time :(
         return webdriver.Remote(desired_capabilities=capabilities,
                                 command_executor=hub_url)
     if browser_name == 'chrome':
