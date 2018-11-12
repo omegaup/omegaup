@@ -30,7 +30,7 @@
                   data-placement="top"
                   data-toggle="tooltip"
                   v-bind:title="T.courseAssignmentNewFormStartDateDesc"></span>
-                  <omegaup-datetimepicker v-bind:enabled="update"
+                  <omegaup-datetimepicker v-bind:enabled="!update"
                                     v-model="startTime"></omegaup-datetimepicker></label>
           </div>
           <div class="form-group col-md-4">
