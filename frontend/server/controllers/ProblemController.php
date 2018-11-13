@@ -909,6 +909,7 @@ class ProblemController extends Controller {
      * Validate problem Details API
      *
      * @param Request $r
+     * @return Array
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
@@ -926,13 +927,13 @@ class ProblemController extends Controller {
         }
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+        if (is_null($problem)) {
+            return null;
         }
 
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
@@ -940,23 +941,24 @@ class ProblemController extends Controller {
         }
 
         // If we request a problem inside a contest
-        if (self::validateProblemset($r)) {
-            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
+        $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
+        if (!is_null($problemset) && isset($problemset['problemset'])) {
+            if (!Authorization::isAdmin($r['current_identity_id'], $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
-                if (isset($r['contest'])) {
-                    if (!ContestController::isPublic($r['contest']->admission_mode)) {
-                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['problemset']->problemset_id))) {
+                if (!empty($problemset['contest'])) {
+                    if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }
                     }
                     // If the contest has not started, non-admin users should not see it
-                    if (!ContestsDAO::hasStarted($r['contest'])) {
+                    if (!ContestsDAO::hasStarted($problemset['contest'])) {
                         throw new ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
                     if (!Authorization::canSubmitToProblemset(
                         $r['current_identity_id'],
-                        $r['problemset']
+                        $problemset['problemset']
                     )
                     ) {
                         throw new ForbiddenAccessException();
@@ -965,14 +967,18 @@ class ProblemController extends Controller {
                 }
             }
         } else {
-            if (!Authorization::canEditProblem($r['current_identity_id'], $r['problem'])) {
+            if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
-                if (!ProblemsDAO::isVisible($r['problem'])) {
+                if (!ProblemsDAO::isVisible($problem)) {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
             }
         }
+        return [
+            'problem' => $problem,
+            'problemset' => $problemset['problemset'],
+        ];
     }
 
     /**
@@ -1056,11 +1062,11 @@ class ProblemController extends Controller {
     /**
      * Gets the sample input from the filesystem.
      *
-     * @param Request $r
+     * @param Problems $problem
      * @throws InvalidFilesystemOperationException
      */
-    public static function getSampleInput(Request $r) {
-        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+    public static function getSampleInput(Problems $problem) {
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
 
         try {
             $file_content = $problemArtifacts->get('examples/sample.in', true /* quiet */);
@@ -1075,11 +1081,11 @@ class ProblemController extends Controller {
     /**
      * Gets the libinteractive interface name from the filesystem.
      *
-     * @param Request $r
+     * @param Problems $problem
      * @throws InvalidFilesystemOperationException
      */
-    public static function getLibinteractiveInterfaceName(Request $r) {
-        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+    public static function getLibinteractiveInterfaceName(Problems $problem) {
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
 
         $interactiveFiles = [];
         try {
@@ -1153,17 +1159,29 @@ class ProblemController extends Controller {
         }
     }
 
-    private static function validateProblemset(Request $r) {
+    /**
+     * Validate problemset Details API
+     *
+     * @param Problems $problem
+     * @param $problemsetId
+     * @param $contestAlias
+     * @return Array
+     * @throws ApiException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
-        if (!empty($r['contest_alias'])) {
+        $response = [];
+        if (!empty($contestAlias)) {
             try {
                 // Is it a valid contest_alias?
-                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-                if (is_null($r['contest'])) {
+                $response['contest'] = ContestsDAO::getByAlias($contestAlias);
+                if (is_null($response['contest'])) {
                     throw new NotFoundException('contestNotFound');
                 }
-                $r['problemset'] = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-                if (is_null($r['problemset'])) {
+                $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
+                if (is_null($response['problemset'])) {
                     throw new NotFoundException('contestNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInContest';
@@ -1172,11 +1190,11 @@ class ProblemController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-        } elseif (!empty($r['problemset_id'])) {
+        } elseif (!is_null($problemsetId)) {
             try {
                 // Is it a valid problemset_id?
-                $r['problemset'] = ProblemsetsDAO::getByPK($r['problemset_id']);
-                if (is_null($r['problemset'])) {
+                $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
+                if (is_null($response['problemset'])) {
                     throw new NotFoundException('problemsetNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInProblemset';
@@ -1187,19 +1205,19 @@ class ProblemController extends Controller {
             }
         } else {
             // Nothing to see here, move along.
-            return false;
+            return null;
         }
 
         // Is the problem actually in the problemset?
         if (is_null(ProblemsetProblemsDAO::getByPK(
-            $r['problemset']->problemset_id,
-            $r['problem']->problem_id
+            $response['problemset']->problemset_id,
+            $problem->problem_id
         ))
         ) {
             throw new NotFoundException($problemNotFound);
         }
 
-        return true;
+        return $response;
     }
 
     /**
@@ -1222,8 +1240,13 @@ class ProblemController extends Controller {
         }
 
         // Validate request
-        self::validateDetails($r);
-
+        $problem = self::validateDetails($r);
+        if (is_null($problem)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
         $response = [];
 
         // Create array of relevant columns
@@ -1234,7 +1257,7 @@ class ProblemController extends Controller {
             'visibility','languages', 'slow', 'email_clarifications'];
 
         $response['statement'] = ProblemController::getProblemStatement(
-            $r['problem']->alias,
+            $problem['problem']->alias,
             $r['lang']
         );
 
@@ -1242,8 +1265,8 @@ class ProblemController extends Controller {
         $sample_input = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_SAMPLE,
-            $r['problem']->alias . '-sample.in',
-            $r,
+            $problem['problem']->alias . '-sample.in',
+            $problem['problem'],
             'ProblemController::getSampleInput',
             $sample_input,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -1256,8 +1279,8 @@ class ProblemController extends Controller {
         $libinteractive_interface_name = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME,
-            $r['problem']->alias,
-            $r,
+            $problem['problem']->alias,
+            $problem['problem'],
             'ProblemController::getLibinteractiveInterfaceName',
             $libinteractive_interface_name,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -1285,13 +1308,13 @@ class ProblemController extends Controller {
         }
 
         // Add the problem the response
-        $response = array_merge($response, $r['problem']->asFilteredArray($relevant_columns));
+        $response = array_merge($response, $problem['problem']->asFilteredArray($relevant_columns));
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if (ProblemsDAO::isVisible($r['problem']) ||
-            Authorization::isProblemAdmin($r['current_identity_id'], $r['problem'])) {
-            $acl = ACLsDAO::getByPK($r['problem']->acl_id);
+        if (ProblemsDAO::isVisible($problem['problem']) ||
+            Authorization::isProblemAdmin($r['current_identity_id'], $problem['problem'])) {
+            $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
@@ -1303,7 +1326,7 @@ class ProblemController extends Controller {
             unset($response['source']);
         }
 
-        $problemset_id = isset($r['problemset']) ? $r['problemset']->problemset_id : null;
+        $problemset_id = !is_null($problem['problemset']) ? $problem['problemset']->problemset_id : null;
 
         if (!is_null($r['current_user_id'])) {
             // Create array of relevant columns for list of runs
@@ -1316,7 +1339,7 @@ class ProblemController extends Controller {
             // Get all the available runs done by the current_user
             try {
                 $runsArray = RunsDAO::getByKeys(
-                    $r['problem']->problem_id,
+                    $problem['problem']->problem_id,
                     $problemset_id,
                     $r['current_identity_id']
                 );
@@ -1329,7 +1352,7 @@ class ProblemController extends Controller {
             $runs_filtered_array = [];
             foreach ($runsArray as $run) {
                 $filtered = $run->asFilteredArray($relevant_columns);
-                $filtered['alias'] = $r['problem']->alias;
+                $filtered['alias'] = $problem['problem']->alias;
                 $filtered['username'] = $r['current_user']->username;
                 $filtered['time'] = strtotime($filtered['time']);
                 $filtered['contest_score'] = (float)$filtered['contest_score'];
@@ -1347,7 +1370,7 @@ class ProblemController extends Controller {
                     $problemset_id,
                     Authorization::canSubmitToProblemset(
                         $r['current_identity_id'],
-                        $r['problemset']
+                        $problem['problemset']
                     )
                 );
             } catch (ApiException $e) {
@@ -1360,14 +1383,14 @@ class ProblemController extends Controller {
             // As last step, register the problem as opened
             if (!ProblemsetProblemOpenedDAO::getByPK(
                 $problemset_id,
-                $r['problem']->problem_id,
+                $problem['problem']->problem_id,
                 $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset_id,
-                        'problem_id' => $r['problem']->problem_id,
+                        'problem_id' => $problem['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'identity_id' => $r['current_identity_id']
                     ]));
@@ -1377,13 +1400,13 @@ class ProblemController extends Controller {
                 }
             }
         } elseif (isset($r['show_solvers']) && $r['show_solvers']) {
-            $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
+            $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($problem['problem']->problem_id);
         }
 
         if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
                 $r['current_identity_id'],
-                $r['problem']->problem_id
+                $problem['problem']->problem_id
             );
         }
 
@@ -1392,8 +1415,9 @@ class ProblemController extends Controller {
         $response['languages'] = array_filter(explode(',', $response['languages']));
 
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
-        $response['score'] = self::bestScore($r);
+        $response['score'] = self::bestScore($problem['problem'], $r['problemset_id'], $r['contest_alias'], $r['current_identity_id']);
         $response['status'] = 'ok';
+        $response['exists'] = true;
         return $response;
     }
 
@@ -1873,46 +1897,62 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Uses same params as apiDetails, except for lang, which is optional
-        self::validateDetails($r);
+        $problem = self::validateDetails($r);
 
         // If username is set in the request, we use that identity as target.
         // else, we query using current_user
         $identity = self::resolveTargetIdentity($r);
 
-        $response['score'] = self::bestScore($r, $identity);
+        $response['score'] = self::bestScore(
+            $problem['problem'],
+            $r['problemset_id'],
+            $r['contest_alias'],
+            $r['current_identity_id'],
+            $identity
+        );
         $response['status'] = 'ok';
         return $response;
     }
 
     /**
      * Returns the best score of a problem.
-     * Problem must be loadad in $r["problem"]
-     * Contest could be loadad in $r["contest"]. If set, will only look for
-     * runs inside that contest.
+     * If problemset is set, will only look for
+     * runs inside the contest.
      *
      * Authentication is expected to be performed earlier.
      *
-     * @param Request $r
+     * @param Problems $problem
+     * @param $problemsetId
+     * @param $contestAlias
+     * @param $currentLoggedIdentityId
+     * @param Identities $identity
      * @return float
      * @throws InvalidDatabaseOperationException
      */
-    private static function bestScore(Request $r, Identities $identity = null) {
-        $current_identity_id = (is_null($identity) ? $r['current_identity_id'] : $identity->identity_id);
+    private static function bestScore(
+        Problems $problem,
+        $problemsetId,
+        $contestAlias,
+        $currentLoggedIdentityId,
+        Identities $identity = null
+    ) {
+        $currentIdentityId = (is_null($identity) ? $currentLoggedIdentityId : $identity->identity_id);
 
-        if (is_null($current_identity_id)) {
+        if (is_null($currentIdentityId)) {
             return 0;
         }
 
         $score = 0;
         try {
             // Add best score info
-            if (!self::validateProblemset($r)) {
-                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_identity_id);
+            $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
+            if (is_null($problemset['problemset'])) {
+                $score = RunsDAO::GetBestScore($problem->problem_id, $currentIdentityId);
             } else {
                 $bestRun = RunsDAO::GetBestRun(
-                    $r['problemset']->problemset_id,
-                    $r['problem']->problem_id,
-                    $current_identity_id,
+                    $problemset['problemset']->problemset_id,
+                    $problem->problem_id,
+                    $currentIdentityId,
                     false /*showAllRuns*/
                 );
                 $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;

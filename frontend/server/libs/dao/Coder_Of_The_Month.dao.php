@@ -33,7 +33,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           SELECT DISTINCT
             i.user_id,
             i.username,
-            i.country_id,
+            COALESCE(i.country_id, 'xx') AS country_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
             (SELECT urc.classname FROM
@@ -110,7 +110,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     final public static function getCodersOfTheMonth() {
         $sql = '
           SELECT
-            cm.time, u.username, u.country_id, e.email
+            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
@@ -142,7 +142,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
-            cm.time, u.username, u.country_id, e.email, u.user_id
+            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email, u.user_id
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
