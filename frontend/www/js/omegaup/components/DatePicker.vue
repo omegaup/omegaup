@@ -2,7 +2,7 @@
   <input class="form-control"
         size="16"
         type="text"
-        v-bind:disabled="!enabled">
+        v-bind:disabled="disabled">
 </template>
 
 <script>
@@ -10,9 +10,9 @@ import {T} from '../omegaup.js';
 export default {
   props: {
     value: Date,
-    enabled: {
+    disabled: {
       type: Boolean,
-      'default': true,
+      'default': false,
     },
     format: {
       type: String,

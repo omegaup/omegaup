@@ -99,10 +99,7 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
-        // Validate only when create
-        if (!$is_update) {
-            Validators::isNumber($r['start_time'], 'start_time', !$is_update);
-        }
+        Validators::isNumber($r['start_time'], 'start_time', !$is_update);
         Validators::isNumber($r['finish_time'], 'finish_time', !$is_update);
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
@@ -438,8 +435,9 @@ class CourseController extends Controller {
             }
         }
 
-        // Force start time with original value
-        $r['start_time'] = $r['assignment']->start_time;
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = $r['assignment']->start_time;
+        }
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $r['assignment']->finish_time;
         }
@@ -1497,14 +1495,17 @@ class CourseController extends Controller {
         }
         $r['assignment']->toUnixTime();
 
-        if (!$is_update) {
-            Validators::isNumberInRange(
-                $r['start_time'],
-                'start_time',
-                $course_start_time,
-                $course_finish_time,
-                $is_required
-            );
+        Validators::isNumberInRange(
+            $r['start_time'],
+            'start_time',
+            $course_start_time,
+            $course_finish_time,
+            $is_required
+        );
+
+        // Set null start_time because is lower than current date
+        if ($r['start_time'] < Time::get()) {
+            $r['start_time'] = null;
         }
         Validators::isNumberInRange(
             $r['finish_time'],
