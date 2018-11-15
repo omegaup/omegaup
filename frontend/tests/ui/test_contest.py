@@ -158,6 +158,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         create_run_user(driver, alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
+    with driver.login(driver.user_username, 'user'):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, '.navbar-brand'))).click()
@@ -282,8 +283,6 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
              'button.details'))).click()
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
-
-    driver.browser.find_element_by_id('overlay').click()
 
 
 @util.annotate
