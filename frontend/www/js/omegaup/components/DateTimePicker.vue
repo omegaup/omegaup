@@ -2,7 +2,7 @@
   <input class="form-control"
         size="16"
         type="text"
-        v-bind:disabled="enabled">
+        v-bind:disabled="!enabled">
 </template>
 
 <script>
