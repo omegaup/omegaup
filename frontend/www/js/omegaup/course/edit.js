@@ -428,20 +428,23 @@ OmegaUp.on('ready', function() {
           courseAlias: courseAlias,
         },
         on: {
-          'add-student': function(username) {
-            API.Course.addStudent({
-                        course_alias: courseAlias,
-                        usernameOrEmail: username,
-                      })
-                .then(function(data) {
+          'add-student': function(ev) {
+            let participants = [];
+            if (ev.participants !== '')
+              participants = ev.participants.split(',');
+            if (ev.participant !== '') participants.push(ev.participant);
+            let promises = participants.map(function(participant) {
+              return API.Course.addStudent({
+                course_alias: courseAlias,
+                usernameOrEmail: participant.trim()
+              });
+            });
+            $.when.apply($, promises)
+                .then(function() {
                   refreshStudentList();
                   UI.success(T.courseStudentAdded);
-                  addStudents.$children[0].reset();
                 })
-                .fail(UI.apiError);
-          },
-          cancel: function(ev) {
-            window.location = '/course/' + courseAlias + '/';
+                .fail(function() { UI.error(T.bulkUserAddError); });
           },
           remove: function(student) {
             API.Course.removeStudent({

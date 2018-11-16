@@ -32,7 +32,8 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'course' => $courseAlias
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']);
+        // Start time is not modified
+        $this->assertEquals($courseData['request']['start_time'], $response['start_time']);
         $this->assertEquals($updatedFinishTime, $response['finish_time']);
 
         $this->assertEquals('some new name', $response['name']);
@@ -60,21 +61,31 @@ class AssignmentUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * Can't update the start time to be after the finish time.
-     * @expectedException InvalidParameterException
+     * Can't update the start time to be after the finish time,
+     * because start time can not be modified
      */
     public function testAssignmentUpdateWithInvertedTimes() {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
-        $response = CourseController::apiUpdateAssignment(new Request([
+        $assignmentAlias = $courseData['assignment_alias'];
+        $courseAlias = $courseData['course_alias'];
+        CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
-            'assignment' => $courseData['assignment_alias'],
-            'course' => $courseData['course_alias'],
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
             'start_time' => $courseData['request']['start_time'] + 10,
             'finish_time' => $courseData['request']['start_time'] + 9,
         ]));
+
+        // Read the assignment again
+        $response = CourseController::apiAssignmentDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias
+        ]));
+        $this->assertEquals($courseData['request']['start_time'], $response['start_time']);
     }
 
     /**
