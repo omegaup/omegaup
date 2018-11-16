@@ -6,24 +6,15 @@ OmegaUp.on('ready', function() {
   const contestAlias =
       /\/contest\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
-  function callApi(api) {
-    return new Promise((resolve, reject) => {
-      api({contest_alias: contestAlias})
-          .then((response) => { resolve(response); })
-          .fail(UI.apiError);
-    });
-  }
-
-  function refresh(ev, promises, param, key) {
-    Promise.all(promises)
-        .then(function(results) {
-          let response = results[1];
-          key = key || param;
+  function refresh(ev, api, param, key) {
+    key = key || param;
+    api({contest_alias: contestAlias})
+        .then((response) => {
           ev[param] = response[key] || response;
           ev.$parent[param] = response[key] || response;
           return response;
         })
-        .catch(UI.apiError);
+        .fail(UI.apiError);
   }
 
   $.when(API.Contest.adminDetails({contest_alias: contestAlias}),
@@ -77,20 +68,27 @@ OmegaUp.on('ready', function() {
                       .fail(UI.apiError);
                 },
                 'add-problem': function(ev) {
-                  let promises = [];
-                  promises.push(new Promise((resolve, reject) => {
-                    API.Contest.addProblem({
-                                 contest_alias: contestAlias,
-                                 order_in_contest: ev.order,
-                                 problem_alias: ev.alias,
-                                 points: ev.points,
-                               })
-                        .then(function(response) { resolve(response); })
-                        .fail(UI.apiError);
-                  }));
-                  promises.push(callApi(API.Contest.problems));
-
-                  let results = refresh(ev, promises, 'problems');
+                  API.Contest.addProblem({
+                               contest_alias: contestAlias,
+                               order_in_contest: ev.order,
+                               problem_alias: ev.alias,
+                               points: ev.points,
+                             })
+                      .then(function(response) {
+                        API.Contest.problems({contest_alias: contestAlias})
+                            .then(function(result) {
+                              if (result.status != 'ok') {
+                                UI.error(result.error || 'error');
+                              }
+                              UI.success(T.problemSuccessfullyRemoved);
+                              let problems = result['problems'];
+                              ev['problems'] = problems;
+                              ev.$parent['problems'] = problems;
+                              ev['order'] = problems.length + 1;
+                            })
+                            .fail(UI.apiError);
+                      })
+                      .fail(UI.apiError);
                 },
                 'remove-problem': function(ev) {
                   API.Contest.removeProblem({
