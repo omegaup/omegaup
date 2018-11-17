@@ -409,19 +409,40 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAssignmentDetails($r, true /*is_required*/, true /*is_update*/);
-
+        self::validateAssignmentDetails($r);
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
 
-        Validators::isNumber($r['start_time'], 'start_time', false /*is_required*/);
-        Validators::isNumber($r['finish_time'], 'finish_time', false /*is_required*/);
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = $r['assignment']->start_time;
+        } else {
+            Validators::isNumberInRange(
+                $r['start_time'],
+                'start_time',
+                $r['course']->start_time,
+                $r['course']->finish_time,
+                true /* is_required */
+            );
+        }
+        if (is_null($r['start_time'])) {
+            $r['finish_time'] = $r['assignment']->finish_time;
+        } else {
+            Validators::isNumberInRange(
+                $r['finish_time'],
+                'finish_time',
+                $r['course']->start_time,
+                $r['course']->finish_time,
+                true /* is_required */
+            );
+        }
+
+        if ($r['start_time'] > $r['finish_time']) {
+            throw new InvalidParameterException('courseInvalidStartTime');
+        }
 
         // Prevent date changes if a course already has runs
-        if ((!is_null($r['finish_time']) && $r['finish_time'] != strtotime($r['assignment']->finish_time)) ||
-            (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['assignment']->start_time))
-        ) {
+        if ($r['start_time'] != $r['assignment']->start_time) {
             $runCount = 0;
 
             try {
@@ -433,16 +454,6 @@ class CourseController extends Controller {
             if ($runCount > 0) {
                 throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
             }
-        }
-
-        if (is_null($r['start_time'])) {
-            $r['start_time'] = $r['assignment']->start_time;
-        }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $r['assignment']->finish_time;
-        }
-        if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         $valueProperties = [
@@ -1480,40 +1491,20 @@ class CourseController extends Controller {
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
-    private static function validateAssignmentDetails(Request $r, $is_required = false, $is_update = false) {
-        Validators::isStringNonEmpty($r['course'], 'course', $is_required);
-        Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+    private static function validateAssignmentDetails(Request $r) {
+        Validators::isStringNonEmpty($r['course'], 'course', true /* is_required */);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /* is_required */);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
-        $course_start_time = strtotime($r['course']->start_time);
-        $course_finish_time = strtotime($r['course']->finish_time);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+        $r['course']->toUnixTime();
         $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
         $r['assignment']->toUnixTime();
 
-        Validators::isNumberInRange(
-            $r['start_time'],
-            'start_time',
-            $course_start_time,
-            $course_finish_time,
-            $is_required
-        );
-
-        // Set null start_time because is lower than current date
-        if ($r['start_time'] < Time::get()) {
-            $r['start_time'] = null;
-        }
-        Validators::isNumberInRange(
-            $r['finish_time'],
-            'finish_time',
-            $course_start_time,
-            $course_finish_time,
-            $is_required
-        );
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             return;
