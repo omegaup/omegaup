@@ -446,7 +446,7 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(function() { UI.error(T.bulkUserAddError); });
           },
-          remove: function(student) {
+          'remove-student': function(student) {
             API.Course.removeStudent({
                         course_alias: courseAlias,
                         usernameOrEmail: student.username
