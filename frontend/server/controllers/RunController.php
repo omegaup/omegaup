@@ -379,11 +379,11 @@ class RunController extends Controller {
                     if (isset($r['container']->window_length)) {
                         $response['submission_deadline'] = min(
                             strtotime($r['container']->finish_time),
-                            strtotime($contest_user->end_time) * 60
+                            strtotime($contest_user->end_time)
                         );
                     }
                 } elseif (isset($r['container']->window_length)) {
-                    $response['submission_deadline'] = strtotime($contest_user->end_time) * 60;
+                    $response['submission_deadline'] = strtotime($contest_user->end_time);
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer

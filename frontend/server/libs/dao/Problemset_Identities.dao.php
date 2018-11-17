@@ -26,7 +26,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity = new ProblemsetIdentities();
             $problemsetIdentity->identity_id = $identityId;
             $problemsetIdentity->problemset_id = $problemsetId;
-            $problemsetIdentity->access_time = date('Y-m-d H:i:s');
+            $problemsetIdentity->access_time = date('Y-m-d H:i:s', Time::get());
             $problemsetIdentity->end_time = date('Y-m-d H:i:s', Time::get() + $windowLength * 60);
             $problemsetIdentity->score = 0;
             $problemsetIdentity->time = 0;
@@ -102,24 +102,34 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     public static function recalculateEndTimeForProblemsetIdentities($problemsetId, $windowLength) {
         $problemsetIdentities = self::getIdentitiesByProblemset($problemsetId);
         global $conn;
-        foreach ($problemsetIdentities as $problemsetIdentity) {
-            if (is_null($problemsetIdentity['end_time'])) {
-                continue;
+
+        ContestsDAO::transBegin();
+
+        try {
+            foreach ($problemsetIdentities as $problemsetIdentity) {
+                if (is_null($problemsetIdentity['end_time'])) {
+                    continue;
+                }
+                // Window length is in minutes
+                $endTime = date('Y-m-d H:i:s', strtotime($problemsetIdentity['access_time']) + $windowLength * 60);
+                $sql = 'UPDATE
+                            `Problemset_Identities`
+                        SET
+                            `end_time` = ?
+                        WHERE
+                            `identity_id` = ?
+                            AND `problemset_id` = ?;';
+                $params = [
+                    $endTime,
+                    $problemsetIdentity['identity_id'],
+                    $problemsetId,
+                ];
+                $conn->Execute($sql, $params);
             }
-            $endTime = date('Y-m-d H:i:s', strtotime($problemsetIdentity['access_time']) + $windowLength * 60);
-            $sql = 'UPDATE
-                        `Problemset_Identities`
-                    SET
-                        `end_time` = ?
-                    WHERE
-                        `identity_id` = ?
-                        AND `problemset_id` = ?;';
-            $params = [
-                $endTime,
-                $problemsetIdentity['identity_id'],
-                $problemsetId,
-            ];
-            $conn->Execute($sql, $params);
+            ContestsDAO::transEnd();
+        } catch (Exception $e) {
+            ContestsDAO::transRollback();
+            throw new InvalidDatabaseOperationException($e);
         }
     }
 

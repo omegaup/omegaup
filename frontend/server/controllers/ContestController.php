@@ -2359,7 +2359,7 @@ class ContestController extends Controller {
         Validators::isNumber($r['end_time'], 'end_time');
 
         try {
-            $problemsetIdentity = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
+            $updatedEntries = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
                 $r['contest_alias'],
                 $r['username'],
                 gmdate('Y-m-d H:i:s', $r['end_time'])
@@ -2369,7 +2369,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!$problemsetIdentity) {
+        if (!$updatedEntries) {
             throw new NotFoundException('ProblemsetIdentityNotFound');
         }
 
