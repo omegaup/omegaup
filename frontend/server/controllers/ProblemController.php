@@ -830,12 +830,12 @@ class ProblemController extends Controller {
         // All clear
         $response['status'] = 'ok';
 
-        // Invalidar problem statement cache @todo invalidar todos los lenguajes
+        // Invalidate problem statement cache
         foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$lang}-html");
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$lang}-markdown");
         }
-        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
+        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$r['problem']->alias}-sample.in");
         Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
 
         return $response;
@@ -885,10 +885,10 @@ class ProblemController extends Controller {
             $problemDeployer->updateStatement($r['lang'], $r['statement']);
             $problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
 
-            // Invalidar problem statement cache
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'markdown');
-            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
+            // Invalidate problem statement cache.
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$r['lang']}-html");
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$r['lang']}-markdown");
+            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$r['problem']->alias}-sample.in");
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -1049,7 +1049,7 @@ class ProblemController extends Controller {
         $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            $problemAlias . '-' . $language,
+            "${problemAlias}-{$language}-markdown",
             [$problemAlias, $language],
             'ProblemController::getProblemStatementImpl',
             $problemStatement,
@@ -1265,7 +1265,7 @@ class ProblemController extends Controller {
         $sample_input = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_SAMPLE,
-            $problem['problem']->alias . '-sample.in',
+            "{$problem['problem']->alias}-sample.in",
             $problem['problem'],
             'ProblemController::getSampleInput',
             $sample_input,
