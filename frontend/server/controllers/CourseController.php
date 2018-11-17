@@ -99,10 +99,7 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
-        // Validate only when create
-        if (!$is_update) {
-            Validators::isNumber($r['start_time'], 'start_time', !$is_update);
-        }
+        Validators::isNumber($r['start_time'], 'start_time', !$is_update);
         Validators::isNumber($r['finish_time'], 'finish_time', !$is_update);
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
@@ -412,19 +409,40 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        self::validateAssignmentDetails($r, true /*is_required*/, true /*is_update*/);
-
+        self::validateAssignmentDetails($r);
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
 
-        Validators::isNumber($r['start_time'], 'start_time', false /*is_required*/);
-        Validators::isNumber($r['finish_time'], 'finish_time', false /*is_required*/);
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = $r['assignment']->start_time;
+        } else {
+            Validators::isNumberInRange(
+                $r['start_time'],
+                'start_time',
+                $r['course']->start_time,
+                $r['course']->finish_time,
+                true /* is_required */
+            );
+        }
+        if (is_null($r['start_time'])) {
+            $r['finish_time'] = $r['assignment']->finish_time;
+        } else {
+            Validators::isNumberInRange(
+                $r['finish_time'],
+                'finish_time',
+                $r['course']->start_time,
+                $r['course']->finish_time,
+                true /* is_required */
+            );
+        }
+
+        if ($r['start_time'] > $r['finish_time']) {
+            throw new InvalidParameterException('courseInvalidStartTime');
+        }
 
         // Prevent date changes if a course already has runs
-        if ((!is_null($r['finish_time']) && $r['finish_time'] != strtotime($r['assignment']->finish_time)) ||
-            (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['assignment']->start_time))
-        ) {
+        if ($r['start_time'] != $r['assignment']->start_time) {
             $runCount = 0;
 
             try {
@@ -436,15 +454,6 @@ class CourseController extends Controller {
             if ($runCount > 0) {
                 throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
             }
-        }
-
-        // Force start time with original value
-        $r['start_time'] = $r['assignment']->start_time;
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $r['assignment']->finish_time;
-        }
-        if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         $valueProperties = [
@@ -746,6 +755,12 @@ class CourseController extends Controller {
         ];
         $time = Time::get();
         foreach ($assignments as $assignment) {
+            try {
+                $assignment['has_runs'] = RunsDAO::CountTotalRunsOfProblemset($assignment['problemset_id']) > 0;
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+            unset($assignment['problemset_id']);
             if (!$isAdmin && $assignment['start_time'] > $time) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
@@ -1482,37 +1497,20 @@ class CourseController extends Controller {
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
-    private static function validateAssignmentDetails(Request $r, $is_required = false, $is_update = false) {
-        Validators::isStringNonEmpty($r['course'], 'course', $is_required);
-        Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+    private static function validateAssignmentDetails(Request $r) {
+        Validators::isStringNonEmpty($r['course'], 'course', true /* is_required */);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /* is_required */);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
-        $course_start_time = strtotime($r['course']->start_time);
-        $course_finish_time = strtotime($r['course']->finish_time);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
+        $r['course']->toUnixTime();
         $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
         $r['assignment']->toUnixTime();
 
-        if (!$is_update) {
-            Validators::isNumberInRange(
-                $r['start_time'],
-                'start_time',
-                $course_start_time,
-                $course_finish_time,
-                $is_required
-            );
-        }
-        Validators::isNumberInRange(
-            $r['finish_time'],
-            'finish_time',
-            $course_start_time,
-            $course_finish_time,
-            $is_required
-        );
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($r['current_identity_id'], $r['course'])) {
             return;

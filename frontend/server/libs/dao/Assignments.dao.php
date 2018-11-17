@@ -139,7 +139,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
      */
     final public static function getSortedCourseAssignments($courseId) {
         $sql = 'SELECT
-                   `a`.`assignment_id`,
+                   `a`.`problemset_id`,
                    `a`.`name`,
                    `a`.`description`,
                    `a`.`alias`,
