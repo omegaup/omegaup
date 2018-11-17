@@ -18,15 +18,13 @@
   <link rel="stylesheet" href="./css/highlight.css">
 
   
-  <script>
-    // Current page data
-    var mkdocs_page_name = "None";
-  </script>
-  
   <script src="./js/jquery-2.1.1.min.js"></script>
   <script src="./js/modernizr-2.8.3.min.js"></script>
   <script type="text/javascript" src="./js/highlight.pack.js"></script>
-  <script src="./js/theme.js"></script> 
+  <script src="./js/theme.js"></script>
+  <script>var base_url = '.';</script>
+  <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+
 
   
 </head>
@@ -50,20 +48,8 @@
         <ul class="current">
           
             <li>
-    <li class="toctree-l1 current">
-        <a class="current" href=".">Index</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#libinteractive">libinteractive</a></li>
-                
-                    <li><a class="toctree-l4" href="#example">Example</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#download">Download</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href=".">Index</a>
         
     </li>
 <li>
@@ -116,9 +102,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".">Docs</a> &raquo;</li>
     
-      
     
-    <li>Index</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -132,68 +116,22 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="libinteractive">libinteractive</h1>
-<p>A tiny IDL translator that creates IPC shims to easily create interactive
-problems.</p>
-<p>To avoid having to write a program in each of the supported languages and
-making sure that none of them has bugs or undefined behavior that might
-cause the wrong output/veredict to be emitted, libinteractive allows you
-to have both the problemsetter and contestants' implementations in different
-processes and possibly languages.</p>
-<h3 id="example">Example</h3>
-<p>Let's say you have a problem called <code>sums</code>. You, as problemsetter, implement
-your part of the problem in a file called <code>Main.cpp</code> and the contestants writes
-their solution in a file called <code>sums.py</code>, so you can do:</p>
-<pre><code class="console">$ ls
-Main.cpp sums.py sums.idl input
 
-$ cat Main.cpp
-#include &lt;stdio.h&gt;
-#include &quot;sums.h&quot;
+  <h1 id="search">Search Results</h1>
 
-int main(int argc, char* argv[]) {
-    int a, b;
-    scanf(&quot;%d %d\n&quot;, &amp;a, &amp;b);
-    printf(&quot;%d\n&quot;, sums(a, b));
-}
+  <form id="content_search" action="search.html">
+    <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+    <input name="q" id="mkdocs-search-query" type="text" class="search_input search-query ui-autocomplete-input" placeholder="Search the Docs" autocomplete="off" autofocus>
+  </form>
 
-$ cat sums.py
-def sums(a, b):
-    print 'Hello, world!'
-    return a + b
+  <div id="mkdocs-search-results">
+    Sorry, page not found.
+  </div>
 
-$ cat sums.idl
-interface Main {
-};
 
-interface sums {
-    int sums(int a, int b);
-};
-
-$ java -jar libinteractive.jar generate sums.idl cpp py --makefile
-$ make run &lt; input
-[Main] 3
-[ sum] Hello, world!
-
-Memory:   5.023 MB
-Time:     0.011 s
-</code></pre>
-
-<p>You can also add a --verbose flag to libinteractive to print a message every
-time an IPC call is made.</p>
-<h1 id="download">Download</h1>
-<p>You can grab the latest <code>.jar</code> from the <a href="https://github.com/omegaup/libinteractive/releases">Releases page</a></p>
-              
             </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="writing/" class="btn btn-neutral float-right" title="Writing problems"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>
@@ -220,15 +158,8 @@ time an IPC call is made.</p>
       
       
       
-        <span style="margin-left: 15px"><a href="writing/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
     </span>
 </div>
 
 </body>
 </html>
-
-<!--
-MkDocs version : 0.14.0
-Build Date UTC : 2018-11-17 16:02:59.283217
--->
