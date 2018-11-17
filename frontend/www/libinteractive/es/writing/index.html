@@ -8,20 +8,27 @@
   <title>Escribiendo problemas - libinteractive</title>
   
 
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
   
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script src="../js/theme.js"></script>
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Escribiendo problemas";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
 
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -33,47 +40,67 @@
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> libinteractive</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
   </form>
 </div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Índice</a>
         
-            <li class="toctree-l1 current">
-                <a class="current" href=".">Escribiendo problemas</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Escribiendo problemas</a>
         
-
-    
+            <ul>
+            
+                <li class="toctree-l3"><a href="#como-escribir-problemas">Cómo escribir problemas</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#convenciones">Convenciones</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#ejemplos-de-archivos-idl">Ejemplos de archivos .idl</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#gramatica-idl">Gramática IDL</a></li>
+                
+            
+            </ul>
         
-            <li class="toctree-l1 ">
-                <a class="" href="../internals">Detalles de implementación</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../internals/">Detalles de implementación</a>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../contest/">Concursantes</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="../contest">Concursantes</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">Licencia</a>
         
-
-    
-        
-            <li class="toctree-l1 ">
-                <a class="" href="../license">Licencia</a>
-            </li>
-        
-
-    
-</ul>
-
+    </li>
+<li>
+          
+        </ul>
       </div>
       &nbsp;
     </nav>
@@ -82,8 +109,8 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">libinteractive</a>
       </nav>
 
       
@@ -92,20 +119,24 @@
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
     <li>Escribiendo problemas</li>
-      <li class="wy-breadcrumbs-aside">
+    <li class="wy-breadcrumbs-aside">
+      
         
-          
-            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
-          
+          <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="como-escribir-problemas">Cómo escribir problemas</h1>
+              
+                <h1 id="como-escribir-problemas">Cómo escribir problemas</h1>
 <p>Primero debes escribir un archivo .idl con la descripción de las interfaces
 (funciones definidas en el programa del juez y concursante). También debes
 escribir un programa (de preferencia en C/C++, por eficiencia) que lea el caso
@@ -114,11 +145,13 @@ y finalmente escriba en salida estándar ya sea la salida del programa o el
 puntaje final que el concursante obtuvo en ese caso (si se utiliza el validador
 <code>literal</code> en omegaUp). Finalmente, es necesario correr libinteractive para que
 genere todos los archivos necesarios para poder probar la solución, de esta manera:</p>
-<pre class="prettyprint well"><code>java -jar libinteractive.jar generate &lt;archivo.idl&gt; &lt;lenguaje del juez&gt; &lt;lenguaje de la solución&gt; --makefile
+<pre><code>java -jar libinteractive.jar generate &lt;archivo.idl&gt; &lt;lenguaje del juez&gt; &lt;lenguaje de la solución&gt; --makefile
 </code></pre>
 <p>Donde el lenguaje es uno de <code>c</code>, <code>cpp</code>, <code>pas</code>, <code>py</code>, <code>java</code>. <code>pas</code>
 no está soportado como lenguaje para el programa del juez, solo
-del concursante</p>
+del concursante.</p>
+<p>Para usuarios de Windows, es necesario agregar la bandera <code>--windows</code> para que
+puedas compilar correctamente desde Code::Blocks.</p>
 <p>Es necesario crear un directorio llamado <code>examples</code> (en minúsculas) y colocar
 un caso de ejemplo llamado <code>sample.in</code> en ese directorio. De ser necesario, es
 posible colocar más casos de ejemplo en ese directorio y se copiarán
@@ -184,10 +217,14 @@ de manera automática.</p>
   una operación inválida), la función debe tener el atributo <code>NoReturn</code> para
   evitar que el otro proceso se confunda cuando deje de recibir información a
   media llamada.</li>
+<li>Si estás utilizando el módulo de kernel <code>transact</code> para hacer llamadas IPC
+  rápidas, puedes agregar el atributo <code>ShmSize</code> a las interfaces para
+  establecer explícitamente el tamaño de la región de memoria compartida si
+  necesitas un valor distinto del valor por defecto (64k).</li>
 </ul>
 <h1 id="ejemplos-de-archivos-idl">Ejemplos de archivos .idl</h1>
 <p><a href="https://omegaup.com/arena/problem/jarras/">Las jarras de agua</a></p>
-<pre class="prettyprint well"><code>interface Main {
+<pre><code>interface Main {
  void verterAgua(int fuente, int destino);
 };
 
@@ -196,7 +233,7 @@ interface jarras {
 };
 </code></pre>
 <p><a href="http://cms.ioi-jp.org/open-2014/data/2014-open-d1-factories-en.pdf">Factories</a></p>
-<pre class="prettyprint well"><code>interface Main {
+<pre><code>interface Main {
 };
 
 interface factories {
@@ -205,7 +242,7 @@ interface factories {
 };
 </code></pre>
 <p><a href="http://www.ioi2011.or.th/hsc/tasks/EN/parrots.pdf">Parrots</a></p>
-<pre class="prettyprint well"><code>interface Main {
+<pre><code>interface Main {
     void send([Range(0, 65535)] int n);
     void output([Range(0, 255)] int n);
 };
@@ -219,7 +256,7 @@ interface decoder {
 };
 </code></pre>
 <p><a href="http://www.ioi2013.org/wp-content/uploads/tasks/day2/cave/cave.pdf">Cave</a></p>
-<pre class="prettyprint well"><code>interface Main {
+<pre><code>interface Main {
     [NoReturn] int tryCombination([Range(0, 5000)] int N, int[N] S);
     [NoReturn] void answer([Range(0, 5000)] int N, int[N] S, int[N] D);
 };
@@ -231,7 +268,7 @@ interface cave {
 <h1 id="gramatica-idl">Gramática IDL</h1>
 <p>IDL es casi un subconjunto de WebIDL, pero con un poco de sintaxis extra para
 concursos de programación:</p>
-<pre class="prettyprint well"><code>letter
+<pre><code>letter
     = "a" | "b" | ... | "y" | "z"
     | "A" | "B" | ... | "Y" | "Z"
     ;
@@ -253,7 +290,7 @@ interface-list
     ;
 
 interface
-    = "interface", ident, "{", { function }, "}", ";"
+    = { interface-attribute }, "interface", ident, "{", { function }, "}", ";"
     ;
 
 function
@@ -290,6 +327,14 @@ param
     = { param-attribute }, type, ident
     ;
 
+interface-attribute
+    = "[", shmsize-attribute, "]"
+    ;
+
+shmsize-attribute
+    = "ShmSize", "(", number, ")"
+    ;
+
 function-attribute
     = "[", noreturn-attribute, "]"
     ;
@@ -306,14 +351,14 @@ range-attribute
     = "Range", "(", expression, ",", expression, ")"
     ;
 </code></pre>
-
+              
             </div>
-          </div> 
+          </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../internals" class="btn btn-neutral float-right" title="Detalles de implementación"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../internals/" class="btn btn-neutral float-right" title="Detalles de implementación"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href=".." class="btn btn-neutral" title="Índice"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -324,12 +369,11 @@ range-attribute
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+    
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
 	  
         </div>
@@ -341,12 +385,17 @@ range-attribute
 
 <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../internals/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
     </span>
 </div>
+
 </body>
 </html>
