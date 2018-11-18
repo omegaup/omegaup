@@ -590,4 +590,76 @@ class CreateProblemTest extends OmegaupTestCase {
             $this->assertEquals('problemDeployerMissingOutput', $e->getMessage());
         }
     }
+
+    /**
+     * Test that we are able to submit a problem with an interactive/ directory.
+     */
+    public function testValidProblemInteractive() {
+        // Get the problem data
+        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos_interactive.zip'
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+        // Call the API
+        $response = ProblemController::apiCreate($r);
+
+        // Validate
+        // Verify response
+        $this->assertEquals('ok', $response['status']);
+
+        // Verify data in DB
+        $problems = ProblemsDAO::getByTitle($r['title']);
+
+        // Check that we only retreived 1 element
+        $this->assertEquals(1, count($problems));
+        $problem = $problems[0];
+
+        // Verify contest was found
+        $this->assertNotNull($problem);
+        $this->assertNotNull($problem->problem_id);
+
+        // Verify DB data
+        $this->assertEquals($r['title'], $problem->title);
+        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
+        $this->assertEquals($r['validator'], $problem->validator);
+        $this->assertEquals($r['time_limit'], $problem->time_limit);
+        $this->assertEquals($r['memory_limit'], $problem->memory_limit);
+        $this->assertEquals($r['order'], $problem->order);
+        $this->assertEquals($r['source'], $problem->source);
+
+        // Verify author username -> author id conversion
+        $acl = ACLsDAO::getByPK($problem->acl_id);
+        $user = UsersDAO::getByPK($acl->owner_id);
+        $this->assertEquals($user->username, $r['author_username']);
+
+        // Verify problem contents were copied
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+
+        $this->assertTrue($problemArtifacts->exists('cases'));
+        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+        $this->assertTrue($problemArtifacts->exists('interactive/triangulos.idl'));
+        $this->assertTrue($problemArtifacts->exists('interactive/Main.cpp'));
+        $this->assertTrue($problemArtifacts->exists('interactive/Main.distrib.cpp'));
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
+        $problemSettings = json_decode(
+            $problemArtifacts->get('settings.json'),
+            true /* assoc */
+        );
+        $this->assertArrayHasKey('Interactive', $problemSettings);
+
+        // Default data
+        $this->assertEquals(0, $problem->visits);
+        $this->assertEquals(0, $problem->submissions);
+        $this->assertEquals(0, $problem->accepted);
+        $this->assertEquals(0, $problem->difficulty);
+    }
 }
