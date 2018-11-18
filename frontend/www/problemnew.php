@@ -17,6 +17,7 @@ $smarty->assign('EMAIL_CLARIFICATIONS', '0');
 $smarty->assign('SOURCE', '');
 $smarty->assign('VISIBILITY', '0');
 $smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
+$smarty->assign('SELECTED_TAGS', '');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     $r = new Request([
@@ -34,7 +35,8 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
                 'source' => $_POST['source'],
                 'visibility' => $_POST['visibility'],
                 'languages' => $_POST['languages'],
-                'email_clarifications' => $_POST['email_clarifications']
+                'email_clarifications' => $_POST['email_clarifications'],
+                'selected_tags' => $_POST['selected_tags'],
             ]);
     $r->method = 'ProblemController::apiCreate';
 
@@ -60,6 +62,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('LANGUAGES', $_POST['languages']);
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
         $smarty->assign('VISIBILITY', $_POST['visibility']);
+        $smarty->assign('SELECTED_TAGS', $_POST['selected_tags']);
     } elseif ($response['status'] == 'ok') {
         header("Location: /problem/{$_POST['alias']}/edit/");
         die();

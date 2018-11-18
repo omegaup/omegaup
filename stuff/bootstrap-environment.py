@@ -102,7 +102,7 @@ def _does_resource_exist(s, request):
     if request['api'] == '/problem/create':
         if s.request('/problem/details/',
                      {'problem_alias':
-                      request['params']['problem_alias']}):
+                      request['params']['problem_alias']})['exists']:
             logging.warning('Problem %s exists, skipping',
                             request['params']['problem_alias'])
             return True

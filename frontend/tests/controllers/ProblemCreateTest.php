@@ -471,7 +471,71 @@ class CreateProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Basic test for uploadin problem without statement
+     * Basic test for creating a problem
+     */
+    public function testCreateProblemWithTags() {
+        // Get the problem data
+        $problemData = ProblemsFactory::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = json_encode([
+            ['tagname' => 'math', 'public' => true],
+            ['tagname' => 'geometry', 'public' => false],
+        ]);
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+        // Call the API
+        ProblemController::apiCreate($r);
+
+        $tags = ProblemController::apiTags(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]))['tags'];
+
+        foreach ($r['selected_tags'] as $selectedTag) {
+            $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
+                return $tag['name'] == $selectedTag->tagname;
+            });
+        }
+    }
+
+    /**
+     * Basic test for creating a problem with wrong attribute
+     */
+    public function testCreateProblemTagsWithWrongAttribute() {
+        // Get the problem data
+        $problemData = ProblemsFactory::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = json_encode([
+            ['name' => 'math', 'public' => true],
+            ['tagname' => 'geometry', 'public' => false],
+        ]);
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+        try {
+            // Call the API
+            $response = ProblemController::apiCreate($r);
+            $this->fail('Exception was expected. Wrong attribute');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterEmpty');
+        }
+    }
+
+    /**
+     * Basic test for uploading problem without statement
      *
      * @expectedException InvalidParameterException
      */

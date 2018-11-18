@@ -385,6 +385,10 @@ def enter_contest(driver, contest_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
+            (By.XPATH, '//ul[contains(@class, "arena-tabs")]'
+                       '/li[contains(@class, "active")]')))
+    driver.wait.until(
+        EC.element_to_be_clickable(
             (By.XPATH, '//a[contains(@href, "#list-past-contest")]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
