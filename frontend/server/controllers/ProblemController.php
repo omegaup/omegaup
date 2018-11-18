@@ -1049,7 +1049,7 @@ class ProblemController extends Controller {
         $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            "${problemAlias}-{$language}-markdown",
+            "{$problemAlias}-{$language}-markdown",
             [$problemAlias, $language],
             'ProblemController::getProblemStatementImpl',
             $problemStatement,
