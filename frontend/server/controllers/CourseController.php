@@ -576,11 +576,11 @@ class CourseController extends Controller {
             if (is_numeric($r['order'])) {
                 $order = (int)$r['order'];
             }
-            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
-                'problemset_id' => $problemSet->problemset_id,
-                'problem_id' => $currentProblem->problem_id,
-                'order' => $problem['order']
-            ]));
+            ProblemsetProblemsDAO::updateProblemsOrder(
+                $problemSet->problemset_id,
+                $currentProblem->problem_id,
+                $problem['order']
+            );
         }
 
         return ['status' => 'ok'];
