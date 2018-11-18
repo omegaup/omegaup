@@ -8,20 +8,27 @@
   <title>libinteractive</title>
   
 
+  <link rel="shortcut icon" href="./img/favicon.ico">
+
   
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script src="./js/theme.js"></script>
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "None";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script>
+  <script src="./js/theme.js"></script> 
 
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -33,47 +40,63 @@
       <div class="wy-side-nav-search">
         <a href="." class="icon icon-home"> libinteractive</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
   </form>
 </div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Index</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="writing/">Writing problems</a>
-            </li>
+            <ul>
+            
+                <li class="toctree-l3"><a href="#libinteractive">libinteractive</a></li>
+                
+                    <li><a class="toctree-l4" href="#example">Example</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#download">Download</a></li>
+                
+            
+            </ul>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="writing/">Writing problems</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="internals/">Implementation details</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="internals/">Implementation details</a>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="contest/">Contestants</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="contest/">Contestants</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="license/">License</a>
         
-
-    
-        
-            <li class="toctree-l1 ">
-                <a class="" href="license/">License</a>
-            </li>
-        
-
-    
-</ul>
-
+    </li>
+<li>
+          
+        </ul>
       </div>
       &nbsp;
     </nav>
@@ -82,8 +105,8 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">libinteractive</a>
       </nav>
 
       
@@ -92,20 +115,24 @@
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
     <li>Index</li>
-      <li class="wy-breadcrumbs-aside">
+    <li class="wy-breadcrumbs-aside">
+      
         
-          
-            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
-          
+          <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="libinteractive">libinteractive</h1>
+              
+                <h1 id="libinteractive">libinteractive</h1>
 <p>A tiny IDL translator that creates IPC shims to easily create interactive
 problems.</p>
 <p>To avoid having to write a program in each of the supported languages and
@@ -117,7 +144,7 @@ processes and possibly languages.</p>
 <p>Let's say you have a problem called <code>sums</code>. You, as problemsetter, implement
 your part of the problem in a file called <code>Main.cpp</code> and the contestants writes
 their solution in a file called <code>sums.py</code>, so you can do:</p>
-<pre class="prettyprint well"><code class="console">$ ls
+<pre><code class="console">$ ls
 Main.cpp sums.py sums.idl input
 
 $ cat Main.cpp
@@ -135,13 +162,13 @@ def sums(a, b):
     print 'Hello, world!'
     return a + b
 
-$ cat sum.idl
+$ cat sums.idl
 interface Main {
-}
+};
 
 interface sums {
     int sums(int a, int b);
-}
+};
 
 $ java -jar libinteractive.jar generate sums.idl cpp py --makefile
 $ make run &lt; input
@@ -156,9 +183,9 @@ Time:     0.011 s
 time an IPC call is made.</p>
 <h1 id="download">Download</h1>
 <p>You can grab the latest <code>.jar</code> from the <a href="https://github.com/omegaup/libinteractive/releases">Releases page</a></p>
-
+              
             </div>
-          </div> 
+          </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
@@ -172,12 +199,11 @@ time an IPC call is made.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+    
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
 	  
         </div>
@@ -189,12 +215,20 @@ time an IPC call is made.</p>
 
 <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+        <span style="margin-left: 15px"><a href="writing/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
     </span>
 </div>
+
 </body>
 </html>
+
+<!--
+MkDocs version : 0.14.0
+Build Date UTC : 2018-11-17 16:02:59.283217
+-->

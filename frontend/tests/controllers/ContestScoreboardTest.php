@@ -465,13 +465,13 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
         RunsFactory::gradeRun($runData);
 
-        // Get the scoreboard url by using the MyList api being the
+        // Get the scoreboard url by using the AdminList api being the
         // contest director
         $login = self::login($contestData['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = ContestController::apiAdminList($r);
         unset($login);
 
         // Look for our contest from the list and save the scoreboard tokens
