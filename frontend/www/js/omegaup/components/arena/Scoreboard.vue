@@ -27,8 +27,8 @@
                v-bind:title="user.country"
                v-if="user.country"
                width="16"></td>
-          <td v-bind:class="problemClass(problem, problems[problem_index].alias)"
-              v-for="(problem, problem_index) in user.problems">
+          <td v-bind:class="problemClass(problem, problems[problemIndex].alias)"
+              v-for="(problem, problemIndex) in user.problems">
             <template v-if="problem.runs &gt; 0">
               <div class="points">
                 {{ renderPoints(problem) }}
