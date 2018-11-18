@@ -12,7 +12,6 @@ OmegaUp.on('ready', function() {
         .then((response) => {
           ev[param] = response[key] || response;
           ev.$parent[param] = response[key] || response;
-          return response;
         })
         .fail(UI.apiError);
   }
@@ -75,19 +74,12 @@ OmegaUp.on('ready', function() {
                                points: ev.points,
                              })
                       .then(function(response) {
-                        API.Contest.problems({contest_alias: contestAlias})
-                            .then(function(result) {
-                              if (result.status != 'ok') {
-                                UI.error(result.error || 'error');
-                                return;
-                              }
-                              UI.success(T.problemSuccessfullyAdded);
-                              let problems = result['problems'];
-                              ev['problems'] = problems;
-                              ev.$parent['problems'] = problems;
-                              ev['order'] = problems.length + 1;
-                            })
-                            .fail(UI.apiError);
+                        if (response.status != 'ok') {
+                          UI.error(response.error || 'error');
+                          return;
+                        }
+                        UI.success(T.problemSuccessfullyAdded);
+                        refresh(ev, API.Contest.problems, 'problems');
                       })
                       .fail(UI.apiError);
                 },

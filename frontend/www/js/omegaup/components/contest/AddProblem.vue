@@ -76,6 +76,9 @@ export default {
       this.$parent.$emit('remove-problem', this);
     },
   },
+  watch: {
+    problems: function(val) { this.order = val.length + 1;},
+  },
   components: {
     'omegaup-autocomplete': Autocomplete,
   },
