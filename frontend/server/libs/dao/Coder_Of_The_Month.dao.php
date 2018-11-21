@@ -71,18 +71,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
               SELECT
                 user_id,
                 MAX(time) latest_time,
-                rank
+                selected_by
               FROM
                 Coder_Of_The_Month
-              WHERE
-                rank = 1
               GROUP BY
                 user_id,
-                rank
+                selected_by
             ) AS cm on i.user_id = cm.user_id
           WHERE
-            cm.user_id IS NULL
-            OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?
+            (cm.user_id IS NULL
+            OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
           GROUP BY
             up.identity_id
           ORDER BY
@@ -117,7 +115,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE
-            cm.rank = 1
+            cm.rank = 1 OR cm.selected_by IS NOT NULL
           ORDER BY
             cm.time DESC
         ';
@@ -187,7 +185,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndRank($time, $rank) {
+    final public static function getByTimeAndSelected($time, $autoselected = false) {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
                 FROM
@@ -195,10 +194,9 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `rank` = ?;';
-
+                    `selected_by` ' . $clause . ';';
         global $conn;
-        $rs = $conn->Execute($sql, [$time, $rank]);
+        $rs = $conn->Execute($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -207,21 +205,30 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $coders;
     }
 
-    public static function calculateCoderOfLastMonth($currentDate) {
-        $date = new DateTime($currentDate);
+    final public static function getByTime($time) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?;';
+
+        global $conn;
+        $rs = $conn->Execute($sql, [$time]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
+    }
+
+    public static function calculateCoderOfMonthByGivenDate($date) {
+        $date = new DateTime($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth($startTime, $endTime);
-    }
-
-    public static function calculateCoderOfCurrentMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
 }
