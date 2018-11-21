@@ -16,8 +16,7 @@ init_frontend_submodules() {
 		frontend/www/third_party/js/pagedown \
 		frontend/www/third_party/js/mathjax \
 		frontend/www/third_party/wenk \
-		frontend/www/third_party/js/csv.js/ \
-		frontend/www/third_party/js/intro.js/
+		frontend/www/third_party/js/csv.js/
 }
 
 wait_for_mysql() {
