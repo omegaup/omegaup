@@ -76,6 +76,7 @@ export default {
   },
   methods: {
     onSubmit: function() { this.$emit('add-student', this);},
+    onRemove: function(student) { this.$emit('remove-student', student);},
     studentProgressUrl: function(student) {
       return '/course/' + this.courseAlias + '/student/' + student.username +
              '/';
