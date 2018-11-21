@@ -31,9 +31,8 @@
                   class="glyphicon glyphicon-info-sign"
                   data-placement="top"
                   data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormStartDateDesc"></span>
-                  <omegaup-datepicker v-bind:enabled="!update"
-                                v-model="startTime"></omegaup-datepicker></label>
+                  v-bind:title="T.courseNewFormStartDateDesc"></span> <omegaup-datepicker v-model=
+                  "startTime"></omegaup-datepicker></label>
           </div>
           <div class="form-group col-md-4">
             <label>{{ T.courseNewFormEndDate }} <span aria-hidden="true"

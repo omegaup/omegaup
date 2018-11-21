@@ -15,7 +15,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $updatedStartTime = $courseData['request']['start_time'] + 10;
         $updatedFinishTime = $courseData['request']['start_time'] + 20;
 
-        $response = CourseController::apiUpdateAssignment(new Request([
+        CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias,
@@ -32,8 +32,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'course' => $courseAlias
         ]));
 
-        // Start time is not modified
-        $this->assertEquals($courseData['request']['start_time'], $response['start_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']);
         $this->assertEquals($updatedFinishTime, $response['finish_time']);
 
         $this->assertEquals('some new name', $response['name']);
@@ -56,36 +55,33 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $response = CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'assignment' => $courseData['assignment_alias'],
+            'course' => $courseData['course_alias'],
             'name' => 'some new name'
         ]));
     }
 
     /**
-     * Can't update the start time to be after the finish time,
-     * because start time can not be modified
+     * Can't update the start time to be after the finish time.
      */
     public function testAssignmentUpdateWithInvertedTimes() {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
-        $assignmentAlias = $courseData['assignment_alias'];
-        $courseAlias = $courseData['course_alias'];
-        CourseController::apiUpdateAssignment(new Request([
-            'auth_token' => $login->auth_token,
-            'assignment' => $assignmentAlias,
-            'course' => $courseAlias,
-            'start_time' => $courseData['request']['start_time'] + 10,
-            'finish_time' => $courseData['request']['start_time'] + 9,
-        ]));
 
-        // Read the assignment again
-        $response = CourseController::apiAssignmentDetails(new Request([
-            'auth_token' => $login->auth_token,
-            'assignment' => $assignmentAlias,
-            'course' => $courseAlias
-        ]));
-        $this->assertEquals($courseData['request']['start_time'], $response['start_time']);
+        try {
+            CourseController::apiUpdateAssignment(new Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $courseData['assignment_alias'],
+                'course' => $courseData['course_alias'],
+                'start_time' => $courseData['request']['start_time'] + 10,
+                'finish_time' => $courseData['request']['start_time'] + 9,
+            ]));
+
+            $this->fail('Assignment should not have been updated because finish time is earlier than start time');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'courseInvalidStartTime');
+        }
     }
 
     /**

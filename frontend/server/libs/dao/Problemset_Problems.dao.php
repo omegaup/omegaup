@@ -17,7 +17,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
-               'ORDER BY pp.`order` ASC;';
+               'ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset_id];
 
         global $conn;
@@ -46,7 +46,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
-               'ORDER BY pp.`order` ASC;';
+               'ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         global $conn;
         return $conn->GetAll($sql, $val);
@@ -64,7 +64,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 WHERE
                     problemset_id = ?
                 ORDER BY
-                    `order` ASC;';
+                    `order`, `problem_id` ASC;';
 
         global $conn;
         $rs = $conn->Execute($sql, [$problemset_id]);
@@ -91,7 +91,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 Problems p ON p.problem_id = pp.problem_id
             WHERE
                 pp.problemset_id = ?
-            ORDER BY pp.`order` ASC;';
+            ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         global $conn;
         $rs = $conn->Execute($sql, $val);
@@ -128,37 +128,21 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /**
       * Update problemset order.
       *
+      * @param $problemsetId
+      * @param $problemId
+      * @param $order
       * @return Affected Rows
-      * @param ProblemsetProblems [$Problemset_Problems]
       */
-    final public static function updateProblemsOrder(ProblemsetProblems $Problemset_Problems) {
+    final public static function updateProblemsOrder($problemsetId, $problemId, $order) {
         $sql = 'UPDATE `Problemset_Problems` SET `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
         $params = [
-            $Problemset_Problems->order,
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
+            $order,
+            $problemsetId,
+            $problemId,
         ];
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
-    }
-
-    final public static function getProblemIdsByProblemset($problemset_id) {
-        $sql = 'SELECT
-                    pp.problem_id
-                FROM
-                    Problemset_Problems pp
-                WHERE
-                    pp.problemset_id = ?;';
-
-        global $conn;
-        $rs = $conn->Execute($sql, [$problemset_id]);
-
-        $problemIds = [];
-        foreach ($rs as $problem) {
-            array_push($problemIds, $problem['problem_id']);
-        }
-        return $problemIds;
     }
 
     final public static function getProblemsByProblemset($problemset_id) {
@@ -184,7 +168,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ON
                     p.problem_id = pp.problem_id
                 WHERE
-                  pp.problemset_id = ?;';
+                    pp.problemset_id = ?
+                ORDER BY
+                    pp.order, pp.problem_id ASC;';
 
         global $conn;
         $rs = $conn->Execute($sql, [$problemset_id]);
