@@ -1449,7 +1449,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Inserts flag to coder selected
+     * Selects coder of the month for next month.
      *
      * @param Request $r
      * @return Array
@@ -1471,9 +1471,9 @@ class UserController extends Controller {
         Validators::isStringNonEmpty($r['username'], 'username');
 
         $currentDate = date('Y-m-d', $currentTimestamp);
-        $firstDayOfMonth = new DateTime($currentDate);
-        $firstDayOfMonth->modify('first day of next month');
-        $dateToSelect = $firstDayOfMonth->format('Y-m-d');
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
         try {
             $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
