@@ -2806,8 +2806,8 @@ class ContestController extends Controller {
 
     /**
      * Return users who participate in a contest, as long as contest admin
-     * contest admin have chosen asking for users information and contestant
-     * have previously agreed to share their information.
+     * has chosen to ask for users information and contestants have
+     * previously agreed to share their information.
      *
      * @param Request $r
      * @return array
@@ -2819,11 +2819,11 @@ class ContestController extends Controller {
 
         self::validateStats($r);
 
-        if (!ContestsDAO::isRequiredUsersInformation($r['contest']->contest_id)) {
+        if (!ContestsDAO::requestsUserInformation($r['contest']->contest_id)) {
             throw new ForbiddenAccessException('contestInformationNoRequired');
         }
 
-        // Get our runs
+        // Get contestants info
         try {
             $contestants = ContestsDAO::getContestantsInfo($r['contest']->contest_id);
         } catch (Exception $e) {

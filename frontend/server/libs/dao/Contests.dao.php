@@ -817,15 +817,13 @@ class ContestsDAO extends ContestsDAOBase {
             INNER JOIN
                 Emails e ON e.email_id = u.main_email_id
             LEFT JOIN
-                States st ON st.state_id = u.state_id
+                States st ON st.state_id = u.state_id AND st.country_id = u.country_id
             LEFT JOIN
                 Countries cn ON cn.country_id = u.country_id
             LEFT JOIN
                 Schools sc ON sc.school_id = u.school_id
             INNER JOIN
-                Identities i ON i.identity_id = u.main_identity_id
-            INNER JOIN
-                Problemset_Identities pi ON pi.identity_id = i.identity_id
+                Problemset_Identities pi ON pi.identity_id = u.main_identity_id
             INNER JOIN
                 Contests c ON c.problemset_id = pi.problemset_id
             WHERE
@@ -839,7 +837,7 @@ class ContestsDAO extends ContestsDAOBase {
         return $conn->GetAll($sql, [$contestId]);
     }
 
-    public static function isRequiredUsersInformation($contestId) {
+    public static function requestsUserInformation($contestId) {
         $sql = '
             SELECT
                 requests_user_information
@@ -854,6 +852,6 @@ class ContestsDAO extends ContestsDAOBase {
 
         $requestsUsersInfo = $conn->GetOne($sql, [$contestId]);
 
-        return $requestsUsersInfo != 'no';
+        return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
     }
 }
