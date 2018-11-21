@@ -230,12 +230,12 @@ class Authorization {
      * the coder of the month
      * @return Array
      */
-    public static function canChooseCoder($currentDate) {
-        $today = date('Y-m-d', $currentDate);
-        $lastDayOfMonth = date('t', $currentDate);
+    public static function canChooseCoder($currentTimestamp) {
+        $today = date('Y-m-d', $currentTimestamp);
+        $lastDayOfMonth = date('t', $currentTimestamp);
         $availableDateToChooseCoder = [];
-        $availableDateToChooseCoder[] = date('Y-m-', $currentDate) . $lastDayOfMonth;
-        $availableDateToChooseCoder[] = date('Y-m-', $currentDate) . ($lastDayOfMonth - 1);
+        $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . $lastDayOfMonth;
+        $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . ($lastDayOfMonth - 1);
         return in_array($today, $availableDateToChooseCoder);
     }
 

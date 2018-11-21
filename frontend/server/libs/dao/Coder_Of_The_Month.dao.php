@@ -78,12 +78,9 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 user_id,
                 selected_by
             ) AS cm on i.user_id = cm.user_id
-          LEFT JOIN
-            (SELECT user_id, time FROM Coder_Of_The_Month WHERE time = ? GROUP BY user_id) AS com on i.user_id
           WHERE
             (cm.user_id IS NULL
             OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
-            AND com.user_id IS NULL
           GROUP BY
             up.identity_id
           ORDER BY
@@ -91,7 +88,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 100
         ";
 
-        $val = [$startTime, $endTime, $endTime, $endTime];
+        $val = [$startTime, $endTime, $endTime];
 
         global $conn;
         $results = $conn->getAll($sql, $val);
@@ -118,7 +115,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE
-            cm.rank = 1
+            cm.rank = 1 OR cm.selected_by IS NOT NULL
           ORDER BY
             cm.time DESC
         ';
@@ -226,8 +223,8 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $coders;
     }
 
-    public static function calculateCoderOfLastMonth($currentDate) {
-        $date = new DateTime($currentDate);
+    public static function calculateCoderOfMonthByGivenDate($date) {
+        $date = new DateTime($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');

@@ -1379,7 +1379,7 @@ class UserController extends Controller {
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
-                $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($firstDay);
+                $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($firstDay);
                 if (is_null($users)) {
                     return [
                         'status' => 'ok',
@@ -1455,20 +1455,24 @@ class UserController extends Controller {
      * @return Array
      * @throws ForbiddenAccessException
      * @throws DuplicatedEntryInDatabaseException
+     * @throws NotFoundException
      * @throws InvalidDatabaseOperationException
      */
     public static function apiSelectCoderOfTheMonth(Request $r) {
         self::authenticateRequest($r);
         $currentTimestamp = Time::get();
 
-        if (!Authorization::isMentor($r['current_identity_id']) || !Authorization::canChooseCoder($currentTimestamp)) {
+        if (!Authorization::isMentor($r['current_identity_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
+        }
+        if (!Authorization::canChooseCoder($currentTimestamp)) {
+            throw new ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
         }
         Validators::isStringNonEmpty($r['username'], 'username');
 
-        $runCreationDate = date('Y-m-d', $currentTimestamp);
-        $firstDayOfMonth = new DateTime($runCreationDate);
-        $firstDayOfMonth->modify('first day of this month');
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfMonth = new DateTime($currentDate);
+        $firstDayOfMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfMonth->format('Y-m-d');
 
         try {
@@ -1478,7 +1482,11 @@ class UserController extends Controller {
                 throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
             }
             // Generate the coder
-            $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($dateToSelect);
+            $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
+
+            if (empty($users)) {
+                throw new NotFoundException('noCoders');
+            }
 
             foreach ($users as $index => $user) {
                 if ($user['username'] != $r['username']) {

@@ -58,6 +58,7 @@
 	"clarificationNotFound": "Clarificacion no encontrada",
 	"coderOfTheMonthAlreadySelected": "El coder del mes ya ha sido seleccionado con anterioridad",
 	"coderOfTheMonthFullList": "Ver listado completo",
+	"coderOfTheMonthIsNotInPeriodToBeChosen": "Coder del mes no est\u00e1 en periodo de ser elegido",
 	"coderOfTheMonthNotice": "\u00a1Hola %(username)! \u00a1Felicidades por ser el ganador Coder del Mes! Tenemos un premio para t\u00ed, por favor cont\u00e1ctanos en mentores@omegaup.org",
 	"codersOfTheMonth": "Coders del Mes",
 	"codersOfTheMonthCountry": "Pa\u00eds",

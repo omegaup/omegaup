@@ -57,6 +57,7 @@ clarificationEmailSubject = "[omegaUp] Nueva clarificación para el problema %(p
 clarificationNotFound = "Clarificacion no encontrada"
 coderOfTheMonthAlreadySelected = "El coder del mes ya ha sido seleccionado con anterioridad"
 coderOfTheMonthFullList = "Ver listado completo"
+coderOfTheMonthIsNotInPeriodToBeChosen = "Coder del mes no está en periodo de ser elegido"
 coderOfTheMonthNotice = "¡Hola %(username)! ¡Felicidades por ser el ganador Coder del Mes! Tenemos un premio para tí, por favor contáctanos en mentores@omegaup.org"
 codersOfTheMonth = "Coders del Mes"
 codersOfTheMonthCountry = "País"
