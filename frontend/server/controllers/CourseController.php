@@ -576,11 +576,11 @@ class CourseController extends Controller {
             if (is_numeric($r['order'])) {
                 $order = (int)$r['order'];
             }
-            ProblemsetProblemsDAO::updateProblemsOrder(new ProblemsetProblems([
-                'problemset_id' => $problemSet->problemset_id,
-                'problem_id' => $currentProblem->problem_id,
-                'order' => $problem['order']
-            ]));
+            ProblemsetProblemsDAO::updateProblemsOrder(
+                $problemSet->problemset_id,
+                $currentProblem->problem_id,
+                $problem['order']
+            );
         }
 
         return ['status' => 'ok'];
@@ -1642,16 +1642,23 @@ class CourseController extends Controller {
 
         try {
             $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
-            $r['assignment'] = AssignmentsDAO::getByAlias($r['assignment_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
 
+        try {
+            $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+                $r['assignment_alias'],
+                $r['course']->course_id
+            );
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
