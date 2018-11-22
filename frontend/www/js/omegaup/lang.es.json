@@ -107,6 +107,7 @@
 	"contestEditTagPublic": "P\u00fablico",
 	"contestEditWithTitle": "Editar concurso %(title)",
 	"contestFullList": "Ver listado completo",
+	"contestInformationNotRequired": "La informaci\u00f3n de usuario para este concurso no fue requerida.",
 	"contestIntroDifferentStarts": "Tiempo (en minutos) que tienes para enviar soluciones despu\u00e9s que el concurso inicia: %(window_length) minutos",
 	"contestIntroPenaltyDesc": "Entero indicando el n\u00famero de minutos con que se penaliza por enviar una respuesta incorrecta: %(window_length) minutos",
 	"contestIntroScoreboardTimePercent": "Porcentaje del tiempo total del concurso en el que la tabla de puntuaciones se puede observar: %(window_length)%",

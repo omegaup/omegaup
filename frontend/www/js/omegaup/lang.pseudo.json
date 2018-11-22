@@ -107,6 +107,7 @@
 	"contestEditTagPublic": "(Pub1ic)",
 	"contestEditWithTitle": "(Edi7 c0n7357 %(title))",
 	"contestFullList": "(S33 fu11 1i57)",
+	"contestInformationNotRequired": "(U53r inf0rma7i0n f0r 7hi5 c0n7357 wa5 n07 r3quir3d.)",
 	"contestIntroDifferentStarts": "(H0w much 7im3 (in minu735) y0u hav3 70 5ubmi7 501u7i0n5 fr0m 7h3 p0in7 7h3 c0n7357 i5 0p3n3d: %(window_length) minu735)",
 	"contestIntroPenaltyDesc": "(In73g3r am0un7 0f minu735 70 p3na1iz3 an inc0rr3c7 5ubmi55i0n: %(window_length) minu735)",
 	"contestIntroScoreboardTimePercent": "(P3rc3n7ag3 0f 7h3 c0n7357'5 707a1 7im3 wh3r3 7h3 5c0r3b0ard wi11 b3 vi5ib13: %(window_length)%)",

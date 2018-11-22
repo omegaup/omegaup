@@ -2820,7 +2820,7 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         if (!ContestsDAO::requestsUserInformation($r['contest']->contest_id)) {
-            throw new ForbiddenAccessException('contestInformationNoRequired');
+            throw new ForbiddenAccessException('contestInformationNotRequired');
         }
 
         // Get contestants info

@@ -828,8 +828,7 @@ class ContestsDAO extends ContestsDAOBase {
                 Contests c ON c.problemset_id = pi.problemset_id
             WHERE
                 c.contest_id = ?
-                AND pi.share_user_information = 1
-            LIMIT 100;
+                AND pi.share_user_information = 1;
         ';
 
         global $conn;
