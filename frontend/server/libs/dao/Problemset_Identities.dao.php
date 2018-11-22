@@ -17,26 +17,25 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         $grantAccess = false,
         $shareUserInformation = false
     ) {
+        $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
         if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
             }
-            $problemsetIdentity = new ProblemsetIdentities();
-            $problemsetIdentity->identity_id = $identityId;
-            $problemsetIdentity->problemset_id = $problemsetId;
-            $problemsetIdentity->access_time = date('Y-m-d H:i:s', Time::get());
-            $problemsetIdentity->end_time = date('Y-m-d H:i:s', Time::get() + $windowLength * 60);
-            $problemsetIdentity->score = 0;
-            $problemsetIdentity->time = 0;
-            $problemsetIdentity->is_invited = 0;
-            $problemsetIdentity->share_user_information = $shareUserInformation;
-            self::save($problemsetIdentity);
-        } elseif (is_null($problemsetIdentity->access_time)) {
+            $problemsetIdentity = new ProblemsetIdentities([
+                'identity_id' => $identityId,
+                'problemset_id' => $problemsetId,
+                'score' => 0,
+                'time' => 0,
+                'is_invited' => 0,
+            ]);
+        }
+        if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemsetIdentity->access_time = date('Y-m-d H:i:s');
-            $problemsetIdentity->end_time = date('Y-m-d H:i:s', Time::get() + $windowLength * 60);
+            $problemsetIdentity->access_time = date('Y-m-d H:i:s', $currentTime);
+            $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
             $problemsetIdentity->share_user_information = $shareUserInformation;
             self::save($problemsetIdentity);
         }
@@ -100,55 +99,34 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     }
 
     public static function recalculateEndTimeForProblemsetIdentities($problemsetId, $windowLength) {
-        $problemsetIdentities = self::getIdentitiesByProblemset($problemsetId);
-        global $conn;
-
-        ContestsDAO::transBegin();
-
-        try {
-            foreach ($problemsetIdentities as $problemsetIdentity) {
-                if (is_null($problemsetIdentity['end_time'])) {
-                    continue;
-                }
-                // Window length is in minutes
-                $endTime = date('Y-m-d H:i:s', strtotime($problemsetIdentity['access_time']) + $windowLength * 60);
-                $sql = 'UPDATE
-                            `Problemset_Identities`
-                        SET
-                            `end_time` = ?
-                        WHERE
-                            `identity_id` = ?
-                            AND `problemset_id` = ?;';
-                $params = [
-                    $endTime,
-                    $problemsetIdentity['identity_id'],
-                    $problemsetId,
-                ];
-                $conn->Execute($sql, $params);
-            }
-            ContestsDAO::transEnd();
-        } catch (Exception $e) {
-            ContestsDAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
-        }
-    }
-
-    public static function updateEndTimeForIdentity($contestAlias, $username, $endTime) {
         $sql = 'UPDATE
                     `Problemset_Identities`
+                SET
+                    `end_time` = FROM_UNIXTIME(UNIX_TIMESTAMP(access_time) + (? * 60), \'%Y-%m-%d %H:%i:%s\')
+                WHERE
+                    `problemset_id` = ?
+                    AND `end_time` IS NOT NULL;';
+
+        global $conn;
+        $conn->Execute($sql, [$windowLength, $problemsetId,]);
+
+        return $conn->Affected_Rows();
+    }
+
+    public static function updateEndTimeForIdentity($problemsetId, $username, $endTime) {
+        $sql = 'UPDATE
+                    `Problemset_Identities` `pi`
                 INNER JOIN
-                    `Identities` ON `Problemset_Identities`.`identity_id` = `Identities`.`identity_id`
-                INNER JOIN
-                    `Contests` ON `Problemset_Identities`.`problemset_id` = `Contests`.`problemset_id`
+                    `Identities` `i` ON `pi`.`identity_id` = `i`.`identity_id`
                 SET
                     `end_time` = ?
                 WHERE
-                    `Identities`.`username` = ?
-                    AND `Contests`.`alias` = ?;';
+                    `i`.`username` = ?
+                    AND `pi`.`problemset_id` = ?;';
         $params = [
             $endTime,
             $username,
-            $contestAlias,
+            $problemsetId,
         ];
 
         global $conn;

@@ -713,6 +713,23 @@ class ContestController extends Controller {
         unset($result['scoreboard_url_admin']);
         unset($result['rerun_id']);
         if (is_null($r['token'])) {
+            $problemsetIdentity = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                $r['current_identity_id'],
+                $r['contest']->problemset_id,
+                $r['contest']->window_length
+            );
+
+            // Add time left to response
+            if ($r['contest']->window_length === null) {
+                $result['submission_deadline'] = strtotime($r['contest']->finish_time);
+            } else {
+                $result['submission_deadline'] = min(
+                    strtotime($r['contest']->finish_time),
+                    strtotime($problemsetIdentity->end_time)
+                );
+            }
+            $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
+
             // Transaction begins
             ContestsDAO::transBegin();
 
@@ -720,23 +737,6 @@ class ContestController extends Controller {
             // want this to get generally cached for everybody
             // Save the time of the first access
             try {
-                $problemsetIdentity = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-                    $r['current_identity_id'],
-                    $r['contest']->problemset_id,
-                    $r['contest']->window_length
-                );
-
-                // Add time left to response
-                if ($r['contest']->window_length === null) {
-                    $result['submission_deadline'] = strtotime($r['contest']->finish_time);
-                } else {
-                    $result['submission_deadline'] = min(
-                        strtotime($r['contest']->finish_time),
-                        strtotime($problemsetIdentity->end_time)
-                    );
-                }
-                $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
-
                 // Log the operation.
                 ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
                     'identity_id' => $r['current_identity_id'],
@@ -2351,16 +2351,23 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        // Authenticate request
         self::authenticateRequest($r);
+        self::validateBasicDetails($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        if (is_null($r['contest'])) {
+            throw new NotFoundException('contestNotFound');
+        }
+
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $r['contest'])) {
+            throw new ForbiddenAccessException();
+        }
+
         Validators::isStringNonEmpty($r['username'], 'username');
         Validators::isNumber($r['end_time'], 'end_time');
 
         try {
             $updatedEntries = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
-                $r['contest_alias'],
+                $r['problemset']->problemset_id,
                 $r['username'],
                 gmdate('Y-m-d H:i:s', $r['end_time'])
             );

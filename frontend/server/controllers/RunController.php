@@ -377,10 +377,11 @@ class RunController extends Controller {
                 if (isset($r['container']->finish_time)) {
                     $response['submission_deadline'] = strtotime($r['container']->finish_time);
                     if (isset($r['container']->window_length)) {
-                        $response['submission_deadline'] = min(
-                            strtotime($r['container']->finish_time),
-                            strtotime($contest_user->end_time)
-                        );
+                        if (!is_null($contest_user->end_time)) {
+                            $response['submission_deadline'] = strtotime($contest_user->end_time);
+                        } elseif (isset($r['container']->finish_time)) {
+                            $response['submission_deadline'] = strtotime($r['container']->finish_time);
+                        }
                     }
                 } elseif (isset($r['container']->window_length)) {
                     $response['submission_deadline'] = strtotime($contest_user->end_time);

@@ -434,13 +434,14 @@ class UpdateContestTest extends OmegaupTestCase {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
 
-        $r['window_length'] = 40;
+        $windowLength = 40;
+        $r['window_length'] = $windowLength;
         // Call API
         $response = ContestController::apiUpdate($r);
 
         $contest = ContestController::apiDetails($r);
 
-        $this->assertEquals(40, $contest['window_length']);
+        $this->assertEquals($windowLength, $contest['window_length']);
 
         // Trying to create a run inside contest time
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
@@ -454,6 +455,36 @@ class UpdateContestTest extends OmegaupTestCase {
         } catch (InvalidParameterException $e) {
             // Pass
             $this->assertEquals('parameterNotANumber', $e->getMessage());
+        }
+
+        $identities = ContestController::apiUsers(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        $index = array_search($contestant->username, array_column($identities['users'], 'username'));
+
+        // Extend end_time for an indentity
+        ContestController::apiUpdateEndTimeForIdentity(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'username' => $contestant->username,
+            'end_time' => strtotime($identities['users'][$index]['access_time']) + 60 * 60,
+        ]));
+
+        $identities = ContestController::apiUsers(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        foreach ($identities['users'] as $identity) {
+            if ($identity['username'] == $contestant->username) {
+                // Identity with extended time
+                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + 60 * 60);
+            } else {
+                // Other identities keep end time with window length
+                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
+            }
         }
     }
 }
