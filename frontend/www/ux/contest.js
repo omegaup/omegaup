@@ -84,10 +84,10 @@ omegaup.OmegaUp.on('ready', function() {
           window.location = '/login/?redirect=' + escape(window.location);
           return;
         }
-        $('#runs-overlay form').hide();
+        $('#overlay form').hide();
         $('#submit input').show();
         $('#submit').show();
-        $('#runs-overlay').show();
+        $('#overlay').show();
         arena.codeEditor.code = arena.currentProblem.template;
         arena.codeEditor.refresh();
 

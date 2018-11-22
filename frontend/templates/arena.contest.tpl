@@ -137,7 +137,7 @@
 {/if}
 {include file='arena.clarification_list.tpl' contest=true}
 		</div>
-		<div id="runs-overlay">
+		<div id="overlay">
 {include file='arena.runsubmit.tpl'}
 {include file='arena.clarification.tpl' admin=$admin}
 			<div id="run-details"></div>

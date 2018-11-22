@@ -1377,10 +1377,10 @@ export class Arena {
       }
 
       if (newRun) {
-        $('#runs-overlay form').hide();
+        $('#overlay form').hide();
         $('input', self.elements.submitForm).show();
         self.elements.submitForm.show();
-        $('#runs-overlay').show();
+        $('#overlay').show();
         if (self.codeEditor) {
           // It might not be mounted yet if we refresh directly onto
           // a /new-run view. This code executes directly, whereas
@@ -1423,8 +1423,8 @@ export class Arena {
       $('.summary', self.elements.problemList).addClass('active');
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
-        $('#runs-overlay form').hide();
-        $('#runs-overlay, #clarification').show();
+        $('#overlay form').hide();
+        $('#overlay, #clarification').show();
       }
     }
     self.detectShowRun();
@@ -1475,8 +1475,8 @@ export class Arena {
     let showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     let showRunMatch = window.location.hash.match(showRunRegex);
     if (showRunMatch) {
-      $('#runs-overlay form').hide();
-      $('#runs-overlay').show();
+      $('#overlay form').hide();
+      $('#overlay').show();
       API.Run.details({run_alias: showRunMatch[1]})
           .then(function(data) {
             self.displayRunDetails(showRunMatch[1], data);
@@ -1486,14 +1486,14 @@ export class Arena {
   }
 
   hideOverlay() {
-    $('#runs-overlay').hide();
+    $('#overlay').hide();
     window.location.hash = window.location.hash.substring(
         0, window.location.hash.lastIndexOf('/'));
   }
 
   bindGlobalHandlers() {
     let self = this;
-    $('#runs-overlay, .close').on('click', self.onCloseSubmit.bind(self));
+    $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
     self.elements.submitForm.language.on('change',
                                          self.onLanguageSelect.bind(self));
     self.elements.submitForm.on('submit', self.onSubmit.bind(self));
@@ -1501,7 +1501,7 @@ export class Arena {
 
   onCloseSubmit(e) {
     let self = this;
-    if (e.target.id !== 'runs-overlay' &&
+    if (e.target.id !== 'overlay' &&
         e.target.closest('button.close') === null) {
       return;
     }

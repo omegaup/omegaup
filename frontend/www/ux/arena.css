@@ -357,7 +357,7 @@ body#only-problem #problems .main {
 	background: #fff;
 }
 
-#runs-overlay {
+#overlay {
 	display: none;
 	position: fixed;
 	top: 0;
@@ -367,7 +367,7 @@ body#only-problem #problems .main {
 	background: rgba(0, 0, 0, .5);
 	z-index: 99999 !important;
 }
-#runs-overlay form {
+#overlay form {
 	background: #eee;
 	width: 850px;
 	height: 38em;
@@ -378,14 +378,14 @@ body#only-problem #problems .main {
 	overflow: auto;
 }
 
-#runs-overlay form textarea {
+#overlay form textarea {
 	width: 790px;
 	height: 23em;
 	margin: 0.5em 0;
 	font-family: monospace;
 }
 
-#runs-overlay form .close {
+#overlay form .close {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -397,11 +397,11 @@ body#only-problem #problems .main {
 	height: 25px;
 }
 
-#runs-overlay form .close:hover {
+#overlay form .close:hover {
 	background-color: #eee;
 }
 
-#runs-overlay input[type=submit] {
+#overlay input[type=submit] {
 	font-size: 110%;
 	padding: 0.3em 0.5em;
 }
