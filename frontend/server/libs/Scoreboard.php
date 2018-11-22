@@ -544,7 +544,7 @@ class Scoreboard {
                     $contestant['username'],
                 'total' => null,
                 'country' => $contestant['country_id'],
-                'is_invited' => $contestant['is_invited'],
+                'is_invited' => $contestant['is_invited'] == '1',
             ];
         }
 
@@ -766,7 +766,7 @@ class Scoreboard {
                     'penalty' => 0
                 ],
                 'country' => $identity['country_id'],
-                'is_invited' => $identity['is_invited'],
+                'is_invited' => $identity['is_invited'] == '1',
             ];
 
             foreach ($identity_problems_score[$identity_id] as $problem) {

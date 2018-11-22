@@ -75,8 +75,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 pi.access_time,
                 pi.is_invited,
                 e.email,
-                i.country_id,
-                pi.access_time
+                i.country_id
             FROM
                 Identities i
             INNER JOIN

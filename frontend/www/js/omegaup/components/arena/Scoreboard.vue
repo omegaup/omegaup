@@ -112,7 +112,7 @@ export default {
       }
     },
     showUser: function(userIsInvited) {
-      return (!! + userIsInvited || (! + userIsInvited && !this.invited));
+      return (userIsInvited || (!userIsInvited && !this.invited));
     },
   },
 };
