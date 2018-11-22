@@ -119,7 +119,6 @@ class AssignmentsDAO extends AssignmentsDAOBase {
     final public static function getByAliasWithExtraInformation($assignmentId) {
         $sql = '
                 SELECT
-                   a.assignment_id,
                    a.name,
                    a.description,
                    a.alias,

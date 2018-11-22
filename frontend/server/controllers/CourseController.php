@@ -427,9 +427,7 @@ class CourseController extends Controller {
         }
 
         // Prevent date changes if a course already has runs
-        if ((!is_null($r['finish_time']) && $r['finish_time'] != strtotime($r['assignment']->finish_time)) ||
-            (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['assignment']->start_time))
-        ) {
+        if ($r['start_time'] != $r['assignment']->start_time) {
             $runCount = 0;
 
             try {
@@ -1484,15 +1482,15 @@ class CourseController extends Controller {
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
-    private static function validateAssignmentDetails(Request $r, $is_required = false, $is_update = false) {
+    private static function validateAssignmentDetails(Request $r) {
         if (is_null($r['token'])) {
             self::authenticateRequest($r);
         }
 
         $courseAdmin = false;
 
-        Validators::isStringNonEmpty($r['course'], 'course', $is_required);
-        Validators::isStringNonEmpty($r['assignment'], 'assignment', $is_required);
+        Validators::isStringNonEmpty($r['course'], 'course', true /* is_required */);
+        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /* is_required */);
 
         $r['course'] = CoursesDAO::getByAlias($r['course']);
         if (is_null($r['course'])) {
@@ -1536,14 +1534,14 @@ class CourseController extends Controller {
             'start_time',
             $courseStartTime,
             $courseFinishTime,
-            $is_required
+            false
         );
         Validators::isNumberInRange(
             $r['finish_time'],
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            $is_required
+            false
         );
 
         // Admins are almighty, no need to check anything else.
