@@ -19,13 +19,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:class="invitedClass(user.is_invited)"
-            v-for="(user, index) in ranking"
+        <tr v-for="(user, index) in ranking"
             v-if="showUser(user.is_invited)">
           <td class="legend"
               v-bind:style="{ backgroundColor: legendColor(index) }"></td>
           <td class="position">{{ user.place }}</td>
-          <td>{{ renderUser(user) }} <img alt=""
+          <td class="user">{{ renderUser(user) }} <img alt=""
                height="11"
                v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
                v-bind:title="user.country"
@@ -74,7 +73,7 @@ export default {
     showPenalty: {
       type: Boolean,
       'default': true,
-    }
+    },
   },
   data: function() {
     return {
@@ -111,19 +110,8 @@ export default {
         return '';
       }
     },
-    invitedClass: function(userIsInvited) {
-      if (userIsInvited == 1) {
-        return 'invited';
-      } else {
-        return '';
-      }
-    },
     showUser: function(userIsInvited) {
-      if (userIsInvited == 1 || (userIsInvited == 0 && this.invited == false) ||
-          userIsInvited == null) {
-        return true;
-      }
-      return false;
+      return (!! + userIsInvited || (! + userIsInvited && !this.invited));
     },
   },
 };

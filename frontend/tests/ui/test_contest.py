@@ -60,11 +60,11 @@ def test_create_contest(driver):
                       contest_alias)))).click()
 
         run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
+            '//td[@class="accepted"]/preceding-sibling::td[@class="user"]')
         assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
+            '//td[@class="wrong"]/preceding-sibling::td[@class="user"]')
         assert run_wrong_user.text == user2, run_wrong_user
 
 
@@ -123,15 +123,15 @@ def test_user_ranking_contest(driver):
                 (By.CSS_SELECTOR, '#ranking')))
 
         run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[1]')
+            '//td[@class="accepted"]/preceding-sibling::td[@class="user"]')
         assert run_accepted_user.text == user1, run_accepted_user
 
         run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[@class="wrong"]/preceding-sibling::td[1]')
+            '//td[@class="wrong"]/preceding-sibling::td[@class="user"]')
         assert run_wrong_user.text == user2, run_wrong_user
 
         contestants_full_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr/td[3]')
+            '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
         assert len(contestants_full_list) == 4, contestants_full_list
         full_list = [user1, user2, user3, driver.user_username]
         find_users_in_list(contestants_full_list, full_list)
@@ -141,7 +141,7 @@ def test_user_ranking_contest(driver):
                 (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
 
         invited_contestant_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr/td[3]')
+            '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
         assert len(invited_contestant_list) == 3, invited_contestant_list
         invited_list = [user1, user2, driver.user_username]
         find_users_in_list(invited_contestant_list, invited_list)
@@ -371,7 +371,7 @@ def find_users_in_list(contestant_elements, list_element):
     '''Find the contestant in a given list'''
     try:
         for element in contestant_elements:
-            contestant = element.get_attribute('innerHTML').split(' ')[0]
+            contestant = element.text
             assert list_element.index(contestant) >= 0, contestant
     except ValueError:
         assert False, contestant_elements
