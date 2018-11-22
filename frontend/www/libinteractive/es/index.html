@@ -8,20 +8,27 @@
   <title>libinteractive</title>
   
 
+  <link rel="shortcut icon" href="./img/favicon.ico">
+
   
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script src="./js/theme.js"></script>
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "None";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script>
+  <script src="./js/theme.js"></script> 
 
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -33,47 +40,63 @@
       <div class="wy-side-nav-search">
         <a href="." class="icon icon-home"> libinteractive</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
   </form>
 </div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Índice</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="writing/">Escribiendo problemas</a>
-            </li>
+            <ul>
+            
+                <li class="toctree-l3"><a href="#libinteractive">libinteractive</a></li>
+                
+                    <li><a class="toctree-l4" href="#ejemplo">Ejemplo</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#descarga">Descarga</a></li>
+                
+            
+            </ul>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="writing/">Escribiendo problemas</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="internals/">Detalles de implementación</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="internals/">Detalles de implementación</a>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="contest/">Concursantes</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="contest/">Concursantes</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="license/">Licencia</a>
         
-
-    
-        
-            <li class="toctree-l1 ">
-                <a class="" href="license/">Licencia</a>
-            </li>
-        
-
-    
-</ul>
-
+    </li>
+<li>
+          
+        </ul>
       </div>
       &nbsp;
     </nav>
@@ -82,8 +105,8 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">libinteractive</a>
       </nav>
 
       
@@ -92,20 +115,24 @@
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
     <li>Índice</li>
-      <li class="wy-breadcrumbs-aside">
+    <li class="wy-breadcrumbs-aside">
+      
         
-          
-            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
-          
+          <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="libinteractive">libinteractive</h1>
+              
+                <h1 id="libinteractive">libinteractive</h1>
 <p>Un pequeño traductor de IDL que crea adaptadores que hacen llamadas entre
 procesos para crear problemas interactivos fácilmente.</p>
 <p>Para evitar tener que escribir un programa en cada uno de los lenguajes
@@ -116,7 +143,7 @@ te permite tener ambas implementaciones en procesos (y lenguajes) separados.</p>
 <p>Digamos que tienes un problema llamado <code>sumas</code>. Tú como juez implementas un
 validador en un archivo <code>Main.cpp</code> y el competidor codifica la solución en
 <code>sumas.py</code>, puedes hacer:</p>
-<pre class="prettyprint well"><code class="console">$ ls
+<pre><code class="console">$ ls
 Main.cpp sumas.py sumas.idl input
 
 $ cat Main.cpp
@@ -136,11 +163,11 @@ def sumas(a, b):
 
 $ cat sumas.idl
 interface Main {
-}
+};
 
 interface sumas {
     int sumas(int a, int b);
-}
+};
 
 $ java -jar libinteractive.jar generate sumas.idl cpp py --makefile
 $ make run &lt; input
@@ -155,9 +182,9 @@ Time:     0.011 s
 mensajes de depuración cada vez que se realiza una llamada entre los procesos.</p>
 <h1 id="descarga">Descarga</h1>
 <p>Puedes descargar el .jar más reciente de la <a href="https://github.com/omegaup/libinteractive/releases">página de descargas</a>.</p>
-
+              
             </div>
-          </div> 
+          </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
@@ -171,12 +198,11 @@ mensajes de depuración cada vez que se realiza una llamada entre los procesos.<
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+    
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
 	  
         </div>
@@ -188,12 +214,20 @@ mensajes de depuración cada vez que se realiza una llamada entre los procesos.<
 
 <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+        <span style="margin-left: 15px"><a href="writing/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
     </span>
 </div>
+
 </body>
 </html>
+
+<!--
+MkDocs version : 0.14.0
+Build Date UTC : 2018-11-17 16:02:59.608314
+-->

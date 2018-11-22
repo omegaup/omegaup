@@ -70,19 +70,6 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         return null;
     }
 
-    final public static function getByAlias($alias) {
-        $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
-        $params = [$alias];
-
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
-        if (empty($row)) {
-            return null;
-        }
-
-        return new Assignments($row);
-    }
-
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
@@ -139,7 +126,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
      */
     final public static function getSortedCourseAssignments($courseId) {
         $sql = 'SELECT
-                   `a`.`assignment_id`,
+                   `a`.`problemset_id`,
                    `a`.`name`,
                    `a`.`description`,
                    `a`.`alias`,

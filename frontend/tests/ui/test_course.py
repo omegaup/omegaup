@@ -72,7 +72,8 @@ def test_user_ranking_course(driver):
                  assignment_alias))).click()
 
         run_user = driver.browser.find_element_by_xpath(
-            '//td[@class="accepted"]/preceding-sibling::td[@class="user"]')
+            '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
+            '"user"]')
         assert run_user.text == driver.user_username, run_user
 
 

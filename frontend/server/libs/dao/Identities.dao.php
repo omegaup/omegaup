@@ -132,7 +132,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             return null;
         }
         $sql = 'SELECT
-                    c.`name` AS country,
+                    COALESCE(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
                     e.`email`,
