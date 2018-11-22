@@ -82,7 +82,7 @@
 					<div id="coder-of-the-month-name">{$coderOfTheMonthData.name|htmlspecialchars}</div>
 					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>
 					<div id="coder-of-the-month-place">
-						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{$coderOfTheMonthData.country|htmlspecialchars}
+						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{if $coderOfTheMonthData.country != 'xx'}{$coderOfTheMonthData.country|htmlspecialchars}{/if}
 					</div>
 				</div>
 			</div>

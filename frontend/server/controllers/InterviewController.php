@@ -200,7 +200,10 @@ class InterviewController extends Controller {
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
-            throw new NotFoundException('interviewNotFound');
+            return [
+                'exists' => false,
+                'status' => 'ok',
+            ];
         }
 
         // Only admins can view interview details
@@ -234,6 +237,7 @@ class InterviewController extends Controller {
             'contest_alias' => $interview->alias,
             'problemset_id' => $interview->problemset_id,
             'users' => $users,
+            'exists' => true,
             'status' => 'ok',
         ];
     }

@@ -2,22 +2,29 @@
   <div class="omegaup-course-addstudent panel">
     <div class="panel-body">
       <form class="form"
-            v-on:submit.prevent="onAddStudent">
+            v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.wordsStudent }}</label> <span aria-hidden="true"
                class="glyphicon glyphicon-info-sign"
                data-placement="top"
                data-toggle="tooltip"
-               v-bind:title="T.courseEditAddStudentsTooltip"></span> <input autocomplete="off"
-               class="form-control typeahead"
-               size="20"
-               type="text">
+               v-bind:title="T.courseEditAddStudentsTooltip"></span>
+               <omegaup-autocomplete v-bind:init="el =&gt; UI.userTypeahead(el)"
+               v-model="participant"></omegaup-autocomplete>
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary"
-               type="submit">{{ T.wordsAddStudent }}</button> <button class="btn btn-secondary"
-               type="reset"
-               v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+               type="submit">{{ T.wordsAddStudent }}</button>
+        </div>
+        <div class="form-group">
+          <label>{{T.wordsMultipleUser}}</label>
+          <textarea class="form-control pariticipants"
+               rows="4"
+               v-model="participants"></textarea>
+        </div>
+        <div class="form-group pull-right">
+          <button class="btn btn-primary user-add-bulk"
+               type="submit">{{ T.wordsAddStudents }}</button>
         </div>
       </form>
       <div v-if="students.length == 0">
@@ -51,6 +58,7 @@
 
 <script>
 import UI from '../../ui.js';
+import Autocomplete from '../Autocomplete.vue';
 
 export default {
   props: {
@@ -61,41 +69,21 @@ export default {
   data: function() {
     return {
       studentUsername: '',
+      participant: '',
+      participants: '',
+      UI: UI,
     };
   },
-  mounted: function() {
-    let self = this;
-    UI.userTypeahead($('input.typeahead', self.$el), function(event, item) {
-      self.studentUsername = item.value;
-    });
-  },
   methods: {
-    onAddStudent: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        // There is a hint currently visible in the UI, the user likely
-        // expects that hint to be used when trying to add someone, instead
-        // of what they've actually typed so far.
-        this.studentUsername = hint;
-      } else {
-        this.studentUsername = $('input.typeahead.tt-input', this.$el).val();
-      }
-      this.$emit('add-student', this.studentUsername);
-    },
-    onCancel: function() { this.$emit('cancel');},
-    onRemove: function(student) { this.$emit('remove', student);},
-    reset: function() {
-      this.studentUsername = '';
-
-      let inputElem = $('input.typeahead', this.$el);
-      inputElem.typeahead('close');
-      inputElem.val('');
-    },
+    onSubmit: function() { this.$emit('add-student', this);},
+    onRemove: function(student) { this.$emit('remove-student', student);},
     studentProgressUrl: function(student) {
       return '/course/' + this.courseAlias + '/student/' + student.username +
              '/';
     },
+  },
+  components: {
+    'omegaup-autocomplete': Autocomplete,
   },
 };
 </script>
