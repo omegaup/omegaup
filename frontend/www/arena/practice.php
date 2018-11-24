@@ -15,6 +15,24 @@ try {
 }
 
 if ($show_intro['shouldShowIntro']) {
+    $session = SessionController::apiCurrentSession($r)['session'];
+    $smarty->assign(
+        'needsBasicInformation',
+        $show_intro['needs_basic_information'] && !is_null($session['user']) && (
+            !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
+        )
+    );
+    $smarty->assign(
+        'requestsUserInformation',
+        $show_intro['requests_user_information']
+    );
+    if (isset($show_intro['privacy_statement_markdown'])) {
+        $smarty->assign('privacyStatement', [
+            'markdown' => $show_intro['privacy_statement_markdown'],
+            'gitObjectId' => $show_intro['git_object_id'],
+            'statementType' => $show_intro['statement_type'],
+        ]);
+    }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.practice.tpl');
