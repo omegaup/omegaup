@@ -132,7 +132,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problem = ProblemsDAO::getByAlias($r['alias']);
 
         // Check that we only retrieved 1 element
-        $this->assertEquals(1, count($problem));
+        $this->assertNotNull($problem);
         $this->assertEqualSets($r['languages'], $problem->languages);
 
         // Validate response
