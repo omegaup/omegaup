@@ -777,7 +777,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $isDemotion = ($nomination['nomination'] == 'demotion');
             $this->assertTrue(
                 $isPromotion || $isDemotion,
-                'Found a nomination of type ' + $nomination['nomination'] + '. Only promotion and demotion should be shown.'
+                'Found a nomination of type ' . $nomination['nomination'] . '. Only promotion and demotion should be shown.'
             );
         }
     }

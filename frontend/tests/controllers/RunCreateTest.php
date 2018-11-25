@@ -139,7 +139,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         $log = SubmissionLogDAO::getByPK($run->run_id);
 
-        $this->assertEquals(1, count($log));
+        $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
