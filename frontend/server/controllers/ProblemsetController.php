@@ -121,8 +121,8 @@ class ProblemsetController extends Controller {
                 new Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
-                    'course' => $r['problemset']['course'],
-                    'assignment' => $r['problemset']['assignment'],
+                    'course_alias' => $r['problemset']['course'],
+                    'assignment_alias' => $r['problemset']['assignment'],
                 ])
             );
         }

@@ -48,8 +48,8 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiAssignmentScoreboard(new Request([
             'auth_token' => $adminLogin->auth_token,
-            'course' => $courseData['course_alias'],
-            'assignment' => $courseData['assignment_alias']
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias']
         ]));
 
         // Validation. Courses should be sorted by names instead of ranking.

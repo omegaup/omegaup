@@ -757,8 +757,8 @@ export class Arena {
     self.onRankingChanged(data);
 
     let assignmentScoreboardEventsParams = {
-      course: self.options.courseAlias,
-      assignment: self.options.assignmentAlias,
+      course_alias: self.options.courseAlias,
+      assignment_alias: self.options.assignmentAlias,
     };
     if (self.options.scoreboardToken) {
       assignmentScoreboardEventsParams.token = self.options.scoreboardToken;

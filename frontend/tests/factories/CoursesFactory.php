@@ -76,7 +76,8 @@ class CoursesFactory {
             'start_time' => Utils::GetPhpUnixTimestamp() + $startTimeDelay,
             'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
             'course_alias' => $courseAlias,
-            'assignment_type' => 'homework'
+            'assignment_type' => 'homework',
+            'course' => CoursesDAO::getByAlias($courseAlias),
         ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
         $assignment = AssignmentsDAO::getByAlias($assignmentAlias);

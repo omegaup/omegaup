@@ -303,9 +303,9 @@ class CoursesDAO extends CoursesDAOBase {
         return new Courses($row);
     }
 
-    final public static function getAssignmentByAlias(Courses $course, $assignment_alias) {
+    final public static function getAssignmentByAlias($courseId, $assignmentAlias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
-        $params = [$assignment_alias, $course->course_id];
+        $params = [$assignmentAlias, $courseId];
 
         global $conn;
         $row = $conn->GetRow($sql, $params);
