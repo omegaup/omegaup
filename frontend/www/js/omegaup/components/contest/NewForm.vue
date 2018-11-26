@@ -66,7 +66,8 @@
         </div>
         <div class="row">
           <div class="form-group col-md-6">
-            <label>{{T.contestNewFormScoreboardTimePercent}}</label> <input class="form-control"
+            <label>{{T.contestNewFormScoreboardTimePercent}}</label> <input class=
+            "form-control scoreboard-time-percent"
                  size="3"
                  type="text"
                  v-model="scoreboard">

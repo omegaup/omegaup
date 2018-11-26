@@ -1709,16 +1709,23 @@ class CourseController extends Controller {
 
         try {
             $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
-            $r['assignment'] = AssignmentsDAO::getByAlias($r['assignment_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
         }
 
+        try {
+            $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+                $r['assignment_alias'],
+                $r['course']->course_id
+            );
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }

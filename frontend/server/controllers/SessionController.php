@@ -370,7 +370,7 @@ class SessionController extends Controller {
             global $smarty;
             return [
                 'status' => 'error',
-                'error' => $smarty->getConfigVariable(
+                'error' => $smarty->getConfigVars(
                     'loginFacebookEmptyEmailError'
                 ),
             ];

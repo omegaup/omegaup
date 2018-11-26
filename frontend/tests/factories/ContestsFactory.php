@@ -103,30 +103,31 @@ class ContestsFactory {
         }
 
         // Set context
-        $r = new Request();
-        $r['title'] = $params['title'];
-        $r['description'] = 'description';
-        $r['start_time'] = $params['start_time'];
-        $r['finish_time'] = $params['finish_time'];
-        $r['last_updated'] = $params['last_updated'];
-        $r['window_length'] = null;
-        $r['admission_mode'] = $params['admission_mode'];
-        $r['alias'] = substr($params['title'], 0, 20);
-        $r['points_decay_factor'] = '.02';
-        $r['partial_score'] = '0';
-        $r['submissions_gap'] = '0';
-        $r['feedback'] = 'yes';
-        $r['penalty'] = 100;
-        $r['scoreboard'] = 100;
-        $r['penalty_type'] = 'contest_start';
+        $r = new Request([
+            'title' => $params['title'],
+            'description' => 'description',
+            'start_time' => $params['start_time'],
+            'finish_time' => $params['finish_time'],
+            'last_updated' => $params['last_updated'],
+            'window_length' => null,
+            'admission_mode' => $params['admission_mode'],
+            'alias' => substr($params['title'], 0, 20),
+            'points_decay_factor' => '0.02',
+            'partial_score' => '0',
+            'submissions_gap' => '0',
+            'feedback' => 'yes',
+            'penalty' => 100,
+            'scoreboard' => 100,
+            'penalty_type' => 'contest_start',
+            'languages' => $params['languages'],
+            'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
+            'basic_information' => $params['basic_information'], // This is just a default value.
+        ]);
         if ($params['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
             $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
-        $r['languages'] = $params['languages'];
-        $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
-        $r['basic_information'] = $params['basic_information']; // This is just a default value.
 
         return [
             'request' => $r,
