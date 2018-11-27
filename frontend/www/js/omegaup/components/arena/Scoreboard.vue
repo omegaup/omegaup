@@ -4,7 +4,7 @@
     <div id="ranking-chart"></div><!-- id-lint on -->
     <label><input class="toggle-contestants"
            type="checkbox"
-           v-model="invited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
+           v-model="onlyShowExplicitlyInvited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
     <table>
       <thead>
         <tr>
@@ -79,7 +79,7 @@ export default {
   data: function() {
     return {
       UI: UI,
-      invited: false,
+      onlyShowExplicitlyInvited: false,
     };
   },
   computed: {
@@ -112,7 +112,7 @@ export default {
       }
     },
     showUser: function(userIsInvited) {
-      return (userIsInvited || (!userIsInvited && !this.invited));
+      return userIsInvited || !this.onlyShowExplicitlyInvited;
     },
   },
 };

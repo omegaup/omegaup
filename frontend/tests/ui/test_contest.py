@@ -81,24 +81,23 @@ def test_user_ranking_contest(driver):
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     user3 = 'ut_rank_user_3_%s' % run_id
-    password = 'P@55w0rd'
 
-    driver.register_user(user1, password)
-    driver.register_user(user2, password)
-    driver.register_user(user3, password)
+    driver.register_user(user1, 'P@55w0rd')
+    driver.register_user(user2, 'P@55w0rd')
+    driver.register_user(user3, 'P@55w0rd')
 
     create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
 
-    with driver.login(user1, password):
+    with driver.login(user1, 'P@55w0rd'):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
-    with driver.login(user2, password):
+    with driver.login(user2, 'P@55w0rd'):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
                         verdict='WA', score=0)
 
-    with driver.login(user3, password):
+    with driver.login(user3, 'P@55w0rd'):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
@@ -111,11 +110,11 @@ def test_user_ranking_contest(driver):
                     (By.XPATH, '//a[@href = "/arena/"]'))).click()
 
         with driver.page_transition():
-            contest_url = '/arena/%s' % contest_alias
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR,
-                     '#current-contests a[href="%s"]' % contest_url))).click()
+                     '#current-contests a[href="/arena/%s"]' %
+                     contest_alias))).click()
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -136,9 +135,11 @@ def test_user_ranking_contest(driver):
 
         contestants_full_list = driver.browser.find_elements_by_xpath(
             '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-        assert len(contestants_full_list) == 4, contestants_full_list
-        full_list = [user1, user2, user3, driver.user_username]
-        find_users_in_list(contestants_full_list, full_list)
+        contestants_set = {user1, user2, user3, driver.user_username}
+        contestants_full_set = set()
+        for element in contestants_full_list:
+            contestants_full_set.add(element.text)
+        assert contestants_full_set, contestants_set
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -146,9 +147,11 @@ def test_user_ranking_contest(driver):
 
         invited_contestant_list = driver.browser.find_elements_by_xpath(
             '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-        assert len(invited_contestant_list) == 3, invited_contestant_list
-        invited_list = [user1, user2, driver.user_username]
-        find_users_in_list(invited_contestant_list, invited_list)
+        contestants_set.remove(user3)
+        invited_contestant_set = set()
+        for element in invited_contestant_list:
+            invited_contestant_set.add(element.text)
+        assert invited_contestant_set, contestants_set
 
 
 @util.no_javascript_errors()
@@ -462,13 +465,3 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()
-
-
-def find_users_in_list(contestant_elements, list_element):
-    '''Find the contestant in a given list'''
-    try:
-        for element in contestant_elements:
-            contestant = element.text
-            assert list_element.index(contestant) >= 0, contestant
-    except ValueError:
-        assert False, contestant_elements
