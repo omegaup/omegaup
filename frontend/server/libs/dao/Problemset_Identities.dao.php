@@ -102,7 +102,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = FROM_UNIXTIME(UNIX_TIMESTAMP(access_time) + (? * 60), \'%Y-%m-%d %H:%i:%s\')
+                    `end_time` = DATE_ADD(access_time, INTERVAL ? MINUTE)
                 WHERE
                     `problemset_id` = ?
                     AND `end_time` IS NOT NULL;';
