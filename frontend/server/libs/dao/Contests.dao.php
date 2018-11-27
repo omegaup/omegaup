@@ -279,9 +279,17 @@ class ContestsDAO extends ContestsDAOBase {
         $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
-                c.*
+                c.title,
+                c.alias,
+                UNIX_TIMESTAMP (c.start_time) as start_time,
+                UNIX_TIMESTAMP (c.finish_time) as finish_time,
+                c.admission_mode,
+                ps.scoreboard_url,
+                ps.scoreboard_url_admin
             FROM
                 Contests c
+            INNER JOIN
+                Problemsets AS ps ON ps.problemset_id = c.problemset_id
             INNER JOIN
                 ACLs AS a ON a.acl_id = c.acl_id
             INNER JOIN
@@ -315,13 +323,43 @@ class ContestsDAO extends ContestsDAOBase {
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        return $conn->GetAll($sql, $params);
+    }
 
-        $contests = [];
-        foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
+    /**
+     * Get relevant columns of all contests, including scoreboard_url columns
+     *
+     * @param $page
+     * @param $pageSize
+     * @param $order
+     * @param $orderType
+     * @return Array
+     */
+    final public static function getAllContestsWithScoreboard($page = 1, $pageSize = 1000, $order = null, $orderType = 'ASC') {
+        $sql = '
+            SELECT
+                c.title,
+                c.alias,
+                UNIX_TIMESTAMP (c.start_time) as start_time,
+                UNIX_TIMESTAMP (c.finish_time) as finish_time,
+                c.admission_mode,
+                ps.scoreboard_url,
+                ps.scoreboard_url_admin
+            FROM
+                Contests c
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = c.problemset_id';
+
+        global $conn;
+        if (!is_null($order)) {
+            $sql .= ' ORDER BY `c`.`' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' .
+                    ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
-        return $contests;
+        if (!is_null($page)) {
+            $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . (int)$pageSize;
+        }
+
+        return $conn->GetAll($sql);
     }
 
     /**

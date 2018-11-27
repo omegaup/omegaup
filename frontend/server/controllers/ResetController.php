@@ -25,10 +25,10 @@ class ResetController extends Controller {
         }
 
         global $smarty;
-        $subject = $smarty->getConfigVariable('wordsReset');
+        $subject = $smarty->getConfigVars('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = $smarty->getConfigVariable('wordsResetMessage');
+        $message = $smarty->getConfigVars('wordsResetMessage');
         $body = str_replace('[link]', $link, $message);
 
         try {
@@ -42,7 +42,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' => $smarty->getConfigVariable('passwordResetRequestSuccess')
+            'message' => $smarty->getConfigVars('passwordResetRequestSuccess')
         ];
     }
 
@@ -108,7 +108,7 @@ class ResetController extends Controller {
         global $smarty;
         return [
             'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : $smarty->getConfigVariable('passwordResetResetSuccess')
+            'message' =>  IS_TEST ? 'message' : $smarty->getConfigVars('passwordResetResetSuccess')
         ];
     }
 

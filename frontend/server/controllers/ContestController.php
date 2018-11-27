@@ -150,7 +150,7 @@ class ContestController extends Controller {
         $contests = null;
         try {
             if (Authorization::isSystemAdmin($r['current_identity_id'])) {
-                $contests = ContestsDAO::getAll(
+                $contests = ContestsDAO::getAllContestsWithScoreboard(
                     $page,
                     $pageSize,
                     'contest_id',
@@ -167,16 +167,9 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $addedContests = [];
-        foreach ($contests as $c) {
-            $c->toUnixTime();
-            $contestInfo = $c->asFilteredArray($relevant_columns);
-            $addedContests[] = $contestInfo;
-        }
-
         return [
             'status' => 'ok',
-            'contests' => $addedContests,
+            'contests' => $contests,
         ];
     }
 

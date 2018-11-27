@@ -56,12 +56,12 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * @return Request
      */
-    private function setUpAssignment() {
+    private function setUpAssignment($startTimeDelay = 0) {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Create course and add user as a student
-        $this->courseData = CoursesFactory::createCourseWithOneAssignment();
+        $this->courseData = CoursesFactory::createCourseWithOneAssignment(null, null, false, 'no', 'false', $startTimeDelay);
 
         // Student user
         $this->student = UserFactory::createUser();
@@ -139,7 +139,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         $log = SubmissionLogDAO::getByPK($run->run_id);
 
-        $this->assertEquals(1, count($log));
+        $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
@@ -707,15 +707,7 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromStudentBeforeStart() {
-        $r = $this->setUpAssignment();
-        $adminLogin = self::login($this->courseData['admin']);
-        CourseController::apiUpdateAssignment(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course' => $this->courseData['course_alias'],
-            'assignment' => $this->courseData['assignment_alias'],
-            'start_time' => Utils::GetPhpUnixTimestamp() + 10,
-            'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
-        ]));
+        $r = $this->setUpAssignment(10);
 
         $login = self::login($this->student);
         $r['auth_token'] = $login->auth_token;
@@ -742,13 +734,8 @@ class RunCreateTest extends OmegaupTestCase {
             'start_time' => Utils::GetPhpUnixTimestamp() - 10,
             'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
         ]));
-        CourseController::apiUpdateAssignment(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course' => $this->courseData['course_alias'],
-            'assignment' => $this->courseData['assignment_alias'],
-            'start_time' => Utils::GetPhpUnixTimestamp() - 10,
-            'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
-        ]));
+        // Creating a submission in the future
+        Time::setTimeForTesting(Time::get() + 3600);
 
         $login = self::login($this->student);
         $r['auth_token'] = $login->auth_token;

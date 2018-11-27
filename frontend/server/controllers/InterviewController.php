@@ -118,7 +118,7 @@ class InterviewController extends Controller {
         }
 
         global $smarty;
-        $subject = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+        $subject = $smarty->getConfigVars('interviewInvitationEmailSubject');
 
         if (is_null($r['user'])) {
             // create a new user
@@ -133,19 +133,19 @@ class InterviewController extends Controller {
             UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = $smarty->getConfigVars('interviewInvitationEmailBodyIntro')
                            . '<br>'
                            . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
                            . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
-            $body .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
+            $body .= $smarty->getConfigVars('interviewUseTheFollowingLoginInfoEmail')
                             . '<br>'
-                            . $smarty->getConfigVariable('profileUsername')
+                            . $smarty->getConfigVars('profileUsername')
                             . ' : '
                             . $newUserRequest['username']
                             . '<br>'
-                            . $smarty->getConfigVariable('loginPassword')
+                            . $smarty->getConfigVars('loginPassword')
                             . ' : '
                             . $newUserRequest['password']
                             . '<br>';
@@ -153,7 +153,7 @@ class InterviewController extends Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = $smarty->getConfigVars('interviewInvitationEmailBodyIntro')
                            . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
                            . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }
@@ -200,7 +200,10 @@ class InterviewController extends Controller {
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
-            throw new NotFoundException('interviewNotFound');
+            return [
+                'exists' => false,
+                'status' => 'ok',
+            ];
         }
 
         // Only admins can view interview details
@@ -234,6 +237,7 @@ class InterviewController extends Controller {
             'contest_alias' => $interview->alias,
             'problemset_id' => $interview->problemset_id,
             'users' => $users,
+            'exists' => true,
             'status' => 'ok',
         ];
     }

@@ -44,6 +44,9 @@ class CoderOfTheMonth extends VO {
         if (isset($data['rank'])) {
             $this->rank = $data['rank'];
         }
+        if (isset($data['selected_by'])) {
+            $this->selected_by = $data['selected_by'];
+        }
     }
 
     /**
@@ -100,4 +103,11 @@ class CoderOfTheMonth extends VO {
       * @var int(11)
       */
     public $rank;
+
+    /**
+      * Id de la identidad que seleccionó al coder.
+      * @access public
+      * @var int(11)
+      */
+    public $selected_by;
 }

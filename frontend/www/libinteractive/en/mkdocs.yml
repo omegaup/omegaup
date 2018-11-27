@@ -2,9 +2,9 @@ site_name: libinteractive
 repo_url: https://github.com/omegaup/libinteractive
 docs_dir: .
 pages:
-- [index.md, Index]
-- [writing.md, Writing problems]
-- [internals.md, Implementation details]
-- [contest.md, Contestants]
-- [license.md, License]
+- Index: 'index.md'
+- Writing problems: 'writing.md'
+- Implementation details: 'internals.md'
+- Contestants: 'contest.md'
+- License: 'license.md'
 theme: readthedocs

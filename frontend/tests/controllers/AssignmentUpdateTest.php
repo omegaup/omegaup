@@ -15,7 +15,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $updatedStartTime = $courseData['request']['start_time'] + 10;
         $updatedFinishTime = $courseData['request']['start_time'] + 20;
 
-        $response = CourseController::apiUpdateAssignment(new Request([
+        CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias,
@@ -61,20 +61,26 @@ class AssignmentUpdateTest extends OmegaupTestCase {
 
     /**
      * Can't update the start time to be after the finish time.
-     * @expectedException InvalidParameterException
      */
     public function testAssignmentUpdateWithInvertedTimes() {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
-        $response = CourseController::apiUpdateAssignment(new Request([
-            'auth_token' => $login->auth_token,
-            'assignment' => $courseData['assignment_alias'],
-            'course' => $courseData['course_alias'],
-            'start_time' => $courseData['request']['start_time'] + 10,
-            'finish_time' => $courseData['request']['start_time'] + 9,
-        ]));
+
+        try {
+            CourseController::apiUpdateAssignment(new Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $courseData['assignment_alias'],
+                'course' => $courseData['course_alias'],
+                'start_time' => $courseData['request']['start_time'] + 10,
+                'finish_time' => $courseData['request']['start_time'] + 9,
+            ]));
+
+            $this->fail('Assignment should not have been updated because finish time is earlier than start time');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'courseInvalidStartTime');
+        }
     }
 
     /**
