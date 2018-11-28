@@ -81,23 +81,24 @@ def test_user_ranking_contest(driver):
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     user3 = 'ut_rank_user_3_%s' % run_id
+    password = 'P@55w0rd'
 
-    driver.register_user(user1, 'P@55w0rd')
-    driver.register_user(user2, 'P@55w0rd')
-    driver.register_user(user3, 'P@55w0rd')
+    driver.register_user(user1, password)
+    driver.register_user(user2, password)
+    driver.register_user(user3, password)
 
     create_contest_admin(driver, contest_alias, problem, [user1, user2],
                          driver.user_username)
 
-    with driver.login(user1, 'P@55w0rd'):
+    with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
-    with driver.login(user2, 'P@55w0rd'):
+    with driver.login(user2, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
                         verdict='WA', score=0)
 
-    with driver.login(user3, 'P@55w0rd'):
+    with driver.login(user3, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
@@ -133,25 +134,9 @@ def test_user_ranking_contest(driver):
             '"user"]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        contestants_full_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-        contestants_set = {user1, user2, user3, driver.user_username}
-        contestants_full_set = set()
-        for element in contestants_full_list:
-            contestants_full_set.add(element.text)
-        assert contestants_full_set, contestants_set
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
-
-        invited_contestant_list = driver.browser.find_elements_by_xpath(
-            '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-        contestants_set.remove(user3)
-        invited_contestant_set = set()
-        for element in invited_contestant_list:
-            invited_contestant_set.add(element.text)
-        assert invited_contestant_set, contestants_set
+        users_full_set = {user1, user2, user3, driver.user_username}
+        users_invited_set = {user1, user2, driver.user_username}
+        compare_contestants_list(driver, users_full_set, users_invited_set)
 
 
 @util.no_javascript_errors()
@@ -465,3 +450,24 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()
+
+
+@util.annotate
+def compare_contestants_list(driver, users_full_set, users_invited_set):
+    ''' Compares list of contestants toggle scoreboard filter.'''
+
+    contestants_full_list = driver.browser.find_elements_by_xpath(
+        '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
+    contestants_full_set = {item.text for item in contestants_full_list}
+    different_users = contestants_full_set ^ users_full_set
+    assert contestants_full_set == users_full_set, different_users
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
+
+    invited_contestants_list = driver.browser.find_elements_by_xpath(
+        '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
+    invited_contestants_set = {item.text for item in invited_contestants_list}
+    different_users = invited_contestants_set ^ users_invited_set
+    assert invited_contestants_set == users_invited_set, different_users
