@@ -182,10 +182,6 @@ class CourseController extends Controller {
      * @throws NotFoundException
      */
     private static function resolveGroup(Courses $course, $group = null) {
-        if (!is_a($course, 'Courses')) {
-            throw new InvalidParameterException('parameterNotFound', 'course');
-        }
-
         if (!is_null($group) && is_a($group, 'Groups')) {
             return $group;
         }
@@ -423,31 +419,31 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        $response = self::validateAssignmentDetails($r['course'], $r['assignment'], $r['current_identity_id']);
-        if (!Authorization::isCourseAdmin($r['current_identity_id'], $response['course'])) {
+        $assignmentDetails = self::validateAssignmentDetails($r['course'], $r['assignment'], $r['current_identity_id']);
+        if (!Authorization::isCourseAdmin($r['current_identity_id'], $assignmentDetails['course'])) {
             throw new ForbiddenAccessException();
         }
 
         if (is_null($r['start_time'])) {
-            $r['start_time'] = $response['assignment']->start_time;
+            $r['start_time'] = $assignmentDetails['assignment']->start_time;
         } else {
             Validators::isNumberInRange(
                 $r['start_time'],
                 'start_time',
-                $response['course']->start_time,
-                $response['course']->finish_time,
+                $assignmentDetails['course']->start_time,
+                $assignmentDetails['course']->finish_time,
                 true /* is_required */
             );
         }
 
         if (is_null($r['start_time'])) {
-            $r['finish_time'] = $response['assignment']->finish_time;
+            $r['finish_time'] = $assignmentDetails['assignment']->finish_time;
         } else {
             Validators::isNumberInRange(
                 $r['finish_time'],
                 'finish_time',
-                $response['course']->start_time,
-                $response['course']->finish_time,
+                $assignmentDetails['course']->start_time,
+                $assignmentDetails['course']->finish_time,
                 true /* is_required */
             );
         }
@@ -457,11 +453,11 @@ class CourseController extends Controller {
         }
 
         // Prevent date changes if a course already has runs
-        if ($r['start_time'] != $response['assignment']->start_time) {
+        if ($r['start_time'] != $assignmentDetails['assignment']->start_time) {
             $runCount = 0;
 
             try {
-                $runCount = RunsDAO::CountTotalRunsOfProblemset($response['assignment']->problemset_id);
+                $runCount = RunsDAO::CountTotalRunsOfProblemset($assignmentDetails['assignment']->problemset_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -482,10 +478,10 @@ class CourseController extends Controller {
             }],
             'assignment_type',
         ];
-        self::updateValueProperties($r, $response['assignment'], $valueProperties);
+        self::updateValueProperties($r, $assignmentDetails['assignment'], $valueProperties);
 
         try {
-            AssignmentsDAO::save($response['assignment']);
+            AssignmentsDAO::save($assignmentDetails['assignment']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1890,17 +1886,17 @@ class CourseController extends Controller {
      * @throws NotFoundException
      */
     public static function apiAssignmentScoreboardEvents(Request $r) {
-        $response = self::authenticateToken($r['token'], $r['course_alias'], $r['assignment_alias']);
-        if (!$response['hasToken']) {
+        $tokenAuthenticationResult = self::authenticateToken($r['token'], $r['course_alias'], $r['assignment_alias']);
+        if (!$tokenAuthenticationResult['hasToken']) {
             self::authenticateRequest($r);
-            $response = self::validateAssignmentDetails($r['course_alias'], $r['assignment_alias'], $r['current_identity_id']);
+            $tokenAuthenticationResult = self::validateAssignmentDetails($r['course_alias'], $r['assignment_alias'], $r['current_identity_id']);
         }
 
         $scoreboard = new Scoreboard(
             ScoreboardParams::fromAssignment(
-                $response['assignment'],
-                $response['course']->group_id,
-                self::shouldShowCourseAdminInfo($r['current_user_id'], $response)
+                $tokenAuthenticationResult['assignment'],
+                $tokenAuthenticationResult['course']->group_id,
+                self::shouldShowCourseAdminInfo($r['current_user_id'], $tokenAuthenticationResult)
             )
         );
 
