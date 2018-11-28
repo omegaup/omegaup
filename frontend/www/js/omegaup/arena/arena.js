@@ -44,6 +44,17 @@ export function GetOptionsFromLocation(arenaLocation) {
     };
   }
 
+  $('#submissions-help')
+      .on('click', function(e) {
+        introJs()
+            .setOption('doneLabel', omegaup.T.wordsNextPage)
+            .start()
+            .oncomplete(function() {
+              window.location.href = window.location + '/new-run?tutorial=true';
+            });
+        return false;
+      });
+
   if (arenaLocation.pathname.indexOf('/practice') !== -1) {
     options.isPractice = true;
   }
@@ -1389,7 +1400,7 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
-          if (RegExp('multipage', 'gi').test(window.location.hash)) {
+          if (window.location.hash.indexOf('tutorial') !== -1) {
             window.scrollTo(0, 0);
             introJs()
                 .addSteps([

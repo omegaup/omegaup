@@ -91,7 +91,7 @@ omegaup.OmegaUp.on('ready', function() {
         arena.codeEditor.code = arena.currentProblem.template;
         arena.codeEditor.refresh();
 
-        if (RegExp('multipage', 'gi').test(window.location.hash)) {
+        if (window.location.hash.indexOf('tutorial') !== -1) {
           window.scrollTo(0, 0);
           introJs()
               .addSteps([
@@ -163,18 +163,6 @@ omegaup.OmegaUp.on('ready', function() {
           arena.refreshClarifications();
         });
   }
-
-  $('#submissions-help')
-      .on('click', function(e) {
-        introJs()
-            .setOption('doneLabel', 'Next page')
-            .start()
-            .oncomplete(function() {
-              window.location.href =
-                  window.location + '/new-run?multipage=true';
-            });
-        return false;
-      });
 
   $('#clarification')
       .on('submit', function(e) {

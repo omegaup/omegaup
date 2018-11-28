@@ -57,8 +57,8 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.es.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.pt-BR.js"}"></script>
-		<!-- introJs plugin from https://introjs.com/?v230 -->
-		<link rel="stylesheet" href="/third_party/css/introjs.min.css">
+		<!-- introJs plugin from https://introjs.com/ -->
+		<link rel="stylesheet" href="{version_hash src="/third_party/css/introjs.min.css"}">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/intro.min.js"}"></script>
 
 {if isset($inArena) && $inArena}

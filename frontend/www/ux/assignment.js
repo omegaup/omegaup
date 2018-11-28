@@ -17,16 +17,4 @@ omegaup.OmegaUp.on('ready', function() {
       .fail(omegaup.UI.apiError);
 
   window.addEventListener('hashchange', arena.onHashChanged.bind(arena));
-
-  $('#submissions-help')
-      .on('click', function(e) {
-        introJs()
-            .setOption('doneLabel', 'Next page')
-            .start()
-            .oncomplete(function() {
-              window.location.href =
-                  window.location + '/new-run?multipage=true';
-            });
-        return false;
-      });
 });

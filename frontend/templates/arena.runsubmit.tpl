@@ -22,6 +22,6 @@
 				<div>{#arenaRunSubmitFilename#} <tt>Main<span class="submit-filename-extension"></span></tt></div>
 				<label for="editor">{#arenaRunSubmitPaste#}</label>
 				<textarea id="editor" name="code"></textarea><br/>
-				<div class="file"><label>{#arenaRunSubmitUpload#} <input type="file" /></label></div><br/>
+				<div class="file-upload"><label>{#arenaRunSubmitUpload#} <input type="file" /></label></div><br/>
 				<input type="submit" />
 			</form>
