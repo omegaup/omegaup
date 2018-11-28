@@ -414,13 +414,14 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $this->assertNull($contest['window_length'], 'Window length is not setted, because 0 is not a valid value');
 
-        $r['window_length'] = 10;
+        $windowLength = 10;
+        $r['window_length'] = $windowLength;
         // Call API
         $response = ContestController::apiUpdate($r);
 
         $contest = ContestController::apiDetails($r);
 
-        $this->assertEquals(10, $contest['window_length']);
+        $this->assertEquals($windowLength, $contest['window_length']);
 
         // Update time for testing
         Time::setTimeForTesting(Time::get() + 700);
