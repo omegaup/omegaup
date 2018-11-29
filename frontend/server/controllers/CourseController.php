@@ -37,7 +37,7 @@ class CourseController extends Controller {
      */
     private static function validateCourseAssignmentAlias(Request $r) {
         try {
-            $r['assignment'] = CoursesDAO::getAssignmentByAlias($r['course'], $r['assignment_alias']);
+            $r['assignment'] = CoursesDAO::getAssignmentByAlias($r['course']->course_id, $r['assignment']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1510,9 +1510,9 @@ class CourseController extends Controller {
 
         $courseAdmin = false;
 
-        $r['course'] = self::validateCourseExists($r['course']);
+        self::validateCourseExists($r, 'course');
         $r['course']->toUnixTime();
-        $r['assignment'] = self::validateCourseAssignmentAlias($r['course']->course_id, $r['assignment']);
+        self::validateCourseAssignmentAlias($r);
         $r['assignment']->toUnixTime();
 
         try {
@@ -1866,7 +1866,7 @@ class CourseController extends Controller {
             ScoreboardParams::fromAssignment(
                 $r['assignment'],
                 $r['course']->group_id,
-                $$tokenAuthenticationResult['courseAdmin']/*show_all_runs*/
+                $tokenAuthenticationResult['courseAdmin']/*show_all_runs*/
             )
         );
 

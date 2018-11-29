@@ -121,12 +121,12 @@ class ProblemsetController extends Controller {
                 new Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
-                    'course_alias' => $r['problemset']['course'],
-                    'assignment_alias' => $r['problemset']['assignment'],
+                    'course' => $r['problemset']['course'],
+                    'assignment' => $r['problemset']['assignment'],
                 ])
             );
         }
-        // There in no scoreboard for interviews yet
+        // There is no scoreboard for interviews yet
         return [];
     }
 
@@ -142,17 +142,28 @@ class ProblemsetController extends Controller {
         Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] != 'Contest') {
-            // Not implemented in courses nor interviews yet
+        if ($r['problemset']['type'] == 'Interview') {
+            // Not implemented in interviews yet
             return ['events' => []];
         }
-        return ContestController::apiScoreboardEvents(
-            new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $r['problemset']['contest_alias'],
-                'token' => $r['token'],
-            ])
-        );
+        if ($r['problemset']['type'] == 'Contest') {
+            return ContestController::apiScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $r['problemset']['contest_alias'],
+                    'token' => $r['token'],
+                ])
+            );
+        } elseif ($r['problemset']['type'] == 'Assignment') {
+            return CourseController::apiAssignmentScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'course' => $r['problemset']['course'],
+                    'assignment' => $r['problemset']['assignment'],
+                    'token' => $r['token'],
+                ])
+            );
+        }
     }
 
     /**

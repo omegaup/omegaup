@@ -26,21 +26,19 @@ OmegaUp.on('ready', function() {
         arena.initClock(course.start_time, course.finish_time);
         $('#title .course-title').text(course.name);
 
-        API.Course.assignmentScoreboard({
-                    course_alias: arena.options.courseAlias,
-                    assignment_alias: arena.options.assignmentAlias,
-                    token: arena.options.scoreboardToken
-                  })
-            .then(arena.rankingCourseChange.bind(arena))
+        API.Problemset.scoreboard({
+                        problemset_id: course.problemset_id,
+                        token: arena.options.scoreboardToken
+                      })
+            .then(arena.rankingChange.bind(arena))
             .fail(UI.ignoreError);
         if (new Date() < course.finish_time && !arena.socket) {
           setInterval(function() {
-            API.Course.assignmentScoreboard({
-                        course_alias: arena.options.courseAlias,
-                        assignment_alias: arena.options.assignmentAlias,
-                        token: arena.options.scoreboardToken
-                      })
-                .then(arena.rankingCourseChange.bind(arena))
+            API.Problemset.scoreboard({
+                            problemset_id: course.problemset_id,
+                            token: arena.options.scoreboardToken
+                          })
+                .then(arena.rankingChange.bind(arena))
                 .fail(UI.ignoreError);
           }, getRankingByTokenRefresh);
         }
