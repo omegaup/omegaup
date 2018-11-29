@@ -1497,12 +1497,18 @@ class CourseController extends Controller {
         return ActivityReport::getActivityReport($accesses, $submissions);
     }
 
-    private static function authenticateToken(Request $r) {
+    private static function authenticateAndValidateToken(Request $r) {
         if (is_null($r['token'])) {
-            $r['hasToken'] = false;
-            return;
+            self::authenticateRequest($r);
+            self::validateAssignmentDetails($r);
+
+            return [
+                'hasToken' => false,
+                'courseAdmin' => Authorization::isCourseAdmin($r['current_identity_id'], $r['course']),
+            ];
         }
-        $r['courseAdmin'] = false;
+
+        $courseAdmin = false;
 
         $r['course'] = self::validateCourseExists($r['course']);
         $r['course']->toUnixTime();
@@ -1510,7 +1516,7 @@ class CourseController extends Controller {
         $r['assignment']->toUnixTime();
 
         try {
-            $assignmentProblemset = AssignmentsDAO::getByAliasWithExtraInformation($r['assignment']->assignment_id);
+            $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($r['assignment']->assignment_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1519,10 +1525,16 @@ class CourseController extends Controller {
         }
 
         if ($r['token'] === $assignmentProblemset['scoreboard_url_admin']) {
-            $r['courseAdmin'] = true;
+            $courseAdmin = true;
         } elseif ($r['token'] !== $assignmentProblemset['scoreboard_url']) {
             throw new ForbiddenAccessException('invalidScoreboardUrl');
         }
+
+        // hasToken is true, it means we do not autenticate request user
+        return [
+            'courseAdmin' => $courseAdmin,
+            'hasToken' => true,
+        ];
     }
 
     private static function validateAssignmentDetails(Request $r) {
@@ -1561,11 +1573,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateToken($r);
-        if (!$r['hasToken']) {
-            self::authenticateRequest($r);
-            self::validateAssignmentDetails($r);
-        }
+        $tokenAuthenticationResult = self::authenticateAndValidateToken($r);
 
         $problems = ProblemsetProblemsDAO::getProblems(
             $r['assignment']->problemset_id
@@ -1585,7 +1593,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
         // Log the operation only when there is not a token in request
-        if (!$r['hasToken']) {
+        if (!$tokenAuthenticationResult['hasToken']) {
             ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
                 'identity_id' => $r['current_identity_id'],
                 'problemset_id' => $r['assignment']->problemset_id,
@@ -1602,7 +1610,7 @@ class CourseController extends Controller {
             'problems' => $problems,
             'director' => $director,
             'problemset_id' => $r['assignment']->problemset_id,
-            'admin' => self::shouldShowCourseAdminInfo($r),
+            'admin' => $tokenAuthenticationResult['courseAdmin'],
         ];
     }
 
@@ -1817,14 +1825,10 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiAssignmentScoreboard(Request $r) {
-        self::authenticateToken($r);
-        if (!$r['hasToken']) {
-            self::authenticateRequest($r);
-            self::validateAssignmentDetails($r);
-        }
+        $tokenAuthenticationResult = self::authenticateAndValidateToken($r);
         self::resolveGroup($r);
 
-        if (!$r['hasToken'] && !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
+        if (!$tokenAuthenticationResult['hasToken'] && !Authorization::canViewCourse($r['current_identity_id'], $r['course'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -1837,7 +1841,7 @@ class CourseController extends Controller {
                 'finish_time' => $r['assignment']->finish_time,
                 'acl_id' => $r['assignment']->acl_id,
                 'group_id' => $r['course']->group_id,
-                'admin' => self::shouldShowCourseAdminInfo($r)
+                'admin' => $tokenAuthenticationResult['courseAdmin'],
             ])
         );
 
@@ -1856,17 +1860,13 @@ class CourseController extends Controller {
      * @throws NotFoundException
      */
     public static function apiAssignmentScoreboardEvents(Request $r) {
-        self::authenticateToken($r);
-        if (!$r['hasToken']) {
-            self::authenticateRequest($r);
-            self::validateAssignmentDetails($r);
-        }
+        $tokenAuthenticationResult = self::authenticateAndValidateToken($r);
 
         $scoreboard = new Scoreboard(
             ScoreboardParams::fromAssignment(
                 $r['assignment'],
                 $r['course']->group_id,
-                self::shouldShowCourseAdminInfo($r)
+                $$tokenAuthenticationResult['courseAdmin']/*show_all_runs*/
             )
         );
 
@@ -1938,16 +1938,5 @@ class CourseController extends Controller {
         Validators::isNumber($identity_id, 'identity_id', true);
         return Authorization::canViewCourse($identity_id, $course, $group) &&
             $course->show_scoreboard;
-    }
-
-    /**
-     * @param Request $r
-     * @return Boolean
-     */
-    private static function shouldShowCourseAdminInfo(Request $r) {
-        if (!$r['hasToken']) {
-            return Authorization::isCourseAdmin($r['current_identity_id'], $r['course']);
-        }
-        return $r['courseAdmin'];
     }
 }

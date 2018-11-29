@@ -103,15 +103,9 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         return new Assignments($row);
     }
 
-    final public static function getByAliasWithExtraInformation($assignmentId) {
+    final public static function getByIdWithScoreboardUrls($assignmentId) {
         $sql = '
                 SELECT
-                   a.name,
-                   a.description,
-                   a.alias,
-                   a.assignment_type,
-                   UNIX_TIMESTAMP(a.start_time) AS start_time,
-                   UNIX_TIMESTAMP(a.finish_time) AS finish_time,
                    ps.scoreboard_url,
                    ps.scoreboard_url_admin
                 FROM

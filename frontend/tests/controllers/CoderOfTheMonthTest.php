@@ -238,6 +238,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Testing with an intermediate day of the month
         $timestampTest = Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
+        $timestampTest = strtotime($dateTest);
         $canChooseCoder = Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
