@@ -2,6 +2,7 @@
   var problemsSolved = $('#rank-by-problems-solved');
   var length = parseInt(problemsSolved.attr('data-length'));
   var page = parseInt(problemsSolved.attr('data-page'));
+  console.log(page)
   var filter = problemsSolved.attr('data-filter');
   var isIndex = (problemsSolved.attr('is-index') === '1');
   var rowTemplate = '<tr>' +

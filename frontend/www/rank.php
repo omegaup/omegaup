@@ -20,7 +20,6 @@ if ($session['auth_token']) {
         $availableFilters['school'] = $smarty->getConfigVars('wordsFilterBySchool');
     }
 }
-
 $smarty->assign('page', $page);
 $smarty->assign('length', $length);
 $smarty->assign('filter', $filter);
