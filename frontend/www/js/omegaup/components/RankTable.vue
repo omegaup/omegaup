@@ -11,12 +11,14 @@
         </template><a class="next"
                   v-bind:href="`/rank/?page=${page+1}`">{{ T.wordsNextPage }}</a>
         <template v-if="Object.keys(availableFilters).length &gt; 0">
-          <select class="filter">
+          <select class="filter"
+                    v-model="filter_key"
+                    v-on:change="filterChange">
             <option value="">
               {{ T.wordsSelectFilter }}
             </option>
-            <option v-bind:selected="filter_selected(key)"
-                    v-bind:value="index"
+            <option v-bind:selected="filterSelected(key)"
+                    v-bind:value="key"
                     v-for="(item,key,index) in availableFilters">
               {{ item }}
             </option>
@@ -75,11 +77,11 @@ export default {
     page: Number,
     length: Number,
     is_index: Boolean,
-    availableFilters: Array,
+    availableFilters: undefined,
     filter: String,
   },
   data: function() {
-    return { T: T, UI: UI, }
+    return { T: T, UI: UI, filter_key: this.filter }
   },
   mounted: function() {
     var self = this;
@@ -120,14 +122,36 @@ export default {
           }
           problemsSolved.querySelector('tbody').innerHTML = html;
           if (length * page >= result.total) {
-            self.$el.querySelector('.next,.delimiter').style.display = "none"
+            var temp = self.$el.querySelectorAll('.next,.delimiter');
+            for (var i = 0; i < temp.length; i++) {
+              temp[i].style.display = "none";
+            }
           }
         })
         .fail(omegaup.UI.apiError);
   },
   methods: {
-    filter_selected: function(key) {
+    filterSelected: function(key) {
       if (this.filter == key) return "selected";
+    },
+    filterChange: function() {
+      var queryParameters = {}, queryString = location.search.substring(1),
+          re = /([^&=]+)=([^&]*)/g, m;
+      while (m = re.exec(queryString)) {
+        queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+      }
+      if (this.filter_key !== '') {
+        queryParameters['filter'] = this.filter_key;
+      } else {
+        delete queryParameters['filter'];
+      }
+      var url = Object.keys(queryParameters)
+                    .map(function(k) {
+                      return encodeURIComponent(k) + '=' +
+                             encodeURIComponent(queryParameters[k])
+                    })
+                    .join('&');
+      window.location.search = url;
     },
   },
   computed: {
