@@ -50,9 +50,14 @@
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 						{if $LOGGED_IN eq '1'}
-{if isset($inContest) && $inContest}
-{include file='common.navbar.notifications.tpl'}
-{/if}
+							{if isset($inContest) && $inContest}
+							{include file='common.navbar.notifications.tpl'}
+							{/if}
+
+							<script type="text/json" id="payloadLanguage">{$LANGUAGE|json_encode}</script>
+							<div id="user-language"></div>
+							<script type="text/javascript" src="{version_hash src="/js/dist/user_language.js"}"></script>
+
 							<li class="dropdown">
 							<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">

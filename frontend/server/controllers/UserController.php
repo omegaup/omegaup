@@ -18,6 +18,7 @@ class UserController extends Controller {
     const ALLOWED_GENDER_OPTIONS = [
         'female','male','other','decline',
     ];
+    const LANGUAGES = ['es','en','pt',];
 
     const SENDY_SUCCESS = '1';
 
@@ -2614,6 +2615,25 @@ class UserController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Update language for a logged user
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateLanguage(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isInEnum($r['language'], 'language', UserController::LANGUAGES, true);
+
+        try {
+            UsersDAO::apiUpdateLanguageUser($r['current_identity_id'], $r['language']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        return ['status' => 'ok',];
     }
 }
 
