@@ -297,7 +297,6 @@ class UserUpdateTest extends OmegaupTestCase {
             // OK!
             $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
         }
-        //UserController::getPreferredLanguage($userRequest)
     }
 
     /**
