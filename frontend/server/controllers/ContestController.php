@@ -570,7 +570,7 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($needsInformation['requests_user_information'] != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id '], $r['statement_type']);
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['current_identity_id'],
                     $privacystatement_id
