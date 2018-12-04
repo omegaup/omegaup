@@ -1,13 +1,13 @@
 <template>
   <li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-      <img v-bind:src="flagUrl" /> 
-      <span class="caret"></span></a>
+    <a class="dropdown-toggle"
+        data-toggle="dropdown"
+        href="#"><img v-bind:src="flagUrl"> <span class="caret"></span></a>
     <ul class="dropdown-menu">
       <li v-for="language in availableLanguages">
-        <a href='#' v-on:click="onChangeLanguage(language)">
-          <img v-bind:src="showFlagUrl(language)"> {{ showStatementLanguage(language) }}
-        </a>
+        <a href='#'
+            v-on:click="onChangeLanguage(language)"><img v-bind:src="showFlagUrl(language)"> {{
+            showStatementLanguage(language) }}</a>
       </li>
     </ul>
   </li>
@@ -50,10 +50,10 @@ export default {
       }
       return T.statementLanguageEs;
     },
-    onChangeLanguage: function (language) {
+    onChangeLanguage: function(language) {
       if (language != this.selectedLanguage) {
         this.$emit('change-language', language);
-      }  
+      }
     },
   },
   data: function() {
