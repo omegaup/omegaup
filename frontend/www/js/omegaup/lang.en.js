@@ -532,7 +532,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemEditFormLanguages: "Languages",
 	problemEditFormLiteral: "Interpret stdout as score",
 	problemEditFormMemoryLimit: "Memory limit (KiB)",
-	problemEditFormNumericTokensWithTolerance: "Numeric tokens with tolerance",
+	problemEditFormNumericTokensWithTolerance: "Numeric tokens with tolerance of 1e-9",
 	problemEditFormOutputLimit: "Output limit (bytes)",
 	problemEditFormTimeLimit: "Time limit (ms)",
 	problemEditFormTokenByToken: "Token by Token",
