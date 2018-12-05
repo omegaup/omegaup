@@ -404,7 +404,7 @@ class ProblemDeployer {
         }
 
         // Also extract any images in the statements directory.
-        $images = preg_grep('/^statements\/.*\.(gif|jpg|jpeg|png)$/', $zipFilesArray);
+        $images = preg_grep('/^statements\/.*\.(gif|jpg|jpeg|png|bmp)$/', $zipFilesArray);
 
         // Add images to the files to be unzipped.
         foreach ($images as $file) {
