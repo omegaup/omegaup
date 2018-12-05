@@ -25,7 +25,8 @@ OmegaUp.on('ready', function() {
             let contests = [];
             for (var contest_alias in data['contests']) {
               var now = new Date();
-              var currentTimestamp = data['contests'][contest_alias]['finish_time'] * 1000;
+              var currentTimestamp =
+                  data['contests'][contest_alias]['finish_time'] * 1000;
               var end = OmegaUp.remoteTime(currentTimestamp);
               if (data['contests'][contest_alias]['place'] != null &&
                   now > end) {
