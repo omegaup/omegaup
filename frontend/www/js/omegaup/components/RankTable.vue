@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <template v-if="!is_index">
+      <template v-if="!isIndex">
         <h3 class="panel-title">{{ UI.formatString(T.rankRangeHeader,
         {lowCount:(page-1)*length+1,highCount:page*length}) }}</h3>
         <template v-if="page &gt; 1">
@@ -31,35 +31,41 @@
     </div>
     <div class="panel-body no-padding">
       <div class="table-responsive">
-        <table class="table table-striped table-hover no-margin"
-               v-bind:data-filter="data_filter"
-               v-bind:data-length="length"
-               v-bind:data-page="page"
-               v-bind:is-index="is_index">
+        <table class="table table-striped table-hover no-margin">
           <thead>
             <tr>
               <th>#</th>
               <th colspan="2">{{ T.wordsUser }}</th>
               <th class="numericColumn">{{ T.rankScore }}</th>
               <th class="numericColumn"
-                  v-if="!is_index">{{ T.rankSolved }}</th>
+                  v-if="!isIndex">{{ T.rankSolved }}</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <tr v-for="rank in ranks">
+              <td>{{ rank.rank }}</td>
+              <td>{{ rank.flag }}</td>
+              <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
+              "`/profile/${rank.username}`">{{ rank.username }}</a></strong></td>
+              <td class="numericColumn">{{ rank.score }}</td>
+              <td class="numericColumn"
+                  v-if="!isIndex">{{ rank.problemsSolvedUser }}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <div class="container-fluid">
         <div class="col-xs-12 vertical-padding">
-          <template v-if="is_index">
+          <template v-if="isIndex">
             <a href='/rank/'>{{ T.rankViewFull }}</a>
           </template>
           <template v-else="">
             <template v-if="page &gt; 1">
               <a class="prev"
-                        v-bind:href="prev_page_filter">{{ T.wordsPrevPage }}</a> <span class=
+                        v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
                         "delimiter">|</span>
             </template><a class="next"
-                      v-bind:href="next_page_filter">{{ T.wordsNextPage }}</a>
+                      v-bind:href="nextPageFilter">{{ T.wordsNextPage }}</a>
           </template><br>
         </div>
       </div>
@@ -76,57 +82,47 @@ export default {
   props: {
     page: Number,
     length: Number,
-    is_index: Boolean,
+    isIndex: Boolean,
     availableFilters: undefined,
     filter: String,
   },
   data: function() {
-    return { T: T, UI: UI, filter_key: this.filter }
+    return { T: T, UI: UI, filter_key: this.filter, ranks:[] }
   },
   mounted: function() {
     var self = this;
     var problemsSolved = self.$el.querySelector("table");
-    var length = parseInt(problemsSolved.getAttribute("data-length"));
-    var page = parseInt(problemsSolved.getAttribute("data-page"));
-    var filter = problemsSolved.getAttribute("data-filter");
-    var isIndex = (problemsSolved.getAttribute('is-index') === true);
-    var rowTemplate =
-        '<tr>' +
-        '<td>%(rank)</td><td class="flagColumn">%(flag)</td>' +
-        '<td class="forcebreaks forcebreaks-top-5"><strong>' +
-        '<a href="/profile/%(username)">%(username)</a></strong>' +
-        '%(name)</td>' +
-        '<td class="numericColumn">%(score)</td>' +
-        '%(problemsSolvedRow)' +
-        '</tr>';
+    var length = self.length;
+    var page = self.page;
+    var filter = self.filter;
+    var isIndex = (self.isIndex === true);
+
     omegaup.API.User.rankByProblemsSolved(
                         {offset: page, rowcount: length, filter: filter})
         .then(function(result) {
-          var html = '';
           for (var i = 0; i < result.rank.length; ++i) {
             var user = result.rank[i];
-            var problemsSolvedRow = '';
+            var problemsSolvedUser = undefined;
             if (!isIndex) {
-              problemsSolvedRow =
-                  "<td class='numericColumn'>" + user.problems_solved + '</td>';
+              problemsSolvedUser = user.problems_solved;
             }
-            html += omegaup.UI.formatString(rowTemplate, {
+            self.ranks.add({
               rank: user.rank,
               flag: omegaup.UI.getFlag(user.country_id),
               username: user.username,
               name: (user.name == null || length == 5 ? '&nbsp;' :
                                                         ('<br/>' + user.name)),
               score: user.score,
-              problemsSolvedRow: problemsSolvedRow,
+              problemsSolvedUser: problemsSolvedUser,
             });
           }
-          problemsSolved.querySelector('tbody').innerHTML = html;
           if (length * page >= result.total) {
             var temp = self.$el.querySelectorAll('.next,.delimiter');
             for (var i = 0; i < temp.length; i++) {
               temp[i].style.display = "none";
             }
           }
+          self.$forceUpdate();
         })
         .fail(omegaup.UI.apiError);
   },
@@ -135,6 +131,8 @@ export default {
       if (this.filter == key) return "selected";
     },
     filterChange: function() {
+      // change url parameters with jquery
+      // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
       var queryParameters = {}, queryString = location.search.substring(1),
           re = /([^&=]+)=([^&]*)/g, m;
       while (m = re.exec(queryString)) {
@@ -155,22 +153,17 @@ export default {
     },
   },
   computed: {
-    next_page_filter: function() {
+    nextPageFilter: function() {
       if (this.filter != null)
-        return "/rank/?page=" + (this.page + 1).toString() + "&filter=" +
-               this.filter;
+        return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(this.filter)}`;
       else
-        return "/rank/?page=" + (this.page + 1).toString();
+        return `/rank?page=${this.page + 1}`;
     },
-    prev_page_filter: function() {
+    prevPageFilter: function() {
       if (this.filter != null)
-        return "/rank/?page=" + (this.page - 1).toString() + "&filter=" +
-               this.filter;
+        return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(this.filter)}`;
       else
-        return "/rank/?page=" + (this.page - 1).toString();
-    },
-    data_filter: function() {
-      if (this.filter != null) return this.filter
+        return `/rank?page=${this.page - 1}`;
     },
   },
 };

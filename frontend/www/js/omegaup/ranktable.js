@@ -11,7 +11,7 @@ OmegaUp.on('ready', function() {
         props: {
           page: this.page,
           length: this.length,
-          is_index: this.is_index,
+          isIndex: this.isIndex,
           availableFilters: this.availableFilters,
           filter: this.filter,
         }
@@ -20,7 +20,7 @@ OmegaUp.on('ready', function() {
     data: {
       page: payload.page,
       length: payload.length,
-      is_index: payload.is_index,
+      isIndex: payload.is_index,
       availableFilters: payload.availableFilters,
       filter: payload.filter,
     },
