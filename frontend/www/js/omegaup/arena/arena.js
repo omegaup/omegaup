@@ -47,7 +47,12 @@ export function GetOptionsFromLocation(arenaLocation) {
   $('#submissions-help')
       .on('click', function(e) {
         introJs()
-            .setOption('doneLabel', omegaup.T.wordsNextPage)
+            .setOptions({
+              doneLabel: omegaup.T.wordsNextPage,
+              nextLabel: omegaup.T.wordsNext,
+              prevLabel: omegaup.T.wordsPrev,
+              skipLabel: omegaup.T.wordsSkip,
+            })
             .start()
             .oncomplete(function() {
               window.location.href = window.location + '/new-run?tutorial=true';
@@ -1403,6 +1408,12 @@ export class Arena {
           if (window.location.hash.indexOf('tutorial') !== -1) {
             window.scrollTo(0, 0);
             introJs()
+                .setOptions({
+                  doneLabel: omegaup.T.wordsDone,
+                  nextLabel: omegaup.T.wordsNext,
+                  prevLabel: omegaup.T.wordsPrev,
+                  skipLabel: omegaup.T.wordsSkip,
+                })
                 .addSteps([
                   {
                     element:
