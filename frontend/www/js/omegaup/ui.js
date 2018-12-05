@@ -459,7 +459,7 @@ let UI = {
 
     let converter = Markdown.getSanitizingConverter();
     let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|code|i|table|tbody|thead|tr|th|td|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
-    let imageWhitelist = new RegExp('^<img\\ssrc="(data:image\/)?[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
+    let imageWhitelist = new RegExp('^<img\\ssrc="(data:image\/)?[a-zA-Z0-9/;,=+.?]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
 
     converter.hooks.chain('isValidTag', function(tag) {
       return tag.match(whitelist) || tag.match(imageWhitelist);
