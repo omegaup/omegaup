@@ -1272,15 +1272,8 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiProfile(Request $r) {
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // If $r['username'] is set then $r['userinfo'] will be populated below.
-            if (is_null($r['username'])) {
-                $response['status'] = 'ok';
-                return $response;
-            }
-        }
+        //usarname is needed
+        self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $r['identity'] = self::resolveTargetIdentity($r);
         $r['user'] = self::resolveTargetUser($r);
