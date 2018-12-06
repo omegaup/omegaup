@@ -1,8 +1,6 @@
 <?php
 require_once('../../server/bootstrap.php');
 
-UITools::setProfile($smarty);
-
 // Fetch contests
 try {
     $query = '';
