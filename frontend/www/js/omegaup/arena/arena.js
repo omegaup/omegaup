@@ -22,6 +22,7 @@ let ScoreboardColors = [
   '#8144D6',
   '#CD35D3',
 ];
+let isTutorial = false;
 
 export function GetOptionsFromLocation(arenaLocation) {
   let options = {
@@ -55,7 +56,8 @@ export function GetOptionsFromLocation(arenaLocation) {
             })
             .start()
             .oncomplete(function() {
-              window.location.href = window.location + '/new-run?tutorial=true';
+              isTutorial = true;
+              document.querySelector('td#new-run > a').trigger('click');
             });
         return false;
       });
@@ -1405,7 +1407,8 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
-          if (window.location.hash.indexOf('tutorial') !== -1) {
+          if (isTutorial) {
+            isTutorial = false;
             window.scrollTo(0, 0);
             introJs()
                 .setOptions({
