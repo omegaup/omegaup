@@ -6,19 +6,18 @@
         {lowCount:(page-1)*length+1,highCount:page*length}) }}</h3>
         <template v-if="page &gt; 1">
           <a class="prev"
-                    v-bind:href="`/rank/?page=${page-1}`">{{ T.wordsPrevPage }}</a> <span class=
+                    v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
                     "delimiter">|</span>
         </template><a class="next"
-                  v-bind:href="`/rank/?page=${page+1}`">{{ T.wordsNextPage }}</a>
+                  v-bind:href="nextPageFilter">{{ T.wordsNextPage }}</a>
         <template v-if="Object.keys(availableFilters).length &gt; 0">
           <select class="filter"
-                    v-model="filter_key"
+                    v-model="filter"
                     v-on:change="filterChange">
             <option value="">
               {{ T.wordsSelectFilter }}
             </option>
-            <option v-bind:selected="filterSelected(key)"
-                    v-bind:value="key"
+            <option v-bind:value="key"
                     v-for="(item,key,index) in availableFilters">
               {{ item }}
             </option>
@@ -85,51 +84,12 @@ export default {
     isIndex: Boolean,
     availableFilters: undefined,
     filter: String,
+    ranks: Array,
   },
   data: function() {
-    return { T: T, UI: UI, filter_key: this.filter, ranks:[] }
-  },
-  mounted: function() {
-    var self = this;
-    var problemsSolved = self.$el.querySelector("table");
-    var length = self.length;
-    var page = self.page;
-    var filter = self.filter;
-    var isIndex = (self.isIndex === true);
-
-    omegaup.API.User.rankByProblemsSolved(
-                        {offset: page, rowcount: length, filter: filter})
-        .then(function(result) {
-          for (var i = 0; i < result.rank.length; ++i) {
-            var user = result.rank[i];
-            var problemsSolvedUser = undefined;
-            if (!isIndex) {
-              problemsSolvedUser = user.problems_solved;
-            }
-            self.ranks.add({
-              rank: user.rank,
-              flag: omegaup.UI.getFlag(user.country_id),
-              username: user.username,
-              name: (user.name == null || length == 5 ? '&nbsp;' :
-                                                        ('<br/>' + user.name)),
-              score: user.score,
-              problemsSolvedUser: problemsSolvedUser,
-            });
-          }
-          if (length * page >= result.total) {
-            var temp = self.$el.querySelectorAll('.next,.delimiter');
-            for (var i = 0; i < temp.length; i++) {
-              temp[i].style.display = "none";
-            }
-          }
-          self.$forceUpdate();
-        })
-        .fail(omegaup.UI.apiError);
+    return { T: T, UI: UI, }
   },
   methods: {
-    filterSelected: function(key) {
-      if (this.filter == key) return "selected";
-    },
     filterChange: function() {
       // change url parameters with jquery
       // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
@@ -138,8 +98,8 @@ export default {
       while (m = re.exec(queryString)) {
         queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
       }
-      if (this.filter_key !== '') {
-        queryParameters['filter'] = this.filter_key;
+      if (this.filter !== '') {
+        queryParameters['filter'] = this.filter;
       } else {
         delete queryParameters['filter'];
       }
