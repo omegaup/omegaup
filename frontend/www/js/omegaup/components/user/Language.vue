@@ -2,7 +2,7 @@
   <li class="dropdown">
     <a class="dropdown-toggle"
         data-toggle="dropdown"
-        href="#"><img v-bind:src="flagUrl"> <span class="caret"></span></a>
+        href="#"><img v-bind:src="showFlagUrl(selectedLanguage)"> <span class="caret"></span></a>
     <ul class="dropdown-menu">
       <li v-for="language in availableLanguages">
         <a href='#'
@@ -19,19 +19,6 @@ export default {
   props: {
     selectedLanguage: String,
     availableLanguages: Array,
-  },
-  computed: {
-    flagUrl: function() {
-      let language = '';
-      if (this.selectedLanguage == null) {
-        return '';
-      } else if (this.selectedLanguage == 'en') {
-        language = 'gb';
-      } else {
-        language = this.selectedLanguage;
-      }
-      return '/media/flags/' + language + '.png';
-    },
   },
   methods: {
     showFlagUrl: function(language) {
@@ -51,9 +38,10 @@ export default {
       return T.statementLanguageEs;
     },
     onChangeLanguage: function(language) {
-      if (language != this.selectedLanguage) {
-        this.$emit('change-language', language);
+      if (language == this.selectedLanguage) {
+        return;
       }
+      this.$emit('change-language', language);
     },
   },
   data: function() {
