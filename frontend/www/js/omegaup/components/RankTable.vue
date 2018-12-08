@@ -45,7 +45,8 @@
               <td>{{ rank.rank }}</td>
               <td>{{ rank.flag }}</td>
               <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
-              "`/profile/${rank.username}`">{{ rank.username }}</a></strong></td>
+              "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-html=
+              "rank.name"></span></td>
               <td class="numericColumn">{{ rank.score }}</td>
               <td class="numericColumn"
                   v-if="!isIndex">{{ rank.problemsSolvedUser }}</td>
