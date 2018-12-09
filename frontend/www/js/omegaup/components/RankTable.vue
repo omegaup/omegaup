@@ -132,7 +132,7 @@ export default {
         return `/rank?page=${this.page - 1}`;
     },
     shouldShowNextPage: function() {
-      return !(this.length * this.page >= this.resultTotal);
+      return this.length * this.page < this.resultTotal;
     }
   },
 };
