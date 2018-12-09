@@ -6,8 +6,9 @@ omegaup.API.User.contestStats({username: username})
       t = 0;
       for (var contest_alias in data['contests']) {
         var now = new Date();
-        var end = omegaup.OmegaUp.remoteTime(
-            data['contests'][contest_alias]['data']['finish_time'] * 1000);
+        var currentTimestamp =
+            data['contests'][contest_alias]['finish_time'] * 1000;
+        var end = omegaup.OmegaUp.remoteTime(currentTimestamp);
 
         if (data['contests'][contest_alias]['place'] != null && now > end) {
           var title = data['contests'][contest_alias]['data']['title'];
