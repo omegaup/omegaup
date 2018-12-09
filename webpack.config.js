@@ -42,6 +42,7 @@ module.exports = [{
     group_list: './frontend/www/js/omegaup/group/list.js',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.js',
+    rank_table: './frontend/www/js/omegaup/ranktable.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
