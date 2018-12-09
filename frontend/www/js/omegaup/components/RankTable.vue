@@ -7,10 +7,10 @@
         <template v-if="page &gt; 1">
           <a class="prev"
                     v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class="delimiter"
-                    v-bind:style="nextPageStyle">|</span>
+                    v-show="shouldShowNextPage">|</span>
         </template><a class="next"
                   v-bind:href="nextPageFilter"
-                  v-bind:style="nextPageStyle">{{ T.wordsNextPage }}</a>
+                  v-show="shouldShowNextPage">{{ T.wordsNextPage }}</a>
         <template v-if="Object.keys(availableFilters).length &gt; 0">
           <select class="filter"
                     v-model="filter"
@@ -59,17 +59,17 @@
       <div class="container-fluid">
         <div class="col-xs-12 vertical-padding">
           <template v-if="isIndex">
-            <a href='/rank/'>{{ T.rankViewFull }}</a>
+            <a href="/rank/">{{ T.rankViewFull }}</a>
           </template>
           <template v-else="">
             <template v-if="page &gt; 1">
               <a class="prev"
                         v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
                         "delimiter"
-                        v-bind:style="nextPageStyle">|</span>
+                        v-show="shouldShowNextPage">|</span>
             </template><a class="next"
                       v-bind:href="nextPageFilter"
-                      v-bind:style="nextPageStyle">{{ T.wordsNextPage }}</a>
+                      v-show="shouldShowNextPage">{{ T.wordsNextPage }}</a>
           </template><br>
         </div>
       </div>
@@ -120,21 +120,19 @@ export default {
   },
   computed: {
     nextPageFilter: function() {
-      if (this.filter != null)
+      if (this.filter)
         return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(this.filter)}`;
       else
         return `/rank?page=${this.page + 1}`;
     },
     prevPageFilter: function() {
-      if (this.filter != null)
+      if (this.filter)
         return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(this.filter)}`;
       else
         return `/rank?page=${this.page - 1}`;
     },
-    nextPageStyle: function() {
-      if (this.length * this.page >= this.resultTotal) return {
-          display: 'none',
-        }
+    shouldShowNextPage: function() {
+      return !(this.length * this.page >= this.resultTotal);
     }
   },
 };

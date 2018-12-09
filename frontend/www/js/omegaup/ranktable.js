@@ -21,9 +21,6 @@ OmegaUp.on('ready', function() {
             rank: user.rank,
             flag: omegaup.UI.getFlag(user.country_id),
             username: user.username,
-            // name: (user.name == null || payload.length == 5 ?
-            //            '&nbsp;' :
-            //            ('<br/>' + user.name)),
             name: user.name,
             score: user.score,
             problemsSolvedUser: problemsSolvedUser,
@@ -55,7 +52,7 @@ OmegaUp.on('ready', function() {
             resultTotal: parseInt(result.total),
           },
           components: {
-            'rankTable': rank_table,
+            rankTable: rank_table,
           },
         });
       })
