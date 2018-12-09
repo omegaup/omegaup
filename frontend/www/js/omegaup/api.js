@@ -592,6 +592,8 @@ export default {
      */
     updateBasicInfo: _call('/api/user/updatebasicinfo/'),
 
+    updateLanguage: _call('/api/user/updateLanguage/'),
+
     /**
      * Updates the user's mail email address.
      * @param {string} email - The user's new main email.

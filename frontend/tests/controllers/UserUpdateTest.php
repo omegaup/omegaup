@@ -277,4 +277,63 @@ class UserUpdateTest extends OmegaupTestCase {
             // OK!
         }
     }
+
+    /**
+     * Test update user language
+     */
+    public function testUpdateLanguageWithInvalidOption() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        //updating invalid language option
+        try {
+            UserController::apiUpdateLanguage(new Request([
+                'auth_token' => $login->auth_token,
+                'language' => 'pr',
+            ]));
+            $this->fail('Please select a valid language option');
+        } catch (InvalidParameterException $e) {
+            // OK!
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
+    }
+
+    /**
+     * Test update user language
+     */
+    public function testUpdateLanguageWithValidOption() {
+        // Create the user to edit
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        $requestTokenOnly = new Request([
+            'auth_token' => $login->auth_token,
+        ]);
+
+        $languageSelected = 'pt';
+
+        //updating valid language option
+        UserController::apiUpdateLanguage(new Request([
+            'auth_token' => $login->auth_token,
+            'language' => $languageSelected,
+        ]));
+
+        $userProfile = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+
+        $this->assertEquals($userProfile['locale'], $languageSelected);
+
+        // Changing language
+        $languageSelected = 'es';
+
+        //updating valid language option
+        UserController::apiUpdateLanguage(new Request([
+            'auth_token' => $login->auth_token,
+            'language' => $languageSelected,
+        ]));
+
+        $userProfile = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+
+        $this->assertEquals($userProfile['locale'], $languageSelected);
+    }
 }
