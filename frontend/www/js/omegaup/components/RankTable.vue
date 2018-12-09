@@ -6,10 +6,11 @@
         {lowCount:(page-1)*length+1,highCount:page*length}) }}</h3>
         <template v-if="page &gt; 1">
           <a class="prev"
-                    v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
-                    "delimiter">|</span>
+                    v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class="delimiter"
+                    v-bind:style="nextPageStyle">|</span>
         </template><a class="next"
-                  v-bind:href="nextPageFilter">{{ T.wordsNextPage }}</a>
+                  v-bind:href="nextPageFilter"
+                  v-bind:style="nextPageStyle">{{ T.wordsNextPage }}</a>
         <template v-if="Object.keys(availableFilters).length &gt; 0">
           <select class="filter"
                     v-model="filter"
@@ -45,8 +46,9 @@
               <td>{{ rank.rank }}</td>
               <td>{{ rank.flag }}</td>
               <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
-              "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-html=
-              "rank.name"></span></td>
+              "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-if=
+              "rank.name == null || length == 5">&nbsp;</span> <span v-else=""><br>
+              {{ rank.name }}</span></td>
               <td class="numericColumn">{{ rank.score }}</td>
               <td class="numericColumn"
                   v-if="!isIndex">{{ rank.problemsSolvedUser }}</td>
@@ -63,9 +65,11 @@
             <template v-if="page &gt; 1">
               <a class="prev"
                         v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
-                        "delimiter">|</span>
+                        "delimiter"
+                        v-bind:style="nextPageStyle">|</span>
             </template><a class="next"
-                      v-bind:href="nextPageFilter">{{ T.wordsNextPage }}</a>
+                      v-bind:href="nextPageFilter"
+                      v-bind:style="nextPageStyle">{{ T.wordsNextPage }}</a>
           </template><br>
         </div>
       </div>
@@ -86,6 +90,7 @@ export default {
     availableFilters: undefined,
     filter: String,
     ranks: Array,
+    resultTotal: Number,
   },
   data: function() {
     return { T: T, UI: UI, }
@@ -126,6 +131,11 @@ export default {
       else
         return `/rank?page=${this.page - 1}`;
     },
+    nextPageStyle: function() {
+      if (this.length * this.page >= this.resultTotal) return {
+          display: 'none',
+        }
+    }
   },
 };
 </script>

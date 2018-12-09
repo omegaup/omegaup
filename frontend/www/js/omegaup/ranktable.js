@@ -4,7 +4,6 @@ import {OmegaUp} from './omegaup.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  const ranks = [];
 
   omegaup.API.User.rankByProblemsSolved({
                     offset: payload.page,
@@ -12,6 +11,7 @@ OmegaUp.on('ready', function() {
                     filter: payload.filter
                   })
       .then(function(result) {
+        const ranks = [];
         for (const user of result.rank) {
           let problemsSolvedUser = undefined;
           if (payload.is_index !== true) {
@@ -21,9 +21,10 @@ OmegaUp.on('ready', function() {
             rank: user.rank,
             flag: omegaup.UI.getFlag(user.country_id),
             username: user.username,
-            name: (user.name == null || payload.length == 5 ?
-                       '&nbsp;' :
-                       ('<br/>' + user.name)),
+            // name: (user.name == null || payload.length == 5 ?
+            //            '&nbsp;' :
+            //            ('<br/>' + user.name)),
+            name: user.name,
             score: user.score,
             problemsSolvedUser: problemsSolvedUser,
           });
@@ -40,6 +41,7 @@ OmegaUp.on('ready', function() {
                 availableFilters: this.availableFilters,
                 filter: this.filter,
                 ranks: this.ranks,
+                resultTotal: this.resultTotal,
               }
             });
           },
@@ -50,17 +52,12 @@ OmegaUp.on('ready', function() {
             availableFilters: payload.availableFilters,
             filter: payload.filter,
             ranks: ranks,
+            resultTotal: parseInt(result.total),
           },
           components: {
             'rankTable': rank_table,
           },
         });
-        if (payload.length * payload.page >= result.total) {
-          let tempList = rankTable.$el.querySelectorAll('.next,.delimiter');
-          for (const temp of tempList) {
-            temp.style.display = 'none';
-          }
-        }
       })
       .fail(omegaup.UI.apiError);
 });
