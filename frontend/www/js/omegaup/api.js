@@ -34,6 +34,7 @@ function _call(url, transform, defaultParams) {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
+          omegaup.OmegaUp.addError(errorData);
           dfd.reject(errorData);
         });
     return dfd.promise();

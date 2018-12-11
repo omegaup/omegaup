@@ -680,6 +680,8 @@ omegaup.OmegaUp.loadTranslations({
 	registerForContestChallenges: "(Cha113ng3)",
 	registrationDenied: "(D3ni3d!)",
 	registrationPending: "(Y0ur r3qu357 70 j0in 7hi5 c0n7357 i5 p3nding appr0va1 fr0m 7h3 c0n7357 admin.)",
+	reportAnIssue: "(R3p0r7 an i55u3)",
+	reportAnIssueTemplate: "(## C0mp0r7ami3n70 E5p3rad0\\n\\n*D35crib3 10 qu3 35p3raba5 qu3 pa5ara*\\n\\n## C0mp0r7ami3n70 Ac7ua1\\n\\n*D35crib3 10 qu3 pa5\u00f3 3n 1ugar d3 10 qu3 53 35p3raba*\\n\\n## P05ib13 S01uci\u00f3n\\n\\n*N0 35 0b1iga70ri0, p3r0 pu3d35 5ug3rir una man3ra d3 arr3g1ar 31 bug*\\n\\n## Pa505 para r3pr0ducir (para bug5)\\n\\n*Pr0v33 un 1ink a un 3j3mp10, 0 una 1i57a d3 pa505 d37a11ada d3 c\u00f3m0 r3pr0ducir\\n3573 bug.  Inc1uy3 31 c\u00f3dig0 qu3 10 r3pr0duc3, 5i 35 r313van73*\\n\\n1. \\n2. \\n3. \\n4. \\n\\n## C0n73x70\\n\\n*C\u00f3m0 73 ha af3c7ad0 3573 i55u3? Cu\u00e11 35 31 0bj37iv0 a cump1ir?*\\n\\n*Pr0v33r c0n73x70 n05 ayuda a 3nc0n7rar 1a 501uci\u00f3n ad3cuada*\\n\\n## Tu ambi3n73\\n\\n*Inc1uy3 105 d37a1135 r313van735 ac3rca d31 ambi3n73 3n 31 qu3 r3pr0duji573\\n3573 bug*\\n\\n* N0mbr3 d31 nav3gad0r (3.g. Chr0m3 39, n0d3.j5 5.4): %(userAgent)\\n* Link a1 5i7i0 3n 31 qu3 3573 pr0b13ma pa5a: %(referer)\\n* Err0r35 3n 1a c0n501a: %(serializedErrors)\\n* Cap7ura d3 pan7a11a:)",
 	reportProblemFormAdditionalComments: "(Addi7i0na1 c0mm3n75 (0p7i0na1):)",
 	reportProblemFormCases: "(I b31i3v3 7h3 7357 ca535 ar3 wr0ng.)",
 	reportProblemFormDuplicate: "(Thi5 i5 a dup1ica73d pr0b13m.)",
