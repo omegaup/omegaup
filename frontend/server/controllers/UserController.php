@@ -1272,7 +1272,6 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiProfile(Request $r) {
-        //usarname is needed
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $r['identity'] = self::resolveTargetIdentity($r);
