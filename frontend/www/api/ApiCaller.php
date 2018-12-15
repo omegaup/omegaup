@@ -100,6 +100,26 @@ class ApiCaller {
     }
 
     /**
+     * Determines whether the array is associative or packed.
+     *
+     * @param array $array the input array.
+     *
+     * @return boolean whether the array is associative.
+     */
+    static function isAssociativeArray(array &$array) {
+        if (!is_array($array)) {
+            return false;
+        }
+        $i = 0;
+        foreach ($array as $key => &$value) {
+            if ($key != $i++) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Renders the response properly and, in the case of HTTP API,
      * sets the header
      *
@@ -110,30 +130,37 @@ class ApiCaller {
         if (!is_null($r) && $r->renderFormat == Request::HTML_FORMAT) {
             $smarty->assign('EXPLORER_RESPONSE', $response);
             $smarty->display('../templates/explorer.tpl');
-        } else {
-            static::setHttpHeaders($response);
-            $json_result = json_encode($response);
 
-            if ($json_result === false) {
-                self::$log->warn('json_encode failed for: '. print_r($response, true));
-                if (json_last_error() == JSON_ERROR_UTF8) {
-                    // Attempt to recover gracefully, removing any unencodeable
-                    // elements from the response. This should at least prevent
-                    // completely and premanently breaking some scenarios, like
-                    // trying to fix a problem with illegal UTF-8 codepoints.
-                    $json_result = json_encode($response, JSON_PARTIAL_OUTPUT_ON_ERROR);
-                }
-                if ($json_result === false) {
-                    $apiException = new InternalServerErrorException();
-                    $json_result = json_encode($apiException->asResponseArray());
-                }
-            }
-
-            // Print the result using late static binding semantics
-            // Return needed for testability purposes, for production it
-            // returns void.
-            return static::printResult($json_result);
+            return;
         }
+
+        // Only add the request ID if the response is an associative array. This
+        // allows the APIs that return a flat array to return the right type.
+        if (self::isAssociativeArray($response)) {
+            $response['_id'] = Request::requestId();
+        }
+        static::setHttpHeaders($response);
+        $json_result = json_encode($response);
+
+        if ($json_result === false) {
+            self::$log->warn('json_encode failed for: '. print_r($response, true));
+            if (json_last_error() == JSON_ERROR_UTF8) {
+                // Attempt to recover gracefully, removing any unencodeable
+                // elements from the response. This should at least prevent
+                // completely and premanently breaking some scenarios, like
+                // trying to fix a problem with illegal UTF-8 codepoints.
+                $json_result = json_encode($response, JSON_PARTIAL_OUTPUT_ON_ERROR);
+            }
+            if ($json_result === false) {
+                $apiException = new InternalServerErrorException();
+                $json_result = json_encode($apiException->asResponseArray());
+            }
+        }
+
+        // Print the result using late static binding semantics
+        // Return needed for testability purposes, for production it
+        // returns void.
+        return static::printResult($json_result);
     }
 
     /**

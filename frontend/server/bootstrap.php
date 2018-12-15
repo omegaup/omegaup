@@ -78,15 +78,6 @@ require_once('libs/third_party/ZipStream.php');
 require_once('libs/third_party/phpmailer/class.phpmailer.php');
 require_once('libs/third_party/phpmailer/class.smtp.php');
 
-/*
- * Configurar log4php
- *
- *
- * @todo Email unknown excpetions
- * @todo Print args in call (but don't reveal password in log)
- *
- * */
-$request_id = str_replace('.', '', uniqid('', true));
 Logger::configure([
         'rootLogger' => [
             'appenders' => ['default'],
@@ -108,7 +99,11 @@ Logger::configure([
                 'layout' => [
                     'class' => 'LoggerLayoutPattern',
                     'params' => [
-                        'conversionPattern' => "%date [%level]: $request_id %server{REQUEST_URI} %message (%F:%L) %newline",
+                        'conversionPattern' => (
+                            '%date [%level]: ' .
+                            Request::requestId() .
+                            ' %server{REQUEST_URI} %message (%F:%L) %newline'
+                        ),
                     ]
                 ],
                 'params' => [
@@ -260,6 +255,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
+    $smarty->assign('LANGUAGE', ['selectedLanguage' => $lang, 'availableLanguages' => UserController::LANGUAGES]);
 
     if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {
         $smarty->force_compile = true;

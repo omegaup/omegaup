@@ -86,6 +86,8 @@ export let OmegaUp = {
 
       _deltaTimeForTesting: 0,
 
+      _errors:[],
+
       _listeners:
           {
             'ready': new EventListenerList([
@@ -93,7 +95,28 @@ export let OmegaUp = {
               function() {
                 ko.bindingProvider.instance =
                     new ko.secureBindingsProvider({attribute: 'data-bind'});
-              }
+              },
+              function() {
+                let reportAnIssue = document.getElementById('report-an-issue');
+                if (!reportAnIssue || !window.navigator ||
+                    !window.navigator.userAgent || !T.reportAnIssueTemplate) {
+                  return;
+                }
+                reportAnIssue.addEventListener('click', function(event) {
+                  // Not using UI.formatString() to avoid creating a circular
+                  // dependency.
+                  let issueBody =
+                      T.reportAnIssueTemplate.replace(
+                                                 '%(userAgent)',
+                                                 window.navigator.userAgent)
+                          .replace('%(referer)', window.location.href)
+                          .replace('%(serializedErrors)',
+                                   JSON.stringify(OmegaUp._errors));
+                  reportAnIssue.href =
+                      'https://github.com/omegaup/omegaup/issues/new?body=' +
+                      encodeURIComponent(issueBody);
+                });
+              },
             ]),
           },
 
@@ -178,25 +201,28 @@ export let OmegaUp = {
                 (options.server_sync ? (OmegaUp._remoteDeltaTime || 0) : 0));
           },
 
-      convertTimes: function(item) {
-        if (item.hasOwnProperty('time')) {
-          item.time = OmegaUp.remoteTime(item.time * 1000);
-        }
-        if (item.hasOwnProperty('start_time')) {
-          item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
-        }
-        if (item.hasOwnProperty('finish_time')) {
-          item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
-        }
-        if (item.hasOwnProperty('last_updated')) {
-          item.last_updated = OmegaUp.remoteTime(item.last_updated * 1000);
-        }
-        if (item.hasOwnProperty('submission_deadline')) {
-          item.submission_deadline =
-              OmegaUp.remoteTime(item.submission_deadline * 1000);
-        }
-        return item;
-      },
+      convertTimes:
+          function(item) {
+            if (item.hasOwnProperty('time')) {
+              item.time = OmegaUp.remoteTime(item.time * 1000);
+            }
+            if (item.hasOwnProperty('start_time')) {
+              item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
+            }
+            if (item.hasOwnProperty('finish_time')) {
+              item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
+            }
+            if (item.hasOwnProperty('last_updated')) {
+              item.last_updated = OmegaUp.remoteTime(item.last_updated * 1000);
+            }
+            if (item.hasOwnProperty('submission_deadline')) {
+              item.submission_deadline =
+                  OmegaUp.remoteTime(item.submission_deadline * 1000);
+            }
+            return item;
+          },
+
+      addError: function(error) { OmegaUp._errors.push(error); },
 };
 
 if (document.readyState === 'complete' ||

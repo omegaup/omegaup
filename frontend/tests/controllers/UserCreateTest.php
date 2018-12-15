@@ -208,6 +208,7 @@ class CreateUserTest extends OmegaupTestCase {
             $this->fail('Expected because of the invalid group name');
         } catch (InvalidParameterException $e) {
             // OK
+            $this->assertEquals('parameterInvalidAlias', $e->getMessage());
         }
     }
 

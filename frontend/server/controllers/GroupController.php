@@ -144,7 +144,7 @@ class GroupController extends Controller {
                 $group->group_id,
                 $r['identity']->identity_id
             );
-            if (count($groupIdentities) === 0) {
+            if (is_null($groupIdentities)) {
                 throw new InvalidParameterException('parameterNotFound', 'User');
             }
 

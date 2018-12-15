@@ -35,6 +35,11 @@ class Request extends ArrayObject {
     public $method = null;
 
     /**
+     * A global per-request unique(-ish) ID.
+     */
+    public static $_requestId = null;
+
+    /**
      * Whether $key exists. Used as isset($req[$key]);
      *
      * @param string $key The key.
@@ -77,4 +82,15 @@ class Request extends ArrayObject {
 
         return $response;
     }
+
+    /**
+     * Gets the request ID.
+     *
+     * @return the global per-request unique(-ish) ID
+     */
+    public static function requestId() {
+        return Request::$_requestId;
+    }
 }
+
+Request::$_requestId = str_replace('.', '', uniqid('', true));

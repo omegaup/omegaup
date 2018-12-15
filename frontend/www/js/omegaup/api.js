@@ -34,6 +34,7 @@ function _call(url, transform, defaultParams) {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
+          omegaup.OmegaUp.addError(errorData);
           dfd.reject(errorData);
         });
     return dfd.promise();
@@ -591,6 +592,8 @@ export default {
      * @return {Promise}
      */
     updateBasicInfo: _call('/api/user/updatebasicinfo/'),
+
+    updateLanguage: _call('/api/user/updateLanguage/'),
 
     /**
      * Updates the user's mail email address.

@@ -18,6 +18,7 @@ class UserController extends Controller {
     const ALLOWED_GENDER_OPTIONS = [
         'female','male','other','decline',
     ];
+    const LANGUAGES = ['es','en','pt',];
 
     const SENDY_SUCCESS = '1';
 
@@ -1041,8 +1042,8 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROO-D1-18' => 70,
-                'OMIROO-D2-18' => 70
+                'OMIPROO-19' => 130,
+                'OMISROO-19' => 130,
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
@@ -1365,20 +1366,21 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCoderOfTheMonth(Request $r) {
+        $currentTimestamp = Time::get();
         if (!empty($r['date'])) {
             Validators::isDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
-            $firstDay = date('Y-m-01');
+            $firstDay = date('Y-m-01', $currentTimestamp);
         }
 
         try {
-            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndRank($firstDay, 1);
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($firstDay);
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
-                $users = CoderOfTheMonthDAO::calculateCoderOfLastMonth($firstDay);
+                $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($firstDay);
                 if (is_null($users)) {
                     return [
                         'status' => 'ok',
@@ -1387,24 +1389,21 @@ class UserController extends Controller {
                     ];
                 }
 
-                $codersOfTheMonth = [];
-                foreach ($users as $index => $user) {
-                    // Save it
-                    $c = new CoderOfTheMonth([
-                        'user_id' => $user['user_id'],
-                        'time' => $firstDay,
-                        'rank' => $index + 1,
-                    ]);
-                    CoderOfTheMonthDAO::save($c);
-                    array_push($codersOfTheMonth, $c);
-                }
+                // Only first place coder is saved
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $users[0]['user_id'],
+                    'time' => $firstDay,
+                    'rank' => 1,
+                ]));
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+            } else {
+                $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             }
+            $user = UsersDAO::getByPK($coderOfTheMonthUserId);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = UserController::getProfileImpl($user);
@@ -1448,6 +1447,69 @@ class UserController extends Controller {
 
         $response['status'] = 'ok';
         return $response;
+    }
+
+    /**
+     * Selects coder of the month for next month.
+     *
+     * @param Request $r
+     * @return Array
+     * @throws ForbiddenAccessException
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws NotFoundException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSelectCoderOfTheMonth(Request $r) {
+        self::authenticateRequest($r);
+        $currentTimestamp = Time::get();
+
+        if (!Authorization::isMentor($r['current_identity_id'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+        if (!Authorization::canChooseCoder($currentTimestamp)) {
+            throw new ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
+        }
+        Validators::isStringNonEmpty($r['username'], 'username');
+
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        try {
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
+
+            if (!empty($codersOfTheMonth)) {
+                throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
+            }
+            // Generate the coder
+            $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
+
+            if (empty($users)) {
+                throw new NotFoundException('noCoders');
+            }
+
+            foreach ($users as $index => $user) {
+                if ($user['username'] != $r['username']) {
+                    continue;
+                }
+
+                // Save it
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                    'selected_by' => $r['current_identity_id'],
+                ]));
+
+                return ['status' => 'ok'];
+            }
+        } catch (Exception $e) {
+            self::$log->error('Unable to select coder of the month: ' . $e);
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        throw new InvalidDatabaseOperationException();
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
@@ -2553,6 +2615,25 @@ class UserController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Update language for a logged user
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateLanguage(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isInEnum($r['language'], 'language', UserController::LANGUAGES, true);
+
+        try {
+            UsersDAO::apiUpdateLanguageUser($r['current_identity_id'], $r['language']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        return ['status' => 'ok',];
     }
 }
 
