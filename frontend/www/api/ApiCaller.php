@@ -100,6 +100,26 @@ class ApiCaller {
     }
 
     /**
+     * Determines whether the array is associative or packed.
+     *
+     * @param array $array the input array.
+     *
+     * @return boolean whether the array is associative.
+     */
+    static function isAssociativeArray(array &$array) {
+        if (!is_array($array)) {
+            return false;
+        }
+        $i = 0;
+        foreach ($array as $key => &$value) {
+            if ($key != $i++) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Renders the response properly and, in the case of HTTP API,
      * sets the header
      *
@@ -114,7 +134,11 @@ class ApiCaller {
             return;
         }
 
-        $response['_id'] = Request::requestId();
+        // Only add the request ID if the response is an associative array. This
+        // allows the APIs that return a flat array to return the right type.
+        if (self::isAssociativeArray($response)) {
+            $response['_id'] = Request::requestId();
+        }
         static::setHttpHeaders($response);
         $json_result = json_encode($response);
 
