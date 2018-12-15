@@ -29,7 +29,10 @@
 						<div class="col-md-6">
 							<h5><strong>{#frontPageFooterDevelopers#}</strong></h5>
 							<h6><a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar" target="_blank">{#frontPageFooterHelpUs#}</a></h6>
-							<h6><a href="https://github.com/omegaup/omegaup" target="_blank">Github</a></h6>
+							<h6><a href="https://github.com/omegaup/omegaup" target="_blank">GitHub</a></h6>
+{if !$smarty.const.OMEGAUP_LOCKDOWN && $LOGGED_IN eq '1'}
+							<h6><a href="https://github.com/omegaup/omegaup/issues/new" target="_blank" rel="nofollow" id="report-an-issue">{#reportAnIssue#}</a></h6>
+{/if}
 						</div>
 					</div>
 				</div>

@@ -680,6 +680,8 @@ omegaup.OmegaUp.loadTranslations({
 	registerForContestChallenges: "Challenge",
 	registrationDenied: "Denied!",
 	registrationPending: "Your request to join this contest is pending approval from the contest admin.",
+	reportAnIssue: "Report an issue",
+	reportAnIssueTemplate: "## Expected Behavior\\n\\n*Describe what you expected to happen*\\n\\n## Actual Behavior\\n\\n*Describe what happened instead of what you expected*\\n\\n## Possible Solution\\n\\n*Not required, but if you can think of something, you can suggest a way to fix the bug.*\\n\\n## Reproduction steps\\n\\n*Provide a detailed list of steps of what you did to reproduce\\nthis bug.  Include the code that reproduces it, if it is relevant.*\\n\\n1. \\n2. \\n3. \\n4. \\n\\n## Context\\n\\n*How has this issue affected you? What were you trying to achieve?*\\n\\n*Providing context helps us to find the right solution and priority.*\\n\\n## Your environment\\n\\n*Include the relevant details about the environment in which this bug was reproduced*\\n\\n* Browser name (e.g. Chrome 39, node.js 5.4): %(userAgent)\\n* Link to the site where this problem occurs: %(referer)\\n* Console errors: %(serializedErrors)\\n* Screen capture:",
 	reportProblemFormAdditionalComments: "Additional comments (optional):",
 	reportProblemFormCases: "I believe the test cases are wrong.",
 	reportProblemFormDuplicate: "This is a duplicated problem.",

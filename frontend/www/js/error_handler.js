@@ -25,6 +25,14 @@ function sendError(message, filename, lineno, colno, error) {
     // correctly reported.
   }
 
+  // Try to add it to the list of errors.
+  try {
+    omegaup.OmegaUp.addError(error);
+  } catch (e) {
+    // Something went wrong. Let's keep trying to send the error.
+    console.error('Failed to add the error to the error list', e);
+  }
+
   // Try to send the error.
   try {
     var httpRequest = new XMLHttpRequest();
