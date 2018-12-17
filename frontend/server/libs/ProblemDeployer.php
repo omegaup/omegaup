@@ -214,20 +214,41 @@ class ProblemDeployer {
         $result = $this->executeRaw($args, null /* cwd */, $quiet);
 
         if ($result['retval'] != 0) {
+            $errorMessage = 'problemDeployerInternalError';
+            $context = null;
             if (!empty($result['output'])) {
                 $output = json_decode($result['output']);
                 $errorMapping = [
+                    'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
+                    'config-bad-layout' => 'problemDeployerConfigBadLayout',
+                    'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
+                    'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
+                    'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
+                    'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
+                    'internal-error' => 'problemDeployerInternalError',
+                    'internal-git-error' => 'problemDeployerInternalGitError',
+                    'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
+                    'json-parse-error' => 'problemDeployerJsonParseError',
+                    'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
                     'no-statements' => 'problemDeployerNoStatements',
+                    'not-a-review' => 'problemDeployerNotAReview',
+                    'problem-bad-layout' => 'problemDeployerProblemBadLayout',
+                    'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
+                    'review-bad-layout' => 'problemDeployerReviewBadLayout',
                     'slow-rejected' => 'problemDeployerSlowRejected',
-                    'missing-output' => 'problemDeployerMissingOutput',
+                    'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
                 ];
-                if (array_key_exists($output->error, $errorMapping)) {
-                    throw new ProblemDeploymentFailedException(
-                        $errorMapping[$output->error]
-                    );
+                $tokens = explode(': ', $output->error, 2);
+                if (array_key_exists($tokens[0], $errorMapping)) {
+                    $errorMessage = $errorMapping[$tokens[0]];
+                    if (count($tokens) == 2) {
+                        $context = $tokens[1];
+                    }
+                } else {
+                    $context = $output->error;
                 }
             }
-            throw new ProblemDeploymentFailedException();
+            throw new ProblemDeploymentFailedException($errorMessage, $context);
         }
 
         return json_decode($result['output']);

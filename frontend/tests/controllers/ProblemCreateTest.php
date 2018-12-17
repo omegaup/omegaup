@@ -587,7 +587,7 @@ class CreateProblemTest extends OmegaupTestCase {
             ProblemController::apiCreate($r);
             $this->fail('Exception was expected.');
         } catch (ProblemDeploymentFailedException $e) {
-            $this->assertEquals('problemDeployerMissingOutput', $e->getMessage());
+            $this->assertEquals('problemDeployerMismatchedInputFile', $e->getMessage());
         }
     }
 

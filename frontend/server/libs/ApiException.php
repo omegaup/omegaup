@@ -335,8 +335,23 @@ class ProblemDeploymentFailedException extends ApiException {
      * @param string $message
      * @param Exception $previous
      */
-    public function __construct($message = 'problemDeployerFailed', Exception $previous = null) {
-        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
+    public function __construct($message = 'problemDeployerFailed', $context = null) {
+        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412);
+        $this->context = $context;
+    }
+
+    protected function getErrorMessage() {
+        // Obtener el texto final (ya localizado) de smarty.
+        global $smarty;
+        $localizedText = $smarty->getConfigVars($this->message);
+        if (empty($localizedText)) {
+            self::$log->error("Untranslated error message: {$this->message}");
+            return "{untranslated:{$this->message}}";
+        }
+        if (!empty($this->context)) {
+            $localizedText .= ": {$this->context}";
+        }
+        return $localizedText;
     }
 }
 
