@@ -42,9 +42,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="rank in ranks">
+            <tr v-for="rank in ranking">
               <td>{{ rank.rank }}</td>
-              <td>{{ rank.flag }}</td>
+              <td><img height="11"
+                   v-bind:src="flagURL(rank)"
+                   v-bind:title="rank.country"
+                   v-if="rank.country"
+                   width="16"></td>
               <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
               "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-if=
               "rank.name == null || length == 5">&nbsp;</span> <span v-else=""><br>
@@ -89,7 +93,7 @@ export default {
     isIndex: Boolean,
     availableFilters: undefined,
     filter: String,
-    ranks: Array,
+    ranking: Array,
     resultTotal: Number,
   },
   data: function() {
@@ -116,6 +120,10 @@ export default {
                     })
                     .join('&');
       window.location.search = url;
+    },
+    flagURL(rank) {
+      if (!rank.country) return '';
+      return `/media/flags/${rank.country.toLowerCase()}.png`;
     },
   },
   computed: {
