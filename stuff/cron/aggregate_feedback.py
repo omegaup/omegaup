@@ -17,17 +17,58 @@ import operator
 import logging
 import os
 import warnings
+import sys
 
 import MySQLdb
 import MySQLdb.constants.ER
 
-CONFIDENCE = 5
-MIN_NUM_VOTES = 5
+CONFIDENCE = 10
+MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 
 # Before this id the questions were different
 QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
+
+# weighting factors according to user's range
+weighting_factors = {
+    'user-rank-unranked' : 2,
+    'user-rank-beginner' : 2,
+    'user-rank-specialist' : 3,
+    'user-rank-expert' : 4,
+    'user-rank-master' : 5,
+    'user-rank-international-master': 6,
+}
+
+def get_user_weighting_factor(dbconn, user_id):
+    ''' Gets the weighting factor of the user votes based on the omegaUp 
+    user's classes.
+    
+    As the 'rank' itself is just the position and not the user
+    class to which the user belongs, the weighting factor should be mapped
+    of the user's class name which is being retrieved here.
+    '''
+    with dbconn.cursor() as cur:
+        rows_count = cur.execute("""SELECT urc.`classname`
+                                    FROM `User_Rank_Cutoffs` as urc
+                                    WHERE urc.`score` <= (
+                                            SELECT
+                                                ur.`score`
+                                            FROM
+                                                User_Rank as ur
+                                            WHERE
+                                                ur.`user_id` = %s
+                                        )
+                                    ORDER BY urc.`percentile` ASC
+                                     LIMIT 1;""",
+                                    (user_id,))
+        if rows_count > 0:
+            user_classname = cur.fetchall()[0][0]
+        else:
+            user_classname = 'user-rank-unranked'
+
+    return weighting_factors[user_classname]
+        
 
 
 def get_global_quality_and_difficulty_average(dbconn):
@@ -38,7 +79,7 @@ def get_global_quality_and_difficulty_average(dbconn):
     '''
 
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT qn.`contents`
+        cur.execute("""SELECT qn.`contents`, qn.`user_id`
                        FROM `QualityNominations` as qn
                        WHERE `nomination` = 'suggestion'
                         AND qn.`qualitynomination_id` > %s;""",
@@ -54,13 +95,16 @@ def get_global_quality_and_difficulty_average(dbconn):
             except json.JSONDecodeError:  # pylint: disable=no-member
                 logging.exception('Failed to parse contents')
                 continue
-
+            
+            user_id = row[1]
+            weighting_factor = get_user_weighting_factor(dbconn, user_id)
+        
             if 'quality' in contents:
-                quality_sum += contents['quality']
-                quality_n += 1
+                quality_sum += weighting_factor * contents['quality']
+                quality_n += weighting_factor
             if 'difficulty' in contents:
-                difficulty_sum += contents['difficulty']
-                difficulty_n += 1
+                difficulty_sum += weighting_factor * contents['difficulty']
+                difficulty_n += weighting_factor
 
     global_quality_average = None
     if quality_n:
@@ -75,26 +119,34 @@ def get_problem_aggregates(dbconn, problem_id):
     '''Gets the aggregates for a particular problem.'''
 
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT qn.`contents`
+        cur.execute("""SELECT qn.`contents`, qn.`user_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
-        quality_votes = [0, 0, 0, 0, 0]
-        difficulty_votes = [0, 0, 0, 0, 0]
+        
+        # Both quality votes and difficulty votes are matrices of which each:
+        # row (i) refers to the vote i sent by the user,
+        # column (i) refers to the range that the user that voted has
+        quality_votes = [[0 for i in range(5)] for j in range(5)]
+        difficulty_votes = [[0 for i in range(5)] for j in range(5)]
+        
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
+            user_id = row[1]
+            weighting_factor = get_user_weighting_factor(dbconn, user_id)
+            weight_idx = weighting_factor - 2
             if 'quality' in contents:
-                quality_votes[contents['quality']] += 1
+                quality_votes[contents['quality']][weight_idx] += 1
             if 'difficulty' in contents:
-                difficulty_votes[contents['difficulty']] += 1
+                difficulty_votes[contents['difficulty']][weight_idx] += 1
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
-                    problem_tag_votes[tag] += 1
-                    problem_tag_votes_n += 1
+                    problem_tag_votes[tag] += weighting_factor
+                    problem_tag_votes_n += weighting_factor
 
     return (quality_votes, difficulty_votes,
             problem_tag_votes, problem_tag_votes_n)
@@ -102,11 +154,17 @@ def get_problem_aggregates(dbconn, problem_id):
 
 def bayesian_average(apriori_average, values):
     '''Gets the Bayesian average of an observation based on a prior value.'''
-    values_n = sum(values)
-    value_sum = sum(score * n for score, n in enumerate(values))
-    if values_n < CONFIDENCE or apriori_average is None:
+    weighted_n = 0
+    weighted_sum = 0
+    for i in range(5):
+        for j in range(5):
+            weighted_n += (j + 2) * values[i][j]
+            weighted_sum += i * (j + 2) * values[i][j]
+            
+    if weighted_n < CONFIDENCE or apriori_average is None:
         return None
-    return (CONFIDENCE * apriori_average + value_sum) / (CONFIDENCE + values_n)
+    return (CONFIDENCE * apriori_average + 
+                weighted_sum) / (CONFIDENCE + weighted_n)
 
 
 def get_most_voted_tags(problem_tag_votes, problem_tag_votes_n):
@@ -120,7 +178,7 @@ def get_most_voted_tags(problem_tag_votes, problem_tag_votes_n):
     * No more than a certain number of tags have been chosen (to avoid noise).
     '''
 
-    if problem_tag_votes_n < MIN_NUM_VOTES:
+    if problem_tag_votes_n < MIN_POINTS:
         return None
     maximum = problem_tag_votes[max(problem_tag_votes,
                                     key=problem_tag_votes.get)]
@@ -210,10 +268,10 @@ def aggregate_feedback(dbconn):
                                    p.`difficulty_histogram` = %s
                                WHERE
                                    p.`problem_id` = %s;""",
-                            (problem_quality, problem_difficulty,
-                             json.dumps(problem_quality_votes),
-                             json.dumps(problem_difficulty_votes),
-                             problem_id))
+                        (problem_quality, problem_difficulty,
+                         json.dumps([sum(i) for i in problem_quality_votes]),
+                         json.dumps([sum(i) for i in problem_difficulty_votes]),
+                         problem_id))
                 dbconn.commit()
             else:
                 logging.debug('Not enough information for problem %d',
