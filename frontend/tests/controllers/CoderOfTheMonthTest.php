@@ -192,9 +192,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         }
 
         // Changing date with valid range
-        $runCreationDate = date('Y-m-t', Time::get()); // Last day of the month is valid date to select a coder
+        $runCreationDate = date('Y-m-d', Time::get()); // Last day of the month is valid date to select a coder
         $runCreationDate = strtotime('-1 month', strtotime($runCreationDate));
-        $runCreationDate = date('Y-m-d', $runCreationDate);
+        $runCreationDate = date('Y-m-t', $runCreationDate);
         Time::setTimeForTesting(strtotime($runCreationDate));
 
         // Call api again.
@@ -238,6 +238,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Testing with an intermediate day of the month
         $timestampTest = Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
+        $timestampTest = strtotime($dateTest);
         $canChooseCoder = Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
