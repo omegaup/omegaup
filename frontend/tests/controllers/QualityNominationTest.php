@@ -887,12 +887,15 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /*
-        Creates 7 problems and 5 users.
-         - The first 5 problems are solved as unranked users (with vote weight = 2)
-         - The other 2 problems are solved as ranked users with vote weight according to user's rank classname
+        Creates 5 problems and 5 users.
+         - The first time the cronjob is executed, the problems are voted by users as unranked users (with vote weight = 2)
+         - The second time, the problems are voted by ranked users according to the number of problems they solved
     */
     public function testAggregateFeedback() {
-        for ($i = 0; $i < 7; $i++) {
+        
+        self::deleteAllRanks();
+        
+        for ($i = 0; $i < 5; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
         }
         for ($i = 0; $i < 5; $i++) {
@@ -908,6 +911,20 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals('[0, 0, 2, 2, 1]', $newProblem[0]->difficulty_histogram, 'Wrong difficulty histogram');
         $this->assertEquals('[1, 1, 0, 1, 2]', $newProblem[0]->quality_histogram, 'Wrong quality histogram');
         
+        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
+        $this->assertEquals(0, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
+        $this->assertEquals(0, $newProblem[2]->quality, 'Wrong difficulty', 0.001);
+        
+        self::runUpdateUserRank();
+        self::runCronJobScript();
+        
+        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
+        $this->assertEquals(2.992409867, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(2.419354839, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        
+        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
+        $this->assertEquals(2.990950226, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
+        $this->assertEquals(1.961538462, $newProblem[2]->quality, 'Wrong difficulty', 0.001);
         /*
         $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
             $newProblem[0],
@@ -1086,6 +1103,15 @@ class QualityNominationTest extends OmegaupTestCase {
         self::commit();
 
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+    }
+    
+    private function runUpdateUserRank() {
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -1335,6 +1361,11 @@ class QualityNominationTest extends OmegaupTestCase {
     private static function deleteAllSuggestions() {
         global $conn;
         $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+    }
+    
+    private static function deleteAllRanks() {
+        global $conn;
+        $conn->Execute("DELETE FROM `User_Rank`;");
     }
 
     private static function deleteAllProblemsOfTheWeek() {
