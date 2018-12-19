@@ -11,15 +11,15 @@ OmegaUp.on('ready', function() {
                     filter: payload.filter
                   })
       .then(function(result) {
-        const ranks = [];
+        const ranking = [];
         for (const user of result.rank) {
           let problemsSolvedUser = undefined;
           if (payload.is_index !== true) {
             problemsSolvedUser = user.problems_solved;
           }
-          ranks.add({
+          ranking.add({
             rank: user.rank,
-            flag: omegaup.UI.getFlag(user.country_id),
+            country: user.country_id,
             username: user.username,
             name: user.name,
             score: user.score,
@@ -37,7 +37,7 @@ OmegaUp.on('ready', function() {
                 isIndex: this.isIndex,
                 availableFilters: this.availableFilters,
                 filter: this.filter,
-                ranks: this.ranks,
+                ranking: this.ranking,
                 resultTotal: this.resultTotal,
               }
             });
@@ -48,7 +48,7 @@ OmegaUp.on('ready', function() {
             isIndex: payload.is_index,
             availableFilters: payload.availableFilters,
             filter: payload.filter,
-            ranks: ranks,
+            ranking: ranking,
             resultTotal: parseInt(result.total),
           },
           components: {
