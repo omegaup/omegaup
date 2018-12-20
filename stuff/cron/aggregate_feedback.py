@@ -17,7 +17,6 @@ import operator
 import logging
 import os
 import warnings
-import sys
 
 import MySQLdb
 import MySQLdb.constants.ER
@@ -137,7 +136,6 @@ def get_problem_aggregates(dbconn, problem_id):
             user_id = row[1]
             weighting_factor = get_user_weighting_factor(dbconn, user_id)
             weight_idx = weighting_factor - 2
-
             if 'quality' in contents:
                 quality_votes[contents['quality']][weight_idx] += 1
             if 'difficulty' in contents:

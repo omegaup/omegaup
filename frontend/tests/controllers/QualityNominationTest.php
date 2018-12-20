@@ -893,6 +893,7 @@ class QualityNominationTest extends OmegaupTestCase {
     */
     public function testAggregateFeedback() {
         self::deleteAllRanks();
+        self::deleteAllPreviousRuns();
 
         for ($i = 0; $i < 5; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
@@ -940,12 +941,12 @@ class QualityNominationTest extends OmegaupTestCase {
         self::runCronJobScript();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
-        $this->assertEquals(2.992409867, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(2.419354839, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
+        $this->assertEquals(2.538378378, $newProblem[0]->quality, 'Wrong quality.', 0.001);
 
         $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
-        $this->assertEquals(2.990950226, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
-        $this->assertEquals(1.961538462, $newProblem[2]->quality, 'Wrong difficulty', 0.001);
+        $this->assertEquals(2.684981685, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
+        $this->assertEquals(1.736164736, $newProblem[2]->quality, 'Wrong difficulty', 0.001);
 
         $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
             $newProblem[0],
@@ -1389,7 +1390,12 @@ class QualityNominationTest extends OmegaupTestCase {
     private static function deleteAllRanks() {
         global $conn;
         $conn->Execute('DELETE FROM `User_Rank`;');
-        $conn->Execute('DELETE FROM `User_Rank_Cutoffs`;');
+    }
+
+    private static function deleteAllPreviousRuns() {
+        global $conn;
+        $conn->Execute('DELETE FROM `Submission_Log`;');
+        $conn->Execute('DELETE FROM `Runs`;');
     }
 
     private static function deleteAllProblemsOfTheWeek() {
