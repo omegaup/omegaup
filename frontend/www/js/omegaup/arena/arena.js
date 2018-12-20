@@ -2077,6 +2077,8 @@ class ObservableRun {
         return T.verdictHelpKarelTLE;
       }
     }
+    if(self.type == 'disqualified')
+       return T.verdictHelpDQ;
 
     return T['verdictHelp' + self.verdict()];
   }
