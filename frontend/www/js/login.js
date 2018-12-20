@@ -46,7 +46,6 @@ omegaup.OmegaUp.on('ready', function() {
 var logmeoutOnce = window.location.href.endsWith('?logout');
 
 function signInCallback(authResult) {
-  //$('#google-signin').attr('style', 'display: none');
   if (logmeoutOnce) {
     gapi.auth.signOut();
     logmeoutOnce = false;
