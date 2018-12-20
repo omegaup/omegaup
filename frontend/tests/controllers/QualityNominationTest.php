@@ -967,7 +967,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function setUpRankForUsers($problems, $users, $withSuggestions = false) {
-        for ($i = 0; $i < count($users); $i++) {
+        for ($i = 0; $i < 5; $i++) {
             for ($j = 0; $j <= $i; $j++) {
                 $runData = RunsFactory::createRunToProblem($problems[$j], $users[$i]);
                 RunsFactory::gradeRun($runData);
@@ -1389,6 +1389,7 @@ class QualityNominationTest extends OmegaupTestCase {
     private static function deleteAllRanks() {
         global $conn;
         $conn->Execute('DELETE FROM `User_Rank`;');
+        $conn->Execute('DELETE FROM `User_Rank_Cutoffs`;');
     }
 
     private static function deleteAllProblemsOfTheWeek() {
