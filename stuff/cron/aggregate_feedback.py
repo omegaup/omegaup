@@ -25,6 +25,7 @@ CONFIDENCE = 10
 MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
+VOTES_NUM = 5
 
 # Before this id the questions were different
 QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
@@ -125,10 +126,11 @@ def get_problem_aggregates(dbconn, problem_id):
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
 
         # Both quality votes and difficulty votes are matrices of which each:
-        # row (i) refers to the vote i sent by the user,
+        # row (0) refers to the single vote sent by user
+        # row(1) refers to the weigthed vote sent by user
         # column (i) refers to the range that the user that voted has
-        quality_votes = [[0 for i in range(2)] for j in range(5)]
-        difficulty_votes = [[0 for i in range(2)] for j in range(5)]
+        quality_votes = [[0 for i in range(2)] for j in range(VOTES_NUM)]
+        difficulty_votes = [[0 for i in range(2)] for j in range(VOTES_NUM)]
 
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
@@ -155,7 +157,7 @@ def bayesian_average(apriori_average, values):
     '''Gets the Bayesian average of an observation based on a prior value.'''
     weighted_n = 0
     weighted_sum = 0
-    for i in range(5):
+    for i in range(VOTES_NUM):
         weighted_n += values[i][1]
         weighted_sum += i * values[i][1]
 
