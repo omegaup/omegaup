@@ -30,7 +30,7 @@ MAX_NUM_TOPICS = 5
 QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # weighting factors according to user's range
-weighting_factors = {
+WEIGHTING_FACTORS = {
     'user-rank-unranked': 2,
     'user-rank-beginner': 2,
     'user-rank-specialist': 3,
@@ -38,6 +38,7 @@ weighting_factors = {
     'user-rank-master': 5,
     'user-rank-international-master': 6,
 }
+
 
 def get_user_weighting_factor(dbconn, user_id):
     ''' Gets the weighting factor of the user votes based on the omegaUp
@@ -60,13 +61,13 @@ def get_user_weighting_factor(dbconn, user_id):
                                         )
                                     ORDER BY urc.`percentile` ASC
                                     LIMIT 1;""",
-                                    (user_id,))
+                                 (user_id,))
         if rows_count > 0:
             user_classname = cur.fetchall()[0][0]
         else:
             user_classname = 'user-rank-unranked'
 
-    return weighting_factors[user_classname]
+    return WEIGHTING_FACTORS[user_classname]
 
 
 def get_global_quality_and_difficulty_average(dbconn):
@@ -126,8 +127,8 @@ def get_problem_aggregates(dbconn, problem_id):
         # Both quality votes and difficulty votes are matrices of which each:
         # row (i) refers to the vote i sent by the user,
         # column (i) refers to the range that the user that voted has
-        quality_votes = [[0 for i in range(5)] for j in range(5)]
-        difficulty_votes = [[0 for i in range(5)] for j in range(5)]
+        quality_votes = [[0 for i in range(2)] for j in range(5)]
+        difficulty_votes = [[0 for i in range(2)] for j in range(5)]
 
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
@@ -135,11 +136,12 @@ def get_problem_aggregates(dbconn, problem_id):
             contents = json.loads(row[0])
             user_id = row[1]
             weighting_factor = get_user_weighting_factor(dbconn, user_id)
-            weight_idx = weighting_factor - 2
             if 'quality' in contents:
-                quality_votes[contents['quality']][weight_idx] += 1
+                quality_votes[contents['quality']][0] += 1
+                quality_votes[contents['quality']][1] += weighting_factor
             if 'difficulty' in contents:
-                difficulty_votes[contents['difficulty']][weight_idx] += 1
+                difficulty_votes[contents['difficulty']][0] += 1
+                difficulty_votes[contents['difficulty']][1] += weighting_factor
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += weighting_factor
@@ -154,9 +156,8 @@ def bayesian_average(apriori_average, values):
     weighted_n = 0
     weighted_sum = 0
     for i in range(5):
-        for j in range(5):
-            weighted_n += (j + 2) * values[i][j]
-            weighted_sum += i * (j + 2) * values[i][j]
+        weighted_n += values[i][1]
+        weighted_sum += i * values[i][1]
 
     if weighted_n < CONFIDENCE or apriori_average is None:
         return None
@@ -269,8 +270,8 @@ def aggregate_feedback(dbconn):
                     WHERE
                        p.`problem_id` = %s;""",
                     (problem_quality, problem_difficulty,
-                     json.dumps([sum(i) for i in problem_quality_votes]),
-                     json.dumps([sum(i) for i in problem_difficulty_votes]),
+                     json.dumps([row[0] for row in problem_quality_votes]),
+                     json.dumps([row[0] for row in problem_difficulty_votes]),
                      problem_id))
                 dbconn.commit()
             else:
