@@ -40,35 +40,33 @@ WEIGHTING_FACTORS = {
     'user-rank-international-master': 6,
 }
 
+RANK_CUTOFFS = []
 
-def get_user_weighting_factor(dbconn, user_id):
-    ''' Gets the weighting factor of the user votes based on the omegaUp
-    user's classes.
 
-    As the 'rank' itself is just the position and not the user
-    class to which the user belongs, the weighting factor should be mapped
-    of the user's class name which is being retrieved here.
-    '''
+def fill_rank_cutoffs(dbconn):
+    '''Fills rank_cutoffs array, each position will contain an
+    array of two elements:
+    First one is the classname of the rank cutoff
+    Second one is the score of the rank cutoff'''
     with dbconn.cursor() as cur:
-        rows_count = cur.execute("""SELECT urc.`classname`
-                                    FROM `User_Rank_Cutoffs` as urc
-                                    WHERE urc.`score` <= (
-                                            SELECT
-                                                ur.`score`
-                                            FROM
-                                                User_Rank as ur
-                                            WHERE
-                                                ur.`user_id` = %s
-                                        )
-                                    ORDER BY urc.`percentile` ASC
-                                    LIMIT 1;""",
-                                 (user_id,))
-        if rows_count > 0:
-            user_classname = cur.fetchall()[0][0]
-        else:
-            user_classname = 'user-rank-unranked'
+        cur.execute("""SELECT urc.`classname`, urc.`score`
+                       FROM `User_Rank_Cutoffs` as urc
+                       ORDER BY urc.`percentile` ASC;""")
+        for row in cur:
+            RANK_CUTOFFS.append([row[0], row[1]])
+    return
 
-    return WEIGHTING_FACTORS[user_classname]
+
+def get_weighting_factor(score):
+    '''Gets the user vote weighting factor based on user's
+    score stored in User_Rank table and according to the
+    User_Rank_Cutoffs scores and classnames'''
+    if score is None:
+        return WEIGHTING_FACTORS['user-rank-unranked']
+    for cutoff in RANK_CUTOFFS:
+        if cutoff[1] <= score:
+            return WEIGHTING_FACTORS[cutoff[0]]
+    return WEIGHTING_FACTORS['user-rank-unranked']
 
 
 def get_global_quality_and_difficulty_average(dbconn):
@@ -78,8 +76,10 @@ def get_global_quality_and_difficulty_average(dbconn):
     problem's quality and difficulty ratings.
     '''
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT qn.`contents`, qn.`user_id`
+        cur.execute("""SELECT qn.`contents`, ur.`score`
                        FROM `QualityNominations` as qn
+                       LEFT JOIN `User_Rank` as ur
+                       ON ur.`user_id` = qn.`user_id`
                        WHERE `nomination` = 'suggestion'
                         AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
@@ -87,7 +87,6 @@ def get_global_quality_and_difficulty_average(dbconn):
         quality_n = 0
         difficulty_sum = 0
         difficulty_n = 0
-
         for row in cur:
             try:
                 contents = json.loads(row[0])
@@ -95,9 +94,8 @@ def get_global_quality_and_difficulty_average(dbconn):
                 logging.exception('Failed to parse contents')
                 continue
 
-            user_id = row[1]
-            weighting_factor = get_user_weighting_factor(dbconn, user_id)
-
+            user_score = row[1]
+            weighting_factor = get_weighting_factor(user_score)
             if 'quality' in contents:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
@@ -118,8 +116,10 @@ def get_problem_aggregates(dbconn, problem_id):
     '''Gets the aggregates for a particular problem.'''
 
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT qn.`contents`, qn.`user_id`
+        cur.execute("""SELECT qn.`contents`, ur.`score`
                        FROM `QualityNominations` as qn
+                       LEFT JOIN `User_Rank` as ur
+                       ON ur.`user_id` = qn.`user_id`
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`qualitynomination_id` > %s
                          AND qn.`problem_id` = %s;""",
@@ -136,8 +136,8 @@ def get_problem_aggregates(dbconn, problem_id):
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
-            user_id = row[1]
-            weighting_factor = get_user_weighting_factor(dbconn, user_id)
+            user_score = row[1]
+            weighting_factor = get_weighting_factor(user_score)
             if 'quality' in contents:
                 quality_votes[contents['quality']][0] += 1
                 quality_votes[contents['quality']][1] += weighting_factor
@@ -235,7 +235,7 @@ def aggregate_feedback(dbconn):
     This updates problem quality, difficulty, and tags for each problem that
     has user feedback.
     '''
-
+    fill_rank_cutoffs(dbconn)
     (global_quality_average,
      global_difficulty_average) = get_global_quality_and_difficulty_average(
          dbconn)
