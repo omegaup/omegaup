@@ -56,36 +56,40 @@ WEIGHTING_FACTORS = {
     'user-rank-international-master': 6,
 }
 
-# Cutoffs for each possible range
-RANK_CUTOFFS = []
+
+class Votes:
+    '''This class is an abstraction of a vote with their
+    simple count and weighted sum'''
+    __slots__ = ['count', 'w_sum']
+
+    def __init__(self, count=0, w_sum=0):
+        self.count = count
+        self.w_sum = w_sum
 
 
 def fill_rank_cutoffs(dbconn):
-    '''Fills rank_cutoffs array, each position will contain an
-    array of two elements:
-    First one is the classname of the rank cutoff
-    Second one is the score of the rank cutoff'''
+    '''Creates and fills RankCutoff collection'''
+    rank_cutoff = collections.namedtuple('rank_cutoff', ['classname', 'score'])
     with dbconn.cursor() as cur:
         cur.execute("""SELECT urc.`classname`, urc.`score`
                        FROM `User_Rank_Cutoffs` as urc
                        ORDER BY urc.`percentile` ASC;""")
-        for row in cur:
-            RANK_CUTOFFS.append([row[0], row[1]])
+        return [rank_cutoff(row[0], row[1]) for row in cur]
 
 
-def get_weighting_factor(score):
+def get_weighting_factor(score, rank_cutoffs):
     '''Gets the user vote weighting factor based on user's
     score stored in User_Rank table and according to the
     User_Rank_Cutoffs scores and classnames'''
     if score is None:
         return WEIGHTING_FACTORS['user-rank-unranked']
-    for cutoff in RANK_CUTOFFS:
-        if cutoff[1] <= score:
-            return WEIGHTING_FACTORS[cutoff[0]]
+    for cutoff in rank_cutoffs:
+        if cutoff.score <= score:
+            return WEIGHTING_FACTORS[cutoff.classname]
     return WEIGHTING_FACTORS['user-rank-unranked']
 
 
-def get_global_quality_and_difficulty_average(dbconn):
+def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
     '''Gets the global quality and difficulty average based on user feedback.
 
     This will be used as the prior belief when updating each individual
@@ -106,7 +110,7 @@ def get_global_quality_and_difficulty_average(dbconn):
                 continue
 
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score)
+            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
             if 'quality' in contents:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
@@ -123,32 +127,29 @@ def get_global_quality_and_difficulty_average(dbconn):
     return (global_quality_average, global_difficulty_average)
 
 
-def get_problem_aggregates(dbconn, problem_id):
+def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
     '''Gets the aggregates for a particular problem.'''
-
     with dbconn.cursor() as cur:
         cur.execute(GET_PROBLEM_SCORES_AND_SUGGESTIONS,
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID, problem_id,))
 
-        # Both quality votes and difficulty votes are matrices of which each:
-        # row (0) refers to the single vote sent by user
-        # row(1) refers to the weigthed vote sent by user
-        # column (i) refers to the range that the user that voted has
-        quality_votes = [[0 for i in range(2)] for j in range(VOTES_NUM)]
-        difficulty_votes = [[0 for i in range(2)] for j in range(VOTES_NUM)]
+        quality_votes = [Votes() for _ in range(VOTES_NUM)]
+        difficulty_votes = [Votes() for _ in range(VOTES_NUM)]
 
         problem_tag_votes = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score)
+            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
             if 'quality' in contents:
-                quality_votes[contents['quality']][0] += 1
-                quality_votes[contents['quality']][1] += weighting_factor
+                quality_vote = contents['quality']
+                quality_votes[quality_vote].count += 1
+                quality_votes[quality_vote].w_sum += weighting_factor
             if 'difficulty' in contents:
-                difficulty_votes[contents['difficulty']][0] += 1
-                difficulty_votes[contents['difficulty']][1] += weighting_factor
+                difficulty_vote = contents['difficulty']
+                difficulty_votes[difficulty_vote].count += 1
+                difficulty_votes[difficulty_vote].w_sum += weighting_factor
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += weighting_factor
@@ -162,9 +163,9 @@ def bayesian_average(apriori_average, values):
     '''Gets the Bayesian average of an observation based on a prior value.'''
     weighted_n = 0
     weighted_sum = 0
-    for i in range(VOTES_NUM):
-        weighted_n += values[i][1]
-        weighted_sum += i * values[i][1]
+    for i, vote in enumerate(values):
+        weighted_n += vote.w_sum
+        weighted_sum += i * vote.w_sum
 
     if weighted_n < CONFIDENCE or apriori_average is None:
         return None
@@ -234,7 +235,8 @@ def replace_autogenerated_tags(dbconn, problem_id, problem_tags):
         dbconn.rollback()
 
 
-def aggregate_problem_feedback(dbconn, problem_id, cur, global_quality_average,
+def aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
+                               global_quality_average,
                                global_difficulty_average):
     '''Aggregates user feedback for a certain problem
 
@@ -245,7 +247,8 @@ def aggregate_problem_feedback(dbconn, problem_id, cur, global_quality_average,
 
     (problem_quality_votes, problem_difficulty_votes,
      problem_tag_votes,
-     problem_tag_votes_n) = get_problem_aggregates(dbconn, problem_id)
+     problem_tag_votes_n) = get_problem_aggregates(dbconn, problem_id,
+                                                   rank_cutoffs)
 
     problem_quality = bayesian_average(
         global_quality_average, problem_quality_votes)
@@ -254,21 +257,22 @@ def aggregate_problem_feedback(dbconn, problem_id, cur, global_quality_average,
     if problem_quality is not None and problem_difficulty is not None:
         logging.debug('Updating problem %d. quality=%f, difficulty=%f',
                       problem_id, problem_quality, problem_difficulty)
-        cur.execute(
-            """
-            UPDATE
-               `Problems` as p
-            SET
-               p.`quality` = %s, p.`difficulty` = %s,
-               p.`quality_histogram` = %s,
-               p.`difficulty_histogram` = %s
-            WHERE
-               p.`problem_id` = %s;""",
-            (problem_quality, problem_difficulty,
-             json.dumps([row[0] for row in problem_quality_votes]),
-             json.dumps([row[0] for row in problem_difficulty_votes]),
-             problem_id))
-        dbconn.commit()
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE
+                   `Problems` as p
+                SET
+                   p.`quality` = %s, p.`difficulty` = %s,
+                   p.`quality_histogram` = %s,
+                   p.`difficulty_histogram` = %s
+                WHERE
+                   p.`problem_id` = %s;""",
+                (problem_quality, problem_difficulty,
+                 json.dumps([vote.count for vote in problem_quality_votes]),
+                 json.dumps([vote.count for vote in problem_difficulty_votes]),
+                 problem_id))
+            dbconn.commit()
     else:
         logging.debug('Not enough information for problem %d',
                       problem_id)
@@ -287,10 +291,10 @@ def aggregate_feedback(dbconn):
     This updates problem quality, difficulty, and tags for each problem that
     has user feedback.
     '''
-    fill_rank_cutoffs(dbconn)
+    rank_cutoffs = fill_rank_cutoffs(dbconn)
     (global_quality_average,
      global_difficulty_average) = get_global_quality_and_difficulty_average(
-         dbconn)
+         dbconn, rank_cutoffs)
 
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
@@ -299,7 +303,7 @@ def aggregate_feedback(dbconn):
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
         for row in cur:
-            aggregate_problem_feedback(dbconn, row[0], cur,
+            aggregate_problem_feedback(dbconn, row[0], rank_cutoffs,
                                        global_quality_average,
                                        global_difficulty_average)
 
