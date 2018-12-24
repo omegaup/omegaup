@@ -60,11 +60,11 @@ WEIGHTING_FACTORS = {
 class Votes:
     '''This class is an abstraction of a vote with their
     simple count and weighted sum'''
-    __slots__ = ['count', 'w_sum']
+    __slots__ = ['count', 'weighted_sum']
 
-    def __init__(self, count=0, w_sum=0):
+    def __init__(self, count=0, weighted_sum=0):
         self.count = count
-        self.w_sum = w_sum
+        self.weighted_sum = weighted_sum
 
 
 def fill_rank_cutoffs(dbconn):
@@ -143,13 +143,13 @@ def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
             user_score = row[1]
             weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
             if 'quality' in contents:
-                quality_vote = contents['quality']
-                quality_votes[quality_vote].count += 1
-                quality_votes[quality_vote].w_sum += weighting_factor
+                quality_votes[contents['quality']].count += 1
+                quality_votes[contents['quality']].weighted_sum += (
+                    weighting_factor)
             if 'difficulty' in contents:
-                difficulty_vote = contents['difficulty']
-                difficulty_votes[difficulty_vote].count += 1
-                difficulty_votes[difficulty_vote].w_sum += weighting_factor
+                difficulty_votes[contents['difficulty']].count += 1
+                difficulty_votes[contents['difficulty']].weighted_sum += (
+                    weighting_factor)
             if 'tags' in contents and contents['tags']:
                 for tag in contents['tags']:
                     problem_tag_votes[tag] += weighting_factor
@@ -164,8 +164,8 @@ def bayesian_average(apriori_average, values):
     weighted_n = 0
     weighted_sum = 0
     for i, vote in enumerate(values):
-        weighted_n += vote.w_sum
-        weighted_sum += i * vote.w_sum
+        weighted_n += vote.weighted_sum
+        weighted_sum += i * vote.weighted_sum
 
     if weighted_n < CONFIDENCE or apriori_average is None:
         return None
