@@ -892,6 +892,7 @@ class QualityNominationTest extends OmegaupTestCase {
          - The second time, the problems are voted by ranked users according to the number of problems they solved
     */
     public function testAggregateFeedback() {
+        /* Previous tests create some users with their assigned ranges and forget to delete them, which affects this test */
         self::deleteAllRanks();
         self::deleteAllPreviousRuns();
 
@@ -982,120 +983,120 @@ class QualityNominationTest extends OmegaupTestCase {
             QualityNominationFactory::createSuggestion(
                 $login[0],
                 $problems[0]['request']['problem_alias'],
-                2,
-                1,
+                2, /* difficulty */
+                1, /* quality */
                 ['DP', 'Math']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[1],
                 $problems[0]['request']['problem_alias'],
-                3,
-                3,
+                3, /* difficulty */
+                3, /* quality */
                 ['Matrices', 'Math']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[2],
                 $problems[0]['request']['problem_alias'],
-                4,
-                0,
+                4, /* difficulty */
+                0, /* quality */
                 ['Math', 'DP']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[3],
                 $problems[0]['request']['problem_alias'],
-                2,
-                4,
+                2, /* difficulty */
+                4, /* quality */
                 ['DP', 'Math', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[4],
                 $problems[0]['request']['problem_alias'],
-                3,
-                4,
+                3, /* difficulty */
+                4, /* quality */
                 ['Greedy', 'DP']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[1],
                 $problems[1]['request']['problem_alias'],
-                3,
-                null,
+                3, /* difficulty */
+                null, /* quality */
                 ['Matrices', 'Math']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[2],
                 $problems[1]['request']['problem_alias'],
-                null,
-                1,
+                null, /* difficulty */
+                1, /* quality */
                 ['Math', 'DP']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[3],
                 $problems[1]['request']['problem_alias'],
-                4,
-                null,
+                4, /* difficulty */
+                null, /* quality */
                 ['DP', 'Math', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[4],
                 $problems[1]['request']['problem_alias'],
-                4,
-                0,
+                4, /* difficulty */
+                0, /* quality */
                 ['Greedy', 'DP']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[2],
                 $problems[2]['request']['problem_alias'],
-                4,
-                4,
+                4, /* difficulty */
+                4, /* quality */
                 ['Search', 'DP', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[3],
                 $problems[2]['request']['problem_alias'],
-                4,
-                1,
+                4, /* difficulty */
+                1, /* quality */
                 ['Geometry', 'DP', 'Search', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[4],
                 $problems[2]['request']['problem_alias'],
-                1,
-                1,
+                1, /* difficulty */
+                1, /* quality */
                 ['Search', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[3],
                 $problems[3]['request']['problem_alias'],
-                4,
-                3,
+                4, /* difficulty */
+                3, /* quality */
                 ['DP', 'Math', 'Greedy']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[4],
                 $problems[3]['request']['problem_alias'],
-                3,
-                null,
+                3, /* difficulty */
+                null, /* quality */
                 ['Greedy', 'DP']
             );
 
             QualityNominationFactory::createSuggestion(
                 $login[4],
                 $problems[4]['request']['problem_alias'],
-                3,
-                null,
+                3, /* difficulty */
+                null, /* quality */
                 ['Greedy', 'DP']
             );
         }
