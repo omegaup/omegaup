@@ -223,22 +223,4 @@ class UsersDAO extends UsersDAOBase {
         }
         return $users;
     }
-
-    final public static function apiUpdateLanguageUser($identityId, $language) {
-        $sql = '
-            UPDATE
-                `Users`
-            SET
-                `language_id` = (SELECT `language_id` FROM `Languages` WHERE `name` = ?)
-            WHERE
-                `main_identity_id` = ?;';
-        $params = [
-            $language,
-            $identityId,
-        ];
-
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
-    }
 }

@@ -52,7 +52,6 @@ module.exports = [{
     user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
-    user_language : './frontend/www/js/omegaup/user/language.js',
     user_manage_identities : './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',

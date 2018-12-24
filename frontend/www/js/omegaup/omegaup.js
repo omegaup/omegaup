@@ -111,7 +111,8 @@ export let OmegaUp = {
                                                  window.navigator.userAgent)
                           .replace('%(referer)', window.location.href)
                           .replace('%(serializedErrors)',
-                                   JSON.stringify(OmegaUp._errors));
+                                   JSON.stringify(OmegaUp._errors))
+                          .replace(/\\n/g, '\n');
                   reportAnIssue.href =
                       'https://github.com/omegaup/omegaup/issues/new?body=' +
                       encodeURIComponent(issueBody);
