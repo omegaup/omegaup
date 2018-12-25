@@ -7,9 +7,10 @@
  */
 
 class ProblemDeployer {
-    const CREATE = 0;
+    const UPDATE_SETTINGS = 0;
     const UPDATE_CASES = 1;
     const UPDATE_STATEMENTS = 2;
+    const CREATE = 3;
 
     private $log;
 
@@ -19,7 +20,7 @@ class ProblemDeployer {
     private $created = false;
     private $committed = false;
     private $operation = null;
-    private $updatedLanguages = [];
+    private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
 
     public function __construct($alias, $operation, $acceptsSubmissions = true) {
@@ -28,7 +29,11 @@ class ProblemDeployer {
 
         $this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
         $this->operation = $operation;
-        $this->zipPath = $_FILES['problem_contents']['tmp_name'];
+        if (isset($_FILES['problem_contents'])
+            && isset($_FILES['problem_contents']['tmp_name'])
+        ) {
+            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
+        }
 
         $this->acceptsSubmissions = $acceptsSubmissions;
 
@@ -69,7 +74,8 @@ class ProblemDeployer {
             $problemSettings,
             null,
             $updateCases,
-            $updateStatements
+            $updateStatements,
+            $this->acceptsSubmissions
         );
 
         $this->requiresRejudge = false;
@@ -92,7 +98,7 @@ class ProblemDeployer {
                     if (preg_match('%statements/([a-z]{2})\\.markdown%', $filename, $matches) !== 1) {
                         continue;
                     }
-                    $this->updatedLanguages[] = $matches[1];
+                    $this->updatedStatementLanguages[] = $matches[1];
                 }
             }
         }
@@ -116,7 +122,8 @@ class ProblemDeployer {
             null,
             $blobUpdate,
             $updateCases,
-            $updateStatements
+            $updateStatements,
+            $this->acceptsSubmissions
         );
 
         $this->requiresRejudge = false;
@@ -124,12 +131,12 @@ class ProblemDeployer {
     }
 
     /**
-     * Returns the list of updated langauge files.
+     * Returns the list of languages of updated statement files.
      *
      * @return array The list of updated languages
      */
-    public function getUpdatedLanguages() {
-        return $this->updatedLanguages;
+    public function getUpdatedStatementLanguages() {
+        return $this->updatedStatementLanguages;
     }
 
     private function executeRaw($args, $cwd = null, $quiet = false) {
@@ -188,10 +195,11 @@ class ProblemDeployer {
         $blobUpdate,
         $updateCases,
         $updateStatements,
+        $acceptsSubmissions,
         $quiet = false
     ) {
         $args = [
-            '/usr/bin/omegaup-update-problem',
+            OMEGAUP_UPDATE_PROBLEM,
             "-repository-path=$repositoryPath",
             "-author=$author",
             "-commit-message=$commitMessage",
@@ -210,6 +218,9 @@ class ProblemDeployer {
         }
         if ($updateStatements) {
             $args[] = '-update-statements=true';
+        }
+        if (!$acceptsSubmissions) {
+            $args[] = '-accepts-submissions=false';
         }
         $result = $this->executeRaw($args, null /* cwd */, $quiet);
 
@@ -232,6 +243,7 @@ class ProblemDeployer {
                     'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
                     'no-statements' => 'problemDeployerNoStatements',
                     'not-a-review' => 'problemDeployerNotAReview',
+                    'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
                     'problem-bad-layout' => 'problemDeployerProblemBadLayout',
                     'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
                     'review-bad-layout' => 'problemDeployerReviewBadLayout',

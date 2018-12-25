@@ -519,6 +519,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemDeployerNoCases: "Nenhum caso encontrado",
 	problemDeployerNoStatements: "Nenhuma reda\u00e7\u00e3o encontrada",
 	problemDeployerNotAReview: "A fus\u00e3o com o ramo 'master' foi tentada com um compromisso que n\u00e3o \u00e9 uma revista.",
+	problemDeployerOmegaupUpdateProblemOldVersion: "O problema est\u00e1 sendo migrado para uma nova vers\u00e3o. Por favor, tente novamente mais tarde.",
 	problemDeployerOutMissing: "N\u00e3o foi encontrado .out para o caso",
 	problemDeployerProblemBadLayout: "O problema tem uma estrutura inv\u00e1lida.",
 	problemDeployerPublishedMustPointToCommitInMaster: "A atualiza\u00e7\u00e3o para o ramo 'publicado' conta para apontar para um commit no ramo 'master'.",

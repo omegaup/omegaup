@@ -595,6 +595,9 @@ class CreateProblemTest extends OmegaupTestCase {
      * Test that we are able to submit a problem with an interactive/ directory.
      */
     public function testValidProblemInteractive() {
+        if (!file_exists('/usr/share/java/libinteractive.jar')) {
+            $this->markTestSkipped('libinteractive not available');
+        }
         // Get the problem data
         $problemData = ProblemsFactory::getRequest(new ProblemParams([
             'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos_interactive.zip'

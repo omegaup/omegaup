@@ -38,6 +38,17 @@ install_yarn() {
 	npm install -g yarn
 }
 
+install_omegaup_update_problem() {
+	DOWNLOAD_URL=$(\
+		curl https://api.github.com/repos/omegaup/gitserver/releases/latest |\
+		gawk 'match($0, /browser_download_url.*(https:\/\/.*omegaup-update-problem.xz)/, line) { print line[1] }')
+	TARGET="${HOME}/bin/omegaup-update-problem.xz"
+	mkdir -p $(dirname "${TARGET}")
+	curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
+	unxz "${TARGET}"
+	chmod +x "${TARGET%.xz}"
+}
+
 setup_phpenv() {
 	phpenv rehash
 	echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini

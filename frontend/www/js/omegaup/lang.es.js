@@ -519,6 +519,7 @@ omegaup.OmegaUp.loadTranslations({
 	problemDeployerNoCases: "No se encontraron casos",
 	problemDeployerNoStatements: "No se encontraron redacciones",
 	problemDeployerNotAReview: "El merge a la rama 'master' se intent\u00f3 con un commit que no es una revisi\u00f3n.",
+	problemDeployerOmegaupUpdateProblemOldVersion: "El problema est\u00e1 siendo migrado a un formato m\u00e1s nuevo. Por favor intenta m\u00e1s tarde.",
 	problemDeployerOutMissing: "No se encontr\u00f3 un .out para el caso",
 	problemDeployerProblemBadLayout: "El problema tiene una estructura inv\u00e1lida.",
 	problemDeployerPublishedMustPointToCommitInMaster: "La actualizaci\u00f3n a la rama 'published' deber\u00eda apuntar a un commit en la rama 'master'.",

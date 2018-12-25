@@ -181,22 +181,10 @@ class ProblemController extends Controller {
         $problem->alias = $r['problem_alias'];
         $problem->languages = $r['languages'];
         $problem->email_clarifications = $r['email_clarifications'];
+        $problem->tolerance = 1e-9;
 
-        $problemSettings = [
-            'Limits' => [
-                'ExtraWallTime' => (int)$r['extra_wall_time'] . 'ms',
-                'MemoryLimit' => (int)$r['memory_limit'],
-                'OutputLimit' => (int)$r['output_limit'],
-                'OverallWallTimeLimit' => (int)$r['overall_wall_time_limit'] . 'ms',
-                'TimeLimit' => (int)$r['time_limit'] . 'ms',
-            ],
-            'Validator' => [
-                'Name' => $r['validator'],
-            ],
-        ];
-
+        $problemSettings = self::getProblemSettings($problem);
         $acceptsSubmissions = $r['languages'] !== '';
-        $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
@@ -206,7 +194,16 @@ class ProblemController extends Controller {
             ProblemsDAO::transBegin();
 
             // Commit at the very end
-            $problemDeployer->commit('Initial commit', $r['current_user'], $problemSettings);
+            $problemDeployer = new ProblemDeployer(
+                $r['problem_alias'],
+                ProblemDeployer::CREATE,
+                $acceptsSubmissions
+            );
+            $problemDeployer->commit(
+                'Initial commit',
+                $r['current_user'],
+                $problemSettings
+            );
 
             // Save the contest object with data sent by user to the database
             ACLsDAO::save($acl);
@@ -741,27 +738,40 @@ class ProblemController extends Controller {
             'languages',
         ];
         $problem = $r['problem'];
-        $requiresRejudge = self::updateValueProperties($r, $problem, $valueProperties);
+        self::updateValueProperties($r, $problem, $valueProperties);
         $r['problem'] = $problem;
 
         $response = [
             'rejudged' => false
         ];
 
+        $problemSettings = self::getProblemSettings($problem);
         $acceptsSubmissions = $problem->languages !== '';
-        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
+        $updatedStatementLanguages = [];
 
         // Insert new problem
         try {
             //Begin transaction
             ProblemsDAO::transBegin();
 
+            $operation = ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
                 && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
             ) {
-                $problemDeployer->commit($r['message'], $r['current_user']);
-                $requiresRejudge |= $problemDeployer->requiresRejudge;
+                $operation = ProblemDeployer::UPDATE_CASES;
             }
+            $problemDeployer = new ProblemDeployer(
+                $problem->alias,
+                $operation,
+                $acceptsSubmissions
+            );
+            $problemDeployer->commit(
+                $r['message'],
+                $r['current_user'],
+                $problemSettings
+            );
+            $response['rejudged'] = $problemDeployer->requiresRejudge;
+            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
 
             // Save the contest object with data sent by user to the database
             ProblemsDAO::save($problem);
@@ -782,13 +792,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (($requiresRejudge == true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE == true)) {
+        if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
                 self::apiRejudge($r);
-                $response['rejudged'] = true;
             } catch (Exception $e) {
-                self::$log->error('Best efort ProblemController::apiRejudge failed', $e);
+                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
         }
 
@@ -802,7 +811,7 @@ class ProblemController extends Controller {
         $response['status'] = 'ok';
 
         // Invalidate problem statement cache
-        foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
+        foreach ($updatedStatementLanguages as $lang) {
             Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$lang}-markdown");
         }
         Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$r['problem']->alias}-sample.in");
@@ -1976,5 +1985,40 @@ class ProblemController extends Controller {
             ProblemsLanguagesDAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Converts the Problem's settings into something that
+     * omegaup-update-problem can use.
+     *
+     * @param Problems $problem the problem
+     * @return Array an array that can be serialized into the JSON form of
+     *               quark's common.ProblemSettings.
+     */
+    private static function getProblemSettings(Problems $problem) {
+        $problemSettings = [
+            'Limits' => [
+                'ExtraWallTime' => (int)$problem->extra_wall_time . 'ms',
+                'MemoryLimit' => (int)$problem->memory_limit,
+                'OutputLimit' => (int)$problem->output_limit,
+                'OverallWallTimeLimit' => (
+                    (int)$problem->overall_wall_time_limit . 'ms'
+                ),
+                'TimeLimit' => (int)$problem->time_limit . 'ms',
+            ],
+            'Validator' => [
+                'Name' => $problem->validator,
+                'Tolerance' => (float)$problem->tolerance,
+                'Limits' => [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => 256 * 1024 * 1024,
+                    'OutputLimit' => 10 * 1024,
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => (int)$problem->validator_time_limit . 'ms',
+                ],
+            ],
+        ];
+
+        return $problemSettings;
     }
 }

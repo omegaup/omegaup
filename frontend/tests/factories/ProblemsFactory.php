@@ -105,30 +105,40 @@ class ProblemsFactory {
             $params = new ProblemParams($params);
         }
 
-        $r = new Request();
-        $r['title'] = $params['title'];
-        $r['problem_alias'] = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', str_replace(' ', '-', $r['title'])), 0, 32);
-        $r['author_username'] = $params['author']->username;
-        $r['validator'] = 'token';
-        $r['time_limit'] = 5000;
-        $r['overall_wall_time_limit'] = 60000;
-        $r['validator_time_limit'] = 30000;
-        $r['extra_wall_time'] = 0;
-        $r['memory_limit'] = 32000;
-        $r['source'] = 'yo';
-        $r['order'] = 'normal';
-        $r['visibility'] = $params['visibility'];
-        $r['output_limit'] = 10240;
-        $r['input_limit'] = 10240;
-        $r['languages'] = $params['languages'];
+        $r = new Request([
+            'title' => $params['title'],
+            'problem_alias' => substr(
+                preg_replace(
+                    '/[^a-zA-Z0-9_-]/',
+                    '',
+                    str_replace(' ', '-', $params['title'])
+                ),
+                0,
+                32
+            ),
+            'author_username' => $params['author']->username,
+            'validator' => 'token',
+            'time_limit' => 5000,
+            'overall_wall_time_limit' => 60000,
+            'validator_time_limit' => 30000,
+            'extra_wall_time' => 0,
+            'memory_limit' => 32000,
+            'source' => 'yo',
+            'order' => 'normal',
+            'visibility' => $params['visibility'],
+            'output_limit' => 10240,
+            'input_limit' => 10240,
+            'languages' => $params['languages'],
+        ]);
 
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $params['zipName'];
 
-        return  [
-                'request' => $r,
-                'author' => $params['author'],
-                'zip_path' => $params['zipName']];
+        return [
+            'request' => $r,
+            'author' => $params['author'],
+            'zip_path' => $params['zipName'],
+        ];
     }
 
     public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {

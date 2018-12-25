@@ -515,6 +515,7 @@ problemDeployerMissingFromTestplan = "El caso \"%(file)\" en testplan no fue enc
 problemDeployerNoCases = "No se encontraron casos"
 problemDeployerNoStatements = "No se encontraron redacciones"
 problemDeployerNotAReview = "El merge a la rama 'master' se intentó con un commit que no es una revisión."
+problemDeployerOmegaupUpdateProblemOldVersion = "El problema está siendo migrado a un formato más nuevo. Por favor intenta más tarde."
 problemDeployerOutMissing = "No se encontró un .out para el caso"
 problemDeployerProblemBadLayout = "El problema tiene una estructura inválida."
 problemDeployerPublishedMustPointToCommitInMaster = "La actualización a la rama 'published' debería apuntar a un commit en la rama 'master'."
