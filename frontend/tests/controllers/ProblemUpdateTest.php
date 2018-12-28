@@ -66,23 +66,20 @@ class UpdateProblemTest extends OmegaupTestCase {
         // We will submit 2 runs to the problem, a call to grader to rejudge them
         $this->detourGraderCalls($this->exactly(1));
 
+        // Set file upload context
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
+        $newTitle = 'new title';
+        $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'title' => 'new title',
+            'title' => $newTitle,
             'time_limit' => 12345,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed some properties',
-        ]);
-
-        // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
-
-        // Call API
-        $response = ProblemController::apiUpdate($r);
+        ]));
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = ProblemsDAO::getByTitle($newTitle);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -92,7 +89,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(true, $response['rejudged']);
 
         {
-            $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));
@@ -107,19 +104,31 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $problemArtifacts->get('settings.distrib.json'),
                 true /* assoc */
             );
+
+            // This example comes from the problem statement.
             $this->assertEquals(
-                [],
+                [
+                    'statement_001' => [
+                        'in' => "6\n2 3 2 3 2 4",
+                        'out' => '10',
+                        'weight' => 1,
+                    ],
+                ],
                 $problemDistribSettings['cases']
             );
         }
 
         // Call API again to add an example, should not trigger rejudge.
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos-examples.zip';
-        $response = ProblemController::apiUpdate($r);
+        $response = ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'message' => 'Add example',
+        ]));
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['rejudged']);
         {
-            $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));

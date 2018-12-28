@@ -664,5 +664,13 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals(0, $problem->submissions);
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
+
+        // Verify that the templates were generated.
+        $this->assertTrue(
+            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->alias}_unix_cpp.tar.bz2")
+        );
+        $this->assertTrue(
+            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->alias}_windows_cpp.zip")
+        );
     }
 }

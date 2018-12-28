@@ -80,29 +80,92 @@ class ProblemDeployer {
 
         $this->requiresRejudge = false;
         $this->created = ($this->operation == ProblemDeployer::CREATE);
-        if (property_exists($result, 'updated_refs')) {
-            $masterRef = null;
-            foreach ($result->updated_refs as $ref) {
-                if ($ref->name == 'refs/heads/private') {
+        if (!empty($result['updated_refs'])) {
+            foreach ($result['updated_refs'] as $ref) {
+                if ($ref['name'] == 'refs/heads/private') {
                     $this->requiresRejudge = true;
-                } elseif ($ref->name == 'refs/heads/master') {
-                    $masterRef = $ref;
-                }
-            }
-            if (!is_null($masterRef) && $masterRef->from != '0000000000000000000000000000000000000000') {
-                $result = $this->executeRaw(
-                    ['/usr/bin/git', 'diff', '--name-only', $masterRef->from, $masterRef->to],
-                    $this->gitDir
-                );
-                foreach (explode('\n', $result['output']) as $filename) {
-                    if (preg_match('%statements/([a-z]{2})\\.markdown%', $filename, $matches) !== 1) {
-                        continue;
-                    }
-                    $this->updatedStatementLanguages[] = $matches[1];
                 }
             }
         }
+        $updatedInteractiveFiles = false;
+        $updatedExamples = false;
+        if (!empty($result['updated_files'])) {
+            foreach ($result['updated_files'] as $updated_file) {
+                if (strpos($updated_file['path'], 'examples/') === 0) {
+                    $updatedExamples = true;
+                }
+                if (preg_match('%statements/([a-z]{2})\\.markdown%', $updated_file['path'], $matches) === 1) {
+                    $this->updatedStatementLanguages[] = $matches[1];
+                }
+                if (preg_match(
+                    '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
+                    $updated_file['path']
+                ) === 1) {
+                    $updatedInteractiveFiles = true;
+                }
+            }
+        }
+        if ($updatedExamples || $updatedInteractiveFiles) {
+            $this->generateLibinteractiveTemplates();
+        }
         $this->committed = true;
+    }
+
+    /**
+     * Generate all possible libinteractive templates.
+     *
+     * Calling this function is a no-op if the problem turns out to not be an
+     * interactive problem.
+     *
+     * @return void
+     */
+    private function generateLibinteractiveTemplates() {
+        $problemArtifacts = new ProblemArtifacts($this->alias);
+        $distribSettings = json_decode(
+            $problemArtifacts->get('settings.distrib.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
+        if (empty($distribSettings['interactive'])) {
+            // oops, this was not an interactive problem.
+            return;
+        }
+        $tmpDir = FileHandler::TempDir('/tmp', 'ProblemDeployer', 0755);
+        try {
+            $idlPath = "{$tmpDir}/{$distribSettings['interactive']['module_name']}.idl";
+            file_put_contents(
+                $idlPath,
+                $problemArtifacts->get(
+                    "interactive/{$distribSettings['interactive']['module_name']}.idl"
+                )
+            );
+            file_put_contents(
+                "{$tmpDir}/Main.{$distribSettings['interactive']['language']}",
+                $problemArtifacts->get(
+                    "interactive/Main.distrib.{$distribSettings['interactive']['language']}"
+                )
+            );
+            mkdir("{$tmpDir}/examples");
+            foreach ($distribSettings['cases'] as $filename => $data) {
+                file_put_contents(
+                    "{$tmpDir}/examples/{$filename}.in",
+                    $problemArtifacts->get("examples/{$filename}.in")
+                );
+            }
+            $target = TEMPLATES_PATH . "/{$this->alias}";
+            mkdir($target);
+            $args = ['/usr/bin/java', '-Xmx64M', '-jar',
+                '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
+                '--package-directory', $target, '--package-prefix',
+                "{$this->alias}_", '--shift-time-for-zip'];
+            return $this->executeRaw($args, $target);
+        } catch (Exception $e) {
+            throw new InvalidParameterException(
+                'problemDeployerLibinteractiveValidationError',
+                $e->getMessage()
+            );
+        } finally {
+            FileHandler::DeleteDirRecursive($tmpDir);
+        }
     }
 
     /**
@@ -263,6 +326,6 @@ class ProblemDeployer {
             throw new ProblemDeploymentFailedException($errorMessage, $context);
         }
 
-        return json_decode($result['output']);
+        return json_decode($result['output'], JSON_OBJECT_AS_ARRAY);
     }
 }

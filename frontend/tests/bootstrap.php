@@ -47,10 +47,11 @@ require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
 Utils::CleanLog();
 
 // Clean problems and runs path
-Utils::CleanPath(PROBLEMS_GIT_PATH);
-Utils::CleanPath(RUNS_PATH);
 Utils::CleanPath(GRADE_PATH);
 Utils::CleanPath(IMAGES_PATH);
+Utils::CleanPath(PROBLEMS_GIT_PATH);
+Utils::CleanPath(RUNS_PATH);
+Utils::CleanPath(TEMPLATES_PATH);
 
 for ($i = 0; $i < 256; $i++) {
     mkdir(RUNS_PATH . sprintf('/%02x', $i), 0775, true);
