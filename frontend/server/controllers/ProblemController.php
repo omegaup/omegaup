@@ -805,18 +805,10 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
-        self::updateLanguages($problem);
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
-
-        // Invalidate problem statement cache
-        foreach ($updatedStatementLanguages as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$lang}-markdown");
-        }
-        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$r['problem']->alias}-sample.in");
-        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
-
         return $response;
     }
 
@@ -859,12 +851,16 @@ class ProblemController extends Controller {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
 
-        $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
+        $updatedStatementLanguages = [];
         $tmpfile = tmpfile();
         try {
             fwrite($tmpfile, $r['statement']);
             $path = stream_get_meta_data($tmpfile)['uri'];
 
+            $problemDeployer = new ProblemDeployer(
+                $r['problem_alias'],
+                ProblemDeployer::UPDATE_STATEMENTS
+            );
             $problemDeployer->commitStatements(
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r['current_user'],
@@ -875,10 +871,7 @@ class ProblemController extends Controller {
                     ],
                 ]
             );
-
-            // Invalidate problem statement cache.
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$r['problem']->alias}-{$r['lang']}-markdown");
-            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$r['problem']->alias}-sample.in");
+            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -887,12 +880,32 @@ class ProblemController extends Controller {
             fclose($tmpfile);
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        self::updateLanguages($problem);
+        self::invalidateCache($r['problem'], $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
         return $response;
+    }
+
+    /**
+     * Invalidates the various caches of the problem, as well as updating the
+     * languages.
+     *
+     * @param Problems $problem                   the problem
+     * @param array    $updatedStatementLanguages the array of updated
+     *                                            statement languages.
+     *
+     * @return void
+     */
+    private static function invalidateCache(Problems $problem, array $updatedStatementLanguages) {
+        self::updateLanguages($problem);
+
+        // Invalidate problem statement cache
+        foreach ($updatedStatementLanguages as $lang) {
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$problem->alias}-{$lang}-markdown");
+        }
+        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$problem->alias}-sample.in");
+        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $problem->alias);
     }
 
     /**

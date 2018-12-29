@@ -77,7 +77,21 @@ class ProblemDeployer {
             $updateStatements,
             $this->acceptsSubmissions
         );
+        $this->processResult($result);
+    }
 
+    /**
+     * Generate all possible libinteractive templates.
+     *
+     * This sets the requiresRejudge and committed flags. It also sets the list
+     * of updated statement languages, as well as updating the libinteractive
+     * template files if needed.
+     *
+     * @param array $result the JSON from omegaup-update-problem.
+     *
+     * @return void
+     */
+    private function processResult($result) {
         $this->requiresRejudge = false;
         $this->created = ($this->operation == ProblemDeployer::CREATE);
         if (!empty($result['updated_refs'])) {
@@ -94,7 +108,11 @@ class ProblemDeployer {
                 if (strpos($updated_file['path'], 'examples/') === 0) {
                     $updatedExamples = true;
                 }
-                if (preg_match('%statements/([a-z]{2})\\.markdown%', $updated_file['path'], $matches) === 1) {
+                if (preg_match(
+                    '%statements/([a-z]{2})\\.markdown%',
+                    $updated_file['path'],
+                    $matches
+                ) === 1) {
                     $this->updatedStatementLanguages[] = $matches[1];
                 }
                 if (preg_match(
@@ -188,9 +206,7 @@ class ProblemDeployer {
             $updateStatements,
             $this->acceptsSubmissions
         );
-
-        $this->requiresRejudge = false;
-        $this->committed = true;
+        $this->processResult($result);
     }
 
     /**
