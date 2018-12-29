@@ -35,7 +35,7 @@ export default {
       this.active = item.name;
       item.async('string')
           .then(value => { this.contents = value; })
-          .fail(Util.asyncError);
+          .catch(Util.asyncError);
     },
   },
 };
