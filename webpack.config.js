@@ -119,6 +119,7 @@ module.exports = [{
       'vue$': 'vue/dist/vue.common.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
       jszip: 'jszip/dist/jszip.js',
+      pako: 'pako/dist/pako.min.js',
     }
   },
   devServer: {
