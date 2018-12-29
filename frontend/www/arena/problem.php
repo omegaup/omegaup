@@ -2,12 +2,16 @@
 require_once('../../server/bootstrap.php');
 
 $r = new Request($_REQUEST);
+$problemAlias = $r['problem_alias'];
 $session = SessionController::apiCurrentSession($r)['session'];
-$r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
-    $problem = ProblemsDAO::GetByAlias($result['alias']);
+    if (is_null($result) || empty($result['exists'])) {
+        header('HTTP/1.1 404 Not Found');
+        die(file_get_contents('../404.html'));
+    }
+    $problem = ProblemsDAO::GetByAlias($problemAlias);
     $nominationStatus = null;
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
