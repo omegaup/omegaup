@@ -224,7 +224,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     }
 
     public static function calculateCoderOfMonthByGivenDate($date) {
-        $date = new DateTime($date);
+        $date = new DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');
