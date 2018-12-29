@@ -40,7 +40,7 @@ install_yarn() {
 
 install_omegaup_update_problem() {
 	DOWNLOAD_URL=$(\
-		curl https://api.github.com/repos/omegaup/gitserver/releases/latest |\
+		curl --location https://api.github.com/repos/omegaup/gitserver/releases/latest |\
 		gawk 'match($0, /browser_download_url.*(https:\/\/.*omegaup-update-problem.xz)/, line) { print line[1] }')
 	TARGET="${HOME}/bin/omegaup-update-problem.xz"
 	mkdir -p $(dirname "${TARGET}")
