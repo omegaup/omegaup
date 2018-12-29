@@ -115,6 +115,9 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
+{if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
+					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/embedded/"></iframe>
+{/if}
 {if $showPoints}
 {include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 {else}

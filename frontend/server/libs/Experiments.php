@@ -41,9 +41,14 @@ class Experiments {
     const VIRTUAL = 'virtual';
 
     /**
-     * Constant for manage identities experiment.
+     * Constant for identity management experiment.
      */
     const IDENTITIES = 'identities';
+
+    /**
+     * Constant for ephemeral grader experiment.
+     */
+    const EPHEMERAL = 'ephemeral';
 
     /**
      * An array with all the known experiments.
@@ -51,6 +56,7 @@ class Experiments {
     private static $kKnownExperiments = [
         self::VIRTUAL,
         self::IDENTITIES,
+        self::EPHEMERAL,
     ];
 
     /**

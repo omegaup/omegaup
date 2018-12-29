@@ -13,7 +13,9 @@ import SettingsComponent from './SettingsComponent.vue';
 import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
-let defaultValidatorSource = `#!/usr/bin/python
+const isEmbedded = window.location.href.indexOf('/embedded/') !== -1;
+const apiPrefix = isEmbedded ? '../run' : 'run';
+const defaultValidatorSource = `#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -63,6 +65,121 @@ int main(int argc, char* argv[]) {
     printf("%d\\n", sumas(a, b));
 }`;
 
+const sourceTemplates = {
+  c: `#include <stdio.h>
+#include <stdint.h>
+
+int main() {
+  int64_t a, b;
+  scanf("%" SCNd64 " %" SCNd64, &a, &b);
+  printf("%" PRId64 "\\n", a + b);
+}`,
+  cpp: `#include <iostream>
+
+int main() {
+  int64_t a, b;
+  std::cin >> a >> b;
+  std::cout << a + b << '\\n';
+}`,
+  cs: `using System.Collections.Generic;
+using System.Linq;
+using System;
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    List<long> l = new List<long>();
+    foreach (String token in Console.ReadLine().Trim().Split(' ')) {
+      l.Add(Int64.Parse(token));
+    }
+    Console.WriteLine(l.Sum(x => x));
+  }
+}`,
+  java: `import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main {
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(
+                          new InputStreamReader(System.in));
+
+    StringTokenizer st = new StringTokenizer(br.readLine());
+    long a = Long.parseLong(st.nextToken());
+    long b = Long.parseLong(st.nextToken());
+    System.out.println(a + b);
+  }
+}`,
+  lua: `a = io.read("*n");
+b = io.read("*n");
+io.write(a + b);`,
+  py: `#!/usr/bin/python
+
+from __future__ import print_function
+
+def _main():
+  a, b = (int(num) for num in raw_input().strip().split())
+  print('%d', a + b)
+
+if __name__ == '__main__':
+  _main()`,
+  rb: `a, b = gets.chomp.split(' ').map!{ |num| num.to_i }
+print a + b`,
+};
+
+const interactiveTemplates = {
+  c: `#include "sumas.h"
+
+int sumas(int a, int b) {
+  // FIXME
+  return 0;
+}`,
+  cpp: `#include "sumas.h"
+
+int sumas(int a, int b) {
+  // FIXME
+  return 0;
+}`,
+  cs: '// not supported',
+  java: `public class sumas {
+  public static int sumas(int a, int b) {
+    // FIXME
+    return 0;
+  }
+}`,
+  lua: '-- not supported',
+  pas: `unit sumas;
+{
+ unit Main;
+}
+
+interface
+  function sumas(a: LongInt; b: LongInt): LongInt;
+
+implementation
+
+uses Main;
+
+function sumas(a: LongInt; b: LongInt): LongInt;
+begin
+  { FIXME }
+  sumas := 0;
+end;
+
+end.`,
+  py: `#!/usr/bin/python
+
+import Main
+
+def sumas(a, b):
+    """ sumas """
+    # FIXME
+    return 0`,
+  rb: '# not supported',
+};
+
 Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
@@ -72,6 +189,7 @@ let store = new Vuex.Store({
       },
     },
     dirty: true,
+    updatingSettings: false,
     max_score: 1,
     results: null,
     outputs: {},
@@ -174,6 +292,7 @@ let store = new Vuex.Store({
       return !!state.request.input.validator.custom_validator;
     },
     isInteractive(state) { return !!state.request.input.interactive; },
+    isUpdatingSettings(state) { return !!state.updatingSettings; },
     isDirty(state) { return !!state.dirty; },
   },
   mutations: {
@@ -293,6 +412,7 @@ let store = new Vuex.Store({
       state.request.input.interactive.module_name = value;
       state.dirty = true;
     },
+    updatingSettings(state, value) { state.updatingSettings = value; },
 
     createCase(state, caseData) {
       if (!state.request.input.cases.hasOwnProperty(caseData.name)) {
@@ -303,6 +423,7 @@ let store = new Vuex.Store({
         });
       }
       state.request.input.cases[caseData.name].weight = caseData.weight;
+      state.currentCase = caseData.name;
       state.dirty = true;
     },
     removeCase(state, name) {
@@ -314,8 +435,7 @@ let store = new Vuex.Store({
     },
     reset(state) {
       Vue.set(state, 'request', {
-        source:
-            "#include <iostream>\n\nint main() {\n\tint64_t a, b;\n\tstd::cin >> a >> b;\n\tstd::cout << a + b << '\\n';\n}",
+        source: sourceTemplates.cpp,
         language: 'cpp11',
         input: {
           limits: {
@@ -349,6 +469,7 @@ let store = new Vuex.Store({
       state.currentCase = 'sample';
       state.logs = '';
       state.compilerOutput = '';
+      state.updatingSettings = false;
       state.dirty = true;
     },
   },
@@ -366,10 +487,11 @@ const goldenLayoutSettings = {
       content: [
         {
           type: 'column',
+          id: 'main-column',
           content: [
             {
               type: 'stack',
-              id: 'sourceAndSettings',
+              id: 'source-and-settings',
               content: [
                 {
                   type: 'component',
@@ -387,6 +509,7 @@ const goldenLayoutSettings = {
                 {
                   type: 'component',
                   componentName: 'settings-component',
+                  id: 'settings',
                   componentState: {
                     storeMapping: {},
                     id: 'settings',
@@ -440,9 +563,11 @@ const goldenLayoutSettings = {
               height: 20,
             },
           ],
+          isClosable: false,
         },
         {
           type: 'column',
+          id: 'cases-column',
           content: [
             {
               type: 'row',
@@ -523,9 +648,11 @@ const goldenLayoutSettings = {
               ],
             },
           ],
+          isClosable: false,
         },
         {
           type: 'component',
+          id: 'case-selector-column',
           componentName: 'case-selector-component',
           componentState: {
             storeMapping: {
@@ -564,8 +691,9 @@ const interactiveIdlSettings = {
       module: 'request.input.interactive.module_name',
     },
     initialLanguage: 'idl',
+    readOnly: isEmbedded,
   },
-  id: 'interactive_idl',
+  id: 'interactive-idl',
   isClosable: false,
 };
 const interactiveMainSourceSettings = {
@@ -578,7 +706,7 @@ const interactiveMainSourceSettings = {
     },
     initialModule: 'Main',
   },
-  id: 'interactive_main_source',
+  id: 'interactive-main-source',
   isClosable: false,
 };
 
@@ -638,7 +766,7 @@ RegisterVueComponent(layout, 'zip-viewer-component', ZipViewerComponent,
 
 layout.init();
 
-let sourceAndSettings = layout.root.getItemsById('sourceAndSettings')[0];
+let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
 if (store.getters.isCustomValidator)
   sourceAndSettings.addChild(validatorSettings);
 store.watch(
@@ -652,6 +780,8 @@ store.watch(
 if (store.getters.isInteractive) {
   sourceAndSettings.addChild(interactiveIdlSettings);
   sourceAndSettings.addChild(interactiveMainSourceSettings);
+  let sourceItem = layout.root.getItemsById('source')[0];
+  sourceItem.parent.setActiveContentItem(sourceItem);
 }
 store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
@@ -659,6 +789,8 @@ store.watch(
       if (value) {
         sourceAndSettings.addChild(interactiveIdlSettings);
         sourceAndSettings.addChild(interactiveMainSourceSettings);
+        let sourceItem = layout.root.getItemsById('source')[0];
+        sourceItem.parent.setActiveContentItem(sourceItem);
       } else {
         layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
         layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
@@ -677,7 +809,18 @@ document.getElementById('language')
         'change', function() { store.commit('request.language', this.value); });
 store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'request.language').get,
-    function(value) { document.getElementById('language').value = value; });
+    (value) => {
+      document.getElementById('language').value = value;
+      if (!Util.languageExtensionMapping.hasOwnProperty(value)) return;
+      let language = Util.languageExtensionMapping[value];
+      if (store.getters.isInteractive) {
+        if (!interactiveTemplates.hasOwnProperty(language)) return;
+        store.commit('request.source', interactiveTemplates[language]);
+      } else {
+        if (!sourceTemplates.hasOwnProperty(language)) return;
+        store.commit('request.source', sourceTemplates[language]);
+      }
+    });
 
 function onDetailsJsonReady(results) {
   store.commit('results', results);
@@ -736,8 +879,8 @@ function onFilesZipReady(blob) {
 store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
     function(value) {
-      if (!value) return;
       let downloadLabelElement = document.getElementById('download-label');
+      if (!value || !downloadLabelElement) return;
 
       if (downloadLabelElement.className.indexOf('fa-download') == -1) return;
       downloadLabelElement.className = downloadLabelElement.className.replace(
@@ -747,213 +890,309 @@ store.watch(
       downloadElement.href = undefined;
     });
 
-document.getElementById('upload').addEventListener('change', e => {
-  let files = e.target.files;
-  if (!files.length) return;
+if (isEmbedded) {
+  // Embedded layout should not be able to modify the settings.
+  layout.root.getItemsById('settings')[0].remove();
 
-  let reader = new FileReader();
-  reader.addEventListener('loadend', e => {
-    if (e.target.readyState != FileReader.DONE) return;
-    JSZip.loadAsync(reader.result)
-        .then(zip => {
-          store.commit('reset');
-          store.commit('removeCase', 'long');
-          let cases = {};
-          for (let fileName in zip.files) {
-            if (!zip.files.hasOwnProperty(fileName)) continue;
+  // Since the embedded grader has a lot less horizontal space available, we
+  // move the first two columns into a stack so they can be switched between.
+  let mainColumn = layout.root.getItemsById('main-column')[0];
+  let casesColumn = layout.root.getItemsById('cases-column')[0];
+  let caseSelectorColumn = layout.root.getItemsById('case-selector-column')[0];
+  let oldWidth = caseSelectorColumn.element[0].clientWidth;
+  let oldHeight = caseSelectorColumn.element[0].clientHeight;
 
-            if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
-              let caseName = fileName.substring('cases/'.length,
-                                                fileName.length - '.in'.length);
-              cases[caseName] = true;
-              let caseOutFileName = `cases/${caseName}.out`;
-              if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
-              store.commit('createCase', {
-                name: caseName,
-                weight: 1,
+  let newStack = layout.createContentItem({
+    type: 'stack',
+    content: [],
+    isClosable: false,
+  });
+
+  mainColumn.parent.addChild(newStack, 0);
+
+  casesColumn.setTitle('cases');
+  casesColumn.parent.removeChild(casesColumn, true);
+  newStack.addChild(casesColumn, 0);
+
+  mainColumn.setTitle('code');
+  mainColumn.parent.removeChild(mainColumn, true);
+  newStack.addChild(mainColumn, 0);
+
+  // Also extend the case selector column a little bit so that it looks nicer.
+  caseSelectorColumn.container.setSize(Math.max(160, oldWidth), oldHeight);
+
+  // Whenever a case is selected, show the cases tab.
+  store.watch(Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
+              (value) => {
+                if (store.getters.isUpdatingSettings) return;
+                casesColumn.parent.setActiveContentItem(casesColumn);
               });
 
-              zip.file(fileName)
+  window.addEventListener('message', e => {
+    if (e.origin != window.location.origin) return;
+
+    if (!e.data || !e.data.methodName) return;
+
+    if (e.data.methodName == 'setSettings') {
+      let value = e.data.args[0];
+
+      store.commit('reset');
+      store.commit('updatingSettings', true);
+      store.commit('removeCase', 'long');
+      store.commit('MemoryLimit', value.limits.MemoryLimit * 1024);
+      store.commit('OutputLimit', value.limits.OutputLimit);
+      for (let name of['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+        if (!value.limits.hasOwnProperty(name)) continue;
+        store.commit(name, Util.parseDuration(value.limits[name]));
+      }
+      store.commit('Validator', value.validator.name);
+      store.commit('Tolerance', value.validator.tolerance);
+
+      store.commit('Interactive', !!value.interactive);
+      if (value.interactive) {
+        for (let language in value.interactive.templates) {
+          if (!value.interactive.templates.hasOwnProperty(language)) continue;
+          interactiveTemplates[language] =
+              value.interactive.templates[language];
+        }
+        store.commit('request.source', interactiveTemplates.cpp);
+        store.commit('InteractiveLanguage', value.interactive.language);
+        store.commit('InteractiveModuleName', value.interactive.module_name);
+        store.commit('request.input.interactive.idl', value.interactive.idl);
+        store.commit('request.input.interactive.main_source',
+                     value.interactive.main_source);
+      }
+      for (let caseName in value.cases) {
+        if (!value.cases.hasOwnProperty(caseName)) continue;
+        let caseData = value.cases[caseName];
+        store.commit('createCase', {
+          name: caseName,
+          weight: caseData.weight,
+        });
+        store.commit('inputIn', caseData['in']);
+        store.commit('inputOut', caseData.out);
+      }
+      // Given that the current case will change several times, schedule the
+      // flag to avoid swapping into the cases view for the next tick.
+      //
+      // Also change to the main column in case it was not previously selected.
+      setTimeout(() => {
+        store.commit('updatingSettings', false);
+        mainColumn.parent.setActiveContentItem(mainColumn);
+      });
+    }
+  }, false);
+} else {
+  document.getElementById('upload').addEventListener('change', e => {
+    let files = e.target.files;
+    if (!files.length) return;
+
+    let reader = new FileReader();
+    reader.addEventListener('loadend', e => {
+      if (e.target.readyState != FileReader.DONE) return;
+      JSZip.loadAsync(reader.result)
+          .then(zip => {
+            store.commit('reset');
+            store.commit('removeCase', 'long');
+            let cases = {};
+            for (let fileName in zip.files) {
+              if (!zip.files.hasOwnProperty(fileName)) continue;
+
+              if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+                let caseName = fileName.substring(
+                    'cases/'.length, fileName.length - '.in'.length);
+                cases[caseName] = true;
+                let caseOutFileName = `cases/${caseName}.out`;
+                if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
+                store.commit('createCase', {
+                  name: caseName,
+                  weight: 1,
+                });
+
+                zip.file(fileName)
+                    .async('string')
+                    .then(value => {
+                      store.commit('currentCase', caseName);
+                      store.commit('inputIn', value);
+                    })
+                    .catch(Util.asyncError);
+                zip.file(caseOutFileName)
+                    .async('string')
+                    .then(value => {
+                      store.commit('currentCase', caseName);
+                      store.commit('inputOut', value);
+                    })
+                    .catch(Util.asyncError);
+              } else if (fileName.startsWith('validator.')) {
+                let extension = fileName.substring('validator.'.length);
+                if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+                  continue;
+                zip.file(fileName)
+                    .async('string')
+                    .then(value => {
+                      store.commit('Validator', 'custom');
+                      store.commit('ValidatorLanguage', extension);
+                      store.commit(
+                          'request.input.validator.custom_validator.source',
+                          value);
+                    })
+                    .catch(Util.asyncError);
+              } else if (fileName.startsWith('interactive/') &&
+                         fileName.endsWith('.idl')) {
+                let moduleName = fileName.substring(
+                    'interactive/'.length, fileName.length - '.idl'.length);
+                zip.file(fileName)
+                    .async('string')
+                    .then(value => {
+                      store.commit('Interactive', true);
+                      store.commit('InteractiveModuleName', moduleName);
+                      store.commit('request.input.interactive.idl', value);
+                    })
+                    .catch(Util.asyncError);
+              } else if (fileName.startsWith('interactive/Main.')) {
+                let extension = fileName.substring('interactive/Main.'.length);
+                if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+                  continue;
+                zip.file(fileName)
+                    .async('string')
+                    .then(value => {
+                      store.commit('Interactive', true);
+                      store.commit('InteractiveLanguage', extension);
+                      store.commit('request.input.interactive.main_source',
+                                   value);
+                    })
+                    .catch(Util.asyncError);
+              }
+            }
+
+            if (zip.files.hasOwnProperty('testplan')) {
+              zip.file('testplan')
                   .async('string')
                   .then(value => {
-                    store.commit('currentCase', caseName);
-                    store.commit('inputIn', value);
-                  })
-                  .catch(Util.asyncError);
-              zip.file(caseOutFileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('currentCase', caseName);
-                    store.commit('inputOut', value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('validator.')) {
-              let extension = fileName.substring('validator.'.length);
-              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                continue;
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Validator', 'custom');
-                    store.commit('ValidatorLanguage', extension);
-                    store.commit(
-                        'request.input.validator.custom_validator.source',
-                        value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('interactive/') &&
-                       fileName.endsWith('.idl')) {
-              let moduleName = fileName.substring(
-                  'interactive/'.length, fileName.length - '.idl'.length);
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Interactive', true);
-                    store.commit('InteractiveModuleName', moduleName);
-                    store.commit('request.input.interactive.idl', value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('interactive/Main.')) {
-              let extension = fileName.substring('interactive/Main.'.length);
-              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                continue;
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Interactive', true);
-                    store.commit('InteractiveLanguage', extension);
-                    store.commit('request.input.interactive.main_source',
-                                 value);
+                    for (let line of value.split('\n')) {
+                      if (line.startsWith('#') || line.trim() == '') continue;
+                      let tokens = line.split(/\s+/);
+                      if (tokens.length != 2) continue;
+                      let[caseName, weight] = tokens;
+                      if (!cases.hasOwnProperty(caseName)) continue;
+                      store.commit('createCase', {
+                        name: caseName,
+                        weight: parseFloat(weight),
+                      });
+                    }
                   })
                   .catch(Util.asyncError);
             }
-          }
-
-          if (zip.files.hasOwnProperty('testplan')) {
-            zip.file('testplan')
-                .async('string')
-                .then(value => {
-                  for (let line of value.split('\n')) {
-                    if (line.startsWith('#') || line.trim() == '') continue;
-                    let tokens = line.split(/\s+/);
-                    if (tokens.length != 2) continue;
-                    let[caseName, weight] = tokens;
-                    if (!cases.hasOwnProperty(caseName)) continue;
-                    store.commit('createCase', {
-                      name: caseName,
-                      weight: parseFloat(weight),
-                    });
-                  }
-                })
-                .catch(Util.asyncError);
-          }
-          if (zip.files.hasOwnProperty('settings.json')) {
-            zip.file('settings.json')
-                .async('string')
-                .then(value => {
-                  value = JSON.parse(value);
-                  if (value.hasOwnProperty('Limits')) {
-                    for (let name
-                             of['TimeLimit', 'OverallWallTimeLimit',
-                                'ExtraWallTime', 'MemoryLimit', 'OutputLimit',
-                    ]) {
-                      if (!value.Limits.hasOwnProperty(name)) continue;
-                      store.commit(name, value.Limits[name]);
+            if (zip.files.hasOwnProperty('settings.json')) {
+              zip.file('settings.json')
+                  .async('string')
+                  .then(value => {
+                    value = JSON.parse(value);
+                    if (value.hasOwnProperty('Limits')) {
+                      for (let name
+                               of['TimeLimit', 'OverallWallTimeLimit',
+                                  'ExtraWallTime', 'MemoryLimit', 'OutputLimit',
+                      ]) {
+                        if (!value.Limits.hasOwnProperty(name)) continue;
+                        store.commit(name, value.Limits[name]);
+                      }
                     }
-                  }
-                  if (value.hasOwnProperty('Validator')) {
-                    if (value.Validator.hasOwnProperty('Name')) {
-                      store.commit('Validator', value.Validator.Name);
+                    if (value.hasOwnProperty('Validator')) {
+                      if (value.Validator.hasOwnProperty('Name')) {
+                        store.commit('Validator', value.Validator.Name);
+                      }
+                      if (value.Validator.hasOwnProperty('Tolerance')) {
+                        store.commit('Tolerance', value.Validator.Tolerance);
+                      }
                     }
-                    if (value.Validator.hasOwnProperty('Tolerance')) {
-                      store.commit('Tolerance', value.Validator.Tolerance);
-                    }
-                  }
-                })
-                .catch(Util.asyncError);
-          }
-        })
-        .catch(Util.asyncError);
-  });
-  reader.readAsArrayBuffer(files[0]);
-});
-
-document.getElementById('download')
-    .addEventListener('click', e => {
-      let downloadLabelElement = document.getElementById('download-label');
-      if (downloadLabelElement.className.indexOf('fa-download') != -1)
-        return true;
-      e.preventDefault();
-
-      let zip = new JSZip();
-      let cases = zip.folder('cases');
-
-      let testplan = '';
-      for (let caseName in store.state.request.input.cases) {
-        if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
-
-        cases.file(`${caseName}.in`,
-                   store.state.request.input.cases[caseName].in);
-        cases.file(`${caseName}.out`,
-                   store.state.request.input.cases[caseName].out);
-        testplan += caseName + ' ' +
-                    store.state.request.input.cases[caseName].weight + '\n';
-      }
-      zip.file('testplan', testplan);
-      let settingsValidator = {
-        Name: store.state.request.input.validator.name,
-      };
-      if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
-        settingsValidator.Tolerance =
-            store.state.request.input.validator.Tolerance;
-      }
-      if (store.state.request.input.validator.hasOwnProperty(
-              'custom_validator')) {
-        settingsValidator.Lang =
-            store.state.request.input.validator.custom_validator.lang;
-      }
-      zip.file('settings.json', JSON.stringify(
-                                    {
-                                      Cases: store.getters.settingsCases,
-                                      Limits: store.state.request.input.limits,
-                                      Validator: settingsValidator,
-                                    },
-                                    null, '  '));
-
-      let interactive = store.state.request.input.interactive;
-      if (interactive) {
-        let interactiveFolder = zip.folder('interactive');
-        interactiveFolder.file(`${interactive.module_name}.idl`,
-                               interactive.idl);
-        interactiveFolder.file(`Main.${interactive.language}`,
-                               interactive.main_source);
-        interactiveFolder.file('examples/sample.in',
-                               store.state.request.input.cases.sample.in);
-      }
-
-      let customValidator =
-          store.state.request.input.validator.custom_validator;
-      if (customValidator) {
-        zip.file('validator.' + customValidator.language,
-                 customValidator.source);
-      }
-
-      zip.generateAsync({type: 'blob'})
-          .then(blob => {
-            downloadLabelElement.className =
-                downloadLabelElement.className.replace('fa-file-archive-o',
-                                                       'fa-download');
-            let downloadElement = document.getElementById('download');
-            downloadElement.download = 'omegaup.zip';
-            downloadElement.href = window.URL.createObjectURL(blob);
+                  })
+                  .catch(Util.asyncError);
+            }
           })
           .catch(Util.asyncError);
     });
+    reader.readAsArrayBuffer(files[0]);
+  });
+
+  document.getElementById('download')
+      .addEventListener('click', e => {
+        let downloadLabelElement = document.getElementById('download-label');
+        if (downloadLabelElement.className.indexOf('fa-download') != -1)
+          return true;
+        e.preventDefault();
+
+        let zip = new JSZip();
+        let cases = zip.folder('cases');
+
+        let testplan = '';
+        for (let caseName in store.state.request.input.cases) {
+          if (!store.state.request.input.cases.hasOwnProperty(caseName))
+            continue;
+
+          cases.file(`${caseName}.in`,
+                     store.state.request.input.cases[caseName].in);
+          cases.file(`${caseName}.out`,
+                     store.state.request.input.cases[caseName].out);
+          testplan += caseName + ' ' +
+                      store.state.request.input.cases[caseName].weight + '\n';
+        }
+        zip.file('testplan', testplan);
+        let settingsValidator = {
+          Name: store.state.request.input.validator.name,
+        };
+        if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
+          settingsValidator.Tolerance =
+              store.state.request.input.validator.Tolerance;
+        }
+        if (store.state.request.input.validator.hasOwnProperty(
+                'custom_validator')) {
+          settingsValidator.Lang =
+              store.state.request.input.validator.custom_validator.lang;
+        }
+        zip.file('settings.json',
+                 JSON.stringify(
+                     {
+                       Cases: store.getters.settingsCases,
+                       Limits: store.state.request.input.limits,
+                       Validator: settingsValidator,
+                     },
+                     null, '  '));
+
+        let interactive = store.state.request.input.interactive;
+        if (interactive) {
+          let interactiveFolder = zip.folder('interactive');
+          interactiveFolder.file(`${interactive.module_name}.idl`,
+                                 interactive.idl);
+          interactiveFolder.file(`Main.${interactive.language}`,
+                                 interactive.main_source);
+          interactiveFolder.file('examples/sample.in',
+                                 store.state.request.input.cases.sample.in);
+        }
+
+        let customValidator =
+            store.state.request.input.validator.custom_validator;
+        if (customValidator) {
+          zip.file('validator.' + customValidator.language,
+                   customValidator.source);
+        }
+
+        zip.generateAsync({type: 'blob'})
+            .then(blob => {
+              downloadLabelElement.className =
+                  downloadLabelElement.className.replace('fa-file-archive-o',
+                                                         'fa-download');
+              let downloadElement = document.getElementById('download');
+              downloadElement.download = 'omegaup.zip';
+              downloadElement.href = window.URL.createObjectURL(blob);
+            })
+            .catch(Util.asyncError);
+      });
+}
 
 document.getElementsByTagName('form')[0].addEventListener('submit', e => {
   e.preventDefault();
   document.getElementsByTagName('button')[0].setAttribute('disabled', '');
-  fetch('run/new/',
+  fetch(`${apiPrefix}/new/`,
         {
           method: 'POST',
           headers: new Headers({
@@ -1020,7 +1259,7 @@ function onHashChanged() {
   }
 
   let token = window.location.hash.substring(1);
-  fetch(`run/${token}/request.json`)
+  fetch(`${apiPrefix}/${token}/request.json`)
       .then(response => {
         if (!response.ok) return null;
         return response.json();
@@ -1040,21 +1279,21 @@ function onHashChanged() {
         request.input.limits.TimeLimit =
             Util.parseDuration(request.input.limits.TimeLimit);
         store.commit('request', request);
-        fetch(`run/${token}/details.json`)
+        fetch(`${apiPrefix}/${token}/details.json`)
             .then(response => {
               if (!response.ok) return {};
               return response.json();
             })
             .then(onDetailsJsonReady)
             .catch(Util.asyncError);
-        fetch(`run/${token}/files.zip`)
+        fetch(`${apiPrefix}/${token}/files.zip`)
             .then(response => {
               if (!response.ok) return null;
               return response.blob();
             })
             .then(onFilesZipReady)
             .catch(Util.asyncError);
-        fetch(`run/${token}/logs.txt`)
+        fetch(`${apiPrefix}/${token}/logs.txt`)
             .then(response => {
               if (!response.ok) return '';
               return response.text();

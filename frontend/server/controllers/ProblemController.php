@@ -904,8 +904,7 @@ class ProblemController extends Controller {
         foreach ($updatedStatementLanguages as $lang) {
             Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$problem->alias}-{$lang}-markdown");
         }
-        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, "{$problem->alias}-sample.in");
-        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $problem->alias);
+        Cache::deleteFromCache(Cache::PROBLEM_SETTINGS_DISTRIB, $problem->alias);
     }
 
     /**
@@ -1063,46 +1062,13 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the sample input from the filesystem.
+     * Gets the distributable problem settings for the problem.
      *
      * @param Problems $problem
      * @throws InvalidFilesystemOperationException
      */
-    public static function getSampleInput(Problems $problem) {
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
-
-        try {
-            $file_content = $problemArtifacts->get('examples/sample.in', true /* quiet */);
-        } catch (Exception $e) {
-            // Most problems won't have a sample input.
-            $file_content = '';
-        }
-
-        return $file_content;
-    }
-
-    /**
-     * Gets the libinteractive interface name from the filesystem.
-     *
-     * @param Problems $problem
-     * @throws InvalidFilesystemOperationException
-     */
-    public static function getLibinteractiveInterfaceName(Problems $problem) {
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
-
-        $interactiveFiles = [];
-        try {
-            $interactiveFiles = $problemArtifacts->lsTree('interactive');
-        } catch (Exception $e) {
-            // Most problems won't have interactive files
-        }
-
-        foreach ($interactiveFiles as $file) {
-            if (strrpos($file['name'], '.idl') == strlen($file['name']) - 4) {
-                return $file['name'];
-            }
-        }
-        return null;
+    public static function getProblemSettingsDistrib(Problems $problem) {
+        return (new ProblemArtifacts($problem->alias))->get('settings.distrib.json');
     }
 
     /**
@@ -1264,33 +1230,20 @@ class ProblemController extends Controller {
             $r['lang']
         );
 
-        // Add the example input.
-        $sample_input = null;
+        // Add the problem distributable settings.
+        $problemSettingsDistrib = null;
         Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SAMPLE,
-            "{$problem['problem']->alias}-sample.in",
-            $problem['problem'],
-            'ProblemController::getSampleInput',
-            $sample_input,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
-        );
-        if (!empty($sample_input)) {
-            $response['sample_input'] = $sample_input;
-        }
-
-        // Add the libinteractive interface name.
-        $libinteractive_interface_name = null;
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME,
+            Cache::PROBLEM_SETTINGS_DISTRIB,
             $problem['problem']->alias,
             $problem['problem'],
-            'ProblemController::getLibinteractiveInterfaceName',
-            $libinteractive_interface_name,
+            'ProblemController::getProblemSettingsDistrib',
+            $problemSettingsDistrib,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-        if (!empty($libinteractive_interface_name)) {
-            $response['libinteractive_interface_name'] = $libinteractive_interface_name;
-        }
+        $response['settings'] = json_decode(
+            $problemSettingsDistrib,
+            JSON_OBJECT_AS_ARRAY
+        );
 
         // Add preferred language of the user.
         $user_data = [];
