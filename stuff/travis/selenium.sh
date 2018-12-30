@@ -18,6 +18,8 @@ stage_before_install() {
 }
 
 stage_install() {
+	install_omegaup_update_problem
+
 	# Expand all templates
 	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do
 		/bin/sed -e "s%\${OMEGAUP_ROOT}%${OMEGAUP_ROOT}%g" "${tpl}" > "${tpl%.tpl}"
