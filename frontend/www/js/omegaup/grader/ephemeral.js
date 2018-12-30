@@ -13,8 +13,7 @@ import SettingsComponent from './SettingsComponent.vue';
 import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
-const isEmbedded = window.location.href.indexOf('/embedded/') !== -1;
-const apiPrefix = isEmbedded ? '../run' : 'run';
+const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const defaultValidatorSource = `#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
@@ -893,6 +892,9 @@ store.watch(
 if (isEmbedded) {
   // Embedded layout should not be able to modify the settings.
   layout.root.getItemsById('settings')[0].remove();
+  document.getElementById('download').style.display = 'none';
+  document.getElementById('upload').style.display = 'none';
+  document.querySelector('label[for="upload"]').style.display = 'none';
 
   // Since the embedded grader has a lot less horizontal space available, we
   // move the first two columns into a stack so they can be switched between.
@@ -982,217 +984,215 @@ if (isEmbedded) {
       });
     }
   }, false);
-} else {
-  document.getElementById('upload').addEventListener('change', e => {
-    let files = e.target.files;
-    if (!files.length) return;
+}
 
-    let reader = new FileReader();
-    reader.addEventListener('loadend', e => {
-      if (e.target.readyState != FileReader.DONE) return;
-      JSZip.loadAsync(reader.result)
-          .then(zip => {
-            store.commit('reset');
-            store.commit('removeCase', 'long');
-            let cases = {};
-            for (let fileName in zip.files) {
-              if (!zip.files.hasOwnProperty(fileName)) continue;
+document.getElementById('upload').addEventListener('change', e => {
+  let files = e.target.files;
+  if (!files.length) return;
 
-              if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
-                let caseName = fileName.substring(
-                    'cases/'.length, fileName.length - '.in'.length);
-                cases[caseName] = true;
-                let caseOutFileName = `cases/${caseName}.out`;
-                if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
-                store.commit('createCase', {
-                  name: caseName,
-                  weight: 1,
-                });
+  let reader = new FileReader();
+  reader.addEventListener('loadend', e => {
+    if (e.target.readyState != FileReader.DONE) return;
+    JSZip.loadAsync(reader.result)
+        .then(zip => {
+          store.commit('reset');
+          store.commit('removeCase', 'long');
+          let cases = {};
+          for (let fileName in zip.files) {
+            if (!zip.files.hasOwnProperty(fileName)) continue;
 
-                zip.file(fileName)
-                    .async('string')
-                    .then(value => {
-                      store.commit('currentCase', caseName);
-                      store.commit('inputIn', value);
-                    })
-                    .catch(Util.asyncError);
-                zip.file(caseOutFileName)
-                    .async('string')
-                    .then(value => {
-                      store.commit('currentCase', caseName);
-                      store.commit('inputOut', value);
-                    })
-                    .catch(Util.asyncError);
-              } else if (fileName.startsWith('validator.')) {
-                let extension = fileName.substring('validator.'.length);
-                if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                  continue;
-                zip.file(fileName)
-                    .async('string')
-                    .then(value => {
-                      store.commit('Validator', 'custom');
-                      store.commit('ValidatorLanguage', extension);
-                      store.commit(
-                          'request.input.validator.custom_validator.source',
-                          value);
-                    })
-                    .catch(Util.asyncError);
-              } else if (fileName.startsWith('interactive/') &&
-                         fileName.endsWith('.idl')) {
-                let moduleName = fileName.substring(
-                    'interactive/'.length, fileName.length - '.idl'.length);
-                zip.file(fileName)
-                    .async('string')
-                    .then(value => {
-                      store.commit('Interactive', true);
-                      store.commit('InteractiveModuleName', moduleName);
-                      store.commit('request.input.interactive.idl', value);
-                    })
-                    .catch(Util.asyncError);
-              } else if (fileName.startsWith('interactive/Main.')) {
-                let extension = fileName.substring('interactive/Main.'.length);
-                if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                  continue;
-                zip.file(fileName)
-                    .async('string')
-                    .then(value => {
-                      store.commit('Interactive', true);
-                      store.commit('InteractiveLanguage', extension);
-                      store.commit('request.input.interactive.main_source',
-                                   value);
-                    })
-                    .catch(Util.asyncError);
-              }
-            }
+            if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+              let caseName = fileName.substring('cases/'.length,
+                                                fileName.length - '.in'.length);
+              cases[caseName] = true;
+              let caseOutFileName = `cases/${caseName}.out`;
+              if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
+              store.commit('createCase', {
+                name: caseName,
+                weight: 1,
+              });
 
-            if (zip.files.hasOwnProperty('testplan')) {
-              zip.file('testplan')
+              zip.file(fileName)
                   .async('string')
                   .then(value => {
-                    for (let line of value.split('\n')) {
-                      if (line.startsWith('#') || line.trim() == '') continue;
-                      let tokens = line.split(/\s+/);
-                      if (tokens.length != 2) continue;
-                      let[caseName, weight] = tokens;
-                      if (!cases.hasOwnProperty(caseName)) continue;
-                      store.commit('createCase', {
-                        name: caseName,
-                        weight: parseFloat(weight),
-                      });
-                    }
+                    store.commit('currentCase', caseName);
+                    store.commit('inputIn', value);
+                  })
+                  .catch(Util.asyncError);
+              zip.file(caseOutFileName)
+                  .async('string')
+                  .then(value => {
+                    store.commit('currentCase', caseName);
+                    store.commit('inputOut', value);
+                  })
+                  .catch(Util.asyncError);
+            } else if (fileName.startsWith('validator.')) {
+              let extension = fileName.substring('validator.'.length);
+              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+                continue;
+              zip.file(fileName)
+                  .async('string')
+                  .then(value => {
+                    store.commit('Validator', 'custom');
+                    store.commit('ValidatorLanguage', extension);
+                    store.commit(
+                        'request.input.validator.custom_validator.source',
+                        value);
+                  })
+                  .catch(Util.asyncError);
+            } else if (fileName.startsWith('interactive/') &&
+                       fileName.endsWith('.idl')) {
+              let moduleName = fileName.substring(
+                  'interactive/'.length, fileName.length - '.idl'.length);
+              zip.file(fileName)
+                  .async('string')
+                  .then(value => {
+                    store.commit('Interactive', true);
+                    store.commit('InteractiveModuleName', moduleName);
+                    store.commit('request.input.interactive.idl', value);
+                  })
+                  .catch(Util.asyncError);
+            } else if (fileName.startsWith('interactive/Main.')) {
+              let extension = fileName.substring('interactive/Main.'.length);
+              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+                continue;
+              zip.file(fileName)
+                  .async('string')
+                  .then(value => {
+                    store.commit('Interactive', true);
+                    store.commit('InteractiveLanguage', extension);
+                    store.commit('request.input.interactive.main_source',
+                                 value);
                   })
                   .catch(Util.asyncError);
             }
-            if (zip.files.hasOwnProperty('settings.json')) {
-              zip.file('settings.json')
-                  .async('string')
-                  .then(value => {
-                    value = JSON.parse(value);
-                    if (value.hasOwnProperty('Limits')) {
-                      for (let name
-                               of['TimeLimit', 'OverallWallTimeLimit',
-                                  'ExtraWallTime', 'MemoryLimit', 'OutputLimit',
-                      ]) {
-                        if (!value.Limits.hasOwnProperty(name)) continue;
-                        store.commit(name, value.Limits[name]);
-                      }
+          }
+
+          if (zip.files.hasOwnProperty('testplan')) {
+            zip.file('testplan')
+                .async('string')
+                .then(value => {
+                  for (let line of value.split('\n')) {
+                    if (line.startsWith('#') || line.trim() == '') continue;
+                    let tokens = line.split(/\s+/);
+                    if (tokens.length != 2) continue;
+                    let[caseName, weight] = tokens;
+                    if (!cases.hasOwnProperty(caseName)) continue;
+                    store.commit('createCase', {
+                      name: caseName,
+                      weight: parseFloat(weight),
+                    });
+                  }
+                })
+                .catch(Util.asyncError);
+          }
+          if (zip.files.hasOwnProperty('settings.json')) {
+            zip.file('settings.json')
+                .async('string')
+                .then(value => {
+                  value = JSON.parse(value);
+                  if (value.hasOwnProperty('Limits')) {
+                    for (let name
+                             of['TimeLimit', 'OverallWallTimeLimit',
+                                'ExtraWallTime', 'MemoryLimit', 'OutputLimit',
+                    ]) {
+                      if (!value.Limits.hasOwnProperty(name)) continue;
+                      store.commit(name, value.Limits[name]);
                     }
-                    if (value.hasOwnProperty('Validator')) {
-                      if (value.Validator.hasOwnProperty('Name')) {
-                        store.commit('Validator', value.Validator.Name);
-                      }
-                      if (value.Validator.hasOwnProperty('Tolerance')) {
-                        store.commit('Tolerance', value.Validator.Tolerance);
-                      }
+                  }
+                  if (value.hasOwnProperty('Validator')) {
+                    if (value.Validator.hasOwnProperty('Name')) {
+                      store.commit('Validator', value.Validator.Name);
                     }
-                  })
-                  .catch(Util.asyncError);
-            }
+                    if (value.Validator.hasOwnProperty('Tolerance')) {
+                      store.commit('Tolerance', value.Validator.Tolerance);
+                    }
+                  }
+                })
+                .catch(Util.asyncError);
+          }
+        })
+        .catch(Util.asyncError);
+  });
+  reader.readAsArrayBuffer(files[0]);
+});
+
+document.getElementById('download')
+    .addEventListener('click', e => {
+      let downloadLabelElement = document.getElementById('download-label');
+      if (downloadLabelElement.className.indexOf('fa-download') != -1)
+        return true;
+      e.preventDefault();
+
+      let zip = new JSZip();
+      let cases = zip.folder('cases');
+
+      let testplan = '';
+      for (let caseName in store.state.request.input.cases) {
+        if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
+
+        cases.file(`${caseName}.in`,
+                   store.state.request.input.cases[caseName].in);
+        cases.file(`${caseName}.out`,
+                   store.state.request.input.cases[caseName].out);
+        testplan += caseName + ' ' +
+                    store.state.request.input.cases[caseName].weight + '\n';
+      }
+      zip.file('testplan', testplan);
+      let settingsValidator = {
+        Name: store.state.request.input.validator.name,
+      };
+      if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
+        settingsValidator.Tolerance =
+            store.state.request.input.validator.Tolerance;
+      }
+      if (store.state.request.input.validator.hasOwnProperty(
+              'custom_validator')) {
+        settingsValidator.Lang =
+            store.state.request.input.validator.custom_validator.lang;
+      }
+      zip.file('settings.json', JSON.stringify(
+                                    {
+                                      Cases: store.getters.settingsCases,
+                                      Limits: store.state.request.input.limits,
+                                      Validator: settingsValidator,
+                                    },
+                                    null, '  '));
+
+      let interactive = store.state.request.input.interactive;
+      if (interactive) {
+        let interactiveFolder = zip.folder('interactive');
+        interactiveFolder.file(`${interactive.module_name}.idl`,
+                               interactive.idl);
+        interactiveFolder.file(`Main.${interactive.language}`,
+                               interactive.main_source);
+        interactiveFolder.file('examples/sample.in',
+                               store.state.request.input.cases.sample.in);
+      }
+
+      let customValidator =
+          store.state.request.input.validator.custom_validator;
+      if (customValidator) {
+        zip.file('validator.' + customValidator.language,
+                 customValidator.source);
+      }
+
+      zip.generateAsync({type: 'blob'})
+          .then(blob => {
+            downloadLabelElement.className =
+                downloadLabelElement.className.replace('fa-file-archive-o',
+                                                       'fa-download');
+            let downloadElement = document.getElementById('download');
+            downloadElement.download = 'omegaup.zip';
+            downloadElement.href = window.URL.createObjectURL(blob);
           })
           .catch(Util.asyncError);
     });
-    reader.readAsArrayBuffer(files[0]);
-  });
-
-  document.getElementById('download')
-      .addEventListener('click', e => {
-        let downloadLabelElement = document.getElementById('download-label');
-        if (downloadLabelElement.className.indexOf('fa-download') != -1)
-          return true;
-        e.preventDefault();
-
-        let zip = new JSZip();
-        let cases = zip.folder('cases');
-
-        let testplan = '';
-        for (let caseName in store.state.request.input.cases) {
-          if (!store.state.request.input.cases.hasOwnProperty(caseName))
-            continue;
-
-          cases.file(`${caseName}.in`,
-                     store.state.request.input.cases[caseName].in);
-          cases.file(`${caseName}.out`,
-                     store.state.request.input.cases[caseName].out);
-          testplan += caseName + ' ' +
-                      store.state.request.input.cases[caseName].weight + '\n';
-        }
-        zip.file('testplan', testplan);
-        let settingsValidator = {
-          Name: store.state.request.input.validator.name,
-        };
-        if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
-          settingsValidator.Tolerance =
-              store.state.request.input.validator.Tolerance;
-        }
-        if (store.state.request.input.validator.hasOwnProperty(
-                'custom_validator')) {
-          settingsValidator.Lang =
-              store.state.request.input.validator.custom_validator.lang;
-        }
-        zip.file('settings.json',
-                 JSON.stringify(
-                     {
-                       Cases: store.getters.settingsCases,
-                       Limits: store.state.request.input.limits,
-                       Validator: settingsValidator,
-                     },
-                     null, '  '));
-
-        let interactive = store.state.request.input.interactive;
-        if (interactive) {
-          let interactiveFolder = zip.folder('interactive');
-          interactiveFolder.file(`${interactive.module_name}.idl`,
-                                 interactive.idl);
-          interactiveFolder.file(`Main.${interactive.language}`,
-                                 interactive.main_source);
-          interactiveFolder.file('examples/sample.in',
-                                 store.state.request.input.cases.sample.in);
-        }
-
-        let customValidator =
-            store.state.request.input.validator.custom_validator;
-        if (customValidator) {
-          zip.file('validator.' + customValidator.language,
-                   customValidator.source);
-        }
-
-        zip.generateAsync({type: 'blob'})
-            .then(blob => {
-              downloadLabelElement.className =
-                  downloadLabelElement.className.replace('fa-file-archive-o',
-                                                         'fa-download');
-              let downloadElement = document.getElementById('download');
-              downloadElement.download = 'omegaup.zip';
-              downloadElement.href = window.URL.createObjectURL(blob);
-            })
-            .catch(Util.asyncError);
-      });
-}
 
 document.getElementsByTagName('form')[0].addEventListener('submit', e => {
   e.preventDefault();
   document.getElementsByTagName('button')[0].setAttribute('disabled', '');
-  fetch(`${apiPrefix}/new/`,
+  fetch('run/new/',
         {
           method: 'POST',
           headers: new Headers({
@@ -1259,7 +1259,7 @@ function onHashChanged() {
   }
 
   let token = window.location.hash.substring(1);
-  fetch(`${apiPrefix}/${token}/request.json`)
+  fetch(`run/${token}/request.json`)
       .then(response => {
         if (!response.ok) return null;
         return response.json();
@@ -1279,21 +1279,21 @@ function onHashChanged() {
         request.input.limits.TimeLimit =
             Util.parseDuration(request.input.limits.TimeLimit);
         store.commit('request', request);
-        fetch(`${apiPrefix}/${token}/details.json`)
+        fetch(`run/${token}/details.json`)
             .then(response => {
               if (!response.ok) return {};
               return response.json();
             })
             .then(onDetailsJsonReady)
             .catch(Util.asyncError);
-        fetch(`${apiPrefix}/${token}/files.zip`)
+        fetch(`run/${token}/files.zip`)
             .then(response => {
               if (!response.ok) return null;
               return response.blob();
             })
             .then(onFilesZipReady)
             .catch(Util.asyncError);
-        fetch(`${apiPrefix}/${token}/logs.txt`)
+        fetch(`run/${token}/logs.txt`)
             .then(response => {
               if (!response.ok) return '';
               return response.text();

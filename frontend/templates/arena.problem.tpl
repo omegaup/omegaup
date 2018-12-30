@@ -50,7 +50,7 @@
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
 {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
-					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/embedded/"></iframe>
+					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
 {/if}
 					<div>
 						<script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
