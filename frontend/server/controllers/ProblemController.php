@@ -1068,7 +1068,8 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemSettingsDistrib(Problems $problem) {
-        return (new ProblemArtifacts($problem->alias))->get('settings.distrib.json');
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        return $problemArtifacts->get('settings.distrib.json');
     }
 
     /**

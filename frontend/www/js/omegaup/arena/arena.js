@@ -166,8 +166,12 @@ class EphemeralGrader {
     };
   }
 
-  send(message) {
+  send(method, ...params) {
     let self = this;
+    let message = {
+      method: method,
+      params: params,
+    };
 
     if (!self.loaded) {
       self.messageQueue.push(message);
@@ -1484,10 +1488,7 @@ export class Arena {
     self.updateAllowedLanguages(languageArray);
     self.selectDefaultLanguage();
 
-    self.ephemeralGrader.send({
-      methodName: 'setSettings',
-      args: [problem.settings],
-    });
+    self.ephemeralGrader.send('setSettings', problem.settings);
   }
 
   detectShowRun() {

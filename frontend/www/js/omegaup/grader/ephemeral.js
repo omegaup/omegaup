@@ -929,61 +929,6 @@ if (isEmbedded) {
                 if (store.getters.isUpdatingSettings) return;
                 casesColumn.parent.setActiveContentItem(casesColumn);
               });
-
-  window.addEventListener('message', e => {
-    if (e.origin != window.location.origin) return;
-
-    if (!e.data || !e.data.methodName) return;
-
-    if (e.data.methodName == 'setSettings') {
-      let value = e.data.args[0];
-
-      store.commit('reset');
-      store.commit('updatingSettings', true);
-      store.commit('removeCase', 'long');
-      store.commit('MemoryLimit', value.limits.MemoryLimit * 1024);
-      store.commit('OutputLimit', value.limits.OutputLimit);
-      for (let name of['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
-        if (!value.limits.hasOwnProperty(name)) continue;
-        store.commit(name, Util.parseDuration(value.limits[name]));
-      }
-      store.commit('Validator', value.validator.name);
-      store.commit('Tolerance', value.validator.tolerance);
-
-      store.commit('Interactive', !!value.interactive);
-      if (value.interactive) {
-        for (let language in value.interactive.templates) {
-          if (!value.interactive.templates.hasOwnProperty(language)) continue;
-          interactiveTemplates[language] =
-              value.interactive.templates[language];
-        }
-        store.commit('request.source', interactiveTemplates.cpp);
-        store.commit('InteractiveLanguage', value.interactive.language);
-        store.commit('InteractiveModuleName', value.interactive.module_name);
-        store.commit('request.input.interactive.idl', value.interactive.idl);
-        store.commit('request.input.interactive.main_source',
-                     value.interactive.main_source);
-      }
-      for (let caseName in value.cases) {
-        if (!value.cases.hasOwnProperty(caseName)) continue;
-        let caseData = value.cases[caseName];
-        store.commit('createCase', {
-          name: caseName,
-          weight: caseData.weight,
-        });
-        store.commit('inputIn', caseData['in']);
-        store.commit('inputOut', caseData.out);
-      }
-      // Given that the current case will change several times, schedule the
-      // flag to avoid swapping into the cases view for the next tick.
-      //
-      // Also change to the main column in case it was not previously selected.
-      setTimeout(() => {
-        store.commit('updatingSettings', false);
-        mainColumn.parent.setActiveContentItem(mainColumn);
-      });
-    }
-  }, false);
 }
 
 document.getElementById('upload').addEventListener('change', e => {
@@ -1248,6 +1193,65 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
       })
       .catch(Util.asyncError);
 });
+
+function setSettings(settings) {
+  store.commit('reset');
+  store.commit('updatingSettings', true);
+  store.commit('removeCase', 'long');
+  store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
+  store.commit('OutputLimit', settings.limits.OutputLimit);
+  for (let name of['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+    if (!settings.limits.hasOwnProperty(name)) continue;
+    store.commit(name, Util.parseDuration(settings.limits[name]));
+  }
+  store.commit('Validator', settings.validator.name);
+  store.commit('Tolerance', settings.validator.tolerance);
+
+  store.commit('Interactive', !!settings.interactive);
+  if (settings.interactive) {
+    for (let language in settings.interactive.templates) {
+      if (!settings.interactive.templates.hasOwnProperty(language)) continue;
+      interactiveTemplates[language] = settings.interactive.templates[language];
+    }
+    store.commit('request.source', interactiveTemplates.cpp);
+    store.commit('InteractiveLanguage', settings.interactive.language);
+    store.commit('InteractiveModuleName', settings.interactive.module_name);
+    store.commit('request.input.interactive.idl', settings.interactive.idl);
+    store.commit('request.input.interactive.main_source',
+                 settings.interactive.main_source);
+  }
+  for (let caseName in settings.cases) {
+    if (!settings.cases.hasOwnProperty(caseName)) continue;
+    let caseData = settings.cases[caseName];
+    store.commit('createCase', {
+      name: caseName,
+      weight: caseData.weight,
+    });
+    store.commit('inputIn', caseData['in']);
+    store.commit('inputOut', caseData.out);
+  }
+  // Given that the current case will change several times, schedule the
+  // flag to avoid swapping into the cases view for the next tick.
+  //
+  // Also change to the main column in case it was not previously selected.
+  setTimeout(() => {
+    store.commit('updatingSettings', false);
+    let mainColumn = layout.root.getItemsById('main-column')[0];
+    mainColumn.parent.setActiveContentItem(mainColumn);
+  });
+}
+
+// Add a message listener in case we are embedded or the embedded runner was
+// popped into a full-blown tab.
+window.addEventListener('message', e => {
+  if (e.origin != window.location.origin || !e.data) return;
+
+  switch (e.data.method) {
+    case 'setSettings':
+      setSettings(...e.data.params);
+      break;
+  }
+}, false);
 
 function onHashChanged() {
   if (window.location.hash.length == 0) {
