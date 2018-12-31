@@ -66,23 +66,20 @@ class UpdateProblemTest extends OmegaupTestCase {
         // We will submit 2 runs to the problem, a call to grader to rejudge them
         $this->detourGraderCalls($this->exactly(1));
 
+        // Set file upload context
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
+        $newTitle = 'new title';
+        $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'title' => 'new title',
+            'title' => $newTitle,
             'time_limit' => 12345,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed some properties',
-        ]);
-
-        // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
-
-        // Call API
-        $response = ProblemController::apiUpdate($r);
+        ]));
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = ProblemsDAO::getByTitle($newTitle);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -90,25 +87,131 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Validate rsponse
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(true, $response['rejudged']);
-        $this->assertEquals('cases/1.in', $response['uploaded_files'][0]);
 
-        // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        {
+            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
-        $this->assertTrue($problemArtifacts->exists('cases'));
-        $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
-        $this->assertFalse($problemArtifacts->exists('examples/sample.in'));
+            // Verify problem contents were copied
+            $this->assertTrue($problemArtifacts->exists('cases'));
+            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $this->assertFalse($problemArtifacts->exists('examples/sample.in'));
 
-        // Check update in statements
-        $statement = $problemArtifacts->get('statements/es.markdown');
-        $this->assertContains('perímetro', $statement);
+            // Check update in statements
+            $statement = $problemArtifacts->get('statements/es.markdown');
+            $this->assertContains('perímetro', $statement);
+
+            $problemDistribSettings = json_decode(
+                $problemArtifacts->get('settings.distrib.json'),
+                true /* assoc */
+            );
+
+            // This example comes from the problem statement.
+            $this->assertEquals(
+                [
+                    'statement_001' => [
+                        'in' => "6\n2 3 2 3 2 4",
+                        'out' => '10',
+                        'weight' => 1,
+                    ],
+                ],
+                $problemDistribSettings['cases']
+            );
+        }
 
         // Call API again to add an example, should not trigger rejudge.
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos-examples.zip';
-        $response = ProblemController::apiUpdate($r);
+        $response = ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'message' => 'Add example',
+        ]));
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['rejudged']);
-        $this->assertTrue($problemArtifacts->exists('examples/sample.in'));
+        {
+            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+
+            // Verify problem contents were copied
+            $this->assertTrue($problemArtifacts->exists('cases'));
+            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $this->assertTrue($problemArtifacts->exists('examples/sample.in'));
+
+            // Check update in statements
+            $statement = $problemArtifacts->get('statements/es.markdown');
+            $this->assertContains('perímetro', $statement);
+
+            $problemDistribSettings = json_decode(
+                $problemArtifacts->get('settings.distrib.json'),
+                true /* assoc */
+            );
+            $this->assertEquals(
+                [
+                    'sample' => [
+                        'in' => "6\n2 3 2 3 2 4\n",
+                        'out' => "10\n",
+                        'weight' => 1
+                    ],
+                ],
+                $problemDistribSettings['cases']
+            );
+        }
+    }
+
+    public function testUpdateProblemSettings() {
+        // Get a problem with a run.
+        $problemData = ProblemsFactory::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+        $contestant = UserFactory::createUser();
+        $runData[0] = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData[0]);
+
+        {
+            $problemArtifacts = new ProblemArtifacts($problemAlias);
+            $this->assertTrue($problemArtifacts->exists('cases'));
+            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+            $this->assertEquals(
+                3,
+                count($problemSettings->Cases)
+            );
+            $this->assertEquals(
+                ($problemData['request']['time_limit'] / 1000) . 's',
+                $problemSettings->Limits->TimeLimit
+            );
+        }
+
+        // Update Problem calls grader to rejudge, we need to detour grader calls
+        $this->detourGraderCalls($this->exactly(1));
+
+        // Call API to update time limit.
+        $newTimeLimit = 12345;
+        $login = self::login($problemData['author']);
+        unset($_FILES['problem_contents']);
+        $response = ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'time_limit' => $newTimeLimit,
+            'problem_alias' => $problemAlias,
+            'message' => 'Increased time limit',
+        ]));
+
+        // Validate response
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(true, $response['rejudged']);
+
+        // Verify problem settings were set.
+        {
+            $problemArtifacts = new ProblemArtifacts($problemAlias);
+            $this->assertTrue($problemArtifacts->exists('cases'));
+            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+            $this->assertEquals(
+                3,
+                count($problemSettings->Cases)
+            );
+            $this->assertEquals(
+                ($newTimeLimit / 1000.0) . 's',
+                $problemSettings->Limits->TimeLimit
+            );
+        }
     }
 
     public function testUpdateProblemWithValidLanguages() {
@@ -117,23 +220,23 @@ class UpdateProblemTest extends OmegaupTestCase {
             'title' => 'valid-languages'
         ]));
 
+        $languages = 'hs,java,pl';
+
+        // Call API
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $response = ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
-            'languages' => 'hs,java,pl',
+            'languages' => $languages,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed alias and languages',
-        ]);
-
-        //Call API
-        $response = ProblemController::apiUpdate($r);
+        ]));
 
         // Verify data in DB
-        $problem = ProblemsDAO::getByAlias($r['alias']);
+        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
 
         // Check that we only retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertEqualSets($r['languages'], $problem->languages);
+        $this->assertEqualSets($languages, $problem->languages);
 
         // Validate response
         $this->assertEquals('ok', $response['status']);
@@ -153,8 +256,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Changed invalid languages',
         ]);
-
-        // Log in as contest director
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -235,28 +336,26 @@ class UpdateProblemTest extends OmegaupTestCase {
         // to rejudge them
         $this->detourGraderCalls($this->exactly(0));
 
-        // Prepare request
-        $login = self::login($problemData['author']);
-        $r = new Request([
-            'auth_token' => $login->auth_token,
-            'title' => 'new title',
-            'time_limit' => 12345,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'message' => 'This shoudl fail',
-        ]);
-
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';
 
         // Call API. Should fail
         try {
-            ProblemController::apiUpdate($r);
-        } catch (InvalidParameterException $e) {
-            // Expected
+            $login = self::login($problemData['author']);
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'title' => 'new title',
+                'time_limit' => 12345,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'This should fail',
+            ]));
+            $this->fail('Expected update to fail');
+        } catch (ProblemDeploymentFailedException $e) {
+            $this->assertEquals('problemDeployerNoStatements', $e->getMessage());
         }
 
         // Verify contents were not erased
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));

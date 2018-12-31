@@ -2057,7 +2057,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
-    if (self.type() == 'disqualified') return T['wordsDisqualify'];
+    if (self.type() == 'disqualified') return T['wordsDisqualified'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -2077,6 +2077,7 @@ class ObservableRun {
         return T.verdictHelpKarelTLE;
       }
     }
+    if (self.type() == 'disqualified') return T.verdictHelpDisqualified;
 
     return T['verdictHelp' + self.verdict()];
   }

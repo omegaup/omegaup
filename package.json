@@ -44,6 +44,7 @@
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "codemirror": "^5.38.0",
     "jszip": "^3.1.5",
+    "pako": "^1.0.7",
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1"
   }

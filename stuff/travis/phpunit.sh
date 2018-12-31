@@ -8,6 +8,12 @@ stage_before_install() {
 
 stage_install() {
 	pip3 install --user mysqlclient
+
+	install_omegaup_update_problem
+	cat > frontend/tests/test_config.php <<EOF
+<?php
+define('OMEGAUP_UPDATE_PROBLEM', '/home/travis/bin/omegaup-update-problem');
+EOF
 }
 
 stage_before_script() {

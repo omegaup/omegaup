@@ -3,6 +3,7 @@
 import JSZip from 'jszip';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import pako from 'pako';
 
 import * as Util from './util';
 import CaseSelectorComponent from './CaseSelectorComponent.vue';
@@ -713,7 +714,7 @@ function onFilesZipReady(blob) {
                 }
                 store.commit('compilerOutput', '');
               })
-              .fail(Util.asyncError);
+              .catch(Util.asyncError);
           for (let filename in zip.files) {
             if (filename.indexOf('/') !== -1) continue;
             zip.file(filename)
@@ -724,10 +725,10 @@ function onFilesZipReady(blob) {
                     contents: contents,
                   });
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
         })
-        .fail(Util.asyncError);
+        .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(blob);
 }
@@ -778,14 +779,14 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('currentCase', caseName);
                     store.commit('inputIn', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
               zip.file(caseOutFileName)
                   .async('string')
                   .then(value => {
                     store.commit('currentCase', caseName);
                     store.commit('inputOut', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('validator.')) {
               let extension = fileName.substring('validator.'.length);
               if (!Util.languageExtensionMapping.hasOwnProperty(extension))
@@ -799,7 +800,7 @@ document.getElementById('upload').addEventListener('change', e => {
                         'request.input.validator.custom_validator.source',
                         value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('interactive/') &&
                        fileName.endsWith('.idl')) {
               let moduleName = fileName.substring(
@@ -811,7 +812,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('InteractiveModuleName', moduleName);
                     store.commit('request.input.interactive.idl', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('interactive/Main.')) {
               let extension = fileName.substring('interactive/Main.'.length);
               if (!Util.languageExtensionMapping.hasOwnProperty(extension))
@@ -824,7 +825,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('request.input.interactive.main_source',
                                  value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             }
           }
 
@@ -844,7 +845,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     });
                   }
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
           if (zip.files.hasOwnProperty('settings.json')) {
             zip.file('settings.json')
@@ -869,10 +870,10 @@ document.getElementById('upload').addEventListener('change', e => {
                     }
                   }
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
         })
-        .fail(Util.asyncError);
+        .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(files[0]);
 });
@@ -946,7 +947,7 @@ document.getElementById('download')
             downloadElement.download = 'omegaup.zip';
             downloadElement.href = window.URL.createObjectURL(blob);
           })
-          .fail(Util.asyncError);
+          .catch(Util.asyncError);
     });
 
 document.getElementsByTagName('form')[0].addEventListener('submit', e => {
@@ -1006,7 +1007,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
         onFilesZipReady(formData.get('files.zip'));
       })
-      .fail(Util.asyncError);
+      .catch(Util.asyncError);
 });
 
 function onHashChanged() {
@@ -1045,23 +1046,23 @@ function onHashChanged() {
               return response.json();
             })
             .then(onDetailsJsonReady)
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
         fetch(`run/${token}/files.zip`)
             .then(response => {
               if (!response.ok) return null;
               return response.blob();
             })
             .then(onFilesZipReady)
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
         fetch(`run/${token}/logs.txt`)
             .then(response => {
               if (!response.ok) return '';
               return response.text();
             })
             .then(text => store.commit('logs', text))
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
       })
-      .fail(Util.asyncError);
+      .catch(Util.asyncError);
 }
 window.addEventListener('hashchange', onHashChanged, false);
 onHashChanged();
