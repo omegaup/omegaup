@@ -12,11 +12,14 @@ stage_before_install() {
 	pip install --user six
 	pip install --user https://github.com/google/closure-linter/zipball/master
 	python3 -m pip install --user --upgrade pip
+	python3 -m pip install --user setuptools
+	python3 -m pip install --user wheel
 	python3 -m pip install --user pylint
 	python3 -m pip install --user pep8
 	python3 -m pip install --user awscli
 	python3.5 -m pip install --user --upgrade pip
 	python3.5 -m pip install --user setuptools
+	python3.5 -m pip install --user wheel
 	python3.5 -m pip install --user pylint
 	python3.5 -m pip install --user pep8
 
