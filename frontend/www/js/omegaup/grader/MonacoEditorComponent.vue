@@ -33,10 +33,13 @@ export default {
   },
   mounted: function() {
     this._editor = monaco.editor.create(this.$el, {
-      value: this.contents,
+      autoIndent: true,
+      formatOnPaste: true,
+      formatOnType: true,
       language: Util.languageMonacoModelMapping[this.language],
-      theme: this.theme,
       readOnly: this.readOnly,
+      theme: this.theme,
+      value: this.contents,
     });
     this._model = this._editor.getModel();
     this._model.onDidChangeContent(

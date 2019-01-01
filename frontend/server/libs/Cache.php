@@ -126,10 +126,9 @@ class Cache {
     const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-';
     const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-';
     const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
-    const PROBLEM_STATEMENT = 'statement-';
-    const PROBLEM_SAMPLE = 'sample-';
-    const PROBLEM_LIBINTERACTIVE_INTERFACE_NAME = 'interactive-interface-name-';
     const CONTEST_INFO = 'contest-info-';
+    const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-';
+    const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
