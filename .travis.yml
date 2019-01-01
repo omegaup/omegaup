@@ -1,10 +1,6 @@
 language: php
 
-dist: trusty
-
-group: edge
-
-sudo: false
+dist: xenial
 
 branches:
   only:
