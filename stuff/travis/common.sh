@@ -44,6 +44,11 @@ install_omegaup_update_problem() {
 	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 	sudo xz --decompress "${TARGET}"
 	sudo chmod +x "${TARGET%.xz}"
+
+	# omegaup-update-problem depends on libinteractive.
+	DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.23/libinteractive.jar'
+	TARGET='/usr/share/java/libinteractive.jar'
+	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 }
 
 setup_phpenv() {
