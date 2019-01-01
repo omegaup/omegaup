@@ -7,6 +7,7 @@ stage_before_install() {
 }
 
 stage_install() {
+	pip3 install --user setuptools
 	pip3 install --user mysqlclient
 
 	install_omegaup_update_problem

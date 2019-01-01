@@ -50,6 +50,8 @@ matrix:
           username: lhchavez
         jwt:
           secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
+      services:
+        - mysql
 
 cache:
   directories:

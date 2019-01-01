@@ -16,6 +16,7 @@ stage_before_install() {
 	python3 -m pip install --user pep8
 	python3 -m pip install --user awscli
 	python3.5 -m pip install --user --upgrade pip
+	python3.5 -m pip install --user setuptools
 	python3.5 -m pip install --user pylint
 	python3.5 -m pip install --user pep8
 
