@@ -29,6 +29,8 @@ addons:
 matrix:
   include:
     - env: TEST_SUITE=phpunit
+      services:
+        - mysql
     - env: TEST_SUITE=lint
       addons:
         apt:
