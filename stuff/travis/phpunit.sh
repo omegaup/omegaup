@@ -13,14 +13,10 @@ stage_install() {
 	pip3 install --user mysqlclient
 
 	# We should really try upgrading to PHP 7.1 soon.
-	curl -sSfL -o ~/.phpenv/versions/7.0.7/bin/phpunit \
+	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
 		https://phar.phpunit.de/phpunit-5.3.4.phar
 
 	install_omegaup_update_problem
-	cat > frontend/tests/test_config.php <<EOF
-<?php
-define('OMEGAUP_UPDATE_PROBLEM', '/home/travis/bin/omegaup-update-problem');
-EOF
 }
 
 stage_before_script() {
