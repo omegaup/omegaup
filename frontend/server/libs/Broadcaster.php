@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 class Broadcaster {
     // Logging.
     private $log = null;
@@ -49,7 +51,6 @@ class Broadcaster {
         try {
             $emails = ProblemsDAO::getExplicitAdminEmails($r['problem']);
 
-            global $smarty;
             $email_params = [
                 'clarification_id' => $r['clarification']->clarification_id,
                 'clarification_body' => htmlspecialchars($r['clarification']->message),
@@ -61,14 +62,15 @@ class Broadcaster {
                 'user_name' => $r['user']->username
             ];
             $subject = ApiUtils::FormatString(
-                $smarty->getConfigVars('clarificationEmailSubject'),
+                Translations::getInstance()->get('clarificationEmailSubject'),
                 $email_params
             );
             $body = ApiUtils::FormatString(
-                $smarty->getConfigVars('clarificationEmailBody'),
+                Translations::getInstance()->get('clarificationEmailBody'),
                 $email_params
             );
 
+            include_once 'libs/Email.php';
             Email::sendEmail($emails, $subject, $body);
         } catch (Exception $e) {
             $this->log->error('Failed to send clarification email ' . $e->getMessage());

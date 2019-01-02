@@ -1,6 +1,6 @@
 <?php
 
-require_once('FileUploader.php');
+require_once 'libs/FileUploader.php';
 
 class FileHandler {
     protected static $fileUploader;

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Git.php';
+
 /**
  * Class to abstract access to a problem's artifacts.
  *

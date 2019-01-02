@@ -11,6 +11,7 @@
 		<whitelist processUncoveredFilesFromWhitelist="true">
 			<directory suffix=".php">../server/</directory>
 			<exclude>
+				<file>../server/bootstrap_smarty.php</file>
 				<file>../server/config.php</file>
 				<file>../server/libs/PasswordHashCmd.php</file>
 				<file>../server/libs/ExperimentHashCmd.php</file>

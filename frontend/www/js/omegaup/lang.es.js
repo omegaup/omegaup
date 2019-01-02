@@ -2,8 +2,6 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
-	RegisterForContestRules: "Reglas",
-	User: "Nombre de usuario",
 	aboutToStart: "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciar\u00e1.",
 	activeUsers: "Usuarios activos",
 	addUsersToReviewerGroup: "Clic para agregar un usuario a la lista de revisores.",
@@ -695,6 +693,7 @@ omegaup.OmegaUp.loadTranslations({
 	rankViewFull: "Ver ranking completo",
 	registerForContest: "Registrarse en el concurso",
 	registerForContestChallenges: "Reto",
+	registerForContestRules: "Reglas",
 	registrationDenied: "Su solicitud de registro ha sido negada",
 	registrationPending: "Su solicitud de unirse al concurso esta siendo aprobada por el administrador del concurso.",
 	reportAnIssue: "Reporta un problema",

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 /**
  *   ApiException
  *
@@ -82,9 +84,7 @@ abstract class ApiException extends Exception {
     }
 
     protected function getErrorMessage() {
-        // obtener el texto final (ya localizado) de smarty.
-        global $smarty;
-        $localizedText = $smarty->getConfigVars($this->message);
+        $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
@@ -116,9 +116,7 @@ class InvalidParameterException extends ApiException {
     }
 
     protected function getErrorMessage() {
-        // Obtener el texto final (ya localizado) de smarty.
-        global $smarty;
-        $localizedText = $smarty->getConfigVars($this->message);
+        $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
@@ -341,9 +339,7 @@ class ProblemDeploymentFailedException extends ApiException {
     }
 
     protected function getErrorMessage() {
-        // Obtener el texto final (ya localizado) de smarty.
-        global $smarty;
-        $localizedText = $smarty->getConfigVars($this->message);
+        $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";

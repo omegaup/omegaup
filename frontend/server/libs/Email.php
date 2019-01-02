@@ -1,4 +1,7 @@
 <?php
+
+require_once 'libs/third_party/phpmailer/class.phpmailer.php';
+
 class Email {
     public static $log;
     private static $emailSender = null;

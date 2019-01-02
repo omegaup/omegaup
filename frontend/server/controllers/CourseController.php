@@ -1,6 +1,8 @@
 <?php
 
-require_once('libs/ActivityReport.php');
+require_once 'libs/ActivityReport.php';
+require_once 'libs/PrivacyStatement.php';
+
 /**
  *  CourseController
  *
