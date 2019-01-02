@@ -1,5 +1,8 @@
 <?php
 
+require_once 'libs/FileHandler.php';
+require_once 'libs/FileUploader.php';
+
 /**
  * ProblemParams
  */

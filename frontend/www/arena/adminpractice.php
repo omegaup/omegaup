@@ -1,3 +1,3 @@
 <?php
-require_once('../../server/bootstrap.php');
+require_once('../../server/bootstrap_smarty.php');
 $smarty->display('../../templates/arena.adminpractice.tpl');

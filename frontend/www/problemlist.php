@@ -15,7 +15,7 @@ function getTagList() {
     return array_unique($tags);
 }
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 $r = new Request();
 $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;

@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 $private_problems_alert = 0;
 $is_admin = false;

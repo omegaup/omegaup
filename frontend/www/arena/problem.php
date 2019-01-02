@@ -1,5 +1,6 @@
 <?php
-require_once('../../server/bootstrap.php');
+require_once('../../server/bootstrap_smarty.php');
+require_once('libs/dao/QualityNominations.dao.php');
 
 $r = new Request($_REQUEST);
 $problemAlias = $r['problem_alias'];

@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 $qualitynomination_id = isset($_GET['qualitynomination_id']) ? $_GET['qualitynomination_id'] : null;
 
 try {

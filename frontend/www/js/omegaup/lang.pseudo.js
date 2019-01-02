@@ -2,8 +2,6 @@
 var omegaup = require('../dist/omegaup.js');
 
 omegaup.OmegaUp.loadTranslations({
-	RegisterForContestRules: "(Ru135)",
-	User: "(U53rnam3)",
 	aboutToStart: "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)",
 	activeUsers: "(Ac7iv3 u53r5)",
 	addUsersToReviewerGroup: "(C1iqu3 para adici0nar um u5u\u00e1ri0 na 1i57a d3 r3vi50r35.)",
@@ -695,6 +693,7 @@ omegaup.OmegaUp.loadTranslations({
 	rankViewFull: "(Vi3w fu11 ranking)",
 	registerForContest: "(R3gi573r f0r c0n7357)",
 	registerForContestChallenges: "(Cha113ng3)",
+	registerForContestRules: "(Ru135)",
 	registrationDenied: "(D3ni3d!)",
 	registrationPending: "(Y0ur r3qu357 70 j0in 7hi5 c0n7357 i5 p3nding appr0va1 fr0m 7h3 c0n7357 admin.)",
 	reportAnIssue: "(R3p0r7 an i55u3)",

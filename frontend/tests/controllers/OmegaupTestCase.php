@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Email.php';
+
 /**
  * Parent class of all Test cases for Omegaup
  * Implements common methods for setUp and asserts

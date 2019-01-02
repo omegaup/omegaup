@@ -1,6 +1,5 @@
 <?php
 
-require_once('Estructura.php');
 require_once('base/Groups_Scoreboards.dao.base.php');
 require_once('base/Groups_Scoreboards.vo.base.php');
 /** Page-level DocBlock .

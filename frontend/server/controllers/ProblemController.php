@@ -1,8 +1,11 @@
 <?php
 
 require_once 'libs/FileHandler.php';
+require_once 'libs/Git.php';
 require_once 'libs/ProblemArtifacts.php';
+require_once 'libs/ProblemDeployer.php';
 require_once 'libs/ZipHandler.php';
+
 /**
  * ProblemsController
  */

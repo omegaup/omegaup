@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $length = isset($_GET['length']) ? $_GET['length'] : 100;

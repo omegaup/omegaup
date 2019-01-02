@@ -1,6 +1,5 @@
 <?php
 
-define('WHOAMI', 'API');
 require_once('../../server/inc/bootstrap.php');
 
 // Scumbag IE y su cache agresivo.
