@@ -8,7 +8,7 @@ require_once 'libs/Email.php';
  *
  * @author joemmanuel
  */
-class OmegaupTestCase extends PHPUnit_Framework_TestCase {
+class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public $mockClarificationController = null;
     private static $logObj = null;
 
