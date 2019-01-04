@@ -45,6 +45,7 @@ try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680/grade/');
+try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:33862');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('PROBLEMS_GIT_PATH', OMEGAUP_TEST_ROOT . 'problems.git');
 try_define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');

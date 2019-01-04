@@ -21,6 +21,11 @@ class SecurityTools {
     const MIN_HASHED_STRING_LENGTH = 20;
 
     /**
+     * The secret key that is used to communicate with omegaup-gitserver.
+     */
+    private static $_gitserverSecretKey;
+
+    /**
      * Given the plain password to check and a hash, returns true if there is
      * a match.
      *
@@ -79,5 +84,51 @@ class SecurityTools {
         }
 
         return $str;
+    }
+
+    public static function getGitserverAuthorizationHeader(string $problem, string $username) {
+        require_once 'libs/third_party/sodium_compat/autoload-fast.php';
+
+        require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
+        require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
+        require_once 'libs/third_party/constant_time_encoding/src/Base64UrlSafe.php';
+        require_once 'libs/third_party/constant_time_encoding/src/Binary.php';
+
+        require_once 'libs/third_party/paseto/src/KeyInterface.php';
+        require_once 'libs/third_party/paseto/src/SendingKey.php';
+        require_once 'libs/third_party/paseto/src/ReceivingKey.php';
+        require_once 'libs/third_party/paseto/src/Keys/AsymmetricSecretKey.php';
+        require_once 'libs/third_party/paseto/src/Keys/AsymmetricPublicKey.php';
+        require_once 'libs/third_party/paseto/src/ProtocolCollection.php';
+        require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
+        require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
+        require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
+        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
+        require_once 'libs/third_party/paseto/src/JsonToken.php';
+        require_once 'libs/third_party/paseto/src/Purpose.php';
+        require_once 'libs/third_party/paseto/src/Builder.php';
+        require_once 'libs/third_party/paseto/src/Util.php';
+        require_once 'libs/third_party/paseto/src/Parsing/Header.php';
+        require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
+        require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
+
+        if (self::$_gitserverSecretKey == null) {
+            self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
+                base64_decode(OMEGAUP_GITSERVER_SECRET_KEY)
+            );
+        }
+        $token = (new \ParagonIE\Paseto\Builder())
+            ->setKey(self::$_gitserverSecretKey)
+            ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
+            ->setPurpose(\ParagonIE\Paseto\Purpose::public())
+            ->setExpiration(
+                (new DateTime('now'))->add(new DateInterval('PT5M'))
+            )
+            ->setIssuer('omegaUp frontend')
+            ->setSubject($username)
+            ->setClaims([
+                'problem' => $problem,
+            ]);
+        return "Authorization: Bearer {$token->toString()}";
     }
 }

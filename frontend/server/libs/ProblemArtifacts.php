@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Git.php';
-
 /**
  * Class to abstract access to a problem's artifacts.
  *
@@ -9,52 +7,71 @@ require_once 'libs/Git.php';
  */
 class ProblemArtifacts {
     public function __construct(string $alias, string $commit = 'HEAD') {
-        $this->log = Logger::getLogger('ProblemDeployer');
-        $this->git = new Git(PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $alias);
+        $this->log = Logger::getLogger('ProblemArtifacts');
+        $this->alias = $alias;
         $this->commit = $commit;
     }
 
     public function get($path, $quiet = false) {
-        return $this->git->get(
-            ['cat-file', 'blob', "{$this->commit}:{$path}"],
-            null /* $cwd_override */,
-            $quiet
-        );
+        $curl = curl_init();
+        try {
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/+/{$this->commit}/{$path}",
+                    CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_HTTPHEADER => [
+                        'Accept: application/octet-stream',
+                        SecurityTools::getGitserverAuthorizationHeader($this->alias, 'omegaup:system'),
+                    ],
+                ]
+            );
+            return curl_exec($curl);
+        } finally {
+            curl_close($curl);
+        }
     }
 
     public function exists($path) {
+        $curl = curl_init();
         try {
-            $this->git->get(
-                ['cat-file', '-e', "{$this->commit}:{$path}"],
-                null /* cwd_override */,
-                true /* quiet */
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/+/{$this->commit}/{$path}",
+                    CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_HTTPHEADER => [
+                        'Accept: application/json',
+                        SecurityTools::getGitserverAuthorizationHeader($this->alias, 'omegaup:system'),
+                    ],
+                    CURLOPT_NOBODY => 1,
+                ]
             );
-            return true;
-        } catch (Exception $e) {
-            // This is expected to fail quite often.
-            return false;
+            return curl_exec($curl) !== false && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200;
+        } finally {
+            curl_close($curl);
         }
     }
 
     public function lsTree($path) {
-        $entries = explode("\0", trim($this->git->get(
-            ['ls-tree', '-z', "{$this->commit}:{$path}"],
-            null /* cwd_override */,
-            true /* quiet */
-        )));
-        $result = [];
-        foreach ($entries as $entry) {
-            if (preg_match('/^([^ ]+) ([^ ]+) ([^\t]+)\t(.*)$/', $entry, $matches) !== 1) {
-                continue;
-            }
-            $result[] = [
-                'mode' => $matches[1],
-                'type' => $matches[2],
-                'object' => $matches[3],
-                'name' => $matches[4],
-            ];
+        $curl = curl_init();
+        try {
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/+/{$this->commit}/{$path}/",
+                    CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_HTTPHEADER => [
+                        'Accept: application/json',
+                        SecurityTools::getGitserverAuthorizationHeader($this->alias, 'omegaup:system'),
+                    ],
+                ]
+            );
+            $response = json_decode(curl_exec($curl), JSON_OBJECT_AS_ARRAY);
+            return $response['entries'];
+        } finally {
+            curl_close($curl);
         }
-        return $result;
     }
 }
 
@@ -92,7 +109,7 @@ class WorkingDirProblemArtifacts extends ProblemArtifacts {
             $result[] = [
                 'mode' => $st['mode'],
                 'type' => ($isBlob) ? 'blob' : 'tree',
-                'object' => $objectId,
+                'id' => $objectId,
                 'name' => $entry,
             ];
         }

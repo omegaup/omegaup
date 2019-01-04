@@ -47,6 +47,8 @@ yarn-error.log
 #ignore crated-by-test stuff
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
+frontend/tests/controllers/gitserver.log
+frontend/tests/controllers/gitserver.pid
 frontend/tests/controllers/grade/
 frontend/tests/controllers/img/
 frontend/tests/controllers/templates/

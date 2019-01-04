@@ -87,7 +87,7 @@ class ProblemDeployer {
      * of updated statement languages, as well as updating the libinteractive
      * template files if needed.
      *
-     * @param array $result the JSON from omegaup-update-problem.
+     * @param array $result the JSON from omegaup-gitserver.
      *
      * @return void
      */
@@ -263,7 +263,7 @@ class ProblemDeployer {
     }
 
     /**
-     * Performs the operation by calling the omegaup-update-problem binary.
+     * Performs the operation by calling the omegaup-gitserver API.
      */
     private function execute(
         $repositoryPath,
@@ -277,31 +277,50 @@ class ProblemDeployer {
         $acceptsSubmissions,
         $quiet = false
     ) {
-        $args = [
-            OMEGAUP_UPDATE_PROBLEM,
-            "-repository-path=$repositoryPath",
-            "-author=$author",
-            "-commit-message=$commitMessage",
-        ];
         if (!is_null($zipPath)) {
-            $args[] = "-zip-path=$zipPath";
+            $curl = curl_init();
+            try {
+                $queryParams = [
+                    'message' => $commitMessage,
+                    'settings' => json_encode($problemSettings),
+                    'acceptsSubmissions' => $acceptsSubmissions ? 'true' : 'false',
+                ];
+                if ($updateCases && $updateStatements) {
+                    $queryParams['create'] = '1';
+                }
+                curl_setopt_array(
+                    $curl,
+                    [
+                        CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-upload-zip?" . http_build_query($queryParams),
+                        CURLOPT_HTTPHEADER => [
+                            'Accept: application/json',
+                            'Content-Type: application/zip',
+                            SecurityTools::getGitserverAuthorizationHeader($this->alias, $author),
+                        ],
+                        CURLOPT_POSTFIELDS => file_get_contents($zipPath),
+                        CURLOPT_POST => 1,
+                        CURLOPT_RETURNTRANSFER => 1,
+                    ]
+                );
+                $output = curl_exec($curl);
+                $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                if ($output !== false && $retval == 200) {
+                    $retval = 0;
+                }
+                $result = [
+                    'retval' => $retval,
+                    'output' => (string)$output,
+                ];
+            } finally {
+                curl_close($curl);
+            }
+        } else {
+            // TODO(lhchavez): Support this again.
+            $result = [
+                'retval' => 1,
+                'output' => '',
+            ];
         }
-        if (!is_null($blobUpdate)) {
-            $args[] = '-blob-update=' . json_encode($blobUpdate);
-        }
-        if (!is_null($problemSettings)) {
-            $args[] = '-problem-settings=' . json_encode($problemSettings);
-        }
-        if ($updateCases) {
-            $args[] = '-update-cases=true';
-        }
-        if ($updateStatements) {
-            $args[] = '-update-statements=true';
-        }
-        if (!$acceptsSubmissions) {
-            $args[] = '-accepts-submissions=false';
-        }
-        $result = $this->executeRaw($args, null /* cwd */, $quiet);
 
         if ($result['retval'] != 0) {
             $errorMessage = 'problemDeployerInternalError';

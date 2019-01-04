@@ -26,6 +26,7 @@ class RunController extends Controller {
     public static $grader = null;
     private static $practice = false;
 
+    // TODO(lhchavez): Remove this, since this is gonna die.
     public static function getGradePath($guid) {
         return GRADE_PATH . '/' .
             substr($guid, 0, 2) . '/' .
