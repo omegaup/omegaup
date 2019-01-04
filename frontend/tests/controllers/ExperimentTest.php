@@ -1,6 +1,6 @@
 <?php
 
-class ExperimentsTest extends PHPUnit_Framework_TestCase {
+class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     const TEST = 'experiment_test';
 
     private static $kKnownExperiments = [
