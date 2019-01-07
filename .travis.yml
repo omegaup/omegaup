@@ -74,6 +74,8 @@ script: stuff/travis/run.sh "${TEST_SUITE}" script
 
 after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
 
+after_failure: stuff/travis/run.sh "${TEST_SUITE}" after_failure
+
 after_script: stuff/travis/run.sh "${TEST_SUITE}" after_script
 
 notifications:

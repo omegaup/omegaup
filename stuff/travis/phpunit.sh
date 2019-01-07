@@ -41,3 +41,7 @@ stage_script() {
 stage_after_success() {
 	bash <(curl -s https://codecov.io/bash)
 }
+
+stage_after_failure() {
+	cat /tmp/omegaup/gitserver.log
+}
