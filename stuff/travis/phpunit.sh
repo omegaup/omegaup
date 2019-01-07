@@ -43,5 +43,5 @@ stage_after_success() {
 }
 
 stage_after_failure() {
-	cat /tmp/omegaup/gitserver.log
+	cat frontend/tests/controllers/gitserver.log
 }

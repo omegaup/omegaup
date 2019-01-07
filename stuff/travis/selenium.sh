@@ -70,6 +70,10 @@ stage_script() {
 		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 }
 
+stage_after_failure() {
+	cat /tmp/omegaup/gitserver.log
+}
+
 stage_after_script() {
 	stuff/travis/nginx/gitserver-stop.sh
 }
