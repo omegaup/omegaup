@@ -41,14 +41,14 @@ install_yarn() {
 	npm install -g yarn
 }
 
-install_omegaup_update_problem() {
-	DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.2.0/omegaup-update-problem.xz'
-	TARGET="/usr/bin/omegaup-update-problem.xz"
+install_omegaup_gitserver() {
+	DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.3.0/omegaup-gitserver.xz'
+	TARGET="/usr/bin/omegaup-gitserver.xz"
 	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 	sudo xz --decompress "${TARGET}"
 	sudo chmod +x "${TARGET%.xz}"
 
-	# omegaup-update-problem depends on libinteractive.
+	# omegaup-gitserver depends on libinteractive.
 	DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.23/libinteractive.jar'
 	TARGET='/usr/share/java/libinteractive.jar'
 	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"

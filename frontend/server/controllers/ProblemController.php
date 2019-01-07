@@ -3,7 +3,6 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
-require_once 'libs/ZipHandler.php';
 
 /**
  * ProblemsController
@@ -198,12 +197,12 @@ class ProblemController extends Controller {
             // Commit at the very end
             $problemDeployer = new ProblemDeployer(
                 $r['problem_alias'],
-                ProblemDeployer::CREATE,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
                 'Initial commit',
                 $r['current_user'],
+                ProblemDeployer::CREATE,
                 $problemSettings
             );
 
@@ -764,12 +763,12 @@ class ProblemController extends Controller {
             }
             $problemDeployer = new ProblemDeployer(
                 $problem->alias,
-                $operation,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
                 $r['message'],
                 $r['current_user'],
+                $operation,
                 $problemSettings
             );
             $response['rejudged'] = $problemDeployer->requiresRejudge;
@@ -854,23 +853,13 @@ class ProblemController extends Controller {
         }
 
         $updatedStatementLanguages = [];
-        $tmpfile = tmpfile();
         try {
-            fwrite($tmpfile, $r['statement']);
-            $path = stream_get_meta_data($tmpfile)['uri'];
-
-            $problemDeployer = new ProblemDeployer(
-                $r['problem_alias'],
-                ProblemDeployer::UPDATE_STATEMENTS
-            );
+            $problemDeployer = new ProblemDeployer($r['problem_alias']);
             $problemDeployer->commitStatements(
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r['current_user'],
                 [
-                    [
-                        'path' => "statements/{$r['lang']}.markdown",
-                        'contents_path' => $path,
-                    ],
+                    "statements/{$r['lang']}.markdown" => $r['statement'],
                 ]
             );
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
@@ -878,8 +867,6 @@ class ProblemController extends Controller {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-        } finally {
-            fclose($tmpfile);
         }
 
         self::invalidateCache($r['problem'], $updatedStatementLanguages);

@@ -3,7 +3,7 @@
 set -e
 
 DIR="$(realpath "$(dirname "$0")")"
-PIDFILE="${DIR}/gitserver.pid"
+PIDFILE=/tmp/omegaup/gitserver.pid
 
 if [ -f "${PIDFILE}" ]; then
 	# Ignore failures in case the pidfile was stale.

@@ -87,6 +87,10 @@ class SecurityTools {
     }
 
     public static function getGitserverAuthorizationHeader(string $problem, string $username) {
+        if (OMEGAUP_GITSERVER_SECRET_TOKEN != '') {
+            return 'Authorization: Bearer ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
+        }
+
         require_once 'libs/third_party/sodium_compat/autoload-fast.php';
 
         require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';

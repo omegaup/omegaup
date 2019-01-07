@@ -17,75 +17,65 @@ class ProblemDeployer {
     private $alias;
     private $zipPath = null;
     public $requiresRejudge = false;
-    private $created = false;
-    private $committed = false;
-    private $operation = null;
     private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
 
-    public function __construct($alias, $operation, $acceptsSubmissions = true) {
+    public function __construct($alias, $acceptsSubmissions = true) {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
-        $this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
-        $this->operation = $operation;
         if (isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
         ) {
             $this->zipPath = $_FILES['problem_contents']['tmp_name'];
+        } else {
+            $this->zipPath = __DIR__ . '/empty.zip';
         }
 
         $this->acceptsSubmissions = $acceptsSubmissions;
-
-        if (!is_writable(PROBLEMS_GIT_PATH)) {
-            $this->log->error('path is not writable:' . PROBLEMS_GIT_PATH);
-            throw new ProblemDeploymentFailedException();
-        }
     }
 
     public function __destruct() {
-        // Something went wrong and the target directory was not committed. Rollback.
-        if ($this->created && !$this->committed) {
-            FileHandler::DeleteDirRecursive($this->gitDir);
-        }
     }
 
-    public function commit($message, $user, $problemSettings = null) {
-        $updateCases = false;
-        $updateStatements = false;
+    public function commit(string $message, Users $user, int $operation, array $problemSettings) {
+        $mergeStrategy = 'ours';
 
-        switch ($this->operation) {
+        switch ($operation) {
+            case ProblemDeployer::UPDATE_SETTINGS:
+                $mergeStrategy = 'ours';
+                break;
             case ProblemDeployer::CREATE:
-                $updateCases = true;
-                $updateStatements = true;
+                $mergeStrategy = 'theirs';
                 break;
             case ProblemDeployer::UPDATE_CASES:
-                $updateCases = true;
+                $mergeStrategy = 'theirs';
                 break;
             case ProblemDeployer::UPDATE_STATEMENTS:
-                $updateStatements = true;
+                $mergeStrategy = 'recursive-theirs';
                 break;
         }
         $result = $this->execute(
-            $this->gitDir,
             $this->zipPath,
             $user->username,
             $message,
             $problemSettings,
             null,
-            $updateCases,
-            $updateStatements,
+            $mergeStrategy,
+            $operation == ProblemDeployer::CREATE,
             $this->acceptsSubmissions
         );
-        $this->processResult($result);
+        $this->processResult(
+            $result
+        );
     }
 
     /**
      * Generate all possible libinteractive templates.
      *
-     * This sets the requiresRejudge and committed flags. It also sets the list
-     * of updated statement languages, as well as updating the libinteractive
-     * template files if needed.
+     * This sets the requiresRejudge flag. It also sets the list of updated
+     * statement languages, as well as updating the libinteractive template
+     * files if needed.
      *
      * @param array $result the JSON from omegaup-gitserver.
      *
@@ -93,7 +83,6 @@ class ProblemDeployer {
      */
     private function processResult($result) {
         $this->requiresRejudge = false;
-        $this->created = ($this->operation == ProblemDeployer::CREATE);
         if (!empty($result['updated_refs'])) {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
@@ -126,7 +115,6 @@ class ProblemDeployer {
         if ($updatedExamples || $updatedInteractiveFiles) {
             $this->generateLibinteractiveTemplates();
         }
-        $this->committed = true;
     }
 
     /**
@@ -193,20 +181,39 @@ class ProblemDeployer {
      * @throws ProblemDeploymentFailedException
      */
     public function commitStatements($message, $user, $blobUpdate) {
-        $updateCases = false;
-        $updateStatements = true;
-        $result = $this->execute(
-            $this->gitDir,
-            null,
-            $user->username,
-            $message,
-            null,
-            $blobUpdate,
-            $updateCases,
-            $updateStatements,
-            $this->acceptsSubmissions
-        );
-        $this->processResult($result);
+        $tmpfile = tmpfile();
+        try {
+            $zipPath = stream_get_meta_data($tmpfile)['uri'];
+            $zipArchive = new ZipArchive();
+            $err = $zipArchive->open(
+                $zipPath,
+                ZipArchive::OVERWRITE
+            );
+            if ($err !== true) {
+                throw new ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $err
+                );
+            }
+            foreach ($blobUpdate as $path => $contents) {
+                $zipArchive->addFromString($path, $contents);
+            }
+            $zipArchive->close();
+
+            $result = $this->execute(
+                $zipPath,
+                $user->username,
+                $message,
+                null,
+                $blobUpdate,
+                'recursive-theirs',
+                false,
+                $this->acceptsSubmissions
+            );
+            $this->processResult($result);
+        } finally {
+            fclose($tmpfile);
+        }
     }
 
     /**
@@ -218,7 +225,7 @@ class ProblemDeployer {
         return $this->updatedStatementLanguages;
     }
 
-    private function executeRaw($args, $cwd = null, $quiet = false) {
+    private function executeRaw(array $args, string $cwd) {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
@@ -249,12 +256,10 @@ class ProblemDeployer {
         fclose($pipes[2]);
 
         $retval = proc_close($proc);
-        if (!$quiet) {
-            if ($retval == 0) {
-                $this->log->info("$cmd finished: $retval $err");
-            } else {
-                $this->log->error("$cmd failed: $retval $output $err");
-            }
+        if ($retval == 0) {
+            $this->log->info("$cmd finished: $retval $err");
+        } else {
+            $this->log->error("$cmd failed: $retval $output $err");
         }
         return [
             'retval' => $retval,
@@ -266,60 +271,60 @@ class ProblemDeployer {
      * Performs the operation by calling the omegaup-gitserver API.
      */
     private function execute(
-        $repositoryPath,
-        $zipPath,
-        $author,
-        $commitMessage,
+        string $zipPath,
+        string $author,
+        string $commitMessage,
         $problemSettings,
         $blobUpdate,
-        $updateCases,
-        $updateStatements,
-        $acceptsSubmissions,
-        $quiet = false
+        string $mergeStrategy,
+        bool $create,
+        bool $acceptsSubmissions
     ) {
-        if (!is_null($zipPath)) {
-            $curl = curl_init();
-            try {
-                $queryParams = [
-                    'message' => $commitMessage,
-                    'settings' => json_encode($problemSettings),
-                    'acceptsSubmissions' => $acceptsSubmissions ? 'true' : 'false',
-                ];
-                if ($updateCases && $updateStatements) {
-                    $queryParams['create'] = '1';
-                }
-                curl_setopt_array(
-                    $curl,
-                    [
-                        CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-upload-zip?" . http_build_query($queryParams),
-                        CURLOPT_HTTPHEADER => [
-                            'Accept: application/json',
-                            'Content-Type: application/zip',
-                            SecurityTools::getGitserverAuthorizationHeader($this->alias, $author),
-                        ],
-                        CURLOPT_POSTFIELDS => file_get_contents($zipPath),
-                        CURLOPT_POST => 1,
-                        CURLOPT_RETURNTRANSFER => 1,
-                    ]
-                );
-                $output = curl_exec($curl);
-                $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                if ($output !== false && $retval == 200) {
-                    $retval = 0;
-                }
-                $result = [
-                    'retval' => $retval,
-                    'output' => (string)$output,
-                ];
-            } finally {
-                curl_close($curl);
-            }
-        } else {
-            // TODO(lhchavez): Support this again.
-            $result = [
-                'retval' => 1,
-                'output' => '',
+        $curl = curl_init();
+        $zipFile = fopen($zipPath, 'r');
+        $zipFileSize = fstat($zipFile)['size'];
+        try {
+            $queryParams = [
+                'message' => $commitMessage,
+                'acceptsSubmissions' => $acceptsSubmissions ? 'true' : 'false',
+                'mergeStrategy' => $mergeStrategy,
             ];
+            if ($create) {
+                $queryParams['create'] = '1';
+            }
+            if (!is_null($problemSettings)) {
+                $queryParams['settings'] = json_encode($problemSettings);
+            }
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-upload-zip?" . http_build_query($queryParams),
+                    CURLOPT_HTTPHEADER => [
+                        'Accept: application/json',
+                        'Content-Type: application/zip',
+                        // Unsetting Expect:, since it kind of breaks the gitserver.
+                        'Expect: ',
+                        "Content-Length: $zipFileSize",
+                        SecurityTools::getGitserverAuthorizationHeader($this->alias, $author),
+                    ],
+                    CURLOPT_INFILE => $zipFile,
+                    CURLOPT_INFILESIZE => $zipFileSize,
+                    CURLOPT_POST => 1,
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
+            $output = curl_exec($curl);
+            $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($output !== false && $retval == 200) {
+                $retval = 0;
+            }
+            $result = [
+                'retval' => $retval,
+                'output' => (string)$output,
+            ];
+        } finally {
+            curl_close($curl);
+            fclose($zipFile);
         }
 
         if ($result['retval'] != 0) {
@@ -358,7 +363,11 @@ class ProblemDeployer {
                     $context = $output->error;
                 }
             }
-            throw new ProblemDeploymentFailedException($errorMessage, $context);
+            $error = new ProblemDeploymentFailedException($errorMessage, $context);
+            $this->log->error(
+                'update zip failed: ' . json_encode($result) . ' ' .$error
+            );
+            throw $error;
         }
 
         return json_decode($result['output'], JSON_OBJECT_AS_ARRAY);
