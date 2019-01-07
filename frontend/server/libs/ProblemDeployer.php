@@ -65,9 +65,7 @@ class ProblemDeployer {
             $operation == ProblemDeployer::CREATE,
             $this->acceptsSubmissions
         );
-        $this->processResult(
-            $result
-        );
+        $this->processResult($result);
     }
 
     /**
@@ -290,7 +288,7 @@ class ProblemDeployer {
                 'mergeStrategy' => $mergeStrategy,
             ];
             if ($create) {
-                $queryParams['create'] = '1';
+                $queryParams['create'] = 'true';
             }
             if (!is_null($problemSettings)) {
                 $queryParams['settings'] = json_encode($problemSettings);
