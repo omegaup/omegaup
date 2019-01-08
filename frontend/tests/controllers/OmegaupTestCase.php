@@ -15,7 +15,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $scriptFilename = __DIR__ . '/gitserver-start.sh';
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' . OMEGAUP_GITSERVER_PORT;
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new Exception(
