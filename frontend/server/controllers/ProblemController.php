@@ -1545,17 +1545,20 @@ class ProblemController extends Controller {
 
             // For each run we got
             foreach ($runs as $run) {
-                // Build grade dir
-                $grade_dir = RunController::getGradePath($run->guid);
-
                 // Skip it if it failed to compile.
                 if ($run->verdict == 'CE') {
                     continue;
                 }
 
-                // Try to open the details file.
-                if (file_exists("$grade_dir/details.json")) {
-                    $details = json_decode(file_get_contents("$grade_dir/details.json"));
+                // Try to open the details file. It's okay if the file is missing.
+                $details = Grader::getInstance()->getGraderResource(
+                    $run->guid,
+                    'details.json',
+                    /*passthru=*/false,
+                    /*missingOk=*/true
+                );
+                if (!is_null($details)) {
+                    $details = json_decode($details);
                     foreach ($details as $group) {
                         if (!isset($group->cases) || !is_array($group->cases)) {
                             continue;

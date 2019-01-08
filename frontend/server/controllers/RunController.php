@@ -27,13 +27,6 @@ class RunController extends Controller {
     public static $defaultSubmissionGap = 60; /*seconds*/
     private static $practice = false;
 
-    // TODO(lhchavez): Remove this, since this is gonna die.
-    public static function getGradePath($guid) {
-        return GRADE_PATH . '/' .
-            substr($guid, 0, 2) . '/' .
-            substr($guid, 2);
-    }
-
     /**
      * Gets the path of the file that contains the submission.
      */
@@ -512,15 +505,6 @@ class RunController extends Controller {
 
         self::$log->info('Run being rejudged!!');
 
-        // Try to delete existing directory, if exists.
-        try {
-            $gradeDir = RunController::getGradePath($r['run']->guid);
-            FileHandler::DeleteDirRecursive($gradeDir);
-        } catch (Exception $e) {
-            // Soft error :P
-            self::$log->warn($e);
-        }
-
         // Reset fields.
         $r['run']->verdict = 'JE';
         $r['run']->status = 'new';
@@ -637,7 +621,7 @@ class RunController extends Controller {
         // Get the details, compile error, logs, etc.
         RunController::getSource($r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
-            $gzippedLogs = RunController::getGraderResource($r['run']->guid, 'logs.txt.gz');
+            $gzippedLogs = Grader::getInstance()->getGraderResource($r['run']->guid, 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
                 $response['logs'] = gzdecode($gzippedLogs);
             }
@@ -721,7 +705,7 @@ class RunController extends Controller {
         if (!$showDetails && $run->verdict != 'CE') {
             return;
         }
-        $detailsJson = RunController::getGraderResource($run->guid, 'details.json');
+        $detailsJson = Grader::getInstance()->getGraderResource($run->guid, 'details.json');
         if (!is_string($detailsJson)) {
             return;
         }
@@ -751,34 +735,10 @@ class RunController extends Controller {
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!RunController::serveGraderResource($r['run']->guid, 'files.zip')) {
+        if (!Grader::getInstance()->getGraderResource($r['run']->guid, 'files.zip', /*passthru=*/ true)) {
             http_response_code(404);
         }
         exit;
-    }
-
-    private static function getGraderResource($guid, $filename) {
-        $gradeDir = RunController::getGradePath($guid);
-        $resourcePath = "${gradeDir}/${filename}";
-
-        if (!file_exists($resourcePath)) {
-            return self::downloadRunFromS3($guid, $filename, false);
-        }
-
-        return file_get_contents($resourcePath);
-    }
-
-    private static function serveGraderResource($guid, $filename) {
-        $gradeDir = RunController::getGradePath($guid);
-        $resourcePath = "${gradeDir}/${filename}";
-
-        if (!file_exists($resourcePath)) {
-            return self::downloadRunFromS3($guid, $filename, true);
-        }
-
-        header('Content-Length: ' . filesize($resourcePath));
-        readfile($resourcePath);
-        return true;
     }
 
     /**

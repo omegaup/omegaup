@@ -137,4 +137,13 @@ class Grader {
             curl_close($curl);
         }
     }
+
+    public function getGraderResource(
+        string $guid,
+        string $filename,
+        bool $passthru = false,
+        bool $missingOk = false
+    ) {
+        throw new Exception('X_x');
+    }
 }
