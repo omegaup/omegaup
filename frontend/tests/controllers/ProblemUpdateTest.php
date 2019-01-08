@@ -64,7 +64,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = $this->detourGraderCalls($this->exactly(1));
 
         // Set file upload context
         $login = self::login($problemData['author']);
@@ -180,7 +180,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = $this->detourGraderCalls($this->exactly(1));
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -334,7 +334,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, so we can expect 2 calls to grader
         // to rejudge them
-        $this->detourGraderCalls($this->exactly(0));
+        $detourGrader = $this->detourGraderCalls($this->exactly(0));
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';

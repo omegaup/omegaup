@@ -23,7 +23,6 @@ class RunController extends Controller {
         'lua' => 'Lua',
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
-    public static $grader = null;
     private static $practice = false;
 
     public static function getGradePath($guid) {
@@ -39,19 +38,6 @@ class RunController extends Controller {
         return RUNS_PATH .
             DIRECTORY_SEPARATOR . substr($run->guid, 0, 2) .
             DIRECTORY_SEPARATOR . substr($run->guid, 2);
-    }
-
-    /**
-     * Creates an instance of Grader if not already created
-     */
-    private static function initializeGrader() {
-        if (is_null(self::$grader)) {
-            // Create new grader
-            self::$grader = new Grader();
-        }
-
-        // Set practice mode OFF by default
-        self::$practice = false;
     }
 
     /**
@@ -230,8 +216,7 @@ class RunController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function apiCreate(Request $r) {
-        // Init
-        self::initializeGrader();
+        self::$practice = false;
 
         // Authenticate user
         self::authenticateRequest($r);
@@ -361,7 +346,7 @@ class RunController extends Controller {
 
         // Call Grader
         try {
-            self::$grader->Grade([$run->guid], false, false);
+            Grader::getInstance()->grade([$run->guid], false, false);
         } catch (Exception $e) {
             self::$log->error('Call to Grader::grade() failed:');
             self::$log->error($e);
@@ -511,8 +496,7 @@ class RunController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRejudge(Request $r) {
-        // Init
-        self::initializeGrader();
+        self::$practice = false;
 
         // Get the user who is calling this API
         self::authenticateRequest($r);
@@ -544,7 +528,7 @@ class RunController extends Controller {
         RunsDAO::save($r['run']);
 
         try {
-            self::$grader->Grade([$r['run']->guid], true, $r['debug'] || false);
+            Grader::getInstance()->grade([$r['run']->guid], true, $r['debug'] || false);
         } catch (Exception $e) {
             self::$log->error('Call to Grader::grade() failed:');
             self::$log->error($e);
