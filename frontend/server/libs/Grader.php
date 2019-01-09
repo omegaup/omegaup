@@ -28,7 +28,7 @@ class Grader {
             return;
         }
         return $this->curlRequest(
-            OMEGAUP_GRADER_URL,
+            OMEGAUP_GRADER_URL . '/run/grade/',
             [
                 'id' => $runGuids,
                 'rejudge' => !!$rejudge,
@@ -56,7 +56,7 @@ class Grader {
                 ],
             ];
         }
-        return $this->curlRequest(OMEGAUP_GRADER_STATUS_URL);
+        return $this->curlRequest(OMEGAUP_GRADER_URL . '/grader/status/');
     }
 
     public function broadcast(
@@ -73,11 +73,11 @@ class Grader {
             return;
         }
         return $this->curlRequest(
-            OMEGAUP_GRADER_BROADCAST_URL,
+            OMEGAUP_GRADER_URL . '/broadcast/',
             [
                 'contest' => $contestAlias,
                 'problemset' => $problemsetId,
-                'problem' => $problem_alias,
+                'problem' => $problemAlias,
                 'message' => $message,
                 'public' => $public,
                 'user' => $username,
@@ -89,11 +89,30 @@ class Grader {
         );
     }
 
+    public function getGraderResource(
+        string $guid,
+        string $filename,
+        bool $passthru = false,
+        bool $missingOk = false
+    ) {
+        return $this->curlRequestRaw(
+            OMEGAUP_GRADER_URL . '/run/resource/',
+            [
+                'id' => $guid,
+                'filename' => $filename,
+            ],
+            $passthru,
+            $missingOk
+        );
+    }
+
     /**
-     * Sends a request to multiple URLs. Only returns the data from the first
-     * element in the list.
+     * Sends a request to the grader and returns the data as a JSON array.
      */
-    private function curlRequest(string $url, array $postFields = null) {
+    private function curlRequest(
+        string $url,
+        array $postFields = null
+    ) {
         $curl = curl_init();
 
         if ($curl === false) {
@@ -105,6 +124,7 @@ class Grader {
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_FOLLOWLOCATION => 1,
                 CURLOPT_SSLCERT => OMEGAUP_SSLCERT_URL,
                 CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
                 CURLOPT_HTTPHEADER => [
@@ -120,30 +140,74 @@ class Grader {
             // Execute call
             $content = curl_exec($curl);
 
-            if ($content === false) {
-                $message = 'curl_exec failed: ' . curl_error($curl) . ' ' . curl_errno($curl);
+            if ($content === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
+                $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
+                    curl_errno($curl) . ' HTTP ' .
+                    curl_getinfo($curl, CURLINFO_HTTP_CODE);
                 throw new Exception($message);
             }
 
-            $response_array = json_decode($content, true);
-            if ($response_array === false) {
+            $responseArray = json_decode($content, true);
+            if ($responseArray === false) {
                 throw new Exception('json_decode failed with: ' . json_last_error() . 'for : ' . $content);
-            } elseif ($response_array['status'] !== 'ok') {
+            } elseif ($responseArray['status'] !== 'ok') {
                 throw new Exception('Grader did not return status OK: ' . $content);
             }
 
-            return $response_array;
+            return $responseArray;
         } finally {
             curl_close($curl);
         }
     }
 
-    public function getGraderResource(
-        string $guid,
-        string $filename,
-        bool $passthru = false,
-        bool $missingOk = false
+    /**
+     * Sends a request to the grader and returns the data as a raw string.
+     */
+    private function curlRequestRaw(
+        string $url,
+        array $postFields,
+        bool $passthru,
+        bool $missingOk
     ) {
-        throw new Exception('X_x');
+        $curl = curl_init();
+
+        if ($curl === false) {
+            throw new Exception('curl_init failed: ' . curl_error($curl));
+        }
+
+        Logger::getLogger('Grader')->info("curl {$url}");
+
+        curl_setopt_array(
+            $curl,
+            [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => !$passthru,
+                CURLOPT_SSLCERT => OMEGAUP_SSLCERT_URL,
+                CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
+                CURLOPT_HTTPHEADER => [
+                    'Accept: application/octet-stream',
+                    'Content-Type: application/json',
+                ],
+            ]
+        );
+        if (!is_null($postFields)) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postFields));
+        }
+        try {
+            // Execute call
+            $response = curl_exec($curl);
+
+            if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
+                if ($missingOk) {
+                    return null;
+                }
+                $message = 'curl_exec failed: ' . curl_error($curl) . ' ' . curl_errno($curl);
+                throw new Exception($message);
+            }
+
+            return $response;
+        } finally {
+            curl_close($curl);
+        }
     }
 }
