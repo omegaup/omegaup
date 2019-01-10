@@ -1046,7 +1046,7 @@ class UserController extends Controller {
             $keys = [
                 'OMIROO-19' => 130,
                 'OMIPROO-19' => 50,
-                'OMISROO-19' => 100,
+                'OMISROO-19' => 100
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
