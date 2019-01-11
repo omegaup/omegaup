@@ -10,7 +10,6 @@ if (!function_exists('try_define')) {
 # ####################################
 # EXPERIMENTS
 # ####################################
-try_define('EXPERIMENT_VIRTUAL', true);
 try_define('EXPERIMENT_IDENTITIES', true);
 
 # ####################################

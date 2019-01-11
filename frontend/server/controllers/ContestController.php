@@ -883,7 +883,6 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 
