@@ -23,14 +23,21 @@ omegaup.OmegaUp.on('ready', function() {
           return;
         }
         $('#state_id').prop('disabled', false);
+        
+        var states = {};
+        Object.keys(country.sub).sort().forEach(function(key){
+          console.log(key);
+          states[key] = country.sub[key];
+        });
 
-        for (var key in country.sub) {
-          if (!country.sub.hasOwnProperty(key)) continue;
+        for (var key in states) {
+          console.log(key);
+          if (!states.hasOwnProperty(key)) continue;
           var id = key.split('-')[1];
           $('#state_id')
               .append($('<option></option')
                           .attr('value', id)
-                          .text(country.sub[key].name));
+                          .text(states[key].name));
         }
       });
 
