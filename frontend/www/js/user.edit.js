@@ -26,12 +26,10 @@ omegaup.OmegaUp.on('ready', function() {
         
         var states = {};
         Object.keys(country.sub).sort().forEach(function(key){
-          console.log(key);
           states[key] = country.sub[key];
         });
 
         for (var key in states) {
-          console.log(key);
           if (!states.hasOwnProperty(key)) continue;
           var id = key.split('-')[1];
           $('#state_id')
