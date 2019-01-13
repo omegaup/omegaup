@@ -23,11 +23,11 @@ omegaup.OmegaUp.on('ready', function() {
           return;
         }
         $('#state_id').prop('disabled', false);
-        
+
         var states = {};
-        Object.keys(country.sub).sort().forEach(function(key){
-          states[key] = country.sub[key];
-        });
+        Object.keys(country.sub)
+            .sort()
+            .forEach(function(key) { states[key] = country.sub[key]; });
 
         for (var key in states) {
           if (!states.hasOwnProperty(key)) continue;
