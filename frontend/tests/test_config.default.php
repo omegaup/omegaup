@@ -46,7 +46,10 @@ try_define('IMAGES_URL_PATH', '/img/');
 try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680/grade/');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('PROBLEMS_GIT_PATH', OMEGAUP_TEST_ROOT . 'problems.git');
+// We need to have this directory be NOT within the /opt/omegaup directory
+// since we intend to share it through VirtualBox, and that does not support
+// mmapping files, which is needed for libgit2.
+try_define('PROBLEMS_GIT_PATH', '/tmp/problems.git');
 try_define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
 try_define('TEMPLATES_PATH', OMEGAUP_TEST_ROOT . '/templates/');
 
