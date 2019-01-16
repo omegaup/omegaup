@@ -1942,7 +1942,7 @@ class ProblemController extends Controller {
         $problemSettings = [
             'Limits' => [
                 'ExtraWallTime' => (int)$problem->extra_wall_time . 'ms',
-                'MemoryLimit' => (int)$problem->memory_limit,
+                'MemoryLimit' => (int)$problem->memory_limit * 1024,
                 'OutputLimit' => (int)$problem->output_limit,
                 'OverallWallTimeLimit' => (
                     (int)$problem->overall_wall_time_limit . 'ms'
