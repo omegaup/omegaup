@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/FileHandler.php';
+
 /**
  * RunController
  *
