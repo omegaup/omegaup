@@ -1,10 +1,8 @@
 <?php
 
 require_once 'libs/FileHandler.php';
-require_once 'libs/Git.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
-require_once 'libs/ZipHandler.php';
 
 /**
  * ProblemsController
@@ -199,12 +197,12 @@ class ProblemController extends Controller {
             // Commit at the very end
             $problemDeployer = new ProblemDeployer(
                 $r['problem_alias'],
-                ProblemDeployer::CREATE,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
                 'Initial commit',
                 $r['current_user'],
+                ProblemDeployer::CREATE,
                 $problemSettings
             );
 
@@ -765,12 +763,12 @@ class ProblemController extends Controller {
             }
             $problemDeployer = new ProblemDeployer(
                 $problem->alias,
-                $operation,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
                 $r['message'],
                 $r['current_user'],
+                $operation,
                 $problemSettings
             );
             $response['rejudged'] = $problemDeployer->requiresRejudge;
@@ -855,23 +853,13 @@ class ProblemController extends Controller {
         }
 
         $updatedStatementLanguages = [];
-        $tmpfile = tmpfile();
         try {
-            fwrite($tmpfile, $r['statement']);
-            $path = stream_get_meta_data($tmpfile)['uri'];
-
-            $problemDeployer = new ProblemDeployer(
-                $r['problem_alias'],
-                ProblemDeployer::UPDATE_STATEMENTS
-            );
+            $problemDeployer = new ProblemDeployer($r['problem_alias']);
             $problemDeployer->commitStatements(
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r['current_user'],
                 [
-                    [
-                        'path' => "statements/{$r['lang']}.markdown",
-                        'contents_path' => $path,
-                    ],
+                    "statements/{$r['lang']}.markdown" => $r['statement'],
                 ]
             );
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
@@ -879,8 +867,6 @@ class ProblemController extends Controller {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-        } finally {
-            fclose($tmpfile);
         }
 
         self::invalidateCache($r['problem'], $updatedStatementLanguages);
@@ -1026,8 +1012,8 @@ class ProblemController extends Controller {
             if (!in_array($extension, $imageExtensions)) {
                 continue;
             }
-            $result['images'][$file['name']] = IMAGES_URL_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
-            $imagePath = IMAGES_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
+            $result['images'][$file['name']] = IMAGES_URL_PATH . "{$problemAlias}/{$file['id']}.{$extension}";
+            $imagePath = IMAGES_PATH . "{$problemAlias}/{$file['id']}.{$extension}";
             if (!@file_exists($imagePath)) {
                 @mkdir(IMAGES_PATH . $problemAlias, 0755, true);
                 file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
@@ -1088,21 +1074,8 @@ class ProblemController extends Controller {
         // Validate request
         self::validateDownload($r);
 
-        // Get HEAD revision to avoid race conditions.
-        $gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias;
-        $git = new Git($gitDir);
-        $head = trim($git->get(['rev-parse', 'HEAD']));
-
-        // Set headers to auto-download file
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment;filename=' . $r['problem']->alias . '_' . $head . '.zip');
-        header('Content-Transfer-Encoding: binary');
-        $git->exec(['archive', '--format=zip', $head]);
-
-        die();
+        // TODO(lhchavez): Support this.
+        throw new NotFoundException('problemNotFound');
     }
 
     /**
@@ -1959,7 +1932,7 @@ class ProblemController extends Controller {
 
     /**
      * Converts the Problem's settings into something that
-     * omegaup-update-problem can use.
+     * omegaup-gitserver can use.
      *
      * @param Problems $problem the problem
      * @return Array an array that can be serialized into the JSON form of

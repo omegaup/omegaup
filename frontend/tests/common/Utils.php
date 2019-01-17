@@ -80,6 +80,7 @@ class Utils {
 
     public static function CleanLog() {
         file_put_contents(OMEGAUP_LOG_FILE, '');
+        file_put_contents(__DIR__ . '/../controllers/gitserver.log', '');
     }
 
     public static function CleanPath($path) {

@@ -12,6 +12,31 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public $mockClarificationController = null;
     private static $logObj = null;
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' . OMEGAUP_GITSERVER_PORT;
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
+
+    public static function tearDownAfterClass() {
+        parent::tearDownAfterClass();
+        $scriptFilename = __DIR__ . '/gitserver-stop.sh';
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
+
     /**
      * setUp function gets executed before each test (thanks to phpunit)
      */
