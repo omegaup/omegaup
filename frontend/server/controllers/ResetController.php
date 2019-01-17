@@ -1,4 +1,7 @@
 <?php
+
+require_once 'libs/Translations.php';
+
 class ResetController extends Controller {
     /**
      * Creates a reset operation, the first of two steps needed to reset a
@@ -24,14 +27,14 @@ class ResetController extends Controller {
             return ['status' => 'ok', 'token' => $token];
         }
 
-        global $smarty;
-        $subject = $smarty->getConfigVars('wordsReset');
+        $subject = Translations::getInstance()->get('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = $smarty->getConfigVars('wordsResetMessage');
+        $message = Translations::getInstance()->get('wordsResetMessage');
         $body = str_replace('[link]', $link, $message);
 
         try {
+            include_once 'libs/Email.php';
             Email::sendEmail($email, $subject, $body);
         } catch (Exception $e) {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
@@ -42,7 +45,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' => $smarty->getConfigVars('passwordResetRequestSuccess')
+            'message' => Translations::getInstance()->get('passwordResetRequestSuccess')
         ];
     }
 
@@ -105,10 +108,9 @@ class ResetController extends Controller {
         $user->reset_sent_at = null;
         UsersDAO::save($user);
 
-        global $smarty;
         return [
             'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : $smarty->getConfigVars('passwordResetResetSuccess')
+            'message' =>  IS_TEST ? 'message' : Translations::getInstance()->get('passwordResetResetSuccess')
         ];
     }
 

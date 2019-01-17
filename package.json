@@ -30,7 +30,7 @@
     "vue-template-compiler": "^2.5.16",
     "vuex": "^3.0.1",
     "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.9.7",
+    "webpack-dev-server": "^3.1.14",
     "wrapper-webpack-plugin": "^1.0.0"
   },
   "scripts": {
@@ -44,6 +44,7 @@
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "codemirror": "^5.38.0",
     "jszip": "^3.1.5",
+    "pako": "^1.0.7",
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1"
   }

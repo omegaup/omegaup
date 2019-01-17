@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 require_once('api/ApiCaller.php');
 
 $smarty->assign('IS_UPDATE', 1);

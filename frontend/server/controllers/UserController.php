@@ -1,5 +1,8 @@
 <?php
 
+require_once 'libs/Translations.php';
+require_once 'libs/UrlHelper.php';
+
 /**
  *  UserController
  *
@@ -308,15 +311,15 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        global $smarty;
-        $subject = $smarty->getConfigVars('verificationEmailSubject');
+        $subject = Translations::getInstance()->get('verificationEmailSubject');
         $body = sprintf(
-            $smarty->getConfigVars('verificationEmailBody'),
+            Translations::getInstance()->get('verificationEmailBody'),
             OMEGAUP_URL,
             $r['user']->verification_id
         );
 
         if (self::$sendEmailOnVerify) {
+            include_once 'libs/Email.php';
             Email::sendEmail($email->email, $subject, $body);
         } else {
             self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
@@ -1041,8 +1044,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIPROO-19' => 130,
-                'OMISROO-19' => 130,
+                'OMIROO-19' => 130,
+                'OMIPROO-19' => 50,
+                'OMISROO-19' => 100,
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'

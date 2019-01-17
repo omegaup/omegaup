@@ -7,7 +7,16 @@ stage_before_install() {
 }
 
 stage_install() {
+	pip3 install --user --upgrade pip
+	pip3 install --user setuptools
+	pip3 install --user wheel
 	pip3 install --user mysqlclient
+
+	# We should really try upgrading to PHP 7.1 soon.
+	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
+		https://phar.phpunit.de/phpunit-5.7.phar
+
+	install_omegaup_gitserver
 }
 
 stage_before_script() {
@@ -31,4 +40,8 @@ stage_script() {
 
 stage_after_success() {
 	bash <(curl -s https://codecov.io/bash)
+}
+
+stage_after_failure() {
+	cat frontend/tests/controllers/gitserver.log
 }

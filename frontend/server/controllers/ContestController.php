@@ -1,7 +1,8 @@
 <?php
 
-require_once('libs/dao/Contests.dao.php');
-require_once('libs/ActivityReport.php');
+require_once 'libs/ActivityReport.php';
+require_once 'libs/PrivacyStatement.php';
+require_once 'libs/dao/Contests.dao.php';
 
 /**
  * ContestController
@@ -882,7 +883,6 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -2698,6 +2698,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        include_once 'libs/third_party/ZipStream.php';
         $zip = new ZipStream($r['contest_alias'] . '.zip');
 
         // Add runs to zip

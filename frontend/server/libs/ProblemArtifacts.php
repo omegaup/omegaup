@@ -6,94 +6,57 @@
  * @author lhchavez
  */
 class ProblemArtifacts {
-    public function __construct($alias) {
-        $this->log = Logger::getLogger('ProblemDeployer');
-        $this->git = new Git(PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $alias);
+    public function __construct(string $alias, string $commit = 'HEAD') {
+        $this->log = Logger::getLogger('ProblemArtifacts');
+        $this->alias = $alias;
+        $this->commit = $commit;
     }
 
     public function get($path, $quiet = false) {
-        return $this->git->get(
-            ['cat-file', 'blob', 'HEAD:' . $path],
-            null /* $cwd_override */,
-            $quiet
-        );
+        $browser = new GitServerBrowser($this->alias, $this->commit, $path);
+        $browser->headers[] = 'Accept: application/octet-stream';
+        return $browser->exec();
     }
 
     public function exists($path) {
-        try {
-            $this->git->get(
-                ['cat-file', '-e', 'HEAD:' . $path],
-                null /* cwd_override */,
-                true /* quiet */
-            );
-            return true;
-        } catch (Exception $e) {
-            // This is expected to fail quite often.
-            return false;
-        }
+        $browser = new GitServerBrowser($this->alias, $this->commit, $path);
+        $browser->headers[] = 'Accept: application/json';
+        curl_setopt($browser->curl, CURLOPT_NOBODY, 1);
+        return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
     }
 
     public function lsTree($path) {
-        $entries = explode("\0", trim($this->git->get(
-            ['ls-tree', '-z', 'HEAD:' . $path],
-            null /* cwd_override */,
-            true /* quiet */
-        )));
-        $result = [];
-        foreach ($entries as $entry) {
-            if (preg_match('/^([^ ]+) ([^ ]+) ([^\t]+)\t(.*)$/', $entry, $matches) !== 1) {
-                continue;
-            }
-            $result[] = [
-                'mode' => $matches[1],
-                'type' => $matches[2],
-                'object' => $matches[3],
-                'name' => $matches[4],
-            ];
-        }
-        return $result;
+        $browser = new GitServerBrowser($this->alias, $this->commit, "{$path}/");
+        $browser->headers[] = 'Accept: application/json';
+        $response = json_decode($browser->exec(), JSON_OBJECT_AS_ARRAY);
+        return $response['entries'];
     }
 }
 
-class WorkingDirProblemArtifacts extends ProblemArtifacts {
-    public function __construct($path) {
-        $this->log = Logger::getLogger('WorkingDirProblemDeployer');
-        $this->path = $path;
+class GitServerBrowser {
+    public $curl = null;
+    public $headers = [];
+
+    public function __construct(string $alias, string $commit, string $path) {
+        $this->curl = curl_init();
+        $this->headers = [
+            SecurityTools::getGitserverAuthorizationHeader($alias, 'omegaup:system'),
+        ];
+        curl_setopt_array(
+            $this->curl,
+            [
+                CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}/{$path}",
+                CURLOPT_RETURNTRANSFER => 1,
+            ]
+        );
     }
 
-    public function get($path, $quiet = false) {
-        return file_get_contents("{$this->path}/$path");
+    public function __destruct() {
+        curl_close($this->curl);
     }
 
-    public function exists($path) {
-        return file_exists("{$this->path}/$path");
-    }
-
-    public function lsTree($path) {
-        $S_IFDIR = 0x0040000;
-
-        $handle = opendir("{$this->path}/$path");
-        if ($handle === false) {
-            return [];
-        }
-        $result = [];
-        while (($entry = readdir($handle)) !== false) {
-            $fullPath = "{$this->path}/$path/$entry";
-            $st = lstat($fullPath);
-            $isBlob = ($st['mode'] & $S_IFDIR) == 0;
-            $objectId = '0000000000000000000000000000000000000000';
-            if ($isBlob) {
-                $header = sprintf('blob %d\0', $st['size']);
-                $objectId = sha1($header . file_get_contents($fullPath));
-            }
-            $result[] = [
-                'mode' => $st['mode'],
-                'type' => ($isBlob) ? 'blob' : 'tree',
-                'object' => $objectId,
-                'name' => $entry,
-            ];
-        }
-        closedir($handle);
-        return $result;
+    public function exec() {
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
+        return curl_exec($this->curl);
     }
 }

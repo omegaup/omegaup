@@ -18,7 +18,7 @@
              v-if="scoreboard.length &gt; 0">
         <tr>
           <td></td>
-          <td><strong>{{ T.User }}</strong></td>
+          <td><strong>{{ T.username }}</strong></td>
           <td colspan="2"
               v-for="alias in aliases"><strong>{{ alias }}</strong></td>
           <td colspan="2"><strong>{{ T.wordsTotal }}</strong></td>
@@ -47,7 +47,7 @@
              v-else="">
         <tr>
           <td></td>
-          <td><strong>{{ T.User }}</strong></td>
+          <td><strong>{{ T.username }}</strong></td>
           <td colspan="2"><strong>{{ T.wordsTotal }}</strong></td>
         </tr>
       </table>

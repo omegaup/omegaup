@@ -147,6 +147,47 @@ class EventsSocket {
 }
 ;
 
+class EphemeralGrader {
+  constructor() {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement =
+        document.getElementById('ephemeral-embedded-grader');
+    self.messageQueue = [];
+    self.loaded = false;
+
+    if (!self.ephemeralEmbeddedGraderElement) return;
+
+    self.ephemeralEmbeddedGraderElement.onload = () => {
+      self.loaded = true;
+      while (self.messageQueue.length > 0) {
+        self._sendInternal(self.messageQueue.shift());
+      }
+    };
+  }
+
+  send(method, ...params) {
+    let self = this;
+    let message = {
+      method: method,
+      params: params,
+    };
+
+    if (!self.loaded) {
+      self.messageQueue.push(message);
+      return;
+    }
+    self._sendInternal(message);
+  }
+
+  _sendInternal(message) {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement.contentWindow.postMessage(
+        message, window.location.origin + '/grader/ephemeral/embedded/');
+  }
+}
+
 export class Arena {
   constructor(options) {
     let self = this;
@@ -300,6 +341,9 @@ export class Arena {
 
     // Virtual contest refresh interval
     self.virtualContestRefreshInterval = null;
+
+    // Ephemeral grader support.
+    self.ephemeralGrader = new EphemeralGrader();
   }
 
   installLibinteractiveHooks() {
@@ -1301,10 +1345,11 @@ export class Arena {
           if (hash_index != -1) {
             original_href = original_href.substring(0, hash_index);
           }
-          if (problem.sample_input) {
+          if (problem.settings.cases.sample) {
             $('#problem .karel-js-link a')
-                .attr('href', original_href + '#mundo:' +
-                                  encodeURIComponent(problem.sample_input));
+                .attr('href',
+                      original_href + '#mundo:' +
+                          encodeURIComponent(problem.settings.cases.sample.in));
           } else {
             $('#problem .karel-js-link a').attr('href', original_href);
           }
@@ -1362,9 +1407,7 @@ export class Arena {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
                 problem.statement = problem_ext.statement;
-                problem.libinteractive_interface_name =
-                    problem_ext.libinteractive_interface_name;
-                problem.sample_input = problem_ext.sample_input;
+                problem.settings = problem_ext.settings;
                 problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
@@ -1430,9 +1473,11 @@ export class Arena {
 
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
-    if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
+    if (libinteractiveInterfaceName && problem.settings &&
+        problem.settings.interactive &&
+        problem.settings.interactive.module_name) {
       libinteractiveInterfaceName.innerText =
-          problem.libinteractive_interface_name.replace(/\.idl$/, '');
+          problem.settings.interactive.module_name.replace(/\.idl$/, '');
     }
     self.installLibinteractiveHooks();
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
@@ -1442,6 +1487,8 @@ export class Arena {
     let languageArray = problem.languages;
     self.updateAllowedLanguages(languageArray);
     self.selectDefaultLanguage();
+
+    self.ephemeralGrader.send('setSettings', problem.settings);
   }
 
   detectShowRun() {

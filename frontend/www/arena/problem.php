@@ -1,13 +1,18 @@
 <?php
-require_once('../../server/bootstrap.php');
+require_once('../../server/bootstrap_smarty.php');
+require_once('libs/dao/QualityNominations.dao.php');
 
 $r = new Request($_REQUEST);
+$problemAlias = $r['problem_alias'];
 $session = SessionController::apiCurrentSession($r)['session'];
-$r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
-    $problem = ProblemsDAO::GetByAlias($result['alias']);
+    if (is_null($result) || empty($result['exists'])) {
+        header('HTTP/1.1 404 Not Found');
+        die(file_get_contents('../404.html'));
+    }
+    $problem = ProblemsDAO::GetByAlias($problemAlias);
     $nominationStatus = null;
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
@@ -48,8 +53,10 @@ $smarty->assign('karel_problem', count(array_intersect(
     $result['languages'],
     ['kp', 'kj']
 )) == 2);
-if (isset($result['sample_input'])) {
-    $smarty->assign('sample_input', $result['sample_input']);
+if (isset($result['settings']['cases'])
+    && isset($result['settings']['cases']['sample'])
+) {
+    $smarty->assign('sample_input', $result['settings']['cases']['sample']);
 }
 
 $result['user'] = [
