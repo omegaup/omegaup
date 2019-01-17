@@ -99,4 +99,6 @@ namespace {
     $current_time = time();
     Time::setTimeForTesting($current_time);
     $conn->EXECUTE('SET TIMESTAMP = ' . $current_time);
+
+    Grader::setInstanceForTesting(new NoOpGrader());
 }

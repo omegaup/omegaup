@@ -8,8 +8,6 @@ require_once 'libs/ProblemDeployer.php';
  * ProblemsController
  */
 class ProblemController extends Controller {
-    public static $grader = null;
-
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
@@ -17,16 +15,6 @@ class ProblemController extends Controller {
     const VISIBILITY_PRIVATE = 0;
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
-
-    /**
-     * Creates an instance of Grader if not already created
-     */
-    private static function initializeGrader() {
-        if (is_null(self::$grader)) {
-            // Create new grader
-            self::$grader = new Grader();
-        }
-    }
 
     /**
      * Validates a Create or Update Problem API request
@@ -671,9 +659,6 @@ class ProblemController extends Controller {
 
         self::validateRejudge($r);
 
-        // We need to rejudge runs after an update, let's initialize the grader
-        self::initializeGrader();
-
         // Call Grader
         $runs = [];
         try {
@@ -691,7 +676,7 @@ class ProblemController extends Controller {
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
             }
-            self::$grader->Grade($guids, true, false);
+            Grader::getInstance()->grade($guids, true, false);
         } catch (Exception $e) {
             self::$log->error('Failed to rejudge runs after problem update');
             self::$log->error($e);

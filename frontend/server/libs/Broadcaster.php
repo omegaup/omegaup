@@ -25,16 +25,15 @@ class Broadcaster {
                 ]
             ]);
 
-            $grader = new Grader();
             $this->log->debug("Sending update $message");
-            $grader->broadcast(
+            Grader::getInstance()->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
                 is_null($r['contest']) ? null : (int)$r['contest']->problemset_id,
                 is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
                 $r['clarification']->public != '0',
                 $r['user']->username,
-                $r['clarification']->author_id,
+                (int)$r['clarification']->author_id,
                 false  // user_only
             );
         } catch (Exception $e) {
