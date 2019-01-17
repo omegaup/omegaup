@@ -18,7 +18,7 @@ stage_before_install() {
 }
 
 stage_install() {
-	install_omegaup_update_problem
+	install_omegaup_gitserver
 
 	# Expand all templates
 	for tpl in `find "${OMEGAUP_ROOT}/stuff/travis/nginx/" -name '*.conf.tpl'`; do
@@ -48,6 +48,8 @@ stage_install() {
 	yarn install
 	yarn build-development
 
+	stuff/travis/nginx/gitserver-start.sh
+
 	# Install the database schema
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup --development-environment
@@ -66,4 +68,12 @@ stage_script() {
 	python3.5 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 		--verbose --capture=no --log-cli-level=INFO --browser=chrome \
 		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
+}
+
+stage_after_failure() {
+	cat /tmp/omegaup/gitserver.log
+}
+
+stage_after_script() {
+	stuff/travis/nginx/gitserver-stop.sh
 }

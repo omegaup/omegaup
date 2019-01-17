@@ -62,7 +62,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals(5000, $r['time_limit']);
         $this->assertEquals('5s', $problemSettings->Limits->TimeLimit);
         $this->assertEquals(
-            $r['memory_limit'],
+            $r['memory_limit'] * 1024,
             $problemSettings->Limits->MemoryLimit
         );
 

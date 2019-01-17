@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/FileHandler.php';
+
 /**
  * RunController
  *
@@ -25,6 +27,7 @@ class RunController extends Controller {
     public static $defaultSubmissionGap = 60; /*seconds*/
     private static $practice = false;
 
+    // TODO(lhchavez): Remove this, since this is gonna die.
     public static function getGradePath($guid) {
         return GRADE_PATH . '/' .
             substr($guid, 0, 2) . '/' .
