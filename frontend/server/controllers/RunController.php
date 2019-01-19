@@ -621,7 +621,7 @@ class RunController extends Controller {
         // Get the details, compile error, logs, etc.
         RunController::getSource($r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
-            $gzippedLogs = Grader::getInstance()->getGraderResource($r['run']->guid, 'logs.txt.gz');
+            $gzippedLogs = self::getGraderResource($r['run']->guid, 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
                 $response['logs'] = gzdecode($gzippedLogs);
             }
@@ -705,7 +705,7 @@ class RunController extends Controller {
         if (!$showDetails && $run->verdict != 'CE') {
             return;
         }
-        $detailsJson = Grader::getInstance()->getGraderResource($run->guid, 'details.json');
+        $detailsJson = self::getGraderResource($run->guid, 'details.json');
         if (!is_string($detailsJson)) {
             return;
         }
@@ -735,10 +735,22 @@ class RunController extends Controller {
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!Grader::getInstance()->getGraderResource($r['run']->guid, 'files.zip', /*passthru=*/ true)) {
+        if (!self::getGraderResource($r['run']->guid, 'files.zip', /*passthru=*/ true)) {
             http_response_code(404);
         }
         exit;
+    }
+
+    private static function getGraderResource(
+        string $guid,
+        string $filename,
+        bool $passthru = false
+    ) {
+        $result = Grader::getInstance()->getGraderResource($guid, $filename, $passthru, /*missingOk=*/true);
+        if (is_null($result)) {
+            return self::downloadRunFromS3($guid, $filename, $passthru);
+        }
+        return $result;
     }
 
     /**

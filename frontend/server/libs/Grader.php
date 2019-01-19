@@ -95,6 +95,9 @@ class Grader {
         bool $passthru = false,
         bool $missingOk = false
     ) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return null;
+        }
         return $this->curlRequestRaw(
             OMEGAUP_GRADER_URL . '/run/resource/',
             [
@@ -141,7 +144,7 @@ class Grader {
             $content = curl_exec($curl);
 
             if ($content === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-                $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
+                $message = "curl_exec failed for $url: " . curl_error($curl) . ' ' .
                     curl_errno($curl) . ' HTTP ' .
                     curl_getinfo($curl, CURLINFO_HTTP_CODE);
                 throw new Exception($message);
