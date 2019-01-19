@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 class InterviewController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = !$is_update;
@@ -117,8 +119,7 @@ class InterviewController extends Controller {
             // this is fine, we'll create an account for this user
         }
 
-        global $smarty;
-        $subject = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+        $subject = Translations::getInstance()->get('interviewInvitationEmailSubject');
 
         if (is_null($r['user'])) {
             // create a new user
@@ -133,19 +134,19 @@ class InterviewController extends Controller {
             UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . '<br>'
                            . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
                            . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
-            $body .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
+            $body .= Translations::getInstance()->get('interviewEmailDraft')
                             . '<br>'
-                            . $smarty->getConfigVariable('profileUsername')
+                            . Translations::getInstance()->get('profileUsername')
                             . ' : '
                             . $newUserRequest['username']
                             . '<br>'
-                            . $smarty->getConfigVariable('loginPassword')
+                            . Translations::getInstance()->get('loginPassword')
                             . ' : '
                             . $newUserRequest['password']
                             . '<br>';
@@ -153,7 +154,7 @@ class InterviewController extends Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
                            . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }
@@ -188,6 +189,7 @@ class InterviewController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        include_once 'libs/Email.php';
         Email::sendEmail($email, $subject, $body);
 
         self::$log->info('Added ' . $r['username'] . ' to interview.');
@@ -200,7 +202,10 @@ class InterviewController extends Controller {
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
-            throw new NotFoundException('interviewNotFound');
+            return [
+                'exists' => false,
+                'status' => 'ok',
+            ];
         }
 
         // Only admins can view interview details
@@ -234,6 +239,7 @@ class InterviewController extends Controller {
             'contest_alias' => $interview->alias,
             'problemset_id' => $interview->problemset_id,
             'users' => $users,
+            'exists' => true,
             'status' => 'ok',
         ];
     }

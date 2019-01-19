@@ -8,20 +8,27 @@
   <title>Contestants - libinteractive</title>
   
 
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
   
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script src="../js/theme.js"></script>
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Contestants";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
 
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -33,47 +40,65 @@
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> libinteractive</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
   </form>
 </div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Index</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="../writing">Writing problems</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../writing/">Writing problems</a>
         
-
-    
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../internals/">Implementation details</a>
         
-            <li class="toctree-l1 ">
-                <a class="" href="../internals">Implementation details</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Contestants</a>
         
-
-    
+            <ul>
+            
+                <li class="toctree-l3"><a href="#running-libinteractive-problems">Running libinteractive problems</a></li>
+                
+                    <li><a class="toctree-l4" href="#windows">Windows</a></li>
+                
+                    <li><a class="toctree-l4" href="#linuxmac-os-x">Linux/Mac OS X</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#general-notes">General notes</a></li>
+                
+            
+            </ul>
         
-            <li class="toctree-l1 current">
-                <a class="current" href=".">Contestants</a>
-            </li>
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../license/">License</a>
         
-
-    
-        
-            <li class="toctree-l1 ">
-                <a class="" href="../license">License</a>
-            </li>
-        
-
-    
-</ul>
-
+    </li>
+<li>
+          
+        </ul>
       </div>
       &nbsp;
     </nav>
@@ -82,8 +107,8 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">libinteractive</a>
       </nav>
 
       
@@ -92,44 +117,55 @@
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
     <li>Contestants</li>
-      <li class="wy-breadcrumbs-aside">
+    <li class="wy-breadcrumbs-aside">
+      
         
-          
-            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
-          
+          <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="running-libinteractive-problems">Running libinteractive problems</h1>
+              
+                <h1 id="running-libinteractive-problems">Running libinteractive problems</h1>
 <p>libinteractive is an easy way to write interactive problems. The process to
 compile, run, and test programs is slightly different to the one you are used
 to, but it is simple. The specific steps depend on the operating system you are
-using:</p>
+using.</p>
+<p>First, choose your operating system and the language you will be using with the
+dropdown that is shown in the problem statement. Then, follow the steps that
+correspond to the operating system you are using:</p>
 <h3 id="windows">Windows</h3>
 <ul>
 <li>Extract all files in the template into a folder. Open the Commandline
-    (Windows+R, type <code>cmd</code> and press Return),   and navigate to the folder you just
-    created.</li>
-<li>You must have previously installed <a href="http://www.codeblocks.org/downloads/binaries#windows">CodeBlocks</a>
+  (Windows+R, type <code>cmd</code> and press Return), and navigate to the folder you just
+  created.</li>
+<li>You must have previously installed <a href="http://www.codeblocks.org/downloads/binaries#windows">Code::Blocks</a>
   (make sure to install the version that says MinGW) and run it at least once.<ul>
+<li>If you want to use C or C++, simply open the Code::Blocks project file
+  that is included in the folder you just extracted. You can ignore the
+  rest of the steps. To try other test cases, try modifying the <code>sample.in</code>
+  file that is included in the project.</li>
 <li>If you are using Java, you must install the
   <a href="http://www.oracle.com/technetwork/java/javase/downloads/">JDK</a>.</li>
 <li>If you want to use Pascal, you need to install
   <a href="http://www.lazarus.freepascal.org/index.php?page=downloads">Lazarus</a> and
-        have launched it at least once.</li>
+  have launched it at least once.</li>
 <li>If you want to use Python, you need to install
-      <a href="https://www.python.org/downloads/">Python 2.7</a>.</li>
+  <a href="https://www.python.org/downloads/">Python 2.7</a>.</li>
 </ul>
 </li>
 <li>To compile all required programs, type <code>run</code> (or <code>run.bat</code>). This will also
-    run your code. Remember that the problemsetter program expects to read the
-    case from stdin, so you either need to type it on the commandline or redirect
-    stdin (<code>run &lt; input.in</code>).</li>
+  run your code. Remember that the problemsetter program expects to read the
+  case from stdin, so you either need to type it on the commandline or redirect
+  stdin (<code>run &lt; input.in</code>).</li>
 <li>To test your solution with a test case, write <code>test</code> (or <code>test.bat</code>). This is
   equivalent to running <code>run.bat &lt; examples\sample.in</code>.</li>
 </ul>
@@ -141,7 +177,7 @@ using:</p>
   <code>gcc</code>, <code>g++</code>, <code>fpc</code>, <code>python</code> y <code>openjdk-7-jdk</code>.</li>
 <li>Write <code>make</code> to compile all needed programs and <code>make run</code> to execute your
   code. Rembember that the problemsetter program expects to read a test case
-    from stdin, so either type it on the terminal or redirect stdin (<code>make run
+  from stdin, so either type it on the terminal or redirect stdin (<code>make run
   &lt; input.in</code>).</li>
 <li>To test your solution against a test case, write <code>make test</code>. This is
   equivalent to running <code>make run &lt; examples/sample.in</code>.</li>
@@ -149,28 +185,28 @@ using:</p>
 <h1 id="general-notes">General notes</h1>
 <ul>
 <li>To correctly solve the problem, you must only submit the file that the
-    website tells you. Don't send any other file or it will result in a
-    compilation error.</li>
+  website tells you. Don't send any other file or it will result in a
+  compilation error.</li>
 <li>Some problems will have extra test inputs beside <code>sample.in</code>. Try to make
-    your code run correctly with all those cases. You can try them out by running
-    either <code>run &lt; examples/file.in</code> or <code>make run &lt; examples/file.in</code>, depending
-    on your operating system.</li>
+  your code run correctly with all those cases. You can try them out by running
+  either <code>run &lt; examples/file.in</code> or <code>make run &lt; examples/file.in</code>, depending
+  on your operating system.</li>
 <li>To get all possible points in a problem, your program must solve all possible
-    test cases, even some not included in the <code>examples</code> folder. Try to think of
-    additional test cases, run your code with them and verify that the result is
-    correct. Good luck!</li>
+  test cases, even some not included in the <code>examples</code> folder. Try to think of
+  additional test cases, run your code with them and verify that the result is
+  correct. Good luck!</li>
 </ul>
-
+              
             </div>
-          </div> 
+          </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../license" class="btn btn-neutral float-right" title="License"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../license/" class="btn btn-neutral float-right" title="License"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../internals" class="btn btn-neutral" title="Implementation details"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../internals/" class="btn btn-neutral" title="Implementation details"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -178,12 +214,11 @@ using:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+    
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
 	  
         </div>
@@ -195,12 +230,17 @@ using:</p>
 
 <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../internals/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../license/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
     </span>
 </div>
+
 </body>
 </html>

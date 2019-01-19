@@ -503,7 +503,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     public static function getPrivateCount(Users $user) {
         $sql = 'SELECT
-            COUNT(*) as Total
+            COUNT(*) as total
         FROM
             Problems AS p
         INNER JOIN
@@ -515,13 +515,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $params = [$user->user_id];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-
-        if (!array_key_exists('Total', $rs)) {
-            return 0;
-        }
-
-        return $rs['Total'];
+        return $conn->GetOne($sql, $params);
     }
 
     public static function getExplicitAdminEmails(Problems $problem) {
@@ -584,14 +578,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                1;
         ';
         $params = [$problem->acl_id];
-        $rs = $conn->Execute($sql, $params);
-        if (count($rs)==0) {
+        $row = $conn->GetRow($sql, $params);
+        if (!array_key_exists('name', $row)) {
                 return null;
         }
 
         return [
-            'name' => $rs->fields['name'],
-            'email' => $rs->fields['email']
+            'name' => $row['name'],
+            'email' => $row['email']
         ];
     }
 

@@ -76,19 +76,42 @@ def test_create_problem(driver):
         runs_before_submit = driver.browser.find_elements_by_xpath(
             '//td[@class="status"]')
 
-        util.create_run(driver, problem_alias, 'Main.java')
+        filename = 'Main.java'
+        util.create_run(driver, problem_alias, filename)
 
         runs_after_submit = driver.browser.find_elements_by_xpath(
             '//td[@class="status"]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//button[contains(@class, "details")]'))).click()
 
-# Creating a problem intentionally attempts to get the details of a problem to
-# see if the alias is being used already.
-@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
-                           message_whitelist=('/api/problem/details/',))
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, '//form[@class="run-details-view"]')))
+
+        textarea = driver.browser.find_element_by_xpath(
+            '//form[@class="run-details-view"]//div[@class="CodeMirror-code"]')
+
+        assert textarea.text is not None
+
+        resource_path = os.path.join(util.OMEGAUP_ROOT,
+                                     'frontend/tests/resources', filename)
+        # The text of the CodeMirror editor contains the line number.
+        # Non-exact match is needed.
+        with open(resource_path, 'r') as f:
+            for row in f.read().splitlines():
+                if row is not None:
+                    assert (row in textarea.text), row
+
+        driver.browser.find_element_by_id('overlay').click()
+
+
 @util.annotate
+@util.no_javascript_errors()
 def create_problem(driver, problem_alias):
     '''Create a problem.'''
     with driver.login_admin():

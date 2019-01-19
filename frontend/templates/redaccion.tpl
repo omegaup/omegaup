@@ -15,41 +15,8 @@
 <div><em>Subido por: tu_usuario</em></div>
 </div>
 <div id="wmd-panel">
-	<div id="wmd-button-bar"></div>
-	<textarea class="wmd-input" id="wmd-input"># Descripción
-
-Esta es la descripción del problema. Inventa una historia creativa. Puedes utilizar matemáticas inline para hacer $x_i, y_i$, o $z_i$ o incluso: $$x=\frac{ldelim}b\pm \sqrt{ldelim}b^2 -4ac{rdelim}{rdelim}{ldelim}2a{rdelim}$$
-
-# Entrada
-
-Aquí va la descripción de la entrada del problema.
-
-# Salida
-
-Esta es la descripción de la salida esperada.
-
-# Ejemplo
-
-||input
-1
-2
-||output
-Case #1: 3
-||description
-Explicación
-||input
-5
-10
-||output
-Case #2: 15
-||end
-
-# Límites
-
-* Aquí
-* Van
-* Los
-* Límites</textarea>
+	<div id="wmd-button-bar"></div><button id="reset-statement">Restaurar</button>
+	<textarea class="wmd-input" id="wmd-input"></textarea>
 </div>
 <script type="text/javascript" src="{version_hash src="/js/redaccion.js"}"></script>
 <div style='clear: both;'></div>

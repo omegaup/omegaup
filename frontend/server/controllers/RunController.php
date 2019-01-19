@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/FileHandler.php';
+
 /**
  * RunController
  *
@@ -23,13 +25,13 @@ class RunController extends Controller {
         'lua' => 'Lua',
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
-    public static $grader = null;
     private static $practice = false;
 
-    public static function getGradePath($run) {
+    // TODO(lhchavez): Remove this, since this is gonna die.
+    public static function getGradePath($guid) {
         return GRADE_PATH . '/' .
-            substr($run->guid, 0, 2) . '/' .
-            substr($run->guid, 2);
+            substr($guid, 0, 2) . '/' .
+            substr($guid, 2);
     }
 
     /**
@@ -39,19 +41,6 @@ class RunController extends Controller {
         return RUNS_PATH .
             DIRECTORY_SEPARATOR . substr($run->guid, 0, 2) .
             DIRECTORY_SEPARATOR . substr($run->guid, 2);
-    }
-
-    /**
-     * Creates an instance of Grader if not already created
-     */
-    private static function initializeGrader() {
-        if (is_null(self::$grader)) {
-            // Create new grader
-            self::$grader = new Grader();
-        }
-
-        // Set practice mode OFF by default
-        self::$practice = false;
     }
 
     /**
@@ -230,8 +219,7 @@ class RunController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function apiCreate(Request $r) {
-        // Init
-        self::initializeGrader();
+        self::$practice = false;
 
         // Authenticate user
         self::authenticateRequest($r);
@@ -361,7 +349,7 @@ class RunController extends Controller {
 
         // Call Grader
         try {
-            self::$grader->Grade([$run->guid], false, false);
+            Grader::getInstance()->grade([$run->guid], false, false);
         } catch (Exception $e) {
             self::$log->error('Call to Grader::grade() failed:');
             self::$log->error($e);
@@ -511,8 +499,7 @@ class RunController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiRejudge(Request $r) {
-        // Init
-        self::initializeGrader();
+        self::$practice = false;
 
         // Get the user who is calling this API
         self::authenticateRequest($r);
@@ -527,8 +514,8 @@ class RunController extends Controller {
 
         // Try to delete existing directory, if exists.
         try {
-            $grade_dir = RunController::getGradePath($r['run']);
-            FileHandler::DeleteDirRecursive($grade_dir);
+            $gradeDir = RunController::getGradePath($r['run']->guid);
+            FileHandler::DeleteDirRecursive($gradeDir);
         } catch (Exception $e) {
             // Soft error :P
             self::$log->warn($e);
@@ -544,7 +531,7 @@ class RunController extends Controller {
         RunsDAO::save($r['run']);
 
         try {
-            self::$grader->Grade([$r['run']->guid], true, $r['debug'] || false);
+            Grader::getInstance()->grade([$r['run']->guid], true, $r['debug'] || false);
         } catch (Exception $e) {
             self::$log->error('Call to Grader::grade() failed:');
             self::$log->error($e);
@@ -637,54 +624,26 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = [];
-
-        if (OMEGAUP_LOCKDOWN) {
-            $response['source'] = 'lockdownDetailsDisabled';
-            $response['status'] = 'ok';
-            return $response;
-        }
-
         // Get the source
-        $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        $response['admin'] = Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']);
+        $response = [
+            'status' => 'ok',
+            'admin' => Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']),
+            'guid' => $r['run']->guid,
+            'language' => $r['run']->language,
+        ];
         $showDetails = $response['admin'] ||
             ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
-        // Get the details and/or compile error.
-        $grade_dir = RunController::getGradePath($r['run']);
-        $details = null;
-        if (($showDetails || $r['run']->verdict == 'CE') &&
-            file_exists("$grade_dir/details.json")) {
-            $details = json_decode(file_get_contents("$grade_dir/details.json"), true);
-        }
-        if (!is_null($details) && isset($details['compile_error'])) {
-            $response['compile_error'] = $details['compile_error'];
-        } elseif (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
-        if ($showDetails && !is_null($details)) {
-            if (count(array_filter(array_keys($details), 'is_string')) > 0) {
-                $response['details'] = $details;
-            } else {
-                // TODO(lhchavez): Remove this backwards-compatibility shim
-                // with backendv1.
-                $response['groups'] = $details;
-            }
-        }
-
-        if ($response['admin']) {
-            if (file_exists("$grade_dir/logs.txt.gz")) {
-                $response['logs'] = file_get_contents("compress.zlib://$grade_dir/logs.txt.gz");
-            } elseif (file_exists("$grade_dir/run.log")) {
-                $response['logs'] = file_get_contents("$grade_dir/run.log");
+        // Get the details, compile error, logs, etc.
+        RunController::getSource($r['run'], $showDetails, $response);
+        if (!OMEGAUP_LOCKDOWN && $response['admin']) {
+            $gzippedLogs = RunController::getGraderResource($r['run']->guid, 'logs.txt.gz');
+            if (is_string($gzippedLogs)) {
+                $response['logs'] = gzdecode($gzippedLogs);
             }
 
             $response['judged_by'] = $r['run']->judged_by;
         }
-        $response['guid'] = $r['run']->guid;
-        $response['status'] = 'ok';
-        $response['language'] = $r['run']->language;
 
         return $response;
     }
@@ -746,25 +705,33 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = [];
-
-        if (OMEGAUP_LOCKDOWN) {
-            // OMI hotfix
-            // @TODO @joemmanuel, hay que localizar este msg :P
-            $response['source'] = 'Ver el código ha sido temporalmente desactivado.';
-        } else {
-            // Get the source
-            $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        }
-
-        // Get the error
-        $grade_dir = RunController::getGradePath($r['run']);
-        if (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
-
-        $response['status'] = 'ok';
+        $response = [
+            'status' => 'ok',
+        ];
+        RunController::getSource($r['run'], false, $response);
         return $response;
+    }
+
+    private static function getSource(Runs $run, $showDetails, &$response) {
+        if (OMEGAUP_LOCKDOWN) {
+            $response['source'] = 'lockdownDetailsDisabled';
+        } else {
+            $response['source'] = file_get_contents(RunController::getSubmissionPath($run));
+        }
+        if (!$showDetails && $run->verdict != 'CE') {
+            return;
+        }
+        $detailsJson = RunController::getGraderResource($run->guid, 'details.json');
+        if (!is_string($detailsJson)) {
+            return;
+        }
+        $details = json_decode($detailsJson, true);
+        if (isset($details['compile_error'])) {
+            $response['compile_error'] = $details['compile_error'];
+        }
+        if (!OMEGAUP_LOCKDOWN && $showDetails) {
+            $response['details'] = $details;
+        }
     }
 
     /**
@@ -782,30 +749,36 @@ class RunController extends Controller {
 
         self::validateAdminDetailsRequest($r);
 
-        $grade_dir = RunController::getGradePath($r['run']);
-        $results_zip = "$grade_dir/files.zip";
-        if (!file_exists($results_zip)) {
-            $results_zip = "$grade_dir/results.zip";
-        }
-
-        if (file_exists($results_zip)) {
-            $output_callback = function () use ($results_zip) {
-                header('Content-Length: ' . filesize($results_zip));
-                readfile($results_zip);
-                return true;
-            };
-        } else {
-            $output_callback = function () use ($r) {
-                return self::downloadRunFromS3($r['run']->guid);
-            };
-        }
-
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!$output_callback()) {
+        if (!RunController::serveGraderResource($r['run']->guid, 'files.zip')) {
             http_response_code(404);
         }
         exit;
+    }
+
+    private static function getGraderResource($guid, $filename) {
+        $gradeDir = RunController::getGradePath($guid);
+        $resourcePath = "${gradeDir}/${filename}";
+
+        if (!file_exists($resourcePath)) {
+            return self::downloadRunFromS3($guid, $filename, false);
+        }
+
+        return file_get_contents($resourcePath);
+    }
+
+    private static function serveGraderResource($guid, $filename) {
+        $gradeDir = RunController::getGradePath($guid);
+        $resourcePath = "${gradeDir}/${filename}";
+
+        if (!file_exists($resourcePath)) {
+            return self::downloadRunFromS3($guid, $filename, true);
+        }
+
+        header('Content-Length: ' . filesize($resourcePath));
+        readfile($resourcePath);
+        return true;
     }
 
     /**
@@ -814,7 +787,7 @@ class RunController extends Controller {
      * @param string $guid The run's GUID.
      * @return bool True if successful.
      */
-    private static function downloadRunFromS3($guid) {
+    private static function downloadRunFromS3($guid, $filename, $passthru) {
         if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
             return false;
         }
@@ -825,7 +798,7 @@ class RunController extends Controller {
             2 => ['pipe', 'w']
         ];
         $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}.zip -",
+            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}/${filename} -",
             $descriptorspec,
             $pipes,
             '/tmp',
@@ -844,7 +817,12 @@ class RunController extends Controller {
         fclose($pipes[0]);
         $err = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
-        fpassthru($pipes[1]);
+        if ($passthru) {
+            fpassthru($pipes[1]);
+            $result = true;
+        } else {
+            $result = stream_get_contents($pipes[1]);
+        }
         fclose($pipes[1]);
 
         $retval = proc_close($proc);
@@ -853,7 +831,7 @@ class RunController extends Controller {
             self::$log->error("Getting run $guid failed: $retval $err");
             return false;
         }
-        return true;
+        return $result;
     }
 
     /**

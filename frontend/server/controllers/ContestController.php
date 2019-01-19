@@ -1,7 +1,8 @@
 <?php
 
-require_once('libs/dao/Contests.dao.php');
-require_once('libs/ActivityReport.php');
+require_once 'libs/ActivityReport.php';
+require_once 'libs/PrivacyStatement.php';
+require_once 'libs/dao/Contests.dao.php';
 
 /**
  * ContestController
@@ -150,7 +151,7 @@ class ContestController extends Controller {
         $contests = null;
         try {
             if (Authorization::isSystemAdmin($r['current_identity_id'])) {
-                $contests = ContestsDAO::getAll(
+                $contests = ContestsDAO::getAllContestsWithScoreboard(
                     $page,
                     $pageSize,
                     'contest_id',
@@ -167,16 +168,9 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $addedContests = [];
-        foreach ($contests as $c) {
-            $c->toUnixTime();
-            $contestInfo = $c->asFilteredArray($relevant_columns);
-            $addedContests[] = $contestInfo;
-        }
-
         return [
             'status' => 'ok',
-            'contests' => $addedContests,
+            'contests' => $contests,
         ];
     }
 
@@ -577,7 +571,7 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($needsInformation['requests_user_information'] != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id '], $r['statement_type']);
+                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r['current_identity_id'],
                     $privacystatement_id
@@ -638,6 +632,7 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
+            $result['show_scoreboard_after'] = $result['show_scoreboard_after'] == '1';
             $result['original_contest_alias'] = null;
             $result['original_problemset_id'] = null;
             if ($result['rerun_id'] != 0) {
@@ -888,7 +883,6 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        $experiments->ensureEnabled(Experiments::VIRTUAL);
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -1025,7 +1019,7 @@ class ContestController extends Controller {
         $contest->description = $r['description'];
         $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
-        $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
+        $contest->window_length = empty($r['window_length']) ? null : $r['window_length'];
         $contest->rerun_id = 0;
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
@@ -1039,7 +1033,7 @@ class ContestController extends Controller {
         $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
 
         if (!is_null($r['show_scoreboard_after'])) {
-            $contest->show_scoreboard_after = $r['show_scoreboard_after'];
+            $contest->show_scoreboard_after = $r['show_scoreboard_after'] == 'true';
         } else {
             $contest->show_scoreboard_after = '1';
         }
@@ -1117,7 +1111,7 @@ class ContestController extends Controller {
         }
 
         // Window_length is optional
-        if (!is_null($r['window_length']) && $r['window_length'] !== 'NULL') {
+        if (!empty($r['window_length'])) {
             Validators::isNumberInRange(
                 $r['window_length'],
                 'window_length',
@@ -1168,7 +1162,7 @@ class ContestController extends Controller {
         }
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['0', '1'], false);
+        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
 
         // languages is always optional
         if (!empty($r['languages'])) {
@@ -1506,6 +1500,7 @@ class ContestController extends Controller {
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
+                'is_invited' => '1',
             ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
@@ -2230,19 +2225,21 @@ class ContestController extends Controller {
                 return gmdate('Y-m-d H:i:s', $value);
             }],
             'window_length' => ['transform' => function ($value) {
-                return $value == 'NULL' ? null : $value;
+                return empty($value) ? null : $value;
             }],
             'scoreboard',
             'points_decay_factor',
             'partial_score',
             'submissions_gap',
             'feedback',
-            'penalty'               => ['transform' => function ($value) {
+            'penalty' => ['transform' => function ($value) {
                 return max(0, intval($value));
             }],
             'penalty_type',
             'penalty_calc_policy',
-            'show_scoreboard_after',
+            'show_scoreboard_after' => ['transform' => function ($value) {
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            }],
             'languages' => ['transform' => function ($value) {
                 if (!is_array($value)) {
                     return $value;
@@ -2701,6 +2698,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        include_once 'libs/third_party/ZipStream.php';
         $zip = new ZipStream($r['contest_alias'] . '.zip');
 
         // Add runs to zip

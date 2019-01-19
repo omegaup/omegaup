@@ -110,7 +110,11 @@ class EventsSocket {
         self.arena.updateClarification(data.clarification);
       }
     } else if (data.message == '/scoreboard/update/') {
-      if (self.arena.contestAdmin && data.scoreboard_type != 'admin') return;
+      if (self.arena.contestAdmin && data.scoreboard_type != 'admin') {
+        if (self.arena.options.originalContestAlias == null) return;
+        self.arena.virtualRankingChange(data.scoreboard);
+        return;
+      }
       self.arena.rankingChange(data.scoreboard);
     }
   }
@@ -142,6 +146,47 @@ class EventsSocket {
   }
 }
 ;
+
+class EphemeralGrader {
+  constructor() {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement =
+        document.getElementById('ephemeral-embedded-grader');
+    self.messageQueue = [];
+    self.loaded = false;
+
+    if (!self.ephemeralEmbeddedGraderElement) return;
+
+    self.ephemeralEmbeddedGraderElement.onload = () => {
+      self.loaded = true;
+      while (self.messageQueue.length > 0) {
+        self._sendInternal(self.messageQueue.shift());
+      }
+    };
+  }
+
+  send(method, ...params) {
+    let self = this;
+    let message = {
+      method: method,
+      params: params,
+    };
+
+    if (!self.loaded) {
+      self.messageQueue.push(message);
+      return;
+    }
+    self._sendInternal(message);
+  }
+
+  _sendInternal(message) {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement.contentWindow.postMessage(
+        message, window.location.origin + '/grader/ephemeral/embedded/');
+  }
+}
 
 export class Arena {
   constructor(options) {
@@ -290,6 +335,15 @@ export class Arena {
 
     // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
+
+    // Cache scoreboard data for virtual contest
+    self.originalContestScoreboardEvent = null;
+
+    // Virtual contest refresh interval
+    self.virtualContestRefreshInterval = null;
+
+    // Ephemeral grader support.
+    self.ephemeralGrader = new EphemeralGrader();
   }
 
   installLibinteractiveHooks() {
@@ -571,21 +625,14 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
-    if (self.options.originalContestAlias != null) {
-      API.Problemset.scoreboardEvents(
-                        {problemset_id: self.options.problemsetId})
+    if (self.options.contestAlias != null) {
+      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(function(response) {
-            let events = response.events;
-            for (let event of events) event.virtual = true;
-            API.Problemset.scoreboardEvents({
-                            problemset_id: self.options.originalProblemsetId
-                          })
-                .then(function(response) {
-                  events.push.apply(response.events);
-                  self.virtualRankingChange(events);
-                  self.onRankingEvents({events: events});
-                })
-                .fail(UI.ignoreError);
+            // Differentiate ranking change between virtual and normal contest
+            if (self.options.originalContestAlias != null)
+              self.virtualRankingChange(response);
+            else
+              self.rankingChange(response);
           })
           .fail(UI.ignoreError);
     } else if (self.options.contestAdmin || self.options.contestAlias != null ||
@@ -597,63 +644,130 @@ export class Arena {
     }
   }
 
-  virtualRankingChange(data) {
+  onVirtualRankingChange(virtualContestData) {
     let self = this;
-    let delta = (new Date()).getTime() - self.startTime.getTime();
-    let rank = [];
+    // This clones virtualContestData to data so that virtualContestData values
+    // won't be overriden by processes below
+    let data = JSON.parse(JSON.stringify(virtualContestData));
+    let events = self.originalContestScoreboardEvent;
+    let currentDelta =
+        ((new Date()).getTime() - self.startTime.getTime()) / (1000 * 60);
+
+    for (let rank of data.ranking) rank.virtual = true;
 
     let problemOrder = {};
     let problems = [];
-    let initialScores = [];
+    let initialProblems = [];
 
     for (let problem of Object.values(self.problems)) {
       problemOrder[problem.alias] = problems.length;
+      initialProblems.push({
+        penalty: 0,
+        percent: 0,
+        points: 0,
+        runs: 0,
+      });
       problems.push({order: problems.length + 1, alias: problem.alias});
     }
 
-    data.forEach(function(env) {
-      if (env.delta > delta) return;
-      let key = env.username + (env.virtual ? '-virtual' : '');
-      if (!rank.hasOwnProperty(key)) {
-        rank[key] = {
-          country: env.country,
-          name: env.name,
-          username: env.username,
+    // Calculate original contest scoreboard with current delta time
+    let originalContestRanking = {};
+    let originalContestEvents = [];
+
+    // Refresh after time T
+    let refreshTime = 30 * 1000;  // 30 seconds
+
+    events.forEach(function(evt) {
+      let key = evt.username;
+      if (!originalContestRanking.hasOwnProperty(key)) {
+        originalContestRanking[key] = {
+          country: evt.country,
+          name: evt.name,
+          username: evt.username,
+          problems: Array.from(initialProblems),
+          total: {
+            penalty: 0,
+            points: 0,
+            runs: 0,
+          },
           place: 0,
-          problems: [], virtual: env.virtual || false,
         };
-        for (let j = 0; j < problems.length; j++) {
-          rank[key].problems.push({penalty: 0, percent: 0, points: 0, runs: 0});
-        }
-        rank[key].total = {points: 0, penalty: 0};
       }
-      let problem = rank[key].problems[problemOrder[env.problem.alias]];
-      rank[key].problems[problemOrder[env.problem.alias]] = {
-        penalty: env.problem.penalty,
-        points: env.problem.points,
-        runs: problem.runs + 1
+      if (evt.delta > currentDelta) {
+        refreshTime =
+            Math.min(refreshTime, (evt.delta - currentDelta) * 60 * 1000);
+        return;
+      }
+      originalContestEvents.push(evt);
+      let problem =
+          originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
+      originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
+        penalty: evt.problem.penalty,
+        points: evt.problem.points,
+        runs: problem ? problem.runs + 1 :
+                        1  // If problem appeared in event for than one, it
+                           // means a problem has been solved multiple times
       };
-      rank[key].total = env.total;
+      originalContestRanking[key].total = evt.total;
     });
+    // Merge original contest scoreboard ranking with virtual contest
+    for (let ranking of Object.values(originalContestRanking))
+      data.ranking.push(ranking);
 
-    let ranking = Object.values(rank);
+    // Re-sort rank
+    data.ranking.sort(
+        (rank1, rank2) => { return rank2.total.points - rank1.total.points; });
 
-    ranking.sort(function(rank1, rank2) {
-      return rank2.total.points - rank1.total.points;
-    });
+    // Override ranking
+    data.ranking.forEach((rank, index) => rank.place = index + 1);
+    self.onRankingChanged(data);
 
-    for (var index = 0; index < ranking.length; index++)
-      ranking[index].place = index + 1;
-
-    let scoreboard = {
-      finish_time: self.finishTime.getTime(),
-      start_time: self.startTime.getTime(),
-      time: Date.now(),
-      problems: problems,
-      ranking: ranking
+    let params = {
+      problemset_id: self.options.problemsetId,
     };
+    if (self.options.scoreboardToken) {
+      params.token = self.options.scoreboardToken;
+    }
 
-    self.rankingChange(scoreboard, false);
+    API.Problemset.scoreboardEvents(params)
+        .then(function(response) {
+          // Change username to username-virtual
+          for (let evt of response.events) {
+            evt.username =
+                UI.formatString(T.virtualSuffix, {username: evt.username});
+            evt.name = UI.formatString(T.virtualSuffix, {username: evt.name});
+          }
+
+          // Merge original contest and virtual contest scoreboard events
+          response.events = response.events.concat(originalContestEvents);
+          self.onRankingEvents(response);
+        })
+        .fail(UI.ignoreError);
+
+    self.virtualContestRefreshInterval = setTimeout(function() {
+      self.onVirtualRankingChange(virtualContestData);
+    }, refreshTime);
+  }
+
+  virtualRankingChange(data) {
+    // Merge original contest scoreboard and virtual contest
+    let self = this;
+
+    // Stop existing scoreboard simulation
+    if (self.virtualContestRefreshInterval != null)
+      clearTimeout(self.virtualContestRefreshInterval);
+
+    if (self.originalContestScoreboardEvent == null) {
+      API.Problemset.scoreboardEvents(
+                        {problemset_id: self.options.originalProblemsetId})
+          .then(function(response) {
+            self.originalContestScoreboardEvent = response.events;
+            self.onVirtualRankingChange(data);
+          })
+          .fail(UI.apiError);
+    } else {
+      self.onVirtualRankingChange(data);
+    }
   }
 
   rankingChange(data, rankingEvent = true) {
@@ -771,6 +885,10 @@ export class Arena {
     let navigatorData = [[this.startTime.getTime(), 0]];
     let series = [];
     let usernames = {};
+
+    // Don't trust input data (data might not be sorted)
+    data.events.sort((a, b) => a.delta - b.delta);
+
     this.currentEvents = data;
     // group points by person
     for (let i = 0, l = data.events.length; i < l; i++) {
@@ -1227,10 +1345,11 @@ export class Arena {
           if (hash_index != -1) {
             original_href = original_href.substring(0, hash_index);
           }
-          if (problem.sample_input) {
+          if (problem.settings.cases.sample) {
             $('#problem .karel-js-link a')
-                .attr('href', original_href + '#mundo:' +
-                                  encodeURIComponent(problem.sample_input));
+                .attr('href',
+                      original_href + '#mundo:' +
+                          encodeURIComponent(problem.settings.cases.sample.in));
           } else {
             $('#problem .karel-js-link a').attr('href', original_href);
           }
@@ -1288,9 +1407,7 @@ export class Arena {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
                 problem.statement = problem_ext.statement;
-                problem.libinteractive_interface_name =
-                    problem_ext.libinteractive_interface_name;
-                problem.sample_input = problem_ext.sample_input;
+                problem.settings = problem_ext.settings;
                 problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
@@ -1356,9 +1473,11 @@ export class Arena {
 
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
-    if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
+    if (libinteractiveInterfaceName && problem.settings &&
+        problem.settings.interactive &&
+        problem.settings.interactive.module_name) {
       libinteractiveInterfaceName.innerText =
-          problem.libinteractive_interface_name.replace(/\.idl$/, '');
+          problem.settings.interactive.module_name.replace(/\.idl$/, '');
     }
     self.installLibinteractiveHooks();
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
@@ -1368,6 +1487,8 @@ export class Arena {
     let languageArray = problem.languages;
     self.updateAllowedLanguages(languageArray);
     self.selectDefaultLanguage();
+
+    self.ephemeralGrader.send('setSettings', problem.settings);
   }
 
   detectShowRun() {
@@ -1401,12 +1522,14 @@ export class Arena {
 
   onCloseSubmit(e) {
     let self = this;
-    if (e.target.id === 'overlay' || e.target.className === 'close') {
-      $('#clarification', self.elements.submitForm).hide();
-      self.hideOverlay();
-      self.clearInputFile();
-      return false;
+    if (e.target.id !== 'overlay' &&
+        e.target.closest('button.close') === null) {
+      return;
     }
+    $('#clarification', self.elements.submitForm).hide();
+    self.hideOverlay();
+    self.clearInputFile();
+    return false;
   }
 
   clearInputFile() {
@@ -1703,8 +1826,11 @@ export class Arena {
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
     $('.problem_' + alias + ' .solved')
-        .html('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
+        .text('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
               maxScore + ')');
+    $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
+      ' .points')
+        .text(self.myRuns.getMaxScore(alias, previousScore))
   }
 }
 ;
@@ -1978,7 +2104,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
-    if (self.type() == 'disqualified') return T['wordsDisqualify'];
+    if (self.type() == 'disqualified') return T['wordsDisqualified'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -1998,6 +2124,7 @@ class ObservableRun {
         return T.verdictHelpKarelTLE;
       }
     }
+    if (self.type() == 'disqualified') return T.verdictHelpDisqualified;
 
     return T['verdictHelp' + self.verdict()];
   }

@@ -5,13 +5,15 @@
   "license": "BSD",
   "private": true,
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.22.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/traverse": "^7.2.3",
+    "@babel/types": "^7.3.0",
+    "babel-loader": "^8.0.5",
+    "babylon": "^6.18.0",
     "cross-env": "^5.1.6",
-    "css-loader": "^0.28.11",
+    "css-loader": "^2.1.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^1.1.11",
     "highcharts": "^6.1.0",
@@ -34,18 +36,20 @@
   },
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
-    "dev": "cross-env NODE_ENV=development webpack --watch --mode=development",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules --mode=production",
-    "build-development": "cross-env NODE_ENV=development webpack --hide-modules --mode=development",
+    "dev": "cross-env NODE_ENV=development webpack --watch --mode=development --max_old_space_size=512",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules --mode=production --max_old_space_size=512",
+    "build-development": "cross-env NODE_ENV=development webpack --hide-modules --mode=development --max_old_space_size=512",
     "refactor": "cross-env ./stuff/refactor.js"
   },
   "dependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "@babel/plugin-transform-async-to-generator": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
     "codemirror": "^5.38.0",
     "jszip": "^3.1.5",
-    "monaco-editor": "^0.14.3",
-    "monaco-editor-webpack-plugin": "^1.5.3",
-    "vue": "^2.5.16",
-    "vue-async-computed": "^3.3.1"
+    "monaco-editor": "^0.15.6",
+    "monaco-editor-webpack-plugin": "^1.7.0",
+    "pako": "^1.0.7",
+    "vue": "^2.5.22",
+    "vue-async-computed": "^3.5.1"
   }
 }

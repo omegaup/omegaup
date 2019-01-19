@@ -76,6 +76,7 @@ OmegaUp.on('ready', function() {
                       .then(function(response) {
                         if (response.status != 'ok') {
                           UI.error(response.error || 'error');
+                          return;
                         }
                         UI.success(T.problemSuccessfullyAdded);
                         refresh(ev, API.Contest.problems, 'problems');
@@ -90,6 +91,7 @@ OmegaUp.on('ready', function() {
                       .then(function(response) {
                         if (response.status != 'ok') {
                           UI.error(response.error || 'error');
+                          return;
                         }
                         UI.success(T.problemSuccessfullyRemoved);
                         refresh(ev, API.Contest.problems, 'problems');
@@ -171,6 +173,7 @@ OmegaUp.on('ready', function() {
                       .then(function(response) {
                         if (response.status != 'ok') {
                           UI.error(response.error || 'error');
+                          return;
                         }
                         UI.success(T.adminRemoved);
                         refresh(ev, API.Contest.admins, 'admins')

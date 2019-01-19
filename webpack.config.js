@@ -14,7 +14,7 @@ module.exports = [{
   name: 'frontend',
   entry: {
     omegaup: [
-      'babel-polyfill',
+      '@babel/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup.js'
     ],
@@ -28,6 +28,7 @@ module.exports = [{
     contest_edit: './frontend/www/js/omegaup/contest/edit.js',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant: './frontend/www/js/omegaup/contest/list_participant.js',
+    contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_requests: './frontend/www/js/omegaup/contest/requests.js',
     contest_scoreboardmerge: './frontend/www/js/omegaup/contest/scoreboardmerge.js',
     contest_stats: './frontend/www/js/omegaup/contest/stats.js',
@@ -42,6 +43,7 @@ module.exports = [{
     group_list: './frontend/www/js/omegaup/group/list.js',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.js',
+    rank_table: './frontend/www/js/omegaup/ranktable.js',
     schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     schools_rank: './frontend/www/js/omegaup/schools/rank.js',
     qualitynomination_popup: './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
@@ -51,6 +53,7 @@ module.exports = [{
     user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_charts: './frontend/www/js/omegaup/user/charts.js',
     user_edit_email_form : './frontend/www/js/omegaup/user/emailedit.js',
+    user_manage_identities : './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.js',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
     omegaup_styles: './frontend/www/sass/main.scss',
@@ -119,6 +122,7 @@ module.exports = [{
       'vue$': 'vue/dist/vue.common.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
       jszip: 'jszip/dist/jszip.js',
+      pako: 'pako/dist/pako.min.js',
     }
   },
   devServer: {
@@ -133,7 +137,7 @@ module.exports = [{
   name: 'grader',
   entry: {
     grader_ephemeral: [
-      'babel-polyfill',
+      '@babel/polyfill',
       './frontend/www/js/omegaup/grader/ephemeral.js',
     ],
   },
@@ -153,7 +157,7 @@ module.exports = [{
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env'],
+            presets: ['@babel/env'],
           },
         },
       },

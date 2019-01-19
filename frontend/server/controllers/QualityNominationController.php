@@ -1,7 +1,9 @@
 <?php
-require_once 'libs/dao/QualityNominations.dao.php';
+
+require_once 'libs/Translations.php';
 require_once 'libs/dao/QualityNomination_Log.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
+require_once 'libs/dao/QualityNominations.dao.php';
 
 class QualityNominationController extends Controller {
     /**
@@ -336,16 +338,16 @@ class QualityNominationController extends Controller {
             'problem_name' => htmlspecialchars($r['problem']->title),
             'user_name' => $username
         ];
-        global $smarty;
         $mail_subject = ApiUtils::FormatString(
-            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            Translations::getInstance()->get('demotionProblemEmailSubject'),
             $email_params
         );
         $mail_body = ApiUtils::FormatString(
-            $smarty->getConfigVars('demotionProblemEmailBody'),
+            Translations::getInstance()->get('demotionProblemEmailBody'),
             $email_params
         );
 
+        include_once 'libs/Email.php';
         Email::sendEmail($email, $mail_subject, $mail_body);
     }
 

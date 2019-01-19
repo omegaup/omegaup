@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -7,8 +9,7 @@
  * Author:
  *     Alan Gonzalez alanboy@alanboy.net
  *
- * */
-
+ */
 class SessionController extends Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
 
@@ -30,6 +31,7 @@ class SessionController extends Controller {
      * */
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
+            require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
             self::$_facebook = new Facebook\Facebook([
                 'app_id' => OMEGAUP_FB_APPID,
                 'app_secret' => OMEGAUP_FB_SECRET,
@@ -283,6 +285,8 @@ class SessionController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'storeToken');
         }
 
+        require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';
+
         $client = new Google_Client();
         $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
@@ -367,10 +371,9 @@ class SessionController extends Controller {
         self::$log->info('User is logged in via facebook !!');
         if (!isset($fb_user_profile['email'])) {
             self::$log->error('Facebook email empty');
-            global $smarty;
             return [
                 'status' => 'error',
-                'error' => $smarty->getConfigVariable(
+                'error' => Translations::getInstance()->get(
                     'loginFacebookEmptyEmailError'
                 ),
             ];
@@ -433,6 +436,7 @@ class SessionController extends Controller {
     }
 
     public static function getLinkedInInstance() {
+        require_once 'libs/LinkedIn.php';
         return new LinkedIn(
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,

@@ -23,7 +23,7 @@
         <p>{{description}}</p>
       </div>
       <div class="">
-        <h1>{{T.RegisterForContestRules}}</h1>
+        <h1>{{T.registerForContestRules}}</h1>
         <ul>
           <li>{{scoreboardTimeString}}</li>
           <li>{{submissionGapString}}</li>

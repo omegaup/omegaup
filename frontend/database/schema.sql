@@ -106,9 +106,12 @@ CREATE TABLE `Coder_Of_The_Month` (
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
+  `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
+  KEY `selected_by` (`selected_by`),
+  CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -540,6 +543,7 @@ CREATE TABLE `Problemset_Identities` (
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
+  `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),

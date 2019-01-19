@@ -6,8 +6,6 @@
  * @author joemmanuel
  */
 class Controller {
-    // If we turn this into protected,
-    // how are we going to initialize?
     public static $log;
 
     /**

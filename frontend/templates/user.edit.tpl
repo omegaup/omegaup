@@ -148,15 +148,17 @@
 						</div>
 					</div>
 
-					<div class="form-group">
-						<div class="col-md-offset-3 col-md-7">
-							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
-						</div>
+					<div class="col-md-offset-6 col-md-6 col-xs-12">
+						<button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{#wordsSaveChanges#}</button>
+						<a href="/profile" class="btn col-xs-5 btn-cancel">{#wordsCancel#}</a>
 					</div>
 				</form>
 			</div>
-
 		</div>
+{if !empty($ENABLED_EXPERIMENTS) && in_array('identities', $ENABLED_EXPERIMENTS)}
+		<div id="manage-identities"></div>
+		<script type="text/javascript" src="{version_hash src="/js/dist/user_manage_identities.js"}"></script>
+{/if}
 		{block name="basic-content"}
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -183,10 +185,9 @@
 						</div>
 					</div>
 
-					<div class="form-group">
-						<div class="col-md-offset-3 col-md-7">
-							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
-						</div>
+					<div class="col-md-offset-6 col-md-6 col-xs-12">
+						<button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{#wordsSaveChanges#}</button>
+						<a href="/profile" class="btn col-xs-5 btn-cancel">{#wordsCancel#}</a>
 					</div>
 				</form>
 			</div>

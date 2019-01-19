@@ -66,7 +66,8 @@
         </div>
         <div class="row">
           <div class="form-group col-md-6">
-            <label>{{T.contestNewFormScoreboardTimePercent}}</label> <input class="form-control"
+            <label>{{T.contestNewFormScoreboardTimePercent}}</label> <input class=
+            "form-control scoreboard-time-percent"
                  size="3"
                  type="text"
                  v-model="scoreboard">
@@ -136,10 +137,10 @@
           <div class="form-group col-md-6">
             <label>{{T.contestNewFormScoreboardAtEnd}}</label> <select class="form-control"
                  v-model="showScoreboardAfter">
-              <option value="1">
+              <option v-bind:value="true">
                 {{T.wordsYes}}
               </option>
-              <option value="0">
+              <option v-bind:value="false">
                 {{T.wordsNo}}
               </option>
             </select>
@@ -228,10 +229,7 @@ export default {
       submissionsGap: this.data.submissions_gap,
       title: this.data.title,
       titlePlaceHolder: '',
-      windowLength:
-          (this.data.window_length == 0 || this.data.window_length == null) ?
-              '' :
-              this.data.window_length,
+      windowLength: this.data.window_length || 0,
       windowLengthEnabled: this.data.window_length != 0 &&
                                this.data.window_length != '' &&
                                this.data.window_length != null,

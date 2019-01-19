@@ -1,6 +1,10 @@
 import API from './api.js';
 import UI from './ui.js';
 import * as arena from './arena/arena.js';
+import * as lang_en from './lang.en.js';
+import * as lang_es from './lang.es.js';
+import * as lang_pt from './lang.pt.js';
+import * as lang_pseudo from './lang.pseudo.js';
 
 export {API, UI, arena};
 
@@ -65,9 +69,27 @@ class EventListenerList {
 }
 ;
 
-// Stub for translations.
-// These should be loaded later with OmegaUp.loadTranslations.
-export let T = {};
+// Translation strings.
+export let T = (function() {
+  const head =
+      (document && document.querySelector && document.querySelector('head')) ||
+      null;
+
+  switch ((head && head.dataset && head.dataset.locale) || 'es') {
+    case 'pseudo':
+      return lang_pseudo.default;
+
+    case 'pt':
+      return lang_pt.default;
+
+    case 'en':
+      return lang_en.default;
+
+    case 'es':
+    default:
+      return lang_es.default;
+  }
+})();
 
 export let OmegaUp = {
   loggedIn: false,
@@ -86,6 +108,8 @@ export let OmegaUp = {
 
       _deltaTimeForTesting: 0,
 
+      _errors:[],
+
       _listeners:
           {
             'ready': new EventListenerList([
@@ -93,7 +117,29 @@ export let OmegaUp = {
               function() {
                 ko.bindingProvider.instance =
                     new ko.secureBindingsProvider({attribute: 'data-bind'});
-              }
+              },
+              function() {
+                let reportAnIssue = document.getElementById('report-an-issue');
+                if (!reportAnIssue || !window.navigator ||
+                    !window.navigator.userAgent || !T.reportAnIssueTemplate) {
+                  return;
+                }
+                reportAnIssue.addEventListener('click', function(event) {
+                  // Not using UI.formatString() to avoid creating a circular
+                  // dependency.
+                  let issueBody =
+                      T.reportAnIssueTemplate.replace(
+                                                 '%(userAgent)',
+                                                 window.navigator.userAgent)
+                          .replace('%(referer)', window.location.href)
+                          .replace('%(serializedErrors)',
+                                   JSON.stringify(OmegaUp._errors))
+                          .replace(/\\n/g, '\n');
+                  reportAnIssue.href =
+                      'https://github.com/omegaup/omegaup/issues/new?body=' +
+                      encodeURIComponent(issueBody);
+                });
+              },
             ]),
           },
 
@@ -139,16 +185,6 @@ export let OmegaUp = {
             OmegaUp._listeners[eventName].notify();
           },
 
-      loadTranslations:
-          function(t) {
-            for (var p in t) {
-              if (!t.hasOwnProperty(p)) {
-                continue;
-              }
-              T[p] = t[p];
-            }
-          },
-
       on:
           function(events, handler) {
             OmegaUp._initialize();
@@ -178,25 +214,28 @@ export let OmegaUp = {
                 (options.server_sync ? (OmegaUp._remoteDeltaTime || 0) : 0));
           },
 
-      convertTimes: function(item) {
-        if (item.hasOwnProperty('time')) {
-          item.time = OmegaUp.remoteTime(item.time * 1000);
-        }
-        if (item.hasOwnProperty('start_time')) {
-          item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
-        }
-        if (item.hasOwnProperty('finish_time')) {
-          item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
-        }
-        if (item.hasOwnProperty('last_updated')) {
-          item.last_updated = OmegaUp.remoteTime(item.last_updated * 1000);
-        }
-        if (item.hasOwnProperty('submission_deadline')) {
-          item.submission_deadline =
-              OmegaUp.remoteTime(item.submission_deadline * 1000);
-        }
-        return item;
-      },
+      convertTimes:
+          function(item) {
+            if (item.hasOwnProperty('time')) {
+              item.time = OmegaUp.remoteTime(item.time * 1000);
+            }
+            if (item.hasOwnProperty('start_time')) {
+              item.start_time = OmegaUp.remoteTime(item.start_time * 1000);
+            }
+            if (item.hasOwnProperty('finish_time')) {
+              item.finish_time = OmegaUp.remoteTime(item.finish_time * 1000);
+            }
+            if (item.hasOwnProperty('last_updated')) {
+              item.last_updated = OmegaUp.remoteTime(item.last_updated * 1000);
+            }
+            if (item.hasOwnProperty('submission_deadline')) {
+              item.submission_deadline =
+                  OmegaUp.remoteTime(item.submission_deadline * 1000);
+            }
+            return item;
+          },
+
+      addError: function(error) { OmegaUp._errors.push(error); },
 };
 
 if (document.readyState === 'complete' ||
