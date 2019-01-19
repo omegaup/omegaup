@@ -151,7 +151,7 @@
 					<div class="col-md-offset-6 col-md-6 col-xs-12">
 						<button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{#wordsSaveChanges#}</button>
 						<a href="/profile" class="btn btn-default col-xs-5 btn-cancel">{#wordsCancel#}</a>
-					</div>	
+					</div>
 				</form>
 			</div>
 		</div>
@@ -185,7 +185,6 @@
 						</div>
 					</div>
 
-					
 					<div class="col-md-offset-6 col-md-6 col-xs-12">
 						<button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{#wordsSaveChanges#}</button>
 						<a href="/profile" class="btn btn-default col-xs-5 btn-cancel">{#wordsCancel#}</a>
