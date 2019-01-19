@@ -6,25 +6,6 @@
  * @author joemmanuel
  */
 
-/**
- * Detours the Grader calls.
- * Problem: Submiting a new run invokes the Grader::grade() function which makes
- * a HTTP call to official grader using CURL. This call will fail if grader is
- * not turned on. We are not testing the Grader functionallity itself, we are
- * only validating that we populate the DB correctly and that we make a call
- * to the function Grader::grade(), without executing the contents.
- *
- * Solution: We create a phpunit mock of the Grader class. We create a fake
- * object Grader with the function grade() which will always return true
- * and expects to be excecuted once.
- *
- */
-class GraderMock extends Grader {
-    public function Grade($runGuids, $rejudge, $debug) {
-        return;
-    }
-}
-
 class RunsFactory {
     /**
      * Builds and returns a request object to be used for RunController::apiCreate
@@ -117,7 +98,6 @@ class RunsFactory {
         $r = self::createRequestCourseAssignmentCommon($problemData, $courseAssignmentData, $participant);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
@@ -148,7 +128,6 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, $contestData, $contestant);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
@@ -171,7 +150,6 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
