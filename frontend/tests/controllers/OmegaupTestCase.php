@@ -12,6 +12,31 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public $mockClarificationController = null;
     private static $logObj = null;
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' . OMEGAUP_GITSERVER_PORT;
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
+
+    public static function tearDownAfterClass() {
+        parent::tearDownAfterClass();
+        $scriptFilename = __DIR__ . '/gitserver-stop.sh';
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
+
     /**
      * setUp function gets executed before each test (thanks to phpunit)
      */
@@ -306,7 +331,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Detours the Grader calls.
+     * Detours the Grader calls to a mock instance.
+     *
      * Problem: Submiting a new run invokes the Grader::grade() function which makes
      * a HTTP call to official grader using CURL. This call will fail if grader is
      * not turned on. We are not testing the Grader functionallity itself, we are
@@ -314,27 +340,21 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      * to the function Grader::grade(), without executing the contents.
      *
      * Solution: We create a phpunit mock of the Grader class. We create a fake
-     * object Grader with the function grade() which will always return true
-     * and expects to be excecuted once.
-     *
+     * object Grader with the function grade() which will expects to be
+     * excecuted $times times.
      */
     public function detourGraderCalls($times = null) {
         if (is_null($times)) {
             $times = $this->once();
         }
 
-        // Create a fake Grader object which will always return true (see
-        // next line)
-        $graderMock = $this->getMockBuilder('Grader')->getMock();
-
-        // Set expectations:
-        $graderMock->expects($times)
-                ->method('Grade')
-                ->will($this->returnValue(true));
-
-        // Detour all Grader::grade() calls to our mock
-        RunController::$grader = $graderMock;
-        ProblemController::$grader = $graderMock;
+        // Create a fake Grader object which will make sure that the 'grade'
+        // method is invoked the correct number of times.
+        $mockGrader = $this->getMockBuilder('Grader')->getMock();
+        $mockGrader
+            ->expects($times)
+            ->method('grade');
+        return new ScopedGraderDetour($mockGrader);
     }
 
     protected function detourBroadcasterCalls($times = null) {
@@ -343,7 +363,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         }
 
         $broadcasterMock = $this->getMockBuilder('Broadcaster')->getMock();
-        $broadcasterMock->expects($times)
+        $broadcasterMock
+            ->expects($times)
             ->method('broadcastClarification');
         ClarificationController::$broadcaster = $broadcasterMock;
     }
@@ -407,5 +428,60 @@ class ScopedEmailSender {
 
     public function sendEmail($emails, $subject, $body) {
         self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
+    }
+}
+
+/**
+ * No-op version of the Grader.
+ *
+ * We are not testing the Grader functionallity itself, we are only validating
+ * that we populate the DB correctly and that we make a call to the function
+ * Grader::grade(), without executing the contents.
+ */
+class NoOpGrader extends Grader {
+    public function grade(array $runGuids, bool $rejudge, bool $debug) {
+        return;
+    }
+
+    public function status() {
+        return [
+            'status' => 'ok',
+            'broadcaster_sockets' => 0,
+            'embedded_runner' => false,
+            'queue' => [
+                'running' => [],
+                'run_queue_length' => 0,
+                'runner_queue_length' => 0,
+                'runners' => []
+            ],
+        ];
+    }
+
+    public function broadcast(
+        /* string? */ $contestAlias,
+        /* string? */ $problemsetId,
+        /* string? */ $problemAlias,
+        string $message,
+        bool $public,
+        /* string? */ $username,
+        int $userId = -1,
+        bool $userOnly = false
+    ) {
+    }
+}
+
+/**
+ * Simple RAII class to detour grader calls to a mock instance.
+ */
+class ScopedGraderDetour {
+    private $originalInstance = null;
+
+    public function __construct($instance) {
+        $originalInstance = Grader::getInstance();
+        Grader::setInstanceForTesting($instance);
+    }
+
+    public function __destruct() {
+        Grader::setInstanceForTesting($this->originalInstance);
     }
 }

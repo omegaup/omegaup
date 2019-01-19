@@ -64,7 +64,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = $this->detourGraderCalls($this->exactly(1));
 
         // Set file upload context
         $login = self::login($problemData['author']);
@@ -180,7 +180,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = $this->detourGraderCalls($this->exactly(1));
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -195,7 +195,10 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Validate response
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(true, $response['rejudged']);
+        $this->assertTrue(
+            $response['rejudged'],
+            'Problem should have been rejudged'
+        );
 
         // Verify problem settings were set.
         {
@@ -303,7 +306,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $imgUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
         $imgFilename = 'af6a4603e039cca2f6823d287f6c87e561aa6e68.png';
 
-        $statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")";
+        $statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")\n";
         $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateStatement(new Request([
             'auth_token' => $login->auth_token,
@@ -334,7 +337,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, so we can expect 2 calls to grader
         // to rejudge them
-        $this->detourGraderCalls($this->exactly(0));
+        $detourGrader = $this->detourGraderCalls($this->exactly(0));
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';

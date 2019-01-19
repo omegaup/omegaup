@@ -16,7 +16,7 @@ stage_install() {
 	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
 		https://phar.phpunit.de/phpunit-5.7.phar
 
-	install_omegaup_update_problem
+	install_omegaup_gitserver
 }
 
 stage_before_script() {
@@ -40,4 +40,8 @@ stage_script() {
 
 stage_after_success() {
 	bash <(curl -s https://codecov.io/bash)
+}
+
+stage_after_failure() {
+	cat frontend/tests/controllers/gitserver.log
 }

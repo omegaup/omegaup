@@ -154,7 +154,7 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testNewRunValid() {
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = $this->detourGraderCalls();
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -188,7 +188,7 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testRunToValidPrivateContest() {
         $r = $this->setValidRequest('private' /* admission mode */);
-        $this->detourGraderCalls();
+        $detourGrader = $this->detourGraderCalls();
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -243,7 +243,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = $this->detourGraderCalls();
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -269,7 +269,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Prepare the Grader mock, validate that grade is called 2 times
         // (we will use 2 problems for this test)
-        $this->detourGraderCalls($this->exactly(2));
+        $detourGrader = $this->detourGraderCalls($this->exactly(2));
 
         // Add a second problem to the contest
         $problemData2 = ProblemsFactory::createProblem();
@@ -318,7 +318,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testMissingParameters() {
         // Set the context for the first contest
         $original_r = $this->setValidRequest();
-        $this->detourGraderCalls($this->any());
+        $detourGrader = $this->detourGraderCalls($this->any());
 
         $needed_keys = [
             'problem_alias',
@@ -353,7 +353,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testNewRunInWindowLengthPublicContest() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = $this->detourGraderCalls();
 
         // Alter Contest window length to 20
         // This means: once I started the contest, I have 20 more mins
@@ -400,7 +400,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testRunWhenContestNotStartedForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = $this->detourGraderCalls();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -448,7 +448,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGapForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls($this->exactly(2));
+        $detourGrader = $this->detourGraderCalls($this->exactly(2));
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -500,7 +500,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = $this->detourGraderCalls($this->exactly(1));
         $response = RunController::apiCreate($r);
 
         // Validate the run
@@ -634,7 +634,7 @@ class RunCreateTest extends OmegaupTestCase {
             ]);
 
             // Call API
-            $this->detourGraderCalls($this->exactly(1));
+            $detourGrader = $this->detourGraderCalls($this->exactly(1));
             $response = RunController::apiCreate($r);
 
             // Validate the run
