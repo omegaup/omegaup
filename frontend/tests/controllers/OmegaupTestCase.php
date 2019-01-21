@@ -15,7 +15,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $scriptFilename = __DIR__ . '/gitserver-start.sh ' . OMEGAUP_GITSERVER_PORT;
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' .
+            OMEGAUP_GITSERVER_PORT . ' ' . PROBLEMS_GIT_PATH;
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new Exception(
@@ -479,6 +480,9 @@ class NoOpGrader extends Grader {
         bool $passthru = false,
         bool $missingOk = false
     ) {
+        if ($passthru) {
+            throw new UnimplementedException();
+        }
         $path = "{$guid}/{$filename}";
         if (!array_key_exists($path, $this->resources)) {
             if (!$missingOk) {
