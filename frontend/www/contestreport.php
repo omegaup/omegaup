@@ -2,6 +2,9 @@
 
 require_once('../server/bootstrap_smarty.php');
 require_once('api/ApiCaller.php');
+
+UITools::redirectToLoginIfNotLoggedIn();
+
 $r = new Request([
         'contest_alias' => $_REQUEST['contest_alias'],
         'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
