@@ -416,9 +416,8 @@ class Scoreboard {
         // Try to broadcast the updated scoreboards:
         $log = Logger::getLogger('Scoreboard');
         try {
-            $grader = new Grader();
             $log->debug('Sending updated scoreboards');
-            $grader->broadcast(
+            Grader::getInstance()->broadcast(
                 $params['alias'],
                 (int)$problemset->problemset_id,
                 null,
@@ -432,7 +431,7 @@ class Scoreboard {
                 -1,  // user_id
                 true  // user_only
             );
-            $grader->broadcast(
+            Grader::getInstance()->broadcast(
                 $params['alias'],
                 (int)$problemset->problemset_id,
                 null,

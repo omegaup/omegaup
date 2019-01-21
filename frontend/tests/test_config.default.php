@@ -44,6 +44,9 @@ try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680/grade/');
+try_define('OMEGAUP_GITSERVER_PORT', '33863');
+try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:' . OMEGAUP_GITSERVER_PORT);
+try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'cbaf89d3bb2ee6b0a90bc7a90d937f9ade16739ed9f573c76e1ac72064e397aac2b35075040781dd0df9a8f1d6fc4bd4a4941eb6b0b62541b0a35fb0f89cfc3f');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 // We need to have this directory be NOT within the /opt/omegaup directory
 // since we intend to share it through VirtualBox, and that does not support
