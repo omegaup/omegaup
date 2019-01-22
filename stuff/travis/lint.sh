@@ -35,7 +35,8 @@ stage_before_script() {
 stage_script() {
 	rm -rf frontend/www/{js,css}/dist
 	yarn install
-	yarn run cross-env webpack --progress -p
+	yarn run cross-env webpack --progress -p --config-name=grader
+	yarn run cross-env webpack --progress -p --config-name=frontend
 	yarn test
 
 	python3 stuff/db-migrate.py validate

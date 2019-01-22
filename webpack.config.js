@@ -91,7 +91,7 @@ module.exports = [{
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        loader: 'babel-loader?cacheDirectory',
         exclude: /node_modules/
       },
       {
@@ -155,7 +155,7 @@ module.exports = [{
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: 'babel-loader?cacheDirectory',
           options: {
             presets: ['@babel/env'],
           },
@@ -204,6 +204,13 @@ if (process.env.NODE_ENV === 'production') {
         minimize: true
       })
     ]);
-    config.optimization.minimize = true;
+    config.optimization = {
+      minimizer: [
+        new TerserPlugin({
+          cache: true,
+          parallel: true,
+        }),
+      ],
+    };
   }
 }
