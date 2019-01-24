@@ -676,7 +676,7 @@ class ProblemController extends Controller {
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
             }
-            Grader::getInstance()->grade($guids, true, false);
+            Grader::getInstance()->rejudge($guids, false);
         } catch (Exception $e) {
             self::$log->error('Failed to rejudge runs after problem update');
             self::$log->error($e);

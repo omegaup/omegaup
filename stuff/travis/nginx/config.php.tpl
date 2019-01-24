@@ -14,5 +14,4 @@ define('OMEGAUP_ENVIRONMENT', 'production');
 define('OMEGAUP_GRADER_FAKE', true);
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
 define('PROBLEMS_GIT_PATH', '/tmp/omegaup/problems.git');
-define('RUNS_PATH', '/tmp/omegaup/submissions');
 define('SMARTY_CACHE_DIR', '/tmp');

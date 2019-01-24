@@ -28,15 +28,6 @@ class RunController extends Controller {
     private static $practice = false;
 
     /**
-     * Gets the path of the file that contains the submission.
-     */
-    public static function getSubmissionPath($run) {
-        return RUNS_PATH .
-            DIRECTORY_SEPARATOR . substr($run->guid, 0, 2) .
-            DIRECTORY_SEPARATOR . substr($run->guid, 2);
-    }
-
-    /**
      *
      * Validates Create Run request
      *
@@ -332,17 +323,9 @@ class RunController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        try {
-            // Create file for the run
-            $filepath = RunController::getSubmissionPath($run);
-            FileHandler::CreateFile($filepath, trim($r['source']));
-        } catch (Exception $e) {
-            throw new InvalidFilesystemOperationException($e);
-        }
-
         // Call Grader
         try {
-            Grader::getInstance()->grade([$run->guid], false, false);
+            Grader::getInstance()->grade($run->guid, trim($r['source']));
         } catch (Exception $e) {
             self::$log->error('Call to Grader::grade() failed:');
             self::$log->error($e);
@@ -515,10 +498,9 @@ class RunController extends Controller {
         RunsDAO::save($r['run']);
 
         try {
-            Grader::getInstance()->grade([$r['run']->guid], true, $r['debug'] || false);
+            Grader::getInstance()->rejudge([$r['run']->guid], $r['debug'] || false);
         } catch (Exception $e) {
-            self::$log->error('Call to Grader::grade() failed:');
-            self::$log->error($e);
+            self::$log->error("Call to Grader::rejudge() failed: {$e}");
         }
 
         $response = [];
@@ -619,7 +601,7 @@ class RunController extends Controller {
             ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
         // Get the details, compile error, logs, etc.
-        RunController::getSource($r['run'], $showDetails, $response);
+        RunController::populateRunDetails($r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
             $gzippedLogs = self::getGraderResource($r['run']->guid, 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
@@ -692,15 +674,19 @@ class RunController extends Controller {
         $response = [
             'status' => 'ok',
         ];
-        RunController::getSource($r['run'], false, $response);
+        RunController::populateRunDetails($r['run'], false, $response);
         return $response;
     }
 
-    private static function getSource(Runs $run, $showDetails, &$response) {
+    public static function getRunSource(Runs $run) {
+        return Grader::GetInstance()->getSource($run->guid);
+    }
+
+    private static function populateRunDetails(Runs $run, $showDetails, &$response) {
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
-            $response['source'] = file_get_contents(RunController::getSubmissionPath($run));
+            $response['source'] = RunController::getRunSource($run);
         }
         if (!$showDetails && $run->verdict != 'CE') {
             return;
