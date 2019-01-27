@@ -185,13 +185,22 @@ class RunsFactory {
 
         RunsDAO::save($run);
 
-        $gradeDir = RunController::getGradePath($run->guid);
-        mkdir($gradeDir, 0755, true);
-        file_put_contents("$gradeDir/details.json", json_encode([
-            'verdict' => $verdict,
-            'contest_score' => $points,
-            'score' => $points,
-            'judged_by' => 'RunsFactory.php',
-        ]));
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run->guid,
+            'details.json',
+            json_encode([
+                'verdict' => $verdict,
+                'contest_score' => $points,
+                'score' => $points,
+                'judged_by' => 'RunsFactory.php',
+            ])
+        );
+        // An empty gzip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run->guid,
+            'logs.txt.gz',
+            "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
+            "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
     }
 }

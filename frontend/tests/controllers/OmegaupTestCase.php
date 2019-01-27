@@ -15,7 +15,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $scriptFilename = __DIR__ . '/gitserver-start.sh ' . OMEGAUP_GITSERVER_PORT;
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' .
+            OMEGAUP_GITSERVER_PORT . ' ' . PROBLEMS_GIT_PATH;
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new Exception(
@@ -350,7 +351,9 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
         // Create a fake Grader object which will make sure that the 'grade'
         // method is invoked the correct number of times.
-        $mockGrader = $this->getMockBuilder('Grader')->getMock();
+        $mockGrader = $this->getMockBuilder('NoOpGrader')
+            ->setMethods(['grade'])
+            ->getMock();
         $mockGrader
             ->expects($times)
             ->method('grade');
@@ -439,6 +442,8 @@ class ScopedEmailSender {
  * Grader::grade(), without executing the contents.
  */
 class NoOpGrader extends Grader {
+    private $resources = [];
+
     public function grade(array $runGuids, bool $rejudge, bool $debug) {
         return;
     }
@@ -467,6 +472,35 @@ class NoOpGrader extends Grader {
         int $userId = -1,
         bool $userOnly = false
     ) {
+    }
+
+    public function getGraderResource(
+        string $guid,
+        string $filename,
+        bool $passthru = false,
+        bool $missingOk = false
+    ) {
+        if ($passthru) {
+            throw new UnimplementedException();
+        }
+        $path = "{$guid}/{$filename}";
+        if (!array_key_exists($path, $this->resources)) {
+            if (!$missingOk) {
+                throw new Exception("Resource {$path} not found");
+            }
+            return null;
+        }
+
+        return $this->resources[$path];
+    }
+
+    public function setGraderResourceForTesting(
+        string $guid,
+        string $filename,
+        string $contents
+    ) {
+        $path = "{$guid}/{$filename}";
+        $this->resources[$path] = $contents;
     }
 }
 
