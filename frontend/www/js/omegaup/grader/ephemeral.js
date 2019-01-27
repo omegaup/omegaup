@@ -763,45 +763,101 @@ RegisterVueComponent(layout, 'text-editor-component', TextEditorComponent,
 RegisterVueComponent(layout, 'zip-viewer-component', ZipViewerComponent,
                      componentMapping);
 
-layout.init();
+function initialize() {
+  layout.init();
 
-let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
-if (store.getters.isCustomValidator)
-  sourceAndSettings.addChild(validatorSettings);
-store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function(value) {
-      if (value)
-        sourceAndSettings.addChild(validatorSettings);
-      else
-        layout.root.getItemsById(validatorSettings.id)[0].remove();
+  let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
+  if (store.getters.isCustomValidator)
+    sourceAndSettings.addChild(validatorSettings);
+  store.watch(
+      Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
+      function(value) {
+        if (value)
+          sourceAndSettings.addChild(validatorSettings);
+        else
+          layout.root.getItemsById(validatorSettings.id)[0].remove();
+      });
+  if (store.getters.isInteractive) {
+    sourceAndSettings.addChild(interactiveIdlSettings);
+    sourceAndSettings.addChild(interactiveMainSourceSettings);
+    let sourceItem = layout.root.getItemsById('source')[0];
+    sourceItem.parent.setActiveContentItem(sourceItem);
+  }
+  store.watch(
+      Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
+      function(value) {
+        if (value) {
+          sourceAndSettings.addChild(interactiveIdlSettings);
+          sourceAndSettings.addChild(interactiveMainSourceSettings);
+          let sourceItem = layout.root.getItemsById('source')[0];
+          sourceItem.parent.setActiveContentItem(sourceItem);
+        } else {
+          layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
+          layout.root.getItemsById(interactiveMainSourceSettings.id)[0]
+              .remove();
+        }
+      });
+
+  if (isEmbedded) {
+    // Embedded layout should not be able to modify the settings.
+    layout.root.getItemsById('settings')[0].remove();
+    document.getElementById('download').style.display = 'none';
+    document.getElementById('upload').style.display = 'none';
+    document.querySelector('label[for="upload"]').style.display = 'none';
+
+    // Since the embedded grader has a lot less horizontal space available, we
+    // move the first two columns into a stack so they can be switched between.
+    let mainColumn = layout.root.getItemsById('main-column')[0];
+    let casesColumn = layout.root.getItemsById('cases-column')[0];
+    let caseSelectorColumn =
+        layout.root.getItemsById('case-selector-column')[0];
+    let oldWidth = caseSelectorColumn.element[0].clientWidth;
+    let oldHeight = caseSelectorColumn.element[0].clientHeight;
+
+    let newStack = layout.createContentItem({
+      type: 'stack',
+      content: [],
+      isClosable: false,
     });
-if (store.getters.isInteractive) {
-  sourceAndSettings.addChild(interactiveIdlSettings);
-  sourceAndSettings.addChild(interactiveMainSourceSettings);
-  let sourceItem = layout.root.getItemsById('source')[0];
-  sourceItem.parent.setActiveContentItem(sourceItem);
+
+    mainColumn.parent.addChild(newStack, 0);
+
+    casesColumn.setTitle('cases');
+    casesColumn.parent.removeChild(casesColumn, true);
+    newStack.addChild(casesColumn, 0);
+
+    mainColumn.setTitle('code');
+    mainColumn.parent.removeChild(mainColumn, true);
+    newStack.addChild(mainColumn, 0);
+
+    // Also extend the case selector column a little bit so that it looks nicer.
+    caseSelectorColumn.container.setSize(Math.max(160, oldWidth), oldHeight);
+
+    // Whenever a case is selected, show the cases tab.
+    store.watch(
+        Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
+        (value) => {
+          if (store.getters.isUpdatingSettings) return;
+          casesColumn.parent.setActiveContentItem(casesColumn);
+        });
+  }
 }
-store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function(value) {
-      if (value) {
-        sourceAndSettings.addChild(interactiveIdlSettings);
-        sourceAndSettings.addChild(interactiveMainSourceSettings);
-        let sourceItem = layout.root.getItemsById('source')[0];
-        sourceItem.parent.setActiveContentItem(sourceItem);
-      } else {
-        layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
-        layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
-      }
-    });
+
+function onResized() {
+  const layoutRoot = document.getElementById('layout-root');
+  if (!layoutRoot.clientWidth) return;
+  if (!layout.isInitialised) {
+    initialize();
+  }
+  layout.updateSize();
+}
 
 if (window.ResizeObserver) {
-  new ResizeObserver(() => { layout.updateSize(); })
-      .observe(document.getElementById('layout-root'));
+  new ResizeObserver(onResized).observe(document.getElementById('layout-root'));
 } else {
-  window.addEventListener('resize', () => { layout.updateSize(); });
+  window.addEventListener('resize', onResized);
 }
+onResized();
 
 document.getElementById('language')
     .addEventListener(
@@ -888,48 +944,6 @@ store.watch(
       downloadElement.download = undefined;
       downloadElement.href = undefined;
     });
-
-if (isEmbedded) {
-  // Embedded layout should not be able to modify the settings.
-  layout.root.getItemsById('settings')[0].remove();
-  document.getElementById('download').style.display = 'none';
-  document.getElementById('upload').style.display = 'none';
-  document.querySelector('label[for="upload"]').style.display = 'none';
-
-  // Since the embedded grader has a lot less horizontal space available, we
-  // move the first two columns into a stack so they can be switched between.
-  let mainColumn = layout.root.getItemsById('main-column')[0];
-  let casesColumn = layout.root.getItemsById('cases-column')[0];
-  let caseSelectorColumn = layout.root.getItemsById('case-selector-column')[0];
-  let oldWidth = caseSelectorColumn.element[0].clientWidth;
-  let oldHeight = caseSelectorColumn.element[0].clientHeight;
-
-  let newStack = layout.createContentItem({
-    type: 'stack',
-    content: [],
-    isClosable: false,
-  });
-
-  mainColumn.parent.addChild(newStack, 0);
-
-  casesColumn.setTitle('cases');
-  casesColumn.parent.removeChild(casesColumn, true);
-  newStack.addChild(casesColumn, 0);
-
-  mainColumn.setTitle('code');
-  mainColumn.parent.removeChild(mainColumn, true);
-  newStack.addChild(mainColumn, 0);
-
-  // Also extend the case selector column a little bit so that it looks nicer.
-  caseSelectorColumn.container.setSize(Math.max(160, oldWidth), oldHeight);
-
-  // Whenever a case is selected, show the cases tab.
-  store.watch(Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
-              (value) => {
-                if (store.getters.isUpdatingSettings) return;
-                casesColumn.parent.setActiveContentItem(casesColumn);
-              });
-}
 
 document.getElementById('upload').addEventListener('change', e => {
   let files = e.target.files;
