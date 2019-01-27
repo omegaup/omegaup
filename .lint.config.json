@@ -1,4 +1,11 @@
 {
+	"custom_linters": [
+		{
+			"name": "i18n",
+			"path": "stuff/i18n.py",
+			"class_name": "I18nLinter"
+		}
+	],
 	"lint": {
 		"whitespace": {
 			"whitelist": [

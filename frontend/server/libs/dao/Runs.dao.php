@@ -872,7 +872,7 @@ class RunsDAO extends RunsDAOBase {
                         ON (ppo.problemset_id = r.problemset_id
                             AND r.problem_id = ppo.problem_id)
                     INNER JOIN
-                        `Identities`
+                        `Identities` i
                         ON (i.identity_id = ppo.identity_id AND r.identity_id = i.identity_id)
                     INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
                     SET

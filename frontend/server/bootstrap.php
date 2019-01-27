@@ -43,6 +43,11 @@ require_once('libs/dao/Estructura.php');
 spl_autoload_register(function ($classname) {
     $suffix = 'Controller';
     if (substr_compare($classname, $suffix, strlen($classname) - strlen($suffix)) === 0) {
+        // TODO: Figure out a better way of dealing with this.
+        $qualityNomination = 'Qualitynomination';
+        if (substr_compare($classname, $qualityNomination, 0, strlen($qualityNomination)) === 0) {
+            $classname = 'QualityNominationController';
+        }
         include_once "controllers/{$classname}.php";
         return;
     }

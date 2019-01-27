@@ -254,29 +254,42 @@ def aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
         global_quality_average, problem_quality_votes)
     problem_difficulty = bayesian_average(global_difficulty_average,
                                           problem_difficulty_votes)
-    if problem_quality is not None and problem_difficulty is not None:
-        logging.debug('Updating problem %d. quality=%f, difficulty=%f',
-                      problem_id, problem_quality, problem_difficulty)
+    if problem_quality is not None:
+        logging.debug('quality=%f', problem_quality)
         with dbconn.cursor() as cur:
             cur.execute(
                 """
                 UPDATE
-                   `Problems` as p
+                `Problems` as p
                 SET
-                   p.`quality` = %s, p.`difficulty` = %s,
-                   p.`quality_histogram` = %s,
-                   p.`difficulty_histogram` = %s
+                p.`quality` = %s,
+                p.`quality_histogram` = %s
                 WHERE
-                   p.`problem_id` = %s;""",
-                (problem_quality, problem_difficulty,
-                 json.dumps([vote.count for vote in problem_quality_votes]),
-                 json.dumps([vote.count for vote in problem_difficulty_votes]),
+                p.`problem_id` = %s;""",
+                (problem_quality,
+                 json.dumps([vote.count for vote in
+                             problem_quality_votes]),
                  problem_id))
-            dbconn.commit()
+    if problem_difficulty is not None:
+        logging.debug('difficulty=%f', problem_difficulty)
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE
+                `Problems` as p
+                SET
+                p.`difficulty` = %s,
+                p.`difficulty_histogram` = %s
+                WHERE
+                p.`problem_id` = %s;""",
+                (problem_difficulty,
+                 json.dumps([vote.count for vote in
+                             problem_difficulty_votes]),
+                 problem_id))
+    if problem_quality is not None or problem_difficulty is not None:
+        dbconn.commit()
     else:
-        logging.debug('Not enough information for problem %d',
-                      problem_id)
-
+        logging.debug('Not enough information for problem %d', problem_id)
     # TODO(heduenas): Get threshold parameter from DB for each problem
     # independently.
     problem_tags = get_most_voted_tags(problem_tag_votes,
