@@ -1,5 +1,6 @@
 'use strict';
 
+require('../dist/commons.js');
 var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
