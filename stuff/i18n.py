@@ -11,6 +11,7 @@ import sys
 from hook_tools import linters
 from hook_tools import git_tools
 
+
 class I18nLinter(linters.Linter):
     '''Runs i18n'''
     # pylint: disable=R0903
@@ -182,9 +183,13 @@ class I18nLinter(linters.Linter):
         return new_contents, original_contents
 
     def run_one(self, filename, contents):
+        '''Runs the linter against |contents|.'''
+        # pylint: disable=no-self-use, unused-argument
         return contents, []
 
     def run_all(self, file_contents, contents_callback):
+        '''Runs the linter against a subset of files.'''
+        # pylint: disable=no-self-use, unused-argument
         not_sorted = set()
         strings = self._get_translated_strings(contents_callback, not_sorted)
 
@@ -195,11 +200,8 @@ class I18nLinter(linters.Linter):
 
     @property
     def name(self):
+        '''Gets the name of the linter.'''
         return 'i18n'
-
-if __name__ == '__main__':
-    import sys
-    dir(sys.modules)
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
