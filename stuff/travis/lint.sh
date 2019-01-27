@@ -27,7 +27,10 @@ stage_before_install() {
 }
 
 stage_before_script() {
-	pear install pear/PHP_CodeSniffer-2.9.1
+	DOWNLOAD_URL='https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.9.1/phpcbf.phar'
+	TARGET="/usr/bin/phpcbf"
+	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
+	sudo chmod +x "${TARGET}"
 
 	setup_phpenv
 }
