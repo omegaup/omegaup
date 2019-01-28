@@ -1057,10 +1057,18 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Validate request
-        self::validateDownload($r);
+        $problem = self::validateDownload($r);
 
-        // TODO(lhchavez): Support this.
-        throw new NotFoundException('problemNotFound');
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Content-Type: application/zip');
+        header("Content-Disposition: attachment;filename={$problem->alias}.zip");
+        header('Content-Transfer-Encoding: binary');
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts->download();
+
+        die();
     }
 
     /**
@@ -1076,18 +1084,20 @@ class ProblemController extends Controller {
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($r['problem'])) {
+        if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canEditProblem($r['current_identity_id'], $r['problem'])) {
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
+
+        return $problem;
     }
 
     /**
