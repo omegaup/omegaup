@@ -541,6 +541,8 @@ class ContestDetailsTest extends OmegaupTestCase {
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 
+        $detourGrader = $this->detourGraderCalls($this->any());
+
         // Grade the runs
         RunsFactory::gradeRun($runsData[0], 0, 'CE');
         RunsFactory::gradeRun($runsData[1]);

@@ -1,6 +1,10 @@
 import API from './api.js';
 import UI from './ui.js';
 import * as arena from './arena/arena.js';
+import * as lang_en from './lang.en.js';
+import * as lang_es from './lang.es.js';
+import * as lang_pt from './lang.pt.js';
+import * as lang_pseudo from './lang.pseudo.js';
 
 export {API, UI, arena};
 
@@ -65,9 +69,27 @@ class EventListenerList {
 }
 ;
 
-// Stub for translations.
-// These should be loaded later with OmegaUp.loadTranslations.
-export let T = {};
+// Translation strings.
+export let T = (function() {
+  const head =
+      (document && document.querySelector && document.querySelector('head')) ||
+      null;
+
+  switch ((head && head.dataset && head.dataset.locale) || 'es') {
+    case 'pseudo':
+      return lang_pseudo.default;
+
+    case 'pt':
+      return lang_pt.default;
+
+    case 'en':
+      return lang_en.default;
+
+    case 'es':
+    default:
+      return lang_es.default;
+  }
+})();
 
 export let OmegaUp = {
   loggedIn: false,
@@ -161,16 +183,6 @@ export let OmegaUp = {
           function(eventName) {
             if (!OmegaUp._listeners.hasOwnProperty(eventName)) return;
             OmegaUp._listeners[eventName].notify();
-          },
-
-      loadTranslations:
-          function(t) {
-            for (var p in t) {
-              if (!t.hasOwnProperty(p)) {
-                continue;
-              }
-              T[p] = t[p];
-            }
           },
 
       on:

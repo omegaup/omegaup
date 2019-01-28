@@ -53,7 +53,7 @@ try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
 # ####################################
 # GRADER CONFIG
 # ####################################
-try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680/run/grade/');
+try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
 try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:33861');
 try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
 try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
@@ -69,10 +69,7 @@ try_define('IMAGES_PATH', OMEGAUP_ROOT . '/www/img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('TEMPLATES_PATH', OMEGAUP_ROOT . '/www/templates/');
 try_define('TEMPLATES_URL_PATH', '/templates/');
-try_define('OMEGAUP_GRADER_RELOAD_CONFIG_URL', 'https://localhost:21680/reload-config/');
-try_define('OMEGAUP_GRADER_STATUS_URL', 'https://localhost:21680/grader/status/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
-try_define('OMEGAUP_GRADER_BROADCAST_URL', 'https://localhost:21680/broadcast/');
 try_define('OMEGAUP_GRADER_FAKE', false);
 try_define('OMEGAUP_UPDATE_PROBLEM', '/usr/bin/omegaup-update-problem');
 
