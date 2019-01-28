@@ -1250,6 +1250,7 @@ function setSettings(settings) {
   // Also change to the main column in case it was not previously selected.
   setTimeout(() => {
     store.commit('updatingSettings', false);
+    if (!layout.isInitialised) return;
     let mainColumn = layout.root.getItemsById('main-column')[0];
     mainColumn.parent.setActiveContentItem(mainColumn);
   });
