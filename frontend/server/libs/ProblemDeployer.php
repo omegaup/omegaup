@@ -25,7 +25,7 @@ class ProblemDeployer {
         $this->alias = $alias;
 
         if (isset($_FILES['problem_contents'])
-            && isset($_FILES['problem_contents']['tmp_name'])
+            && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
         ) {
             $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
