@@ -172,6 +172,9 @@ class Grader {
             $response = curl_exec($curl);
 
             if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
+                if ($missingOk) {
+                    return null;
+                }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
                     curl_errno($curl) . ' HTTP ' .
                     curl_getinfo($curl, CURLINFO_HTTP_CODE);
