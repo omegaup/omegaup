@@ -256,7 +256,7 @@ class SessionController extends Controller {
         } catch (InvalidParameterException $e) {
             // How can we know whats wrong with the username?
             // Things that could go wrong:
-            //		generated email is too short
+            //      generated email is too short
             $username = 'OmegaupUser';
         }
 
