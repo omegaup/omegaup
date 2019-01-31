@@ -20,8 +20,8 @@ require_once('base/Runs.vo.base.php');
  */
 class RunsDAO extends RunsDAOBase {
     /*
-	 * Gets an array of the guids of the pending runs
-	 */
+     * Gets an array of the guids of the pending runs
+     */
 
     final public static function GetPendingRuns($showAllRuns = false) {
         // Build SQL statement.
@@ -45,8 +45,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets an array of the guids of the pending runs
-	 */
+     * Gets an array of the guids of the pending runs
+     */
 
     final public static function GetBestSolvingRunsForProblem($problem_id) {
         $sql = '
@@ -82,8 +82,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets an array of the guids of the pending runs
-	 */
+     * Gets an array of the guids of the pending runs
+     */
 
     final public static function GetPendingRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
@@ -157,8 +157,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets an array of the guids of the pending runs
-	 */
+     * Gets an array of the guids of the pending runs
+     */
 
     final public static function GetPendingRunsOfProblem($problem_id, $showAllRuns = false) {
         // Build SQL statement.
@@ -195,8 +195,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given problemset
-	 */
+     * Gets the count of total runs sent to a given problemset
+     */
     final public static function CountTotalRunsOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? ';
@@ -211,8 +211,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given problem
-	 */
+     * Gets the count of total runs sent to a given problem
+     */
 
     final public static function CountTotalRunsOfProblem($problem_id, $showAllRuns = false) {
         // Build SQL statement.
@@ -243,8 +243,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given contest by verdict
-	 */
+     * Gets the count of total runs sent to a given contest by verdict
+     */
 
     final public static function CountTotalRunsOfProblemsetByVerdict($problemset_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
@@ -260,8 +260,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the count of total runs sent to a given contest by verdict
-	 */
+     * Gets the count of total runs sent to a given contest by verdict
+     */
 
     final public static function CountTotalRunsOfProblemByVerdict($problem_id, $verdict, $showAllRuns = false) {
         // Build SQL statement.
@@ -318,8 +318,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Gets the largest queued time of a run in ms
-	 */
+     * Gets the largest queued time of a run in ms
+     */
     final public static function GetLargestWaitTimeOfProblemset($problemset_id, $showAllRuns = false) {
         // Build SQL statement.
         $sql = "SELECT * FROM Runs WHERE problemset_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
@@ -337,9 +337,9 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 *  getAllRelevantIdentities
-	 *
-	 */
+     *  getAllRelevantIdentities
+     *
+     */
 
     final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $excludeAdmin = true) {
         // Build SQL statement
@@ -455,10 +455,10 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 *
-	 * Get last run of a user
-	 *
-	 */
+     *
+     * Get last run of a user
+     *
+     */
     final public static function GetLastRun($problemset_id, $problem_id, $identity_id) {
         //Build SQL statement
         if (is_null($problemset_id)) {
@@ -481,10 +481,10 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 *
-	 * Get best run of a user
-	 *
-	 */
+     *
+     * Get best run of a user
+     *
+     */
 
     final public static function GetBestRun($problemset_id, $problem_id, $identity_id, $showAllRuns) {
         $filterTest = $showAllRuns ? '' : ' AND `type` = \'normal\'';
@@ -531,8 +531,8 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 * Get runs of an identity with verdict eq AC
-	 */
+     * Get runs of an identity with verdict eq AC
+     */
     final public static function GetRunsByUser($identity_id) {
         // SQL sentence
         $sql = "SELECT DISTINCT * FROM Runs WHERE identity_id = ? AND verdict = 'AC'";
