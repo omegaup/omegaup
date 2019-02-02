@@ -412,7 +412,7 @@ def pytest_pyfunc_call(pyfuncitem):
         current_driver = pyfuncitem.funcargs['driver']
         try:
             logs = current_driver.browser.get_log('browser')
-        except:  # pylint: disable=bare-except
+        except:  # noqa: bare-except
             # geckodriver does not support getting logs:
             # https://github.com/mozilla/geckodriver/issues/284
             logs = []
@@ -548,6 +548,6 @@ def driver(request, browser_name):
                     # Test is done. Just ignore the error.
                     pass
             browser.quit()
-    except:
+    except:  # noqa: bare-except
         logging.exception('Failed to initialize')
         raise
