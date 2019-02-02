@@ -112,7 +112,7 @@ def annotate(f):
         driver.annotate('begin %s' % funcstring)
         try:
             return f(driver, *args, **kwargs)
-        except:
+        except:  # noqa: bare-except
             driver.annotate(
                 ''.join(traceback.format_exception(*sys.exc_info())).rstrip(),
                 level=logging.ERROR)
