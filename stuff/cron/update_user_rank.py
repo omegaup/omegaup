@@ -180,7 +180,7 @@ def main():
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
         dbconn.commit()
-    except:  # pylint: disable=bare-except
+    except:  # noqa: bare-except
         logging.exception('Failed to update user ranking')
     finally:
         dbconn.close()

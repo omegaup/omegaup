@@ -406,7 +406,7 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($this->contestData['director']);
         $r['auth_token'] = $login->auth_token;
 
-        // Manually set the contest	start 10 mins in the future
+        // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
         ContestsDAO::save($contest);
@@ -430,7 +430,7 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($this->contestData['director']);
         $r['auth_token'] = $login->auth_token;
 
-        // Manually set the contest	start 10 mins in the future
+        // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1);
         ContestsDAO::save($contest);

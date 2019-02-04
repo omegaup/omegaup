@@ -7,8 +7,8 @@
  */
 class UserProfileTest extends OmegaupTestCase {
     /*
-	 * Test for the function which returns the general user info
-	 */
+     * Test for the function which returns the general user info
+     */
     public function testUserData() {
         $user = UserFactory::createUser(new UserParams(['username' => 'testuser1']));
 
@@ -23,8 +23,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test for the function which returns the general user info
-	 */
+     * Test for the function which returns the general user info
+     */
     public function testUserDataAnotherUser() {
         $user = UserFactory::createUser(new UserParams(['username' => 'testuser2']));
         $user2 = UserFactory::createUser(new UserParams(['username' => 'testuser3']));
@@ -42,8 +42,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test apiProfile with is_private enabled
-	 */
+     * Test apiProfile with is_private enabled
+     */
     public function testUserPrivateDataAnotherUser() {
         $user = UserFactory::createUser();
         // Mark user2's profile as private (5th argument)
@@ -132,8 +132,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the contest which a certain user has participated
-	 */
+     * Test the contest which a certain user has participated
+     */
     public function testUserContests() {
         $contestant = UserFactory::createUser();
 
@@ -163,9 +163,9 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the contest which a certain user has participated.
-	 * API can be accessed by a user who cannot see the contest (contest is private)
-	 */
+     * Test the contest which a certain user has participated.
+     * API can be accessed by a user who cannot see the contest (contest is private)
+     */
     public function testUserContestsPrivateContestOutsider() {
         $contestant = UserFactory::createUser();
 
@@ -198,8 +198,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the problems solved by user
-	 */
+     * Test the problems solved by user
+     */
     public function testProblemsSolved() {
         $user = UserFactory::createUser();
 

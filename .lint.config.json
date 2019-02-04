@@ -45,7 +45,7 @@
 			]
 		},
 		"python": {
-			"pep8_config": "setup.cfg",
+			"pycodestyle_config": "setup.cfg",
 			"whitelist": [
 				".*\\.py$"
 			],
