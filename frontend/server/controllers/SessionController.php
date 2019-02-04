@@ -422,7 +422,7 @@ class SessionController extends Controller {
             return false;
         }
 
-        self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has loged in natively.');
+        self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has logged in natively.');
 
         UserController::checkEmailVerification($r);
 
