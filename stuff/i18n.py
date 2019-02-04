@@ -96,7 +96,7 @@ class I18nLinter(linters.Linter):
                     if match is None:
                         raise Exception("Invalid value")
                     strings[key][lang] = match.group(1).replace(r'\"', '"')
-                except:  # pylint: disable=bare-except
+                except:  # noqa: bare-except
                     raise linters.LinterException(
                         'Invalid i18n line "%s" in %s:%d' %
                         (row.strip(), filename, lineno + 1),

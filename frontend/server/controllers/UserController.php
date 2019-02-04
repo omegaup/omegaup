@@ -71,6 +71,17 @@ class UserController extends Controller {
 
         if (!is_null($userByEmail)) {
             if (!is_null($userByEmail->password)) {
+                // Check if the same user had already tried to create this account.
+                if (!is_null($user) && $user->user_id == $userByEmail->user_id
+                    && SecurityTools::compareHashedStrings(
+                        $r['password'],
+                        $user->password
+                    )) {
+                    return [
+                        'status' => 'ok',
+                        'username' => $user->username,
+                    ];
+                }
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
             }
 
@@ -83,7 +94,7 @@ class UserController extends Controller {
 
             return [
                 'status' => 'ok',
-                'user_id' => $user->user_id
+                'username' => $user->username,
             ];
         }
 
@@ -174,23 +185,19 @@ class UserController extends Controller {
             $user->main_identity_id = $identity->identity_id;
             UsersDAO::save($user);
 
+            $r['user'] = $user;
+            if ($user->verified) {
+                self::$log->info('User ' . $user->username . ' created, trusting e-mail');
+            } else {
+                self::$log->info('User ' . $user->username . ' created, sending verification mail');
+
+                self::sendVerificationEmail($user);
+            }
+
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!is_null($r['skip_verification_email']) && ($r['skip_verification_email'] == 1)) {
-            UserController::$sendEmailOnVerify = false;
-        }
-
-        $r['user'] = $user;
-        if (!$user->verified) {
-            self::$log->info('User ' . $user->username . ' created, sending verification mail');
-
-            self::sendVerificationEmail($r);
-        } else {
-            self::$log->info('User ' . $user->username . ' created, trusting e-mail');
         }
 
         return [
@@ -304,26 +311,27 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws EmailVerificationSendException
      */
-    private static function sendVerificationEmail(Request $r) {
+    private static function sendVerificationEmail(Users $user) {
         try {
-            $email = EmailsDAO::getByPK($r['user']->main_email_id);
+            $email = EmailsDAO::getByPK($user->main_email_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!self::$sendEmailOnVerify) {
+            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
+            return;
         }
 
         $subject = Translations::getInstance()->get('verificationEmailSubject');
         $body = sprintf(
             Translations::getInstance()->get('verificationEmailBody'),
             OMEGAUP_URL,
-            $r['user']->verification_id
+            $user->verification_id
         );
 
-        if (self::$sendEmailOnVerify) {
-            include_once 'libs/Email.php';
-            Email::sendEmail($email->email, $subject, $body);
-        } else {
-            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
-        }
+        include_once 'libs/Email.php';
+        Email::sendEmail($email->email, $subject, $body);
     }
 
     /**
@@ -333,29 +341,29 @@ class UserController extends Controller {
      * @throws EmailNotVerifiedException
      */
     public static function checkEmailVerification(Request $r) {
-        if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
-            // Check if he has been verified
-            if ($r['user']->verified == '0') {
-                self::$log->info('User not verified.');
-
-                if ($r['user']->verification_id == null) {
-                    self::$log->info('User does not have verification id. Generating.');
-
-                    try {
-                        $r['user']->verification_id = SecurityTools::randomString(50);
-                        UsersDAO::save($r['user']);
-                    } catch (Exception $e) {
-                        // best effort, eat exception
-                    }
-
-                    self::sendVerificationEmail($r);
-                }
-
-                throw new EmailNotVerifiedException();
-            } else {
-                self::$log->info('User already verified.');
-            }
+        if (!OMEGAUP_FORCE_EMAIL_VERIFICATION) {
+            return;
         }
+        // Check if they have been verified.
+        if ($r['user']->verified != '0') {
+            return;
+        }
+        self::$log->info('User not verified.');
+
+        if ($r['user']->verification_id == null) {
+            self::$log->info('User does not have verification id. Generating.');
+
+            try {
+                $r['user']->verification_id = SecurityTools::randomString(50);
+                UsersDAO::save($r['user']);
+            } catch (Exception $e) {
+                // best effort, eat exception
+            }
+
+            self::sendVerificationEmail($r['user']);
+        }
+
+        throw new EmailNotVerifiedException();
     }
 
     /**
@@ -2121,7 +2129,7 @@ class UserController extends Controller {
 
         // Send verification email
         $r['user'] = $r['current_user'];
-        self::sendVerificationEmail($r);
+        self::sendVerificationEmail($r['user']);
 
         return ['status' => 'ok'];
     }

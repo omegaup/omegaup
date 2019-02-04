@@ -183,11 +183,11 @@ class ApiCaller {
     private static function parseUrl() {
         $apiAsUrl = $_SERVER['REQUEST_URI'];
         // Spliting only by '/' results in URIs with parameters like this:
-        //		/api/problem/list/?page=1
-        //						 ^^
+        //      /api/problem/list/?page=1
+        //                       ^^
         // Adding '?' as a separator results in URIs like this:
-        //		/api/problem/list?page=1
-        //						 ^
+        //      /api/problem/list?page=1
+        //                       ^
         $args = preg_split('/[\/?]/', $apiAsUrl);
 
         if ($args === false || count($args) < 2) {

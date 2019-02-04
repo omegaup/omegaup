@@ -451,6 +451,13 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#wmd-input-statement')
       .on('blur', function(e) {
-        statements[$('#statement-language').val()].current = $(this).val();
+        var currentLanguage = $('#statement-language').val();
+        if (!statements.hasOwnProperty(currentLanguage)) {
+          statements[currentLanguage] = {
+            original: '',
+            current: '',
+          };
+        }
+        statements[currentLanguage].current = $(this).val();
       });
 });
