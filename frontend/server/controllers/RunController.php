@@ -308,6 +308,18 @@ class RunController extends Controller {
             // Push run into DB
             RunsDAO::save($run);
 
+            // Call Grader
+            try {
+                Grader::getInstance()->grade($run->guid, trim($r['source']));
+            } catch (Exception $e) {
+                // Welp, it failed. We cannot make this a real transaction
+                // because the Run row would not be visible from the Grader
+                // process, so we attempt to roll it back by hand.
+                RunsDAO::delete($run);
+                self::$log->error("Call to Grader::grade() failed: $e");
+                throw $e;
+            }
+
             SubmissionLogDAO::save(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
                 'identity_id' => $r['current_identity_id'],
@@ -321,14 +333,6 @@ class RunController extends Controller {
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
-        }
-
-        // Call Grader
-        try {
-            Grader::getInstance()->grade($run->guid, trim($r['source']));
-        } catch (Exception $e) {
-            self::$log->error('Call to Grader::grade() failed:');
-            self::$log->error($e);
         }
 
         if (self::$practice) {

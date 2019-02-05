@@ -33,7 +33,7 @@ class Grader {
         }
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . "/run/new/{$guid}/",
-            self::REQUEST_MODE_JSON,
+            self::REQUEST_MODE_RAW,
             $source
         );
     }
@@ -212,7 +212,7 @@ class Grader {
             $response = curl_exec($curl);
 
             if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-                if ($missingOk) {
+                if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == 404 && $missingOk) {
                     return null;
                 }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
