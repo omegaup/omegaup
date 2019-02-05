@@ -969,7 +969,7 @@ class CourseController extends Controller {
                 $run->toUnixTime();
                 $filtered_run = $run->asFilteredArray($relevant_run_columns);
                 try {
-                    $filtered_run['source'] = file_get_contents(RunController::getSubmissionPath($run));
+                    $filtered_run['source'] = RunController::getRunSource($run);
                 } catch (Exception $e) {
                     self::$log->error('Error fetching source for {$run->guid}: ' . $e);
                 }
