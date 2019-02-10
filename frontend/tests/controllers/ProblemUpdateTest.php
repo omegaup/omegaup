@@ -64,7 +64,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $detourGrader = $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = new ScopedGraderDetour();
 
         // Set file upload context
         $login = self::login($problemData['author']);
@@ -154,6 +154,8 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $problemDistribSettings['cases']
             );
         }
+
+        $this->assertEquals(2, $detourGrader->getGraderCallCount());
     }
 
     public function testUpdateProblemSettings() {
@@ -180,7 +182,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = new ScopedGraderDetour();
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -215,6 +217,8 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $problemSettings->Limits->TimeLimit
             );
         }
+
+        $this->assertEquals(1, $detourGrader->getGraderCallCount());
     }
 
     public function testUpdateProblemWithValidLanguages() {
@@ -335,9 +339,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        // We will submit 2 runs to the problem, so we can expect 2 calls to grader
-        // to rejudge them
-        $detourGrader = $this->detourGraderCalls($this->exactly(0));
+        $detourGrader = new ScopedGraderDetour();
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';
@@ -366,6 +368,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Check statements still is the original one
         $statement = $problemArtifacts->get('statements/es.markdown');
         $this->assertContains('# Entrada', $statement);
+
+        $this->assertEquals(0, $detourGrader->getGraderCallCount());
     }
 
     /**

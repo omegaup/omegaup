@@ -129,7 +129,6 @@ class InterviewController extends Controller {
             $newUserRequest['email'] = $r['usernameOrEmail'];
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = SecurityTools::randomString(8);
-            $newUserRequest['skip_verification_email'] = 1;
 
             UserController::apiCreate($newUserRequest);
 

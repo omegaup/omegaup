@@ -19,15 +19,34 @@ class Grader {
     }
 
     /**
-     * Call /grade endpoint with run id as parameter
+     * Call /run/new/ endpoint with run id as parameter.
+     *
+     * @param string $guid   the GUID of the run to be graded.
+     * @param string $source the source of the submission.
+     *
+     * @throws Exception
+     */
+    public function grade(string $guid, string $source) {
+        if (OMEGAUP_GRADER_FAKE) {
+            file_put_contents("/tmp/{$guid}", $source);
+            return;
+        }
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . "/run/new/{$guid}/",
+            self::REQUEST_MODE_RAW,
+            $source
+        );
+    }
+
+    /**
+     * Call /run/grade/ endpoint in rejudge mode.
      *
      * @param array $runGuids the array of runs to be grader.
-     * @param bool  $rejudge  whether this is a rejudge.
      * @param bool  $debug    whether this is a debug-rejudge.
      *
      * @throws Exception
      */
-    public function grade(array $runGuids, bool $rejudge, bool $debug) {
+    public function rejudge(array $runGuids, bool $debug) {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
@@ -36,9 +55,26 @@ class Grader {
             self::REQUEST_MODE_JSON,
             [
                 'id' => $runGuids,
-                'rejudge' => !!$rejudge,
+                'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]
+        );
+    }
+
+    /**
+     * Call /run/source/ endpoint with run guid as parameter
+     *
+     * @param string $guids the guid of the run.
+     *
+     * @throws Exception
+     */
+    public function getSource(string $guid) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return file_get_contents("/tmp/{$guid}");
+        }
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . "/run/source/{$guid}/",
+            self::REQUEST_MODE_RAW
         );
     }
 
@@ -123,8 +159,8 @@ class Grader {
      *
      * @param string $url        The URL to request
      * @param int    $mode       How to return the result.
-     * @param array  $postFields Optional key-value pair dictionary with POST
-     *                           fields.
+     * @param mixed  $postData   Optional POST data. Will convert key-value
+     *                           pair dictionaries into JSON.
      * @param bool   $missingOk  Return null if the resource is not found.
      *
      * @return mixed The result of the request.
@@ -132,7 +168,7 @@ class Grader {
     private function curlRequest(
         string $url,
         int $mode,
-        array $postFields = null,
+        $postData = null,
         bool $missingOk = false
     ) {
         $curl = false;
@@ -153,8 +189,12 @@ class Grader {
                     CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
                 ]
             );
-            if (!is_null($postFields)) {
-                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postFields));
+            if (!is_null($postData)) {
+                curl_setopt(
+                    $curl,
+                    CURLOPT_POSTFIELDS,
+                    is_string($postData) ? $postData : json_encode($postData)
+                );
             }
             if ($mode == self::REQUEST_MODE_JSON) {
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
@@ -172,7 +212,7 @@ class Grader {
             $response = curl_exec($curl);
 
             if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-                if ($missingOk) {
+                if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == 404 && $missingOk) {
                     return null;
                 }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .

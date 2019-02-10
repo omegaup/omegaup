@@ -18,6 +18,10 @@
 		line-height: 150%;
 		text-align: justify;
 	}
+	.statement p {
+		hyphens: auto;
+		margin-bottom: 1.5em;
+	}
 	#report > .title {
 		text-align: center;
 	}
@@ -57,6 +61,11 @@
 	}
 	p, li {
 		font-family: "Arial Narrow", sans-serif;
+	}
+	figure {
+		text-align: center;
+	}
+	li {
 		line-height: 100% !important;
 	}
 	hr { display: none; }
@@ -69,7 +78,7 @@
 		display: none;
 	}
 	.statement img {
-		max-width: 100%;
+		max-width: 50%;
 	}
 }
 
