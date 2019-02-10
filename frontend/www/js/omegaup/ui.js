@@ -458,7 +458,7 @@ let UI = {
     }
 
     let converter = Markdown.getSanitizingConverter();
-    let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|code|i|table|tbody|thead|tr|th|td|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th|td|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
     let imageWhitelist = new RegExp('^<img\\ssrc="data:image\/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
 
     converter.hooks.chain('isValidTag', function(tag) {
@@ -483,7 +483,14 @@ let UI = {
             if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
               return wholeMatch;
             }
-            return '<img src="' + imageMapping[url] + '" ' + attributes + '>';
+            return `<img src="${imageMapping[url]}" ${attributes}>`;
+          });
+      // Figures.
+      text = text.replace(
+          /^\s*<img src="([^"]+)"\s*([^>]+)\s+title="([^"]+)"\s*\/>\s*$/g,
+          function(wholeMatch, url, attributes, title) {
+            return `<figure><img src="${url}" ${attributes} />` +
+                   `<figcaption>${title}</figcaption></figure>`;
           });
       return text;
     });
