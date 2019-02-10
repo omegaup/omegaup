@@ -3,7 +3,7 @@
     <div class="panel-heading">
       <template v-if="!isIndex">
         <div class="text-right">
-          <form v-on:submit.prevent="onSubmit">
+          <form>
             <div class="form-inline">
               <div class="form-group">
                 <div class="text-left">
@@ -11,9 +11,9 @@
                        v-bind:init="el =&gt; UI.userTypeahead(el)"
                        v-model="searchedUsername"></omegaup-autocomplete>
                 </div>
-              </div><input class="btn btn-primary btn-lg active"
-                   type="submit"
-                   value="Search User">
+              </div><button class="btn btn-primary btn-lg active"
+                   type="button"
+                   v-on:click="onSubmit">{{ T.searchUser }}</button>
             </div>
           </form>
         </div>
