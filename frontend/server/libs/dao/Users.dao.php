@@ -33,7 +33,7 @@ class UsersDAO extends UsersDAOBase {
         }
         return new Users($rs);
     }
-    
+
     public static function IsUserInterviewer($user_id) {
         $sql = '
             SELECT
