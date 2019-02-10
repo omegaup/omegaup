@@ -450,6 +450,7 @@ CREATE TABLE `Problems` (
   `visibility` tinyint(1) NOT NULL DEFAULT '1' COMMENT '-1 banned, 0 private, 1 public, 2 recommended',
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
+  `current_version` char(40) DEFAULT NULL COMMENT 'La versión actual del problema.',
   `validator` enum('token','token-caseless','token-numeric','custom','literal') NOT NULL DEFAULT 'token-numeric',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
@@ -606,6 +607,7 @@ CREATE TABLE `Problemset_Problem_Opened` (
 CREATE TABLE `Problemset_Problems` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
+  `version` char(40) DEFAULT NULL COMMENT 'La versión del problema.',
   `points` double NOT NULL DEFAULT '1',
   `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
   PRIMARY KEY (`problemset_id`,`problem_id`),
@@ -740,6 +742,8 @@ CREATE TABLE `Run_Counts` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Runs` (
   `run_id` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_id` int(11) NOT NULL COMMENT 'El envío',
+  `version` char(40) DEFAULT NULL COMMENT 'La versión del problema.',
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `problem_id` int(11) NOT NULL,
   `problemset_id` int(11) DEFAULT NULL,
@@ -757,13 +761,14 @@ CREATE TABLE `Runs` (
   `judged_by` char(32) DEFAULT NULL,
   `type` enum('normal','test','disqualified') DEFAULT 'normal',
   PRIMARY KEY (`run_id`),
-  UNIQUE KEY `runs_alias` (`guid`),
+  UNIQUE KEY `runs_versions` (`submission_id`,`version`),
   KEY `problem_id` (`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_r_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_r_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -795,18 +800,44 @@ CREATE TABLE `States` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Submission_Log` (
   `problemset_id` int(11) DEFAULT NULL,
-  `run_id` int(11) NOT NULL,
+  `submission_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `ip` int(10) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`run_id`),
+  PRIMARY KEY (`submission_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_sli_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_slp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_slr_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Submissions` (
+  `submission_id` int(11) NOT NULL AUTO_INCREMENT,
+  `current_run_id` int(11) DEFAULT NULL COMMENT 'La evaluación actual del envío',
+  `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
+  `problem_id` int(11) NOT NULL,
+  `problemset_id` int(11) DEFAULT NULL,
+  `guid` char(32) NOT NULL,
+  `language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') NOT NULL,
+  `penalty` int(11) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `submit_delay` int(11) NOT NULL DEFAULT '0',
+  `type` enum('normal','test','disqualified') DEFAULT 'normal',
+  PRIMARY KEY (`submission_id`),
+  UNIQUE KEY `submissions_guid` (`guid`),
+  KEY `problem_id` (`problem_id`),
+  KEY `problemset_id` (`problemset_id`),
+  KEY `identity_id` (`identity_id`),
+  KEY `fk_s_current_run_id` (`current_run_id`),
+  CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;

@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Runs.
+ * Value Object file for table Submissions.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class Runs extends VO {
+class Submissions extends VO {
     /**
-     * Constructor de Runs
+     * Constructor de Submissions
      *
-     * Para construir un objeto de tipo Runs debera llamarse a el constructor
+     * Para construir un objeto de tipo Submissions debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,14 +26,11 @@ class Runs extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['run_id'])) {
-            $this->run_id = $data['run_id'];
-        }
         if (isset($data['submission_id'])) {
             $this->submission_id = $data['submission_id'];
         }
-        if (isset($data['version'])) {
-            $this->version = $data['version'];
+        if (isset($data['current_run_id'])) {
+            $this->current_run_id = $data['current_run_id'];
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
@@ -50,35 +47,14 @@ class Runs extends VO {
         if (isset($data['language'])) {
             $this->language = $data['language'];
         }
-        if (isset($data['status'])) {
-            $this->status = $data['status'];
-        }
-        if (isset($data['verdict'])) {
-            $this->verdict = $data['verdict'];
-        }
-        if (isset($data['runtime'])) {
-            $this->runtime = $data['runtime'];
-        }
         if (isset($data['penalty'])) {
             $this->penalty = $data['penalty'];
-        }
-        if (isset($data['memory'])) {
-            $this->memory = $data['memory'];
-        }
-        if (isset($data['score'])) {
-            $this->score = $data['score'];
-        }
-        if (isset($data['contest_score'])) {
-            $this->contest_score = $data['contest_score'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
         if (isset($data['submit_delay'])) {
             $this->submit_delay = $data['submit_delay'];
-        }
-        if (isset($data['judged_by'])) {
-            $this->judged_by = $data['judged_by'];
         }
         if (isset($data['type'])) {
             $this->type = $data['type'];
@@ -103,21 +79,14 @@ class Runs extends VO {
       * @access public
       * @var int(11)
       */
-    public $run_id;
-
-    /**
-      * El envío
-      * @access public
-      * @var int(11)
-      */
     public $submission_id;
 
     /**
-      * La versión del problema.
+      * La evaluación actual del envío
       * @access public
-      * @var char(40)
+      * @var int(11)
       */
-    public $version;
+    public $current_run_id;
 
     /**
       * Identidad del usuario
@@ -157,51 +126,9 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('new','waiting','compiling','running','ready')
-      */
-    public $status;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('ac','pa','pe','wa','tle','ole','mle','rte','rfe','ce','je')
-      */
-    public $verdict;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $runtime;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var int(11)
       */
     public $penalty;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $memory;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $score;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $contest_score;
 
     /**
       *  [Campo no documentado]
@@ -216,13 +143,6 @@ class Runs extends VO {
       * @var int(11)
       */
     public $submit_delay;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(32)
-      */
-    public $judged_by;
 
     /**
       *  [Campo no documentado]
