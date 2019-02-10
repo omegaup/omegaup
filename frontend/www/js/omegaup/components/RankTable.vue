@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     onSubmit: function() {
-      var Searched_user_url='/profile/'+this.Searched_user
+      var Searched_user_url='/profile/'+this.Searched_user;
       window.location = Searched_user_url;
      },
 
