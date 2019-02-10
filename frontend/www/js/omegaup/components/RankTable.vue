@@ -117,7 +117,6 @@ export default {
   },
   methods: {
     onSubmit: function() {
-      let searchedUsername_url = '/profile/' + this.searchedUsername;
       window.location = `/profile/${encodeURIComponent(this.searchedUsername)}`;
     },
 
