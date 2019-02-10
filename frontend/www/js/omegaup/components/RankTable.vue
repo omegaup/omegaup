@@ -6,15 +6,12 @@
           <form v-on:submit.prevent="onSubmit">
             <div class="form-inline">
               <div class="form-group">
-                     <omegaup-autocomplete class="form-control"
-                     v-model="Searched_user"
-                     v-bind:init=
-                     "el =&gt; UI.userTypeahead(el)">
-                    </omegaup-autocomplete>
-              </div>
-              <input class="btn btn-primary btn-lg active"
-                     type="submit"
-                     value="Search User">
+                <omegaup-autocomplete class="form-control"
+                     v-bind:init="el =&gt; UI.userTypeahead(el)"
+                     v-model="Searched_user"></omegaup-autocomplete>
+              </div><input class="btn btn-primary btn-lg active"
+                   type="submit"
+                   value="Search User">
             </div>
           </form>
         </div>
@@ -114,13 +111,13 @@ export default {
     resultTotal: Number,
   },
   data: function() {
-    return { T: T, UI: UI,Searched_user:'',}
+    return { T: T, UI: UI, Searched_user: '', }
   },
   methods: {
     onSubmit: function() {
-      var Searched_user_url='/profile/'+this.Searched_user;
+      var Searched_user_url = '/profile/' + this.Searched_user;
       window.location = Searched_user_url;
-     },
+    },
 
     filterChange: function() {
       // change url parameters with jquery
