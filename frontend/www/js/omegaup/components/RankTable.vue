@@ -3,17 +3,18 @@
     <div class="panel-heading">
       <template v-if="!isIndex">
         <div class="text-right">
-          <form action="/rank/"
-                method="get">
+          <form v-on:submit.prevent="onSubmit">
             <div class="form-inline">
               <div class="form-group">
-                <input autocomplete="off"
-                     class="form-control"
-                     name="query"
-                     type="text">
-              </div><input class="btn btn-primary btn-lg active"
-                   type="submit"
-                   value="Search User">
+                     <omegaup-autocomplete class="form-control"
+                     v-model="Searched_user"
+                     v-bind:init=
+                     "el =&gt; UI.userTypeahead(el)">
+                    </omegaup-autocomplete>
+              </div>
+              <input class="btn btn-primary btn-lg active"
+                     type="submit"
+                     value="Search User">
             </div>
           </form>
         </div>
@@ -100,6 +101,7 @@
 import {T} from '../omegaup.js';
 import UI from '../ui.js';
 import {OmegaUp} from '../omegaup.js';
+import Autocomplete from './Autocomplete.vue';
 
 export default {
   props: {
@@ -112,9 +114,14 @@ export default {
     resultTotal: Number,
   },
   data: function() {
-    return { T: T, UI: UI, }
+    return { T: T, UI: UI,Searched_user:'',}
   },
   methods: {
+    onSubmit: function() {
+      var Searched_user_url='/profile/'+this.Searched_user
+      window.location = Searched_user_url;
+     },
+
     filterChange: function() {
       // change url parameters with jquery
       // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
@@ -157,6 +164,9 @@ export default {
     shouldShowNextPage: function() {
       return this.length * this.page < this.resultTotal;
     }
+  },
+  components: {
+    'omegaup-autocomplete': Autocomplete,
   },
 };
 </script>

@@ -33,17 +33,7 @@ class UsersDAO extends UsersDAOBase {
         }
         return new Users($rs);
     }
-
-    public static function CheckUsername($username) {
-        global  $conn;
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1';
-        $rs = $conn->GetRow($sql, [$username]);
-        if (count($rs)==0) {
-            return null;
-        }
-        return ($username);
-    }
-
+    
     public static function IsUserInterviewer($user_id) {
         $sql = '
             SELECT
