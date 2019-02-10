@@ -725,6 +725,7 @@ const translations = {
 	schoolsManageProgressOfStudents: "Administre el progreso de sus estudiantes",
 	schoolsStartUsingSchools: "Empieza a usar las escuelas",
 	scoreboardmerge: "Unir scorboard",
+	searchedUsername: "Nombre de usuario buscado",
 	selectAction: "Seleccionar acci\u00f3n",
 	sendInvitesToCandidates: "Enviar correos",
 	showLinks: "Enlaces",
