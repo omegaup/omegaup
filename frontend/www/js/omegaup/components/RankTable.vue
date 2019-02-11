@@ -3,18 +3,14 @@
     <div class="panel-heading">
       <template v-if="!isIndex">
         <h3 class="panel-title">{{ UI.formatString(T.rankRangeHeader,
-        {lowCount:(page-1)*length+1,highCount:page*length}) }}</h3>
-        <label>
-                  <omegaup-autocomplete class="form-control"
-                       v-bind:init="el =&gt; UI.userTypeahead(el)"
-                       v-model="searchedUsername"></omegaup-autocomplete></label>
-                       <div class="btn-group">
-
-                       <button 
-                       type="button"
-                       v-on:click="onSubmit">{{ T.searchUser }}</button>
-                 </div>
-
+        {lowCount:(page-1)*length+1,highCount:page*length})
+        }}</h3><label><omegaup-autocomplete class="form-control"
+                              v-bind:init="el =&gt; UI.userTypeahead(el)"
+                              v-model="searchedUsername"></omegaup-autocomplete></label>
+        <div class="btn-group">
+          <button type="button"
+               v-on:click="onSubmit">{{ T.searchUser }}</button>
+        </div>
         <template v-if="page &gt; 1">
           <a class="prev"
                     v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class="delimiter"
