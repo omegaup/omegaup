@@ -2704,9 +2704,9 @@ class ContestController extends Controller {
         // Add runs to zip
         $table = "guid,user,problem,verdict,points\n";
         foreach ($runs as $run) {
-            $zip->add_file_from_path(
+            $zip->add_file(
                 'runs/' . $run->guid,
-                RunController::getSubmissionPath($run)
+                RunController::getRunSource($run)
             );
 
             $columns[0] = 'username';

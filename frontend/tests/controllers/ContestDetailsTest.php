@@ -532,6 +532,8 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
+        $detourGrader = new ScopedGraderDetour();
+
         // Create runs
         $runsData = [];
         $runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
@@ -540,8 +542,6 @@ class ContestDetailsTest extends OmegaupTestCase {
         $runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
-
-        $detourGrader = $this->detourGraderCalls($this->any());
 
         // Grade the runs
         RunsFactory::gradeRun($runsData[0], 0, 'CE');

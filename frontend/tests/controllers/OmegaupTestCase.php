@@ -331,35 +331,6 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         return copy($filename, $targetpath);
     }
 
-    /**
-     * Detours the Grader calls to a mock instance.
-     *
-     * Problem: Submiting a new run invokes the Grader::grade() function which makes
-     * a HTTP call to official grader using CURL. This call will fail if grader is
-     * not turned on. We are not testing the Grader functionallity itself, we are
-     * only validating that we populate the DB correctly and that we make a call
-     * to the function Grader::grade(), without executing the contents.
-     *
-     * Solution: We create a phpunit mock of the Grader class. We create a fake
-     * object Grader with the function grade() which will expects to be
-     * excecuted $times times.
-     */
-    public function detourGraderCalls($times = null) {
-        if (is_null($times)) {
-            $times = $this->once();
-        }
-
-        // Create a fake Grader object which will make sure that the 'grade'
-        // method is invoked the correct number of times.
-        $mockGrader = $this->getMockBuilder('NoOpGrader')
-            ->setMethods(['grade'])
-            ->getMock();
-        $mockGrader
-            ->expects($times)
-            ->method('grade');
-        return new ScopedGraderDetour($mockGrader);
-    }
-
     protected function detourBroadcasterCalls($times = null) {
         if (is_null($times)) {
             $times = $this->once();
@@ -443,9 +414,20 @@ class ScopedEmailSender {
  */
 class NoOpGrader extends Grader {
     private $resources = [];
+    private $submissions = [];
+    private $runCount = 0;
 
-    public function grade(array $runGuids, bool $rejudge, bool $debug) {
-        return;
+    public function grade(string $guid, string $source) {
+        $this->submissions[$guid] = $source;
+        $this->runCount += 1;
+    }
+
+    public function rejudge(array $runGuids, bool $debug) {
+        $this->runCount += count($runGuids);
+    }
+
+    public function getSource(string $guid) {
+        return $this->submissions[$guid];
     }
 
     public function status() {
@@ -502,20 +484,30 @@ class NoOpGrader extends Grader {
         $path = "{$guid}/{$filename}";
         $this->resources[$path] = $contents;
     }
+
+    public function getGraderCallCount() {
+        return $this->runCount;
+    }
 }
 
 /**
  * Simple RAII class to detour grader calls to a mock instance.
  */
 class ScopedGraderDetour {
-    private $originalInstance = null;
+    private $_originalInstance = null;
+    private $_instance = null;
 
-    public function __construct($instance) {
-        $originalInstance = Grader::getInstance();
-        Grader::setInstanceForTesting($instance);
+    public function __construct() {
+        $this->_originalInstance = Grader::getInstance();
+        $this->_instance = new NoOpGrader();
+        Grader::setInstanceForTesting($this->_instance);
     }
 
     public function __destruct() {
-        Grader::setInstanceForTesting($this->originalInstance);
+        Grader::setInstanceForTesting($this->_originalInstance);
+    }
+
+    public function getGraderCallCount() {
+        return $this->_instance->getGraderCallCount();
     }
 }
