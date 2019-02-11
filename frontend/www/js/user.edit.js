@@ -17,11 +17,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#state_id option').remove();
         $('#state_id').val('');
 
-        try {
-          var country = iso3166.country($('#country_id').val());
-        } catch (err) {
-          country = '';
-        }
+        var country = iso3166.country($('#country_id').val() || '');
 
         if (!country.sub) {
           $('#state_id').attr('disabled', 'disabled');
