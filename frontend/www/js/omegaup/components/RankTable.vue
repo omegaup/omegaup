@@ -7,10 +7,9 @@
         }}</h3><label><omegaup-autocomplete class="form-control"
                               v-bind:init="el =&gt; UI.userTypeahead(el)"
                               v-model="searchedUsername"></omegaup-autocomplete></label>
-        <div class="btn-group">
-          <button type="button"
-               v-on:click="onSubmit">{{ T.searchUser }}</button>
-        </div>
+                              <button class="btn btn-primary"
+                  type="button"
+                  v-on:click="onSubmit">{{ T.searchUser }}</button>
         <template v-if="page &gt; 1">
           <a class="prev"
                     v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class="delimiter"
