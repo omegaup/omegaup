@@ -9,7 +9,7 @@
         {lowCount:(page-1)*length+1,highCount:page*length}) }}</h3>
       </template>
     </div>
-    <div class="panel-body no-padding"
+    <div class="panel-body"
          v-if="!isIndex">
       <label><omegaup-autocomplete class="form-control"
                             v-bind:init="el =&gt; UI.userTypeahead(el)"
@@ -66,22 +66,19 @@
         </tr>
       </tbody>
     </table>
-    <div class="container-fluid">
-      <div class="col-xs-12 vertical-padding">
-        <template v-if="isIndex">
-          <a href="/rank/">{{ T.rankViewFull }}</a>
-        </template>
-        <template v-else="">
-          <template v-if="page &gt; 1">
-            <a class="prev"
-                      v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class=
-                      "delimiter"
-                      v-show="shouldShowNextPage">|</span>
-          </template><a class="next"
-                    v-bind:href="nextPageFilter"
-                    v-show="shouldShowNextPage">{{ T.wordsNextPage }}</a>
-        </template><br>
-      </div>
+    <div class="panel-footer">
+      <template v-if="isIndex">
+        <a href="/rank/">{{ T.rankViewFull }}</a>
+      </template>
+      <template v-else="">
+        <template v-if="page &gt; 1">
+          <a class="prev"
+                    v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a> <span class="delimiter"
+                    v-show="shouldShowNextPage">|</span>
+        </template><a class="next"
+                  v-bind:href="nextPageFilter"
+                  v-show="shouldShowNextPage">{{ T.wordsNextPage }}</a>
+      </template>
     </div>
   </div>
 </template>
