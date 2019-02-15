@@ -17,7 +17,8 @@ omegaup.OmegaUp.on('ready', function() {
         $('#state_id option').remove();
         $('#state_id').val('');
 
-        var country = iso3166.country($('#country_id').val());
+        var country = iso3166.country($('#country_id').val() || '');
+
         if (!country.sub) {
           $('#state_id').attr('disabled', 'disabled');
           return;
