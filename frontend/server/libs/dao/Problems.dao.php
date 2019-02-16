@@ -108,8 +108,8 @@ class ProblemsDAO extends ProblemsDAOBase {
         $select = '';
         $sql= '';
         $args = [];
-        $karel_problems = $only_karel ? " (FIND_IN_SET('kp', p.languages) > 0 AND FIND_IN_SET('kj', p.languages) > 0) AND" : "";
-        $difficulty_query = $difficulty_range ? " (p.difficulty >= $difficulty_range[0] AND p.difficulty <= $difficulty_range[1]) AND" : "";
+        $karel_problems = $only_karel ? " (FIND_IN_SET('kp', p.languages) > 0 AND FIND_IN_SET('kj', p.languages) > 0) AND" : '';
+        $difficulty_query = $difficulty_range ? " (p.difficulty >= $difficulty_range[0] AND p.difficulty <= $difficulty_range[1]) AND" : '';
 
         if ($identity_type === IDENTITY_ADMIN) {
             $args = [$identity_id];

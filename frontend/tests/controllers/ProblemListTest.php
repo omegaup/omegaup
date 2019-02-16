@@ -120,7 +120,7 @@ class ProblemList extends OmegaupTestCase {
     */
     private static function deleteAllProblemsTags() {
         global $conn;
-        $conn->Execute("DELETE FROM `Problems_Tags`;");
+        $conn->Execute('DELETE FROM `Problems_Tags`;');
     }
 
     /**
@@ -224,9 +224,9 @@ class ProblemList extends OmegaupTestCase {
         */
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => "tag-0",
+            'tag' => 'tag-0',
             'only_karel' => true,
-            'difficulty_range' => array(0,2),
+            'difficulty_range' => [0,2],
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
@@ -242,7 +242,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login[0]->auth_token,
             'tag' => ['tag-0', 'tag-3'],
             'some_tags' => true,
-            'difficulty_range' => array(0,4),
+            'difficulty_range' => [0,4],
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
@@ -258,7 +258,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login[0]->auth_token,
             'tag' => ['tag-2', 'tag-3'],
             'some_tags' => true,
-            'difficulty_range' => array(1,4),
+            'difficulty_range' => [1,4],
             'order_by' => 'quality',
         ]));
         $this->assertCount(0, $response['results']);
