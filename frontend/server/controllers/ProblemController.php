@@ -1720,6 +1720,9 @@ class ProblemController extends Controller {
             $author_user_id,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
+            $r['some_tags'],
+            $r['only_karel'],
+            $r['difficulty_range'],
             $total
         );
         $response['total'] = $total;
