@@ -2,7 +2,7 @@
 <html lang="{#locale#}">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>omegaUp &mdash; {$contestName}</title>
+    <title>omegaUp &mdash; {$contestName|htmlspecialchars}</title>
     <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
     <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.2.1.min.js"}"></script>
@@ -22,7 +22,7 @@
     <div class="problem">
       <script type="text/json" class="payload">{$problem.payload|json_encode}</script>
       <div class="title">
-        <h1 class="problem-title">{$problem.letter}. {$problem.title|htmlspecialchars}</h2>
+        <h1 class="problem-title">{$contestName|htmlspecialchars} &mdash; {$problem.letter}. {$problem.title|htmlspecialchars}</h2>
         <table class="data">
           <tr>
             <td>{#wordsPoints#}</td>
@@ -39,8 +39,6 @@
         </table>
       </div>
       <div class="statement"></div>
-      <hr />
-      <div class="page-break"></div>
     </div>
 {/foreach}
   <script type="text/javascript" src="{version_hash src="/js/contest.print.js"}"></script>

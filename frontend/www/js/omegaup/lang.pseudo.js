@@ -725,6 +725,7 @@ const translations = {
 	schoolsManageProgressOfStudents: "(Manag3 7h3 pr0gr355 0f y0ur 57ud3n75)",
 	schoolsStartUsingSchools: "(S7ar7 u5ing Sch0015)",
 	scoreboardmerge: "(M3rg3 5c0rb0ard)",
+	searchUser: "(S3arch u53r)",
 	selectAction: "(S313c7 ac7i0n)",
 	sendInvitesToCandidates: "(S3nd 3mai15)",
 	showLinks: "(Link5)",
