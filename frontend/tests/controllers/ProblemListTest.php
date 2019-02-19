@@ -116,14 +116,6 @@ class ProblemList extends OmegaupTestCase {
     }
 
     /**
-     * Removes all Tags connected to Problems from database
-    */
-    private static function deleteAllProblemsTags() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Problems_Tags`;');
-    }
-
-    /**
      * Test getting a list of problems using Problem Finder's filters:
      * - tags
      * - karel vs language
@@ -131,13 +123,9 @@ class ProblemList extends OmegaupTestCase {
      * - Sort by: quality vs points vs submissions
      */
     public function testProblemFinderSearch() {
-        self::deleteAllProblemsTags();
-        /*
-            Create 5 problems
-            - Even problems could be solved using Karel, odd ones don't
-            - Each one will have i tags, where i equals the number of the problem
-            - Fourth problem won't have tag-0
-        */
+        // Create 5 problems
+        // - Even problems could be solved using Karel, odd ones don't
+        // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
         $karel_problem = 'kj,kp,cpp,c'; // Karel problems should allow kj AND kp extensions
         for ($i = 0; $i < $n; $i++) {
@@ -146,20 +134,14 @@ class ProblemList extends OmegaupTestCase {
                 'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
             ]));
             for ($j = 0; $j <= $i; $j++) {
-                if (!($i == 3 && $j == 0)) {
-                    ProblemsFactory::addTag($problemData[$i], "tag-$j", 1 /* public */);
-                }
+                ProblemsFactory::addTag($problemData[$i], "test-tag-$j", 1 /* public */);
             }
         }
 
-        /*
-            5 users are going to be created, each i user will solve i problems
-            and all users are going to send their feedback to the first problem
-        */
+        // 5 users are going to be created, each i user will solve i problems
+        // and all users are going to send their feedback to the first problem
         for ($i = 0; $i < 5; $i++) {
             $users[$i] = UserFactory::createUser();
-        }
-        for ($i = 0; $i < 5; $i++) {
             for ($j = 0; $j <= $i; $j++) {
                 $runData = RunsFactory::createRunToProblem($problemData[$j], $users[$i]);
                 RunsFactory::gradeRun($runData);
@@ -170,40 +152,40 @@ class ProblemList extends OmegaupTestCase {
         QualityNominationFactory::createSuggestion(
             $login[0],
             $problemData[0]['request']['problem_alias'],
-            4, /* difficulty */
-            3, /* quality */
+            4, // difficulty
+            3, // quality
             []
         );
 
         QualityNominationFactory::createSuggestion(
             $login[1],
             $problemData[0]['request']['problem_alias'],
-            4, /* difficulty */
-            4, /* quality */
+            4, // difficulty
+            4, // quality
             []
         );
 
         QualityNominationFactory::createSuggestion(
             $login[2],
             $problemData[0]['request']['problem_alias'],
-            4, /* difficulty */
-            2, /* quality */
+            4, // difficulty
+            2, // quality
             []
         );
 
         QualityNominationFactory::createSuggestion(
             $login[3],
             $problemData[0]['request']['problem_alias'],
-            4, /* difficulty */
-            4, /* quality */
+            4, // difficulty
+            4, // quality
             []
         );
 
         QualityNominationFactory::createSuggestion(
             $login[4],
             $problemData[0]['request']['problem_alias'],
-            4, /* difficulty */
-            4, /* quality */
+            4, // difficulty
+            4, // quality
             []
         );
 
@@ -216,15 +198,14 @@ class ProblemList extends OmegaupTestCase {
                  ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
                  ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
 
-        /* Filter 1:
-            - Containing tag-0
-            - Only Karel problems
-            - Difficulty between 0 and 3
-            - Sorted by popularity
-        */
+        // Filter 1:
+        // - Containing tag-0
+        // - Only Karel problems
+        // - Difficulty between 0 and 3
+        // - Sorted by popularity
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => 'tag-0',
+            'tag' => 'test-tag-0',
             'only_karel' => true,
             'difficulty_range' => [0,2],
             'order_by' => 'submissions',
@@ -233,31 +214,29 @@ class ProblemList extends OmegaupTestCase {
         $this->assertEquals($problemData[2]['request']['problem_alias'], $response['results'][0]['alias']);
         $this->assertEquals($problemData[4]['request']['problem_alias'], $response['results'][1]['alias']);
 
-        /* Filter 2:
-            - Containing tag-0 or/and tag-3
-            - Difficulty between 0 and 4
-            - Sorted by quality
-        */
+        // Filter 2:
+        // - Containing tag-0 or/and tag-3
+        // - Difficulty between 0 and 4
+        // - Sorted by quality
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['tag-0', 'tag-3'],
-            'some_tags' => true,
+            'tag' => ['test-tag-0', 'test-tag-3'],
+            'require_all_tags' => false,
             'difficulty_range' => [0,4],
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
         $this->assertEquals($problemData[0]['request']['problem_alias'], $response['results'][0]['alias']);
 
-        /* Filter 3:
-            - Containing tag-2 or/and tag-3
-            - Only karel
-            - Difficulty between 2 and 4
-            - Sorted by quality
-        */
+        // Filter 3:
+        // - Containing tag-2 or/and tag-3
+        // - Only karel
+        // - Difficulty between 2 and 4
+        // - Sorted by quality
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['tag-2', 'tag-3'],
-            'some_tags' => true,
+            'tag' => ['test-tag-2', 'test-tag-3'],
+            'require_all_tags' => false,
             'difficulty_range' => [1,4],
             'order_by' => 'quality',
         ]));
