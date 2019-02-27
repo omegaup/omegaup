@@ -16,7 +16,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         parent::setUpBeforeClass();
 
         $scriptFilename = __DIR__ . '/gitserver-start.sh ' .
-            OMEGAUP_GITSERVER_PORT . ' ' . PROBLEMS_GIT_PATH;
+            OMEGAUP_GITSERVER_PORT . ' /tmp/omegaup/problems.git';
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new Exception(
