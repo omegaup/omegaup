@@ -14,14 +14,7 @@ stage_before_install() {
 	python3 -m pip install --user --upgrade pip
 	python3 -m pip install --user setuptools
 	python3 -m pip install --user wheel
-	python3 -m pip install --user pylint==2.2.2
-	python3 -m pip install --user pycodestyle==2.5.0
 	python3 -m pip install --user awscli
-	python3.5 -m pip install --user --upgrade pip
-	python3.5 -m pip install --user setuptools
-	python3.5 -m pip install --user wheel
-	python3.5 -m pip install --user pylint==2.2.2
-	python3.5 -m pip install --user pycodestyle==2.5.0
 
 	install_yarn
 }
@@ -42,7 +35,7 @@ stage_script() {
 	yarn test
 
 	python3 stuff/db-migrate.py validate
-	python3.5 stuff/hook_tools/lint.py -j4 validate --all < /dev/null
+	docker run --rm -v "$PWD:/src" -v "$PWD:/opt/omegaup" omegaup/hook_tools -j4 validate --all < /dev/null
 }
 
 stage_after_success() {
