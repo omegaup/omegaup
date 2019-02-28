@@ -206,7 +206,7 @@ class ProblemList extends OmegaupTestCase {
         $response = ProblemController::apiList(new Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => 'test-tag-0',
-            'only_karel' => true,
+            'programming_languages' => ['kp', 'kj'],
             'difficulty_range' => [0,2],
             'order_by' => 'submissions',
         ]));

@@ -1721,7 +1721,7 @@ class ProblemController extends Controller {
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
-            is_null($r['only_karel']) ? false : !!$r['only_karel'],
+            $r['programming_languages'],
             $r['difficulty_range'],
             $total
         );
