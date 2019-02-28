@@ -83,7 +83,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $tag,
         $min_visibility,
         $require_all_tags,
-        $only_karel,
+        $programming_languages,
         $difficulty_range,
         &$total
     ) {
@@ -109,7 +109,15 @@ class ProblemsDAO extends ProblemsDAOBase {
         $select = '';
         $sql= '';
         $args = [];
-        $karel_problems = $only_karel ? " (FIND_IN_SET('kp', p.languages) > 0 AND FIND_IN_SET('kj', p.languages) > 0) AND" : '';
+        $programming_languages_filter = '';
+        if (is_array($programming_languages) && count($programming_languages) > 0) {
+            $programming_languages_filter = " (FIND_IN_SET('$programming_languages[0]', p.languages) > 0";
+            for ($i = 1; $i < count($programming_languages); $i++) {
+                $programming_languages_filter .= " AND FIND_IN_SET('$programming_languages[$i]', p.languages) > 0";
+            }
+            $programming_languages_filter .= ') AND ';
+        }
+
         $difficulty_query = (is_array($difficulty_range) && count($difficulty_range) == 2) ? " (p.difficulty >= $difficulty_range[0] AND p.difficulty <= $difficulty_range[1]) AND" : '';
 
         if ($identity_type === IDENTITY_ADMIN) {
@@ -138,7 +146,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
-            $sql .= $karel_problems;
+            $sql .= $programming_languages_filter;
             $sql .= $difficulty_query;
             if (!is_null($query)) {
                 $sql .= " (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
@@ -198,7 +206,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             $args[] = Authorization::ADMIN_ROLE;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
-            $sql .= $karel_problems;
+            $sql .= $programming_languages_filter;
             $sql .= $difficulty_query;
             $sql .= '
                 (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
@@ -225,7 +233,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
             $sql .= ' p.visibility >= ? ';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
-            $sql .= $karel_problems;
+            $sql .= $programming_languages_filter;
             $sql .= $difficulty_query;
             if (!is_null($query)) {
                 $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
