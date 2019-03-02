@@ -20,11 +20,6 @@ stage_before_install() {
 }
 
 stage_before_script() {
-	DOWNLOAD_URL='https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.4.0/phpcbf.phar'
-	TARGET="/usr/bin/phpcbf"
-	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
-	sudo chmod +x "${TARGET}"
-
 	setup_phpenv
 }
 

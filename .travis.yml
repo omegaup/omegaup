@@ -8,7 +8,7 @@ branches:
     - release
 
 php:
-  - 7.0.7
+  - 7.0.33
 
 # Common sources and packages. If a matrix entry needs these, it should
 # explicitly add both of the sources and package YAML references in its addons
