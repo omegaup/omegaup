@@ -1,14 +1,5 @@
 <?php
 
-// Older (~Xenial) PHP Unit compatibility hack.
-// We should be able to remove this once we upgrade PHPUnit and/or PHP.
-namespace PHPUnit\Framework {
-    if (!class_exists('\\PHPUnit\\Framework\\TestCase')) {
-        class TestCase extends \PHPUnit_Framework_TestCase {
-        }
-    }
-}
-
 namespace {
     define('IS_TEST', true);
 
@@ -54,6 +45,7 @@ namespace {
     Utils::CleanPath(IMAGES_PATH);
     Utils::CleanPath(RUNS_PATH);
     Utils::CleanPath(TEMPLATES_PATH);
+    Utils::CleanPath(PROBLEMS_GIT_PATH);
 
     for ($i = 0; $i < 256; $i++) {
         mkdir(RUNS_PATH . sprintf('/%02x', $i), 0775, true);

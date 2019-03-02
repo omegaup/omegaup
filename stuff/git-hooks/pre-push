@@ -56,4 +56,4 @@ fi
 
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/database_schema.py validate $ARGS
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/policy-tool.py validate
-/usr/bin/python3 $OMEGAUP_ROOT/stuff/hook_tools/lint.py validate $ARGS
+/usr/bin/docker run --rm -v "$OMEGAUP_ROOT:/src" -v "$OMEGAUP_ROOT:/opt/omegaup" omegaup/hook_tools -j4 validate $ARGS < /dev/null
