@@ -1,5 +1,5 @@
 <?php
-
+include('QualityNominationTest.php');
 /**
  * Description of ProblemList
  *
@@ -189,14 +189,8 @@ class ProblemList extends OmegaupTestCase {
             []
         );
 
-        global $conn;
-        $conn->Execute('COMMIT');
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        $qnt = new QualityNominationTest();
+        $qnt->runCronjobScript();
 
         // Filter 1:
         // - Containing tag-0
