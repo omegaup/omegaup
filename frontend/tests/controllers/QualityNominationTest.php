@@ -1126,7 +1126,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
     }
 
-    private function runCronjobScript() {
+    public function runCronjobScript() {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
