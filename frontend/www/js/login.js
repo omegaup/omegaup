@@ -43,32 +43,25 @@ omegaup.OmegaUp.on('ready', function() {
   $('#register-form').on('submit', registerAndLogin);
 });
 
-var logmeoutOnce = window.location.href.endsWith('?logout');
+function signInCallback(googleUser) {
+  // Only log in if the user actually clicked the sign-in button.
+  omegaup.API.Session.googleLogin(
+                         {storeToken: googleUser.getAuthResponse().id_token})
+      .then(function(data) { window.location.reload(); })
+      .fail(omegaup.UI.apiError);
+}
 
-function signInCallback(authResult) {
-  if (logmeoutOnce) {
-    gapi.auth.signOut();
-    logmeoutOnce = false;
-  } else if (authResult['code']) {
-    if (authResult.status.method != 'AUTO') {
-      // Only log in if the user actually clicked the sign-in button.
-      omegaup.API.Session.googleLogin({storeToken: authResult['code']})
-          .then(function(data) { window.location.reload(); })
-          .fail(omegaup.UI.apiError);
-    }
-  } else if (authResult['error']) {
-    // Esto se hace en cada refresh a la pagina de login.
-    // omegaup.UI.error('There was an error: ' + authResult['error']);
-  }
+function signInFailure(error) {
+  console.error(error);
 }
 
 // https://developers.google.com/+/web/signin/server-side-flow
 function renderButton() {
   gapi.signin2.render('google-signin', {
     'scope': 'email',
-    'width': 200,
-    'height': 50,
+    'theme': 'dark',
     'longtitle': false,
-    'redirect_uri': 'postmessage',
+    'onsuccess': signInCallback,
+    'onfailure': signInFailure,
   });
 }
