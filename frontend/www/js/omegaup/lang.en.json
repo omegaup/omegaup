@@ -384,6 +384,7 @@
 	"loginRequired": "You need to login to perform that action.",
 	"loginSignUp": "Register",
 	"loginSignupHeader": "Create an omegaUp account, it's quick and easy!",
+	"loginThroughThirdParty": "Your user was created through a third-party login (Google, Facebook, LinkedIn, etc.). Please login using that mechanism again in order to set a password.",
 	"loginWithFacebook": "Log in with Facebook",
 	"loginWithGoogle": "Log in with Google",
 	"mailInUse": "This mail is already in use. Try again.",
