@@ -13,16 +13,8 @@
 
 {if $GOOGLECLIENTID != ""}
 				<div
-					id="signinButton"
-					title="{#loginWithGoogle#}"
-					class="openid_large_btn">
-					<span class="g-signin "
-						data-scope="email"
-						data-clientid="{$GOOGLECLIENTID}"
-						data-redirecturi="postmessage"
-						data-cookiepolicy="single_host_origin"
-						data-callback="signInCallback">
-					</span>
+					id="google-signin"
+					title="{#loginWithGoogle#}">
 				</div>
 {/if}
 
@@ -123,6 +115,6 @@
 
 <script type="text/javascript" src="{version_hash src="/js/login.js"}"></script>
 {if $GOOGLECLIENTID != ""}
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 {/if}
 {include file='footer.tpl'}

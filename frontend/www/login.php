@@ -1,5 +1,4 @@
 <?php
-define('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS', true);
 require_once('../server/bootstrap_smarty.php');
 require_once('api/ApiCaller.php');
 
