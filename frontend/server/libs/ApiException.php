@@ -355,8 +355,8 @@ class ProblemDeploymentFailedException extends ApiException {
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-    public function __construct(ApiException $previous = null) {
-        parent::__construct('loginDisabled', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    public function __construct($message, ApiException $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
 

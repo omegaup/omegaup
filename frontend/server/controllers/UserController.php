@@ -269,33 +269,38 @@ class UserController extends Controller {
      *
      * */
     public function TestPassword(Request $r) {
-        $vo_UserToTest = null;
+        $userToTest = null;
 
         //find this user
         if (!is_null($r['user_id'])) {
-            $vo_UserToTest = UsersDAO::getByPK($r['user_id']);
+            $userToTest = UsersDAO::getByPK($r['user_id']);
         } elseif (!is_null($r['email'])) {
-            $vo_UserToTest = $this->FindByEmail();
+            $userToTest = $this->FindByEmail();
         } elseif (!is_null($r['username'])) {
-            $vo_UserToTest = $this->FindByUserName();
+            $userToTest = $this->FindByUserName();
         } elseif (!is_null($r['identity_id'])) {
-            $vo_UserToTest = IdentitiesDAO::getByPK($r['identity_id']);
+            $userToTest = IdentitiesDAO::getByPK($r['identity_id']);
         } else {
             throw new ApiException('mustProvideUserIdEmailOrUsername');
         }
 
-        if (is_null($vo_UserToTest)) {
-            //user does not even exist
+        if (is_null($userToTest)) {
+            // user does not even exist.
             return false;
         }
 
-        if (strlen($vo_UserToTest->password) === 0) {
-            throw new LoginDisabledException();
+        if (is_null($userToTest->password)) {
+            // The user had logged in through a third-party account.
+            throw new LoginDisabledException('loginThroughThirdParty');
+        }
+
+        if (strlen($userToTest->password) === 0) {
+            throw new LoginDisabledException('loginDisabled');
         }
 
         $newPasswordCheck = SecurityTools::compareHashedStrings(
             $r['password'],
-            $vo_UserToTest->password
+            $userToTest->password
         );
 
         // We are OK
@@ -1015,7 +1020,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'OVI18' => 155
+                'OVI19' => 200
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'

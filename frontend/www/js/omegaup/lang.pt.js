@@ -385,6 +385,7 @@ const translations = {
 	loginRequired: "Voc\u00ea precisa fazer o login para executar essa a\u00e7\u00e3o",
 	loginSignUp: "Registrar",
 	loginSignupHeader: "Criar uma conta omegaUp, r\u00e1pido e f\u00e1cil!",
+	loginThroughThirdParty: "Seu usu\u00e1rio foi criado por meio de um login de terceiros (Google, Facebook, LinkedIn, etc.). Por favor, fa\u00e7a login usando esse mecanismo novamente para definir uma senha.",
 	loginWithFacebook: "Entrar com Facebook",
 	loginWithGoogle: "Entrar com Google",
 	mailInUse: "Este e-mail j\u00e1 est\u00e1 em uso. Tente novamente.",

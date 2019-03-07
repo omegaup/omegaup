@@ -12,9 +12,8 @@ stage_install() {
 	pip3 install --user wheel
 	pip3 install --user mysqlclient
 
-	# We should really try upgrading to PHP 7.1 soon.
 	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
-		https://phar.phpunit.de/phpunit-5.7.phar
+		https://phar.phpunit.de/phpunit-6.5.9.phar
 
 	install_omegaup_gitserver
 }
