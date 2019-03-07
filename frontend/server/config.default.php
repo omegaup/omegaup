@@ -159,3 +159,4 @@ try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 # ########################
 try_define('AWS_CLI_ACCESS_KEY_ID', null);
 try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
+try_define('AWS_CLI_BINARY', '/usr/bin/aws');
