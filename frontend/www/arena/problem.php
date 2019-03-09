@@ -55,8 +55,9 @@ $smarty->assign('karel_problem', count(array_intersect(
 )) == 2);
 if (isset($result['settings']['cases'])
     && isset($result['settings']['cases']['sample'])
+    && isset($result['settings']['cases']['sample']['in'])
 ) {
-    $smarty->assign('sample_input', $result['settings']['cases']['sample']);
+    $smarty->assign('sample_input', $result['settings']['cases']['sample']['in']);
 }
 
 $result['user'] = [
