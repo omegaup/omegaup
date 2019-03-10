@@ -84,13 +84,16 @@ abstract class ApiException extends Exception {
     }
 
     protected function getErrorMessage() {
+        if (is_null($this->message)) {
+            self::$log->error('null error message');
+            return '{untranslated:(null)}';
+        }
         $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
-        } else {
-            return $localizedText;
         }
+        return $localizedText;
     }
 }
 
