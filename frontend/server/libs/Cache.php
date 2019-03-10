@@ -139,7 +139,6 @@ class Cache {
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
 
-    private $enabled;
     private $log;
     protected $key;
 
@@ -150,16 +149,16 @@ class Cache {
      * @param string $key el id del cache
      */
     public function __construct($prefix, $id = '') {
-        $this->enabled = self::cacheEnabled();
         $this->log = Logger::getLogger('cache');
 
-        if ($this->enabled) {
-            $cache_ver = self::getVersion($prefix);
-            $this->key = $cache_ver.$prefix.$id;
-            $this->log->debug('Cache enabled for ' . $this->key);
-        } else {
+        if (!self::cacheEnabled()) {
             $this->log->debug('Cache disabled');
+            return;
         }
+
+        $cache_ver = self::getVersion($prefix);
+        $this->key = "{$cache_ver}{$prefix}{$id}";
+        $this->log->debug("Cache enabled for {$this->key}");
     }
 
     /**
@@ -172,15 +171,15 @@ class Cache {
      * @return boolean
      */
     public function set($value, $timeout = APC_USER_CACHE_TIMEOUT) {
-        if ($this->enabled === true) {
-            if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) === true) {
-                $this->log->debug('Cache stored successful for key: ' . $this->key);
-                return true;
-            } else {
-                $this->log->debug('Cache store failed for key: ' . $this->key);
-            }
+        if (!self::cacheEnabled()) {
+            return false;
         }
-        return false;
+        if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) !== true) {
+            $this->log->debug("Cache store failed for key: {$this->key}");
+            return false;
+        }
+        $this->log->debug("Cache stored successful for key: {$this->key}");
+        return true;
     }
 
     /**
@@ -191,15 +190,14 @@ class Cache {
      * @return boolean
      */
     public function delete() {
-        if ($this->enabled === true) {
-            if (CacheAdapter::getInstance()->delete($this->key) === true) {
-                return true;
-            } else {
-                $this->log->warn('Failed to invalidate cache for key: ' . $this->key);
-            }
+        if (!self::cacheEnabled()) {
+            return false;
         }
-
-        return false;
+        if (CacheAdapter::getInstance()->delete($this->key) !== true) {
+            $this->log->warn("Failed to invalidate cache for key: {$this->key}");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -210,16 +208,15 @@ class Cache {
      * @return mixed
      */
     public function get() {
-        if ($this->enabled === true) {
-            if (($result = CacheAdapter::getInstance()->fetch($this->key)) !== false) {
-                $this->log->debug('Cache hit for key: ' . $this->key);
-                return $result;
-            } else {
-                $this->log->info('Cache miss for key: ' . $this->key);
-            }
+        if (!self::cacheEnabled()) {
+            return null;
         }
-
-        return null;
+        if (($result = CacheAdapter::getInstance()->fetch($this->key)) === false) {
+            $this->log->info("Cache miss for key: {$this->key}");
+            return null;
+        }
+        $this->log->debug("Cache hit for key: {$this->key}");
+        return $result;
     }
 
     /**
@@ -247,24 +244,24 @@ class Cache {
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
-        if (is_null($returnValue)) {
-            // Get the value from the function provided
-            $returnValue = call_user_func($setFunc, $arg);
-
-            // If the $setFunc() didn't disable the cache
-            if (self::$cacheResults === true) {
-                $cache->set($returnValue, $timeout);
-            } else {
-                // Reset value
-                self::$cacheResults = true;
-            }
-
-            // Cache was not used
-            return false;
+        if (!is_null($returnValue)) {
+            // Cache was used
+            return true;
         }
 
-        // Cache was used
-        return true;
+        // Get the value from the function provided
+        $returnValue = call_user_func($setFunc, $arg);
+
+        // If the $setFunc() didn't disable the cache
+        if (self::$cacheResults === true) {
+            $cache->set($returnValue, $timeout);
+        } else {
+            // Reset value
+            self::$cacheResults = true;
+        }
+
+        // Cache was not used
+        return false;
     }
 
     /**
@@ -284,7 +281,7 @@ class Cache {
      * @param string $prefix
      */
     private static function getVersion($prefix) {
-        $key = 'v'.$prefix;
+        $key = "v{$prefix}";
         return (int) CacheAdapter::getInstance()->entry($key, 0);
     }
 
@@ -300,7 +297,7 @@ class Cache {
         if (!self::cacheEnabled()) {
             return;
         }
-        $key = 'v'.$prefix;
+        $key = "v{$prefix}";
         // Must do this in a loop to avoid race condition when two threads try
         // to invalidate the cache simultaneously.
         do {
