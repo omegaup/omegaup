@@ -138,7 +138,15 @@ class SessionController extends Controller {
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
-        if (is_null($currentUser) && is_null($currentIdentity)) {
+        // Get email via their id
+        if (!is_null($currentUser)) {
+            $email = EmailsDAO::getByPK($currentUser->main_email_id);
+            if (is_null($currentIdentity)) {
+                $currentIdentity = IdentitiesDAO::getByPK($currentUser->main_identity_id);
+            }
+        }
+
+        if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
                 'valid' => false,
@@ -148,11 +156,6 @@ class SessionController extends Controller {
                 'auth_token' => null,
                 'is_admin' => false,
             ];
-        }
-
-        // Get email via their id
-        if (!is_null($currentUser)) {
-            $email = EmailsDAO::getByPK($currentUser->main_email_id);
         }
 
         return [
@@ -206,14 +209,9 @@ class SessionController extends Controller {
 
         $this->InvalidateLocalCache();
 
-        //find if this user has older sessions
-        $authToken = new AuthTokens();
-        $authToken->user_id = $identity->user_id;
-        $authToken->identity_id = $identity->identity_id;
-
         //erase expired tokens
         try {
-            $tokens_erased = AuthTokensDAO::expireAuthTokens($identity->identity_id);
+            AuthTokensDAO::expireAuthTokens($identity->identity_id);
         } catch (Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
@@ -385,7 +383,6 @@ class SessionController extends Controller {
      * @return boolean
      */
     public function NativeLogin(Request $r) {
-        $c_Users = new UserController();
         $identity = null;
 
         if (null != $r['returnAuthToken']) {
@@ -404,16 +401,17 @@ class SessionController extends Controller {
             return false;
         }
 
-        $b_Valid = $c_Users->TestPassword($r);
-
-        if (!$b_Valid) {
+        if (!UserController::testPassword($identity, $r['password'])) {
             self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' has introduced invalid credentials.');
             return false;
         }
 
         self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has logged in natively.');
 
-        UserController::checkEmailVerification($r);
+        if (!is_null($identity->user_id)) {
+            $user = UsersDAO::getByPK($identity->user_id);
+            UserController::checkEmailVerification($user);
+        }
 
         try {
             return $this->RegisterSession($identity, $returnAuthToken);

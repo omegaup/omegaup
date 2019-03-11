@@ -30,10 +30,53 @@ if (!(defined('IS_TEST') && IS_TEST === true)) {
     }
 }
 
-define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0);
+define(
+    'OMEGAUP_LOCKDOWN',
+    isset(
+        $_SERVER['HTTP_HOST']
+    ) && strpos(
+        $_SERVER['HTTP_HOST'],
+        OMEGAUP_LOCKDOWN_DOMAIN
+    ) === 0
+);
 
-$csp_mode = 'Content-Security-Policy';
-header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com https://connect.facebook.net https://platform.twitter.com; frame-src 'self' https://www.facebook.com https://web.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com https://docs.google.com https://staticxx.facebook.com https://syndication.twitter.com; report-uri /cspreport.php");
+$contentSecurityPolicy = [
+    'script-src' => [
+        '\'self\'',
+        'https://www.google.com',
+        'https://apis.google.com',
+        'https://www.gstatic.com',
+        'https://js-agent.newrelic.com',
+        'https://bam.nr-data.net',
+        'https://ssl.google-analytics.com',
+        'https://connect.facebook.net',
+        'https://platform.twitter.com',
+    ],
+    'frame-src' => [
+        '\'self\'',
+        'https://www.facebook.com',
+        'https://web.facebook.com',
+        'https://platform.twitter.com',
+        'https://www.google.com',
+        'https://apis.google.com',
+        'https://accounts.google.com',
+        'https://docs.google.com',
+        'https://staticxx.facebook.com',
+        'https://syndication.twitter.com',
+    ],
+    'report-uri' => [
+        '/cspreport.php',
+    ],
+];
+if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
+    array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
+}
+header('Content-Security-Policy: ' . implode('; ', array_map(
+    function ($k) use ($contentSecurityPolicy) {
+        return "{$k} " . implode(' ', $contentSecurityPolicy[$k]);
+    },
+    array_keys($contentSecurityPolicy)
+)));
 header('X-Frame-Options: DENY');
 
 require_once('libs/third_party/log4php/src/main/php/Logger.php');

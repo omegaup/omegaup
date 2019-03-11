@@ -103,10 +103,27 @@ class ResetController extends Controller {
     public static function apiUpdate(Request $r) {
         self::validateUpdateRequest($r);
         $user = UsersDAO::FindByEmail($r['email']);
+        if (is_null($user)) {
+            throw new InvalidParameterException('invalidUser');
+        }
         $user->password = SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
-        UsersDAO::save($user);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        if (is_null($identity)) {
+            throw new InvalidParameterException('invalidUser');
+        }
+        $identity->password = $user->password;
+        try {
+            DAO::transBegin();
+            UsersDAO::save($user);
+            IdentitiesDAO::save($identity);
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            self::$log->error('Failed to reset password: ' . $e->getMessage());
+            throw new InvalidDatabaseOperationException($e);
+        }
 
         return [
             'status' => 'ok',

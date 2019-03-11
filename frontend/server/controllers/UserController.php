@@ -268,45 +268,20 @@ class UserController extends Controller {
      * @param password
      *
      * */
-    public function TestPassword(Request $r) {
-        $userToTest = null;
-
-        //find this user
-        if (!is_null($r['user_id'])) {
-            $userToTest = UsersDAO::getByPK($r['user_id']);
-        } elseif (!is_null($r['email'])) {
-            $userToTest = $this->FindByEmail();
-        } elseif (!is_null($r['username'])) {
-            $userToTest = $this->FindByUserName();
-        } elseif (!is_null($r['identity_id'])) {
-            $userToTest = IdentitiesDAO::getByPK($r['identity_id']);
-        } else {
-            throw new ApiException('mustProvideUserIdEmailOrUsername');
-        }
-
-        if (is_null($userToTest)) {
-            // user does not even exist.
-            return false;
-        }
-
-        if (is_null($userToTest->password)) {
+    public static function testPassword(Identities $identity, string $password) {
+        if (is_null($identity->password)) {
             // The user had logged in through a third-party account.
             throw new LoginDisabledException('loginThroughThirdParty');
         }
 
-        if (strlen($userToTest->password) === 0) {
+        if (strlen($identity->password) === 0) {
             throw new LoginDisabledException('loginDisabled');
         }
 
-        $newPasswordCheck = SecurityTools::compareHashedStrings(
-            $r['password'],
-            $userToTest->password
+        return SecurityTools::compareHashedStrings(
+            $password,
+            $identity->password
         );
-
-        // We are OK
-        if ($newPasswordCheck === true) {
-            return true;
-        }
     }
 
     /**
@@ -345,27 +320,27 @@ class UserController extends Controller {
      * @param Request $r
      * @throws EmailNotVerifiedException
      */
-    public static function checkEmailVerification(Request $r) {
+    public static function checkEmailVerification(Users $user) {
         if (!OMEGAUP_FORCE_EMAIL_VERIFICATION) {
             return;
         }
         // Check if they have been verified.
-        if ($r['user']->verified != '0') {
+        if ($user->verified != '0') {
             return;
         }
         self::$log->info('User not verified.');
 
-        if ($r['user']->verification_id == null) {
+        if (is_null($user->verification_id)) {
             self::$log->info('User does not have verification id. Generating.');
 
             try {
-                $r['user']->verification_id = SecurityTools::randomString(50);
-                UsersDAO::save($r['user']);
+                $user->verification_id = SecurityTools::randomString(50);
+                UsersDAO::save($user);
             } catch (Exception $e) {
                 // best effort, eat exception
             }
 
-            self::sendVerificationEmail($r['user']);
+            self::sendVerificationEmail($user);
         }
 
         throw new EmailNotVerifiedException();

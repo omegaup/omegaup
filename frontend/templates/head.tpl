@@ -2,6 +2,9 @@
 <html lang="{#locale#}">
 	<head data-locale="{#locale#}">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{if !is_null($smarty.const.NEW_RELIC_SCRIPT)}
+		{$smarty.const.NEW_RELIC_SCRIPT}
+{/if}
 {if isset($inArena) && $inArena}
 		{assign var='LOAD_MATHJAX' value='true'}
 		{assign var='navbarSection' value='arena'}
