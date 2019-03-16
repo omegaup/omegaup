@@ -37,16 +37,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args[] = $identity_id;
             }
         } elseif (is_array($tag)) {
-            $having_clause = '';
-            $args = array_merge($args, $tag);
             // Look for problems matching ALL tags or not
-            if ($require_all_tags) {
-                $args[] = count($tag);
-                $having_clause = 'HAVING (COUNT(pt.tag_id) = ?)';
-            }
-            if ($add_identity_id) {
-                $args[] = $identity_id;
-            }
+            $having_clause = $require_all_tags ? 'HAVING (COUNT(pt.tag_id) = ?)':'';
             $placeholders = array_fill(0, count($tag), '?');
             $placeholders = join(',', $placeholders);
             $sql .= "
@@ -65,6 +57,13 @@ class ProblemsDAO extends ProblemsDAOBase {
                         pt.problem_id
                     $having_clause
                 ) ptp ON ptp.problem_id = p.problem_id WHERE $public_check";
+            $args = array_merge($args, $tag);
+            if ($require_all_tags) {
+                $args[] = count($tag);
+            }
+            if ($add_identity_id) {
+                $args[] = $identity_id;
+            }
         } else {
             $sql .= ' WHERE';
         }
@@ -109,16 +108,15 @@ class ProblemsDAO extends ProblemsDAOBase {
         $select = '';
         $sql= '';
         $args = [];
-        $programming_languages_filter = '';
-        if (is_array($programming_languages) && count($programming_languages) > 0) {
-            $programming_languages_filter = " (FIND_IN_SET('$programming_languages[0]', p.languages) > 0";
-            for ($i = 1; $i < count($programming_languages); $i++) {
-                $programming_languages_filter .= " AND FIND_IN_SET('$programming_languages[$i]', p.languages) > 0";
-            }
-            $programming_languages_filter .= ') AND ';
+        $programming_languages_clause = '';
+        if (is_array($programming_languages) && !empty($programming_languages)) {
+            $programming_languages_clause = join(
+                ' AND ',
+                array_fill(0, count($programming_languages), 'FIND_IN_SET(?, p.languages) > 0')
+            );
+            $programming_languages_clause .= ' AND ';
         }
-
-        $difficulty_query = (is_array($difficulty_range) && count($difficulty_range) == 2) ? " (p.difficulty >= $difficulty_range[0] AND p.difficulty <= $difficulty_range[1]) AND" : '';
+        $difficulty_query = ' p.difficulty >= ? AND p.difficulty <= ? AND ';
 
         if ($identity_type === IDENTITY_ADMIN) {
             $args = [$identity_id];
@@ -146,8 +144,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
-            $sql .= $programming_languages_filter;
-            $sql .= $difficulty_query;
+            if (is_array($programming_languages)) {
+                $sql .= $programming_languages_clause;
+                $args = array_merge($args, $programming_languages);
+            }
+            if (is_array($difficulty_range) && count($difficulty_range) == 2) {
+                $sql .= $difficulty_query;
+                $args = array_merge($args, $difficulty_range);
+            }
             if (!is_null($query)) {
                 $sql .= " (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
                 $args[] = $query;
@@ -206,8 +210,14 @@ class ProblemsDAO extends ProblemsDAOBase {
             $args[] = Authorization::ADMIN_ROLE;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
-            $sql .= $programming_languages_filter;
-            $sql .= $difficulty_query;
+            if (is_array($programming_languages)) {
+                $sql .= $programming_languages_clause;
+                $args = array_merge($args, $programming_languages);
+            }
+            if (is_array($difficulty_range) && count($difficulty_range) == 2) {
+                $sql .= $difficulty_query;
+                $args = array_merge($args, $difficulty_range);
+            }
             $sql .= '
                 (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
@@ -233,8 +243,14 @@ class ProblemsDAO extends ProblemsDAOBase {
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
             $sql .= ' p.visibility >= ? ';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
-            $sql .= $programming_languages_filter;
-            $sql .= $difficulty_query;
+            if (!empty($programming_languages)) {
+                $sql .= $programming_languages_clause;
+                $args = array_merge($args, $programming_languages);
+            }
+            if (is_array($difficulty_range) && count($difficulty_range) == 2) {
+                $sql .= $difficulty_query;
+                $args = array_merge($args, $difficulty_range);
+            }
             if (!is_null($query)) {
                 $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
                 $args[] = $query;
@@ -259,7 +275,6 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql .= ' LIMIT ?, ?';
         $args[] = $offset;
         $args[] = $rowcount;
-
         $result = $conn->Execute("$select $sql", $args);
 
         // Only these fields (plus score, points and ratio) will be returned.
