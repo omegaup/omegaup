@@ -904,7 +904,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         self::setUpRankForUsers($problemData, $userData, true);
 
-        self::runCronjobScript();
+        Utils::runCronjobScript();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -939,7 +939,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search']);
 
         self::runUpdateUserRank();
-        self::runCronJobScript();
+        Utils::runCronJobScript();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -1115,7 +1115,7 @@ class QualityNominationTest extends OmegaupTestCase {
     // with difficulty < 2.
     public function testUpdateProblemOfTheWeek() {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
-        self::runCronjobScript();
+        Utils::runCronjobScript();
 
         $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
         $this->assertEquals(count($problemOfTheWeek), 1);
@@ -1124,19 +1124,6 @@ class QualityNominationTest extends OmegaupTestCase {
             $syntheticProblems[1]['problem']->problem_id
         );
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
-    }
-
-    public function runCronjobScript() {
-        // Ensure all suggestions are written to the database before invoking
-        // the external script.
-        self::commit();
-
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 
     private function runUpdateUserRank() {
@@ -1218,7 +1205,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ));
         $this->assertEquals($tags, ['dp']);
 
-        self::runCronjobScript();
+        Utils::runCronjobScript();
 
         $tags = array_map(function ($tag) {
             return $tag['name'];
@@ -1406,11 +1393,6 @@ class QualityNominationTest extends OmegaupTestCase {
     private static function deleteAllProblemsOfTheWeek() {
         global $conn;
         $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
-    }
-
-    private static function commit() {
-        global $conn;
-        $conn->Execute('COMMIT');
     }
 
     public function testMostVotedTags() {

@@ -1,5 +1,4 @@
 <?php
-include('QualityNominationTest.php');
 /**
  * Description of ProblemList
  *
@@ -189,8 +188,7 @@ class ProblemList extends OmegaupTestCase {
             []
         );
 
-        $qnt = new QualityNominationTest();
-        $qnt->runCronjobScript();
+        Utils::RunCronjobScript();
 
         // Filter 1:
         // - Containing tag-0
