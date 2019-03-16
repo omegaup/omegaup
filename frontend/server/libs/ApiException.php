@@ -84,13 +84,16 @@ abstract class ApiException extends Exception {
     }
 
     protected function getErrorMessage() {
+        if (is_null($this->message)) {
+            self::$log->error('null error message');
+            return '{untranslated:(null)}';
+        }
         $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
-        } else {
-            return $localizedText;
         }
+        return $localizedText;
     }
 }
 
@@ -355,8 +358,8 @@ class ProblemDeploymentFailedException extends ApiException {
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-    public function __construct(ApiException $previous = null) {
-        parent::__construct('loginDisabled', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    public function __construct($message, ApiException $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
 

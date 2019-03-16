@@ -1,6 +1,7 @@
 <?php
 
 require_once 'libs/third_party/phpmailer/class.phpmailer.php';
+require_once 'libs/third_party/phpmailer/class.smtp.php';
 
 class Email {
     public static $log;

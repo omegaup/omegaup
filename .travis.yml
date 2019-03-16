@@ -8,7 +8,7 @@ branches:
     - release
 
 php:
-  - 7.0.7
+  - 7.2
 
 # Common sources and packages. If a matrix entry needs these, it should
 # explicitly add both of the sources and package YAML references in its addons
@@ -17,7 +17,6 @@ addons:
   apt:
     sources: &common_sources
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.7
       - deadsnakes
     packages: &common_packages
       - libmysqlclient-dev
@@ -36,10 +35,8 @@ matrix:
         apt:
           sources:
             - *common_sources
-            - [llvm-toolchain-precise-3.7]
           packages:
             - *common_packages
-            - [clang-format-3.7]
     - env: TEST_SUITE=selenium
       addons:
         apt:

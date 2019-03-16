@@ -61,8 +61,6 @@ try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('GRADE_PATH', '/var/lib/omegaup/grade');
-try_define('PROBLEMS_GIT_PATH', '/var/lib/omegaup/problems.git');
 try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
 try_define('IMAGES_PATH', OMEGAUP_ROOT . '/www/img/');
 try_define('IMAGES_URL_PATH', '/img/');
@@ -70,7 +68,6 @@ try_define('TEMPLATES_PATH', OMEGAUP_ROOT . '/www/templates/');
 try_define('TEMPLATES_URL_PATH', '/templates/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_FAKE', false);
-try_define('OMEGAUP_UPDATE_PROBLEM', '/usr/bin/omegaup-update-problem');
 
 # ####################################
 # FACEBOOK LOGIN CONFIG
@@ -160,6 +157,12 @@ try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 # ########################
 # S3 CONFIG
 # ########################
-try_define('AWS_CLI_BINARY', '/usr/local/bin/aws');
 try_define('AWS_CLI_ACCESS_KEY_ID', null);
 try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
+try_define('AWS_CLI_BINARY', '/usr/bin/aws');
+
+# ########################
+# NEW RELIC CONFIG
+# ########################
+try_define('NEW_RELIC_SCRIPT', null);
+try_define('NEW_RELIC_SCRIPT_HASH', null);
