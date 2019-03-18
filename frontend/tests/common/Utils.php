@@ -156,4 +156,22 @@ class Utils {
             $conn->Execute('SET foreign_key_checks = 1;');
         }
     }
+
+    public static function Commit() {
+        global $conn;
+        $conn->Execute('COMMIT');
+    }
+
+    public static function RunCronjobScript() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+    }
 }
