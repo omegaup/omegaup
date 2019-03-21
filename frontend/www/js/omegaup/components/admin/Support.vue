@@ -8,7 +8,7 @@
       <div class="row">
         <form class="form"
               v-on:submit.prevent="onSearchEmail">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="input-group">
               <input class="form-control"
                    name="email"
@@ -25,7 +25,7 @@
         <form class="form"
               v-on:submit.prevent="onVerifyUser"
               v-show="username != null">
-          <div class="col-md-6 bottom-margin">
+          <div class="col-md-4 bottom-margin">
             <button class="btn btn-default btn-block"
                  type="button"
                  v-bind:disabled="verified"
@@ -37,6 +37,17 @@
             <template v-else="">
               {{ T.userVerify }}
             </template></button>
+          </div>
+          <div class="col-md-4 bottom-margin"
+               v-show="username != null">
+            <label>
+            <template v-if="lastLogin != null">
+              {{ UI.formatString(T.userLastLogin, {lastLogin: lastLogin.toLocaleString(T.locale)})
+              }}
+            </template>
+            <template v-else="">
+              {{ T.userNeverLoggedIn }}
+            </template></label>
           </div>
         </form>
       </div>
@@ -85,8 +96,9 @@ export default {
     username: String,
     verified: Boolean,
     link: String,
+    lastLogin: Date,
   },
-  data: function() { return {T: T, email: null};},
+  data: function() { return {T: T, UI: UI, email: null};},
   methods: {
     onSearchEmail: function() { this.$emit('search-email', this.email);},
     onVerifyUser: function() { this.$emit('verify-user', this.email);},

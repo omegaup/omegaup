@@ -71,9 +71,17 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     public static function getExtraInformation($email) {
         global  $conn;
         $sql = 'SELECT
-                  u.reset_sent_at,
+                  UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
-                  u.username
+                  u.username,
+                  (
+                    SELECT
+                      MAX(UNIX_TIMESTAMP(ill.time))
+                    FROM
+                      Identity_Login_Log AS ill
+                    WHERE
+                      ill.identity_id = i.identity_id
+                  ) AS last_login
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -97,9 +105,10 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return [
           // Asks whether request was made on the last day
-          'within_last_day' => Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24,
+          'within_last_day' => Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
           'verified' => $rs['verified'] == 1,
-          'username' => $rs['username']
+          'username' => $rs['username'],
+          'last_login' => is_null($rs['last_login']) ? null : ((int)$rs['last_login']),
         ];
     }
 

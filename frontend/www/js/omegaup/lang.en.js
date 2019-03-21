@@ -797,6 +797,8 @@ const translations = {
 	userEmailEditSaving: "Saving",
 	userEmails: "E-mails",
 	userGroups: "Groups",
+	userLastLogin: "Last login: %(lastLogin)",
+	userNeverLoggedIn: "Has never logged in.",
 	userNotAllowed: "User is not allowed to perform action.",
 	userNotExist: "User does not exist.",
 	userNotInListOfRequests: "The user is not pending request to join.",
