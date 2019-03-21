@@ -797,6 +797,8 @@ const translations = {
 	userEmailEditSaving: "Salvando",
 	userEmails: "E-mails",
 	userGroups: "Grupos",
+	userLastLogin: "Data do \u00faltimo login: %(lastLogin)",
+	userNeverLoggedIn: "Nunca logado.",
 	userNotAllowed: "O usu\u00e1rio n\u00e3o tem permiss\u00e3o para executar a a\u00e7\u00e3o",
 	userNotExist: "Usu\u00e1rio n\u00e3o existe",
 	userNotInListOfRequests: "O usu\u00e1rio n\u00e3o esteja pendente pedido",

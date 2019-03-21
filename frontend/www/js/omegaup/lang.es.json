@@ -796,6 +796,8 @@
 	"userEmailEditSaving": "Guardando ",
 	"userEmails": "Correos electr\u00f3nicos",
 	"userGroups": "Grupos",
+	"userLastLogin": "\u00daltimo inicio de sesi\u00f3n: %(lastLogin)",
+	"userNeverLoggedIn": "Nunca ha iniciado sesi\u00f3n.",
 	"userNotAllowed": "No tienes los permisos para realizar esa acci\u00f3n",
 	"userNotExist": "Usuario no existe",
 	"userNotInListOfRequests": "Este usuario no tiene una solicitud pendiente.",

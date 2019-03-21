@@ -321,14 +321,14 @@ class UserController extends Controller {
      * @throws EmailNotVerifiedException
      */
     public static function checkEmailVerification(Users $user) {
+        if ($user->verified != '0') {
+            // Already verified, nothing to do.
+            return;
+        }
         if (!OMEGAUP_FORCE_EMAIL_VERIFICATION) {
             return;
         }
-        // Check if they have been verified.
-        if ($user->verified != '0') {
-            return;
-        }
-        self::$log->info('User not verified.');
+        self::$log->info("User {$user->username} not verified.");
 
         if (is_null($user->verification_id)) {
             self::$log->info('User does not have verification id. Generating.');
@@ -337,7 +337,7 @@ class UserController extends Controller {
                 $user->verification_id = SecurityTools::randomString(50);
                 UsersDAO::save($user);
             } catch (Exception $e) {
-                // best effort, eat exception
+                self::$log->info("Unable to save verification ID: $e");
             }
 
             self::sendVerificationEmail($user);
@@ -1338,12 +1338,8 @@ class UserController extends Controller {
             throw new InvalidParameterException('invalidUser');
         }
 
-        return [
-            'status' => 'ok',
-            'username' => $response['username'],
-            'within_last_day' => $response['within_last_day'],
-            'verified' => $response['verified'],
-        ];
+        $response['status'] = 'ok';
+        return $response;
     }
 
     /**
