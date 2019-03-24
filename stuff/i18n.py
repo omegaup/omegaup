@@ -54,8 +54,8 @@ class I18nLinter(linters.Linter):
         return json.dumps(json_map, sort_keys=True, indent='\t')
 
     @staticmethod
-    def _generate_pseudo(lang, strings):
-        '''Generates pseudoloc file'''
+    def _generate_sorted(lang, strings):
+        '''Generate the sorted version of the i18n file.'''
 
         result = []
         for key in sorted(strings.keys()):
@@ -75,21 +75,17 @@ class I18nLinter(linters.Linter):
 
         return '(%s)' % ''.join(tokens)
 
-    def _get_translated_strings(self, contents_callback, not_sorted):
+    def _get_translated_strings(self, contents_callback):
         strings = {}
         languages = set()
         for lang in self._LANGS:
             filename = '%s/%s.lang' % (self._TEMPLATES_PATH, lang)
             languages.add(lang)
-            last_key = ''
             for lineno, line in enumerate(contents_callback(
                     filename).split(b'\n')[:-1]):
                 try:
                     row = line.decode('utf-8')
                     key, value = re.compile(r'\s+=\s+').split(row.strip(), 1)
-                    if last_key >= key:
-                        not_sorted.add(lang)
-                    last_key = key
                     if key not in strings:
                         strings[key] = collections.defaultdict(str)
                     match = re.compile(r'^"((?:[^"]|\\")*)"$').match(value)
@@ -101,12 +97,6 @@ class I18nLinter(linters.Linter):
                         'Invalid i18n line "%s" in %s:%d' %
                         (row.strip(), filename, lineno + 1),
                         fixable=False)
-
-        if not_sorted:
-            raise linters.LinterException(
-                'Entries in %s are not sorted.' % ', '.join(
-                    sorted(not_sorted)),
-                fixable=False)
 
         self._check_missing_entries(strings, languages)
         return strings
@@ -158,13 +148,19 @@ class I18nLinter(linters.Linter):
         original_contents = {}
         for language in self._LANGS:
             self._generate_content_entry(new_contents, original_contents,
+                                         path='%s/%s.lang' % (
+                                             self._TEMPLATES_PATH,
+                                             language),
+                                         new_content=self._generate_sorted(
+                                             language, strings),
+                                         contents_callback=contents_callback)
+            self._generate_content_entry(new_contents, original_contents,
                                          path='%s/lang.%s.js' % (
                                              self._JS_TEMPLATES_PATH,
                                              language),
                                          new_content=self._generate_javascript(
                                              language, strings),
                                          contents_callback=contents_callback)
-
             self._generate_content_entry(new_contents, original_contents,
                                          path='%s/lang.%s.json' % (
                                              self._JS_TEMPLATES_PATH,
@@ -176,7 +172,7 @@ class I18nLinter(linters.Linter):
         self._generate_content_entry(new_contents, original_contents,
                                      path='%s/pseudo.lang' % (
                                          self._TEMPLATES_PATH),
-                                     new_content=self._generate_pseudo(
+                                     new_content=self._generate_sorted(
                                          'pseudo', strings),
                                      contents_callback=contents_callback)
 
@@ -190,8 +186,7 @@ class I18nLinter(linters.Linter):
     def run_all(self, file_contents, contents_callback):
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
-        not_sorted = set()
-        strings = self._get_translated_strings(contents_callback, not_sorted)
+        strings = self._get_translated_strings(contents_callback)
 
         new_contents, original_contents = self._generate_new_contents(
             strings, contents_callback)
