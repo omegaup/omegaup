@@ -27,7 +27,7 @@ class Email {
             return;
         }
 
-        self::$log->info('Really sending email.');
+        self::$log->debug('Sending email to ' . (is_array($emails) ? join(',', $emails) : $emails));
 
         $mail = new PHPMailer();
         $mail->IsSMTP();

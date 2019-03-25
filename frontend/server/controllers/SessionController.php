@@ -397,16 +397,16 @@ class SessionController extends Controller {
             $r['identity_id'] = $identity->identity_id;
             $r['user'] = $identity;
         } catch (ApiException $e) {
-            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' not found.');
+            self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             return false;
         }
 
         if (!UserController::testPassword($identity, $r['password'])) {
-            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' has introduced invalid credentials.');
+            self::$log->warn("Identity {$r['usernameOrEmail']} has introduced invalid credentials.");
             return false;
         }
 
-        self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has logged in natively.');
+        self::$log->info("Identity {$r['usernameOrEmail']} has logged in natively.");
 
         if (!is_null($identity->user_id)) {
             $user = UsersDAO::getByPK($identity->user_id);
