@@ -751,6 +751,7 @@ const translations = {
 	successfulOperation: "Success",
 	tagAdded: "Tag successfully added!",
 	tagRemoved: "Tag successfully removed!",
+	tagRestricted: "Tag cannot be added or removed.",
 	titleInUse: "Title already exists. Please choose a different title.",
 	totalRuns: "Total runs: %(numRuns)",
 	unableToVerifyCaptcha: "We failed to verify the captcha. Please reload the page and try again.",

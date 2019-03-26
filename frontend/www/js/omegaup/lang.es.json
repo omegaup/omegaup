@@ -750,6 +750,7 @@
 	"successfulOperation": "Operacion exitosa",
 	"tagAdded": "\u00a1Tag agregado exitosamente!",
 	"tagRemoved": "\u00a1Tag eliminiado exitosamente!",
+	"tagRestricted": "La etiqueta no puede ser agregada o eliminada.",
 	"titleInUse": "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
 	"totalRuns": "Total de env\u00edos: %(numRuns)",
 	"unableToVerifyCaptcha": "No fue posible verificar el captcha. Vuelve a cargar la p\u00e1gina e intenta de nuevo.",
