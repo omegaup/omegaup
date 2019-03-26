@@ -238,6 +238,20 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Asserts that $array has no elements that matches $predicate.
+     *
+     * @param array $array
+     * @param callable $predicate
+     */
+    public function assertArrayNotContainsWithPredicate($array, $predicate) {
+        foreach ($array as $key => $value) {
+            if ($predicate($value)) {
+                $this->fail('At least one element in array satisfied predicate');
+            }
+        }
+    }
+
+    /**
      * Finds the first element in $array that matches $predicate.
      *
      * @param array $array

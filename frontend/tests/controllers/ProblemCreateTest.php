@@ -506,6 +506,12 @@ class CreateProblemTest extends OmegaupTestCase {
                 return $tag['name'] == $selectedTag->tagname;
             });
         }
+        $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
+            return $tag['name'] == 'lenguaje';
+        });
+        $this->assertArrayNotContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
+            return ($tag['name'] == 'karel' || $tag['name'] == 'solo-salida');
+        });
     }
 
     /**

@@ -43,4 +43,25 @@ class TagsDAO extends TagsDAOBase {
         }
         return $result;
     }
+
+    public static function deleteRestrictedTags() {
+        global $conn;
+        $placeholders = join(
+            ',',
+            array_fill(0, count(ProblemController::RESTRICTED_TAG_NAMES), '?')
+        );
+        $sql = "
+            DELETE FROM
+                `Problems_Tags`
+            WHERE
+                tag_id IN (
+                    SELECT
+                        tag_id
+                    FROM
+                        Tags
+                    WHERE
+                        name IN ($placeholders)
+                );";
+        $conn->Execute($sql, ProblemController::RESTRICTED_TAG_NAMES);
+    }
 }
