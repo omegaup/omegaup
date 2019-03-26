@@ -20,7 +20,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ui import util
+from ui import util  # pylint: disable=no-name-in-module
 
 _DEFAULT_TIMEOUT = 10  # seconds
 _DIRNAME = os.path.dirname(__file__)
