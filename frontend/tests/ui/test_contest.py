@@ -8,7 +8,7 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-from ui import util
+from ui import util  # pylint: disable=no-name-in-module
 
 
 @util.no_javascript_errors()
