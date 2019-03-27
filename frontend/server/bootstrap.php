@@ -84,22 +84,31 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
 // Load DAOs and controllers lazily.
 require_once('libs/dao/Estructura.php');
 spl_autoload_register(function ($classname) {
-    $suffix = 'Controller';
-    if (substr_compare($classname, $suffix, strlen($classname) - strlen($suffix)) === 0) {
+    $controllerSuffix = 'Controller';
+    $daoSuffix = 'DAO';
+    if ($classname == 'QualitynominationController') {
         // TODO: Figure out a better way of dealing with this.
-        $qualityNomination = 'Qualitynomination';
-        if (substr_compare($classname, $qualityNomination, 0, strlen($qualityNomination)) === 0) {
-            $classname = 'QualityNominationController';
+        $filename = __DIR__ . '/controllers/QualityNominationController.php';
+    } elseif (substr_compare(
+        $classname,
+        $controllerSuffix,
+        strlen($classname) - strlen($controllerSuffix)
+    ) === 0
+    ) {
+        $filename = __DIR__ . "/controllers/{$classname}.php";
+    } else {
+        if (substr_compare(
+            $classname,
+            $daoSuffix,
+            strlen($classname) - strlen($daoSuffix)
+        ) === 0
+        ) {
+            $classname = substr($classname, 0, strlen($classname) - strlen($daoSuffix));
         }
-        include_once "controllers/{$classname}.php";
-        return;
+        $classname = preg_replace('/([a-z])([A-Z])/', '$1_$2', $classname);
+        $filename = __DIR__ . "/libs/dao/{$classname}.dao.php";
     }
-    $suffix = 'DAO';
-    if (substr_compare($classname, $suffix, strlen($classname) - strlen($suffix)) === 0) {
-        $classname = substr($classname, 0, strlen($classname) - strlen($suffix));
-    }
-    $classname = preg_replace('/([a-z])([A-Z])/', '$1_$2', $classname);
-    $filename = __DIR__ . "/libs/dao/{$classname}.dao.php";
+
     if (file_exists($filename)) {
         include_once $filename;
     }
