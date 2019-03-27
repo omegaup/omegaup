@@ -56,4 +56,7 @@ fi
 
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/database_schema.py validate $ARGS
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/policy-tool.py validate
-/usr/bin/docker run --rm -v "$OMEGAUP_ROOT:/src" -v "$OMEGAUP_ROOT:/opt/omegaup" omegaup/hook_tools -j4 validate $ARGS < /dev/null
+exec /usr/bin/docker run --interactive --tty --rm \
+	--volume "$OMEGAUP_ROOT:/src" \
+	--volume "$OMEGAUP_ROOT:$OMEGAUP_ROOT" \
+	omegaup/hook_tools -j4 validate $ARGS
