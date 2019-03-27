@@ -80,6 +80,7 @@
   display: block;
   color: #337ab7;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 </style>
 

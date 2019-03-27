@@ -3,7 +3,7 @@
     <div class="modal-mask">
       <div class="modal-container">
         <button class="close" v-on:click="$emit('close')">❌</button>
-        <h3 class="panel-title">Problem Finder</h3>
+        <h3 class="panel-title">Buscador de Problemas de omegaUp</h3>
       </div>
     </div>
   </transition>
@@ -23,9 +23,9 @@
 
 .modal-container {
   background: #eee;
-  width: 850px;
+  width: 800px;
   height: 38em;
-  margin: 2em auto 0 auto;
+  margin: 2.5em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
   position: relative;
@@ -41,9 +41,6 @@ export default {
     return {
       T,
     }
-  },
-  methods: {
-
   },
 }
 </script>
