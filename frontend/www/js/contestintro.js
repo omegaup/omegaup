@@ -135,19 +135,37 @@ omegaup.OmegaUp.on('ready', function() {
         if (contest.window_length != null) {
           $('.contest #window-length-enabled')
               .text(omegaup.UI.formatString(
-                  omegaup.T.contestIntroDifferentStarts,
-                  {window_length: contest.window_length}));
+                  omegaup.T.contestIntroDifferentStarts, {
+                    window_length_hr: ~~(contest.window_length / 60),
+                    window_length_min: contest.window_length % 60
+                  }));
         } else {
           $('.contest #window-length-enabled').hide();
         }
-        $('.contest #scoreboard')
-            .text(omegaup.UI.formatString(
-                omegaup.T.contestIntroScoreboardTimePercent,
-                {window_length: contest.scoreboard}));
+        if (contest.scoreboard == 100) {
+          $('.contest #scoreboard')
+              .text(omegaup.T.contestIntroScoreboardTimePercentOneHundred);
+        } else if (contest.scoreboard == 0) {
+          $('.contest #scoreboard')
+              .text(omegaup.T.contestIntroScoreboardTimePercentZero);
+        } else {
+          var minutesPercentage =
+              (contest.scoreboard / 100) * (~~((contest.finish_time.getTime() -
+                                                contest.start_time.getTime()) /
+                                               60000));
+          $('.contest #scoreboard')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestIntroScoreboardTimePercent, {
+                    window_length_hr: ~~(minutesPercentage / 60),
+                    window_length_min: minutesPercentage % 60
+                  }));
+        }
         $('.contest #submissions-gap')
             .text(omegaup.UI.formatString(
-                omegaup.T.contestIntroSubmissionsSeparationDesc,
-                {window_length: contest.submissions_gap / 60}));
+                omegaup.T.contestIntroSubmissionsSeparationDesc, {
+                  window_length_hr: ~~(contest.submissions_gap / 3600),
+                  window_length_min: (contest.submissions_gap % 3600) / 60
+                }));
         var penaltyTypes = {
           none: omegaup.T.contestNewFormNoPenalty,
           problem_open: omegaup.T.contestNewFormByProblem,
@@ -157,8 +175,10 @@ omegaup.OmegaUp.on('ready', function() {
         $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
         if (contest.penalty != 0) {
           $('.contest #penalty')
-              .text(omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc,
-                                            {window_length: contest.penalty}));
+              .text(omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc, {
+                window_length_hr: ~~(contest.penalty / 60),
+                window_length_min: contest.penalty % 60
+              }));
         } else {
           $('.contest #penalty').hide();
         }
