@@ -15,6 +15,12 @@
  * @access public
  */
 class States extends VO {
+    const FIELD_NAMES = [
+        'country_id' => true,
+        'state_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de States
      *
@@ -23,8 +29,12 @@ class States extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];

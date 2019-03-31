@@ -15,6 +15,13 @@
  * @access public
  */
 class UsersBadges extends VO {
+    const FIELD_NAMES = [
+        'user_badge_id' => true,
+        'user_id' => true,
+        'badge_alias' => true,
+        'assignation_time' => true,
+    ];
+
     /**
      * Constructor de UsersBadges
      *
@@ -23,8 +30,12 @@ class UsersBadges extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_badge_id'])) {
             $this->user_badge_id = (int)$data['user_badge_id'];

@@ -15,6 +15,13 @@
  * @access public
  */
 class ProblemOfTheWeek extends VO {
+    const FIELD_NAMES = [
+        'problem_of_the_week_id' => true,
+        'problem_id' => true,
+        'time' => true,
+        'difficulty' => true,
+    ];
+
     /**
      * Constructor de ProblemOfTheWeek
      *
@@ -23,8 +30,12 @@ class ProblemOfTheWeek extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_of_the_week_id'])) {
             $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];

@@ -15,6 +15,12 @@
  * @access public
  */
 class ProblemViewed extends VO {
+    const FIELD_NAMES = [
+        'problem_id' => true,
+        'identity_id' => true,
+        'view_time' => true,
+    ];
+
     /**
      * Constructor de ProblemViewed
      *
@@ -23,8 +29,12 @@ class ProblemViewed extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];

@@ -15,6 +15,16 @@
  * @access public
  */
 class CoderOfTheMonth extends VO {
+    const FIELD_NAMES = [
+        'coder_of_the_month_id' => true,
+        'user_id' => true,
+        'description' => true,
+        'time' => true,
+        'interview_url' => true,
+        'rank' => true,
+        'selected_by' => true,
+    ];
+
     /**
      * Constructor de CoderOfTheMonth
      *
@@ -23,8 +33,12 @@ class CoderOfTheMonth extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['coder_of_the_month_id'])) {
             $this->coder_of_the_month_id = (int)$data['coder_of_the_month_id'];

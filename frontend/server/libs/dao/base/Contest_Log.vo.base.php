@@ -15,6 +15,15 @@
  * @access public
  */
 class ContestLog extends VO {
+    const FIELD_NAMES = [
+        'public_contest_id' => true,
+        'contest_id' => true,
+        'user_id' => true,
+        'from_admission_mode' => true,
+        'to_admission_mode' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de ContestLog
      *
@@ -23,8 +32,12 @@ class ContestLog extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['public_contest_id'])) {
             $this->public_contest_id = (int)$data['public_contest_id'];

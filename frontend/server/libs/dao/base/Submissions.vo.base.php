@@ -15,6 +15,19 @@
  * @access public
  */
 class Submissions extends VO {
+    const FIELD_NAMES = [
+        'submission_id' => true,
+        'current_run_id' => true,
+        'identity_id' => true,
+        'problem_id' => true,
+        'problemset_id' => true,
+        'guid' => true,
+        'language' => true,
+        'time' => true,
+        'submit_delay' => true,
+        'type' => true,
+    ];
+
     /**
      * Constructor de Submissions
      *
@@ -23,8 +36,12 @@ class Submissions extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['submission_id'])) {
             $this->submission_id = (int)$data['submission_id'];

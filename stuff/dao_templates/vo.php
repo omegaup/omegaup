@@ -15,6 +15,12 @@
  * @access public
  */
 class {{ table.class_name }} extends VO {
+    const FIELD_NAMES = [
+{%- for column in table.columns %}
+        '{{ column.name }}' => true,
+{%- endfor %}
+    ];
+
     /**
      * Constructor de {{ table.class_name }}
      *
@@ -23,8 +29,12 @@ class {{ table.class_name }} extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {

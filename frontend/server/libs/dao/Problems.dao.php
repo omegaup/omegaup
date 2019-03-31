@@ -344,7 +344,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDAO::getHideTags($identityId) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
-                $temp = new Problems($row);
+                $temp = new Problems(array_intersect_key($row, Problems::FIELD_NAMES));
                 $problem = $temp->asFilteredArray($filters);
 
                 // score, points and ratio are not actually fields of a Problems object.

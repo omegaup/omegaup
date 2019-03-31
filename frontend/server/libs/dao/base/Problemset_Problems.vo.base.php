@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetProblems extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'problem_id' => true,
+        'commit' => true,
+        'version' => true,
+        'points' => true,
+        'order' => true,
+    ];
+
     /**
      * Constructor de ProblemsetProblems
      *
@@ -23,8 +32,12 @@ class ProblemsetProblems extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];

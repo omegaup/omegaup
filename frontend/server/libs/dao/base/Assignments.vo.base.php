@@ -15,6 +15,22 @@
  * @access public
  */
 class Assignments extends VO {
+    const FIELD_NAMES = [
+        'assignment_id' => true,
+        'course_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'name' => true,
+        'description' => true,
+        'alias' => true,
+        'publish_time_delay' => true,
+        'assignment_type' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'max_points' => true,
+        'order' => true,
+    ];
+
     /**
      * Constructor de Assignments
      *
@@ -23,8 +39,12 @@ class Assignments extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['assignment_id'])) {
             $this->assignment_id = (int)$data['assignment_id'];

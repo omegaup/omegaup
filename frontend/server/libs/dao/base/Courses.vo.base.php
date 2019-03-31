@@ -15,6 +15,22 @@
  * @access public
  */
 class Courses extends VO {
+    const FIELD_NAMES = [
+        'course_id' => true,
+        'name' => true,
+        'description' => true,
+        'alias' => true,
+        'group_id' => true,
+        'acl_id' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'public' => true,
+        'school_id' => true,
+        'needs_basic_information' => true,
+        'requests_user_information' => true,
+        'show_scoreboard' => true,
+    ];
+
     /**
      * Constructor de Courses
      *
@@ -23,8 +39,12 @@ class Courses extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['course_id'])) {
             $this->course_id = (int)$data['course_id'];

@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetIdentityRequestHistory extends VO {
+    const FIELD_NAMES = [
+        'history_id' => true,
+        'identity_id' => true,
+        'problemset_id' => true,
+        'time' => true,
+        'accepted' => true,
+        'admin_id' => true,
+    ];
+
     /**
      * Constructor de ProblemsetIdentityRequestHistory
      *
@@ -23,8 +32,12 @@ class ProblemsetIdentityRequestHistory extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['history_id'])) {
             $this->history_id = (int)$data['history_id'];

@@ -15,6 +15,30 @@
  * @access public
  */
 class Problems extends VO {
+    const FIELD_NAMES = [
+        'problem_id' => true,
+        'acl_id' => true,
+        'visibility' => true,
+        'title' => true,
+        'alias' => true,
+        'commit' => true,
+        'current_version' => true,
+        'languages' => true,
+        'input_limit' => true,
+        'visits' => true,
+        'submissions' => true,
+        'accepted' => true,
+        'difficulty' => true,
+        'creation_date' => true,
+        'source' => true,
+        'order' => true,
+        'deprecated' => true,
+        'email_clarifications' => true,
+        'quality' => true,
+        'quality_histogram' => true,
+        'difficulty_histogram' => true,
+    ];
+
     /**
      * Constructor de Problems
      *
@@ -23,8 +47,12 @@ class Problems extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];

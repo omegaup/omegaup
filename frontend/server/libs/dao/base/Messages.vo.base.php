@@ -15,6 +15,15 @@
  * @access public
  */
 class Messages extends VO {
+    const FIELD_NAMES = [
+        'message_id' => true,
+        'read' => true,
+        'sender_id' => true,
+        'recipient_id' => true,
+        'message' => true,
+        'date' => true,
+    ];
+
     /**
      * Constructor de Messages
      *
@@ -23,8 +32,12 @@ class Messages extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['message_id'])) {
             $this->message_id = (int)$data['message_id'];

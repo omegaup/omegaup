@@ -15,6 +15,16 @@
  * @access public
  */
 class QualityNominations extends VO {
+    const FIELD_NAMES = [
+        'qualitynomination_id' => true,
+        'user_id' => true,
+        'problem_id' => true,
+        'nomination' => true,
+        'contents' => true,
+        'time' => true,
+        'status' => true,
+    ];
+
     /**
      * Constructor de QualityNominations
      *
@@ -23,8 +33,12 @@ class QualityNominations extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_id'])) {
             $this->qualitynomination_id = (int)$data['qualitynomination_id'];

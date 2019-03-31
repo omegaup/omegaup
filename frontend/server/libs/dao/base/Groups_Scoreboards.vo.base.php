@@ -15,6 +15,15 @@
  * @access public
  */
 class GroupsScoreboards extends VO {
+    const FIELD_NAMES = [
+        'group_scoreboard_id' => true,
+        'group_id' => true,
+        'create_time' => true,
+        'alias' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de GroupsScoreboards
      *
@@ -23,8 +32,12 @@ class GroupsScoreboards extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_scoreboard_id'])) {
             $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];

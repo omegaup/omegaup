@@ -15,6 +15,33 @@
  * @access public
  */
 class Contests extends VO {
+    const FIELD_NAMES = [
+        'contest_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'title' => true,
+        'description' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'last_updated' => true,
+        'window_length' => true,
+        'rerun_id' => true,
+        'admission_mode' => true,
+        'alias' => true,
+        'scoreboard' => true,
+        'points_decay_factor' => true,
+        'partial_score' => true,
+        'submissions_gap' => true,
+        'feedback' => true,
+        'penalty' => true,
+        'penalty_type' => true,
+        'penalty_calc_policy' => true,
+        'show_scoreboard_after' => true,
+        'urgent' => true,
+        'languages' => true,
+        'recommended' => true,
+    ];
+
     /**
      * Constructor de Contests
      *
@@ -23,8 +50,12 @@ class Contests extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = (int)$data['contest_id'];

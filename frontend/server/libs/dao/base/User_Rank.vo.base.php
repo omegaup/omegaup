@@ -15,6 +15,18 @@
  * @access public
  */
 class UserRank extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'rank' => true,
+        'problems_solved_count' => true,
+        'score' => true,
+        'username' => true,
+        'name' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'school_id' => true,
+    ];
+
     /**
      * Constructor de UserRank
      *
@@ -23,8 +35,12 @@ class UserRank extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];

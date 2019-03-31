@@ -15,6 +15,12 @@
  * @access public
  */
 class UserRoles extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'role_id' => true,
+        'acl_id' => true,
+    ];
+
     /**
      * Constructor de UserRoles
      *
@@ -23,8 +29,12 @@ class UserRoles extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];

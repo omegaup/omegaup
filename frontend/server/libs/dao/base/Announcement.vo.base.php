@@ -15,6 +15,13 @@
  * @access public
  */
 class Announcement extends VO {
+    const FIELD_NAMES = [
+        'announcement_id' => true,
+        'user_id' => true,
+        'time' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Announcement
      *
@@ -23,8 +30,12 @@ class Announcement extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['announcement_id'])) {
             $this->announcement_id = (int)$data['announcement_id'];
