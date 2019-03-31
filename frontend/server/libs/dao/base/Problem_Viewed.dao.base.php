@@ -176,7 +176,8 @@ abstract class ProblemViewedDAOBase extends DAO {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problem_Viewed->view_time,
-            $Problem_Viewed->problem_id,$Problem_Viewed->identity_id,
+            $Problem_Viewed->problem_id,
+            $Problem_Viewed->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

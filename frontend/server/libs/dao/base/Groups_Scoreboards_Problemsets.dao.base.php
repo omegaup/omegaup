@@ -181,7 +181,8 @@ abstract class GroupsScoreboardsProblemsetsDAOBase extends DAO {
         $params = [
             $Groups_Scoreboards_Problemsets->only_ac,
             $Groups_Scoreboards_Problemsets->weight,
-            $Groups_Scoreboards_Problemsets->group_scoreboard_id,$Groups_Scoreboards_Problemsets->problemset_id,
+            $Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            $Groups_Scoreboards_Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

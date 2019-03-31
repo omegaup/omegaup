@@ -8,69 +8,80 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ProblemsetProblems Data Access Object (DAO) Base.
+/** {{ table.class_name }} Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetProblems }.
+ * almacenar de forma permanente y recuperar instancias de objetos {@link {{ table.class_name }} }.
  * @access public
  * @abstract
  *
  */
-abstract class ProblemsetProblemsDAOBase extends DAO {
+abstract class {{ table.class_name }}DAOBase extends DAO {
     /**
      * Campos de la tabla.
      */
-    const FIELDS = '`Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order`';
+    const FIELDS = '{{ table.fieldnames }}';
 
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ProblemsetProblems} pasado en la base de datos. La llave
+{%- if table.primary_key %}
+     * Este metodo guarda el estado actual del objeto {@link {{ table.class_name }}} pasado en la base de datos. La llave
      * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
      * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
      * en ese objeto el ID recien creado.
+{%- else %}
+     * Este metodo guarda el estado actual del objeto {@link {{ table.class_name }}} pasado en la base de datos.
+     * save() siempre creara una nueva fila.
+{%- endif %}
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
+     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
      * @return Un entero mayor o igual a cero denotando las filas afectadas.
      */
-    final public static function save(ProblemsetProblems $Problemset_Problems) {
-        if (!is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))) {
-            return ProblemsetProblemsDAOBase::update($Problemset_Problems);
+    final public static function save({{ table.class_name }} ${{ table.name }}) {
+{%- if table.primary_key %}
+        if (!is_null(self::getByPK({{ table.primary_key|listformat('${table.name}->{.name}', table=table)|join(', ') }}))) {
+            return {{ table.class_name }}DAOBase::update(${{ table.name }});
         } else {
-            return ProblemsetProblemsDAOBase::create($Problemset_Problems);
+            return {{ table.class_name }}DAOBase::create(${{ table.name }});
         }
+{%- else %}
+        return {{ table.class_name }}DAOBase::create(${{ table.name }});
+{%- endif %}
     }
+{%- if table.primary_key %}
 
     /**
-     * Obtener {@link ProblemsetProblems} por llave primaria.
+     * Obtener {@link {{ table.class_name }}} por llave primaria.
      *
-     * Este metodo cargara un objeto {@link ProblemsetProblems} de la base de datos
+     * Este metodo cargara un objeto {@link {{ table.class_name }}} de la base de datos
      * usando sus llaves primarias.
      *
      * @static
-     * @return @link ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
+     * @return @link {{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id) {
-        if (is_null($problemset_id) || is_null($problem_id)) {
+    final public static function getByPK({{ table.primary_key|listformat('${.name}')|join(', ') }}) {
+        if ({{ table.primary_key|listformat('is_null(${.name})')|join(' || ') }}) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
-        $params = [$problemset_id, $problem_id];
+        $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.primary_key|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
+        $params = [{{ table.primary_key|listformat('${.name}')|join(', ') }}];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new ProblemsetProblems($rs);
+        return new {{ table.class_name }}($rs);
     }
+{%- endif %}
 
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link ProblemsetProblems}. Tenga en cuenta que este metodo
+     * un vector que contiene objetos de tipo {@link {{ table.class_name }}}. Tenga en cuenta que este metodo
      * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
      * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
      *
@@ -79,10 +90,10 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
      * @param $columnas_por_pagina Columnas por pagina.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
      */
     final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` from Problemset_Problems';
+        $sql = 'SELECT {{ table.fieldnames }} from {{ table.name }}';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
@@ -93,7 +104,7 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new ProblemsetProblems($row);
+            $allData[] = new {{ table.class_name }}($row);
         }
         return $allData;
     }
@@ -101,7 +112,7 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
     /**
       * Buscar registros.
       *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetProblems} de la base de datos.
+      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link {{ table.class_name }}} de la base de datos.
       * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
       * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
       *
@@ -116,33 +127,23 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
       *   }
       * </code>
       * @static
-      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
+      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
       * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
       * @param $orden 'ASC' o 'DESC' el default es 'ASC'
       */
-    final public static function search($Problemset_Problems, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Problemset_Problems instanceof ProblemsetProblems)) {
-            $Problemset_Problems = new ProblemsetProblems($Problemset_Problems);
+    final public static function search(${{ table.name }}, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
+        if (!(${{ table.name }} instanceof {{ table.class_name }})) {
+            ${{ table.name }} = new {{ table.class_name }}(${{ table.name }});
         }
 
         $clauses = [];
         $params = [];
-        if (!is_null($Problemset_Problems->problemset_id)) {
-            $clauses[] = '`problemset_id` = ?';
-            $params[] = $Problemset_Problems->problemset_id;
+{%- for column in table.columns %}
+        if (!is_null(${{ table.name }}->{{ column.name }})) {
+            $clauses[] = '`{{ column.name }}` = ?';
+            $params[] = ${{ table.name }}->{{ column.name }};
         }
-        if (!is_null($Problemset_Problems->problem_id)) {
-            $clauses[] = '`problem_id` = ?';
-            $params[] = $Problemset_Problems->problem_id;
-        }
-        if (!is_null($Problemset_Problems->points)) {
-            $clauses[] = '`points` = ?';
-            $params[] = $Problemset_Problems->points;
-        }
-        if (!is_null($Problemset_Problems->order)) {
-            $clauses[] = '`order` = ?';
-            $params[] = $Problemset_Problems->order;
-        }
+{%- endfor %}
         global $conn;
         if (!is_null($likeColumns)) {
             foreach ($likeColumns as $column => $value) {
@@ -153,7 +154,7 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
         if (sizeof($clauses) == 0) {
             return self::getAll();
         }
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM `Problemset_Problems`';
+        $sql = 'SELECT {{ table.fieldnames }} FROM `{{ table.name }}`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
@@ -165,55 +166,69 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ProblemsetProblems($row);
+            $ar[] = new {{ table.class_name }}($row);
         }
         return $ar;
     }
+{%- if table.columns|selectattr('primary_key')|list %}
 
     /**
       * Actualizar registros.
       *
       * @return Filas afectadas
-      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a actualizar.
+      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a actualizar.
       */
-    final private static function update(ProblemsetProblems $Problemset_Problems) {
-        $sql = 'UPDATE `Problemset_Problems` SET `points` = ?, `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
+    final private static function update({{ table.class_name }} ${{ table.name }}) {
+{%- if table.columns|rejectattr('primary_key')|list %}
+        $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
         $params = [
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
+{%- for column in table.columns %}
+{%- if not column.primary_key %}
+            ${{ table.name }}->{{ column.name }},
+{%- endif %}
+{%- endfor %}
+{%- for column in table.columns %}
+{%- if column.primary_key %}
+            ${{ table.name }}->{{ column.name }},
+{%- endif %}
+{%- endfor %}
         ];
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
+{%- endif %}
     }
+{%- endif %}
 
     /**
      * Crear registros.
      *
      * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ProblemsetProblems suministrado. Asegurese
+     * contenidos del objeto {{ table.class_name }} suministrado. Asegurese
      * de que los valores para todas las columnas NOT NULL se ha especificado
      * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto ProblemsetProblems dentro de la misma transaccion.
+     * primaria generada en el objeto {{ table.class_name }} dentro de la misma transaccion.
      *
      * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a crear.
+     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a crear.
      */
-    final private static function create(ProblemsetProblems $Problemset_Problems) {
-        if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = '1';
+    final private static function create({{ table.class_name }} ${{ table.name }}) {
+{%- for column in table.columns %}
+{%- if column.default %}
+        if (is_null(${{ table.name }}->{{ column.name }})) {
+{%- if column.default == 'CURRENT_TIMESTAMP' %}
+            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s');
+{%- else %}
+            ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
+{%- endif %}
         }
-        if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order = '1';
-        }
-        $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `points`, `order`) VALUES (?, ?, ?, ?);';
+{%- endif %}
+{%- endfor %}
+        $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
         $params = [
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
+{%- for column in table.columns %}
+            ${{ table.name }}->{{column.name}},
+{%- endfor %}
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -221,6 +236,11 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
         if ($ar == 0) {
             return 0;
         }
+{%- for column in table.columns %}
+{%- if column.auto_increment %}
+        ${{ table.name }}->{{ column.name }} = $conn->Insert_ID();
+{%- endif %}
+{%- endfor %}
 
         return $ar;
     }
@@ -228,8 +248,8 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
     /**
      * Buscar por rango.
      *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsetProblems} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ProblemsetProblems}.
+     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link {{ table.class_name }}} de la base de datos siempre y cuando
+     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link {{ table.class_name }}}.
      *
      * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
      * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -251,60 +271,30 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
      *   }
      * </code>
      * @static
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
+     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
+     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
      */
-    final public static function byRange(ProblemsetProblems $Problemset_ProblemsA, ProblemsetProblems $Problemset_ProblemsB, $orderBy = null, $orden = 'ASC') {
+    final public static function byRange({{ table.class_name }} ${{ table.name }}A, {{ table.class_name }} ${{ table.name }}B, $orderBy = null, $orden = 'ASC') {
         $clauses = [];
         $params = [];
 
-        $a = $Problemset_ProblemsA->problemset_id;
-        $b = $Problemset_ProblemsB->problemset_id;
+{%- for column in table.columns %}
+
+        $a = ${{ table.name }}A->{{ column.name }};
+        $b = ${{ table.name }}B->{{ column.name }};
         if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
+            $clauses[] = '`{{ column.name }}` >= ? AND `{{ column.name }}` <= ?';
             $params[] = min($a, $b);
             $params[] = max($a, $b);
         } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problemset_id` = ?';
+            $clauses[] = '`{{ column.name }}` = ?';
             $params[] = is_null($a) ? $b : $a;
         }
+{%- endfor %}
 
-        $a = $Problemset_ProblemsA->problem_id;
-        $b = $Problemset_ProblemsB->problem_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problem_id` >= ? AND `problem_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problem_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Problemset_ProblemsA->points;
-        $b = $Problemset_ProblemsB->points;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`points` >= ? AND `points` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`points` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Problemset_ProblemsA->order;
-        $b = $Problemset_ProblemsB->order;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`order` >= ? AND `order` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`order` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Problemset_Problems`';
+        $sql = 'SELECT * FROM `{{ table.name }}`';
         $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
         if (!is_null($orderBy)) {
             $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
@@ -313,33 +303,36 @@ abstract class ProblemsetProblemsDAOBase extends DAO {
         $rs = $conn->Execute($sql, $params);
         $ar = [];
         foreach ($rs as $row) {
-            $ar[] = new ProblemsetProblems($row);
+            $ar[] = new {{ table.class_name }}($row);
         }
         return $ar;
     }
+{%- if table.columns|selectattr('primary_key')|list %}
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto ProblemsetProblems suministrado. Una vez que se ha suprimido un objeto, este no
+     * en el objeto {{ table.class_name }} suministrado. Una vez que se ha suprimido un objeto, este no
      * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
      * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
      * @return int El numero de filas afectadas.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a eliminar
+     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a eliminar
      */
-    final public static function delete(ProblemsetProblems $Problemset_Problems) {
-        if (is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))) {
+    final public static function delete({{ table.class_name }} ${{ table.name }}) {
+        if (is_null(self::getByPK({{ table.primary_key|listformat('${table.name}->{.name}', table=table)|join(', ') }}))) {
             throw new Exception('Registro no encontrado.');
         }
-        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
-        $params = [$Problemset_Problems->problemset_id, $Problemset_Problems->problem_id];
+        $sql = 'DELETE FROM `{{ table.name }}` WHERE {{ table.primary_key|listformat('{.name} = ?')|join(' AND ') }};';
+        $params = [{{ table.primary_key|listformat('${table.name}->{.name}', table=table)|join(', ') }}];
         global $conn;
 
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
+{%- endif %}
 }
+

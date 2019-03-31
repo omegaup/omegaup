@@ -186,7 +186,8 @@ abstract class GroupsIdentitiesDAOBase extends DAO {
             $Groups_Identities->share_user_information,
             $Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
-            $Groups_Identities->group_id,$Groups_Identities->identity_id,
+            $Groups_Identities->group_id,
+            $Groups_Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

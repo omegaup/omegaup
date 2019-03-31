@@ -201,7 +201,8 @@ abstract class ProblemsetIdentitiesDAOBase extends DAO {
             $Problemset_Identities->share_user_information,
             $Problemset_Identities->privacystatement_consent_id,
             $Problemset_Identities->is_invited,
-            $Problemset_Identities->identity_id,$Problemset_Identities->problemset_id,
+            $Problemset_Identities->identity_id,
+            $Problemset_Identities->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -1,6 +1,11 @@
 {
 	"custom_linters": [
 		{
+			"name": "dao",
+			"path": "stuff/dao_linter.py",
+			"class_name": "DaoLinter"
+		},
+		{
 			"name": "i18n",
 			"path": "stuff/i18n.py",
 			"class_name": "I18nLinter"
@@ -59,6 +64,12 @@
 				"frontend/templates/.*\\.lang$",
 				"frontend/www/js/omegaup/lang\\..*\\.json$",
 				"frontend/www/js/omegaup/lang\\..*\\.js$"
+			]
+		},
+		"dao": {
+			"whitelist": [
+				"frontend/database/schema.sql",
+				"frontend/server/libs/dao/base/.*\\.base\\.php$"
 			]
 		}
 	}

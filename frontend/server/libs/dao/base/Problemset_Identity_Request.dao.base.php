@@ -191,7 +191,8 @@ abstract class ProblemsetIdentityRequestDAOBase extends DAO {
             $Problemset_Identity_Request->last_update,
             $Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
-            $Problemset_Identity_Request->identity_id,$Problemset_Identity_Request->problemset_id,
+            $Problemset_Identity_Request->identity_id,
+            $Problemset_Identity_Request->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

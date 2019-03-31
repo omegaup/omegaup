@@ -97,7 +97,7 @@ class ProblemsetIdentityRequest extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var mediumtext,
+      * @var mediumtext
       */
     public $extra_note;
 }

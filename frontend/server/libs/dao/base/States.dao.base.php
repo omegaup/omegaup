@@ -176,7 +176,8 @@ abstract class StatesDAOBase extends DAO {
         $sql = 'UPDATE `States` SET `name` = ? WHERE `country_id` = ? AND `state_id` = ?;';
         $params = [
             $States->name,
-            $States->country_id,$States->state_id,
+            $States->country_id,
+            $States->state_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
