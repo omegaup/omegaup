@@ -101,6 +101,16 @@ omegaup.OmegaUp.on('ready', function() {
     $('#countdown_clock').text(formatDelta(starttime.getTime() - Date.now()));
   }
 
+  function formatTimeInRules(timeInMinutes) {
+    var hours = Math.floor(timeInMinutes / 60);
+    if (hours <= 0) {
+      return (timeInMinutes + 'm');
+    } else {
+      var minutes = timeInMinutes % 60;
+      return (hours + 'h' + minutes + 'm');
+    }
+  }
+
   function readyToStart(contest) {
     // User is ready enter contest. If contest started,
     // show button, otherwise show countdown.
@@ -135,10 +145,8 @@ omegaup.OmegaUp.on('ready', function() {
         if (contest.window_length != null) {
           $('.contest #window-length-enabled')
               .text(omegaup.UI.formatString(
-                  omegaup.T.contestIntroDifferentStarts, {
-                    window_length_hr: ~~(contest.window_length / 60),
-                    window_length_min: contest.window_length % 60
-                  }));
+                  omegaup.T.contestIntroDifferentStarts,
+                  {window_length: formatTimeInRules(contest.window_length)}));
         } else {
           $('.contest #window-length-enabled').hide();
         }
@@ -149,22 +157,19 @@ omegaup.OmegaUp.on('ready', function() {
           $('.contest #scoreboard')
               .text(omegaup.T.contestIntroScoreboardTimePercentZero);
         } else {
-          var minutesPercentage =
-              (contest.scoreboard / 100) * (~~((contest.finish_time.getTime() -
-                                                contest.start_time.getTime()) /
-                                               60000));
+          var minutesPercentage = Math.floor(
+              (contest.scoreboard / 100) *
+              ((contest.finish_time.getTime() - contest.start_time.getTime()) /
+               60000));
           $('.contest #scoreboard')
               .text(omegaup.UI.formatString(
-                  omegaup.T.contestIntroScoreboardTimePercent, {
-                    window_length_hr: ~~(minutesPercentage / 60),
-                    window_length_min: minutesPercentage % 60
-                  }));
+                  omegaup.T.contestIntroScoreboardTimePercent,
+                  {window_length: formatTimeInRules(minutesPercentage)}));
         }
         $('.contest #submissions-gap')
             .text(omegaup.UI.formatString(
                 omegaup.T.contestIntroSubmissionsSeparationDesc, {
-                  window_length_hr: ~~(contest.submissions_gap / 3600),
-                  window_length_min: (contest.submissions_gap % 3600) / 60
+                  window_length: formatTimeInRules(contest.submissions_gap / 60)
                 }));
         var penaltyTypes = {
           none: omegaup.T.contestNewFormNoPenalty,
@@ -175,10 +180,9 @@ omegaup.OmegaUp.on('ready', function() {
         $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
         if (contest.penalty != 0) {
           $('.contest #penalty')
-              .text(omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc, {
-                window_length_hr: ~~(contest.penalty / 60),
-                window_length_min: contest.penalty % 60
-              }));
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestIntroPenaltyDesc,
+                  {window_length: formatTimeInRules(contest.penalty)}));
         } else {
           $('.contest #penalty').hide();
         }
