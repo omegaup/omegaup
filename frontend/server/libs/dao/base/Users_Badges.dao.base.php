@@ -181,7 +181,8 @@ abstract class UsersBadgesDAOBase extends DAO {
         $params = [
             $Users_Badges->time,
             $Users_Badges->last_problem_id,
-            $Users_Badges->badge_id,$Users_Badges->user_id,
+            $Users_Badges->badge_id,
+            $Users_Badges->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

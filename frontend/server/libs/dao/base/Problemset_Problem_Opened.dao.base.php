@@ -180,7 +180,9 @@ abstract class ProblemsetProblemOpenedDAOBase extends DAO {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problemset_Problem_Opened->open_time,
-            $Problemset_Problem_Opened->problemset_id,$Problemset_Problem_Opened->problem_id,$Problemset_Problem_Opened->identity_id,
+            $Problemset_Problem_Opened->problemset_id,
+            $Problemset_Problem_Opened->problem_id,
+            $Problemset_Problem_Opened->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
