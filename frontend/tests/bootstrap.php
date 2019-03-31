@@ -67,7 +67,7 @@ namespace {
         'acl_id' => Authorization::SYSTEM_ACL,
         'owner_id' => $admin->user_id,
     ]));
-    UserRolesDAO::save(new UserRoles([
+    UserRolesDAO::create(new UserRoles([
         'user_id' => $admin->user_id,
         'role_id' => Authorization::ADMIN_ROLE,
         'acl_id' => Authorization::SYSTEM_ACL,
