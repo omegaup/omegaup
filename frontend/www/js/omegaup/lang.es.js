@@ -186,7 +186,7 @@ const translations = {
 	contestScoreboardLink: "Scoreboard link",
 	contestTimeExpired: "El tiempo del concurso ha expirado o aun no inicia.",
 	contestUpdateAlreadyHasRuns: "La duraci\u00f3n del concurso no se puede cambiar si ya tiene soluciones revisadas.",
-	contestWillBeginIn: "Este concurso iniciara en ",
+	contestWillBeginIn: "Este concurso iniciar\u00e1 en ",
 	contestsCreateNew: "Crear un concurso",
 	contestsJoinScoreboards: "Unir scoreboards",
 	contestsTablePublic: "P\u00fablico",
