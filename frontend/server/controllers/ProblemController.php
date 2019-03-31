@@ -182,7 +182,7 @@ class ProblemController extends Controller {
 
         // Insert new problem
         try {
-            ProblemsDAO::transBegin();
+            DAO::transBegin();
 
             // Commit at the very end
             $problemDeployer = new ProblemDeployer(
@@ -208,10 +208,10 @@ class ProblemController extends Controller {
                 }
             }
             ProblemController::setRestrictedTags($problem);
-            ProblemsDAO::transEnd();
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
@@ -219,7 +219,7 @@ class ProblemController extends Controller {
             self::$log->error($e);
 
             // Operation failed unexpectedly, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
             // Alias may be duplicated, 1062 error indicates that
             if (strpos($e->getMessage(), '1062') !== false) {
@@ -743,7 +743,7 @@ class ProblemController extends Controller {
         // Insert new problem
         try {
             //Begin transaction
-            ProblemsDAO::transBegin();
+            DAO::transBegin();
 
             $operation = ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
@@ -770,15 +770,15 @@ class ProblemController extends Controller {
             ProblemController::setRestrictedTags($problem);
 
             //End transaction
-            ProblemsDAO::transEnd();
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in the data layer, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
             self::$log->error('Failed to update problem');
             self::$log->error($e);
 
@@ -1935,7 +1935,7 @@ class ProblemController extends Controller {
     private static function updateLanguages(Problems $problem) {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
         try {
-            ProblemsLanguagesDAO::transBegin();
+            DAO::transBegin();
 
             // Removing existing data
             $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
@@ -1951,10 +1951,10 @@ class ProblemController extends Controller {
                     'language_id' => $lang->language_id,
                 ]));
             }
-            ProblemsLanguagesDAO::transEnd();
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            ProblemsLanguagesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
     }

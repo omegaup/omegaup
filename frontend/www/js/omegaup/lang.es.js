@@ -690,6 +690,7 @@ const translations = {
 	rankScore: "Score",
 	rankSolved: "Problemas",
 	rankViewFull: "Ver ranking completo",
+	recordNotFound: "Registro no encontrado.",
 	registerForContest: "Registrarse en el concurso",
 	registerForContestChallenges: "Reto",
 	registerForContestRules: "Reglas",

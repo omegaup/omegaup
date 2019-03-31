@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class ContestLogDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time`';
-
+abstract class ContestLogDAOBase {
     /**
      * Guardar registros.
      *
@@ -99,86 +94,6 @@ abstract class ContestLogDAOBase extends DAO {
     }
 
     /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestLog} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Contest_Log, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Contest_Log instanceof ContestLog)) {
-            $Contest_Log = new ContestLog($Contest_Log);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Contest_Log->public_contest_id)) {
-            $clauses[] = '`public_contest_id` = ?';
-            $params[] = $Contest_Log->public_contest_id;
-        }
-        if (!is_null($Contest_Log->contest_id)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = $Contest_Log->contest_id;
-        }
-        if (!is_null($Contest_Log->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Contest_Log->user_id;
-        }
-        if (!is_null($Contest_Log->from_admission_mode)) {
-            $clauses[] = '`from_admission_mode` = ?';
-            $params[] = $Contest_Log->from_admission_mode;
-        }
-        if (!is_null($Contest_Log->to_admission_mode)) {
-            $clauses[] = '`to_admission_mode` = ?';
-            $params[] = $Contest_Log->to_admission_mode;
-        }
-        if (!is_null($Contest_Log->time)) {
-            $clauses[] = '`time` = ?';
-            $params[] = $Contest_Log->time;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM `Contest_Log`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new ContestLog($row);
-        }
-        return $ar;
-    }
-
-    /**
       * Actualizar registros.
       *
       * @return Filas afectadas
@@ -236,121 +151,6 @@ abstract class ContestLogDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestLog} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestLog}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
-     * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(ContestLog $Contest_LogA, ContestLog $Contest_LogB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $Contest_LogA->public_contest_id;
-        $b = $Contest_LogB->public_contest_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`public_contest_id` >= ? AND `public_contest_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`public_contest_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Contest_LogA->contest_id;
-        $b = $Contest_LogB->contest_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`contest_id` >= ? AND `contest_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`contest_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Contest_LogA->user_id;
-        $b = $Contest_LogB->user_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Contest_LogA->from_admission_mode;
-        $b = $Contest_LogB->from_admission_mode;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`from_admission_mode` >= ? AND `from_admission_mode` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`from_admission_mode` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Contest_LogA->to_admission_mode;
-        $b = $Contest_LogB->to_admission_mode;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`to_admission_mode` >= ? AND `to_admission_mode` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`to_admission_mode` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Contest_LogA->time;
-        $b = $Contest_LogB->time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`time` >= ? AND `time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Contest_Log`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new ContestLog($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -360,18 +160,16 @@ abstract class ContestLogDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a eliminar
      */
     final public static function delete(ContestLog $Contest_Log) {
-        if (is_null(self::getByPK($Contest_Log->public_contest_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Contest_Log` WHERE public_contest_id = ?;';
         $params = [$Contest_Log->public_contest_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }

@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class EmailsDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id`';
-
+abstract class EmailsDAOBase {
     /**
      * Guardar registros.
      *
@@ -99,74 +94,6 @@ abstract class EmailsDAOBase extends DAO {
     }
 
     /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Emails} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param Emails [$Emails] El objeto de tipo Emails
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Emails, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Emails instanceof Emails)) {
-            $Emails = new Emails($Emails);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Emails->email_id)) {
-            $clauses[] = '`email_id` = ?';
-            $params[] = $Emails->email_id;
-        }
-        if (!is_null($Emails->email)) {
-            $clauses[] = '`email` = ?';
-            $params[] = $Emails->email;
-        }
-        if (!is_null($Emails->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Emails->user_id;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` FROM `Emails`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Emails($row);
-        }
-        return $ar;
-    }
-
-    /**
       * Actualizar registros.
       *
       * @return Filas afectadas
@@ -215,88 +142,6 @@ abstract class EmailsDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Emails} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Emails}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param Emails [$Emails] El objeto de tipo Emails
-     * @param Emails [$Emails] El objeto de tipo Emails
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(Emails $EmailsA, Emails $EmailsB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $EmailsA->email_id;
-        $b = $EmailsB->email_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`email_id` >= ? AND `email_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`email_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $EmailsA->email;
-        $b = $EmailsB->email;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`email` >= ? AND `email` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`email` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $EmailsA->user_id;
-        $b = $EmailsB->user_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Emails`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Emails($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -306,18 +151,16 @@ abstract class EmailsDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param Emails [$Emails] El objeto de tipo Emails a eliminar
      */
     final public static function delete(Emails $Emails) {
-        if (is_null(self::getByPK($Emails->email_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Emails` WHERE email_id = ?;';
         $params = [$Emails->email_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }

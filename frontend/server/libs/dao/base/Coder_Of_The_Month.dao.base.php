@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class CoderOfTheMonthDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by`';
-
+abstract class CoderOfTheMonthDAOBase {
     /**
      * Guardar registros.
      *
@@ -99,90 +94,6 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
     }
 
     /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link CoderOfTheMonth} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Coder_Of_The_Month, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Coder_Of_The_Month instanceof CoderOfTheMonth)) {
-            $Coder_Of_The_Month = new CoderOfTheMonth($Coder_Of_The_Month);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Coder_Of_The_Month->coder_of_the_month_id)) {
-            $clauses[] = '`coder_of_the_month_id` = ?';
-            $params[] = $Coder_Of_The_Month->coder_of_the_month_id;
-        }
-        if (!is_null($Coder_Of_The_Month->user_id)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = $Coder_Of_The_Month->user_id;
-        }
-        if (!is_null($Coder_Of_The_Month->description)) {
-            $clauses[] = '`description` = ?';
-            $params[] = $Coder_Of_The_Month->description;
-        }
-        if (!is_null($Coder_Of_The_Month->time)) {
-            $clauses[] = '`time` = ?';
-            $params[] = $Coder_Of_The_Month->time;
-        }
-        if (!is_null($Coder_Of_The_Month->interview_url)) {
-            $clauses[] = '`interview_url` = ?';
-            $params[] = $Coder_Of_The_Month->interview_url;
-        }
-        if (!is_null($Coder_Of_The_Month->rank)) {
-            $clauses[] = '`rank` = ?';
-            $params[] = $Coder_Of_The_Month->rank;
-        }
-        if (!is_null($Coder_Of_The_Month->selected_by)) {
-            $clauses[] = '`selected_by` = ?';
-            $params[] = $Coder_Of_The_Month->selected_by;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` FROM `Coder_Of_The_Month`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new CoderOfTheMonth($row);
-        }
-        return $ar;
-    }
-
-    /**
       * Actualizar registros.
       *
       * @return Filas afectadas
@@ -242,132 +153,6 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link CoderOfTheMonth} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link CoderOfTheMonth}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
-     * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(CoderOfTheMonth $Coder_Of_The_MonthA, CoderOfTheMonth $Coder_Of_The_MonthB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $Coder_Of_The_MonthA->coder_of_the_month_id;
-        $b = $Coder_Of_The_MonthB->coder_of_the_month_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`coder_of_the_month_id` >= ? AND `coder_of_the_month_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`coder_of_the_month_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->user_id;
-        $b = $Coder_Of_The_MonthB->user_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`user_id` >= ? AND `user_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`user_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->description;
-        $b = $Coder_Of_The_MonthB->description;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`description` >= ? AND `description` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`description` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->time;
-        $b = $Coder_Of_The_MonthB->time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`time` >= ? AND `time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->interview_url;
-        $b = $Coder_Of_The_MonthB->interview_url;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`interview_url` >= ? AND `interview_url` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`interview_url` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->rank;
-        $b = $Coder_Of_The_MonthB->rank;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`rank` >= ? AND `rank` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`rank` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $Coder_Of_The_MonthA->selected_by;
-        $b = $Coder_Of_The_MonthB->selected_by;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`selected_by` >= ? AND `selected_by` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`selected_by` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Coder_Of_The_Month`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new CoderOfTheMonth($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -377,18 +162,16 @@ abstract class CoderOfTheMonthDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a eliminar
      */
     final public static function delete(CoderOfTheMonth $Coder_Of_The_Month) {
-        if (is_null(self::getByPK($Coder_Of_The_Month->coder_of_the_month_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Coder_Of_The_Month` WHERE coder_of_the_month_id = ?;';
         $params = [$Coder_Of_The_Month->coder_of_the_month_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }
