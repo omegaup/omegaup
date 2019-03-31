@@ -692,6 +692,7 @@ const translations = {
 	rankScore: "(Sc0r3)",
 	rankSolved: "(S01v3d pr0b13m5)",
 	rankViewFull: "(Vi3w fu11 ranking)",
+	recordNotFound: "(R3c0rd n07 f0und.)",
 	registerForContest: "(R3gi573r f0r c0n7357)",
 	registerForContestChallenges: "(Cha113ng3)",
 	registerForContestRules: "(Ru135)",

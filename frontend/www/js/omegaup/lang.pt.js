@@ -692,6 +692,7 @@ const translations = {
 	rankScore: "Pontua\u00e7\u00e3o",
 	rankSolved: "Problemas",
 	rankViewFull: "Exibir ranking completo",
+	recordNotFound: "Registro n\u00e3o foi encontrado.",
 	registerForContest: "cadastre-se para o concurso",
 	registerForContestChallenges: "Desafio",
 	registerForContestRules: "Regras",

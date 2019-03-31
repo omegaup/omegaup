@@ -690,6 +690,7 @@ rankRangeHeader = "Top %(lowCount) a %(highCount) usuários com mais problemas r
 rankScore = "Pontuação"
 rankSolved = "Problemas"
 rankViewFull = "Exibir ranking completo"
+recordNotFound = "Registro não foi encontrado."
 registerForContest = "cadastre-se para o concurso"
 registerForContestChallenges = "Desafio"
 registerForContestRules = "Regras"
