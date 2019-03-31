@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class AssignmentsDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order`';
-
+abstract class AssignmentsDAOBase {
     /**
      * Guardar registros.
      *
@@ -96,114 +91,6 @@ abstract class AssignmentsDAOBase extends DAO {
             $allData[] = new Assignments($row);
         }
         return $allData;
-    }
-
-    /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Assignments} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param Assignments [$Assignments] El objeto de tipo Assignments
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Assignments, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Assignments instanceof Assignments)) {
-            $Assignments = new Assignments($Assignments);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Assignments->assignment_id)) {
-            $clauses[] = '`assignment_id` = ?';
-            $params[] = $Assignments->assignment_id;
-        }
-        if (!is_null($Assignments->course_id)) {
-            $clauses[] = '`course_id` = ?';
-            $params[] = $Assignments->course_id;
-        }
-        if (!is_null($Assignments->problemset_id)) {
-            $clauses[] = '`problemset_id` = ?';
-            $params[] = $Assignments->problemset_id;
-        }
-        if (!is_null($Assignments->acl_id)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = $Assignments->acl_id;
-        }
-        if (!is_null($Assignments->name)) {
-            $clauses[] = '`name` = ?';
-            $params[] = $Assignments->name;
-        }
-        if (!is_null($Assignments->description)) {
-            $clauses[] = '`description` = ?';
-            $params[] = $Assignments->description;
-        }
-        if (!is_null($Assignments->alias)) {
-            $clauses[] = '`alias` = ?';
-            $params[] = $Assignments->alias;
-        }
-        if (!is_null($Assignments->publish_time_delay)) {
-            $clauses[] = '`publish_time_delay` = ?';
-            $params[] = $Assignments->publish_time_delay;
-        }
-        if (!is_null($Assignments->assignment_type)) {
-            $clauses[] = '`assignment_type` = ?';
-            $params[] = $Assignments->assignment_type;
-        }
-        if (!is_null($Assignments->start_time)) {
-            $clauses[] = '`start_time` = ?';
-            $params[] = $Assignments->start_time;
-        }
-        if (!is_null($Assignments->finish_time)) {
-            $clauses[] = '`finish_time` = ?';
-            $params[] = $Assignments->finish_time;
-        }
-        if (!is_null($Assignments->max_points)) {
-            $clauses[] = '`max_points` = ?';
-            $params[] = $Assignments->max_points;
-        }
-        if (!is_null($Assignments->order)) {
-            $clauses[] = '`order` = ?';
-            $params[] = $Assignments->order;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM `Assignments`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Assignments($row);
-        }
-        return $ar;
     }
 
     /**
@@ -287,198 +174,6 @@ abstract class AssignmentsDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Assignments} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Assignments}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param Assignments [$Assignments] El objeto de tipo Assignments
-     * @param Assignments [$Assignments] El objeto de tipo Assignments
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(Assignments $AssignmentsA, Assignments $AssignmentsB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $AssignmentsA->assignment_id;
-        $b = $AssignmentsB->assignment_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`assignment_id` >= ? AND `assignment_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`assignment_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->course_id;
-        $b = $AssignmentsB->course_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`course_id` >= ? AND `course_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`course_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->problemset_id;
-        $b = $AssignmentsB->problemset_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`problemset_id` >= ? AND `problemset_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`problemset_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->acl_id;
-        $b = $AssignmentsB->acl_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`acl_id` >= ? AND `acl_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->name;
-        $b = $AssignmentsB->name;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`name` >= ? AND `name` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`name` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->description;
-        $b = $AssignmentsB->description;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`description` >= ? AND `description` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`description` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->alias;
-        $b = $AssignmentsB->alias;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`alias` >= ? AND `alias` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`alias` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->publish_time_delay;
-        $b = $AssignmentsB->publish_time_delay;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`publish_time_delay` >= ? AND `publish_time_delay` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`publish_time_delay` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->assignment_type;
-        $b = $AssignmentsB->assignment_type;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`assignment_type` >= ? AND `assignment_type` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`assignment_type` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->start_time;
-        $b = $AssignmentsB->start_time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`start_time` >= ? AND `start_time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`start_time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->finish_time;
-        $b = $AssignmentsB->finish_time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`finish_time` >= ? AND `finish_time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`finish_time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->max_points;
-        $b = $AssignmentsB->max_points;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`max_points` >= ? AND `max_points` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`max_points` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $AssignmentsA->order;
-        $b = $AssignmentsB->order;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`order` >= ? AND `order` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`order` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Assignments`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Assignments($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -488,18 +183,16 @@ abstract class AssignmentsDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param Assignments [$Assignments] El objeto de tipo Assignments a eliminar
      */
     final public static function delete(Assignments $Assignments) {
-        if (is_null(self::getByPK($Assignments->assignment_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Assignments` WHERE assignment_id = ?;';
         $params = [$Assignments->assignment_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }

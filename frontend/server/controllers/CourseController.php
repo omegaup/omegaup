@@ -205,7 +205,7 @@ class CourseController extends Controller {
         $offset = round($r['start_time']) - strtotime($original_course->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
         $response = [];
         try {
             // Create the course (and group)
@@ -250,15 +250,15 @@ class CourseController extends Controller {
                     ]));
                 }
             }
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (InvalidParameterException $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -288,7 +288,7 @@ class CourseController extends Controller {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
 
         $group = GroupController::createGroup(
             $r['alias'],
@@ -323,9 +323,9 @@ class CourseController extends Controller {
                 'requests_user_information' => $r['requests_user_information'],
             ]));
 
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
 
             if (strpos($e->getMessage(), '1062') !== false) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
@@ -356,7 +356,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        AssignmentsDAO::transBegin();
+        DAO::transBegin();
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
@@ -385,9 +385,9 @@ class CourseController extends Controller {
             $problemset->assignment_id = $assignment->assignment_id;
             ProblemsetsDAO::save($problemset);
 
-            AssignmentsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            AssignmentsDAO::transRollback();
+            DAO::transRollback();
             if (strpos($e->getMessage(), '1062') !== false) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
@@ -1062,7 +1062,7 @@ class CourseController extends Controller {
             'accept_teacher' => $r['accept_teacher'],
         ]);
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
 
         try {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
@@ -1097,9 +1097,9 @@ class CourseController extends Controller {
             }
             GroupsIdentitiesDAO::save($groupIdentity);
 
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
