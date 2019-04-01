@@ -79,7 +79,7 @@ class CoderOfTheMonth extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinytext,
+      * @var tinytext
       */
     public $description;
 

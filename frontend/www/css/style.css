@@ -501,6 +501,8 @@ padding-right: 5px;
 #content > .navbar { border-radius: 4px; }
 #inner-content { margin-left: 0; margin-right: 0; }
 
+#contest-rules ul { list-style-type: circle; }
+
 #userbox { padding: 0 10px 0 0; }
 #userbox-inner { text-align: center;}
 #userbox-inner > div { margin-bottom: 15px;}

@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class MessagesDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date`';
-
+abstract class MessagesDAOBase {
     /**
      * Guardar registros.
      *
@@ -99,86 +94,6 @@ abstract class MessagesDAOBase extends DAO {
     }
 
     /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Messages} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param Messages [$Messages] El objeto de tipo Messages
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Messages, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Messages instanceof Messages)) {
-            $Messages = new Messages($Messages);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Messages->message_id)) {
-            $clauses[] = '`message_id` = ?';
-            $params[] = $Messages->message_id;
-        }
-        if (!is_null($Messages->read)) {
-            $clauses[] = '`read` = ?';
-            $params[] = $Messages->read;
-        }
-        if (!is_null($Messages->sender_id)) {
-            $clauses[] = '`sender_id` = ?';
-            $params[] = $Messages->sender_id;
-        }
-        if (!is_null($Messages->recipient_id)) {
-            $clauses[] = '`recipient_id` = ?';
-            $params[] = $Messages->recipient_id;
-        }
-        if (!is_null($Messages->message)) {
-            $clauses[] = '`message` = ?';
-            $params[] = $Messages->message;
-        }
-        if (!is_null($Messages->date)) {
-            $clauses[] = '`date` = ?';
-            $params[] = $Messages->date;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM `Messages`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Messages($row);
-        }
-        return $ar;
-    }
-
-    /**
       * Actualizar registros.
       *
       * @return Filas afectadas
@@ -239,121 +154,6 @@ abstract class MessagesDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Messages} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Messages}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param Messages [$Messages] El objeto de tipo Messages
-     * @param Messages [$Messages] El objeto de tipo Messages
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(Messages $MessagesA, Messages $MessagesB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $MessagesA->message_id;
-        $b = $MessagesB->message_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`message_id` >= ? AND `message_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`message_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $MessagesA->read;
-        $b = $MessagesB->read;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`read` >= ? AND `read` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`read` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $MessagesA->sender_id;
-        $b = $MessagesB->sender_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`sender_id` >= ? AND `sender_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`sender_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $MessagesA->recipient_id;
-        $b = $MessagesB->recipient_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`recipient_id` >= ? AND `recipient_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`recipient_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $MessagesA->message;
-        $b = $MessagesB->message;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`message` >= ? AND `message` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`message` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $MessagesA->date;
-        $b = $MessagesB->date;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`date` >= ? AND `date` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`date` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Messages`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Messages($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -363,18 +163,16 @@ abstract class MessagesDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param Messages [$Messages] El objeto de tipo Messages a eliminar
      */
     final public static function delete(Messages $Messages) {
-        if (is_null(self::getByPK($Messages->message_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
         $params = [$Messages->message_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }

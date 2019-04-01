@@ -559,7 +559,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
         try {
             ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
                 $r['current_identity_id'],
@@ -584,9 +584,9 @@ class ContestController extends Controller {
                 ]));
             }
 
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -835,7 +835,7 @@ class ContestController extends Controller {
         $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
-        ContestsDAO::transBegin();
+        DAO::transBegin();
         $response = [];
         try {
             // Create the contest
@@ -862,15 +862,15 @@ class ContestController extends Controller {
                         'auth_token' => $auth_token
                     ]));
             }
-            ContestsDAO::transEnd();
+            DAO::transEnd();
         } catch (InvalidParameterException $e) {
-            ContestsDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
-            ContestsDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (Exception $e) {
-            ContestsDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -949,7 +949,7 @@ class ContestController extends Controller {
         // Push changes
         try {
             // Begin a new transaction
-            ContestsDAO::transBegin();
+            DAO::transBegin();
 
             ACLsDAO::save($acl);
             $problemset->acl_id = $acl->acl_id;
@@ -972,10 +972,10 @@ class ContestController extends Controller {
             ProblemsetsDAO::save($problemset);
 
             // End transaction transaction
-            ContestsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
+            DAO::transRollback();
 
             // Alias may be duplicated, 1062 error indicates that
             if (strpos($e->getMessage(), '1062') !== false) {
@@ -2255,7 +2255,7 @@ class ContestController extends Controller {
         // Push changes
         try {
             // Begin a new transaction
-            ContestsDAO::transBegin();
+            DAO::transBegin();
 
             // Save the contest object with data sent by user to the database
             self::updateContest($r['contest'], $original_contest, $r['current_user_id']);
@@ -2290,10 +2290,10 @@ class ContestController extends Controller {
             }
 
             // End transaction
-            ContestsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            ContestsDAO::transRollback();
+            DAO::transRollback();
 
             throw new InvalidDatabaseOperationException($e);
         }

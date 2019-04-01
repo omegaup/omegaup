@@ -16,12 +16,7 @@
  * @abstract
  *
  */
-abstract class CoursesDAOBase extends DAO {
-    /**
-     * Campos de la tabla.
-     */
-    const FIELDS = '`Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard`';
-
+abstract class CoursesDAOBase {
     /**
      * Guardar registros.
      *
@@ -96,114 +91,6 @@ abstract class CoursesDAOBase extends DAO {
             $allData[] = new Courses($row);
         }
         return $allData;
-    }
-
-    /**
-      * Buscar registros.
-      *
-      * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Courses} de la base de datos.
-      * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
-      * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-      *
-      * <code>
-      *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-      *   $cliente = new Cliente();
-      *   $cliente->setLimiteCredito('20000');
-      *   $resultados = ClienteDAO::search($cliente);
-      *
-      *   foreach ($resultados as $c){
-      *       echo $c->nombre . '<br>';
-      *   }
-      * </code>
-      * @static
-      * @param Courses [$Courses] El objeto de tipo Courses
-      * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-      * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-      */
-    final public static function search($Courses, $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = null, $likeColumns = null) {
-        if (!($Courses instanceof Courses)) {
-            $Courses = new Courses($Courses);
-        }
-
-        $clauses = [];
-        $params = [];
-        if (!is_null($Courses->course_id)) {
-            $clauses[] = '`course_id` = ?';
-            $params[] = $Courses->course_id;
-        }
-        if (!is_null($Courses->name)) {
-            $clauses[] = '`name` = ?';
-            $params[] = $Courses->name;
-        }
-        if (!is_null($Courses->description)) {
-            $clauses[] = '`description` = ?';
-            $params[] = $Courses->description;
-        }
-        if (!is_null($Courses->alias)) {
-            $clauses[] = '`alias` = ?';
-            $params[] = $Courses->alias;
-        }
-        if (!is_null($Courses->group_id)) {
-            $clauses[] = '`group_id` = ?';
-            $params[] = $Courses->group_id;
-        }
-        if (!is_null($Courses->acl_id)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = $Courses->acl_id;
-        }
-        if (!is_null($Courses->start_time)) {
-            $clauses[] = '`start_time` = ?';
-            $params[] = $Courses->start_time;
-        }
-        if (!is_null($Courses->finish_time)) {
-            $clauses[] = '`finish_time` = ?';
-            $params[] = $Courses->finish_time;
-        }
-        if (!is_null($Courses->public)) {
-            $clauses[] = '`public` = ?';
-            $params[] = $Courses->public;
-        }
-        if (!is_null($Courses->school_id)) {
-            $clauses[] = '`school_id` = ?';
-            $params[] = $Courses->school_id;
-        }
-        if (!is_null($Courses->needs_basic_information)) {
-            $clauses[] = '`needs_basic_information` = ?';
-            $params[] = $Courses->needs_basic_information;
-        }
-        if (!is_null($Courses->requests_user_information)) {
-            $clauses[] = '`requests_user_information` = ?';
-            $params[] = $Courses->requests_user_information;
-        }
-        if (!is_null($Courses->show_scoreboard)) {
-            $clauses[] = '`show_scoreboard` = ?';
-            $params[] = $Courses->show_scoreboard;
-        }
-        global $conn;
-        if (!is_null($likeColumns)) {
-            foreach ($likeColumns as $column => $value) {
-                $escapedValue = mysqli_real_escape_string($conn->_connectionID, $value);
-                $clauses[] = "`{$column}` LIKE '%{$escapedValue}%'";
-            }
-        }
-        if (sizeof($clauses) == 0) {
-            return self::getAll();
-        }
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` FROM `Courses`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orderBy) . '` ' . ($orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT '. (int)$offset . ', ' . (int)$rowcount;
-        }
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Courses($row);
-        }
-        return $ar;
     }
 
     /**
@@ -293,198 +180,6 @@ abstract class CoursesDAOBase extends DAO {
     }
 
     /**
-     * Buscar por rango.
-     *
-     * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Courses} de la base de datos siempre y cuando
-     * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Courses}.
-     *
-     * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
-     * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
-     * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-     *
-     * <code>
-     *   // Ejemplo de uso - buscar todos los clientes que tengan limite de credito
-     *   // mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-     *   $cr1 = new Cliente();
-     *   $cr1->limite_credito = "2000";
-     *   $cr1->descuento = "50";
-     *
-     *   $cr2 = new Cliente();
-     *   $cr2->limite_credito = "5000";
-     *   $resultados = ClienteDAO::byRange($cr1, $cr2);
-     *
-     *   foreach($resultados as $c ){
-     *       echo $c->nombre . "<br>";
-     *   }
-     * </code>
-     * @static
-     * @param Courses [$Courses] El objeto de tipo Courses
-     * @param Courses [$Courses] El objeto de tipo Courses
-     * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $orden 'ASC' o 'DESC' el default es 'ASC'
-     */
-    final public static function byRange(Courses $CoursesA, Courses $CoursesB, $orderBy = null, $orden = 'ASC') {
-        $clauses = [];
-        $params = [];
-
-        $a = $CoursesA->course_id;
-        $b = $CoursesB->course_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`course_id` >= ? AND `course_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`course_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->name;
-        $b = $CoursesB->name;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`name` >= ? AND `name` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`name` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->description;
-        $b = $CoursesB->description;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`description` >= ? AND `description` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`description` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->alias;
-        $b = $CoursesB->alias;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`alias` >= ? AND `alias` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`alias` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->group_id;
-        $b = $CoursesB->group_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`group_id` >= ? AND `group_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`group_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->acl_id;
-        $b = $CoursesB->acl_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`acl_id` >= ? AND `acl_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`acl_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->start_time;
-        $b = $CoursesB->start_time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`start_time` >= ? AND `start_time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`start_time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->finish_time;
-        $b = $CoursesB->finish_time;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`finish_time` >= ? AND `finish_time` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`finish_time` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->public;
-        $b = $CoursesB->public;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`public` >= ? AND `public` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`public` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->school_id;
-        $b = $CoursesB->school_id;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`school_id` >= ? AND `school_id` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`school_id` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->needs_basic_information;
-        $b = $CoursesB->needs_basic_information;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`needs_basic_information` >= ? AND `needs_basic_information` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`needs_basic_information` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->requests_user_information;
-        $b = $CoursesB->requests_user_information;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`requests_user_information` >= ? AND `requests_user_information` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`requests_user_information` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $a = $CoursesA->show_scoreboard;
-        $b = $CoursesB->show_scoreboard;
-        if (!is_null($a) && !is_null($b)) {
-            $clauses[] = '`show_scoreboard` >= ? AND `show_scoreboard` <= ?';
-            $params[] = min($a, $b);
-            $params[] = max($a, $b);
-        } elseif (!is_null($a) || !is_null($b)) {
-            $clauses[] = '`show_scoreboard` = ?';
-            $params[] = is_null($a) ? $b : $a;
-        }
-
-        $sql = 'SELECT * FROM `Courses`';
-        $sql .= ' WHERE (' . implode(' AND ', $clauses) . ')';
-        if (!is_null($orderBy)) {
-            $sql .= ' ORDER BY `' . $orderBy . '` ' . $orden;
-        }
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = new Courses($row);
-        }
-        return $ar;
-    }
-
-    /**
      * Eliminar registros.
      *
      * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
@@ -494,18 +189,16 @@ abstract class CoursesDAOBase extends DAO {
      * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
      *
      * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @return int El numero de filas afectadas.
      * @param Courses [$Courses] El objeto de tipo Courses a eliminar
      */
     final public static function delete(Courses $Courses) {
-        if (is_null(self::getByPK($Courses->course_id))) {
-            throw new Exception('Registro no encontrado.');
-        }
         $sql = 'DELETE FROM `Courses` WHERE course_id = ?;';
         $params = [$Courses->course_id];
         global $conn;
 
         $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
     }
 }
