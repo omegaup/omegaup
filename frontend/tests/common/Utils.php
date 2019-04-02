@@ -121,6 +121,7 @@ class Utils {
             'Problemset_Identities',
             'Problemsets',
             'QualityNomination_Comments',
+            'QualityNomination_Log',
             'QualityNomination_Reviewers',
             'QualityNominations',
             'Runs',
