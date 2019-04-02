@@ -166,7 +166,7 @@
 	"contestNewFormStartDate": "Data de in\u00edcio",
 	"contestNewFormStartDateDesc": "A data (no hor\u00e1rio local), no qual a concurso come\u00e7ar\u00e1",
 	"contestNewFormSubmissionsSeparation": "Separa\u00e7\u00e3o das Solu\u00e7\u00f5es",
-	"contestNewFormSubmissionsSeparationDesc": "Tempo m\u00ednimo em minutos que deve esperar un competidor depois de entregar uma solu\u00e7\u00e3o a um problema para poder entregar outra.",
+	"contestNewFormSubmissionsSeparationDesc": "Tempo m\u00ednimo em minutos que deve esperar un competidor depois de entregar uma solu\u00e7\u00e3o a um problema para poder entregar outra (1 minuto m\u00ednimo).",
 	"contestNewFormTitlePlaceholderConacupStyle": "**Estilo CONACUP usado. Colocar o seu t\u00edtulo aqui**",
 	"contestNewFormTitlePlaceholderIoiStyle": "**Estilo IOI usado. Colocar o seu t\u00edtulo aqui**",
 	"contestNewFormTitlePlaceholderOmiStyle": "**Estilo OMI usado. Colocar o seu t\u00edtulo aqui**",
