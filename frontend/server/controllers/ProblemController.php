@@ -16,7 +16,7 @@ class ProblemController extends Controller {
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
 
-    const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactivo'];
+    const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
 
     /**
      * Validates a Create or Update Problem API request
@@ -806,7 +806,7 @@ class ProblemController extends Controller {
     }
 
     private static function setRestrictedTags(Problems $problem) {
-        TagsDAO::deleteRestrictedTags();
+        ProblemsTagsDAO::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
             ProblemController::addTag('solo-salida', true, $problem, true);
@@ -822,7 +822,7 @@ class ProblemController extends Controller {
             JSON_OBJECT_AS_ARRAY
         );
         if (!empty($distribSettings['interactive'])) {
-            ProblemController::addTag('interactivo', true, $problem, true);
+            ProblemController::addTag('interactive', true, $problem, true);
         }
     }
 
