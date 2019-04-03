@@ -67,12 +67,6 @@ class Table:
         return ', '.join("`{}`.`{}`".format(self.name, column.name)
                          for column in self.columns)
 
-    @property
-    def primary_key(self):
-        '''The list of columns that constitute this table's primary key.'''
-
-        return [column for column in self.columns if column.primary_key]
-
     def __repr__(self):
         return 'Table<name={}, columns={}>'.format(self.name, self.columns)
 

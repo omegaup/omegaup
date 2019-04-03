@@ -276,12 +276,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         // Add the sysadmin role to the contest director
-        $userRoles = new UserRoles([
+        UserRolesDAO::create(new UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ]);
-        UserRolesDAO::save($userRoles);
+        ]));
 
         $response = ContestsFactory::removeProblemFromContest(
             $problemData,
@@ -450,12 +449,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $userRoles = new UserRoles([
+        UserRolesDAO::create(new UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
-        ]);
-        UserRolesDAO::save($userRoles);
+        ]));
 
         $response = ContestsFactory::removeProblemFromContest(
             $problemData,

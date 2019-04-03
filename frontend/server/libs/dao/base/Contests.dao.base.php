@@ -10,8 +10,9 @@
 
 /** Contests Data Access Object (DAO) Base.
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link Contests }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link Contests}.
  * @access public
  * @abstract
  *
@@ -20,86 +21,33 @@ abstract class ContestsDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link Contests} pasado en la base de datos. La llave
-     * primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
-     * primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
-     * en ese objeto el ID recien creado.
+     * Este metodo guarda el estado actual del objeto {@link Contests}
+     * pasado en la base de datos. La llave primaria indicará qué instancia va
+     * a ser actualizada en base de datos. Si la llave primara o combinación de
+     * llaves primarias que describen una fila que no se encuentra en la base de
+     * datos, entonces save() creará una nueva fila, insertando en ese objeto
+     * el ID recién creado.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param Contests [$Contests] El objeto de tipo Contests
-     * @return Un entero mayor o igual a cero denotando las filas afectadas.
+     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function save(Contests $Contests) {
-        if (!is_null(self::getByPK($Contests->contest_id))) {
-            return ContestsDAOBase::update($Contests);
-        } else {
+        if (is_null(self::getByPK($Contests->contest_id))) {
             return ContestsDAOBase::create($Contests);
         }
+        return ContestsDAOBase::update($Contests);
     }
 
     /**
-     * Obtener {@link Contests} por llave primaria.
-     *
-     * Este metodo cargara un objeto {@link Contests} de la base de datos
-     * usando sus llaves primarias.
+     * Actualizar registros.
      *
      * @static
-     * @return @link Contests Un objeto del tipo {@link Contests}. NULL si no hay tal registro.
+     * @return Filas afectadas
+     * @param Contests [$Contests] El objeto de tipo Contests a actualizar.
      */
-    final public static function getByPK($contest_id) {
-        if (is_null($contest_id)) {
-            return null;
-        }
-        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
-        $params = [$contest_id];
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
-            return null;
-        }
-        return new Contests($rs);
-    }
-
-    /**
-     * Obtener todas las filas.
-     *
-     * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-     * un vector que contiene objetos de tipo {@link Contests}. Tenga en cuenta que este metodo
-     * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
-     * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-     *
-     * @static
-     * @param $pagina Pagina a ver.
-     * @param $columnas_por_pagina Columnas por pagina.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
-     */
-    final public static function getAll($pagina = null, $columnas_por_pagina = null, $orden = null, $tipo_de_orden = 'ASC') {
-        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
-        global $conn;
-        if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipo_de_orden == 'DESC' ? 'DESC' : 'ASC');
-        }
-        if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $columnas_por_pagina) . ', ' . (int)$columnas_por_pagina;
-        }
-        $rs = $conn->Execute($sql);
-        $allData = [];
-        foreach ($rs as $row) {
-            $allData[] = new Contests($row);
-        }
-        return $allData;
-    }
-
-    /**
-      * Actualizar registros.
-      *
-      * @return Filas afectadas
-      * @param Contests [$Contests] El objeto de tipo Contests a actualizar.
-      */
-    final private static function update(Contests $Contests) {
+    final public static function update(Contests $Contests) {
         $sql = 'UPDATE `Contests` SET `problemset_id` = ?, `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `last_updated` = ?, `window_length` = ?, `rerun_id` = ?, `admission_mode` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `urgent` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
             $Contests->problemset_id,
@@ -133,18 +81,100 @@ abstract class ContestsDAOBase {
     }
 
     /**
+     * Obtener {@link Contests} por llave primaria.
+     *
+     * Este metodo cargará un objeto {@link Contests} de la base
+     * de datos usando sus llaves primarias.
+     *
+     * @static
+     * @return @link Contests Un objeto del tipo {@link Contests}. NULL si no hay tal registro.
+     */
+    final public static function getByPK($contest_id) {
+        if (is_null($contest_id)) {
+            return null;
+        }
+        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
+        $params = [$contest_id];
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
+        return new Contests($rs);
+    }
+
+    /**
+     * Eliminar registros.
+     *
+     * Este metodo eliminará el registro identificado por la llave primaria en
+     * el objeto Contests suministrado. Una vez que se ha
+     * eliminado un objeto, este no puede ser restaurado llamando a
+     * {@link save()}, ya que este último creará un nuevo registro con una
+     * llave primaria distinta a la que estaba en el objeto eliminado.
+     *
+     * Si no puede encontrar el registro a eliminar, {@link Exception} será
+     * arrojada.
+     *
+     * @static
+     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @param Contests [$Contests] El objeto de tipo Contests a eliminar
+     */
+    final public static function delete(Contests $Contests) {
+        $sql = 'DELETE FROM `Contests` WHERE contest_id = ?;';
+        $params = [$Contests->contest_id];
+        global $conn;
+
+        $conn->Execute($sql, $params);
+        if ($conn->Affected_Rows() == 0) {
+            throw new NotFoundException('recordNotFound');
+        }
+    }
+
+    /**
+     * Obtener todas las filas.
+     *
+     * Esta funcion leerá todos los contenidos de la tabla en la base de datos
+     * y construirá un arreglo que contiene objetos de tipo {@link Contests}.
+     * Este método consume una cantidad de memoria proporcional al número de
+     * registros regresados, así que sólo debe usarse cuando la tabla en
+     * cuestión es pequeña o se proporcionan parámetros para obtener un menor
+     * número de filas.
+     *
+     * @static
+     * @param $pagina Página a ver.
+     * @param $filasPorPagina Filas por página.
+     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
+     */
+    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+        $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
+        global $conn;
+        if (!is_null($orden)) {
+            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+        }
+        if (!is_null($pagina)) {
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+        }
+        $rs = $conn->Execute($sql);
+        $allData = [];
+        foreach ($rs as $row) {
+            $allData[] = new Contests($row);
+        }
+        return $allData;
+    }
+
+    /**
      * Crear registros.
      *
-     * Este metodo creara una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Contests suministrado. Asegurese
-     * de que los valores para todas las columnas NOT NULL se ha especificado
-     * correctamente. Despues del comando INSERT, este metodo asignara la clave
-     * primaria generada en el objeto Contests dentro de la misma transaccion.
+     * Este metodo creará una nueva fila en la base de datos de acuerdo con los
+     * contenidos del objeto Contests suministrado.
      *
-     * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
+     * @static
+     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Contests [$Contests] El objeto de tipo Contests a crear.
      */
-    final private static function create(Contests $Contests) {
+    final public static function create(Contests $Contests) {
         if (is_null($Contests->start_time)) {
             $Contests->start_time = '2000-01-01 06:00:00';
         }
@@ -217,28 +247,5 @@ abstract class ContestsDAOBase {
         $Contests->contest_id = $conn->Insert_ID();
 
         return $ar;
-    }
-
-    /**
-     * Eliminar registros.
-     *
-     * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-     * en el objeto Contests suministrado. Una vez que se ha suprimido un objeto, este no
-     * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
-     * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
-     * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-     *
-     * @throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
-     * @param Contests [$Contests] El objeto de tipo Contests a eliminar
-     */
-    final public static function delete(Contests $Contests) {
-        $sql = 'DELETE FROM `Contests` WHERE contest_id = ?;';
-        $params = [$Contests->contest_id];
-        global $conn;
-
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
-        }
     }
 }

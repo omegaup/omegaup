@@ -202,7 +202,7 @@ class SessionController extends Controller {
 
     private function RegisterSession(Identities $identity, $b_ReturnAuthTokenAsString = false) {
         // Log the login.
-        IdentityLoginLogDAO::save(new IdentityLoginLog([
+        IdentityLoginLogDAO::create(new IdentityLoginLog([
             'identity_id' => $identity->identity_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));

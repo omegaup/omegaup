@@ -301,7 +301,7 @@ class CourseController extends Controller {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
             ACLsDAO::save($acl);
 
-            GroupRolesDAO::save(new GroupRoles([
+            GroupRolesDAO::create(new GroupRoles([
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
                 'role_id' => Authorization::CONTESTANT_ROLE,
@@ -1556,7 +1556,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
         // Log the operation.
-        ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+        ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
             'identity_id' => $r['current_identity_id'],
             'problemset_id' => $r['assignment']->problemset_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
