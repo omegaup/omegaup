@@ -167,7 +167,7 @@ abstract class ContestsDAOBase {
             $Contests->partial_score = '1';
         }
         if (is_null($Contests->submissions_gap)) {
-            $Contests->submissions_gap = '1';
+            $Contests->submissions_gap = '60';
         }
         if (is_null($Contests->penalty)) {
             $Contests->penalty = '1';

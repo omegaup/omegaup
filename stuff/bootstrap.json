@@ -60,7 +60,7 @@
 					"scoreboard": 100,
 					"points_decay_factor": 0,
 					"partial_score": 1,
-					"submissions_gap": 20,
+					"submissions_gap": 1200,
 					"feedback": "yes",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",

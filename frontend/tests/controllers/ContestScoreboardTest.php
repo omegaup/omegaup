@@ -45,6 +45,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
                 $runDescription['verdict'],
                 $runDescription['submit_delay']
             );
+            Time::setTimeForTesting(Time::get() + 60);
         }
 
         if ($runForDirector) {

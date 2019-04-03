@@ -537,10 +537,15 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Create runs
         $runsData = [];
         $runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
+        Time::setTimeForTesting(Time::get() + 60);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 
         // Grade the runs
