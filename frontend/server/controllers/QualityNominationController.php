@@ -204,7 +204,7 @@ class QualityNominationController extends Controller {
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
             ) as $reviewer) {
-                QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                QualityNominationReviewersDAO::create(new QualityNominationReviewers([
                     'qualitynomination_id' => $nomination->qualitynomination_id,
                     'user_id' => $reviewer->user_id,
                 ]));

@@ -731,7 +731,7 @@ class ContestController extends Controller {
             $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
 
             // Log the operation.
-            ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+            ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
                 'identity_id' => $r['current_identity_id'],
                 'problemset_id' => $r['contest']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),

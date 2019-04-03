@@ -85,7 +85,7 @@ class ClarificationController extends Controller {
         // Insert new Clarification
         try {
             // Save the clarification object with data sent by user to the database
-            ClarificationsDAO::save($r['clarification']);
+            ClarificationsDAO::create($r['clarification']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -208,7 +208,7 @@ class ClarificationController extends Controller {
 
         // Save the clarification
         try {
-            ClarificationsDAO::save($clarification);
+            ClarificationsDAO::update($clarification);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
