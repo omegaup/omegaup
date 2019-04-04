@@ -153,9 +153,8 @@ abstract class ACLsDAOBase {
      * @param ACLs [$ACLs] El objeto de tipo ACLs a crear.
      */
     final public static function create(ACLs $ACLs) {
-        $sql = 'INSERT INTO ACLs (`acl_id`, `owner_id`) VALUES (?, ?);';
+        $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
-            $ACLs->acl_id,
             $ACLs->owner_id,
         ];
         global $conn;

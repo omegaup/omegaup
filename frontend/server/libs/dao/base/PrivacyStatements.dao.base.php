@@ -157,9 +157,8 @@ abstract class PrivacyStatementsDAOBase {
         if (is_null($PrivacyStatements->type)) {
             $PrivacyStatements->type = 'privacy_policy';
         }
-        $sql = 'INSERT INTO PrivacyStatements (`privacystatement_id`, `git_object_id`, `type`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO PrivacyStatements (`git_object_id`, `type`) VALUES (?, ?);';
         $params = [
-            $PrivacyStatements->privacystatement_id,
             $PrivacyStatements->git_object_id,
             $PrivacyStatements->type,
         ];

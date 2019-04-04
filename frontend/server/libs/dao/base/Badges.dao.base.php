@@ -159,9 +159,8 @@ abstract class BadgesDAOBase {
         if (is_null($Badges->name)) {
             $Badges->name = 'MyBadge';
         }
-        $sql = 'INSERT INTO Badges (`badge_id`, `name`, `image_url`, `description`, `hint`) VALUES (?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Badges (`name`, `image_url`, `description`, `hint`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Badges->badge_id,
             $Badges->name,
             $Badges->image_url,
             $Badges->description,

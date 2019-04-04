@@ -158,9 +158,8 @@ abstract class ProblemOfTheWeekDAOBase {
         if (is_null($Problem_Of_The_Week->time)) {
             $Problem_Of_The_Week->time = '2000-01-01';
         }
-        $sql = 'INSERT INTO Problem_Of_The_Week (`problem_of_the_week_id`, `problem_id`, `time`, `difficulty`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
-            $Problem_Of_The_Week->problem_of_the_week_id,
             $Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,

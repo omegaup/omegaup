@@ -158,9 +158,8 @@ abstract class InterviewsDAOBase {
      * @param Interviews [$Interviews] El objeto de tipo Interviews a crear.
      */
     final public static function create(Interviews $Interviews) {
-        $sql = 'INSERT INTO Interviews (`interview_id`, `problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Interviews->interview_id,
             $Interviews->problemset_id,
             $Interviews->acl_id,
             $Interviews->alias,

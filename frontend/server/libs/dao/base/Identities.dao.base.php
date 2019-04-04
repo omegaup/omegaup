@@ -161,9 +161,8 @@ abstract class IdentitiesDAOBase {
      * @param Identities [$Identities] El objeto de tipo Identities a crear.
      */
     final public static function create(Identities $Identities) {
-        $sql = 'INSERT INTO Identities (`identity_id`, `username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Identities (`username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Identities->identity_id,
             $Identities->username,
             $Identities->password,
             $Identities->name,

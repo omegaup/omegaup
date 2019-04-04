@@ -173,9 +173,9 @@ abstract class {{ table.class_name }}DAOBase {
 {%- endif %}
         }
 {%- endfor %}
-        $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
+        $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
-{%- for column in table.columns %}
+{%- for column in table.columns|rejectattr('auto_increment') %}
             ${{ table.name }}->{{column.name}},
 {%- endfor %}
         ];

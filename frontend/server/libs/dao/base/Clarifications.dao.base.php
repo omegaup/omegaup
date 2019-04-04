@@ -166,9 +166,8 @@ abstract class ClarificationsDAOBase {
         if (is_null($Clarifications->public)) {
             $Clarifications->public = '0';
         }
-        $sql = 'INSERT INTO Clarifications (`clarification_id`, `author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Clarifications->clarification_id,
             $Clarifications->author_id,
             $Clarifications->receiver_id,
             $Clarifications->message,

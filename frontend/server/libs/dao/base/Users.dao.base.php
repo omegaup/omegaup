@@ -183,9 +183,8 @@ abstract class UsersDAOBase {
         if (is_null($Users->is_private)) {
             $Users->is_private = '0';
         }
-        $sql = 'INSERT INTO Users (`user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `main_identity_id`, `name`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `gender`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Users (`username`, `facebook_user_id`, `password`, `main_email_id`, `main_identity_id`, `name`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `gender`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Users->user_id,
             $Users->username,
             $Users->facebook_user_id,
             $Users->password,

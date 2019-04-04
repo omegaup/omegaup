@@ -182,9 +182,8 @@ abstract class CoursesDAOBase {
         if (is_null($Courses->show_scoreboard)) {
             $Courses->show_scoreboard = '0';
         }
-        $sql = 'INSERT INTO Courses (`course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`, `show_scoreboard`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Courses (`name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`, `show_scoreboard`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Courses->course_id,
             $Courses->name,
             $Courses->description,
             $Courses->alias,

@@ -155,9 +155,8 @@ abstract class SchoolsDAOBase {
      * @param Schools [$Schools] El objeto de tipo Schools a crear.
      */
     final public static function create(Schools $Schools) {
-        $sql = 'INSERT INTO Schools (`school_id`, `country_id`, `state_id`, `name`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Schools (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
         $params = [
-            $Schools->school_id,
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,

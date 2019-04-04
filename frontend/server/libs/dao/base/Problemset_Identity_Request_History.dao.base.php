@@ -160,9 +160,8 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         if (is_null($Problemset_Identity_Request_History->time)) {
             $Problemset_Identity_Request_History->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Problemset_Identity_Request_History (`history_id`, `identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Identity_Request_History->history_id,
             $Problemset_Identity_Request_History->identity_id,
             $Problemset_Identity_Request_History->problemset_id,
             $Problemset_Identity_Request_History->time,

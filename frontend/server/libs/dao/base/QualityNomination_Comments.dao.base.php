@@ -160,9 +160,8 @@ abstract class QualityNominationCommentsDAOBase {
         if (is_null($QualityNomination_Comments->time)) {
             $QualityNomination_Comments->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_comment_id`, `qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $QualityNomination_Comments->qualitynomination_comment_id,
             $QualityNomination_Comments->qualitynomination_id,
             $QualityNomination_Comments->user_id,
             $QualityNomination_Comments->time,

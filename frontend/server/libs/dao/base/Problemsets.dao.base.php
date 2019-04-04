@@ -175,9 +175,8 @@ abstract class ProblemsetsDAOBase {
         if (is_null($Problemsets->type)) {
             $Problemsets->type = 'Contest';
         }
-        $sql = 'INSERT INTO Problemsets (`problemset_id`, `acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemsets->problemset_id,
             $Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
