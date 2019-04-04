@@ -160,9 +160,8 @@ abstract class GroupsDAOBase {
         if (is_null($Groups->create_time)) {
             $Groups->create_time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Groups (`group_id`, `acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Groups->group_id,
             $Groups->acl_id,
             $Groups->create_time,
             $Groups->alias,

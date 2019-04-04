@@ -154,9 +154,8 @@ abstract class EmailsDAOBase {
      * @param Emails [$Emails] El objeto de tipo Emails a crear.
      */
     final public static function create(Emails $Emails) {
-        $sql = 'INSERT INTO Emails (`email_id`, `email`, `user_id`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';
         $params = [
-            $Emails->email_id,
             $Emails->email,
             $Emails->user_id,
         ];

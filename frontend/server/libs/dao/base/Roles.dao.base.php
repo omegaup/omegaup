@@ -154,9 +154,8 @@ abstract class RolesDAOBase {
      * @param Roles [$Roles] El objeto de tipo Roles a crear.
      */
     final public static function create(Roles $Roles) {
-        $sql = 'INSERT INTO Roles (`role_id`, `name`, `description`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Roles (`name`, `description`) VALUES (?, ?);';
         $params = [
-            $Roles->role_id,
             $Roles->name,
             $Roles->description,
         ];

@@ -154,9 +154,8 @@ abstract class PermissionsDAOBase {
      * @param Permissions [$Permissions] El objeto de tipo Permissions a crear.
      */
     final public static function create(Permissions $Permissions) {
-        $sql = 'INSERT INTO Permissions (`permission_id`, `name`, `description`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Permissions (`name`, `description`) VALUES (?, ?);';
         $params = [
-            $Permissions->permission_id,
             $Permissions->name,
             $Permissions->description,
         ];

@@ -192,9 +192,8 @@ abstract class RunsDAOBase {
         if (is_null($Runs->type)) {
             $Runs->type = 'normal';
         }
-        $sql = 'INSERT INTO Runs (`run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `submit_delay`, `judged_by`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Runs (`identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `submit_delay`, `judged_by`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Runs->run_id,
             $Runs->identity_id,
             $Runs->problem_id,
             $Runs->problemset_id,

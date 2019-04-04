@@ -161,9 +161,8 @@ abstract class CoderOfTheMonthDAOBase {
         if (is_null($Coder_Of_The_Month->time)) {
             $Coder_Of_The_Month->time = '2000-01-01';
         }
-        $sql = 'INSERT INTO Coder_Of_The_Month (`coder_of_the_month_id`, `user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Coder_Of_The_Month (`user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Coder_Of_The_Month->coder_of_the_month_id,
             $Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
