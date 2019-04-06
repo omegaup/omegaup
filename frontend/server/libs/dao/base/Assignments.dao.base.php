@@ -176,9 +176,8 @@ abstract class AssignmentsDAOBase {
         if (is_null($Assignments->order)) {
             $Assignments->order = '1';
         }
-        $sql = 'INSERT INTO Assignments (`assignment_id`, `course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Assignments (`course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Assignments->assignment_id,
             $Assignments->course_id,
             $Assignments->problemset_id,
             $Assignments->acl_id,

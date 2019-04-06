@@ -163,9 +163,8 @@ abstract class MessagesDAOBase {
         if (is_null($Messages->date)) {
             $Messages->date = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Messages (`message_id`, `read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Messages->message_id,
             $Messages->read,
             $Messages->sender_id,
             $Messages->recipient_id,

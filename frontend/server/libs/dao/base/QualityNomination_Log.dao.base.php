@@ -167,9 +167,8 @@ abstract class QualityNominationLogDAOBase {
         if (is_null($QualityNomination_Log->to_status)) {
             $QualityNomination_Log->to_status = 'open';
         }
-        $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_log_id`, `qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $QualityNomination_Log->qualitynomination_log_id,
             $QualityNomination_Log->qualitynomination_id,
             $QualityNomination_Log->time,
             $QualityNomination_Log->user_id,

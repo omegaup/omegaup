@@ -154,9 +154,8 @@ abstract class LanguagesDAOBase {
      * @param Languages [$Languages] El objeto de tipo Languages a crear.
      */
     final public static function create(Languages $Languages) {
-        $sql = 'INSERT INTO Languages (`language_id`, `name`, `country_id`) VALUES (?, ?, ?);';
+        $sql = 'INSERT INTO Languages (`name`, `country_id`) VALUES (?, ?);';
         $params = [
-            $Languages->language_id,
             $Languages->name,
             $Languages->country_id,
         ];

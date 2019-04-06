@@ -160,9 +160,8 @@ abstract class ContestLogDAOBase {
         if (is_null($Contest_Log->time)) {
             $Contest_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Contest_Log (`public_contest_id`, `contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Contest_Log->public_contest_id,
             $Contest_Log->contest_id,
             $Contest_Log->user_id,
             $Contest_Log->from_admission_mode,

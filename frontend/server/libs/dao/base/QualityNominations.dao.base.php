@@ -167,9 +167,8 @@ abstract class QualityNominationsDAOBase {
         if (is_null($QualityNominations->status)) {
             $QualityNominations->status = 'open';
         }
-        $sql = 'INSERT INTO QualityNominations (`qualitynomination_id`, `user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $QualityNominations->qualitynomination_id,
             $QualityNominations->user_id,
             $QualityNominations->problem_id,
             $QualityNominations->nomination,

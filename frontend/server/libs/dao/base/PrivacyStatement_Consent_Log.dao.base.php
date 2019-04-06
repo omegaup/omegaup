@@ -158,9 +158,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
         if (is_null($PrivacyStatement_Consent_Log->timestamp)) {
             $PrivacyStatement_Consent_Log->timestamp = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`privacystatement_consent_id`, `identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
-            $PrivacyStatement_Consent_Log->privacystatement_consent_id,
             $PrivacyStatement_Consent_Log->identity_id,
             $PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,

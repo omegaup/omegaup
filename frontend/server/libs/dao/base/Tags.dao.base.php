@@ -153,9 +153,8 @@ abstract class TagsDAOBase {
      * @param Tags [$Tags] El objeto de tipo Tags a crear.
      */
     final public static function create(Tags $Tags) {
-        $sql = 'INSERT INTO Tags (`tag_id`, `name`) VALUES (?, ?);';
+        $sql = 'INSERT INTO Tags (`name`) VALUES (?);';
         $params = [
-            $Tags->tag_id,
             $Tags->name,
         ];
         global $conn;

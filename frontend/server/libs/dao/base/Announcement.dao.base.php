@@ -158,9 +158,8 @@ abstract class AnnouncementDAOBase {
         if (is_null($Announcement->time)) {
             $Announcement->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Announcement (`announcement_id`, `user_id`, `time`, `description`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
-            $Announcement->announcement_id,
             $Announcement->user_id,
             $Announcement->time,
             $Announcement->description,
