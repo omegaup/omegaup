@@ -1130,7 +1130,7 @@ class ContestController extends Controller {
         Validators::isNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
         Validators::isNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
         Validators::isInEnum($r['partial_score'], 'partial_score', ['0', '1'], false);
-        Validators::isNumberInRange($r['submissions_gap'], 'submissions_gap', 0, $contest_length, $is_required);
+        Validators::isNumberInRange($r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60), 'submissions_gap', 1, floor($contest_length / 60), $is_required);
 
         Validators::isInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $is_required);
         Validators::isInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $is_required);

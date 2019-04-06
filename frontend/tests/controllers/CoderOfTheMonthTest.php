@@ -84,6 +84,8 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $runData = RunsFactory::createRun($problem, $contest, $user);
             RunsFactory::gradeRun($runData);
+            //sumbmission gap between runs must be 60 seconds
+            Time::setTimeForTesting(Time::get() + 60);
 
             // Force the run to be in any date
             $run = RunsDAO::getByAlias($runData['response']['guid']);

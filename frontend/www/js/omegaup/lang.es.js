@@ -167,7 +167,7 @@ const translations = {
 	contestNewFormStartDate: "Fecha de Inicio",
 	contestNewFormStartDateDesc: "La fecha (en hora local) en la que inicia el concurso.",
 	contestNewFormSubmissionsSeparation: "Separaci&oacute;n de envios",
-	contestNewFormSubmissionsSeparationDesc: "Tiempo m\u00ednimo en minutos que debe de esperar un concursante despues de realizar un env\u00edo para hacer otro.",
+	contestNewFormSubmissionsSeparationDesc: "Tiempo m\u00ednimo en minutos que debe de esperar un concursante despues de realizar un env\u00edo para hacer otro (m\u00ednimo 1 minuto).",
 	contestNewFormTitlePlaceholderConacupStyle: "**Estilo CONACUP aplicado. Pon tu t\u00edtulo aqu\u00ed**",
 	contestNewFormTitlePlaceholderIoiStyle: "**Estilo Preselectivo aplicado. Pon tu t\u00edtulo aqu\u00ed**",
 	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI aplicado. Tu t\u00edtulo aqu\u00ed**",
