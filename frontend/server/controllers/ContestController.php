@@ -2667,37 +2667,11 @@ class ContestController extends Controller {
 
         self::validateStats($r);
 
-        // Get our runs
-        try {
-            $runs = RunsDAO::getByContest($r['contest']->contest_id);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
         include_once 'libs/third_party/ZipStream.php';
-        $zip = new ZipStream($r['contest_alias'] . '.zip');
-
-        // Add runs to zip
-        $table = "guid,user,problem,verdict,points\n";
-        foreach ($runs as $run) {
-            $zip->add_file(
-                'runs/' . $run->guid,
-                RunController::getRunSource($run)
-            );
-
-            $columns[0] = 'username';
-            $columns[1] = 'alias';
-            $usernameProblemData = $run->asFilteredArray($columns);
-
-            $table .= $run->guid . ',' . $usernameProblemData['username'] . ',' . $usernameProblemData['alias'] . ',' . $run->verdict . ',' . $run->contest_score;
-            $table .= "\n";
-        }
-
-        $zip->add_file('summary.csv', $table);
-
-        // Return zip
+        $zip = new ZipStream("{$r['contest_alias']}.zip");
+        ProblemsetController::downloadRuns($r['contest']->problemset_id, $zip);
         $zip->finish();
+
         die();
     }
 

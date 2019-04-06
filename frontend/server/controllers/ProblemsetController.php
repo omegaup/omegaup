@@ -194,4 +194,29 @@ class ProblemsetController extends Controller {
         }
         return $r;
     }
+
+    /**
+     * Downloads all the runs of the problemset.
+     *
+     * @param $problemsetId integer The problemset ID.
+     * @param $zip ZipStream The object that represents the .zip file.
+     */
+    public static function downloadRuns(int $problemsetId, ZipStream $zip): void {
+        try {
+            $runs = RunsDAO::getByProblemset($problemsetId);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $table = ['guid,user,problem,verdict,points'];
+        foreach ($runs as $run) {
+            $zip->add_file(
+                "runs/{$run['guid']}.{$run['language']}",
+                RunController::getRunSource($run['guid'])
+            );
+            $table[] = "{$run['guid']},{$run['username']},{$run['alias']},{$run['verdict']},{$run['contest_score']}";
+        }
+        $zip->add_file('summary.csv', implode("\n", $table));
+    }
 }
