@@ -1387,7 +1387,9 @@ class QualityNominationTest extends OmegaupTestCase {
     private static function deleteAllPreviousRuns() {
         global $conn;
         $conn->Execute('DELETE FROM `Submission_Log`;');
+        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
         $conn->Execute('DELETE FROM `Runs`;');
+        $conn->Execute('DELETE FROM `Submissions`;');
     }
 
     private static function deleteAllProblemsOfTheWeek() {

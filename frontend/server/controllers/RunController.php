@@ -284,29 +284,42 @@ class RunController extends Controller {
                 !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
 
-        // Populate new run object
+        // Populate new run+submission object
+        $submission = new Submissions([
+            'identity_id' => $r['current_identity_id'],
+            'problem_id' => $r['problem']->problem_id,
+            'problemset_id' => $problemset_id,
+            'guid' => md5(uniqid(rand(), true)),
+            'language' => $r['language'],
+            'penalty' => $submit_delay,
+            'time' => gmdate('Y-m-d H:i:s', Time::get()),
+            'submit_delay' => $submit_delay, /* based on penalty_type */
+            'type' => $type
+        ]);
         $run = new Runs([
-                    'identity_id' => $r['current_identity_id'],
-                    'problem_id' => $r['problem']->problem_id,
-                    'problemset_id' => $problemset_id,
-                    'language' => $r['language'],
-                    'source' => $r['source'],
-                    'status' => 'new',
-                    'runtime' => 0,
-                    'penalty' => $submit_delay,
-                    'memory' => 0,
-                    'score' => 0,
-                    'contest_score' => $problemset_id != null ? 0 : null,
-                    'time' => gmdate('Y-m-d H:i:s', Time::get()),
-                    'submit_delay' => $submit_delay, /* based on penalty_type */
-                    'guid' => md5(uniqid(rand(), true)),
-                    'verdict' => 'JE',
-                    'type' => $type
-                ]);
+            'identity_id' => $r['current_identity_id'],
+            'problem_id' => $r['problem']->problem_id,
+            'version' => $r['problem']->current_version,
+            'problemset_id' => $problemset_id,
+            'language' => $r['language'],
+            'status' => 'new',
+            'runtime' => 0,
+            'penalty' => $submit_delay,
+            'memory' => 0,
+            'score' => 0,
+            'contest_score' => $problemset_id != null ? 0 : null,
+            'time' => $submission->time,
+            'submit_delay' => $submit_delay, /* based on penalty_type */
+            'guid' => $submission->guid,
+            'verdict' => 'JE',
+            'type' => $type
+        ]);
 
         try {
             // Push run into DB
-            RunsDAO::save($run);
+            SubmissionsDAO::create($submission);
+            $run->submission_id = $submission->submission_id;
+            RunsDAO::create($run);
 
             // Call Grader
             try {
@@ -316,20 +329,24 @@ class RunController extends Controller {
                 // because the Run row would not be visible from the Grader
                 // process, so we attempt to roll it back by hand.
                 RunsDAO::delete($run);
+                SubmissionsDAO::delete($run);
                 self::$log->error("Call to Grader::grade() failed: $e");
                 throw $e;
             }
 
-            SubmissionLogDAO::save(new SubmissionLog([
+            $submission->current_run_id = $run->run_id;
+            SubmissionsDAO::update($submission);
+
+            SubmissionLogDAO::create(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
                 'identity_id' => $r['current_identity_id'],
-                'run_id' => $run->run_id,
-                'problemset_id' => $run->problemset_id,
+                'submission_id' => $submission->submission_id,
+                'problemset_id' => $submission->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
             ]));
 
             $r['problem']->submissions++;
-            ProblemsDAO::save($r['problem']);
+            ProblemsDAO::update($r['problem']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -383,14 +400,21 @@ class RunController extends Controller {
     private static function validateDetailsRequest(Request $r) {
         Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
 
+        // If user is not judge, must be the run's owner.
         try {
-            // If user is not judge, must be the run's owner.
-            $r['run'] = RunsDAO::getByAlias($r['run_alias']);
+            $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
         } catch (Exception $e) {
-            // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($r['submission'])) {
+            throw new NotFoundException('runNotFound');
+        }
 
+        try {
+            $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         if (is_null($r['run'])) {
             throw new NotFoundException('runNotFound');
         }
@@ -408,11 +432,19 @@ class RunController extends Controller {
         Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
 
         try {
-            $r['run'] = RunsDAO::getByAlias($r['run_alias']);
+            $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($r['submission'])) {
+            throw new NotFoundException('runNotFound');
+        }
 
+        try {
+            $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         if (is_null($r['run'])) {
             throw new NotFoundException('runNotFound');
         }

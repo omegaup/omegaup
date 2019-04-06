@@ -109,22 +109,23 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('guid', $response);
 
-        // Get run from DB
-        $run = RunsDAO::getByAlias($response['guid']);
-        $this->assertNotNull($run);
+        // Get submissionn from DB
+        $submission = SubmissionsDAO::getByGuid($response['guid']);
+        $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
 
         // Validate data
-        $this->assertEquals($r['language'], $run->language);
-        $this->assertNotNull($run->guid);
+        $this->assertEquals($r['language'], $submission->language);
+        $this->assertNotNull($submission->guid);
 
         // Validate file created
-        $fileContent = RunController::getRunSource($run);
+        $fileContent = SubmissionController::getSource($submission);
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
+        $run = RunsDAO::getByPK($submission->current_run_id);
         $this->assertEquals('new', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
@@ -135,13 +136,13 @@ class RunCreateTest extends OmegaupTestCase {
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
         $this->assertEquals(Utils::GetPhpUnixTimestamp() + $submission_gap, $response['nextSubmissionTimestamp']);
 
-        $log = SubmissionLogDAO::getByPK($run->run_id);
+        $log = SubmissionLogDAO::getByPK($submission->submission_id);
 
         $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);
+            $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $submission->penalty, '', 0.5);
         }
 
         $this->assertEquals('JE', $run->verdict);

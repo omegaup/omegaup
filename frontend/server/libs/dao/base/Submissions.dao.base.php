@@ -8,20 +8,20 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ProblemsetProblems Data Access Object (DAO) Base.
+/** Submissions Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link ProblemsetProblems}.
+ * {@link Submissions}.
  * @access public
  * @abstract
  *
  */
-abstract class ProblemsetProblemsDAOBase {
+abstract class SubmissionsDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ProblemsetProblems}
+     * Este metodo guarda el estado actual del objeto {@link Submissions}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,14 +30,14 @@ abstract class ProblemsetProblemsDAOBase {
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
+     * @param Submissions [$Submissions] El objeto de tipo Submissions
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetProblems $Problemset_Problems) {
-        if (is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))) {
-            return ProblemsetProblemsDAOBase::create($Problemset_Problems);
+    final public static function save(Submissions $Submissions) {
+        if (is_null(self::getByPK($Submissions->submission_id))) {
+            return SubmissionsDAOBase::create($Submissions);
         }
-        return ProblemsetProblemsDAOBase::update($Problemset_Problems);
+        return SubmissionsDAOBase::update($Submissions);
     }
 
     /**
@@ -45,16 +45,22 @@ abstract class ProblemsetProblemsDAOBase {
      *
      * @static
      * @return Filas afectadas
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a actualizar.
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a actualizar.
      */
-    final public static function update(ProblemsetProblems $Problemset_Problems) {
-        $sql = 'UPDATE `Problemset_Problems` SET `version` = ?, `points` = ?, `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
+    final public static function update(Submissions $Submissions) {
+        $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `penalty` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
-            $Problemset_Problems->version,
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
+            $Submissions->current_run_id,
+            $Submissions->identity_id,
+            $Submissions->problem_id,
+            $Submissions->problemset_id,
+            $Submissions->guid,
+            $Submissions->language,
+            $Submissions->penalty,
+            $Submissions->time,
+            $Submissions->submit_delay,
+            $Submissions->type,
+            $Submissions->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -62,33 +68,33 @@ abstract class ProblemsetProblemsDAOBase {
     }
 
     /**
-     * Obtener {@link ProblemsetProblems} por llave primaria.
+     * Obtener {@link Submissions} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link ProblemsetProblems} de la base
+     * Este metodo cargará un objeto {@link Submissions} de la base
      * de datos usando sus llaves primarias.
      *
      * @static
-     * @return @link ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
+     * @return @link Submissions Un objeto del tipo {@link Submissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id) {
-        if (is_null($problemset_id) || is_null($problem_id)) {
+    final public static function getByPK($submission_id) {
+        if (is_null($submission_id)) {
             return null;
         }
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
-        $params = [$problemset_id, $problem_id];
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
+        $params = [$submission_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new ProblemsetProblems($rs);
+        return new Submissions($rs);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto ProblemsetProblems suministrado. Una vez que se ha
+     * el objeto Submissions suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
      * {@link save()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
@@ -98,11 +104,11 @@ abstract class ProblemsetProblemsDAOBase {
      *
      * @static
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a eliminar
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a eliminar
      */
-    final public static function delete(ProblemsetProblems $Problemset_Problems) {
-        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
-        $params = [$Problemset_Problems->problemset_id, $Problemset_Problems->problem_id];
+    final public static function delete(Submissions $Submissions) {
+        $sql = 'DELETE FROM `Submissions` WHERE submission_id = ?;';
+        $params = [$Submissions->submission_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -115,7 +121,7 @@ abstract class ProblemsetProblemsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link ProblemsetProblems}.
+     * y construirá un arreglo que contiene objetos de tipo {@link Submissions}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -126,10 +132,10 @@ abstract class ProblemsetProblemsDAOBase {
      * @param $filasPorPagina Filas por página.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link Submissions}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` from Problemset_Problems';
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -140,7 +146,7 @@ abstract class ProblemsetProblemsDAOBase {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new ProblemsetProblems($row);
+            $allData[] = new Submissions($row);
         }
         return $allData;
     }
@@ -149,26 +155,37 @@ abstract class ProblemsetProblemsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ProblemsetProblems suministrado.
+     * contenidos del objeto Submissions suministrado.
      *
      * @static
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a crear.
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a crear.
      */
-    final public static function create(ProblemsetProblems $Problemset_Problems) {
-        if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = '1';
+    final public static function create(Submissions $Submissions) {
+        if (is_null($Submissions->penalty)) {
+            $Submissions->penalty = '0';
         }
-        if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order = '1';
+        if (is_null($Submissions->time)) {
+            $Submissions->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?);';
+        if (is_null($Submissions->submit_delay)) {
+            $Submissions->submit_delay = '0';
+        }
+        if (is_null($Submissions->type)) {
+            $Submissions->type = 'normal';
+        }
+        $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `penalty`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
-            $Problemset_Problems->version,
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
+            $Submissions->current_run_id,
+            $Submissions->identity_id,
+            $Submissions->problem_id,
+            $Submissions->problemset_id,
+            $Submissions->guid,
+            $Submissions->language,
+            $Submissions->penalty,
+            $Submissions->time,
+            $Submissions->submit_delay,
+            $Submissions->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -176,6 +193,7 @@ abstract class ProblemsetProblemsDAOBase {
         if ($ar == 0) {
             return 0;
         }
+        $Submissions->submission_id = $conn->Insert_ID();
 
         return $ar;
     }

@@ -126,6 +126,7 @@ class Utils {
             'QualityNominations',
             'Runs',
             'Schools',
+            'Submissions',
             'Submission_Log',
             'Tags',
             'User_Roles',

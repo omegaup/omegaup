@@ -17,6 +17,7 @@ class ProblemDeployer {
     private $alias;
     private $zipPath = null;
     public $requiresRejudge = false;
+    public $privateTreeHash = null;
     private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
 
@@ -85,6 +86,7 @@ class ProblemDeployer {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
                     $this->requiresRejudge = true;
+                    $this->privateTreeHash = $ref['to_tree'];
                 }
             }
         }

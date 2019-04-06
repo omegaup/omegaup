@@ -29,8 +29,8 @@ class SubmissionLog extends VO {
         if (isset($data['problemset_id'])) {
             $this->problemset_id = $data['problemset_id'];
         }
-        if (isset($data['run_id'])) {
-            $this->run_id = $data['run_id'];
+        if (isset($data['submission_id'])) {
+            $this->submission_id = $data['submission_id'];
         }
         if (isset($data['user_id'])) {
             $this->user_id = $data['user_id'];
@@ -70,7 +70,7 @@ class SubmissionLog extends VO {
       * @access public
       * @var int(11)
       */
-    public $run_id;
+    public $submission_id;
 
     /**
       *  [Campo no documentado]

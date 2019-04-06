@@ -2266,29 +2266,6 @@ class ContestController extends Controller {
             $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
             ProblemsetsDAO::save($problemset);
 
-            if (!is_null($r['problems'])) {
-                // Get current problems
-                $currentProblemIds = ProblemsetProblemsDAO::getIdByProblemset($r['contest']->problemset_id);
-                // Check who needs to be deleted and who needs to be added
-                $to_delete = array_diff($currentProblemIds, self::$problems_id);
-                $to_add = array_diff(self::$problems_id, $currentProblemIds);
-
-                foreach ($to_add as $problem) {
-                    ProblemsetProblemsDAO::save(new ProblemsetProblems([
-                        'problemset_id' => $r['contest']->problemset_id,
-                        'problem_id' => $problem,
-                        'points' => $r['problems'][$problem]['points']
-                    ]));
-                }
-
-                foreach ($to_delete as $problem) {
-                    ProblemsetProblemsDAO::delete(new ProblemsetProblems([
-                        'problemset_id' => $r['contest']->problemset_id,
-                        'problem_id' => $problem,
-                    ]));
-                }
-            }
-
             // End transaction
             DAO::transEnd();
         } catch (Exception $e) {

@@ -37,6 +37,7 @@ class ProblemsetController extends Controller {
             self::updateProblemsetProblem(new ProblemsetProblems([
                 'problemset_id' => $problemset_id,
                 'problem_id' => $problem->problem_id,
+                'version' => $problem->current_version,
                 'points' => $points,
                 'order' => $order_in_contest,
             ]));

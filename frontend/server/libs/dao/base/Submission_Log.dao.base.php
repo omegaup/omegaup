@@ -34,7 +34,7 @@ abstract class SubmissionLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function save(SubmissionLog $Submission_Log) {
-        if (is_null(self::getByPK($Submission_Log->run_id))) {
+        if (is_null(self::getByPK($Submission_Log->submission_id))) {
             return SubmissionLogDAOBase::create($Submission_Log);
         }
         return SubmissionLogDAOBase::update($Submission_Log);
@@ -48,14 +48,14 @@ abstract class SubmissionLogDAOBase {
      * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a actualizar.
      */
     final public static function update(SubmissionLog $Submission_Log) {
-        $sql = 'UPDATE `Submission_Log` SET `problemset_id` = ?, `user_id` = ?, `identity_id` = ?, `ip` = ?, `time` = ? WHERE `run_id` = ?;';
+        $sql = 'UPDATE `Submission_Log` SET `problemset_id` = ?, `user_id` = ?, `identity_id` = ?, `ip` = ?, `time` = ? WHERE `submission_id` = ?;';
         $params = [
             $Submission_Log->problemset_id,
             $Submission_Log->user_id,
             $Submission_Log->identity_id,
             $Submission_Log->ip,
             $Submission_Log->time,
-            $Submission_Log->run_id,
+            $Submission_Log->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,12 +71,12 @@ abstract class SubmissionLogDAOBase {
      * @static
      * @return @link SubmissionLog Un objeto del tipo {@link SubmissionLog}. NULL si no hay tal registro.
      */
-    final public static function getByPK($run_id) {
-        if (is_null($run_id)) {
+    final public static function getByPK($submission_id) {
+        if (is_null($submission_id)) {
             return null;
         }
-        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (run_id = ?) LIMIT 1;';
-        $params = [$run_id];
+        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (submission_id = ?) LIMIT 1;';
+        $params = [$submission_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
@@ -102,8 +102,8 @@ abstract class SubmissionLogDAOBase {
      * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a eliminar
      */
     final public static function delete(SubmissionLog $Submission_Log) {
-        $sql = 'DELETE FROM `Submission_Log` WHERE run_id = ?;';
-        $params = [$Submission_Log->run_id];
+        $sql = 'DELETE FROM `Submission_Log` WHERE submission_id = ?;';
+        $params = [$Submission_Log->submission_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -130,7 +130,7 @@ abstract class SubmissionLogDAOBase {
      * @return Array Un arreglo que contiene objetos del tipo {@link SubmissionLog}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`run_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
+        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -160,10 +160,10 @@ abstract class SubmissionLogDAOBase {
         if (is_null($Submission_Log->time)) {
             $Submission_Log->time = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Submission_Log (`problemset_id`, `run_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             $Submission_Log->problemset_id,
-            $Submission_Log->run_id,
+            $Submission_Log->submission_id,
             $Submission_Log->user_id,
             $Submission_Log->identity_id,
             $Submission_Log->ip,
