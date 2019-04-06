@@ -325,7 +325,7 @@ class RunController extends Controller {
 
             // Call Grader
             try {
-                Grader::getInstance()->grade($run->guid, trim($r['source']));
+                Grader::getInstance()->grade($run, trim($r['source']));
             } catch (Exception $e) {
                 // Welp, it failed. We cannot make this a real transaction
                 // because the Run row would not be visible from the Grader
@@ -538,7 +538,7 @@ class RunController extends Controller {
         RunsDAO::save($r['run']);
 
         try {
-            Grader::getInstance()->rejudge([$r['run']->guid], $r['debug'] || false);
+            Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
         } catch (Exception $e) {
             self::$log->error("Call to Grader::rejudge() failed: {$e}");
         }
@@ -678,15 +678,11 @@ class RunController extends Controller {
         return $response;
     }
 
-    public static function getRunSource(string $guid) {
-        return Grader::GetInstance()->getSource($guid);
-    }
-
     private static function populateRunDetails(Runs $run, $showDetails, &$response) {
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
-            $response['source'] = RunController::getRunSource($run->guid);
+            $response['source'] = SubmissionController::getSource($run->guid);
         }
         if (!$showDetails && $run->verdict != 'CE') {
             return;
@@ -735,9 +731,6 @@ class RunController extends Controller {
         $result = Grader::getInstance()->getGraderResource($run, $filename, $passthru, /*missingOk=*/true);
         if (is_null($result)) {
             $result = self::downloadResourceFromS3("{$run->run_id}/{$filename}", $passthru);
-        }
-        if (is_null($result)) {
-            $result = self::downloadResourceFromS3("{$run->guid}/{$filename}", $passthru);
         }
         return $result;
     }
