@@ -537,47 +537,40 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function getByContest($contest_id) {
-        $sql = 'SELECT
-                    `run_id`,
-                    `guid`,
-                    `language`,
-                    `status`,
-                    `verdict`,
-                    `runtime`,
-                    `penalty`,
-                    `memory`,
-                    `score`,
-                    `contest_score`,
-                    `time`,
-                    `submit_delay`,
-                    `Identities.username`,
-                    `Problems.alias`
-                FROM
-                    Runs r
-                INNER JOIN
-                    Contests c
-                ON
-                    c.problemset_id = r.problemset_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = r.problem_id
-                INNER JOIN
-                    Identities i
-                ON
-                    i.identity_id = r.identity_id
-                WHERE
-                    c.contest_id = ?
-                ORDER BY
-                    `time` DESC;';
+    final public static function getByProblemset($problemset_id) {
+        $sql = '
+            SELECT
+                guid,
+                language,
+                verdict,
+                contest_score,
+                i.username,
+                p.alias
+            FROM
+                Runs r
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = r.problem_id
+            INNER JOIN
+                Problemset_Problems pp
+            ON
+                pp.problemset_id = r.problemset_id AND
+                pp.version = r.version
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = r.identity_id
+            WHERE
+                r.problemset_id = ?
+            ORDER BY
+                r.`time` DESC;
+        ';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$contest_id]);
-
         $runs = [];
-        foreach ($rs as $row) {
-            array_push($runs, new Runs($row));
+        foreach ($conn->Execute($sql, [$problemset_id]) as $row) {
+            array_push($runs, $row);
         }
         return $runs;
     }

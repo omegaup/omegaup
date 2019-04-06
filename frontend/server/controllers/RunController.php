@@ -714,15 +714,15 @@ class RunController extends Controller {
         return $response;
     }
 
-    public static function getRunSource(Runs $run) {
-        return Grader::GetInstance()->getSource($run->guid);
+    public static function getRunSource(string $guid) {
+        return Grader::GetInstance()->getSource($guid);
     }
 
     private static function populateRunDetails(Runs $run, $showDetails, &$response) {
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
-            $response['source'] = RunController::getRunSource($run);
+            $response['source'] = RunController::getRunSource($run->guid);
         }
         if (!$showDetails && $run->verdict != 'CE') {
             return;
