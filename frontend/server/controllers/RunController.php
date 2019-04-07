@@ -329,7 +329,7 @@ class RunController extends Controller {
                 // because the Run row would not be visible from the Grader
                 // process, so we attempt to roll it back by hand.
                 RunsDAO::delete($run);
-                SubmissionsDAO::delete($run);
+                SubmissionsDAO::delete($submission);
                 self::$log->error("Call to Grader::grade() failed: $e");
                 throw $e;
             }
