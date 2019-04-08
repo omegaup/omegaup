@@ -28,9 +28,6 @@
       <li v-on:click="showTab = 'admins'">
         <a data-toggle="tab">{{T.omegaupTitleContestAddAdmin}}</a>
       </li>
-      <li v-on:click="showTab = 'group_admins'">
-        <a data-toggle="tab">{{T.omegaupTitleContestAddGroupAdmin}}</a>
-      </li>
       <li v-if="!virtual"
           v-on:click="showTab = 'links'">
         <a data-toggle="tab">{{T.showLinks}}</a>
@@ -48,7 +45,8 @@
       </div>
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
-        <omegaup-contest-add-problem v-bind:data="problems"></omegaup-contest-add-problem>
+        <omegaup-contest-add-problem v-bind:contest-alias="contest.alias"
+             v-bind:data="problems"></omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
@@ -61,9 +59,6 @@
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
         <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
-      </div>
-      <div class="tab-pane active"
-           v-if="showTab === 'group_admins'">
         <omegaup-contest-group-admins v-bind:data="groupAdmins"></omegaup-contest-group-admins>
       </div>
       <div class="tab-pane active"
