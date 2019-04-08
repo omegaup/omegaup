@@ -2,52 +2,48 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close" v-on:click="$emit('close')">❌</button>
-        <form-wizard v-bind:title="T.wizardTitle"
-                    v-bind:subtitle="T.wizardDescription"
-                    color="#678DD7"
-                    v-bind:nextButtonText="T.wordsNext"
-                    v-bind:backButtonText="T.wordsBack"
-                    v-bind:finishButtonText="T.wordsConfirm"
-                    v-on:on-complete="searchProblems">
-          <tab-content v-bind:title="T.wizardStepOne">
-            <toggle-button v-bind:value="karel"
-                           v-model="karel"
-                            v-bind:color="{checked: '#678DD7', unchecked: '#343a40'}"
-                            v-bind:labels="{checked: `${T.wordsKarel}`, unchecked: `${T.wordsAnyLanguage}`}"
-                            v-bind:width=160
-                            v-bind:height=35
-                            v-bind:font-size=12>
-            </toggle-button>
-            <tags-input element-id="tags"
-              v-model="selectedTags"
-              v-bind:typeahead=true
-              v-bind:placeholder="T.wordsAddTag"
-              v-bind:existingTags="possibleTags"
-              v-bind:only-existing-tags=true></tags-input>
-          </tab-content>
-          <tab-content v-bind:title="T.wizardStepTwo">
-            <vue-slider v-model="difficultyRange"
-                        v-bind:enable-cross="false"
-                        v-bind:adsorb="true"
-                        v-bind:included="true"
-                        v-bind:marks="sliderMarks"
-                        v-bind:dotSize=18
-                        v-bind:min="0"
-                        v-bind:max="4"
-                        tooltip="none"></vue-slider>
-          </tab-content>
-          <tab-content v-bind:title="T.wizardStepThree">
-            <div class="tab-select">
-              <div v-on:click="setPriority" data-id="quality"
-                    class="tab-select-el" v-bind:class="priority === 'quality' ? 'tab-select-el-active':''">{{ T.wordsQuality }}</div>
-              <div v-on:click="setPriority" data-id="points"
-                    class="tab-select-el" v-bind:class="priority === 'points' ? 'tab-select-el-active':''">{{ T.wizardPriorityPoints }}</div>
-              <div v-on:click="setPriority" data-id="submissions"
-                    class="tab-select-el" v-bind:class="priority === 'submissions' ? 'tab-select-el-active':''">{{ T.wizardPriorityPopularity }}</div>
+        <button class="close"
+             v-on:click="$emit('close')">❌</button> <form-wizard color="#678DD7"
+             v-bind:back-button-text="T.wordBack"
+             v-bind:finish-button-text="T.wordConfirm"
+             v-bind:next-button-text="T.wordNext"
+             v-bind:subtitle="T.wizardDescription"
+             v-bind:title="T.wizardTitle"
+             v-on:on-complete="searchProblems"><tab-content v-bind:title=
+             "T.wizardStepOne"><toggle-button v-bind:color=
+             "{checked: '#678DD7', unchecked: '#343a40'}"
+                       v-bind:font-size="12"
+                       v-bind:height="35"
+                       v-bind:labels=
+                       "{checked: `${T.wordKarel}`, unchecked: `${T.wordsAnyLanguage}`}"
+                       v-bind:value="karel"
+                       v-bind:width="160"
+                       v-model="karel"></toggle-button> <tags-input element-id="tags"
+                    v-bind:existing-tags="possibleTags"
+                    v-bind:only-existing-tags="true"
+                    v-bind:placeholder="T.wordsAddTag"
+                    v-bind:typeahead="true"
+                    v-model="selectedTags"></tags-input></tab-content> <tab-content v-bind:title=
+                    "T.wizardStepTwo"><vue-slider tooltip="none"
+                    v-bind:adsorb="true"
+                    v-bind:dot-size="18"
+                    v-bind:enable-cross="false"
+                    v-bind:included="true"
+                    v-bind:marks="sliderMarks"
+                    v-bind:max="4"
+                    v-bind:min="0"
+                    v-model="difficultyRange"></vue-slider></tab-content> <tab-content v-bind:title=
+                    "T.wizardStepThree">
+          <div class="tab-select">
+            <div class="tab-select-el"
+                 v-bind:class="{ 'tab-select-el-active': priority.type === selectedPriority }"
+                 v-bind:data-id="priority.type"
+                 v-for="priority in priorities"
+                 v-on:click="setPriority">
+              {{ priority.text }}
             </div>
-          </tab-content>
-        </form-wizard>
+          </div>
+        </tab-content></form-wizard>
       </div>
     </div>
   </transition>
@@ -144,61 +140,73 @@
 
 <script>
 // https://binarcode.github.io/vue-form-wizard/
-import {FormWizard, TabContent} from 'vue-form-wizard'
-import 'vue-form-wizard/dist/vue-form-wizard.min.css'
+import {FormWizard, TabContent} from 'vue-form-wizard';
+import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 // https://www.npmjs.com/package/vue-js-toggle-button
-import {ToggleButton} from 'vue-js-toggle-button'
+import {ToggleButton} from 'vue-js-toggle-button';
 // https://github.com/voerro/vue-tagsinput
 import VoerroTagsInput from '@voerro/vue-tagsinput';
-import '@voerro/vue-tagsinput/dist/style.css'
+import '@voerro/vue-tagsinput/dist/style.css';
 // https://nightcatsama.github.io/vue-slider-component/
-import VueSlider from 'vue-slider-component'
-import 'vue-slider-component/theme/default.css'
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
 
 import {OmegaUp, T, API} from '../../omegaup.js';
 
 export default {
   data: function() {
     return {
-      T,
-      karel: true,
-      possibleTags: {},
-      selectedTags: [],
-      difficultyRange: [0, 4],
-      sliderMarks: {
-        '0': 'Muy fácil',
-        '1': 'Fácil',
-        '2': 'Normal',
-        '3': 'Difícil',
-        '4': 'Muy Difícil',
-      },
-      priority: 'quality',
+      T, karel: true, possibleTags: {}, selectedTags:[], difficultyRange:[0, 4],
+          sliderMarks:
+              {
+                '0': 'Muy fácil',
+                '1': 'Fácil',
+                '2': 'Normal',
+                '3': 'Difícil',
+                '4': 'Muy Difícil',
+              },
+          selectedPriority: 'quality', priorities:[
+            {
+              type: 'quality',
+              text: T.wordsQuality,
+            },
+            {
+              type: 'points',
+              text: T.wordsPointsForRank,
+            },
+            {
+              type: 'submissions',
+              text: T.wizardPriorityPopularity,
+            },
+          ],
     }
   },
   mounted: function() {
     const self = this;
     omegaup.API.Tag.list({query: ''})
-      .then(function(data) {
-        data.forEach(tagObject => {
-          self.possibleTags[tagObject.name] = tagObject.name
-        });
-      })
-      .fail(omegaup.UI.apiError);
+        .then(function(data) {
+          data.forEach(tagObject => {self.possibleTags[tagObject.name] =
+                                         tagObject.name});
+        })
+        .fail(omegaup.UI.apiError);
   },
   methods: {
     setPriority: function(e) {
       const self = this;
-      self.priority = e.target.dataset.id;
+      self.selectedPriority = e.target.dataset.id;
     },
     searchProblems: function() {
       const self = this;
       // Build URL
-      let url = `https://omegaup.com/problem/?some_tags=true${self.karel ? '&only_karel=true' : ''}`;
+      let url =
+          `https://omegaup.com/problem/?some_tags=true${self.karel ? '&only_karel=true' : ''}`;
       if (self.selectedTags !== undefined && self.selectedTags.length > 0) {
-        url += self.selectedTags.map((tag) => `&tag[]=${tag}`).reduce((query, tag) => query += tag);
+        url += self.selectedTags.map((tag) => `&tag[]=${tag}`)
+                   .reduce((query, tag) => query += tag);
       }
-      url += `&min_difficulty=${self.difficultyRange[0]}&max_difficulty=${self.difficultyRange[1]}`;
-      url += `&order_by=${self.priority}&mode=desc`;
+      url +=
+          `&min_difficulty=${self.difficultyRange[0]}&max_difficulty=${self.difficultyRange[1]}`;
+      url += `&order_by=${self.selectedPriority}&mode=desc`;
       window.location.href = url;
     },
   },
@@ -210,4 +218,5 @@ export default {
     VueSlider,
   },
 }
+
 </script>

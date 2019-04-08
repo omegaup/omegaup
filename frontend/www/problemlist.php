@@ -19,7 +19,7 @@ function getDifficultyRange() {
     $min_val = isset($_GET['min_difficulty']) ? intval($_GET['min_difficulty']) : -1;
     $max_val = isset($_GET['max_difficulty']) ? intval($_GET['max_difficulty']) : -1;
     if ($min_val <= $max_val && $min_val > -1 && $max_val > -1 && $min_val < 5 && $max_val < 5) {
-        return array($min_val, $max_val);
+        return [$min_val, $max_val];
     }
     return null;
 }
