@@ -757,11 +757,14 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /**
-     * Update the version of the runs of a problem to the current version.
+     * Creates any necessary runs for submissions against a problem, given a
+     * problem version.
      *
      * @param Problems $problem the problem.
      */
-    final public static function updateVersionToCurrent(Problems $problem) : void {
+    final public static function createRunsForVersion(
+        Problems $problem
+    ) : void {
         global $conn;
 
         $sql = '
@@ -779,6 +782,16 @@ class RunsDAO extends RunsDAOBase {
                 s.submission_id;
         ';
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+    }
+
+    /**
+     * Update the version of the non-problemset runs of a problem to the
+     * current version.
+     *
+     * @param Problems $problem the problem.
+     */
+    final public static function updateVersionToCurrent(Problems $problem) : void {
+        global $conn;
 
         $sql = '
             UPDATE
