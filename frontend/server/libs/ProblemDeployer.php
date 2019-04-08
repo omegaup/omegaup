@@ -1,11 +1,8 @@
 <?php
 
 /**
- * Unzip and deploy a problem
- *
- * @author joemmanuel
+ * Class to abstract interactions with omegaup-gitserver.
  */
-
 class ProblemDeployer {
     const UPDATE_SETTINGS = 0;
     const UPDATE_CASES = 1;
@@ -16,7 +13,6 @@ class ProblemDeployer {
 
     private $alias;
     private $zipPath = null;
-    public $requiresRejudge = false;
     public $privateTreeHash = null;
     private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
@@ -72,7 +68,7 @@ class ProblemDeployer {
     /**
      * Generate all possible libinteractive templates.
      *
-     * This sets the requiresRejudge flag. It also sets the list of updated
+     * This sets the privateTreeHash field. It also sets the list of updated
      * statement languages, as well as updating the libinteractive template
      * files if needed.
      *
@@ -81,11 +77,9 @@ class ProblemDeployer {
      * @return void
      */
     private function processResult($result) {
-        $this->requiresRejudge = false;
         if (!empty($result['updated_refs'])) {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
-                    $this->requiresRejudge = true;
                     $this->privateTreeHash = $ref['to_tree'];
                 }
             }
@@ -371,5 +365,49 @@ class ProblemDeployer {
         }
 
         return json_decode($result['output'], JSON_OBJECT_AS_ARRAY);
+    }
+
+    /**
+     * Updates the published branch.
+     */
+    public function updatePublished(
+        string $oldOid,
+        string $newOid,
+        Users $user
+    ) {
+        $curl = curl_init();
+
+        $pktline = "${oldOid} ${newOid} refs/heads/published\n";
+        $pktline = sprintf('%04x%s', 4 + strlen($pktline), $pktline);
+
+        $payload = "${pktline}0000";  // flush.
+        $payload .= "\x50\x41\x43\x4B";  // PACK
+        $payload .= "\x00\x00\x00\x02";  // packfile version (2)
+        $payload .= "\x00\x00\x00\x00";  // number of objects (0)
+        $payload .= "\x02\x9D\x08\x82\x3B\xD8\xA8\xEA\xB5\x10\xAD\x6A\xC7\x5C\x82\x3C\xFD\x3E\xD3\x1E";  // hash of the packfile.
+        try {
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-receive-pack",
+                    CURLOPT_HTTPHEADER => [
+                        SecurityTools::getGitserverAuthorizationHeader($this->alias, $user->username),
+                    ],
+                    CURLOPT_POSTFIELDS => $payload,
+                    CURLOPT_POST => 1,
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
+            $output = curl_exec($curl);
+            $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($output === false || $retval != 200) {
+                throw new ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $retval
+                );
+            }
+        } finally {
+            curl_close($curl);
+        }
     }
 }
