@@ -167,7 +167,7 @@ const translations = {
 	contestNewFormStartDate: "Start date",
 	contestNewFormStartDateDesc: "The time and date (in local time) in which the contest will begin",
 	contestNewFormSubmissionsSeparation: "Submission time window",
-	contestNewFormSubmissionsSeparationDesc: "Time in minutes that must pass before a contestant can send a new submission for the same problem after sending one.",
+	contestNewFormSubmissionsSeparationDesc: "Time in minutes that must pass before a contestant can send a new submission for the same problem after sending one (1 minute minimum).",
 	contestNewFormTitlePlaceholderConacupStyle: "**CONACUP Style applied. Set your title here**",
 	contestNewFormTitlePlaceholderIoiStyle: "**IOI Style applied. Set your title here**",
 	contestNewFormTitlePlaceholderOmiStyle: "**OMI Style applied. Set your title here**",

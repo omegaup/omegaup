@@ -59,7 +59,10 @@ class Translations {
      *
      * @return string the translated string.
      */
-    public function get(string $key) : string {
+    public function get(string $key) : ?string {
+        if (!array_key_exists($key, $this->_translations)) {
+            return null;
+        }
         return $this->_translations[$key];
     }
 }

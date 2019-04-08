@@ -19,13 +19,17 @@ class RunsTotalsTest extends OmegaupTestCase {
         // Create our contestant
         $contestant = UserFactory::createUser();
 
-        // Create a run
+        // Create a run. Submission gap must be 60 seconds
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        Time::setTimeForTesting(Time::get() + 60);
         $runDataOld = RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $run = RunsDAO::getByAlias($runDataOld['response']['guid']);
+        $submission = SubmissionsDAO::getByGuid($runDataOld['response']['guid']);
+        $submission->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
+        SubmissionsDAO::update($submission);
+        $run = RunsDAO::getByPK($submission->current_run_id);
         $run->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
-        RunsDAO::save($run);
+        RunsDAO::update($run);
 
         $response = RunController::apiCounts(new Request());
 

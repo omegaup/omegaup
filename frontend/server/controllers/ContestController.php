@@ -731,7 +731,7 @@ class ContestController extends Controller {
             $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);
 
             // Log the operation.
-            ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+            ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
                 'identity_id' => $r['current_identity_id'],
                 'problemset_id' => $r['contest']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),
@@ -1130,7 +1130,7 @@ class ContestController extends Controller {
         Validators::isNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
         Validators::isNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
         Validators::isInEnum($r['partial_score'], 'partial_score', ['0', '1'], false);
-        Validators::isNumberInRange($r['submissions_gap'], 'submissions_gap', 0, $contest_length, $is_required);
+        Validators::isNumberInRange($r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60), 'submissions_gap', 1, floor($contest_length / 60), $is_required);
 
         Validators::isInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $is_required);
         Validators::isInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $is_required);
@@ -2266,29 +2266,6 @@ class ContestController extends Controller {
             $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
             ProblemsetsDAO::save($problemset);
 
-            if (!is_null($r['problems'])) {
-                // Get current problems
-                $currentProblemIds = ProblemsetProblemsDAO::getIdByProblemset($r['contest']->problemset_id);
-                // Check who needs to be deleted and who needs to be added
-                $to_delete = array_diff($currentProblemIds, self::$problems_id);
-                $to_add = array_diff(self::$problems_id, $currentProblemIds);
-
-                foreach ($to_add as $problem) {
-                    ProblemsetProblemsDAO::save(new ProblemsetProblems([
-                        'problemset_id' => $r['contest']->problemset_id,
-                        'problem_id' => $problem,
-                        'points' => $r['problems'][$problem]['points']
-                    ]));
-                }
-
-                foreach ($to_delete as $problem) {
-                    ProblemsetProblemsDAO::delete(new ProblemsetProblems([
-                        'problemset_id' => $r['contest']->problemset_id,
-                        'problem_id' => $problem,
-                    ]));
-                }
-            }
-
             // End transaction
             DAO::transEnd();
         } catch (Exception $e) {
@@ -2690,37 +2667,11 @@ class ContestController extends Controller {
 
         self::validateStats($r);
 
-        // Get our runs
-        try {
-            $runs = RunsDAO::getByContest($r['contest']->contest_id);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
         include_once 'libs/third_party/ZipStream.php';
-        $zip = new ZipStream($r['contest_alias'] . '.zip');
-
-        // Add runs to zip
-        $table = "guid,user,problem,verdict,points\n";
-        foreach ($runs as $run) {
-            $zip->add_file(
-                'runs/' . $run->guid,
-                RunController::getRunSource($run)
-            );
-
-            $columns[0] = 'username';
-            $columns[1] = 'alias';
-            $usernameProblemData = $run->asFilteredArray($columns);
-
-            $table .= $run->guid . ',' . $usernameProblemData['username'] . ',' . $usernameProblemData['alias'] . ',' . $run->verdict . ',' . $run->contest_score;
-            $table .= "\n";
-        }
-
-        $zip->add_file('summary.csv', $table);
-
-        // Return zip
+        $zip = new ZipStream("{$r['contest_alias']}.zip");
+        ProblemsetController::downloadRuns($r['contest']->problemset_id, $zip);
         $zip->finish();
+
         die();
     }
 

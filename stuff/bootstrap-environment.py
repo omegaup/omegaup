@@ -119,6 +119,15 @@ def _does_resource_exist(s, request):
             logging.warning('Course %s exists, skipping',
                             request['params']['alias'])
             return True
+    if request['api'] == '/course/createAssignment':
+        if s.request(
+                '/course/assignmentDetails/', {
+                    'course': request['params']['course_alias'],
+                    'assignment': request['params']['alias']
+                }):
+            logging.warning('Assignment %s exists, skipping',
+                            request['params']['alias'])
+            return True
     if request['api'] == '/user/create':
         if s.request('/user/profile',
                      {'username':

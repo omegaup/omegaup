@@ -15,14 +15,12 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function addUser($acl_id, $user_id, $role_id = Authorization::ADMIN_ROLE) {
-        $user_role = new UserRoles();
-        $user_role->acl_id = $acl_id;
-        $user_role->user_id = $user_id;
-        $user_role->role_id = $role_id;
-
-        // Save the ACL to the DB
         try {
-            UserRolesDAO::save($user_role);
+            UserRolesDAO::create(new UserRoles([
+                'acl_id' => $acl_id,
+                'user_id' => $user_id,
+                'role_id' => $role_id,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -38,14 +36,12 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function removeUser($acl_id, $user_id, $role_id = Authorization::ADMIN_ROLE) {
-        $user_role = new UserRoles();
-        $user_role->acl_id = $acl_id;
-        $user_role->user_id = $user_id;
-        $user_role->role_id = $role_id;
-
-        // Delete the role
         try {
-            UserRolesDAO::delete($user_role);
+            UserRolesDAO::delete(new UserRoles([
+                'acl_id' => $acl_id,
+                'user_id' => $user_id,
+                'role_id' => $role_id,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -61,14 +57,12 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function addGroup($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $acl_id;
-        $group_role->group_id = $group_id;
-        $group_role->role_id = $role_id;
-
-        // Save the ACL to the DB
         try {
-            GroupRolesDAO::save($group_role);
+            GroupRolesDAO::create(new GroupRoles([
+                'acl_id' => $acl_id,
+                'group_id' => $group_id,
+                'role_id' => $role_id,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -84,14 +78,12 @@ class ACLController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function removeGroup($acl_id, $group_id, $role_id = Authorization::ADMIN_ROLE) {
-        $group_role = new GroupRoles();
-        $group_role->acl_id = $acl_id;
-        $group_role->group_id = $group_id;
-        $group_role->role_id = $role_id;
-
-        // Delete the role
         try {
-            GroupRolesDAO::delete($group_role);
+            GroupRolesDAO::delete(new GroupRoles([
+                'acl_id' => $acl_id,
+                'group_id' => $group_id,
+                'role_id' => $role_id,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);

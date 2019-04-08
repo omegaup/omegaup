@@ -41,6 +41,9 @@ class Problems extends VO {
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
         }
+        if (isset($data['current_version'])) {
+            $this->current_version = $data['current_version'];
+        }
         if (isset($data['validator'])) {
             $this->validator = $data['validator'];
         }
@@ -165,6 +168,13 @@ class Problems extends VO {
       * @var varchar(32)
       */
     public $alias;
+
+    /**
+      * La versión actual del problema.
+      * @access public
+      * @var char(40)
+      */
+    public $current_version;
 
     /**
       *  [Campo no documentado]

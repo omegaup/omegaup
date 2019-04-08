@@ -152,27 +152,28 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r);
 
         // Populate a new Problem object
-        $problem = new Problems();
-        $problem->visibility = $r['visibility']; /* private by default */
-        $problem->title = $r['title'];
-        $problem->validator = $r['validator'];
-        $problem->time_limit = $r['time_limit'];
-        $problem->validator_time_limit = $r['validator_time_limit'];
-        $problem->overall_wall_time_limit = $r['overall_wall_time_limit'];
-        $problem->extra_wall_time = $r['extra_wall_time'];
-        $problem->memory_limit = $r['memory_limit'];
-        $problem->output_limit = $r['output_limit'];
-        $problem->input_limit = $r['input_limit'];
-        $problem->visits = 0;
-        $problem->submissions = 0;
-        $problem->accepted = 0;
-        $problem->difficulty = 0;
-        $problem->source = $r['source'];
-        $problem->order = 'normal'; /* defaulting to normal */
-        $problem->alias = $r['problem_alias'];
-        $problem->languages = $r['languages'];
-        $problem->email_clarifications = $r['email_clarifications'];
-        $problem->tolerance = 1e-9;
+        $problem = new Problems([
+            'visibility' => $r['visibility'], /* private by default */
+            'title' => $r['title'],
+            'validator' => $r['validator'],
+            'time_limit' => $r['time_limit'],
+            'validator_time_limit' => $r['validator_time_limit'],
+            'overall_wall_time_limit' => $r['overall_wall_time_limit'],
+            'extra_wall_time' => $r['extra_wall_time'],
+            'memory_limit' => $r['memory_limit'],
+            'output_limit' => $r['output_limit'],
+            'input_limit' => $r['input_limit'],
+            'visits' => 0,
+            'submissions' => 0,
+            'accepted' => 0,
+            'difficulty' => 0,
+            'source' => $r['source'],
+            'order' => 'normal', /* defaulting to normal */
+            'alias' => $r['problem_alias'],
+            'languages' => $r['languages'],
+            'email_clarifications' => $r['email_clarifications'],
+            'tolerance' => 1e-9,
+        ]);
 
         $problemSettings = self::getProblemSettings($problem);
         $acceptsSubmissions = $r['languages'] !== '';
@@ -195,11 +196,12 @@ class ProblemController extends Controller {
                 ProblemDeployer::CREATE,
                 $problemSettings
             );
+            $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $problem->acl_id = $acl->acl_id;
-            ProblemsDAO::save($problem);
+            ProblemsDAO::create($problem);
 
             // Add tags
             if (!empty($r['selected_tags'])) {
@@ -673,6 +675,7 @@ class ProblemController extends Controller {
             foreach ($runs as $run) {
                 $guids[] = $run->guid;
                 $run->status = 'new';
+                $run->version = $r['problem']->current_version;
                 $run->verdict = 'JE';
                 $run->score = 0;
                 $run->contest_score = 0;
@@ -762,14 +765,19 @@ class ProblemController extends Controller {
                 $problemSettings
             );
             $response['rejudged'] = $problemDeployer->requiresRejudge;
+            if ($problemDeployer->requiresRejudge) {
+                $problem->current_version = $problemDeployer->privateTreeHash;
+                // TODO(lhchavez): Stop updating the problemsets and runs.
+                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+                RunsDAO::updateVersionToCurrent($problem);
+            }
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
 
             // Save the contest object with data sent by user to the database
-            ProblemsDAO::save($problem);
+            ProblemsDAO::update($problem);
 
             ProblemController::setRestrictedTags($problem);
 
-            //End transaction
             DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in the data layer, rollback transaction
@@ -1946,7 +1954,7 @@ class ProblemController extends Controller {
                 if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
                     continue;
                 }
-                ProblemsLanguagesDAO::save(new ProblemsLanguages([
+                ProblemsLanguagesDAO::create(new ProblemsLanguages([
                     'problem_id' => $problem->problem_id,
                     'language_id' => $lang->language_id,
                 ]));

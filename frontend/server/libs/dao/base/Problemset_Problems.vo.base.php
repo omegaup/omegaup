@@ -32,6 +32,9 @@ class ProblemsetProblems extends VO {
         if (isset($data['problem_id'])) {
             $this->problem_id = $data['problem_id'];
         }
+        if (isset($data['version'])) {
+            $this->version = $data['version'];
+        }
         if (isset($data['points'])) {
             $this->points = $data['points'];
         }
@@ -66,6 +69,13 @@ class ProblemsetProblems extends VO {
       * @var int(11)
       */
     public $problem_id;
+
+    /**
+      * La versión del problema.
+      * @access public
+      * @var char(40)
+      */
+    public $version;
 
     /**
       *  [Campo no documentado]

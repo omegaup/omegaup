@@ -170,7 +170,8 @@ class RunsFactory {
      * @param string $verdict
      */
     public static function gradeRun($runData, $points = 1, $verdict = 'AC', $submitDelay = null, $runGuid = null) {
-        $run = RunsDAO::getByAlias($runGuid === null ? $runData['response']['guid'] : $runGuid);
+        $submission = SubmissionsDAO::getByGuid($runGuid === null ? $runData['response']['guid'] : $runGuid);
+        $run = RunsDAO::getByPK($submission->current_run_id);
 
         $run->verdict = $verdict;
         $run->score = $points;

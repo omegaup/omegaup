@@ -13,7 +13,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblems($problemset_id) {
         // Build SQL statement
         $sql = 'SELECT p.problem_id, p.title, p.alias, p.time_limit, p.overall_wall_time_limit, '.
-               'p.memory_limit, p.languages, pp.points, pp.order ' .
+               'p.memory_limit, p.languages, pp.points, pp.order, pp.version ' .
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
@@ -42,7 +42,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      */
     final public static function getProblemsetProblems(Problemsets $problemset) {
         // Build SQL statement
-        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order ' .
+        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order, pp.version ' .
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
@@ -84,7 +84,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         // Build SQL statement
         $sql = '
             SELECT
-                p.problem_id, p.alias
+                p.problem_id, p.alias, pp.version AS current_version
             FROM
                 Problemset_Problems pp
             INNER JOIN
@@ -94,13 +94,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         global $conn;
-        $rs = $conn->Execute($sql, $val);
-        $ar = [];
-        foreach ($rs as $foo) {
-            $bar =  new Problems($foo);
-            array_push($ar, $bar);
+        $result = [];
+        foreach ($conn->Execute($sql, $val) as $row) {
+            $result[] = new Problems($row);
         }
-        return $ar;
+        return $result;
     }
 
     /**
@@ -111,9 +109,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     public static function copyProblemset($new_problemset, $old_problemset) {
         $sql = '
             INSERT INTO
-                Problemset_Problems (problemset_id, problem_id, points, `order`)
+                Problemset_Problems (problemset_id, problem_id, version, points, `order`)
             SELECT
-                ?, problem_id, points, `order`
+                ?, problem_id, version, points, `order`
             FROM
                 Problemset_Problems
             WHERE
@@ -160,7 +158,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     p.difficulty,
                     p.order,
                     p.languages,
-                    pp.points
+                    pp.points,
+                    pp.version
                 FROM
                     Problems p
                 INNER JOIN
@@ -196,5 +195,24 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
 
         global $conn;
         return $conn->GetOne($sql, [$problemset_id]);
+    }
+
+    /**
+     * Update the version of the problem across all problemsets to the current
+     * version.
+     *
+     * @param Problems $problem the problem.
+     * @return integer the number of affected rows.
+     */
+    final public static function updateVersionToCurrent(Problems $problem) {
+        $sql = 'UPDATE
+                    Problemset_Problems
+                SET
+                    version = ?
+                WHERE
+                    problem_id = ?;';
+        global $conn;
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        return $conn->Affected_Rows();
     }
 }

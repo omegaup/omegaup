@@ -2285,7 +2285,7 @@ class UserController extends Controller {
         self::validateAddRemoveRole($r);
 
         try {
-            UserRolesDAO::save(new UserRoles([
+            UserRolesDAO::create(new UserRoles([
                 'user_id' => $r['user']->user_id,
                 'role_id' => $r['role']->role_id,
                 'acl_id' => Authorization::SYSTEM_ACL,
@@ -2409,7 +2409,7 @@ class UserController extends Controller {
         self::validateAddRemoveExperiment($r);
 
         try {
-            UsersExperimentsDAO::save(new UsersExperiments([
+            UsersExperimentsDAO::create(new UsersExperiments([
                 'user_id' => $r['user']->user_id,
                 'experiment' => $r['experiment'],
             ]));

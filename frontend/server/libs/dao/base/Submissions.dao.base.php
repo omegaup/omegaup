@@ -8,20 +8,20 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Groups Data Access Object (DAO) Base.
+/** Submissions Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Groups}.
+ * {@link Submissions}.
  * @access public
  * @abstract
  *
  */
-abstract class GroupsDAOBase {
+abstract class SubmissionsDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link Groups}
+     * Este metodo guarda el estado actual del objeto {@link Submissions}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,14 +30,14 @@ abstract class GroupsDAOBase {
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param Groups [$Groups] El objeto de tipo Groups
+     * @param Submissions [$Submissions] El objeto de tipo Submissions
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Groups $Groups) {
-        if (is_null(self::getByPK($Groups->group_id))) {
-            return GroupsDAOBase::create($Groups);
+    final public static function save(Submissions $Submissions) {
+        if (is_null(self::getByPK($Submissions->submission_id))) {
+            return SubmissionsDAOBase::create($Submissions);
         }
-        return GroupsDAOBase::update($Groups);
+        return SubmissionsDAOBase::update($Submissions);
     }
 
     /**
@@ -45,17 +45,22 @@ abstract class GroupsDAOBase {
      *
      * @static
      * @return Filas afectadas
-     * @param Groups [$Groups] El objeto de tipo Groups a actualizar.
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a actualizar.
      */
-    final public static function update(Groups $Groups) {
-        $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
+    final public static function update(Submissions $Submissions) {
+        $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `penalty` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
-            $Groups->acl_id,
-            $Groups->create_time,
-            $Groups->alias,
-            $Groups->name,
-            $Groups->description,
-            $Groups->group_id,
+            $Submissions->current_run_id,
+            $Submissions->identity_id,
+            $Submissions->problem_id,
+            $Submissions->problemset_id,
+            $Submissions->guid,
+            $Submissions->language,
+            $Submissions->penalty,
+            $Submissions->time,
+            $Submissions->submit_delay,
+            $Submissions->type,
+            $Submissions->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -63,33 +68,33 @@ abstract class GroupsDAOBase {
     }
 
     /**
-     * Obtener {@link Groups} por llave primaria.
+     * Obtener {@link Submissions} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Groups} de la base
+     * Este metodo cargará un objeto {@link Submissions} de la base
      * de datos usando sus llaves primarias.
      *
      * @static
-     * @return @link Groups Un objeto del tipo {@link Groups}. NULL si no hay tal registro.
+     * @return @link Submissions Un objeto del tipo {@link Submissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_id) {
-        if (is_null($group_id)) {
+    final public static function getByPK($submission_id) {
+        if (is_null($submission_id)) {
             return null;
         }
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM Groups WHERE (group_id = ?) LIMIT 1;';
-        $params = [$group_id];
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
+        $params = [$submission_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
         if (count($rs) == 0) {
             return null;
         }
-        return new Groups($rs);
+        return new Submissions($rs);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Groups suministrado. Una vez que se ha
+     * el objeto Submissions suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
      * {@link save()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
@@ -99,11 +104,11 @@ abstract class GroupsDAOBase {
      *
      * @static
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Groups [$Groups] El objeto de tipo Groups a eliminar
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a eliminar
      */
-    final public static function delete(Groups $Groups) {
-        $sql = 'DELETE FROM `Groups` WHERE group_id = ?;';
-        $params = [$Groups->group_id];
+    final public static function delete(Submissions $Submissions) {
+        $sql = 'DELETE FROM `Submissions` WHERE submission_id = ?;';
+        $params = [$Submissions->submission_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -116,7 +121,7 @@ abstract class GroupsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Groups}.
+     * y construirá un arreglo que contiene objetos de tipo {@link Submissions}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -127,10 +132,10 @@ abstract class GroupsDAOBase {
      * @param $filasPorPagina Filas por página.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Groups}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link Submissions}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` from Groups';
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -141,7 +146,7 @@ abstract class GroupsDAOBase {
         $rs = $conn->Execute($sql);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new Groups($row);
+            $allData[] = new Submissions($row);
         }
         return $allData;
     }
@@ -150,23 +155,37 @@ abstract class GroupsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Groups suministrado.
+     * contenidos del objeto Submissions suministrado.
      *
      * @static
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Groups [$Groups] El objeto de tipo Groups a crear.
+     * @param Submissions [$Submissions] El objeto de tipo Submissions a crear.
      */
-    final public static function create(Groups $Groups) {
-        if (is_null($Groups->create_time)) {
-            $Groups->create_time = gmdate('Y-m-d H:i:s');
+    final public static function create(Submissions $Submissions) {
+        if (is_null($Submissions->penalty)) {
+            $Submissions->penalty = '0';
         }
-        $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
+        if (is_null($Submissions->time)) {
+            $Submissions->time = gmdate('Y-m-d H:i:s');
+        }
+        if (is_null($Submissions->submit_delay)) {
+            $Submissions->submit_delay = '0';
+        }
+        if (is_null($Submissions->type)) {
+            $Submissions->type = 'normal';
+        }
+        $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `penalty`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Groups->acl_id,
-            $Groups->create_time,
-            $Groups->alias,
-            $Groups->name,
-            $Groups->description,
+            $Submissions->current_run_id,
+            $Submissions->identity_id,
+            $Submissions->problem_id,
+            $Submissions->problemset_id,
+            $Submissions->guid,
+            $Submissions->language,
+            $Submissions->penalty,
+            $Submissions->time,
+            $Submissions->submit_delay,
+            $Submissions->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -174,7 +193,7 @@ abstract class GroupsDAOBase {
         if ($ar == 0) {
             return 0;
         }
-        $Groups->group_id = $conn->Insert_ID();
+        $Submissions->submission_id = $conn->Insert_ID();
 
         return $ar;
     }
