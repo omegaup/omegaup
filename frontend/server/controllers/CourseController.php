@@ -205,7 +205,7 @@ class CourseController extends Controller {
         $offset = round($r['start_time']) - strtotime($original_course->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
         $response = [];
         try {
             // Create the course (and group)
@@ -250,15 +250,15 @@ class CourseController extends Controller {
                     ]));
                 }
             }
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (InvalidParameterException $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (DuplicatedEntryInDatabaseException $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw $e;
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -288,7 +288,7 @@ class CourseController extends Controller {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
 
         $group = GroupController::createGroup(
             $r['alias'],
@@ -301,7 +301,7 @@ class CourseController extends Controller {
             $acl = new ACLs(['owner_id' => $r['current_user_id']]);
             ACLsDAO::save($acl);
 
-            GroupRolesDAO::save(new GroupRoles([
+            GroupRolesDAO::create(new GroupRoles([
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
                 'role_id' => Authorization::CONTESTANT_ROLE,
@@ -323,9 +323,9 @@ class CourseController extends Controller {
                 'requests_user_information' => $r['requests_user_information'],
             ]));
 
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
 
             if (strpos($e->getMessage(), '1062') !== false) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
@@ -356,7 +356,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        AssignmentsDAO::transBegin();
+        DAO::transBegin();
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
@@ -385,9 +385,9 @@ class CourseController extends Controller {
             $problemset->assignment_id = $assignment->assignment_id;
             ProblemsetsDAO::save($problemset);
 
-            AssignmentsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            AssignmentsDAO::transRollback();
+            DAO::transRollback();
             if (strpos($e->getMessage(), '1062') !== false) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
@@ -1062,7 +1062,7 @@ class CourseController extends Controller {
             'accept_teacher' => $r['accept_teacher'],
         ]);
 
-        CoursesDAO::transBegin();
+        DAO::transBegin();
 
         try {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
@@ -1097,9 +1097,9 @@ class CourseController extends Controller {
             }
             GroupsIdentitiesDAO::save($groupIdentity);
 
-            CoursesDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
-            CoursesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1556,7 +1556,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
         // Log the operation.
-        ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+        ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
             'identity_id' => $r['current_identity_id'],
             'problemset_id' => $r['assignment']->problemset_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),

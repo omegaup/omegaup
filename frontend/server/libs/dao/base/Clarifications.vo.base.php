@@ -99,7 +99,7 @@ class Clarifications extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var text,
+      * @var text
       */
     public $answer;
 

@@ -71,4 +71,26 @@ class ProblemsTagsDAO extends ProblemsTagsDAOBase {
         global $conn;
         return $conn->Execute($sql, $params);
     }
+
+    public static function clearRestrictedTags(Problems $problem) {
+        global $conn;
+        $placeholders = join(
+            ',',
+            array_fill(0, count(ProblemController::RESTRICTED_TAG_NAMES), '?')
+        );
+        $params = array_merge(ProblemController::RESTRICTED_TAG_NAMES, [$problem->problem_id]);
+        $sql = "
+            DELETE FROM
+                `Problems_Tags`
+            WHERE
+                tag_id IN (
+                    SELECT
+                        tag_id
+                    FROM
+                        Tags
+                    WHERE
+                        name IN ($placeholders)
+                ) AND problem_id = ?;";
+        $conn->Execute($sql, $params);
+    }
 }

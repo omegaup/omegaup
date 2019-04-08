@@ -42,11 +42,8 @@ install_yarn() {
 }
 
 install_omegaup_gitserver() {
-	DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.3.2/omegaup-gitserver.xz'
-	TARGET="/usr/bin/omegaup-gitserver.xz"
-	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
-	sudo xz --decompress "${TARGET}"
-	sudo chmod +x "${TARGET%.xz}"
+	DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.3.7/omegaup-gitserver.tar.xz'
+	curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
 	# omegaup-gitserver depends on libinteractive.
 	DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.23/libinteractive.jar'

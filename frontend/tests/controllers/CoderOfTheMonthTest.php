@@ -84,11 +84,16 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $runData = RunsFactory::createRun($problem, $contest, $user);
             RunsFactory::gradeRun($runData);
+            //sumbmission gap between runs must be 60 seconds
+            Time::setTimeForTesting(Time::get() + 60);
 
-            // Force the run to be in any date
-            $run = RunsDAO::getByAlias($runData['response']['guid']);
+            // Force the submission to be in any date
+            $submission = SubmissionsDAO::getByGuid($runData['response']['guid']);
+            $submission->time = $runCreationDate;
+            SubmissionsDAO::update($submission);
+            $run = RunsDAO::getByPK($submission->current_run_id);
             $run->time = $runCreationDate;
-            RunsDAO::save($run);
+            RunsDAO::update($run);
         }
     }
 

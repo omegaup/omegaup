@@ -31,14 +31,27 @@ class ProblemArtifacts {
         return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
     }
 
-    public function lsTree($path) {
+    public function lsTree($path) : array {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->commit, "{$path}/")
         );
         $browser->headers[] = 'Accept: application/json';
         $response = json_decode($browser->exec(), JSON_OBJECT_AS_ARRAY);
-        return $response['entries'];
+        if (!array_key_exists('entries', $response)) {
+            $this->log->error(
+                "Failed to get entries of {$path} for problem {$this->alias} at commit {$this->commit}"
+            );
+            return [];
+        }
+        $entries = $response['entries'];
+        if (!is_iterable($entries)) {
+            $this->log->error(
+                "Invalid entries of {$path} for problem {$this->alias} at commit {$this->commit}"
+            );
+            return [];
+        }
+        return $entries;
     }
 
     public function download() {

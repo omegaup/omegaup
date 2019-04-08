@@ -29,6 +29,12 @@ class Runs extends VO {
         if (isset($data['run_id'])) {
             $this->run_id = $data['run_id'];
         }
+        if (isset($data['submission_id'])) {
+            $this->submission_id = $data['submission_id'];
+        }
+        if (isset($data['version'])) {
+            $this->version = $data['version'];
+        }
         if (isset($data['identity_id'])) {
             $this->identity_id = $data['identity_id'];
         }
@@ -98,6 +104,20 @@ class Runs extends VO {
       * @var int(11)
       */
     public $run_id;
+
+    /**
+      * El envío
+      * @access public
+      * @var int(11)
+      */
+    public $submission_id;
+
+    /**
+      * La versión del problema.
+      * @access public
+      * @var char(40)
+      */
+    public $version;
 
     /**
       * Identidad del usuario

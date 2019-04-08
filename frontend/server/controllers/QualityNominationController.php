@@ -204,7 +204,7 @@ class QualityNominationController extends Controller {
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
             ) as $reviewer) {
-                QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                QualityNominationReviewersDAO::create(new QualityNominationReviewers([
                     'qualitynomination_id' => $nomination->qualitynomination_id,
                     'user_id' => $reviewer->user_id,
                 ]));
@@ -288,19 +288,19 @@ class QualityNominationController extends Controller {
         ]);
         $qualitynomination->status = $r['status'];
 
-        QualityNominationsDAO::transBegin();
+        DAO::transBegin();
         try {
             $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationLogDAO::save($qualitynominationlog);
-            QualityNominationsDAO::transEnd();
+            DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
                 $response = self::sendDemotionEmail($r, $qualitynomination, $qualitynominationlog->rationale);
             }
         } catch (Exception $e) {
-            QualityNominationsDAO::transRollback();
+            DAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
             self::$log->error($e);
             throw new InvalidDatabaseOperationException($e);

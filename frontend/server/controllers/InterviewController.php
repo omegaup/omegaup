@@ -37,7 +37,7 @@ class InterviewController extends Controller {
         ]);
 
         try {
-            InterviewsDAO::transBegin();
+            DAO::transBegin();
 
             ACLsDAO::save($acl);
             $interview->acl_id = $acl->acl_id;
@@ -56,10 +56,10 @@ class InterviewController extends Controller {
             $problemset->interview_id = $interview->interview_id;
             ProblemsetsDAO::save($problemset);
 
-            InterviewsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            InterviewsDAO::transRollback();
+            DAO::transRollback();
 
             // Alias may be duplicated, 1062 error indicates that
             if (strpos($e->getMessage(), '1062') !== false) {
