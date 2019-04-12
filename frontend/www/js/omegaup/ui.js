@@ -9,6 +9,16 @@ let UI = {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
 
+  buildURLQuery: function(queryParameters) {
+    const url = Object.keys(queryParameters)
+                    .map(function(k) {
+                      return encodeURIComponent(k) + '=' +
+                             encodeURIComponent(queryParameters[k]);
+                    })
+                    .join('&');
+    return url;
+  },
+
   formatDelta: function(delta) {
     let days = Math.floor(delta / (24 * 60 * 60 * 1000));
     delta -= days * (24 * 60 * 60 * 1000);

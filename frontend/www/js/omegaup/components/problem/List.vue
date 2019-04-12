@@ -2,7 +2,9 @@
   <div>
     <a class="show-finder-button"
          v-on:click="showFinderWizard = true">{{ T.wizardLinkText }}</a>
-         <omegaup-problem-finder v-on:close="showFinderWizard = false"
+         <omegaup-problem-finder v-bind:possible-tags="wizardTags"
+         v-on:close="showFinderWizard = false"
+         v-on:search-problems="wizardSearch"
          v-show="showFinderWizard"></omegaup-problem-finder>
     <div class="wait_for_ajax panel panel-default">
       <div class="panel-heading">
@@ -96,6 +98,7 @@ export default {
     problems: Array,
     loggedIn: Boolean,
     currentTags: Array,
+    wizardTags: Object,
   },
   data: function() {
     return {
@@ -143,6 +146,9 @@ export default {
       let tags = currentTags.slice();
       if (!tags.includes(problemTag)) tags.push(problemTag);
       return `/problem/?tag[]=${tags.join('&tag[]=')}`;
+    },
+    wizardSearch: function(queryParameters) {
+      this.$emit('wizard-search', queryParameters);
     },
   },
   components: {

@@ -4,9 +4,9 @@
       <div class="modal-container">
         <button class="close"
              v-on:click="$emit('close')">❌</button> <form-wizard color="#678DD7"
-             v-bind:back-button-text="T.wordBack"
-             v-bind:finish-button-text="T.wordConfirm"
-             v-bind:next-button-text="T.wordNext"
+             v-bind:back-button-text="T.wordsBack"
+             v-bind:finish-button-text="T.wordsConfirm"
+             v-bind:next-button-text="T.wordsNext"
              v-bind:subtitle="T.wizardDescription"
              v-bind:title="T.wizardTitle"
              v-on:on-complete="searchProblems"><tab-content v-bind:title=
@@ -15,7 +15,7 @@
                        v-bind:font-size="12"
                        v-bind:height="35"
                        v-bind:labels=
-                       "{checked: `${T.wordKarel}`, unchecked: `${T.wordsAnyLanguage}`}"
+                       "{checked: `${T.wordsKarel}`, unchecked: `${T.wordsAnyLanguage}`}"
                        v-bind:value="karel"
                        v-bind:width="160"
                        v-model="karel"></toggle-button> <tags-input element-id="tags"
@@ -35,13 +35,13 @@
                     v-model="difficultyRange"></vue-slider></tab-content> <tab-content v-bind:title=
                     "T.wizardStepThree">
           <div class="tab-select">
-            <div class="tab-select-el"
+            <label class="tab-select-el"
                  v-bind:class="{ 'tab-select-el-active': priority.type === selectedPriority }"
-                 v-bind:data-id="priority.type"
-                 v-for="priority in priorities"
-                 v-on:click="setPriority">
-              {{ priority.text }}
-            </div>
+                 v-for="priority in priorities">{{ priority.text }} <input class="hidden-radio"
+                   name="priority"
+                   type="radio"
+                   v-bind:value="priority.type"
+                   v-model="selectedPriority"></label>
           </div>
         </tab-content></form-wizard>
       </div>
@@ -123,6 +123,7 @@
 }
 
 .tab-select-el {
+  display: block;
   cursor: pointer;
   padding: .25em 1em;
   border: 1px solid #678DD7;
@@ -135,6 +136,10 @@
 .tab-select-el-active {
   color: #FFF;
   background: #678DD7;
+}
+
+.hidden-radio {
+  display: none;
 }
 </style>
 
@@ -154,16 +159,19 @@ import 'vue-slider-component/theme/default.css';
 import {OmegaUp, T, API} from '../../omegaup.js';
 
 export default {
+  props: {
+    possibleTags: Object,
+  },
   data: function() {
     return {
-      T, karel: true, possibleTags: {}, selectedTags:[], difficultyRange:[0, 4],
+      T, karel: true, selectedTags:[], difficultyRange:[0, 4],
           sliderMarks:
               {
-                '0': 'Muy fácil',
-                '1': 'Fácil',
-                '2': 'Normal',
-                '3': 'Difícil',
-                '4': 'Muy Difícil',
+                '0': T.qualityFormDifficultyVeryEasy,
+                '1': T.qualityFormDifficultyEasy,
+                '2': T.qualityFormDifficultyMedium,
+                '3': T.qualityFormDifficultyHard,
+                '4': T.qualityFormDifficultyVeryHard,
               },
           selectedPriority: 'quality', priorities:[
             {
@@ -181,15 +189,6 @@ export default {
           ],
     }
   },
-  mounted: function() {
-    const self = this;
-    omegaup.API.Tag.list({query: ''})
-        .then(function(data) {
-          data.forEach(tagObject => {self.possibleTags[tagObject.name] =
-                                         tagObject.name});
-        })
-        .fail(omegaup.UI.apiError);
-  },
   methods: {
     setPriority: function(e) {
       const self = this;
@@ -197,17 +196,18 @@ export default {
     },
     searchProblems: function() {
       const self = this;
-      // Build URL
-      let url =
-          `https://omegaup.com/problem/?some_tags=true${self.karel ? '&only_karel=true' : ''}`;
-      if (self.selectedTags !== undefined && self.selectedTags.length > 0) {
-        url += self.selectedTags.map((tag) => `&tag[]=${tag}`)
-                   .reduce((query, tag) => query += tag);
+      // Build query parameters
+      let queryParameters = {
+        'some_tags': 'true',
+        'min_difficulty': self.difficultyRange[0],
+        'max_difficulty': self.difficultyRange[1],
+        'order_by': self.selectedPriority,
+        'mode': 'desc'
+      };
+      if (self.karel) {
+        queryParameters['only_karel'] = 'true';
       }
-      url +=
-          `&min_difficulty=${self.difficultyRange[0]}&max_difficulty=${self.difficultyRange[1]}`;
-      url += `&order_by=${self.selectedPriority}&mode=desc`;
-      window.location.href = url;
+      self.$emit('search-problems', queryParameters);
     },
   },
   components: {
