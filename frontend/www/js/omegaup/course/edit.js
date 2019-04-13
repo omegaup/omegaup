@@ -24,7 +24,12 @@ OmegaUp.on('ready', function() {
       .on('click', 'a', function(e) {
         e.preventDefault();
         // add this line
-        window.location.hash = $(this).attr('href');
+        let tabName = $(this).attr('href');
+        window.location.hash = tabName;
+        if (tabName.split('#')[1] !== 'assignments') {
+          assignmentDetails.show = false;
+          manageNewAssignmentButton(true);
+        }
         $(this).tab('show');
       });
 
@@ -36,7 +41,11 @@ OmegaUp.on('ready', function() {
   var defaultStartTime = Date.create(defaultDate);
   defaultDate.setHours(defaultDate.getHours() + 5);
   var defaultFinishTime = Date.create(defaultDate);
-
+  function manageNewAssignmentButton(status) {
+    let newStatus = (status ? 'block' : 'none');
+    let buttonNewAssignment = document.querySelector('form.new');
+    buttonNewAssignment.setAttribute('style', 'display:' + newStatus + ';');
+  }
   function onNewAssignment(assignmentType) {
     assignmentDetails.show = true;
     assignmentDetails.update = false;
@@ -45,6 +54,8 @@ OmegaUp.on('ready', function() {
       finish_time: defaultFinishTime,
       assignment_type: assignmentType,
     };
+    manageNewAssignmentButton(false);
+
     // Vue lazily updates the DOM, so any interactions with `$el` need to
     // wait until the update is done.
     Vue.nextTick(function() { assignmentDetails.$el.scrollIntoView(); });
@@ -155,6 +166,7 @@ OmegaUp.on('ready', function() {
             assignmentDetails.update = true;
             assignmentDetails.assignment = assignment;
             assignmentDetails.$el.scrollIntoView();
+            manageNewAssignmentButton(true);
           },
           'delete': function(assignment) {
             if (!window.confirm(
@@ -250,6 +262,7 @@ OmegaUp.on('ready', function() {
                                 })
                   .then(function(data) {
                     omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+                    manageNewAssignmentButton(true);
                     refreshAssignmentsList();
                   })
                   .fail(function(error) {
@@ -259,7 +272,10 @@ OmegaUp.on('ready', function() {
             }
             assignmentDetails.show = false;
           },
-          cancel: function() { assignmentDetails.show = false; },
+          cancel: function() {
+            assignmentDetails.show = false;
+            manageNewAssignmentButton(true);
+          },
         },
       });
     },
