@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
       .on('click', 'a', function(e) {
         e.preventDefault();
         // add this line
-        let tabName = $(this).attr('href');
+        var tabName = $(this).attr('href');
         window.location.hash = tabName;
         if (tabName.split('#')[1] !== 'assignments') {
           assignmentDetails.show = false;
