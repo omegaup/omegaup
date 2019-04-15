@@ -19,7 +19,7 @@
                        v-bind:value="karel"
                        v-bind:width="160"
                        v-model="karel"></toggle-button> <tags-input element-id="tags"
-                    v-bind:existing-tags="possibleTags"
+                    v-bind:existing-tags="tagsObject"
                     v-bind:only-existing-tags="true"
                     v-bind:placeholder="T.wordsAddTag"
                     v-bind:typeahead="true"
@@ -160,7 +160,7 @@ import {OmegaUp, T, API} from '../../omegaup.js';
 
 export default {
   props: {
-    possibleTags: Object,
+    possibleTags: Array,
   },
   data: function() {
     return {
@@ -189,11 +189,16 @@ export default {
           ],
     }
   },
-  methods: {
-    setPriority: function(e) {
+  computed: {
+    tagsObject: function() {
       const self = this;
-      self.selectedPriority = e.target.dataset.id;
+      const singleTagsObject = {};
+      self.possibleTags.forEach(tagObject => singleTagsObject[tagObject.name] =
+                                    tagObject.name);
+      return singleTagsObject;
     },
+  },
+  methods: {
     searchProblems: function() {
       const self = this;
       // Build query parameters
@@ -206,6 +211,9 @@ export default {
       };
       if (self.karel) {
         queryParameters['only_karel'] = 'true';
+      }
+      if (self.selectedTags.length > 0) {
+        queryParameters.tag = self.selectedTags;
       }
       self.$emit('search-problems', queryParameters);
     },

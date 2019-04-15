@@ -98,7 +98,7 @@ export default {
     problems: Array,
     loggedIn: Boolean,
     currentTags: Array,
-    wizardTags: Object,
+    wizardTags: Array,
   },
   data: function() {
     return {

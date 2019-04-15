@@ -10,13 +10,17 @@ let UI = {
   },
 
   buildURLQuery: function(queryParameters) {
-    const url = Object.keys(queryParameters)
-                    .map(function(k) {
-                      return encodeURIComponent(k) + '=' +
-                             encodeURIComponent(queryParameters[k]);
-                    })
-                    .join('&');
-    return url;
+    return Object.entries(queryParameters)
+        .map(([key, value]) => {
+          const encodedKey = encodeURIComponent(key);
+          if (Array.isArray(value)) {
+            return value.map(entry =>
+                                 `${encodedKey}[]=` + encodeURIComponent(entry))
+                .join('&');
+          }
+          return `${encodedKey}=` + encodeURIComponent(value);
+        })
+        .join('&');
   },
 
   formatDelta: function(delta) {
