@@ -320,6 +320,8 @@ class RunController extends Controller {
             SubmissionsDAO::create($submission);
             $run->submission_id = $submission->submission_id;
             RunsDAO::create($run);
+            $submission->current_run_id = $run->run_id;
+            SubmissionsDAO::update($submission);
 
             // Call Grader
             try {
@@ -328,16 +330,16 @@ class RunController extends Controller {
                 // Welp, it failed. We cannot make this a real transaction
                 // because the Run row would not be visible from the Grader
                 // process, so we attempt to roll it back by hand.
+                // We need to unlink the current run and submission prior to
+                // deleting the rows. Otherwise we would have a foreign key
+                // violation.
+                $submission->current_run_id = null;
+                SubmissionsDAO::update($submission);
                 RunsDAO::delete($run);
                 SubmissionsDAO::delete($submission);
                 self::$log->error("Call to Grader::grade() failed: $e");
                 throw $e;
             }
-
-            // Now that the Grader has ACKed the submission, we can set the
-            // link between the submission and the run.
-            $submission->current_run_id = $run->run_id;
-            SubmissionsDAO::update($submission);
 
             SubmissionLogDAO::create(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
