@@ -320,6 +320,8 @@ class RunController extends Controller {
             SubmissionsDAO::create($submission);
             $run->submission_id = $submission->submission_id;
             RunsDAO::create($run);
+            $submission->current_run_id = $run->run_id;
+            SubmissionsDAO::update($submission);
 
             // Call Grader
             try {
@@ -338,11 +340,6 @@ class RunController extends Controller {
                 self::$log->error("Call to Grader::grade() failed: $e");
                 throw $e;
             }
-
-            // Now that the Grader has ACKed the submission, we can set the
-            // link between the submission and the run.
-            $submission->current_run_id = $run->run_id;
-            SubmissionsDAO::update($submission);
 
             SubmissionLogDAO::create(new SubmissionLog([
                 'user_id' => $r['current_user_id'],
