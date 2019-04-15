@@ -328,6 +328,11 @@ class RunController extends Controller {
                 // Welp, it failed. We cannot make this a real transaction
                 // because the Run row would not be visible from the Grader
                 // process, so we attempt to roll it back by hand.
+                // We need to unlink the current run and submission prior to
+                // deleting the rows. Otherwise we would have a foreign key
+                // violation.
+                $submission->current_run_id = null;
+                SubmissionsDAO::update($submission);
                 RunsDAO::delete($run);
                 SubmissionsDAO::delete($submission);
                 self::$log->error("Call to Grader::grade() failed: $e");
