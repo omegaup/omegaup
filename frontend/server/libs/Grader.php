@@ -135,7 +135,7 @@ class Grader {
     }
 
     public function getGraderResource(
-        string $guid,
+        Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false
@@ -147,7 +147,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             $passthru ? self::REQUEST_MODE_PASSTHRU : self::REQUEST_MODE_RAW,
             [
-                'id' => $guid,
+                'id' => $run->guid,
                 'filename' => $filename,
             ],
             $missingOk
@@ -210,14 +210,14 @@ class Grader {
 
             // Execute call
             $response = curl_exec($curl);
+            $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-                if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == 404 && $missingOk) {
+            if ($response === false || $httpStatus != 200) {
+                if ($httpStatus == 404 && $missingOk) {
                     return null;
                 }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
-                    curl_errno($curl) . ' HTTP ' .
-                    curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    curl_errno($curl) . " HTTP {$httpStatus}";
                 throw new Exception($message);
             }
 

@@ -471,7 +471,7 @@ class NoOpGrader extends Grader {
     }
 
     public function getGraderResource(
-        string $guid,
+        Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false
@@ -479,7 +479,7 @@ class NoOpGrader extends Grader {
         if ($passthru) {
             throw new UnimplementedException();
         }
-        $path = "{$guid}/{$filename}";
+        $path = "{$run->guid}/{$filename}";
         if (!array_key_exists($path, $this->resources)) {
             if (!$missingOk) {
                 throw new Exception("Resource {$path} not found");

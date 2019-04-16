@@ -643,7 +643,7 @@ class RunController extends Controller {
         // Get the details, compile error, logs, etc.
         RunController::populateRunDetails($r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
-            $gzippedLogs = self::getGraderResource($r['run']->guid, 'logs.txt.gz');
+            $gzippedLogs = self::getGraderResource($r['run'], 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
                 $response['logs'] = gzdecode($gzippedLogs);
             }
@@ -652,46 +652,6 @@ class RunController extends Controller {
         }
 
         return $response;
-    }
-
-    /**
-     * Parses Run metadata
-     *
-     * @param string $meta
-     * @return array
-     */
-    public static function ParseMeta($meta) {
-        $ans = [];
-
-        foreach (explode("\n", trim($meta)) as $line) {
-            list($key, $value) = explode(':', trim($line));
-            $ans[$key] = $value;
-        }
-
-        return $ans;
-    }
-
-    /**
-     * Compare two Run metadata
-     *
-     * @param array $a
-     * @param array $b
-     * @return boolean
-     */
-    public static function MetaCompare($a, $b) {
-        if ($a['group'] == $b['group']) {
-            return 0;
-        }
-
-        return ($a['group'] < $b['group']) ? -1 : 1;
-    }
-
-    public static function CaseCompare($a, $b) {
-        if ($a['name'] == $b['name']) {
-            return 0;
-        }
-
-        return ($a['name'] < $b['name']) ? -1 : 1;
     }
 
     /**
@@ -731,7 +691,7 @@ class RunController extends Controller {
         if (!$showDetails && $run->verdict != 'CE') {
             return;
         }
-        $detailsJson = self::getGraderResource($run->guid, 'details.json');
+        $detailsJson = self::getGraderResource($run, 'details.json');
         if (!is_string($detailsJson)) {
             return;
         }
@@ -761,33 +721,37 @@ class RunController extends Controller {
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!self::getGraderResource($r['run']->guid, 'files.zip', /*passthru=*/ true)) {
+        if (!self::getGraderResource($r['run'], 'files.zip', /*passthru=*/ true)) {
             http_response_code(404);
         }
         exit;
     }
 
     private static function getGraderResource(
-        string $guid,
+        Runs $run,
         string $filename,
         bool $passthru = false
     ) {
-        $result = Grader::getInstance()->getGraderResource($guid, $filename, $passthru, /*missingOk=*/true);
+        $result = Grader::getInstance()->getGraderResource($run, $filename, $passthru, /*missingOk=*/true);
         if (is_null($result)) {
-            return self::downloadRunFromS3($guid, $filename, $passthru);
+            $result = self::downloadResourceFromS3("{$run->run_id}/{$filename}", $passthru);
+        }
+        if (is_null($result)) {
+            $result = self::downloadResourceFromS3("{$run->guid}/{$filename}", $passthru);
         }
         return $result;
     }
 
     /**
-     * Given the run GUID, fetches the .zip file with the results from S3.
+     * Given the run resouce path, fetches its contents from S3.
      *
-     * @param string $guid The run's GUID.
-     * @return bool True if successful.
+     * @param  string $resourcePath The run's resource path.
+     * @param  bool   $passthru     Whether to output directly.
+     * @return ?string              The contents of the resource (or an empty string) if successful. null otherwise.
      */
-    private static function downloadRunFromS3($guid, $filename, $passthru) {
+    private static function downloadResourceFromS3(string $resourcePath, bool $passthru) : ?string {
         if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
-            return false;
+            return null;
         }
 
         $descriptorspec = [
@@ -796,7 +760,7 @@ class RunController extends Controller {
             2 => ['pipe', 'w']
         ];
         $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/${guid}/${filename} -",
+            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/{$resourcePath} -",
             $descriptorspec,
             $pipes,
             '/tmp',
@@ -808,16 +772,16 @@ class RunController extends Controller {
 
         if (!is_resource($proc)) {
             $errors = error_get_last();
-            self::$log->error("Getting run $guid failed: {$errors['type']} {$errors['message']}");
-            return false;
+            self::$log->error("Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}");
+            return null;
         }
 
         fclose($pipes[0]);
-        $err = stream_get_contents($pipes[2]);
+        $err = trim(stream_get_contents($pipes[2]));
         fclose($pipes[2]);
         if ($passthru) {
             fpassthru($pipes[1]);
-            $result = true;
+            $result = '';
         } else {
             $result = stream_get_contents($pipes[1]);
         }
@@ -826,8 +790,8 @@ class RunController extends Controller {
         $retval = proc_close($proc);
 
         if ($retval != 0) {
-            self::$log->error("Getting run $guid failed: $retval $err");
-            return false;
+            self::$log->error("Getting {$resourcePath} failed: $retval $err");
+            return null;
         }
         return $result;
     }
