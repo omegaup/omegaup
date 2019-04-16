@@ -1598,7 +1598,7 @@ class ProblemController extends Controller {
 
                 // Try to open the details file. It's okay if the file is missing.
                 $details = Grader::getInstance()->getGraderResource(
-                    $run->guid,
+                    $run,
                     'details.json',
                     /*passthru=*/false,
                     /*missingOk=*/true
