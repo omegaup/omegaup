@@ -297,20 +297,13 @@ class RunController extends Controller {
             'type' => $type
         ]);
         $run = new Runs([
-            'identity_id' => $r['current_identity_id'],
-            'problem_id' => $r['problem']->problem_id,
             'version' => $r['problem']->current_version,
-            'problemset_id' => $problemset_id,
-            'language' => $r['language'],
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submit_delay,
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemset_id != null ? 0 : null,
-            'time' => $submission->time,
-            'submit_delay' => $submit_delay, /* based on penalty_type */
-            'guid' => $submission->guid,
             'verdict' => 'JE',
             'type' => $type
         ]);

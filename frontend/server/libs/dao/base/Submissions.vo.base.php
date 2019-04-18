@@ -47,9 +47,6 @@ class Submissions extends VO {
         if (isset($data['language'])) {
             $this->language = $data['language'];
         }
-        if (isset($data['penalty'])) {
-            $this->penalty = $data['penalty'];
-        }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
@@ -122,13 +119,6 @@ class Submissions extends VO {
       * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $language;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $penalty;
 
     /**
       *  [Campo no documentado]

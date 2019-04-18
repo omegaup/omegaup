@@ -35,21 +35,6 @@ class Runs extends VO {
         if (isset($data['version'])) {
             $this->version = $data['version'];
         }
-        if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
-        }
-        if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
-        }
-        if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
-        }
-        if (isset($data['guid'])) {
-            $this->guid = $data['guid'];
-        }
-        if (isset($data['language'])) {
-            $this->language = $data['language'];
-        }
         if (isset($data['status'])) {
             $this->status = $data['status'];
         }
@@ -74,14 +59,8 @@ class Runs extends VO {
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
-        if (isset($data['submit_delay'])) {
-            $this->submit_delay = $data['submit_delay'];
-        }
         if (isset($data['judged_by'])) {
             $this->judged_by = $data['judged_by'];
-        }
-        if (isset($data['type'])) {
-            $this->type = $data['type'];
         }
     }
 
@@ -113,46 +92,11 @@ class Runs extends VO {
     public $submission_id;
 
     /**
-      * La versión del problema.
+      * El hash SHA1 del árbol de la rama private.
       * @access public
       * @var char(40)
       */
     public $version;
-
-    /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(32)
-      */
-    public $guid;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $language;
 
     /**
       *  [Campo no documentado]
@@ -213,21 +157,7 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $submit_delay;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var char(32)
       */
     public $judged_by;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('normal','test','disqualified')
-      */
-    public $type;
 }

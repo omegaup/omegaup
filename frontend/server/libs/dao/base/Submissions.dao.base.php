@@ -48,7 +48,7 @@ abstract class SubmissionsDAOBase {
      * @param Submissions [$Submissions] El objeto de tipo Submissions a actualizar.
      */
     final public static function update(Submissions $Submissions) {
-        $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `penalty` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
+        $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
             $Submissions->current_run_id,
             $Submissions->identity_id,
@@ -56,7 +56,6 @@ abstract class SubmissionsDAOBase {
             $Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            $Submissions->penalty,
             $Submissions->time,
             $Submissions->submit_delay,
             $Submissions->type,
@@ -80,7 +79,7 @@ abstract class SubmissionsDAOBase {
         if (is_null($submission_id)) {
             return null;
         }
-        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
         $params = [$submission_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -135,7 +134,7 @@ abstract class SubmissionsDAOBase {
      * @return Array Un arreglo que contiene objetos del tipo {@link Submissions}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`penalty`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
+        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -162,9 +161,6 @@ abstract class SubmissionsDAOBase {
      * @param Submissions [$Submissions] El objeto de tipo Submissions a crear.
      */
     final public static function create(Submissions $Submissions) {
-        if (is_null($Submissions->penalty)) {
-            $Submissions->penalty = '0';
-        }
         if (is_null($Submissions->time)) {
             $Submissions->time = gmdate('Y-m-d H:i:s');
         }
@@ -174,7 +170,7 @@ abstract class SubmissionsDAOBase {
         if (is_null($Submissions->type)) {
             $Submissions->type = 'normal';
         }
-        $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `penalty`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Submissions->current_run_id,
             $Submissions->identity_id,
@@ -182,7 +178,6 @@ abstract class SubmissionsDAOBase {
             $Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            $Submissions->penalty,
             $Submissions->time,
             $Submissions->submit_delay,
             $Submissions->type,
