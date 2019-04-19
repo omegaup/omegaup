@@ -121,7 +121,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertNotNull($submission->guid);
 
         // Validate file created
-        $fileContent = SubmissionController::getSource($submission);
+        $fileContent = SubmissionController::getSource($submission->guid);
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults

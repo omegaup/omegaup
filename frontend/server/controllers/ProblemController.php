@@ -671,9 +671,7 @@ class ProblemController extends Controller {
         try {
             $runs = RunsDAO::getByKeys($r['problem']->problem_id);
 
-            $guids = [];
             foreach ($runs as $run) {
-                $guids[] = $run->guid;
                 $run->status = 'new';
                 $run->version = $r['problem']->current_version;
                 $run->verdict = 'JE';
@@ -684,7 +682,7 @@ class ProblemController extends Controller {
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
             }
-            Grader::getInstance()->rejudge($guids, false);
+            Grader::getInstance()->rejudge($runs, false);
         } catch (Exception $e) {
             self::$log->error('Failed to rejudge runs after problem update');
             self::$log->error($e);

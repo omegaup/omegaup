@@ -58,29 +58,30 @@ class ScoreboardParams implements ArrayAccess {
 
     public static function fromContest(Contests $contest) {
         return new ScoreboardParams([
-                'alias' => $contest->alias,
-                'title' => $contest->title,
-                'problemset_id' => $contest->problemset_id,
-                'start_time' => $contest->start_time,
-                'finish_time' => $contest->finish_time,
-                'acl_id' => $contest->acl_id,
-                'penalty' => $contest->penalty,
-                'virtual' => ContestsDAO::isVirtual($contest),
-                'penalty_calc_policy' => $contest->penalty_calc_policy,
-                'show_scoreboard_after' => $contest->show_scoreboard_after,
-                'scoreboard_pct' => $contest->scoreboard]);
+            'alias' => $contest->alias,
+            'title' => $contest->title,
+            'problemset_id' => $contest->problemset_id,
+            'start_time' => $contest->start_time,
+            'finish_time' => $contest->finish_time,
+            'acl_id' => $contest->acl_id,
+            'penalty' => $contest->penalty,
+            'virtual' => ContestsDAO::isVirtual($contest),
+            'penalty_calc_policy' => $contest->penalty_calc_policy,
+            'show_scoreboard_after' => $contest->show_scoreboard_after,
+            'scoreboard_pct' => $contest->scoreboard
+        ]);
     }
 
     public static function fromAssignment(Assignments $assignment, $group_id, $show_all_runs) {
         return new ScoreboardParams([
-                'alias' => $assignment->alias,
-                'title' => $assignment->name,
-                'problemset_id' => $assignment->problemset_id,
-                'start_time' => $assignment->start_time,
-                'finish_time' => $assignment->finish_time,
-                'acl_id' => $assignment->acl_id,
-                'group_id' => $group_id,
-                'show_all_runs' => $show_all_runs,
+            'alias' => $assignment->alias,
+            'title' => $assignment->name,
+            'problemset_id' => $assignment->problemset_id,
+            'start_time' => $assignment->start_time,
+            'finish_time' => $assignment->finish_time,
+            'acl_id' => $assignment->acl_id,
+            'group_id' => $group_id,
+            'show_all_runs' => $show_all_runs,
         ]);
     }
 

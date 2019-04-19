@@ -409,35 +409,34 @@ class RunsDAO extends RunsDAOBase {
     }
 
     final public static function getProblemsetRuns(Problemsets $problemset, $onlyAC = false) {
-        $sql =    'SELECT '
-                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.identity_id, r.type, r.time, r.submit_delay, r.guid '
-                . 'FROM '
-                    . 'Runs r '
-                . 'INNER JOIN '
-                    . 'Problemset_Problems pp '
-                . 'ON '
-                    . 'r.problem_id = pp.problem_id '
-                    . 'AND r.problemset_id = pp.problemset_id '
-                . 'WHERE '
-                    . 'pp.problemset_id = ? '
-                    . "AND r.status = 'ready' "
-                    . "AND r.type = 'normal' " .
-                    (($onlyAC === false) ?
-                        "AND r.verdict NOT IN ('CE', 'JE') " :
-                        "AND r.verdict IN ('AC') ")
-                . 'ORDER BY r.run_id;';
+        $sql = '
+            SELECT
+                r.score, r.penalty, r.contest_score, r.problem_id,
+                r.identity_id, r.type, r.time, r.submit_delay, r.guid
+            FROM
+                Runs r
+            INNER JOIN
+                Problemset_Problems pp
+            ON
+                r.problem_id = pp.problem_id AND
+                r.problemset_id = pp.problemset_id AND
+                r.version = pp.version
+            WHERE
+                pp.problemset_id = ? AND
+                r.status = \'ready\' AND
+                r.type = \'normal\' AND ' .
+                ($onlyAC ?
+                    "r.verdict IN ('AC') " :
+                    "r.verdict NOT IN ('CE', 'JE') "
+                ) .
+            ' ORDER BY r.run_id;';
 
-        $val = [$problemset->problemset_id];
-
+        $result = [];
         global $conn;
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        foreach ($rs as $foo) {
-            array_push($ar, new Runs($foo));
+        foreach ($conn->Execute($sql, [$problemset->problemset_id]) as $row) {
+            array_push($result, new Runs($row));
         }
-
-        return $ar;
+        return $result;
     }
 
     /*

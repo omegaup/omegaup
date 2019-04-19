@@ -187,7 +187,7 @@ class RunsFactory {
         RunsDAO::save($run);
 
         Grader::getInstance()->setGraderResourceForTesting(
-            $run->guid,
+            $run,
             'details.json',
             json_encode([
                 'verdict' => $verdict,
@@ -198,7 +198,7 @@ class RunsFactory {
         );
         // An empty gzip file.
         Grader::getInstance()->setGraderResourceForTesting(
-            $run->guid,
+            $run,
             'logs.txt.gz',
             "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
