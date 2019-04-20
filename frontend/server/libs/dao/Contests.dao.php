@@ -252,13 +252,13 @@ class ContestsDAO extends ContestsDAOBase {
                 SELECT DISTINCT
                     c2.contest_id
                 FROM
-                    Runs r
+                    Submissions s
                 INNER JOIN
                     Contests c2
                 ON
-                    c2.problemset_id = r.problemset_id
+                    c2.problemset_id = s.problemset_id
                 WHERE
-                    r.identity_id = ? AND r.type= \'normal\' AND r.problemset_id IS NOT NULL
+                    s.identity_id = ? AND s.type= \'normal\' AND s.problemset_id IS NOT NULL
             )
             ORDER BY
                 contest_id DESC;';

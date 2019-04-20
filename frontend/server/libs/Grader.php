@@ -28,7 +28,8 @@ class Grader {
      */
     public function grade(Runs $run, string $source) {
         if (OMEGAUP_GRADER_FAKE) {
-            file_put_contents("/tmp/{$run->guid}", $source);
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            file_put_contents("/tmp/{$submission->guid}", $source);
             return;
         }
         return $this->curlRequest(
